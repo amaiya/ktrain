@@ -2,15 +2,16 @@ import sys
 import re
 try:
     from PIL import Image
-    PIL_installed = True
+    pil_installed = True
 except:
-    PIL_installed = False
+    pil_installed = False
 from keras.preprocessing import image
 from keras import backend as K
 from keras.utils import to_categorical
 import os.path
 import os
 import csv
+import copy
 import numpy as np
 import glob
 from matplotlib import pyplot as plt
@@ -20,6 +21,34 @@ import pandas as pd
 from .. import utils as U
 from .preprocessor import ImagePreprocessor
 
+
+def preview_data_aug(img_path, data_aug, n=4):
+    """
+    Preview data augmentation (ImageDatagenerator)
+    on a supplied image.
+    """
+    if type(img_path) != type('') or not os.path.isfile(img_path):
+        raise ValueError('img_path must be valid file path to image')
+    idg = copy.copy(data_aug)
+    idg.featurewise_center = False
+    idg.featurewise_std_normalization = False
+    idg.samplewise_center = False
+    idg.samplewise_std_normalization = False
+    idg.rescale = None
+    idg.zca_whitening = False
+    idg.preprocessing_function = None
+
+    img = image.load_img(img_path)
+    x = image.img_to_array(img)
+    x = x/255.
+    x = x.reshape((1,) + x.shape)
+    i = 0
+    for batch in idg.flow(x, batch_size=1):
+        plt.figure()
+        plt.imshow(np.squeeze(batch))
+        i += 1
+        if i >= n: break
+    return
 
 
 def show_image(img_path):
@@ -305,7 +334,7 @@ def images_from_folder(datadir, target_size=(224,224),
     test_dir = os.path.join(datadir, test_str)
 
     # color mode warning
-    if PIL_installed:
+    if pil_installed:
         inferred_color_mode = detect_color_mode(train_dir)
         if inferred_color_mode is not None and (inferred_color_mode != color_mode):
             U.vprint('color_mode detected (%s) different than color_mode selected (%s)' % (inferred_color_mode, color_mode), 
