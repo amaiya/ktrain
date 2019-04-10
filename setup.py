@@ -8,7 +8,7 @@ setup(
   author = 'Arun S. Maiya',
   author_email = 'arun@maiya.net',
   url = 'https://github.com/amaiya/ktrain',
-  download_url = 'https://github.com/amaiya/ktrain/archive/ktrain-0.1.0.tar.gz',
+  download_url = 'https://github.com/amaiya/ktrain/archive/v0.1.0.tar.gz',
   keywords = ['keras', 'deep learning', 'machine learning'],
   install_requires=[
           'keras >= 2.2.4',
