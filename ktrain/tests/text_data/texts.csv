@@ -1,0 +1,5 @@
+"text","pos","neg"
+"The book is good",1,0
+"This book is good",1,0
+"The book is bad",0,1
+"This book is bad",0,1
