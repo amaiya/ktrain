@@ -2,9 +2,9 @@ import sys
 import re
 try:
     from PIL import Image
-    pil_installed = True
+    PIL_installed = True
 except:
-    pil_installed = False
+    PIL_installed = False
 from keras.preprocessing import image
 from keras import backend as K
 from keras.utils import to_categorical
@@ -305,7 +305,7 @@ def images_from_folder(datadir, target_size=(224,224),
     test_dir = os.path.join(datadir, test_str)
 
     # color mode warning
-    if pil_installed:
+    if PIL_installed:
         inferred_color_mode = detect_color_mode(train_dir)
         if inferred_color_mode is not None and (inferred_color_mode != color_mode):
             U.vprint('color_mode detected (%s) different than color_mode selected (%s)' % (inferred_color_mode, color_mode), 
