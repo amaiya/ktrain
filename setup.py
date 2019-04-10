@@ -2,12 +2,13 @@ from distutils.core import setup
 import setuptools
 
 with open('README.md') as readme_file: readme = readme_file.read()
+exec(open('ktrain/version.py').read())
 
 setup(
   name = 'ktrain',
   #packages = ['ktrain'],
   packages = setuptools.find_packages(),
-  version = '0.1.1',
+  version = __version__,
   license='MIT',
   description = 'ktrain is a lightweight wrapper for Keras to help train neural networks',
   long_description = readme,
@@ -15,7 +16,7 @@ setup(
   author = 'Arun S. Maiya',
   author_email = 'arun@maiya.net',
   url = 'https://github.com/amaiya/ktrain',
-  download_url = 'https://github.com/amaiya/ktrain/archive/v0.1.1.tar.gz',
+  download_url = 'https://github.com/amaiya/ktrain/archive/v0.1.2.tar.gz',
   keywords = ['keras', 'deep learning', 'machine learning'],
   install_requires=[
           'keras >= 2.2.4',
