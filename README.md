@@ -3,11 +3,11 @@
 *ktrain* is a lightweight wrapper for the deep learning library [Keras](https://keras.io/) to help build, train, and deploy neural networks.  With only a few lines of code, ktrain allows you to easily and quickly:
 
 - estimate an optimal learning rate for your model given your data using a Learning Rate Finder
-- employ learning rate schedules such as the [triangular policy](https://arxiv.org/abs/1506.01186), the [1cycle policy](https://arxiv.org/abs/1803.09820), and [SGDR](https://arxiv.org/abs/1608.03983) to effectively minimize loss and improve generalization
-- fast and easy-to-use pre-canned models for both text classification (e.g., NBSVM, fastText, logreg) and image classification (e.g., ResNet, Wide ResNet, Inception)
-- methods to help you easily load and preprocess text and image data from a variety of formats 
-- easily inspect data points that were misclassified to help improve your model
-- a simple prediction API for saving and deploying models and data-preprocessing steps to easily make predictions on new raw data
+- utilize learning rate schedules such as the [triangular policy](https://arxiv.org/abs/1506.01186), the [1cycle policy](https://arxiv.org/abs/1803.09820), and [SGDR](https://arxiv.org/abs/1608.03983) to effectively minimize loss and improve generalization
+- employ fast and easy-to-use pre-canned models for both text classification (e.g., NBSVM, fastText, logreg) and image classification (e.g., ResNet, Wide ResNet, Inception)
+- load and preprocess text and image data from a variety of formats 
+- inspect data points that were misclassified to help improve your model
+- leverage a simple prediction API for saving and deploying models and data-preprocessing steps to easily make predictions on new raw data
 
 #### Tutorial Notebooks
 Please see the following tutorial notebooks for a guide on how to use *ktrain* on your projects:
