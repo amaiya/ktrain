@@ -40,7 +40,8 @@ from keras.applications.inception_v3 import preprocess_input as pre_inception
 
 
 def get_learner(model, train_data=None, val_data=None, 
-                batch_size=U.DEFAULT_BS, workers=1, use_multiprocessing=False):
+                batch_size=U.DEFAULT_BS, workers=1, use_multiprocessing=False,
+                multigpu=False):
     """
     Returns a Learner instance that can be used to tune and train Keras models.
 
@@ -58,8 +59,11 @@ def get_learner(model, train_data=None, val_data=None,
     workers (int): number of cpu processes used to load data.
                    only applicable if train_data is is a generator.
     use_multiprocessing(bool):  whether or not to use multiprocessing for workers
+    multigpu(bool):             Lets the Learner know that the model has been 
+                                replicated on more than 1 GPU.
+                                Only supported for models from vision.image_classifiers
+                                at this time.
     """
-    multigpu = False # not fully supported at this time - do not use
 
     # check arguments
     if not isinstance(model, Model):
