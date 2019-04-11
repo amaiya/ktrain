@@ -7,7 +7,7 @@
 - employ fast and easy-to-use pre-canned models for both text classification (e.g., NBSVM, fastText, logreg) and image classification (e.g., ResNet, Wide ResNet, Inception)
 - load and preprocess text and image data from a variety of formats 
 - inspect data points that were misclassified to help improve your model
-- leverage a simple prediction API for saving and deploying models and data-preprocessing steps to easily make predictions on new raw data
+- leverage a simple prediction API for saving and deploying both models and data-preprocessing steps to make predictions on new raw data
 
 #### Tutorial Notebooks
 Please see the following tutorial notebooks for a guide on how to use *ktrain* on your projects:
