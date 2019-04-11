@@ -6,7 +6,6 @@ exec(open('ktrain/version.py').read())
 
 setup(
   name = 'ktrain',
-  #packages = ['ktrain'],
   packages = setuptools.find_packages(),
   version = __version__,
   license='MIT',
@@ -16,7 +15,6 @@ setup(
   author = 'Arun S. Maiya',
   author_email = 'arun@maiya.net',
   url = 'https://github.com/amaiya/ktrain',
-  download_url = 'https://github.com/amaiya/ktrain/archive/v0.1.3.tar.gz',
   keywords = ['keras', 'deep learning', 'machine learning'],
   install_requires=[
           'keras >= 2.2.4',
