@@ -18,7 +18,7 @@ Please see the following tutorial notebooks for a guide on how to use *ktrain* o
 * Tutorial A1: [Additional tricks](https://github.com/amaiya/ktrain/blob/master/tutorial-A1-additional-tricks.ipynb), which covers topics such as examining misclassifications, inspecting intermediate output of Keras models for debugging, and built-in callbacks.
 
 Tasks such as text classification and image classification can be accomplished easily with 
-only a few lines of codes.
+only a few lines of code.
 
 #### Example: Classifying Images of [Dogs and Cats](https://www.kaggle.com/c/dogs-vs-cats) Using *ktrain*
 ```
@@ -34,7 +34,7 @@ learner = ktrain.get_learner(model=model, train_data=train_data, val_data=val_da
                              workers=8, use_multiprocessing=False, batch_size=64)
 learner.lr_find()             # briefly simulate training to find good learning rate
 learner.lr_plot()             # visually identify best learning rate
-# implicitly employs triangular learning rate policy with ReduceLROnPlateau, ModelCheckpoint, and EarlyStopping
+# implicitly employs triangular policy with ReduceLROnPlateau, ModelCheckpoint, and EarlyStopping
 learner.autofit(1e-4, checkpoint_folder='/tmp') 
 ```
 
