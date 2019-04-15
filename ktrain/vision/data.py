@@ -541,7 +541,7 @@ def images_from_fname( img_folder,
     for fname in fnames:
         r = p.search(fname)
         if r:
-            image_names.append(fname)
+            image_names.append(os.path.basename(fname))
             labels.append(r.group(1))
         else:
             warnings.warn('Could not extract class for %s -  skipping this file'% (fname))
