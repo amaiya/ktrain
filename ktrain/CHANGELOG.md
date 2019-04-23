@@ -18,6 +18,7 @@ Most recent releases are shown at the top. Each release shows:
 ### Fixed:
 
 - Bug in ```vision.data.images_from_fname``` that prevented relative paths for directory argument
+- Bug in ```utils.y_from_data``` that returned incorrect information for array-based training/validation data
 
 
 ## 0.1.4 (2019-04-10)
