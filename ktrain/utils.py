@@ -110,7 +110,7 @@ def y_from_data(data):
             raise Exception('could not determine number of classes from %s' % (type(data)))
     else:
         try:
-            return data[1].shape[1]
+            return data[1]
         except:
             raise Exception('could not determine number of classes from %s' % (type(data)))
 
