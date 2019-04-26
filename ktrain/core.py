@@ -642,6 +642,13 @@ class Learner(ABC):
                           'Either reduce reduce_on_plateau or set early_stopping ' +\
                           'to be higher.')
 
+        if self.val_data is None and monitor in ['val_loss', 'val_acc'] and\
+           (reduce_on_plateau is not None or early_stopping is not None):
+            raise Exception('cannot monitor %s ' % (monitor)  +\
+                            'without validation data - please change monitor')
+
+
+
         # setup callbacks for learning rates and early stopping
         if not callbacks: kcallbacks = []
         else:
@@ -740,6 +747,11 @@ class ArrayLearner(Learner):
         callbacks (list):         list of Callback instances to employ during training
         verbose (bool):           whether or not to show progress bar
         """
+
+        # check early_stopping
+        if self.val_data is None and early_stopping is not None:
+            raise ValueError('early_stopping monitors val_loss but validation data not set')
+
 
         # setup data
         x_train = self.train_data[0]
@@ -852,6 +864,9 @@ class GenLearner(Learner):
         callbacks (list):         list of Callback instances to employ during training
         verbose (boolean):       whether or not to print progress bar
         """
+        # check early_stopping
+        if self.val_data is None and early_stopping is not None:
+            raise ValueError('early_stopping monitors val_loss but validation data not set')
 
         
         # handle callbacks

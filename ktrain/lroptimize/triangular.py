@@ -2,6 +2,7 @@ import numpy as np
 import tempfile
 from keras.callbacks import Callback
 import keras.backend as K
+import warnings
 
 class CyclicLR(Callback):
     """This callback implements a cyclical learning rate policy (CLR).
@@ -178,10 +179,10 @@ class CyclicLR(Callback):
 
     def on_epoch_end(self, epoch, logs=None):
         #print(K.eval(self.model.optimizer.lr))
-        current = logs.get(self.monitor)
-        if current is None:
-            raise Exception('unknown metric %s' % (self.monitor))
-        elif self.patience:
+        if self.patience:
+            current = logs.get(self.monitor)
+            if current is None:
+                raise Exception('cannot monitor %s' % (self.monitor))
             if self.monitor_op(current, self.best):
                 self.best = current
                 self.wait = 0
