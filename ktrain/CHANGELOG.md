@@ -20,6 +20,7 @@ Most recent releases are shown at the top. Each release shows:
 - Bug in ```vision.data.images_from_fname``` that prevented relative paths for directory argument
 - Bug in ```utils.y_from_data``` that returned incorrect information for array-based training/validation data
 - Bug in ```core.autofit``` with callback failure when validation data is not set
+- Bug in ```core.autofit``` and ```core.fit_onecycle``` with learning rate setting at end of cycle
 
 
 ## 0.1.4 (2019-04-10)

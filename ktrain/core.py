@@ -7,6 +7,7 @@ from distutils.version import StrictVersion
 import tempfile
 import pickle
 from abc import ABC, abstractmethod
+import math
 
 from matplotlib import pyplot as plt
 
@@ -545,14 +546,14 @@ class Learner(ABC):
         """
 
         num_samples = U.nsamples_from_data(self.train_data)
-        steps_per_epoch = num_samples//self.batch_size
+        steps_per_epoch = math.ceil(num_samples/self.batch_size)
 
         # setup callbacks for learning rates and early stopping
         if not callbacks: kcallbacks = []
         else:
             kcallbacks = callbacks[:] 
         clr = CyclicLR(base_lr=lr/10, max_lr=lr,
-                       step_size=(steps_per_epoch*epochs)//2, 
+                       step_size=math.ceil((steps_per_epoch*epochs)/2), 
                        reduce_on_plateau=0,
                        verbose=verbose)
         kcallbacks.append(clr)
@@ -565,6 +566,8 @@ class Learner(ABC):
         hist = self.fit(lr, epochs, early_stopping=None,
                         checkpoint_folder=checkpoint_folder,
                         verbose=verbose, callbacks=kcallbacks)
+        hist.history['lr'] = clr.history['lr']
+        hist.history['iterations'] = clr.history['iterations']
         self.history = hist
         return hist
 
@@ -623,7 +626,7 @@ class Learner(ABC):
         # setup learning rate policy 
         num_samples = U.nsamples_from_data(self.train_data)
         steps_per_epoch = num_samples//self.batch_size
-        step_size = steps_per_epoch//2
+        step_size = math.ceil(steps_per_epoch/2)
 
         # handle missing epochs
         if epochs is None:
@@ -673,8 +676,10 @@ class Learner(ABC):
         hist = self.fit(lr, epochs, early_stopping=early_stopping,
                         checkpoint_folder=checkpoint_folder,
                         verbose=verbose, callbacks=kcallbacks)
+        hist.history['lr'] = clr.history['lr']
+        hist.history['iterations'] = clr.history['iterations']
         self.history = hist
-        return hist
+        return clr
 
     
 
