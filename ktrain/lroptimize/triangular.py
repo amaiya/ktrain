@@ -66,6 +66,14 @@ class CyclicLR(Callback):
                                  If zero or None, no reduction will take place
         reduce_factor(int):      LR is reduced by this factor (e.g., 2 = 1/2  = 0.5)
         monitor (str):           Value to monitor when reducing LR
+        max_momentum(float):     maximum momentum when momentum is cycled 
+                                 If both max_momentum and min_momentum is None,
+                                 default momentum for Adam is used.
+                                 (only used if optimizer is Adam)
+        min_momentum(float):     minimum momentum when momentum is cycled
+                                 If both max_momentum and min_momentum is None,
+                                 default momentum for Adam is used.
+                                 (only used if optimizer is Adam)
         verbose (bool):          If True, will print information on LR reduction
     References:
         Original Paper: https://arxiv.org/abs/1803.09820
@@ -75,7 +83,8 @@ class CyclicLR(Callback):
 
     def __init__(self, base_lr=0.001, max_lr=0.006, step_size=2000., mode='triangular',
                  gamma=1., scale_fn=None, scale_mode='cycle', 
-                 reduce_on_plateau=0, monitor='val_loss', reduce_factor=2, verbose=1):
+                 reduce_on_plateau=0, monitor='val_loss', reduce_factor=2, 
+                 max_momentum=0.95, min_momentum=0.85, verbose=1):
         super(Callback, self).__init__()
 
         self.base_lr = base_lr
@@ -115,9 +124,17 @@ class CyclicLR(Callback):
         # annihalting LR
         self.overhump = False
 
-
+        # cyclical momentum
+        self.max_momentum = max_momentum
+        self.min_momentum = min_momentum
+        if self.min_momentum is None and self.max_momentum:
+            self.min_momentum = self.max_momentum
+        elif self.min_momentum and self.max_momentum is None:
+            self.max_momentum = self.min_momentum
+        self.cycle_momentum = True if self.max_momentum is not None else False
 
         self._reset()
+
 
     def _reset(self, new_base_lr=None, new_max_lr=None,
                new_step_size=None):
@@ -175,6 +192,20 @@ class CyclicLR(Callback):
             self.base_lr = self.max_lr/1000
         elif prev_overhump and not self.overhump:
             self.base_lr = self.orig_base_lr
+
+        # set momentum
+        if self.cycle_momentum:
+            if self.overhump:
+                current_percentage = 1. - ((iterations - self.step_size) / float(
+                                            self.step_size))
+                new_momentum = self.max_momentum - current_percentage * (
+                    self.max_momentum - self.min_momentum)
+            else:
+                current_percentage = iterations / float(self.step_size)
+                new_momentum = self.max_momentum - current_percentage * (
+                    self.max_momentum - self.min_momentum)
+            K.set_value(self.model.optimizer.beta_1, new_momentum)
+            self.history.setdefault('momentum', []).append(K.get_value(self.model.optimizer.beta_1))
 
 
     def on_epoch_end(self, epoch, logs=None):

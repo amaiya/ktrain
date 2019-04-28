@@ -430,6 +430,50 @@ class Learner(ABC):
         return
 
 
+    def plot(self, plot_type='loss'):
+        """
+        plots training history
+        Args:
+          plot_type (str):  one of {'loss', 'lr', 'momentum'}
+        Return:
+          None
+        """
+        if self.history is None:
+            raise Exception('No training history - did you train the model yet?')
+
+        if plot_type == 'loss':
+            plt.plot(self.history.history['loss'])
+            if 'val_loss' in self.history.history:
+                plt.plot(self.history.history['val_loss'])
+                legend_items = ['train', 'validation']
+            else:
+                legend_items = ['train']
+            plt.title('Model Loss')
+            plt.ylabel('loss')
+            plt.xlabel('epoch')
+            plt.legend(legend_items, loc='upper left')
+            plt.show()
+        elif plot_type == 'lr':
+            if 'lr' not in self.history.history:
+                raise ValueError('no lr in history: are you sure you used autofit or fit_onecycle to train?')
+            plt.plot(self.history.history['lr'])
+            plt.title('LR Schedule')
+            plt.ylabel('lr')
+            plt.xlabel('iterations')
+            plt.show()
+        elif plot_type == 'momentum':
+            if 'momentum' not in self.history.history:
+                raise ValueError('no momentum history: are you sure you used autofit or fit_onecycle to train?')
+            plt.plot(self.history.history['momentum'])
+            plt.title('Momentum Schedule')
+            plt.ylabel('momentum')
+            plt.xlabel('iterations')
+            plt.show()
+        else:
+            raise ValueError('invalid type: choose loss, lr, or momentum')
+        return
+
+
     def print_layers(self):
         """
         prints the layers of the model along with indices
@@ -524,7 +568,7 @@ class Learner(ABC):
         pass
 
 
-    def fit_onecycle(self, lr, epochs, checkpoint_folder=None,
+    def fit_onecycle(self, lr, epochs, checkpoint_folder=None, cycle_momentum=True,
                      verbose=1, callbacks=[]):
         """
         Train model using a version of Leslie Smith's 1cycle policy.
@@ -541,6 +585,10 @@ class Learner(ABC):
                                         for each epoch.
                                         File name will be of the form: 
                                         weights-{epoch:02d}-{val_loss:.2f}.hdf5
+            cycle_momentum (bool):    If True and optimizer is Adam, momentum of optimzer will 
+                                      be cycled between 0.95 and 0.85 as described in 
+                                      https://arxiv.org/abs/1803.09820.
+                                      Only takes effect if Adam optimizer is used.
             callbacks (list): list of Callback instances to employ during training
             verbose (bool):  verbose mode
         """
@@ -552,9 +600,17 @@ class Learner(ABC):
         if not callbacks: kcallbacks = []
         else:
             kcallbacks = callbacks[:] 
+        if cycle_momentum:
+            max_momentum = 0.95
+            min_momentum = 0.85
+        else:
+            max_momentum = None
+            min_momentum = None
         clr = CyclicLR(base_lr=lr/10, max_lr=lr,
                        step_size=math.ceil((steps_per_epoch*epochs)/2), 
                        reduce_on_plateau=0,
+                       max_momentum=max_momentum,
+                       min_momentum=min_momentum,
                        verbose=verbose)
         kcallbacks.append(clr)
 
@@ -568,6 +624,7 @@ class Learner(ABC):
                         verbose=verbose, callbacks=kcallbacks)
         hist.history['lr'] = clr.history['lr']
         hist.history['iterations'] = clr.history['iterations']
+        hist.history['momentum'] = clr.history['momentum']
         self.history = hist
         return hist
 
@@ -575,6 +632,7 @@ class Learner(ABC):
 
     def autofit(self, lr, epochs=None,  
                 early_stopping=None, reduce_on_plateau=None, reduce_factor=2, 
+                cycle_momentum=True,
                 monitor='val_loss', checkpoint_folder=None, verbose=1, callbacks=[]):
         """
         Automatically train model using a default learning rate schedule shown to work well
@@ -608,11 +666,15 @@ class Learner(ABC):
                                       Example: early_stopping=6, reduce_on_plateau=3.
             reduce_factor (int):      Learning reate is reduced by this factor on plateau.
                                       Only takes effect if reduce_on_plateau > 0.
+            cycle_momentum (bool):    If True and optimizer is Adam, momentum of optimzer will 
+                                      be cycled between 0.95 and 0.85 as described in 
+                                      https://arxiv.org/abs/1803.09820.
+                                      Only takes effect if Adam optimizer is used.
             checkpoint_folder (string): Folder path in which to save the model weights 
                                         for each epoch.
                                         File name will be of the form: 
                                         weights-{epoch:02d}-{val_loss:.2f}.hdf5
-            monotor (str):              what metric to monitor for early_stopping
+            monitor (str):              what metric to monitor for early_stopping
                                         and reduce_on_plateau (either val_loss or val_acc).
                                         Only used if early_stopping or reduce_on_plateau
                                         is enabled.
@@ -656,11 +718,19 @@ class Learner(ABC):
         if not callbacks: kcallbacks = []
         else:
             kcallbacks = callbacks[:] 
+        if cycle_momentum:
+            max_momentum = 0.95
+            min_momentum = 0.85
+        else:
+            max_momentum = None
+            min_momentum = None
         clr = CyclicLR(base_lr=lr/10, max_lr=lr,
                        step_size=step_size, verbose=verbose,
                        monitor=monitor,
                        reduce_on_plateau=reduce_on_plateau,
-                       reduce_factor=reduce_factor)
+                       reduce_factor=reduce_factor,
+                       max_momentum=max_momentum,
+                       min_momentum=min_momentum)
         kcallbacks.append(clr)
         if early_stopping:
             kcallbacks.append(EarlyStopping(monitor=monitor, min_delta=0, 
@@ -678,6 +748,7 @@ class Learner(ABC):
                         verbose=verbose, callbacks=kcallbacks)
         hist.history['lr'] = clr.history['lr']
         hist.history['iterations'] = clr.history['iterations']
+        hist.history['momentum'] = clr.history['momentum']
         self.history = hist
         return clr
 
@@ -770,6 +841,7 @@ class ArrayLearner(Learner):
         kcallbacks = self._cb_sgdr(lr, 
                                   np.ceil(len(x_train)/self.batch_size), 
                                   cycle_len, cycle_mult, lr_decay=lr_decay, callbacks=None)
+        sgdr = kcallbacks[0] if kcallbacks is not None else None
         kcallbacks = self._cb_checkpoint(checkpoint_folder, callbacks=kcallbacks)
         kcallbacks = self._cb_earlystopping(early_stopping, callbacks=kcallbacks)
         if callbacks:
@@ -782,6 +854,7 @@ class ArrayLearner(Learner):
                              epochs=epochs,
                              validation_data=validation, verbose=verbose,
                              callbacks=kcallbacks)
+        if sgdr is not None: hist.history['lr'] = sgdr.history['lr']
         self.history = hist
 
         if early_stopping:
@@ -883,6 +956,7 @@ class GenLearner(Learner):
         kcallbacks = self._cb_sgdr(lr, 
                                   steps_per_epoch,
                                   cycle_len, cycle_mult, lr_decay, callbacks=None)
+        sgdr = kcallbacks[0] if kcallbacks is not None else None
         kcallbacks = self._cb_checkpoint(checkpoint_folder, callbacks=kcallbacks)
         kcallbacks = self._cb_earlystopping(early_stopping, callbacks=kcallbacks)
         if callbacks:
@@ -905,6 +979,7 @@ class GenLearner(Learner):
                                        workers=self.workers,
                                        use_multiprocessing=self.use_multiprocessing, verbose=verbose,
                                        callbacks=kcallbacks)
+        if sgdr is not None: hist.history['lr'] = sgdr.history['lr']
         self.history = hist
 
         if early_stopping:

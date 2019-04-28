@@ -10,9 +10,11 @@ Most recent releases are shown at the top. Each release shows:
 ## 0.1.5 (TBD)
 
 ### New:
+- **cycle\_momentum** argument for both```autofit``` and ```fit_onecycle``` method that will cycle momentum between 0.95 and 0.85 as described in [this paper](https://arxiv.org/abs/1803.09820)
+- ```Learner.plot``` method that will plot training-validation loss, LR schedule, or momentum schedule
 
 ### Changed:
-- `vision.data.preview_data_aug``` now displays images in rows by default
+- ```vision.data.preview_data_aug``` now displays images in rows by default
 - added multigpu flag to ```core.get_learner``` with comment that it is only supported by```vision.model.image_classifier```
 
 ### Fixed:
