@@ -19,6 +19,7 @@ from keras.models import load_model
 from keras.callbacks import ModelCheckpoint, EarlyStopping
 from keras.layers import Dense
 from keras.initializers import glorot_uniform  
+from keras import regularizers
 from keras.models import load_model
 from sklearn.metrics import classification_report, confusion_matrix
 
@@ -111,6 +112,38 @@ class Learner(ABC):
         self.model.save_weights(weightfile)
         self._original_weights = weightfile
 
+
+
+    def get_weight_decay(self):
+        """
+        Gets set of weight decays currently used in network.
+        use print_layers(show_wd=True) to view weight decays per layer.
+        """
+        wds = []
+        for layer in self.model.layers:
+            if hasattr(layer, 'kernel_regularizer'):
+                reg = layer.kernel_regularizer
+                if hasattr(reg, 'l2'):
+                    wd = reg.l2
+                elif hasattr(reg, 'l1'):
+                    wd = reg.l1
+                else:
+                    wd = None
+                wds.append(wd)
+        return wds
+
+
+    def set_weight_decay(self, wd=1e-2):
+        """
+        sets global weight decay layer-by-layer
+        """
+        for layer in self.model.layers:
+            if hasattr(layer, 'kernel_regularizer'):
+                layer.kernel_regularizer= regularizers.l2(wd)
+            if hasattr(layer, 'bias_regularizer'):
+                layer.bias_regularizer= regularizers.l2(wd)
+        return
+        
 
     def confusion_matrix(self, print_report=False):
         """
@@ -474,13 +507,24 @@ class Learner(ABC):
         return
 
 
-    def print_layers(self):
+    def print_layers(self, show_wd=False):
         """
         prints the layers of the model along with indices
         """
         for i, layer in enumerate(self.model.layers):
-            print("%s (trainable=%s) : %s" % (i, layer.trainable, layer))
+            if show_wd and hasattr(layer, 'kernel_regularizer'):
+                reg = layer.kernel_regularizer
+                if hasattr(reg, 'l2'):
+                    wd = reg.l2
+                elif hasattr(reg, 'l1'):
+                    wd = reg.l1
+                else:
+                    wd = None
+                print("%s (trainable=%s, wd=%s) : %s" % (i, layer.trainable, wd, layer))
+            else:
+                print("%s (trainable=%s) : %s" % (i, layer.trainable, layer))
         return
+
 
     def layer_output(self, layer_id, example_id=0, use_val=False):
         # should implemented in subclass
@@ -624,7 +668,8 @@ class Learner(ABC):
                         verbose=verbose, callbacks=kcallbacks)
         hist.history['lr'] = clr.history['lr']
         hist.history['iterations'] = clr.history['iterations']
-        hist.history['momentum'] = clr.history['momentum']
+        if cycle_momentum:
+            hist.history['momentum'] = clr.history['momentum']
         self.history = hist
         return hist
 
@@ -748,9 +793,10 @@ class Learner(ABC):
                         verbose=verbose, callbacks=kcallbacks)
         hist.history['lr'] = clr.history['lr']
         hist.history['iterations'] = clr.history['iterations']
-        hist.history['momentum'] = clr.history['momentum']
+        if cycle_momentum:
+            hist.history['momentum'] = clr.history['momentum']
         self.history = hist
-        return clr
+        return hist
 
     
 

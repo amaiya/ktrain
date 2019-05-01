@@ -240,7 +240,7 @@ def _build_fasttext(x_train, y_train, num_classes,
     model.add(SpatialDropout1D(0.25))
     model.add(GlobalMaxPool1D())
     model.add(BatchNormalization())
-    model.add(Dense(64, activation='relu'))
+    model.add(Dense(64, activation='relu', kernel_initializer='he_normal'))
     model.add(Dropout(0.5))
     model.add(Dense(num_classes, activation=activation))
     model.compile(loss=loss_func, optimizer='adam', metrics=['accuracy'])
