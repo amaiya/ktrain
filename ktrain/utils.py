@@ -110,7 +110,7 @@ def y_from_data(data):
             raise Exception('could not determine number of classes from %s' % (type(data)))
     else:
         try:
-            return data[1].shape[1]
+            return data[1]
         except:
             raise Exception('could not determine number of classes from %s' % (type(data)))
 
@@ -203,10 +203,10 @@ def set_row_csr(A, row_idx, new_row):
 
 # plots images with labels within jupyter notebook
 def plots(ims, figsize=(12,6), rows=1, interp=False, titles=None):
-    if type(ims[0]) is np.ndarray:
-        ims = np.array(ims).astype(np.uint8)
-        if (ims.shape[-1] != 3):
-            ims = ims.transpose((0,2,3,1))
+    #if type(ims[0]) is np.ndarray:
+        #ims = np.array(ims).astype(np.uint8)
+        #if (ims.shape[-1] != 3):
+            #ims = ims.transpose((0,2,3,1))
     f = plt.figure(figsize=figsize)
     cols = len(ims)//rows if len(ims) % 2 == 0 else len(ims)//rows + 1
     for i in range(len(ims)):

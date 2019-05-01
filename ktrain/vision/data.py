@@ -22,7 +22,37 @@ from .. import utils as U
 from .preprocessor import ImagePreprocessor
 
 
-def preview_data_aug(img_path, data_aug, n=4):
+def preview_data_aug(img_path, data_aug, rows=1, n=4):
+    """
+    Preview data augmentation (ImageDatagenerator)
+    on a supplied image.
+    """
+    if type(img_path) != type('') or not os.path.isfile(img_path):
+        raise ValueError('img_path must be valid file path to image')
+    idg = copy.copy(data_aug)
+    idg.featurewise_center = False
+    idg.featurewise_std_normalization = False
+    idg.samplewise_center = False
+    idg.samplewise_std_normalization = False
+    idg.rescale = None
+    idg.zca_whitening = False
+    idg.preprocessing_function = None
+
+    img = image.load_img(img_path)
+    x = image.img_to_array(img)
+    x = x/255.
+    x = x.reshape((1,) + x.shape)
+    i = 0
+    ims = []
+    for batch in idg.flow(x, batch_size=1):
+        ims.append(np.squeeze(batch))
+        i += 1
+        if i >= n: break
+    U.plots(ims, rows=rows)
+    return
+
+
+def preview_data_aug_colformat(img_path, data_aug, n=4):
     """
     Preview data augmentation (ImageDatagenerator)
     on a supplied image.
@@ -511,7 +541,7 @@ def images_from_fname( img_folder,
     for fname in fnames:
         r = p.search(fname)
         if r:
-            image_names.append(fname)
+            image_names.append(os.path.basename(fname))
             labels.append(r.group(1))
         else:
             warnings.warn('Could not extract class for %s -  skipping this file'% (fname))
