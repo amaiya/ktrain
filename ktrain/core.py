@@ -629,10 +629,10 @@ class Learner(ABC):
                                         for each epoch.
                                         File name will be of the form: 
                                         weights-{epoch:02d}-{val_loss:.2f}.hdf5
-            cycle_momentum (bool):    If True and optimizer is Adam, momentum of optimzer will 
-                                      be cycled between 0.95 and 0.85 as described in 
+            cycle_momentum (bool):    If True and optimizer is Adam, Nadam, or Adamax, momentum of 
+                                      optimzer will be cycled between 0.95 and 0.85 as described in 
                                       https://arxiv.org/abs/1803.09820.
-                                      Only takes effect if Adam optimizer is used.
+                                      Only takes effect if Adam, Nadam, or Adamax optimizer is used.
             callbacks (list): list of Callback instances to employ during training
             verbose (bool):  verbose mode
         """
@@ -711,10 +711,10 @@ class Learner(ABC):
                                       Example: early_stopping=6, reduce_on_plateau=3.
             reduce_factor (int):      Learning reate is reduced by this factor on plateau.
                                       Only takes effect if reduce_on_plateau > 0.
-            cycle_momentum (bool):    If True and optimizer is Adam, momentum of optimzer will 
-                                      be cycled between 0.95 and 0.85 as described in 
+            cycle_momentum (bool):    If True and optimizer is Adam, Nadam, or Adamax, momentum of 
+                                      optimzer will be cycled between 0.95 and 0.85 as described in 
                                       https://arxiv.org/abs/1803.09820.
-                                      Only takes effect if Adam optimizer is used.
+                                      Only takes effect if Adam, Nadam, or Adamax optimizer is used.
             checkpoint_folder (string): Folder path in which to save the model weights 
                                         for each epoch.
                                         File name will be of the form: 
