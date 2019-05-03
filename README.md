@@ -24,19 +24,35 @@ only a few lines of code.
 ```
 import ktrain
 from ktrain import vision as vis
+
+# load data
 (train_data, val_data, preproc) = vis.images_from_folder(
                                               datadir='data/dogscats',
                                               data_aug = vis.get_data_aug(horizontal_flip=True),
                                               train_test_names=['train', 'valid'], 
                                               target_size=(224,224), color_mode='rgb')
+
+# load model
 model = vis.image_classifier('pretrained_resnet50', train_data, val_data, freeze_layers=80)
+
+# wrap model and data in ktrain.Learner object
 learner = ktrain.get_learner(model=model, train_data=train_data, val_data=val_data, 
                              workers=8, use_multiprocessing=False, batch_size=64)
+
+# find good learning rate
 learner.lr_find()             # briefly simulate training to find good learning rate
 learner.lr_plot()             # visually identify best learning rate
-# implicitly employs triangular policy with ReduceLROnPlateau, ModelCheckpoint, and EarlyStopping
+
+# train using triangular policy with ModelCheckpoint and implicit ReduceLROnPlateau and EarlyStopping
 learner.autofit(1e-4, checkpoint_folder='/tmp') 
 ```
+
+### Installation
+
+```
+pip3 install ktrain
+```
+
 
 
 ### Requirements
