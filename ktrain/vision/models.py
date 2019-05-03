@@ -1,4 +1,3 @@
-import tensorflow as tf
 from keras.utils import to_categorical
 from .. import utils as U
 import numpy as np
@@ -188,7 +187,7 @@ def image_classifier(name,
     if type(multigpu_number) == type(1) and multigpu_number < 2:
         raise ValuError('multigpu_number must either be None or > 1')
     if multigpu_number is not None and multigpu_number >1:
-
+        import tensorflow as tf
         with tf.device("/cpu:0"):
             model = build_visionmodel(name,
                                       num_classes,

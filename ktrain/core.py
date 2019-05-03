@@ -11,7 +11,6 @@ import math
 
 from matplotlib import pyplot as plt
 
-import tensorflow as tf
 import keras
 from keras import backend as K
 from keras.engine.training import Model
@@ -178,6 +177,8 @@ class Learner(ABC):
             is loss.
 
         """
+        import tensorflow as tf
+
         # check validation data and arguments
         if not self.val_data:
             raise Exception('val_data was not supplied to get_learner')
