@@ -7,6 +7,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.1.6 (2019-05-03)
+
+### New:
+
+### Changed:
+- relocated calls to tensorflow 
+- installation instructions and reformatted examples
+
+### Fixed:
+
+
+
 ## 0.1.5 (2019-05-01)
 
 ### New:
