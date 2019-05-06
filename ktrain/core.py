@@ -132,9 +132,22 @@ class Learner(ABC):
         return wds
 
 
-    def set_weight_decay(self, wd=1e-2):
+    def set_weight_decay(self, wd=0.005):
         """
-        sets global weight decay layer-by-layer
+        Sets global weight decay layer-by-layer using L2 regularization.
+
+        NOTE: Weight decay can be implemented in the form of
+              L2 regularization, which is the case with Keras.
+              Thus, he weight decay value must be divided by
+              2 to obtain similar behavior.
+              The default weight decay here is 0.01/2 = 0.005.
+              See here for more information: 
+              https://bbabenko.github.io/weight-decay/
+        Args:
+          wd(float): weight decay (see note above)
+        Returns:
+          None
+              
         """
         for layer in self.model.layers:
             if hasattr(layer, 'kernel_regularizer'):
