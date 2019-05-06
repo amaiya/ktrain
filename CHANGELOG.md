@@ -6,6 +6,16 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.1.7 (TBD)
+
+### New:
+
+### Changed:
+- Epochs are calculated automatically in ```Learner.lr_find```
+
+### Fixed:
+- Number of epochs that ```Learner.lr_find``` runs can be specified again
+
 
 ## 0.1.6 (2019-05-03)
 

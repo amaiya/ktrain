@@ -413,8 +413,7 @@ class Learner(ABC):
 
 
 
-    def lr_find(self, epochs=5, start_lr=1e-7, 
-                verbose=1):
+    def lr_find(self, start_lr=1e-7, epochs=None, verbose=1):
         """
         Plots loss as learning rate is increased.
         Highest learning rate corresponding to a still
@@ -424,6 +423,7 @@ class Learner(ABC):
 
         Args:
             epochs (int): maximum number of epochs to simulate training
+                          If None, chosen automatically.
             start_lr (float): smallest lr to start simulation
             verbose (bool): specifies how much output to print
         Returns:
@@ -431,6 +431,14 @@ class Learner(ABC):
                     The lr_plot method should be invoked to
                     identify the maximal loss associated with falling loss.
         """
+
+        # compute epochs
+        if epochs is None:
+            num_samples = U.nsamples_from_data(self.train_data)
+            steps_per_epoch = num_samples//self.batch_size
+            sample_size = 2056.
+            epochs = math.ceil(sample_size/steps_per_epoch)
+
 
         U.vprint('simulating training for different learning rates... this may take a few moments...',
                 verbose=verbose)
@@ -443,7 +451,8 @@ class Learner(ABC):
         try:
             # track and plot learning rates
             self.lr_finder = LRFinder(self.model)
-            self.lr_finder.find(self.train_data, start_lr=start_lr, end_lr=10, epochs=5,
+            self.lr_finder.find(self.train_data, start_lr=start_lr, end_lr=10, 
+                                epochs=epochs,
                                 workers=self.workers, 
                                 use_multiprocessing=self.use_multiprocessing, 
                                 verbose=verbose)
