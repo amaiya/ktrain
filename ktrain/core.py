@@ -432,14 +432,6 @@ class Learner(ABC):
                     identify the maximal loss associated with falling loss.
         """
 
-        # compute epochs
-        if epochs is None:
-            num_samples = U.nsamples_from_data(self.train_data)
-            steps_per_epoch = num_samples//self.batch_size
-            sample_size = 2048.
-            epochs = math.ceil(sample_size/steps_per_epoch)
-
-
         U.vprint('simulating training for different learning rates... this may take a few moments...',
                 verbose=verbose)
 

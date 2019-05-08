@@ -9,12 +9,13 @@ Most recent releases are shown at the top. Each release shows:
 ## 0.1.7 (TBD)
 
 ### New:
+- BIGRU text classifier: Bidirectional GRU using pretrained word embeddings
 
 ### Changed:
-- Epochs are calculated automatically in ```Learner.lr_find```
+- Epochs are calculated automatically in ```LRFinder```
 
 ### Fixed:
-- Number of epochs that ```Learner.lr_find``` runs can be specified again
+- Number of epochs that ```Learner.lr_find``` runs can be explicitly set again
 
 
 ## 0.1.6 (2019-05-03)
