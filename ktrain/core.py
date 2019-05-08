@@ -436,7 +436,7 @@ class Learner(ABC):
         if epochs is None:
             num_samples = U.nsamples_from_data(self.train_data)
             steps_per_epoch = num_samples//self.batch_size
-            sample_size = 2056.
+            sample_size = 2048.
             epochs = math.ceil(sample_size/steps_per_epoch)
 
 
