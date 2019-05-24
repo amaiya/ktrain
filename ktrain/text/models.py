@@ -19,9 +19,9 @@ TEXT_CLASSIFIERS = {
                     FASTTEXT: "a fastText-like model (http://arxiv.org/pdf/1607.01759.pdf)",
                     LOGREG:   "logistic regression using a trainable Embedding layer",
                     NBSVM:    "NBSVM model (http://www.aclweb.org/anthology/P12-2018)" +\
-                              " - recommended when training set is smaller than desired"}
+                              " - recommended when training set is smaller than desired",
                     # experimental and requires pretrained word vector file
-                    #BIGRU:    'Bidirectional GRU with pretrained word vectors'} 
+                    BIGRU:    'Bidirectional GRU with pretrained word vectors'} 
 
 
 def print_text_classifiers():
@@ -39,7 +39,8 @@ def calc_r(y_i, x, y):
     return np.log(calc_pr(y_i, x, y, True) / calc_pr(y_i, x, y, False))
 
 
-def text_classifier(name, train_data, preproc=None, multilabel=None,verbose=1):
+def text_classifier(name, train_data, preproc=None, multilabel=None,
+                    pretrained_fpath=None, verbose=1):
     """
     Build and return the default text classification model.
 
@@ -54,8 +55,10 @@ def text_classifier(name, train_data, preproc=None, multilabel=None,verbose=1):
         or one-hot-encoded
         preproc: a ktrain.text.TextPreprocessor instance.
                    This is only required for those models
-                   that employ pretrained-word vectors (none currently do).
-        path_to_pretrained
+                   that employ pretrained-word vectors (e.g., BIGRU)
+        pretrained_fpath (string): path to English word vector file.
+               Recommended:
+               https://dl.fbaipublicfiles.com/fasttext/vectors-english/crawl-300d-2M.vec.zip
         multilabel (bool):  If True, multilabel model will be returned.
                             If false, binary/multiclass model will be returned.
                             If None, multilabel will be inferred from data.
@@ -76,6 +79,8 @@ def text_classifier(name, train_data, preproc=None, multilabel=None,verbose=1):
         raise ValueError('A valid TextPreprocessor object is required for bigru')
     if name == BIGRU and preproc.ngram_count() != 1:
         raise ValueError('Data should be processed with ngram_range=1 for bigru model.')
+    if name == BIGRU and not os.path.isfile(pretrained_fpath):
+        raise ValueError('valid pretrained_fpath is required for bigru')
 
     
 
@@ -143,7 +148,8 @@ def text_classifier(name, train_data, preproc=None, multilabel=None,verbose=1):
                             features,
                             loss_func=loss_func,
                             activation=activation, verbose=verbose,
-                            tokenizer=tokenizer)
+                            tokenizer=tokenizer, 
+                            pretrained_fpath=pretrained_fpath)
     else:
         raise ValueError('name for textclassifier is invalid')
     U.vprint('done.', verbose=verbose)
@@ -254,17 +260,17 @@ def _build_bigru(x_train, y_train, num_classes,
                   maxlen, max_features, features,
                  loss_func='categorical_crossentropy',
                  activation = 'softmax', verbose=1,
-                 tokenizer=None):
+                 tokenizer=None, pretrained_fpath=None):
 
     if tokenizer is None: raise ValueError('bigru requires valid Tokenizer object')
 
     # setup pre-trained word embeddings
     embed_size = 300
     path = os.path.abspath(__file__)
-    wvpath = os.path.dirname(path)
-    EMBEDDING_FILE = os.path.join(wvpath, 'crawl-300d-2M.vec')
+    #wvpath = os.path.dirname(path)
+    #EMBEDDING_FILE = os.path.join(wvpath, 'crawl-300d-2M.vec')
     U.vprint('processing pretrained word vectors...', verbose=verbose)
-    embeddings_index = dict(get_coefs(*o.rstrip().rsplit(' ')) for o in open(EMBEDDING_FILE))
+    embeddings_index = dict(get_coefs(*o.rstrip().rsplit(' ')) for o in open(pretrained_fpath))
     word_index = tokenizer.word_index
     nb_words = min(max_features, len(word_index))
     #nb_words = max_features
