@@ -152,8 +152,11 @@ class Learner(ABC):
         for layer in self.model.layers:
             if hasattr(layer, 'kernel_regularizer'):
                 layer.kernel_regularizer= regularizers.l2(wd)
+                layer.add_loss(regularizers.l2(wd)(layer.kernel))
             if hasattr(layer, 'bias_regularizer'):
                 layer.bias_regularizer= regularizers.l2(wd)
+                layer.add_loss(regularizers.l2(wd)(layer.bias))
+        self._recompile()
         return
         
 
