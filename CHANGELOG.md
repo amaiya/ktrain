@@ -6,6 +6,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.1.8 (2019-06-04)
+
+### New:
+- N/A
+
+### Changed:
+- N/A
+
+### Fixed:
+- ```Learner.set_weight_decay``` now works correctly
+
+
 ## 0.1.7 (2019-05-24)
 
 ### New:
