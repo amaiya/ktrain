@@ -12,7 +12,6 @@ import keras
 from keras.preprocessing.image import ImageDataGenerator
 
 
-
 DEFAULT_BS = 32
 DEFAULT_ES = 5 
 DEFAULT_ROP = 2 
@@ -50,10 +49,6 @@ def shape_from_data(data):
         if hasattr(data, 'image_shape'): return data.image_shape
         elif hasattr(data, 'x'):
             return data.x.shape[1:]
-        elif hasattr(data, 'node_seq'): # stellargraph wrapper
-            # stellargraph GraphSage will return a shape for each 
-            # neighborhood level (typically 3).
-            return [x.shape[1:] for x in data[0][0]]
         else:
             try:
                 return data[0][0].shape[1:]
@@ -78,8 +73,6 @@ def nsamples_from_data(data):
             return data.samples
         elif hasattr(data, 'n'):
             return data.n
-        elif hasattr(data, 'targets'): # stellargraph NodeSeq
-            return data.targets.shape[0]
         else:
             raise Exception(err_msg)
     else:
@@ -93,8 +86,6 @@ def nclasses_from_data(data):
     if is_iter(data):
         if hasattr(data, 'classes'):
             return len(set(data.classes))
-        elif hasattr(data, 'targets'): # stellargraph NodeSeq
-            return data.targets.shape[1]
         else:
             try:
                 return data[0][1].shape[1]
@@ -115,8 +106,6 @@ def y_from_data(data):
             return data.data
         elif hasattr(data, 'y'):
             return data.y
-        elif hasattr(data, 'targets'): # stellargraph NodeSeq
-            return data.targets
         else:
             raise Exception('could not determine number of classes from %s' % (type(data)))
     else:
@@ -135,10 +124,8 @@ def vprint(s=None, verbose=1):
 
 def is_iter(data, ignore=False):
     if ignore: return True
-    if type(data).__name__ in ['DirectoryIterator', 'NumpyArrayIterator', 'DataFrameIterator']:
-        return True
-    else:
-        return False
+    #return isinstance(data, DirectoryIterator)
+    return isinstance(data, Sequence)
     #return isinstance(data, Iterator)
 
 
