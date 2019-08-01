@@ -125,8 +125,12 @@ def vprint(s=None, verbose=1):
 def is_iter(data, ignore=False):
     if ignore: return True
     #return isinstance(data, DirectoryIterator)
-    return isinstance(data, Sequence)
+    #return isinstance(data, Sequence)
     #return isinstance(data, Iterator)
+    if type(data).__name__ in ['DirectoryIterator', 'NumpyArrayIterator', 'DataFrameIterator']:
+        return True
+    else:
+        return False
 
 
 def data_arg_check(train_data=None, val_data=None, train_required=False, val_required=False,
