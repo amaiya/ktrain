@@ -13,6 +13,7 @@ Most recent releases are shown at the top. Each release shows:
 
 ### Changed:
 - Use class check in utils.is_iter as temporary fix
+- revert to epochs=5 for ```Learner.lr_find```
 
 ### Fixed:
 - N/A
