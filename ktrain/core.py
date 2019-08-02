@@ -416,7 +416,7 @@ class Learner(ABC):
 
 
 
-    def lr_find(self, start_lr=1e-7, epochs=None, verbose=1):
+    def lr_find(self, start_lr=1e-7, epochs=5, verbose=1):
         """
         Plots loss as learning rate is increased.
         Highest learning rate corresponding to a still
