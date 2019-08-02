@@ -53,7 +53,7 @@ class LRFinder:
         K.set_value(self.model.optimizer.lr, lr)
 
 
-    def find(self, train_data, start_lr, end_lr, epochs=None, batch_size=U.DEFAULT_BS,
+    def find(self, train_data, start_lr, lr_mult=1.01, batch_size=U.DEFAULT_BS,
              workers=1, use_multiprocessing=False, verbose=1):
         """
         Track loss as learning rate is increased.
@@ -76,12 +76,8 @@ class LRFinder:
             use_gen = False
             steps_per_epoch = np.ceil(num_samples/batch_size)
 
-        if epochs is None:
-            epochs = math.ceil(SAMPLE_SIZE/steps_per_epoch)
-
-
-        num_batches = epochs * steps_per_epoch
-        self.lr_mult = (end_lr / start_lr) ** (1 / num_batches)
+        epochs = 1024
+        self.lr_mult = lr_mult
 
         # Save weights into a file
         new_file, self._weightfile = tempfile.mkstemp()
