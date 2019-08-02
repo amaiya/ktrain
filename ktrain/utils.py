@@ -100,12 +100,12 @@ def nclasses_from_data(data):
 
 def y_from_data(data):
     if is_iter(data):
-        if hasattr(data, 'classes'):
+        if hasattr(data, 'classes'): # DirectoryIterator
             return to_categorical(data.classes)
-        elif hasattr(data, 'data'):
-            return data.data
-        elif hasattr(data, 'y'):
-            return data.y
+        elif hasattr(data, 'labels'):  # DataFrameIterator
+            return data.labels
+        elif hasattr(data, 'y'): # NumpyArrayIterator
+            return to_categorical(data.y)
         else:
             raise Exception('could not determine number of classes from %s' % (type(data)))
     else:
