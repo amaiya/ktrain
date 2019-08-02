@@ -6,6 +6,21 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.1.10 (2019-08-02)
+
+### New:
+- N/A
+
+### Changed:
+- For ```Learner.lr_find```, removed epochs and max_lr arguments and added lr_mult argument
+  Default lr_mult is 1.01, but can be changed to control size of sample being used
+  to estimate learning rate.
+- Changed structure of examples folder
+
+### Fixed:
+- Resolved issue with ```utils.y_from_data``` not working correctly with DataFrameIterator objects.
+
+
 ## 0.1.9 (2019-08-01)
 
 ### New:
