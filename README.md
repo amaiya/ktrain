@@ -57,7 +57,7 @@ learner = ktrain.get_learner(model,
 learner.lr_find()             # briefly simulate training to find good learning rate
 learner.lr_plot()             # visually identify best learning rate
 
-# train using 1cycle learning rate schedule
+# train using 1cycle learning rate schedule for 3 epochs
 learner.fit_onecycle(2e-5, 3) 
 ```
 
