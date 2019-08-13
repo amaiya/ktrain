@@ -18,7 +18,7 @@ def get_wv_path():
     wv_path =  os.path.join(ktrain_data, os.path.splitext(fname_from_url(WV_URL))[0])
     if not os.path.isfile(wv_path):
         # download zip
-        print('downloading pretrained word vectors...')
+        print('downloading pretrained word vectors (~1.5G) ...')
         U.download(WV_URL, zip_fpath)
 
         # unzip
@@ -26,6 +26,14 @@ def get_wv_path():
         with zipfile.ZipFile(zip_fpath, 'r') as zip_ref:
             zip_ref.extractall(ktrain_data)
         print('done.\n')
+
+        # cleanup
+        print('cleanup downloaded zip...')
+        try:
+            os.remove(zip_fpath)
+            print('done.\n')
+        except OSError:
+            print('failed to cleanup/remove %s' % (zip_fpath))
     return wv_path
 
 
@@ -55,6 +63,14 @@ def get_bert_path():
         with zipfile.ZipFile(zip_fpath, 'r') as zip_ref:
             zip_ref.extractall(ktrain_data)
         print('done.\n')
+
+        # cleanup
+        print('cleanup downloaded zip...')
+        try:
+            os.remove(zip_fpath)
+            print('done.\n')
+        except OSError:
+            print('failed to cleanup/remove %s' % (zip_fpath))
     return bert_path
 
 
