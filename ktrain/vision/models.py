@@ -1,21 +1,7 @@
-from keras.utils import to_categorical
+from ..imports import *
 from .. import utils as U
-import numpy as np
-from keras.models import Model, Sequential
-from keras.layers import Flatten, Dense, Dropout, BatchNormalization
-from keras.layers import Conv2D, MaxPooling2D
-from keras.applications.resnet50 import ResNet50
-from keras.applications.resnet50 import preprocess_input as pre_resnet50
-from keras.applications.mobilenet import MobileNet
-from keras.applications.mobilenet import preprocess_input as pre_mobilenet
-from keras.applications.inception_v3 import InceptionV3
-from keras.applications.inception_v3 import preprocess_input as pre_inception
-
-from keras.utils import multi_gpu_model
-
 from .wrn import create_wide_residual_network
 
-import warnings
 
 
 

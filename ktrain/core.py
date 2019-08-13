@@ -1,26 +1,4 @@
-import os
-import os.path
-import numpy as np
-import warnings
-import operator
-from distutils.version import StrictVersion
-import tempfile
-import pickle
-from abc import ABC, abstractmethod
-import math
-
-from matplotlib import pyplot as plt
-
-import keras
-from keras import backend as K
-from keras.engine.training import Model
-from keras.models import load_model
-from keras.callbacks import ModelCheckpoint, EarlyStopping
-from keras.layers import Dense
-from keras.initializers import glorot_uniform  
-from keras import regularizers
-from keras.models import load_model
-from sklearn.metrics import classification_report, confusion_matrix
+from .imports import *
 
 from .lroptimize.sgdr import *
 from .lroptimize.triangular import *
@@ -30,13 +8,8 @@ from . import utils as U
 from .vision.preprocessor import ImagePreprocessor
 from .vision.predictor import ImagePredictor
 from .vision.data import show_image
-from .text.preprocessor import TextPreprocessor
+from .text.preprocessor import TextPreprocessor, BERTPreprocessor
 from .text.predictor import TextPredictor
-
-from keras.applications.resnet50 import preprocess_input as pre_resnet50
-from keras.applications.mobilenet import preprocess_input as pre_mobilenet
-from keras.applications.inception_v3 import preprocess_input as pre_inception
-
 
 
 
@@ -80,6 +53,36 @@ def get_learner(model, train_data=None, val_data=None,
             wrn_msg +=' is slow when use_multiprocessing=False.'
             wrn_msg += ' If you experience issues with this, please set workers=1 and use_multiprocessing=False.'
             warnings.warn(wrn_msg)
+
+    # verify BERT
+    if U.bert_data_tuple(train_data):
+        maxlen = U.shape_from_data(train_data)[1]
+        msg = """For a GPU with 12GB of RAM, the following maxima apply:
+        sequence len=64, max_batch_size=64
+        sequence len=128, max_batch_size=32
+        sequence len=256, max_batch_size=16
+        sequence len=320, max_batch_size=14
+        sequence len=384, max_batch_size=12
+        sequence len=512, max_batch_size=6
+        
+        You've exceeded these limits.
+        If using a GPU with <=12GB of memory, you may run out of memory during training.
+        If necessary, adjust sequence length or batch size based on above."""
+        wrn = False
+        if maxlen > 64 and batch_size > 64:
+            wrn=True
+        elif maxlen > 128 and batch_size>32:
+            wrn=True
+        elif maxlen>256 and batch_size>16:
+            wrn=True
+        elif maxlen>320 and batch_size>14:
+            wrn=True
+        elif maxlen>384 and batch_size>12:
+            wrn=True
+        elif maxlen > 512 and batch_size>6:
+            wrn=True
+        if wrn: warnings.warn(msg)
+
 
     # return the appropriate trainer
     if U.is_iter(train_data):
@@ -160,22 +163,30 @@ class Learner(ABC):
         return
         
 
-    def confusion_matrix(self, print_report=False):
+    def validate(self, val_data=None, print_report=True, class_names=[]):
         """
         Returns confusion matrix and optionally prints
         a classification report.
         This is currently only supported for binary and multiclass
         classification, not multilabel classification.
         """
-        if U.is_multilabel(self.val_data):
+        if val_data is not None:
+            val = val_data
+        else:
+            val = self.val_data
+        if U.is_multilabel(val):
             warnings.warn('multilabel confusion matrices not yet supported')
             return
-        y_pred = self.predict()
-        y_true = self.ground_truth(use_valid=True)
+        y_pred = self.predict(val_data=val)
+        y_true = self.ground_truth(val_data=val)
         y_pred = np.argmax(y_pred, axis=1)
         y_true = np.argmax(y_true, axis=1)
         if print_report:
-            print(classification_report(y_true, y_pred))
+            if class_names:
+                report = classification_report(y_true, y_pred, target_names=class_names)
+            else:
+                report = classification_report(y_true, y_pred)
+            print(report)
             cm_func = confusion_matrix
         cm =  confusion_matrix(y_true,  y_pred)
         return cm
@@ -205,7 +216,7 @@ class Learner(ABC):
 
         # get predicictions and ground truth
         y_pred = self.predict()
-        y_true = self.ground_truth(use_valid=True)
+        y_true = self.ground_truth()
         y_true = y_true.astype('float32')
 
         # compute loss
@@ -270,10 +281,6 @@ class Learner(ABC):
 
 
 
-            
-
-
-
 
     def save_model(self, fpath):
         """
@@ -287,7 +294,7 @@ class Learner(ABC):
         """
         a wrapper to load_model
         """
-        self.model = load_model(fpath)
+        self.model = _load_model(fpath, train_data=self.train_data)
         return
 
 
@@ -416,17 +423,25 @@ class Learner(ABC):
 
 
 
-    def lr_find(self, start_lr=1e-7, lr_mult=1.01, verbose=1):
+    def lr_find(self, start_lr=1e-7, lr_mult=1.01, max_epochs=None, verbose=1):
         """
         Plots loss as learning rate is increased.
         Highest learning rate corresponding to a still
         falling loss should be chosen.
 
+        If lr_mult is supplied and max_epochs is None, LR will increase until loss diverges.
+        Reasonable values of lr_mult are between 1.01 and 1.05.
+
+        If max_epochs is supplied, lr_mult argument is ignored and computed automatically.
+
         Reference: https://arxiv.org/abs/1506.01186
 
         Args:
             lr_mult (float): multiplication factor to increase LR.
+                             Ignored if max_epochs is supplied.
             start_lr (float): smallest lr to start simulation
+            max_epochs (int):  maximum number of epochs to simulate.
+                               lr_mult is ignored if max_epoch is supplied.
             verbose (bool): specifies how much output to print
         Returns:
             float:  Numerical estimate of best lr.  
@@ -446,8 +461,10 @@ class Learner(ABC):
             # track and plot learning rates
             self.lr_finder = LRFinder(self.model)
             self.lr_finder.find(self.train_data, start_lr=start_lr, lr_mult=lr_mult, 
+                                max_epochs=max_epochs,
                                 workers=self.workers, 
                                 use_multiprocessing=self.use_multiprocessing, 
+                                batch_size=self.batch_size,
                                 verbose=verbose)
         except KeyboardInterrupt:
             # re-load current weights
@@ -814,6 +831,30 @@ class Learner(ABC):
         self.history = hist
         return hist
 
+
+    def ground_truth(self, val_data=None):
+        if val_data is not None:
+            val = val_data
+        else:
+            val = self.val_data
+        if not val: raise Exception('val_data must be supplied to get_learner or ground_truth')
+        return U.y_from_data(val)
+
+
+    def predict(self, val_data=None):
+        """
+        Makes predictions on validation set
+        """
+        if val_data is not None:
+            val = val_data
+        else:
+            val = self.val_data
+        if val is None: raise Exception('val_data must be supplied to get_learner or predict')
+        if U.is_iter(val):
+            return self.model.predict_generator(val)
+        else:
+            return self.model.predict(val[0])
+
     
 
 class ArrayLearner(Learner):
@@ -911,11 +952,14 @@ class ArrayLearner(Learner):
             kcallbacks.extend(callbacks)
 
         # train model
-        hist = self.model.fit(x_train, y_train,
-                             batch_size=self.batch_size,
-                             epochs=epochs,
-                             validation_data=validation, verbose=verbose,
-                             callbacks=kcallbacks)
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore', message='.*Check your callbacks.*')
+            hist = self.model.fit(x_train, y_train,
+                                 batch_size=self.batch_size,
+                                 epochs=epochs,
+                                 validation_data=validation, verbose=verbose,
+                                 callbacks=kcallbacks)
+
         if sgdr is not None: hist.history['lr'] = sgdr.history['lr']
         self.history = hist
 
@@ -929,22 +973,6 @@ class ArrayLearner(Learner):
         return hist
 
 
-    def predict(self):
-        """
-        Makes predictions on validation set
-        """
-        if self.val_data is None:
-            raise Exception('val_data is None')
-        return self.model.predict(self.val_data[0])
-
-
-    def ground_truth(self, use_valid=True):
-        if use_valid and self.val_data is None:
-            raise Exception('val_data is None')
-        if use_valid:
-            return self.val_data[1]
-        else:
-            return self.train_data[1]
 
 
 
@@ -1034,13 +1062,16 @@ class GenLearner(Learner):
         #print(self.use_multiprocessing)
 
         # train model
-        hist = self.model.fit_generator(self.train_data,
-                                       steps_per_epoch = steps_per_epoch,
-                                       epochs=epochs,
-                                       validation_data=self.val_data,
-                                       workers=self.workers,
-                                       use_multiprocessing=self.use_multiprocessing, verbose=verbose,
-                                       callbacks=kcallbacks)
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore', message='.*Check your callbacks.*')
+            hist = self.model.fit_generator(self.train_data,
+                                           steps_per_epoch = steps_per_epoch,
+                                           epochs=epochs,
+                                           validation_data=self.val_data,
+                                           workers=self.workers,
+                                           use_multiprocessing=self.use_multiprocessing, 
+                                           verbose=verbose,
+                                           callbacks=kcallbacks)
         if sgdr is not None: hist.history['lr'] = sgdr.history['lr']
         self.history = hist
 
@@ -1079,14 +1110,6 @@ class GenLearner(Learner):
         return self.model.predict_generator(self.val_data)
 
 
-    def ground_truth(self, use_valid=False):
-        if use_valid and self.val_data is None:
-            raise Exception('val_data is None')
-        if use_valid:
-            return U.y_from_data(self.val_data)
-        else:
-            return U.y_from_data(self.train_data)
-
 
 def get_predictor(model, preproc):
     """
@@ -1122,21 +1145,25 @@ def get_predictor(model, preproc):
         raise Exception('preproc of type %s not currently supported' % (type(preproc)))
 
 
-def load_predictor(filename):
+def load_predictor(fpath):
     """
     Loads a previously saved Predictor instance
     """
 
-    model = load_model(filename)
+    # load the preprocessor
     try:
         preproc = None
-        with open(filename+'.preproc', 'rb') as f:
+        with open(fpath+'.preproc', 'rb') as f:
             preproc = pickle.load(f)
     except FileNotFoundError:
         print('load_predictor failed.\n'+\
-              'Could not find the saved preprocessor (%s) for this model.' % (filename+'.preproc') +\
+              'Could not find the saved preprocessor (%s) for this model.' % (fpath+'.preproc') +\
                ' Are you sure predictor.save method was called?')
         return
+
+    # load the model
+    model = _load_model(fpath, preproc=preproc)
+
     # preprocessing functions in ImageDataGenerators are not pickable
     # so, we must reconstruct
     if hasattr(preproc, 'datagen') and hasattr(preproc.datagen, 'ktrain_preproc'):
@@ -1150,7 +1177,7 @@ def load_predictor(filename):
         else:
             raise Exception('Uknown preprocessing_function name: %s' % (preproc_name))
     
-    # check arguments
+    # return the appropriate predictor
     if not isinstance(model, Model):
         raise ValueError('model must be of instance Model')
     if not isinstance(preproc, ImagePreprocessor) and not isinstance(preproc, TextPreprocessor):
@@ -1161,6 +1188,10 @@ def load_predictor(filename):
         return TextPredictor(model, preproc)
     else:
         raise Exception('preprocessor not currently supported')
+
+
+
+
 
 #----------------------------------------
 # Utility Functions
@@ -1180,3 +1211,39 @@ def release_gpu_memory(device=0):
     cuda.select_device(device)
     cuda.close()
     return
+
+
+def _load_model(fpath, preproc=None, train_data=None):
+    if not preproc and not train_data:
+        raise ValueError('Either preproc or train_data is required.')
+    custom_objects=None
+    if preproc and (isinstance(preproc, BERTPreprocessor) or \
+                    type(preproc).__name__ == 'BERTPreprocessor') or\
+       train_data and U.bert_data_tuple(train_data):
+        # custom BERT model
+        from keras_bert.layers.embedding import TokenEmbedding
+        from keras_bert.layers.extract import Extract
+        from keras_pos_embd import PositionEmbedding
+        from keras_layer_normalization import LayerNormalization
+        from keras_multi_head.multi_head_attention import MultiHeadAttention
+        from keras_position_wise_feed_forward import FeedForward
+        from keras_bert.bert import gelu_tensorflow
+        custom_objects={'TokenEmbedding' : TokenEmbedding, 
+                        'PositionEmbedding' : PositionEmbedding,
+                        'LayerNormalization' : LayerNormalization,
+                        'MultiHeadAttention' : MultiHeadAttention,
+                        'FeedForward' : FeedForward,
+                        'gelu_tensorflow' : gelu_tensorflow,
+                        'Extract' : Extract}
+    try:
+        model = load_model(fpath, custom_objects=custom_objects)
+    except Exception as e:
+        print('Call to keras.models.load_model failed.  '
+              'Try using the learner.model.save_weights and '
+              'learner.model.load_weights instead.')
+        print('Error was: %s' % (e))
+        return
+    return model
+
+
+

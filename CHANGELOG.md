@@ -6,6 +6,22 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.2.0 (2019-08-12)
+
+### New:
+- Support for pretrained BERT Text Classification 
+
+### Changed:
+- For ```Learner.lr_find```, added optional ```max_epochs``` argument. 
+- Changed ```Learner.confusion_matrix``` to ```Learner.validate``` and added optional ```val_data``` argument.
+
+### Fixed:
+- Further cleanup of  ```utils.is_iter``` function to use type check.
+
+
+
+
+
 ## 0.1.10 (2019-08-02)
 
 ### New:

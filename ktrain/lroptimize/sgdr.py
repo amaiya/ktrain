@@ -1,7 +1,4 @@
-import numpy as np
-from keras.callbacks import Callback
-import keras.backend as K
-
+from ..imports import *
 
 class SGDRScheduler(Callback):
     '''Cosine annealing learning rate scheduler with periodic restarts.

@@ -1,8 +1,4 @@
-import numpy as np
-import tempfile
-from keras.callbacks import Callback
-import keras.backend as K
-import warnings
+from ..imports import * 
 
 class CyclicLR(Callback):
     """This callback implements a cyclical learning rate policy (CLR).

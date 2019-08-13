@@ -1,6 +1,4 @@
-from abc import ABC, abstractmethod
-import pickle
-
+from .imports import *
 class Predictor(ABC):
     """
     Abstract class to preprocess data

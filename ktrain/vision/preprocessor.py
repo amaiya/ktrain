@@ -1,7 +1,4 @@
-import os.path
-import numpy as np
-import math
-from keras.preprocessing import image
+from ..imports import *
 from ..preprocessor import Preprocessor
 from .. import utils as U
 class ImagePreprocessor(Preprocessor):

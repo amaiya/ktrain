@@ -1,9 +1,4 @@
-from keras.models import Model
-from keras.layers import Input, Add, Activation, Dropout, Flatten, Dense
-from keras.layers.convolutional import Convolution2D, MaxPooling2D, AveragePooling2D
-from keras.layers.normalization import BatchNormalization
-from keras.regularizers import l2
-from keras import backend as K
+from ..imports import *
 
 weight_decay = 0.0005
 

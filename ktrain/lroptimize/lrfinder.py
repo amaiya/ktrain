@@ -1,16 +1,11 @@
-from matplotlib import pyplot as plt
-import numpy as np
-import tempfile
-import math
-from keras.callbacks import LambdaCallback, Callback
-import keras.backend as K
+from ..imports import *
 from .. import utils as U
 
-SAMPLE_SIZE = 2048.
 
 class LRFinder:
     """
-    Plots the change of the loss function of a Keras model when the learning rate is exponentially increasing.
+    Tracks (and plots) the change in loss of a Keras model as learning rate is gradually increased.
+    Used to visually identify a good learning rate, given model and data.
     Reference:
         Original Paper: https://arxiv.org/abs/1506.01186
     """
@@ -53,8 +48,8 @@ class LRFinder:
         K.set_value(self.model.optimizer.lr, lr)
 
 
-    def find(self, train_data, start_lr, lr_mult=1.01, batch_size=U.DEFAULT_BS,
-             workers=1, use_multiprocessing=False, verbose=1):
+    def find(self, train_data, start_lr, lr_mult=1.01, max_epochs=None, 
+             batch_size=U.DEFAULT_BS, workers=1, use_multiprocessing=False, verbose=1):
         """
         Track loss as learning rate is increased.
         NOTE: batch_size is ignored when train_data is instance of Iterator.
@@ -76,8 +71,19 @@ class LRFinder:
             use_gen = False
             steps_per_epoch = np.ceil(num_samples/batch_size)
 
-        epochs = 1024
-        self.lr_mult = lr_mult
+        # max_epochs and lr_mult are None, set max_epochs
+        # using sample size of 1500 batches
+        if max_epochs is None and lr_mult is None:
+            max_epochs = int(np.ceil(1500./steps_per_epoch))
+
+        if max_epochs:
+            epochs = max_epochs
+            num_batches = epochs * steps_per_epoch
+            end_lr = 10 if start_lr < 10 else start_lr * 10
+            self.lr_mult = (end_lr / start_lr) ** (1 / num_batches)
+        else:
+            epochs = 1024
+            self.lr_mult = lr_mult
 
         # Save weights into a file
         new_file, self._weightfile = tempfile.mkstemp()

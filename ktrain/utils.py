@@ -1,16 +1,4 @@
-from scipy import sparse
-import numpy as np
-from keras.preprocessing.image import NumpyArrayIterator
-from keras.preprocessing.image import Iterator
-from keras.utils import Sequence, to_categorical
-
-import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.metrics import confusion_matrix
-import itertools
-import keras
-from keras.preprocessing.image import ImageDataGenerator
-
+from .imports import *
 
 DEFAULT_BS = 32
 DEFAULT_ES = 5 
@@ -56,7 +44,10 @@ def shape_from_data(data):
                 raise Exception(err_msg)
     else:
         try:
-            return data[0].shape
+            if type(data[0]) == list: # BERT-style tuple
+                return data[0][0].shape
+            else:
+                return data[0].shape  # standard tuple
         except:
             raise Exception(err_msg)
 
@@ -77,7 +68,10 @@ def nsamples_from_data(data):
             raise Exception(err_msg)
     else:
         try:
-            return len(data[0])
+            if type(data[0]) == list: # BERT-style tuple
+                return len(data[0][0])
+            else:
+                return len(data[0])   # standard tuple
         except:
             raise Exception(err_msg)
 
@@ -124,34 +118,52 @@ def vprint(s=None, verbose=1):
 
 def is_iter(data, ignore=False):
     if ignore: return True
-    #return isinstance(data, DirectoryIterator)
-    #return isinstance(data, Sequence)
-    #return isinstance(data, Iterator)
-    if type(data).__name__ in ['DirectoryIterator', 'NumpyArrayIterator', 'DataFrameIterator']:
-        return True
-    else:
-        return False
+    iter_classes = ["NumpyArrayIterator", "DirectoryIterator",
+                    "DataFrameIterator", "Iterator", "Sequence"]
+    return data.__class__.__name__ in iter_classes
 
 
 def data_arg_check(train_data=None, val_data=None, train_required=False, val_required=False,
                    ndarray_only=False):
-
     if train_required and train_data is None:
         raise ValueError('train_data is required')
     if val_required and val_data is None:
         raise ValueError('val_data is required')
     if train_data is not None and not is_iter(train_data, ndarray_only):
-        if not isinstance(train_data, tuple) or len(train_data) != 2 or \
-           type(train_data[0]) is not np.ndarray or type(train_data[1]) is not np.ndarray:
-            err_msg = 'train_data must be tuple of numpy.ndarrays'
+        if bad_data_tuple(train_data):
+            err_msg = 'data must be tuple of numpy.ndarrays'
             if not ndarray_only: err_msg += ' or an instance of Iterator'
             raise ValueError(err_msg)
     if val_data is not None and not is_iter(val_data, ndarray_only):
-        if not isinstance(val_data, tuple) or len(val_data) != 2 or \
-           type(val_data[0]) is not np.ndarray or type(val_data[1]) is not np.ndarray:
-            err_msg = 'val_data must be tuple of numpy.ndarrays'
+        if bad_data_tuple(val_data):
+            err_msg = 'data must be tuple of numpy.ndarrays or BERT-style tuple'
             if not ndarray_only: err_msg += ' or an instance of Iterator'
             raise ValueError(err_msg)
+    return
+
+
+def bert_data_tuple(data):
+    """
+    checks if data tuple is BERT-style format
+    """
+    if type(data[0]) == list and type(data[0][0]) is np.ndarray and\
+       type(data[0] is np.ndarray):
+           return True
+    else:
+        return False
+
+
+def bad_data_tuple(data):
+    """
+    Checks for standard tuple or BERT-style tuple
+    """
+    if not isinstance(data, tuple) or len(data) != 2 or \
+       type(data[0]) not in [np.ndarray, list] or \
+       (type(data[0]) in [list] and type(data[0][0]) is not np.ndarray) or \
+       type(data[1]) is not np.ndarray: 
+        return True
+    else:
+        return False
 
 
 
@@ -288,3 +300,22 @@ def get_img_fit_flow(image_config, fit_smpl_size, directory, target_size, batch_
        batch_size=batch_size,                                                      
        shuffle=shuffle,                                                            
     )
+
+def download(url, filename):
+    with open(filename, 'wb') as f:
+        response = requests.get(url, stream=True,  verify=False)
+        total = response.headers.get('content-length')
+
+        if total is None:
+            f.write(response.content)
+        else:
+            downloaded = 0
+            total = int(total)
+            for data in response.iter_content(chunk_size=max(int(total/1000), 1024*1024)):
+                downloaded += len(data)
+                f.write(data)
+                done = int(50*downloaded/total)
+                sys.stdout.write('\r[{}{}]'.format('█' * done, '.' * (50-done)))
+                sys.stdout.flush()
+
+

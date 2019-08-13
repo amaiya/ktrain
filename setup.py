@@ -20,7 +20,10 @@ setup(
           'keras >= 2.2.4',
           'scikit-learn >= 0.20.0',
           'matplotlib >= 3.0.0',
-          'pandas >= 0.24.2'
+          'pandas >= 0.24.2',
+          'fastprogress >= 0.1.21',
+          'keras_bert',
+          'requests'
       ],
   classifiers=[  # Optional
     # How mature is this project? Common values are

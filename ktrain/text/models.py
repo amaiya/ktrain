@@ -1,27 +1,18 @@
-from keras.models import Model, Sequential
-from keras.layers import Dense, Embedding, Input, Flatten, GRU, Bidirectional
-from keras.layers import SpatialDropout1D, GlobalMaxPool1D, GlobalAveragePooling1D
-from keras.layers import concatenate, dot, Dropout, BatchNormalization
-from keras.layers.core import Activation
-from keras.utils import to_categorical
-from scipy.sparse import csr_matrix
-import numpy as np
-import os.path
-import warnings
+from ..imports import *
 from .. import utils as U
-from .preprocessor import TextPreprocessor
+from . import preprocessor as tpp
 
 NBSVM = 'nbsvm'
 FASTTEXT = 'fasttext'
 LOGREG = 'logreg'
 BIGRU = 'bigru'
+BERT = 'bert'
 TEXT_CLASSIFIERS = {
                     FASTTEXT: "a fastText-like model (http://arxiv.org/pdf/1607.01759.pdf)",
                     LOGREG:   "logistic regression using a trainable Embedding layer",
-                    NBSVM:    "NBSVM model (http://www.aclweb.org/anthology/P12-2018)" +\
-                              " - recommended when training set is smaller than desired",
-                    # experimental and requires pretrained word vector file
-                    BIGRU:    'Bidirectional GRU with pretrained word vectors'} 
+                    NBSVM:    "NBSVM model (http://www.aclweb.org/anthology/P12-2018)",
+                    BIGRU:    'Bidirectional GRU with pretrained word vectors',
+                    BERT:  'Bidirectional Encoder Representations from Transformers (https://arxiv.org/abs/1810.04805)'} 
 
 
 def print_text_classifiers():
@@ -49,6 +40,8 @@ def text_classifier(name, train_data, preproc=None, multilabel=None,
                       - 'fasttext' for FastText model
                       - 'nbsvm' for NBSVM model  
                       - 'logreg' for logistic regression
+                      - 'bigru' for Bidirectional GRU with pretrained word vectors
+                      = 'bert' for BERT Text Classification
 
         train_data (tuple): a tuple of numpy.ndarrays: (x_train, y_train)
         y_train can either be a list of integers representing classes
@@ -75,12 +68,15 @@ def text_classifier(name, train_data, preproc=None, multilabel=None,
             """
         raise Exception(err)
 
-    if name == BIGRU and not isinstance(preproc, TextPreprocessor):
+    if name == BIGRU and not isinstance(preproc, tpp.TextPreprocessor):
         raise ValueError('A valid TextPreprocessor object is required for bigru')
     if name == BIGRU and preproc.ngram_count() != 1:
         raise ValueError('Data should be processed with ngram_range=1 for bigru model.')
     if name == BIGRU and not os.path.isfile(pretrained_fpath):
         raise ValueError('valid pretrained_fpath is required for bigru')
+    is_bert = U.bert_data_tuple(train_data)
+    if is_bert and name != BERT:
+        raise ValueError('data is preprocessed for %s but %s was not specified as model' % (BERT, BERT))
 
     
 
@@ -109,13 +105,18 @@ def text_classifier(name, train_data, preproc=None, multilabel=None,
 
 
     # determine number of classes, maxlen, and max_features
-    U.vprint('compiling word ID features...', verbose=verbose)
-    maxlen = len(x_train[0]) 
+    maxlen = U.shape_from_data((x_train, y_train))[1]
+    max_features = None
     features = set()
-    for x in x_train:
-        features.update(x)
-    max_features = len(features)
-    U.vprint('max_features is %s' % (max_features))
+    if not is_bert:
+        U.vprint('compiling word ID features...', verbose=verbose)
+        for x in x_train:
+            features.update(x)
+        max_features = len(features)
+        U.vprint('max_features is %s' % (max_features), verbose=verbose)
+    U.vprint('maxlen is %s' % (maxlen), verbose=verbose)
+
+
 
     # return appropriate model
     if name == LOGREG:
@@ -125,6 +126,14 @@ def text_classifier(name, train_data, preproc=None, multilabel=None,
                             features,
                             loss_func=loss_func,
                             activation=activation, verbose=verbose)
+    elif name == BERT:
+        model =  _build_bert(x_train, y_train, num_classes, 
+                            maxlen,
+                            max_features,
+                            features,
+                            loss_func=loss_func,
+                            activation=activation, verbose=verbose)
+
     elif name==NBSVM:
         model = _build_nbsvm(x_train, y_train, num_classes, 
                             maxlen,
@@ -179,6 +188,31 @@ def _build_logreg(x_train, y_train, num_classes,
                   optimizer='adam',
                   metrics=['accuracy'])
     return model
+
+
+def _build_bert(x_train, y_train, num_classes,
+                maxlen, max_features, features,
+               loss_func='categorical_crossentropy',
+               activation = 'softmax', verbose=1):
+
+    config_path = os.path.join(tpp.get_bert_path(), 'bert_config.json')
+    checkpoint_path = os.path.join(tpp.get_bert_path(), 'bert_model.ckpt')
+
+    model = keras_bert.load_trained_model_from_checkpoint(
+                                    config_path,
+                                    checkpoint_path,
+                                    training=True,
+                                    trainable=True,
+                                    seq_len=maxlen)
+    inputs = model.inputs[:2]
+    dense = model.get_layer('NSP-Dense').output
+    outputs = keras.layers.Dense(units=num_classes, activation='softmax')(dense)
+    model = keras.models.Model(inputs, outputs)
+    model.compile(loss=loss_func,
+                  optimizer='adam',
+                  metrics=['accuracy'])
+    return model
+
 
 
 def _build_nbsvm(x_train, y_train, num_classes,

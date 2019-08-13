@@ -4,12 +4,13 @@
 
 - estimate an optimal learning rate for your model given your data using a Learning Rate Finder
 - utilize learning rate schedules such as the [triangular policy](https://arxiv.org/abs/1506.01186), the [1cycle policy](https://arxiv.org/abs/1803.09820), and [SGDR](https://arxiv.org/abs/1608.03983) to effectively minimize loss and improve generalization
-- employ fast and easy-to-use pre-canned models for both text classification (e.g., NBSVM, fastText, logreg) and image classification (e.g., ResNet, Wide ResNet, Inception)
+- employ fast and easy-to-use pre-canned models for both text classification (e.g., [BERT](https://arxiv.org/abs/1810.04805), [NBSVM](https://www.aclweb.org/anthology/P12-2018), [fastText](https://arxiv.org/abs/1607.01759), GRUs with pretrained word vectors) and image classification (e.g., [ResNet](https://arxiv.org/abs/1512.03385), [Wide ResNet](https://arxiv.org/abs/1605.07146), [Inception](https://www.cs.unc.edu/~wliu/papers/GoogLeNet.pdf))
 - load and preprocess text and image data from a variety of formats 
 - inspect data points that were misclassified to help improve your model
 - leverage a simple prediction API for saving and deploying both models and data-preprocessing steps to make predictions on new raw data
 
-#### Tutorial Notebooks
+
+### Tutorials
 Please see the following tutorial notebooks for a guide on how to use *ktrain* on your projects:
 * Tutorial 1:  [Introduction](https://github.com/amaiya/ktrain/blob/master/tutorial-01-introduction.ipynb)
 * Tutorial 2:  [Tuning Learning Rates](https://github.com/amaiya/ktrain/blob/master/tutorial-02-tuning-learning-rates.ipynb)
@@ -17,10 +18,51 @@ Please see the following tutorial notebooks for a guide on how to use *ktrain* o
 * Tutorial 4: [Text Classification](https://github.com/amaiya/ktrain/blob/master/tutorial-04-text-classification.ipynb)
 * Tutorial A1: [Additional tricks](https://github.com/amaiya/ktrain/blob/master/tutorial-A1-additional-tricks.ipynb), which covers topics such as examining misclassifications, inspecting intermediate output of Keras models for debugging, and built-in callbacks.
 
+
+
+
+A Medium post providing a broad overview of *ktrain* is here:
+
+> [**ktrain: A Lightweight Wrapper for Keras to Help Train Neural Networks**](https://towardsdatascience.com/ktrain-a-lightweight-wrapper-for-keras-to-help-train-neural-networks-82851ba889c)   by Arun Maiya.
+
+
+
+
+
+
 Tasks such as text classification and image classification can be accomplished easily with 
 only a few lines of code.
 
-#### Example: Classifying Images of [Dogs and Cats](https://www.kaggle.com/c/dogs-vs-cats) Using *ktrain*
+#### Example: Text Classification of [IMDb Movie Reviews](https://ai.stanford.edu/~amaas/data/sentiment/) Using [BERT](https://arxiv.org/pdf/1810.04805.pdf)
+```
+import ktrain
+from ktrain import text as txt
+
+# load data
+(x_train, y_train), (x_test, y_test), preproc = text.texts_from_folder('data/aclImdb', maxlen=500, 
+                                                                     preprocess_mode='bert',
+                                                                     train_test_names=['train', 'test'],
+                                                                     classes=['pos', 'neg'])
+
+# load model
+model = txt.text_classifier('bert', (x_train, y_train))
+
+# wrap model and data in ktrain.Learner object
+learner = ktrain.get_learner(model, 
+                             train_data=(x_train, y_train), 
+                             val_data=(x_test, y_test), 
+                             batch_size=6)
+
+# find good learning rate
+learner.lr_find()             # briefly simulate training to find good learning rate
+learner.lr_plot()             # visually identify best learning rate
+
+# train using 1cycle learning rate schedule
+learner.fit_onecycle(2e-5, 3) 
+```
+
+
+#### Example: Classifying Images of [Dogs and Cats](https://www.kaggle.com/c/dogs-vs-cats) Using a Pretrained [ResNet50](https://arxiv.org/abs/1512.03385) model
 ```
 import ktrain
 from ktrain import vision as vis
@@ -47,14 +89,17 @@ learner.lr_plot()             # visually identify best learning rate
 learner.autofit(1e-4, checkpoint_folder='/tmp') 
 ```
 
+Additional examples can be found [here](https://github.com/amaiya/ktrain/tree/master/examples).
+
+
+
 ### Installation
 
 ```
 pip3 install ktrain
 ```
 
-
-
+<!--
 ### Requirements
 
 The following software/libraries should be installed:
@@ -65,9 +110,11 @@ The following software/libraries should be installed:
 - [scikit-learn](https://scikit-learn.org/stable/) (tested on 0.20.0)
 - [matplotlib](https://matplotlib.org/) (tested on 3.0.0)
 - [pandas](https://pandas.pydata.org/) (tested on 0.24.2)
-<!--- [PIL](https://pillow.readthedocs.io/en/stable/) (tested on 5.1.0) -->
-<!-- - [scipy](https://www.scipy.org/) (tested on 1.2.1)  - insalled by scikit-learn-->
-<!-- - [numpy](http://www.numpy.org/) (tested on 1.16.1)  - installed by scikit-learn -->
+- [keras_bert](https://github.com/CyberZHG/keras-bert/tree/master/keras_bert) 
+- [fastprogress](https://github.com/fastai/fastprogress) 
+-->
+
+
 
 This code was tested on Ubuntu 18.04 LTS using Keras 2.2.4 with a TensorFlow 1.10 backend.
 There are a few portions of the code that may explicitly depend on TensorFlow, but

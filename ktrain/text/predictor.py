@@ -1,11 +1,7 @@
-from keras.engine.training import Model
-import numpy as np
-import math
+from ..imports import *
 from ..predictor import Predictor
 from .preprocessor import TextPreprocessor
-from sklearn.metrics import classification_report, confusion_matrix
 from .. import utils as U
-import warnings
 
 class TextPredictor(Predictor):
     """
@@ -23,8 +19,10 @@ class TextPredictor(Predictor):
         self.preproc = preproc
         self.c = self.preproc.get_classes()
 
+
     def get_classes(self):
         return self.c
+
 
     def predict(self, texts, return_proba=False):
         """

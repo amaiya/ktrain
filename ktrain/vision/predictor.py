@@ -1,13 +1,7 @@
-from keras.engine.training import Model
-from sklearn.metrics import classification_report, confusion_matrix
-import numpy as np
-import os.path
-import math
+from ..imports import *
 from ..predictor import Predictor
 from .preprocessor import ImagePreprocessor
-import warnings
 from .. import utils as U
-import pickle
 
 
 
