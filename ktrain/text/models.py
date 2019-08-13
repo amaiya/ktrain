@@ -30,8 +30,7 @@ def calc_r(y_i, x, y):
     return np.log(calc_pr(y_i, x, y, True) / calc_pr(y_i, x, y, False))
 
 
-def text_classifier(name, train_data, preproc=None, multilabel=None,
-                    wv_fpath=None, verbose=1):
+def text_classifier(name, train_data, preproc=None, multilabel=None, verbose=1):
     """
     Build and return the default text classification model.
 
@@ -49,9 +48,6 @@ def text_classifier(name, train_data, preproc=None, multilabel=None,
         preproc: a ktrain.text.TextPreprocessor instance.
                    This is only required for those models
                    that employ pretrained-word vectors (e.g., BIGRU)
-        wv_fpath (string): path to English word vector file.
-               Recommended:
-               https://dl.fbaipublicfiles.com/fasttext/vectors-english/crawl-300d-2M.vec.zip
         multilabel (bool):  If True, multilabel model will be returned.
                             If false, binary/multiclass model will be returned.
                             If None, multilabel will be inferred from data.
@@ -72,8 +68,6 @@ def text_classifier(name, train_data, preproc=None, multilabel=None,
         raise ValueError('A valid TextPreprocessor object is required for bigru')
     if name == BIGRU and preproc.ngram_count() != 1:
         raise ValueError('Data should be processed with ngram_range=1 for bigru model.')
-    if name == BIGRU and not os.path.isfile(wv_fpath):
-        raise ValueError('valid wv_fpath is required for bigru')
     is_bert = U.bert_data_tuple(train_data)
     if is_bert and name != BERT:
         raise ValueError('data is preprocessed for %s but %s was not specified as model' % (BERT, BERT))
@@ -157,8 +151,7 @@ def text_classifier(name, train_data, preproc=None, multilabel=None,
                             features,
                             loss_func=loss_func,
                             activation=activation, verbose=verbose,
-                            tokenizer=tokenizer, 
-                            wv_fpath=wv_fpath)
+                            tokenizer=tokenizer)
     else:
         raise ValueError('name for textclassifier is invalid')
     U.vprint('done.', verbose=verbose)
@@ -294,15 +287,17 @@ def _build_bigru(x_train, y_train, num_classes,
                   maxlen, max_features, features,
                  loss_func='categorical_crossentropy',
                  activation = 'softmax', verbose=1,
-                 tokenizer=None, wv_fpath=None):
+                 tokenizer=None):
+
 
     if tokenizer is None: raise ValueError('bigru requires valid Tokenizer object')
 
+    wv_fpath = tpp.get_wv_path()
+
+    
+
     # setup pre-trained word embeddings
     embed_size = 300
-    path = os.path.abspath(__file__)
-    #wvpath = os.path.dirname(path)
-    #EMBEDDING_FILE = os.path.join(wvpath, 'crawl-300d-2M.vec')
     U.vprint('processing pretrained word vectors...', verbose=verbose)
     embeddings_index = dict(get_coefs(*o.rstrip().rsplit(' ')) for o in open(wv_fpath))
     word_index = tokenizer.word_index

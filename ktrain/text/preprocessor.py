@@ -3,21 +3,43 @@ from .. import utils as U
 from ..preprocessor import Preprocessor
 
 
+def fname_from_url(url):
+    return os.path.split(url)[-1]
+
+
+#------------------------------------------------------------------------------
+# Word Vectors
+#------------------------------------------------------------------------------
+WV_URL = 'https://dl.fbaipublicfiles.com/fasttext/vectors-english/crawl-300d-2M.vec.zip'
+
+def get_wv_path():
+    ktrain_data = U.get_ktrain_data()
+    zip_fpath = os.path.join(ktrain_data, fname_from_url(WV_URL))
+    wv_path =  os.path.join(ktrain_data, os.path.splitext(fname_from_url(WV_URL))[0])
+    if not os.path.isfile(wv_path):
+        # download zip
+        print('downloading pretrained word vectors...')
+        U.download(WV_URL, zip_fpath)
+
+        # unzip
+        print('\nextracting pretrained pretrained word vectors...')
+        with zipfile.ZipFile(zip_fpath, 'r') as zip_ref:
+            zip_ref.extractall(ktrain_data)
+        print('done.\n')
+    return wv_path
+
+
+#------------------------------------------------------------------------------
+# BERT
+#------------------------------------------------------------------------------
+
 #BERT_PATH = os.path.join(os.path.dirname(os.path.abspath(localbert.__file__)), 'uncased_L-12_H-768_A-12')
 BERT_URL = 'https://storage.googleapis.com/bert_models/2018_10_18/uncased_L-12_H-768_A-12.zip'
 
-def get_bert_zip():
-    return os.path.split(BERT_URL)[-1]
-
-def get_bert_folder():
-    return os.path.splitext(get_bert_zip())[0]
-
-
 def get_bert_path():
     ktrain_data = U.get_ktrain_data()
-    bert_path = os.path.join(ktrain_data, get_bert_folder())
-    zip_fname = get_bert_zip()
-    zip_fpath = os.path.join(ktrain_data, zip_fname)
+    zip_fpath = os.path.join(ktrain_data, fname_from_url(BERT_URL))
+    bert_path = os.path.join( ktrain_data, os.path.splitext(fname_from_url(BERT_URL))[0] )
     if not os.path.isdir(bert_path) or \
        not os.path.isfile(os.path.join(bert_path, 'bert_config.json')) or\
        not os.path.isfile(os.path.join(bert_path, 'bert_model.ckpt.data-00000-of-00001')) or\
@@ -26,10 +48,7 @@ def get_bert_path():
        not os.path.isfile(os.path.join(bert_path, 'vocab.txt')):
         # download zip
         print('downloading pretrained BERT model and vocabulary...')
-        #urllib.request.urlretrieve(BERT_URL, filename=zip_fpath)
-        #wget.download(BERT_URL, zip_fpath)
         U.download(BERT_URL, zip_fpath)
-        #urllib.request.urlretrieve(BERT_URL, filename=zip_fpath)
 
         # unzip
         print('\nextracting pretrained BERT model and vocabulary...')
@@ -50,6 +69,9 @@ def bert_tokenize(docs, tokenizer, maxlen, verbose=1):
         if verbose: mb.write('done.')
     zeros = np.zeros_like(indices)
     return [np.array(indices), np.array(zeros)]
+
+#------------------------------------------------------------------------------
+
 
 
 class TextPreprocessor(Preprocessor):
