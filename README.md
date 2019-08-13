@@ -39,7 +39,7 @@ import ktrain
 from ktrain import text as txt
 
 # load data
-(x_train, y_train), (x_test, y_test), preproc = text.texts_from_folder('data/aclImdb', maxlen=500, 
+(x_train, y_train), (x_test, y_test), preproc = txt.texts_from_folder('data/aclImdb', maxlen=500, 
                                                                      preprocess_mode='bert',
                                                                      train_test_names=['train', 'test'],
                                                                      classes=['pos', 'neg'])
