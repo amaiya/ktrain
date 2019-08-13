@@ -12,15 +12,9 @@ def get_bert_zip():
 def get_bert_folder():
     return os.path.splitext(get_bert_zip())[0]
 
-def get_ktrain_data():
-    home = os.path.expanduser('~')
-    ktrain_data = os.path.join(home, 'ktrain_data')
-    if not os.path.isdir(ktrain_data):
-        os.mkdir(ktrain_data)
-    return ktrain_data
 
 def get_bert_path():
-    ktrain_data = get_ktrain_data()
+    ktrain_data = U.get_ktrain_data()
     bert_path = os.path.join(ktrain_data, get_bert_folder())
     zip_fname = get_bert_zip()
     zip_fpath = os.path.join(ktrain_data, zip_fname)
@@ -31,14 +25,14 @@ def get_bert_path():
        not os.path.isfile(os.path.join(bert_path, 'bert_model.ckpt.meta')) or\
        not os.path.isfile(os.path.join(bert_path, 'vocab.txt')):
         # download zip
-        print('downloading pretrained BERT model...')
+        print('downloading pretrained BERT model and vocabulary...')
         #urllib.request.urlretrieve(BERT_URL, filename=zip_fpath)
         #wget.download(BERT_URL, zip_fpath)
         U.download(BERT_URL, zip_fpath)
         #urllib.request.urlretrieve(BERT_URL, filename=zip_fpath)
 
         # unzip
-        print('\nextracting pretrained BERT model...')
+        print('\nextracting pretrained BERT model and vocabulary...')
         with zipfile.ZipFile(zip_fpath, 'r') as zip_ref:
             zip_ref.extractall(ktrain_data)
         print('done.\n')
@@ -243,12 +237,12 @@ class StandardTextPreprocessor(TextPreprocessor):
         return set(zip(*[input_list[i:] for i in range(ngram_value)]))
 
 
-        def ngram_count(self):
-            if not self.tok_dct: return 1
-            s = set()
-            for k in self.tok_dct.keys():
-                s.add(len(k))
-            return max(list(s))
+    def ngram_count(self):
+        if not self.tok_dct: return 1
+        s = set()
+        for k in self.tok_dct.keys():
+            s.add(len(k))
+        return max(list(s))
 
 
 class BERTPreprocessor(TextPreprocessor):

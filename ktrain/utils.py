@@ -319,3 +319,11 @@ def download(url, filename):
                 sys.stdout.flush()
 
 
+
+
+def get_ktrain_data():
+    home = os.path.expanduser('~')
+    ktrain_data = os.path.join(home, 'ktrain_data')
+    if not os.path.isdir(ktrain_data):
+        os.mkdir(ktrain_data)
+    return ktrain_data
