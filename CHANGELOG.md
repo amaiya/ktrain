@@ -14,6 +14,9 @@ Most recent releases are shown at the top. Each release shows:
 ### Changed:
 - For ```Learner.lr_find```, added optional ```max_epochs``` argument. 
 - Changed ```Learner.confusion_matrix``` to ```Learner.validate``` and added optional ```val_data``` argument.
+  The ```use_valid``` argument has been removed.
+- Removed ```pretrained_fpath``` argument to ```text.text_classifier```.  Pretrained word vectors are
+  now downloaded automatically when 'bigru' is selected as model.
 
 ### Fixed:
 - Further cleanup of  ```utils.is_iter``` function to use type check.
