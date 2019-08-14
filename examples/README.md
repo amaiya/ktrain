@@ -25,7 +25,7 @@ These examples show the results of training on a relatively small training set.
 
 
 ### [Toxic Comments](https://www.kaggle.com/c/jigsaw-toxic-comment-classification-challenge):  Multi-Label Text Classification
-In multi-label classification, a single document can belong to multiple characters.  The objective here is
+In multi-label classification, a single document can belong to multiple classes.  The objective here is
 to categorize each text comment into one or more categories of toxic online behavior.
 Dataset is in the form of a CSV file.
 - [toxic_comments-fasttext.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text):  A fasttext-like model applied in a multi-label setting.
