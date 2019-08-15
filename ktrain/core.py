@@ -1040,6 +1040,9 @@ class GenLearner(Learner):
         # handle callbacks
         num_samples = U.nsamples_from_data(self.train_data)
         steps_per_epoch = num_samples // self.train_data.batch_size
+        validation_steps = None
+        if self.val_data is not None:
+            validation_steps = U.nsamples_from_data(self.val_data)//self.val_data.batch_size
 
         epochs = self._check_cycles(n_cycles, cycle_len, cycle_mult)
         self.set_lr(lr)
@@ -1066,6 +1069,7 @@ class GenLearner(Learner):
             warnings.filterwarnings('ignore', message='.*Check your callbacks.*')
             hist = self.model.fit_generator(self.train_data,
                                            steps_per_epoch = steps_per_epoch,
+                                           validation_steps = validation_steps,
                                            epochs=epochs,
                                            validation_data=self.val_data,
                                            workers=self.workers,

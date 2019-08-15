@@ -6,6 +6,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.2.1 (2019-08-15)
+
+### New:
+- N/A
+
+### Changed:
+- N/A
+
+### Fixed:
+- Fixed error related to validation_steps=None in call to fit_generator in ```ktrain.core``` on Google Colab
+
+
 ## 0.2.0 (2019-08-12)
 
 ### New:
