@@ -6,6 +6,19 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.2.2 (2019-08-16)
+
+### New:
+- N/A
+
+### Changed:
+- Added check in ```ktrain.lroptimize.lrfinder``` to stop training if learning rate exceeds a fixed maximum,
+  which may happen when bad/dysfunctional model is supplied to learning rate finder.
+
+### Fixed:
+- In ```ktrain.text.data.texts_from_folder``` function, only subfolders specified in classes argument 
+  are read in as training and validation data.
+
 ## 0.2.1 (2019-08-15)
 
 ### New:
@@ -15,7 +28,7 @@ Most recent releases are shown at the top. Each release shows:
 - N/A
 
 ### Fixed:
-- Fixed error related to validation_steps=None in call to fit_generator in ```ktrain.core``` on Google Colab
+- Fixed error related to validation_steps=None in call to fit_generator in ```ktrain.core``` on Google Colab.
 
 
 ## 0.2.0 (2019-08-12)

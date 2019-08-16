@@ -47,6 +47,11 @@ class LRFinder:
         lr *= self.lr_mult
         K.set_value(self.model.optimizer.lr, lr)
 
+        # stop if LR grows too large
+        if lr > 10.:
+            self.model.stop_training = True
+            return
+
 
     def find(self, train_data, start_lr, lr_mult=1.01, max_epochs=None, 
              batch_size=U.DEFAULT_BS, workers=1, use_multiprocessing=False, verbose=1):

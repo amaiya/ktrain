@@ -51,8 +51,8 @@ def texts_from_folder(datadir, classes=None,
     # read in training and test corpora
     train_str = train_test_names[0]
     test_str = train_test_names[1]
-    train_b = load_files(os.path.join(datadir, train_str), shuffle=True)
-    test_b = load_files(os.path.join(datadir,  test_str), shuffle=False)
+    train_b = load_files(os.path.join(datadir, train_str), shuffle=True, categories=classes)
+    test_b = load_files(os.path.join(datadir,  test_str), shuffle=False, categories=classes)
     x_train = [x.decode('utf-8') for x in train_b.data]
     x_test = [x.decode('utf-8') for x in test_b.data]
     y_train = train_b.target
