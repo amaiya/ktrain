@@ -26,7 +26,7 @@ A Medium post providing a broad overview of *ktrain* is here:
 > [**ktrain: A Lightweight Wrapper for Keras to Help Train Neural Networks**](https://towardsdatascience.com/ktrain-a-lightweight-wrapper-for-keras-to-help-train-neural-networks-82851ba889c)   by Arun Maiya.
 
 
-
+Using *ktrain* on **Google Colab**?  See [this demo of Multiclass Text Classification with BERT](https://colab.research.google.com/drive/1ixOZTKLz4aAa-MtC6dy_sAvc9HujQmHN).
 
 
 
