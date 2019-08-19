@@ -851,7 +851,8 @@ class Learner(ABC):
             val = self.val_data
         if val is None: raise Exception('val_data must be supplied to get_learner or predict')
         if U.is_iter(val):
-            return self.model.predict_generator(val)
+            steps = np.ceil(U.nsamples_from_data(val)/val.batch_size)
+            return self.model.predict_generator(val, steps=steps)
         else:
             return self.model.predict(val[0])
 
@@ -1103,16 +1104,6 @@ class GenLearner(Learner):
             example = self.val_data[0][batch_id][example_id]
         layer_out = f_out([np.array([example,])])[0]
         return layer_out
-
-
-    def predict(self):
-        """
-        Makes predictions on validation set
-        """
-        if self.val_data is None:
-            raise Exception('val_data is None')
-        return self.model.predict_generator(self.val_data)
-
 
 
 def get_predictor(model, preproc):
