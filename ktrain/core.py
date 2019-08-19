@@ -192,12 +192,13 @@ class Learner(ABC):
         return cm
 
 
-    def top_losses(self, n=8):
+    def top_losses(self, n=8, val_data=None):
         """
         Computes losses on validation set sorted by examples with top losses
         Args:
-         n(int or tuple): a range to select in form of int or tuple
+          n(int or tuple): a range to select in form of int or tuple
                           e.g., n=8 is treated as n=(0,8)
+          val_data:  optional val_data to use instead of self.val_data
         Returns:
             list of n tuples where first element is either 
             filepath or id of validation example and second element
@@ -207,16 +208,19 @@ class Learner(ABC):
         import tensorflow as tf
 
         # check validation data and arguments
-        if not self.val_data:
-            raise Exception('val_data was not supplied to get_learner')
+        if val_data is not None:
+            val = val_data
+        else:
+            val = self.val_data
+        if val is None: raise Exception('val_data must be supplied to get_learner or top_losses')
         if type(n) == type(42):
             n = (0, n)
 
-        multilabel = True if U.is_multilabel(self.val_data) else False
+        multilabel = True if U.is_multilabel(val) else False
 
         # get predicictions and ground truth
-        y_pred = self.predict()
-        y_true = self.ground_truth()
+        y_pred = self.predict(val_data=val)
+        y_true = self.ground_truth(val_data=val)
         y_true = y_true.astype('float32')
 
         # compute loss
@@ -237,7 +241,7 @@ class Learner(ABC):
         return tups
 
 
-    def view_top_losses(self, preproc=None, n=8):
+    def view_top_losses(self, preproc=None, n=8, val_data=None):
         """
         Views observations with top losses in validation set.
         Args:
@@ -247,32 +251,44 @@ class Learner(ABC):
                                  to correctly view raw data.
          n(int or tuple): a range to select in form of int or tuple
                           e.g., n=8 is treated as n=(0,8)
+          val_data:  optional val_data to use instead of self.val_data
         Returns:
             list of n tuples where first element is either 
             filepath or id of validation example and second element
             is loss.
 
         """
-        tups = self.top_losses(n=n)
+        # check validation data and arguments
+        if val_data is not None:
+            val = val_data
+        else:
+            val = self.val_data
+        if val is None: raise Exception('val_data must be supplied to get_learner or view_top_losses')
+
+        # TODO: fix this
+        tups = self.top_losses(n=n, val_data=val)
         for tup in tups:
             idx = tup[0]
             loss = tup[1]
-            if type(self.val_data).__name__ in ['DirectoryIterator', 'DataFrameIterator']:
+            if type(val).__name__ in ['DirectoryIterator', 'DataFrameIterator']:
                 # idx is replaced with a file path
                 # replace IDs with file paths, if possible
-                fpath = self.val_data.filepaths[tup[0]]
+                fpath = val.filepaths[tup[0]]
                 plt.figure()
                 plt.title("%s (LOSS: %s)" % (fpath, round(loss,3)))
                 show_image(fpath)
             else:
-                if type(self.val_data).__name__ in ['NumpyArrayIterator']:
-                    obs = self.val_data.x[idx]
+                if type(val).__name__ in ['NumpyArrayIterator']:
+                    obs = val.x[idx]
                     if preproc is not None: obs = preproc.undo(obs)
                     plt.figure()
                     plt.title("id:%s (LOSS: %s)" % (idx, round(loss,3)))
                     plt.imshow(np.squeeze(obs))
                 else:
-                    obs = self.val_data[0][idx]
+                    if U.bert_data_tuple(val):
+                        obs = val[0][0][idx]
+                    else:
+                        obs = val[0][idx]
                     if preproc is not None: obs = preproc.undo(obs)
                     print('----------')
                     print("val_id:%s (LOSS: %s)\n" % (idx, round(loss,3)))
