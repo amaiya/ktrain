@@ -6,6 +6,19 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.2.3 (2019-08-18)
+
+### New:
+- N/A
+
+### Changed:
+-
+
+### Fixed:
+- Fixed issue with ```learner.validate``` and ```learner.predict``` failing when validation data is in 
+  the form of an Iterator (e.g., DirectoryIterator).
+
+
 ## 0.2.2 (2019-08-16)
 
 ### New:
