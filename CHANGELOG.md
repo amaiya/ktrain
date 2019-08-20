@@ -6,6 +6,19 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.2.4 (2019-08-20)
+
+### New:
+- added additional tests of *ktrain*
+
+### Changed:
+- Added ```classes``` argument to ```vision.images_from_folder```.  Only classes/subfolders
+  matching a name in the ```classes``` list will be considered.
+
+### Fixed:
+- Resolved issue with using ```learner.view_top_losses``` with BERT models.
+
+
 ## 0.2.3 (2019-08-18)
 
 ### New:
