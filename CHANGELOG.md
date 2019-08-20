@@ -12,7 +12,8 @@ Most recent releases are shown at the top. Each release shows:
 - N/A
 
 ### Changed:
--
+- Added ```classes``` argument to ```vision.images_from_folder```.  Only classes/subfolders
+  matching a name in the ```classes``` list will be considered.
 
 ### Fixed:
 - Fixed issue with ```learner.validate``` and ```learner.predict``` failing when validation data is in 
