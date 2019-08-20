@@ -88,7 +88,7 @@ class TestTextClassification(TestCase):
 
 
 
-    def X_test_nbsvm(self):
+    def test_nbsvm(self):
         trn, val, preproc = txt.texts_from_array(x_train=self.trn[0], 
                                                  y_train=self.trn[1],
                                                  x_test=self.val[0], 
