@@ -123,7 +123,7 @@ class Learner(ABC):
         """
         wds = []
         for layer in self.model.layers:
-            if hasattr(layer, 'kernel_regularizer'):
+            if hasattr(layer, 'kernel_regularizer') and hasattr(layer, 'kernel'):
                 reg = layer.kernel_regularizer
                 if hasattr(reg, 'l2'):
                     wd = reg.l2
@@ -153,10 +153,10 @@ class Learner(ABC):
               
         """
         for layer in self.model.layers:
-            if hasattr(layer, 'kernel_regularizer'):
+            if hasattr(layer, 'kernel_regularizer') and hasattr(layer, 'kernel'):
                 layer.kernel_regularizer= regularizers.l2(wd)
                 layer.add_loss(regularizers.l2(wd)(layer.kernel))
-            if hasattr(layer, 'bias_regularizer'):
+            if hasattr(layer, 'bias_regularizer') and hasattr(layer, 'bias'):
                 layer.bias_regularizer= regularizers.l2(wd)
                 layer.add_loss(regularizers.l2(wd)(layer.bias))
         self._recompile()
