@@ -301,7 +301,7 @@ class BERTPreprocessor(TextPreprocessor):
                 token_dict[token] = len(token_dict)
         tokenizer = BERT_Tokenizer(token_dict)
         self.tok = tokenizer
-        self.tok_dct = token_dict
+        self.tok_dct = dict((v,k) for k,v in token_dict.items())
 
 
     def get_preprocessor(self):

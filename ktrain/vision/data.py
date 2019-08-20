@@ -300,6 +300,7 @@ def preprocess_csv(csv_in, csv_out, x_col='filename', y_col=None,
 
 
 def images_from_folder(datadir, target_size=(224,224),
+                       classes=None,
                        color_mode='rgb',
                        train_test_names=['train', 'test'],
                        data_aug=None, verbose=1):
@@ -358,6 +359,7 @@ def images_from_folder(datadir, target_size=(224,224),
                                         color_mode=color_mode)
     batches_tr = train_datagen.flow_from_directory(train_dir,
                                          target_size=target_size,
+                                         classes=classes,
                                          class_mode='categorical',
                                          shuffle=True,
                                          interpolation='bicubic',
@@ -365,6 +367,7 @@ def images_from_folder(datadir, target_size=(224,224),
 
     batches_te = test_datagen.flow_from_directory(test_dir,
                                               target_size=target_size,
+                                              classes=classes,
                                               class_mode='categorical',
                                               shuffle=False,
                                               interpolation='bicubic',
@@ -403,7 +406,6 @@ def images_from_csv(train_filepath,
     val_filepath (string): path to validation dataset in CSV format
     suffix(string): suffix to add to file names in image_column 
     target_size (tuple):  image dimensions 
-    classes (list):  optional list of class subdirectories (e.g., ['cats','dogs'])
     color_mode (string):  color mode
     data_aug(ImageDataGenerator):  a keras.preprocessing.image.ImageDataGenerator
                                   for data augmentation
