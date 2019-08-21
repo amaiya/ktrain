@@ -30,7 +30,12 @@ class TextPredictor(Predictor):
         or text snippet.
         If return_proba is True, returns probabilities of each class.
         """
-        if not isinstance(texts, np.ndarray) and not isinstance(texts, list):
+
+        is_str = False
+        if isinstance(texts, str):
+            is_str = True
+            texts = [texts]
+        elif not isinstance(texts, np.ndarray) and not isinstance(texts, list):
             raise ValueError('data must be numpy.ndarray or list (of texts)')
         loss = self.model.loss
         treat_multilabel = False
@@ -41,10 +46,27 @@ class TextPredictor(Predictor):
         preds = self.model.predict(texts)
         result =  preds if return_proba else [self.c[np.argmax(pred)] for pred in preds] 
         if treat_multilabel:
-            return [list(zip(self.c, r)) for r in result]
-        else:
-            return result
+            result =  [list(zip(self.c, r)) for r in result]
+        if is_str: return result[0]
+        else:      return result
 
+
+
+    def predict_proba(self, texts):
+        """
+        Makes predictions for a list of strings where each string is a document
+        or text snippet.
+        Returns probabilities of each class.
+        """
+        return self.predict(texts, return_proba=True)
+
+
+    #def explain(self, doc):
+        #if not isinstance(doc, str): raise Exception('text must of type str')
+        #doc = ' '.join(doc.split()[:512])
+        #te = TextExplainer(random_state=42)
+        #_ = te.fit(doc, self.predict_proba)
+        #return te.show_prediction(target_names=self.preproc.get_classes())
 
 
     def analyze_valid(self, val_tup, print_report=True, multilabel=None):

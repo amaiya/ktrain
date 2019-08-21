@@ -231,9 +231,9 @@ class Learner(ABC):
         if 'acc' in self.model.metrics_names and not multilabel:
             y_p = np.argmax(y_pred, axis=1)
             y_t = np.argmax(y_true, axis=1)
-            tups = [(i,x) for i, x in enumerate(losses) if y_p[i] != y_t[i]]
+            tups = [(i,x, y_t[i]) for i, x in enumerate(losses) if y_p[i] != y_t[i]]
         else:
-            tups = [(i,x) for i, x in enumerate(losses)]
+            tups = [(i,x, y_t[i]) for i, x in enumerate(losses)]
         tups.sort(key=operator.itemgetter(1), reverse=True)
 
         # prune by given range
@@ -258,6 +258,8 @@ class Learner(ABC):
             is loss.
 
         """
+        # TODO: fix this mess
+
         # check validation data and arguments
         if val_data is not None:
             val = val_data
@@ -265,33 +267,50 @@ class Learner(ABC):
             val = self.val_data
         if val is None: raise Exception('val_data must be supplied to get_learner or view_top_losses')
 
-        # TODO: fix this
+        # get top losses and associated data
         tups = self.top_losses(n=n, val_data=val)
+
+        # get multilabel status and class names
+        multilabel = True if U.is_multilabel(self.train_data) else False
+        classes = preproc.get_classes() if preproc is not None else None
+
+        # iterate through losses
         for tup in tups:
+
+            # get data
             idx = tup[0]
             loss = tup[1]
+            truth = tup[2]
+
+            # convert ground truth to class name
+            if not multilabel and self.model.loss == 'categorical_crossentropy' and classes: 
+               truth =  classes[np.argmax(truth)]
+
+            # Image Classification
             if type(val).__name__ in ['DirectoryIterator', 'DataFrameIterator']:
-                # idx is replaced with a file path
-                # replace IDs with file paths, if possible
                 fpath = val.filepaths[tup[0]]
                 plt.figure()
-                plt.title("%s (LOSS: %s)" % (fpath, round(loss,3)))
+                plt.title("%s | loss:%s | truth:%s)" % (fpath, round(loss,2), truth))
                 show_image(fpath)
             else:
+                # Image Classification from Array
                 if type(val).__name__ in ['NumpyArrayIterator']:
                     obs = val.x[idx]
                     if preproc is not None: obs = preproc.undo(obs)
                     plt.figure()
-                    plt.title("id:%s (LOSS: %s)" % (idx, round(loss,3)))
+                    plt.title("id:%s | loss:%s | truth:%s)" % (idx, round(loss,2), truth))
                     plt.imshow(np.squeeze(obs))
+                # everything else including text classification
                 else:
                     if U.bert_data_tuple(val):
                         obs = val[0][0][idx]
                     else:
                         obs = val[0][idx]
                     if preproc is not None: obs = preproc.undo(obs)
+                    if type(obs) == str:
+                        obs = ' '.join(obs.split()[:512])
                     print('----------')
-                    print("val_id:%s (LOSS: %s)\n" % (idx, round(loss,3)))
+                    print("id:%s | loss:%s | truth:%s)\n" % (idx, round(loss,2), truth))
                     print(obs)
         return
 
