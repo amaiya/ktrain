@@ -7,11 +7,12 @@ import os
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID";
 os.environ["CUDA_VISIBLE_DEVICES"]="0"
 sys.path.insert(0,'../..')
+import unittest
 from unittest import TestCase, main, skip
 import numpy as np
 import ktrain
 from ktrain import text as txt
-
+TEST_DOC = 'god christ jesus mother mary church sunday lord heaven amen'
 
 class TestTextClassification(TestCase):
 
@@ -79,15 +80,14 @@ class TestTextClassification(TestCase):
 
         # test predictor
         p = ktrain.get_predictor(learner.model, preproc)
-        self.assertEqual(p.predict(['god christ jesus mother mary church sunday lord heaven amen'])[0], 
-                         'soc.religion.christian')
+        self.assertEqual(p.predict([TEST_DOC])[0], 'soc.religion.christian')
         p.save('/tmp/test_predictor')
         p = ktrain.load_predictor('/tmp/test_predictor')
-        self.assertEqual(p.predict(['god christ jesus mother mary church sunday lord heaven amen'])[0], 
-                         'soc.religion.christian')
+        self.assertEqual(p.predict([TEST_DOC])[0], 'soc.religion.christian')
+        self.assertEqual(np.argmax(p.predict_proba([TEST_DOC])[0]), 3)
 
 
-
+    
     def test_nbsvm(self):
         trn, val, preproc = txt.texts_from_array(x_train=self.trn[0], 
                                                  y_train=self.trn[1],
@@ -132,12 +132,11 @@ class TestTextClassification(TestCase):
 
         # test predictor
         p = ktrain.get_predictor(learner.model, preproc)
-        self.assertEqual(p.predict(['god christ jesus mother mary church sunday lord heaven amen'])[0], 
-                         'soc.religion.christian')
+        self.assertEqual(p.predict([TEST_DOC])[0], 'soc.religion.christian')
         p.save('/tmp/test_predictor')
         p = ktrain.load_predictor('/tmp/test_predictor')
-        self.assertEqual(p.predict(['god christ jesus mother mary church sunday lord heaven amen'])[0], 
-                         'soc.religion.christian')
+        self.assertEqual(p.predict([TEST_DOC])[0], 'soc.religion.christian')
+        self.assertEqual(np.argmax(p.predict_proba([TEST_DOC])[0]), 3)
 
 
     def test_logreg(self):
@@ -184,14 +183,14 @@ class TestTextClassification(TestCase):
 
         # test predictor
         p = ktrain.get_predictor(learner.model, preproc)
-        self.assertEqual(p.predict(['god christ jesus mother mary church sunday lord heaven amen'])[0], 
-                         'soc.religion.christian')
+        self.assertEqual(p.predict([TEST_DOC])[0], 'soc.religion.christian')
         p.save('/tmp/test_predictor')
         p = ktrain.load_predictor('/tmp/test_predictor')
-        self.assertEqual(p.predict(['god christ jesus mother mary church sunday lord heaven amen'])[0], 
-                         'soc.religion.christian')
+        self.assertEqual(p.predict([TEST_DOC])[0], 'soc.religion.christian')
+        self.assertEqual(np.argmax(p.predict_proba([TEST_DOC])[0]), 3)
 
 
+    #@unittest.skip('temporarily disabled')
     def test_bigru(self):
         trn, val, preproc = txt.texts_from_array(x_train=self.trn[0], 
                                                  y_train=self.trn[1],
@@ -209,7 +208,7 @@ class TestTextClassification(TestCase):
 
         # test training results
         self.assertAlmostEqual(max(hist.history['lr']), lr)
-        self.assertGreater(max(hist.history['val_acc']), 0.92)
+        self.assertGreater(max(hist.history['val_acc']), 0.9)
         self.assertAlmostEqual(max(hist.history['momentum']), 0.95)
         self.assertAlmostEqual(min(hist.history['momentum']), 0.85)
 
@@ -238,14 +237,15 @@ class TestTextClassification(TestCase):
 
         # test predictor
         p = ktrain.get_predictor(learner.model, preproc)
-        self.assertEqual(p.predict(['god christ jesus mother mary church sunday lord heaven amen'])[0], 
-                         'soc.religion.christian')
+        self.assertEqual(p.predict([TEST_DOC])[0], 'soc.religion.christian')
         p.save('/tmp/test_predictor')
         p = ktrain.load_predictor('/tmp/test_predictor')
-        self.assertEqual(p.predict(['god christ jesus mother mary church sunday lord heaven amen'])[0], 
-                         'soc.religion.christian')
+        self.assertEqual(p.predict([TEST_DOC])[0], 'soc.religion.christian')
+        self.assertEqual(p.predict_proba([TEST_DOC])[0], 'soc.religion.christian')
+        self.assertEqual(np.argmax(p.predict_proba([TEST_DOC])[0]), 3)
 
 
+    #@unittest.skip('temporarily disabled')
     def test_bert(self):
         trn, val, preproc = txt.texts_from_array(x_train=self.trn[0], 
                                                  y_train=self.trn[1],
@@ -288,12 +288,13 @@ class TestTextClassification(TestCase):
 
         # test predictor
         p = ktrain.get_predictor(learner.model, preproc)
-        self.assertEqual(p.predict(['god christ jesus mother mary church sunday lord heaven amen'])[0], 
-                      'soc.religion.christian')
+        self.assertEqual(p.predict([TEST_DOC])[0], 'soc.religion.christian')
         p.save('/tmp/test_predictor')
         p = ktrain.load_predictor('/tmp/test_predictor')
-        self.assertEqual(p.predict(['god christ jesus mother mary church sunday lord heaven amen'])[0], 
-                         'soc.religion.christian')
+        self.assertEqual(p.predict([TEST_DOC])[0], 'soc.religion.christian')
+        self.assertEqual(np.argmax(p.predict_proba([TEST_DOC])[0]), 3)
+
+
 
 
 if __name__ == "__main__":

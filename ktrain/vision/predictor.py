@@ -76,6 +76,23 @@ class ImagePredictor(Predictor):
             return result
 
 
+    def predict_proba(self, data):
+        return self.predict(data, return_proba=True)
+
+
+    def predict_proba_folder(self, folder):
+        return self.predict_folder(folder, return_proba=True)
+
+
+    def predict_proba_filename(self, img_path):
+        return self.predict_filename(img_path, return_proba=True)
+
+
+    def predict_proba_generator(self, generator, steps=None):
+        return self.predict_proba_generator(generator, steps=steps, return_proba=True)
+
+
+
     def analyze_valid(self, generator, print_report=True, multilabel=None):
         """
         Makes predictions on validation set and returns the confusion matrix.
