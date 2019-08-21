@@ -43,6 +43,7 @@ def images_from_folder():
     (trn, val, preproc) = vis.images_from_folder(
                                                   datadir='image_data/image_folder',
                                                   data_aug=vis.get_data_aug(horizontal_flip=True), 
+                                                  classes=['cat', 'dog'],
                                                   train_test_names=['train', 'valid'])
     return (trn, val, preproc)
 
@@ -125,12 +126,12 @@ class TestTextData(TestCase):
 
 class TestImageData(TestCase):
 
-    def test_texts_from_folder_standard(self):
+    def test_images_from_folder(self):
         (trn, val, preproc)  = images_from_folder()
         self.__test_images(trn, val, preproc)
 
 
-    def test_texts_from_csv_standard(self):
+    def test_images_from_csv(self):
         (trn, val, preproc)  = images_from_csv()
         self.__test_images(trn, val, preproc)
 

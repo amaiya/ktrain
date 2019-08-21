@@ -77,8 +77,13 @@ class TestImageClassification(TestCase):
         p = ktrain.get_predictor(learner.model, preproc)
         r = p.predict_folder('image_data/image_folder/train/')
         self.assertEqual(r[0][1], 'cat')
+        r = p.predict_proba_folder('image_data/image_folder/train/')
+        self.assertEqual(np.argmax(r[0][1]), 0)
         r = p.predict_filename('image_data/image_folder/train/cat/cat.11737.jpg')
         self.assertEqual(r, ['cat'])
+        r = p.predict_proba_filename('image_data/image_folder/train/cat/cat.11737.jpg')
+        self.assertEqual(np.argmax(r), 0)
+
         p.save('/tmp/test_predictor')
         p = ktrain.load_predictor('/tmp/test_predictor')
         r = p.predict_filename('image_data/image_folder/train/cat/cat.11737.jpg')
