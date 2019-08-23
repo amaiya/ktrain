@@ -76,6 +76,7 @@ class TestImageClassification(TestCase):
         # test predictor
         p = ktrain.get_predictor(learner.model, preproc)
         r = p.predict_folder('image_data/image_folder/train/')
+        print(r)
         self.assertEqual(r[0][1], 'cat')
         r = p.predict_proba_folder('image_data/image_folder/train/')
         self.assertEqual(np.argmax(r[0][1]), 0)
