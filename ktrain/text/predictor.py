@@ -61,12 +61,15 @@ class TextPredictor(Predictor):
         return self.predict(texts, return_proba=True)
 
 
-    #def explain(self, doc):
-        #if not isinstance(doc, str): raise Exception('text must of type str')
-        #doc = ' '.join(doc.split()[:512])
-        #te = TextExplainer(random_state=42)
-        #_ = te.fit(doc, self.predict_proba)
-        #return te.show_prediction(target_names=self.preproc.get_classes())
+    def explain(self, doc):
+        """
+        Highlights text to explain prediction
+        """
+        if not isinstance(doc, str): raise Exception('text must of type str')
+        doc = ' '.join(doc.split()[:512])
+        te = TextExplainer(random_state=42)
+        _ = te.fit(doc, self.predict_proba)
+        return te.show_prediction(target_names=self.preproc.get_classes())
 
 
     def analyze_valid(self, val_tup, print_report=True, multilabel=None):

@@ -7,7 +7,7 @@ import os
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID";
 os.environ["CUDA_VISIBLE_DEVICES"]="0"
 sys.path.insert(0,'../..')
-import unittest
+import IPython
 from unittest import TestCase, main, skip
 import numpy as np
 import ktrain
@@ -83,11 +83,11 @@ class TestTextClassification(TestCase):
         self.assertEqual(p.predict([TEST_DOC])[0], 'soc.religion.christian')
         p.save('/tmp/test_predictor')
         p = ktrain.load_predictor('/tmp/test_predictor')
-        self.assertEqual(p.predict([TEST_DOC])[0], 'soc.religion.christian')
+        self.assertEqual(p.predict(TEST_DOC), 'soc.religion.christian')
         self.assertEqual(np.argmax(p.predict_proba([TEST_DOC])[0]), 3)
+        self.assertEqual(type(p.explain(TEST_DOC)), IPython.core.display.HTML)
 
 
-    
     def test_nbsvm(self):
         trn, val, preproc = txt.texts_from_array(x_train=self.trn[0], 
                                                  y_train=self.trn[1],
@@ -135,9 +135,9 @@ class TestTextClassification(TestCase):
         self.assertEqual(p.predict([TEST_DOC])[0], 'soc.religion.christian')
         p.save('/tmp/test_predictor')
         p = ktrain.load_predictor('/tmp/test_predictor')
-        self.assertEqual(p.predict([TEST_DOC])[0], 'soc.religion.christian')
+        self.assertEqual(p.predict(TEST_DOC), 'soc.religion.christian')
         self.assertEqual(np.argmax(p.predict_proba([TEST_DOC])[0]), 3)
-
+        self.assertEqual(type(p.explain(TEST_DOC)), IPython.core.display.HTML)
 
     def test_logreg(self):
         trn, val, preproc = txt.texts_from_array(x_train=self.trn[0], 
@@ -186,11 +186,12 @@ class TestTextClassification(TestCase):
         self.assertEqual(p.predict([TEST_DOC])[0], 'soc.religion.christian')
         p.save('/tmp/test_predictor')
         p = ktrain.load_predictor('/tmp/test_predictor')
-        self.assertEqual(p.predict([TEST_DOC])[0], 'soc.religion.christian')
+        self.assertEqual(p.predict(TEST_DOC), 'soc.religion.christian')
         self.assertEqual(np.argmax(p.predict_proba([TEST_DOC])[0]), 3)
+        self.assertEqual(type(p.explain(TEST_DOC)), IPython.core.display.HTML)
 
 
-    #@unittest.skip('temporarily disabled')
+    #@skip('temporarily disabled')
     def test_bigru(self):
         trn, val, preproc = txt.texts_from_array(x_train=self.trn[0], 
                                                  y_train=self.trn[1],
@@ -241,11 +242,12 @@ class TestTextClassification(TestCase):
         p.save('/tmp/test_predictor')
         p = ktrain.load_predictor('/tmp/test_predictor')
         self.assertEqual(p.predict([TEST_DOC])[0], 'soc.religion.christian')
-        self.assertEqual(p.predict_proba([TEST_DOC])[0], 'soc.religion.christian')
+        self.assertEqual(p.predict(TEST_DOC), 'soc.religion.christian')
         self.assertEqual(np.argmax(p.predict_proba([TEST_DOC])[0]), 3)
+        self.assertEqual(type(p.explain(TEST_DOC)), IPython.core.display.HTML)
 
 
-    #@unittest.skip('temporarily disabled')
+    #@skip('temporarily disabled')
     def test_bert(self):
         trn, val, preproc = txt.texts_from_array(x_train=self.trn[0], 
                                                  y_train=self.trn[1],
@@ -262,7 +264,7 @@ class TestTextClassification(TestCase):
 
         # test training results
         self.assertAlmostEqual(max(hist.history['lr']), lr)
-        self.assertGreater(max(hist.history['acc']), 0.75)
+        self.assertGreater(max(hist.history['acc']), 0.72)
 
 
         # test top losses
@@ -291,8 +293,9 @@ class TestTextClassification(TestCase):
         self.assertEqual(p.predict([TEST_DOC])[0], 'soc.religion.christian')
         p.save('/tmp/test_predictor')
         p = ktrain.load_predictor('/tmp/test_predictor')
-        self.assertEqual(p.predict([TEST_DOC])[0], 'soc.religion.christian')
+        self.assertEqual(p.predict(TEST_DOC), 'soc.religion.christian')
         self.assertEqual(np.argmax(p.predict_proba([TEST_DOC])[0]), 3)
+        self.assertEqual(type(p.explain(TEST_DOC)), IPython.core.display.HTML)
 
 
 

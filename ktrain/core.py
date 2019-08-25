@@ -192,12 +192,16 @@ class Learner(ABC):
         return cm
 
 
-    def top_losses(self, n=8, val_data=None):
+    def top_losses(self, n=8, val_data=None, preproc=None):
         """
         Computes losses on validation set sorted by examples with top losses
         Args:
           n(int or tuple): a range to select in form of int or tuple
                           e.g., n=8 is treated as n=(0,8)
+          preproc (Preprocessor): A TextPreprocessor or ImagePreprocessor.
+                                  For some data like text data, a preprocessor
+                                  is required to undo the pre-processing
+                                   to correctly view raw data.
           val_data:  optional val_data to use instead of self.val_data
         Returns:
             list of n tuples where first element is either 
@@ -226,14 +230,20 @@ class Learner(ABC):
         # compute loss
         losses = self.model.loss_functions[0](tf.convert_to_tensor(y_true), tf.convert_to_tensor(y_pred))
         losses = tf.Session().run(losses)
+        class_names = [] if preproc is None else preproc.get_classes()
+        if preproc is None: 
+            class_fcn = lambda x:x
+        else:
+            class_fcn = lambda x:class_names[x]
 
         # sort by loss and prune correct classifications, if necessary
         if 'acc' in self.model.metrics_names and not multilabel:
             y_p = np.argmax(y_pred, axis=1)
             y_t = np.argmax(y_true, axis=1)
-            tups = [(i,x, y_t[i]) for i, x in enumerate(losses) if y_p[i] != y_t[i]]
+            tups = [(i,x, class_fcn(y_t[i]), class_fcn(y_p[i])) for i, x in enumerate(losses) 
+                     if y_p[i] != y_t[i]]
         else:
-            tups = [(i,x, y_t[i]) for i, x in enumerate(losses)]
+            tups = [(i,x, y_true[i], y_pred[i]) for i, x in enumerate(losses)]
         tups.sort(key=operator.itemgetter(1), reverse=True)
 
         # prune by given range
@@ -241,16 +251,16 @@ class Learner(ABC):
         return tups
 
 
-    def view_top_losses(self, preproc=None, n=8, val_data=None):
+    def view_top_losses(self, n=8, preproc=None, val_data=None):
         """
         Views observations with top losses in validation set.
         Args:
+         n(int or tuple): a range to select in form of int or tuple
+                          e.g., n=8 is treated as n=(0,8)
          preproc (Preprocessor): A TextPreprocessor or ImagePreprocessor.
                                  For some data like text data, a preprocessor
                                  is required to undo the pre-processing
                                  to correctly view raw data.
-         n(int or tuple): a range to select in form of int or tuple
-                          e.g., n=8 is treated as n=(0,8)
           val_data:  optional val_data to use instead of self.val_data
         Returns:
             list of n tuples where first element is either 
@@ -268,7 +278,7 @@ class Learner(ABC):
         if val is None: raise Exception('val_data must be supplied to get_learner or view_top_losses')
 
         # get top losses and associated data
-        tups = self.top_losses(n=n, val_data=val)
+        tups = self.top_losses(n=n, val_data=val, preproc=preproc)
 
         # get multilabel status and class names
         multilabel = True if U.is_multilabel(self.train_data) else False
@@ -281,16 +291,14 @@ class Learner(ABC):
             idx = tup[0]
             loss = tup[1]
             truth = tup[2]
-
-            # convert ground truth to class name
-            if not multilabel and self.model.loss == 'categorical_crossentropy' and classes: 
-               truth =  classes[np.argmax(truth)]
+            pred = tup[3]
 
             # Image Classification
             if type(val).__name__ in ['DirectoryIterator', 'DataFrameIterator']:
                 fpath = val.filepaths[tup[0]]
+                fp = os.path.join(os.path.basename(os.path.dirname(fpath)), os.path.basename(fpath))
                 plt.figure()
-                plt.title("%s | loss:%s | truth:%s)" % (fpath, round(loss,2), truth))
+                plt.title("%s | loss:%s | true:%s | pred:%s)" % (fp, round(loss,2), truth, pred))
                 show_image(fpath)
             else:
                 # Image Classification from Array
@@ -298,7 +306,7 @@ class Learner(ABC):
                     obs = val.x[idx]
                     if preproc is not None: obs = preproc.undo(obs)
                     plt.figure()
-                    plt.title("id:%s | loss:%s | truth:%s)" % (idx, round(loss,2), truth))
+                    plt.title("id:%s | loss:%s | true:%s | pred:%s)" % (idx, round(loss,2), truth, pred))
                     plt.imshow(np.squeeze(obs))
                 # everything else including text classification
                 else:
@@ -310,7 +318,7 @@ class Learner(ABC):
                     if type(obs) == str:
                         obs = ' '.join(obs.split()[:512])
                     print('----------')
-                    print("id:%s | loss:%s | truth:%s)\n" % (idx, round(loss,2), truth))
+                    print("id:%s | loss:%s | true:%s | pred:%s)\n" % (idx, round(loss,2), truth, pred))
                     print(obs)
         return
 

@@ -34,7 +34,8 @@ import requests
 # verify=False added to avoid headaches from some corporate networks
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
-
+import eli5
+from eli5.lime import TextExplainer
 
 
 

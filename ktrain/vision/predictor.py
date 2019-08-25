@@ -26,6 +26,20 @@ class ImagePredictor(Predictor):
         return self.c
 
 
+    def explain(self, img_fpath):
+        """
+        Highlights image to explain prediction
+        """
+        img = image.load_img(img_fpath, 
+                             target_size=self.preproc.target_size, 
+                             color_mode=self.preproc.color_mode)
+        x = image.img_to_array(img)
+        x = np.expand_dims(x, axis=0)
+        return eli5.show_prediction(self.model, x)
+
+
+
+
     def predict(self, data, return_proba=False):
         """
         Predicts class from image in array format.

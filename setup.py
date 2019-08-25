@@ -23,7 +23,8 @@ setup(
           'pandas >= 0.24.2',
           'fastprogress >= 0.1.21',
           'keras_bert',
-          'requests'
+          'requests',
+          'eli5 >= 0.10.0'
       ],
   classifiers=[  # Optional
     # How mature is this project? Common values are
