@@ -240,9 +240,10 @@ class Learner(ABC):
         if 'acc' in self.model.metrics_names and not multilabel:
             y_p = np.argmax(y_pred, axis=1)
             y_t = np.argmax(y_true, axis=1)
-            tups = [(i,x, class_fcn(y_t[i])) for i, x in enumerate(losses) if y_p[i] != y_t[i]]
+            tups = [(i,x, class_fcn(y_t[i]), class_fcn(y_p[i])) for i, x in enumerate(losses) 
+                     if y_p[i] != y_t[i]]
         else:
-            tups = [(i,x, y_true[i]) for i, x in enumerate(losses)]
+            tups = [(i,x, y_true[i], y_pred[i]) for i, x in enumerate(losses)]
         tups.sort(key=operator.itemgetter(1), reverse=True)
 
         # prune by given range
@@ -290,12 +291,14 @@ class Learner(ABC):
             idx = tup[0]
             loss = tup[1]
             truth = tup[2]
+            pred = tup[3]
 
             # Image Classification
             if type(val).__name__ in ['DirectoryIterator', 'DataFrameIterator']:
                 fpath = val.filepaths[tup[0]]
+                fp = os.path.join(os.path.basename(os.path.dirname(fpath)), os.path.basename(fpath))
                 plt.figure()
-                plt.title("%s | loss:%s | truth:%s)" % (fpath, round(loss,2), truth))
+                plt.title("%s | loss:%s | true:%s | pred:%s)" % (fp, round(loss,2), truth, pred))
                 show_image(fpath)
             else:
                 # Image Classification from Array
@@ -303,7 +306,7 @@ class Learner(ABC):
                     obs = val.x[idx]
                     if preproc is not None: obs = preproc.undo(obs)
                     plt.figure()
-                    plt.title("id:%s | loss:%s | truth:%s)" % (idx, round(loss,2), truth))
+                    plt.title("id:%s | loss:%s | true:%s | pred:%s)" % (idx, round(loss,2), truth, pred))
                     plt.imshow(np.squeeze(obs))
                 # everything else including text classification
                 else:
@@ -315,7 +318,7 @@ class Learner(ABC):
                     if type(obs) == str:
                         obs = ' '.join(obs.split()[:512])
                     print('----------')
-                    print("id:%s | loss:%s | truth:%s)\n" % (idx, round(loss,2), truth))
+                    print("id:%s | loss:%s | true:%s | pred:%s)\n" % (idx, round(loss,2), truth, pred))
                     print(obs)
         return
 
