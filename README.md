@@ -19,14 +19,15 @@ Please see the following tutorial notebooks for a guide on how to use *ktrain* o
 * Tutorial A1: [Additional tricks](https://github.com/amaiya/ktrain/blob/master/tutorial-A1-additional-tricks.ipynb), which covers topics such as examining misclassifications, inspecting intermediate output of Keras models for debugging, and built-in callbacks.
 
 
+Some blog tutorials about *ktrain* are shown below:
+
+> [**ktrain: A Lightweight Wrapper for Keras to Help Train Neural Networks**](https://towardsdatascience.com/ktrain-a-lightweight-wrapper-for-keras-to-help-train-neural-networks-82851ba889c) 
 
 
-A Medium post providing a broad overview of *ktrain* is here:
-
-> [**ktrain: A Lightweight Wrapper for Keras to Help Train Neural Networks**](https://towardsdatascience.com/ktrain-a-lightweight-wrapper-for-keras-to-help-train-neural-networks-82851ba889c)   by Arun Maiya.
+> [**BERT Text Classification in 3 Lines of Code**](https://towardsdatascience.com/bert-text-classification-in-3-lines-of-code-using-keras-264db7e7a358)  
 
 
-Using *ktrain* on **Google Colab**?  See [this demo of Multiclass Text Classification with BERT](https://colab.research.google.com/drive/1ixOZTKLz4aAa-MtC6dy_sAvc9HujQmHN).
+Using *ktrain* on **Google Colab**?  See [this simple demo of Multiclass Text Classification with BERT](https://colab.research.google.com/drive/1ixOZTKLz4aAa-MtC6dy_sAvc9HujQmHN).
 
 
 
