@@ -52,6 +52,7 @@ class TestImageClassification(TestCase):
 
         # test top_losses
         obs = learner.top_losses(n=1, val_data=val)
+        print(obs)
         if obs:
             self.assertIn(obs[0][0], list(range(U.nsamples_from_data(val))))
         else:

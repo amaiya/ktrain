@@ -70,6 +70,7 @@ from keras.preprocessing.image import ImageDataGenerator
 from keras.preprocessing.text import Tokenizer
 from keras.utils import Sequence, to_categorical
 from keras.utils import multi_gpu_model
+from keras.activations import sigmoid
 
 from keras.applications.resnet50 import ResNet50
 from keras.applications.mobilenet import MobileNet

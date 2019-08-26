@@ -174,7 +174,14 @@ class Learner(ABC):
             val = val_data
         else:
             val = self.val_data
-        if U.is_multilabel(val):
+
+        classification, multilabel = U.is_classifier(self.model)
+        if not classification:
+            warnings.warn('learner.validate is only for classification problems. ' 
+                          'For regression, etc., use learner.predict and learner.ground_truth '
+                          'to manually validate.')
+            return
+        if U.is_multilabel(val) or multilabel:
             warnings.warn('multilabel confusion matrices not yet supported')
             return
         y_pred = self.predict(val_data=val)
@@ -210,6 +217,8 @@ class Learner(ABC):
 
         """
         import tensorflow as tf
+        #multilabel = True if U.is_multilabel(val) else False
+        classification, multilabel = U.is_classifier(self.model)
 
         # check validation data and arguments
         if val_data is not None:
@@ -220,12 +229,12 @@ class Learner(ABC):
         if type(n) == type(42):
             n = (0, n)
 
-        multilabel = True if U.is_multilabel(val) else False
 
         # get predicictions and ground truth
         y_pred = self.predict(val_data=val)
         y_true = self.ground_truth(val_data=val)
         y_true = y_true.astype('float32')
+
 
         # compute loss
         losses = self.model.loss_functions[0](tf.convert_to_tensor(y_true), tf.convert_to_tensor(y_pred))
@@ -236,8 +245,13 @@ class Learner(ABC):
         else:
             class_fcn = lambda x:class_names[x]
 
+        # don't put regression predictions in a list
+        if not classification and len(y_pred.shape) == 2 and y_pred.shape[1] == 1:
+            y_pred = np.squeeze(y_pred)
+            y_pred = np.around(y_pred, 2)
+
         # sort by loss and prune correct classifications, if necessary
-        if 'acc' in self.model.metrics_names and not multilabel:
+        if classification and not multilabel:
             y_p = np.argmax(y_pred, axis=1)
             y_t = np.argmax(y_true, axis=1)
             tups = [(i,x, class_fcn(y_t[i]), class_fcn(y_p[i])) for i, x in enumerate(losses) 
@@ -281,7 +295,6 @@ class Learner(ABC):
         tups = self.top_losses(n=n, val_data=val, preproc=preproc)
 
         # get multilabel status and class names
-        multilabel = True if U.is_multilabel(self.train_data) else False
         classes = preproc.get_classes() if preproc is not None else None
 
         # iterate through losses

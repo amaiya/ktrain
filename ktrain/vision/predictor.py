@@ -76,15 +76,17 @@ class ImagePredictor(Predictor):
 
 
     def predict_generator(self, generator, steps=None, return_proba=False):
-        loss = self.model.loss
-        if callable(loss): loss = loss.__name__
-        treat_multilabel = False
-        if loss != 'categorical_crossentropy' and not return_proba:
-            return_proba=True
-            treat_multilabel = True
+        #loss = self.model.loss
+        #if callable(loss): loss = loss.__name__
+        #treat_multilabel = False
+        #if loss != 'categorical_crossentropy' and not return_proba:
+        #    return_proba=True
+        #    treat_multilabel = True
+        classification, multilabel = U.is_classifier(self.model)
+        if multilabel: return_proba=True
         preds =  self.model.predict_generator(generator, steps=steps)
         result =  preds if return_proba else [self.c[np.argmax(pred)] for pred in preds] 
-        if treat_multilabel:
+        if multilabel:
             return [list(zip(self.c, r)) for r in result]
         else:
             return result

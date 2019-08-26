@@ -22,7 +22,8 @@ def bostonhousing():
     learner = ktrain.get_learner(model, train_data=(x_train, y_train), val_data=(x_test, y_test))
     learner.lr_find()
     hist = learner.fit(0.05, 8, cycle_len=1, cycle_mult=2)
-    learner.view_top_losses(n=1)
+    learner.view_top_losses(n=5)
+    learner.validate()
     return hist
 
 
