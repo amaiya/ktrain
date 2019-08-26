@@ -257,7 +257,7 @@ class Learner(ABC):
             tups = [(i,x, class_fcn(y_t[i]), class_fcn(y_p[i])) for i, x in enumerate(losses) 
                      if y_p[i] != y_t[i]]
         else:
-            tups = [(i,x, y_true[i], y_pred[i]) for i, x in enumerate(losses)]
+            tups = [(i,x, y_true[i], np.around(y_pred[i],2)) for i, x in enumerate(losses)]
         tups.sort(key=operator.itemgetter(1), reverse=True)
 
         # prune by given range

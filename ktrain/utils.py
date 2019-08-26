@@ -23,10 +23,10 @@ def is_classifier(model):
         is_classifier = True
 
     # check for multilabel
-    if model.loss == 'binary_crossentropy':
+    if loss == 'binary_crossentropy':
         last = model.layers[-1]
-        if (hasatt(last, 'activation') and isinstance(last, type(sigmoid))) or\
-           isnstance(last, type(sigmoid)):
+        if (hasattr(last, 'activation') and isinstance(last.activation, type(sigmoid))) or\
+           isinstance(last, type(sigmoid)):
             is_multilabel = True
     return (is_classifier, is_multilabel)
 
