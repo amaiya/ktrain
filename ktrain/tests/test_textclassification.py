@@ -264,7 +264,7 @@ class TestTextClassification(TestCase):
 
         # test training results
         self.assertAlmostEqual(max(hist.history['lr']), lr)
-        self.assertGreater(max(hist.history['acc']), 0.72)
+        self.assertGreater(max(hist.history['acc']), 0.7)
 
 
         # test top losses
