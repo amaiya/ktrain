@@ -6,7 +6,7 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
-## 0.2.5 (TBD)
+## 0.2.5 (2019-08-27)
 
 ### New:
 - ```explain``` methods have been added to ```TextPredictor``` and ```ImagePredictor``` objects.
