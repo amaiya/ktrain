@@ -6,6 +6,23 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.2.5 (TBD)
+
+### New:
+- ```explain``` methods have been added to ```TextPredictor``` and ```ImagePredictor``` objects.
+- ```TextPredictor.predict_proba``` and ```ImagePredictor.predict_proba_*``` convenience
+methods have been added.
+- Added ```utils.is_classifier``` utility function
+
+### Changed:
+- ```TextPredictor.predict``` method can now accept a single document as input instead of
+always requiring a list.
+- Output of ```core.view_top_losses``` now includes the ground truth label of examples
+
+### Fixed:
+- Fixed test of data loading
+
+
 ## 0.2.4 (2019-08-20)
 
 ### New:

@@ -26,6 +26,20 @@ class ImagePredictor(Predictor):
         return self.c
 
 
+    def explain(self, img_fpath):
+        """
+        Highlights image to explain prediction
+        """
+        img = image.load_img(img_fpath, 
+                             target_size=self.preproc.target_size, 
+                             color_mode=self.preproc.color_mode)
+        x = image.img_to_array(img)
+        x = np.expand_dims(x, axis=0)
+        return eli5.show_prediction(self.model, x)
+
+
+
+
     def predict(self, data, return_proba=False):
         """
         Predicts class from image in array format.
@@ -62,18 +76,37 @@ class ImagePredictor(Predictor):
 
 
     def predict_generator(self, generator, steps=None, return_proba=False):
-        loss = self.model.loss
-        if callable(loss): loss = loss.__name__
-        treat_multilabel = False
-        if loss != 'categorical_crossentropy' and not return_proba:
-            return_proba=True
-            treat_multilabel = True
+        #loss = self.model.loss
+        #if callable(loss): loss = loss.__name__
+        #treat_multilabel = False
+        #if loss != 'categorical_crossentropy' and not return_proba:
+        #    return_proba=True
+        #    treat_multilabel = True
+        classification, multilabel = U.is_classifier(self.model)
+        if multilabel: return_proba=True
         preds =  self.model.predict_generator(generator, steps=steps)
         result =  preds if return_proba else [self.c[np.argmax(pred)] for pred in preds] 
-        if treat_multilabel:
+        if multilabel:
             return [list(zip(self.c, r)) for r in result]
         else:
             return result
+
+
+    def predict_proba(self, data):
+        return self.predict(data, return_proba=True)
+
+
+    def predict_proba_folder(self, folder):
+        return self.predict_folder(folder, return_proba=True)
+
+
+    def predict_proba_filename(self, img_path):
+        return self.predict_filename(img_path, return_proba=True)
+
+
+    def predict_proba_generator(self, generator, steps=None):
+        return self.predict_proba_generator(generator, steps=steps, return_proba=True)
+
 
 
     def analyze_valid(self, generator, print_report=True, multilabel=None):

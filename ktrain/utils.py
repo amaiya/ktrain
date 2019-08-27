@@ -5,7 +5,40 @@ DEFAULT_ES = 5
 DEFAULT_ROP = 2 
 
 
+def is_classifier(model):
+    """
+    checks for classification and mutlilabel from model
+    """
+    is_classifier = False
+    is_multilabel = False
+
+    # get loss name
+    loss = model.loss
+    if callable(loss): loss = loss.__name__
+
+    # check for classification
+    if 'acc' in model.metrics_names or loss in ['categorical_crossentropy',
+                                                'sparse_categorical_crossentropy',
+                                                'binary_crossentropy']:
+        is_classifier = True
+
+    # check for multilabel
+    if loss == 'binary_crossentropy':
+        last = model.layers[-1]
+        output_shape = last.output_shape
+        mult_output = True if len(output_shape) ==2 and output_shape[1] >  1 else False
+        if ( (hasattr(last, 'activation') and isinstance(last.activation, type(sigmoid))) or\
+           isinstance(last, type(sigmoid)) ) and mult_output:
+            is_multilabel = True
+    return (is_classifier, is_multilabel)
+
+
+
+
 def is_multilabel(data):
+    """
+    checks for multilabel from data
+    """
     data_arg_check(val_data=data, val_required=True)
     if is_iter(data):
         multilabel = False
