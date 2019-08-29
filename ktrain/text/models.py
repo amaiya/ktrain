@@ -66,6 +66,11 @@ def text_classifier(name, train_data, preproc=None, multilabel=None, verbose=1):
 
     if name == BIGRU and not isinstance(preproc, tpp.TextPreprocessor):
         raise ValueError('A valid TextPreprocessor object is required for bigru')
+    elif not isinstance(preproc, tpp.TextPreprocessor):
+        msg = 'The preproc argument will be required in future versions of ktrain.'
+        msg += ' The preproc arg should be an instance of TextPreprocessor, which is '
+        msg += ' the third return value from texts_from_folder, texts_from_csv, etc.'
+        warnings.warn(msg, FutureWarning)
     if name == BIGRU and preproc.ngram_count() != 1:
         raise ValueError('Data should be processed with ngram_range=1 for bigru model.')
     is_bert = U.bert_data_tuple(train_data)
@@ -100,16 +105,16 @@ def text_classifier(name, train_data, preproc=None, multilabel=None, verbose=1):
 
     # determine number of classes, maxlen, and max_features
     maxlen = U.shape_from_data((x_train, y_train))[1]
-    max_features = None
+    max_features = preproc.max_features if preproc is not None else None
     features = set()
-    if not is_bert:
+    if not is_bert and max_features is None:
         U.vprint('compiling word ID features...', verbose=verbose)
         for x in x_train:
             features.update(x)
-        max_features = len(features)
-        U.vprint('max_features is %s' % (max_features), verbose=verbose)
+        #max_features = len(features)
+        max_features = max(features)+1
+    U.vprint('max_features is %s' % (max_features), verbose=verbose)
     U.vprint('maxlen is %s' % (maxlen), verbose=verbose)
-
 
 
     # return appropriate model
