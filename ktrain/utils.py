@@ -34,6 +34,15 @@ def is_classifier(model):
 
 
 
+def is_crf(model):
+    """
+    checks for CRF sequence tagger
+    """
+    loss = model.loss
+    if callable(loss): loss = loss.__name__
+    return loss == 'crf_loss'
+
+
 
 def is_multilabel(data):
     """

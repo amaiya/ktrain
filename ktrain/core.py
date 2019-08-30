@@ -165,6 +165,34 @@ class Learner(ABC):
         return
         
 
+    def validate_crf(self, val_data=None, class_names=[]):
+        if val_data is not None:
+            val = val_data
+        else:
+            val = self.val_data
+
+        if not U.is_crf(self.model):
+            warnings.warn('learner.validate_crf is only for CRF sequence taggers.')
+            return
+        if not class_names:
+            raise ValueError('class_names is required by validate_crf')
+
+        pred_cat = self.predict(val_data=val)
+        y_te = val[1]
+        pred = np.argmax(pred_cat, axis=-1)
+        y_te_true = np.argmax(y_te, -1)
+
+        # Convert the index to tag
+        pred_tag = [[class_names[i] for i in row] for row in pred]
+        y_te_true_tag = [[class_names[i] for i in row] for row in y_te_true] 
+
+        report = flat_classification_report(y_pred=pred_tag, y_true=y_te_true_tag)
+        print(report)
+        return
+
+
+
+
     def validate(self, val_data=None, print_report=True, class_names=[]):
         """
         Returns confusion matrix and optionally prints
@@ -178,11 +206,15 @@ class Learner(ABC):
             val = self.val_data
 
         classification, multilabel = U.is_classifier(self.model)
-        if not classification:
+        crf = U.is_crf(self.model)
+        if not classification and not crf:
             warnings.warn('learner.validate is only for classification problems. ' 
                           'For regression, etc., use learner.predict and learner.ground_truth '
                           'to manually validate.')
             return
+        if crf:
+            return self.validate_crf(val_data=val_data, class_names=class_names)
+            
         if U.is_multilabel(val) or multilabel:
             warnings.warn('multilabel confusion matrices not yet supported')
             return
