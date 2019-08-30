@@ -10,6 +10,8 @@ from .vision.predictor import ImagePredictor
 from .vision.data import show_image
 from .text.preprocessor import TextPreprocessor, BERTPreprocessor
 from .text.predictor import TextPredictor
+from .text.ner.predictor import NERPredictor
+from .text.ner.preprocessor import NERPreprocessor
 
 
 
@@ -1170,7 +1172,8 @@ def get_predictor(model, preproc):
 
     Args
         model (Model):        A compiled instance of keras.engine.training.Model
-        preproc(Preprocessor):   An instance of TextPreprocessor or ImagePreprocessor.
+        preproc(Preprocessor):   An instance of TextPreprocessor,ImagePreprocessor,
+                                 or NERPreprocessor.
                                  These instances are returned from the data loading
                                  functions in the ktrain vision and text modules:
 
@@ -1179,19 +1182,21 @@ def get_predictor(model, preproc):
                                  ktrain.vision.images_from_array
                                  ktrain.text.texts_from_folder
                                  ktrain.text.texts_from_csv
+                                 ktrain.text.ner.entities_from_csv
     """
 
     # check arguments
     if not isinstance(model, Model):
         raise ValueError('model must be of instance Model')
-    if not isinstance(preproc, ImagePreprocessor) and not isinstance(preproc, TextPreprocessor):
-    #if not isinstance(preproc, ImagePreprocessor) and type(preproc).__name__ != 'TextPreprocessor':
-        raise ValueError('preproc must be instance of ImagePreprocessor or TextPreprocessor')
+    if not isinstance(preproc, (ImagePreprocessor,TextPreprocessor, NERPreprocessor)):
+        raise ValueError('preproc must be instance of ktrain.preprocessor.Preprocessor')
     if isinstance(preproc, ImagePreprocessor):
         return ImagePredictor(model, preproc)
     elif isinstance(preproc, TextPreprocessor):
     #elif type(preproc).__name__ == 'TextPreprocessor':
         return TextPredictor(model, preproc)
+    if isinstance(preproc, NERPreprocessor):
+        return NERPredictor(model, preproc)
     else:
         raise Exception('preproc of type %s not currently supported' % (type(preproc)))
 
@@ -1231,12 +1236,14 @@ def load_predictor(fpath):
     # return the appropriate predictor
     if not isinstance(model, Model):
         raise ValueError('model must be of instance Model')
-    if not isinstance(preproc, ImagePreprocessor) and not isinstance(preproc, TextPreprocessor):
-        raise ValueError('preproc must be instance of ImagePreprocessor or TextPreprocessor')
+    if not isinstance(preproc, (ImagePreprocessor, TextPreprocessor, NERPreprocessor)):
+        raise ValueError('preproc must be instance of ktrain.preprocessor.Preprocessor')
     if isinstance(preproc, ImagePreprocessor):
         return ImagePredictor(model, preproc)
     elif isinstance(preproc, TextPreprocessor):
         return TextPredictor(model, preproc)
+    elif isinstance(preproc, NERPreprocessor):
+        return NERPredictor(model, preproc)
     else:
         raise Exception('preprocessor not currently supported')
 
