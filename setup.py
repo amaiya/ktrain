@@ -25,7 +25,7 @@ setup(
           'keras_bert',
           'requests',
           'eli5 >= 0.10.0',
-          'sklearn_crfsuite'
+          'seqeval'
       ],
   classifiers=[  # Optional
     # How mature is this project? Common values are

@@ -37,11 +37,7 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 import eli5
 from eli5.lime import TextExplainer
-from sklearn_crfsuite.metrics import flat_classification_report
-#from seqeval.metrics import classification_report as seq_classification_report
-#import tensorflow_hub as hub
-#import tensorflow as tf
-
+from seqeval.metrics import classification_report as flat_classification_report
 
 
 

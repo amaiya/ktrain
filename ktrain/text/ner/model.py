@@ -7,8 +7,10 @@ from ...keras_contrib.metrics import crf_accuracy
 from ...keras_contrib.losses import crf_loss
 
 
-BI_LSTM_CRF = 'bi-lstm-crf'
-SEQUENCE_TAGGERS = {BI_LSTM_CRF: 'Bidirectional LSTM-CRF (https://arxiv.org/abs/1508.01991)'} 
+BILSTM_CRF = 'bilstm-crf'
+SEQUENCE_TAGGERS = {
+                     BILSTM_CRF: 'Bidirectional LSTM-CRF  (https://arxiv.org/abs/1508.01991)',
+                     }
 EMBEDDING = 40
 
 
@@ -23,23 +25,33 @@ def sequence_tagger(name, preproc, verbose=1):
 
     Args:
         name (string): one of:
-                      - 'bi-lstm-crf' for Bidirectional LSTM-CRF model
+                      - 'bilstm-crf' for Bidirectional LSTM-CRF model
         preproc(NERPreprocessor):  an instance of NERPreprocessor
         verbose (boolean): verbosity of output
     Return:
         model (Model): A Keras Model instance
     """
     
-    if name == BI_LSTM_CRF:
-        # Model definition
+    if name == BILSTM_CRF:
+        #inp = Input(shape=(preproc.maxlen,))
+        #model = Embedding(input_dim=preproc.max_features, output_dim=EMBEDDING,
+                          #input_length=preproc.maxlen, mask_zero=True)(inp)
+        #model = Bidirectional(LSTM(units=50, return_sequences=True,
+                                   #recurrent_dropout=0.1))(model)
+        #model = TimeDistributed(Dense(50, activation="relu"))(model)
+        #crf = CRF(len(preproc.get_classes()))
+        #out = crf(model)
+        #model = Model(inp, out)
+        #model.compile(optimizer="adam", loss=crf_loss, metrics=[crf_accuracy])
+        #return model
         inp = Input(shape=(preproc.maxlen,))
         model = Embedding(input_dim=preproc.max_features, output_dim=EMBEDDING, # n_words + 2 (PAD & UNK)
-                          input_length=preproc.maxlen, mask_zero=True)(inp)  # default: 20-dim embedding
-        model = Bidirectional(LSTM(units=50, return_sequences=True,
-                                   recurrent_dropout=0.1))(model)  # variational biLSTM
-        model = TimeDistributed(Dense(50, activation="relu"))(model)  # a dense layer as suggested by neuralNer
+                          input_length=preproc.maxlen, mask_zero=False)(inp)  # default: 20-dim embedding
+        model = Bidirectional(LSTM(units=512, return_sequences=True,
+                                   recurrent_dropout=0.2, dropout=0.2))(model)  # variational biLSTM
+        model = TimeDistributed(Dense(512, activation="relu"))(model)  # a dense layer as suggested by neuralNer
         crf = CRF(len(preproc.get_classes()))  # CRF layer, n_tags+1(PAD)
-        out = crf(model) 
+        out = crf(model)
         model = Model(inp, out)
         model.compile(optimizer="adam", loss=crf_loss, metrics=[crf_accuracy])
         return model

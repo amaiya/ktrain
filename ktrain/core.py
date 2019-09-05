@@ -11,7 +11,7 @@ from .vision.data import show_image
 from .text.preprocessor import TextPreprocessor, BERTPreprocessor
 from .text.predictor import TextPredictor
 from .text.ner.predictor import NERPredictor
-from .text.ner.preprocessor import NERPreprocessor
+from .text.ner.preprocessor import NERPreprocessor, PAD, UNK
 
 
 
@@ -183,9 +183,10 @@ class Learner(ABC):
         y_te_true = np.argmax(y_te, -1)
 
         # Convert the index to tag
-        pred_tag = [[class_names[i] for i in row] for row in pred]
-        y_te_true_tag = [[class_names[i] for i in row] for row in y_te_true] 
+        pred_tag = [[class_names[i].replace(PAD, 'O') for i in row] for row in pred]
+        y_te_true_tag = [[class_names[i].replace(PAD, 'O') for i in row] for row in y_te_true] 
 
+        # print classification report
         report = flat_classification_report(y_pred=pred_tag, y_true=y_te_true_tag)
         print(report)
         return
