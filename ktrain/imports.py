@@ -38,6 +38,9 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 import eli5
 from eli5.lime import TextExplainer
 from sklearn_crfsuite.metrics import flat_classification_report
+#from seqeval.metrics import classification_report as seq_classification_report
+#import tensorflow_hub as hub
+#import tensorflow as tf
 
 
 
@@ -58,8 +61,9 @@ from keras.layers import Dense, Embedding, Input, Flatten, GRU, Bidirectional, L
 from keras.layers import SpatialDropout1D, GlobalMaxPool1D, GlobalAveragePooling1D
 from keras.layers import concatenate, dot, Dropout, BatchNormalization, Add
 from keras.layers.convolutional import Convolution2D, MaxPooling2D, AveragePooling2D
-from keras.layers import Conv2D, MaxPooling2D, TimeDistributed
+from keras.layers import Conv2D, MaxPooling2D, TimeDistributed, Lambda
 from keras.layers.core import Activation
+from keras.layers.merge import add
 from keras.initializers import glorot_uniform  
 from keras import regularizers
 from keras.regularizers import l2
