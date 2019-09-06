@@ -17,9 +17,9 @@ def is_classifier(model):
     if callable(loss): loss = loss.__name__
 
     # check for classification
-    if 'acc' in model.metrics_names or loss in ['categorical_crossentropy',
-                                                'sparse_categorical_crossentropy',
-                                                'binary_crossentropy']:
+    if loss in ['categorical_crossentropy',
+                 'sparse_categorical_crossentropy',
+                 'binary_crossentropy']:
         is_classifier = True
 
     # check for multilabel
@@ -33,15 +33,34 @@ def is_classifier(model):
     return (is_classifier, is_multilabel)
 
 
+def is_ner(model=None, data=None):
+    ner = False
+    if model is not None and is_ner_from_model(model):
+        ner = True
+    elif data is not None and is_ner_from_data(data):
+        ner = True
+    return ner 
 
-def is_crf(model):
+
+def is_ner_from_model(model):
     """
-    checks for CRF sequence tagger
+    checks for sequence tagger.
+    Curently, only checks for a CRF-based sequence tagger
     """
     loss = model.loss
     if callable(loss): loss = loss.__name__
     return loss == 'crf_loss'
 
+def is_ner_from_data(data):
+    data_arg_check(train_data=data)
+    X = data[0]
+    y = data[1]
+    ner = False
+    if len(X.shape) == 2 and len(y.shape) == 3 and\
+            tuple(X.shape[:2]) == tuple(y.shape[:2]):
+        ner = True
+    return ner 
+        
 
 
 def is_multilabel(data):

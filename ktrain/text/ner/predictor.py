@@ -53,9 +53,3 @@ class NERPredictor(Predictor):
 
 
 
-    def explain(self, doc):
-        """
-        Highlights text to explain prediction
-        """
-        raise NotImplemented
-

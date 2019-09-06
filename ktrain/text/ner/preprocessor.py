@@ -41,13 +41,24 @@ class NERPreprocessor(Preprocessor):
         return x
 
 
-    def undo(self, sentence):
+    def undo(self, seq):
         """
         undoes preprocessing and returns raw data by:
         converting a list or array of Word IDs back to words
         """
         pad_id = self.word2idx[PAD]
-        s = text_to_word_sequence(sentence, lower=False)
-        x = [self.idx2word.get(wid, UNK) for wid in s if wid != pad_id]
+        #s = text_to_word_sequence(sentence, lower=False)
+        x = [self.idx2word.get(wid, UNK) for wid in seq if wid != pad_id]
         return x
+
+
+    def undo_val(self, val_data, val_id=0):
+        """
+        undoes preprocessing for a particular entry 
+        in a validatio nset.
+        """
+        pad_id = self.word2idx[PAD]
+        sentence = self.undo(val_data[0][val_id])
+        tags = [self.c[tid] for tid in np.argmax(val_data[1][val_id], axis=-1) if tid != pad_id]
+        return list(zip(sentence, tags))
 

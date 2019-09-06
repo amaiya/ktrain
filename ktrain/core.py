@@ -165,17 +165,17 @@ class Learner(ABC):
         return
         
 
-    def validate_crf(self, val_data=None, class_names=[]):
+    def validate_ner(self, val_data=None, class_names=[]):
         if val_data is not None:
             val = val_data
         else:
             val = self.val_data
 
-        if not U.is_crf(self.model):
-            warnings.warn('learner.validate_crf is only for CRF sequence taggers.')
+        if not U.is_ner(self.model):
+            warnings.warn('learner.validate_ner is only for sequence taggers.')
             return
         if not class_names:
-            raise ValueError('class_names is required by validate_crf')
+            raise ValueError('class_names is required by validate_ner')
 
         pred_cat = self.predict(val_data=val)
         y_te = val[1]
@@ -207,14 +207,14 @@ class Learner(ABC):
             val = self.val_data
 
         classification, multilabel = U.is_classifier(self.model)
-        crf = U.is_crf(self.model)
-        if not classification and not crf:
+        ner = U.is_ner(model=self.model, data=val)
+        if not classification and not ner:
             warnings.warn('learner.validate is only for classification problems. ' 
                           'For regression, etc., use learner.predict and learner.ground_truth '
                           'to manually validate.')
             return
-        if crf:
-            return self.validate_crf(val_data=val_data, class_names=class_names)
+        if ner:
+            return self.validate_ner(val_data=val_data, class_names=class_names)
             
         if U.is_multilabel(val) or multilabel:
             warnings.warn('multilabel confusion matrices not yet supported')
@@ -234,17 +234,18 @@ class Learner(ABC):
         return cm
 
 
-    def top_losses(self, n=8, val_data=None, preproc=None):
+    def top_losses(self, n=4, val_data=None, preproc=None, ner=None):
         """
         Computes losses on validation set sorted by examples with top losses
         Args:
           n(int or tuple): a range to select in form of int or tuple
                           e.g., n=8 is treated as n=(0,8)
+          val_data:  optional val_data to use instead of self.val_data
           preproc (Preprocessor): A TextPreprocessor or ImagePreprocessor.
                                   For some data like text data, a preprocessor
                                   is required to undo the pre-processing
                                    to correctly view raw data.
-          val_data:  optional val_data to use instead of self.val_data
+          ner(bool):  Flag to indicate that model is a sequence labeler
         Returns:
             list of n tuples where first element is either 
             filepath or id of validation example and second element
@@ -252,8 +253,8 @@ class Learner(ABC):
 
         """
         import tensorflow as tf
-        #multilabel = True if U.is_multilabel(val) else False
-        classification, multilabel = U.is_classifier(self.model)
+
+
 
         # check validation data and arguments
         if val_data is not None:
@@ -263,6 +264,12 @@ class Learner(ABC):
         if val is None: raise Exception('val_data must be supplied to get_learner or top_losses')
         if type(n) == type(42):
             n = (0, n)
+
+
+        #multilabel = True if U.is_multilabel(val) else False
+        classification, multilabel = U.is_classifier(self.model)
+        if ner is None:
+            ner = U.is_ner(model=self.model, data=val)
 
 
         # get predicictions and ground truth
@@ -276,7 +283,7 @@ class Learner(ABC):
         losses = tf.Session().run(losses)
         class_names = [] if preproc is None else preproc.get_classes()
         if preproc is None: 
-            class_fcn = lambda x:x
+            class_fcn = lambda x:"%s" % (x)
         else:
             class_fcn = lambda x:class_names[x]
 
@@ -286,11 +293,17 @@ class Learner(ABC):
             y_pred = np.around(y_pred, 2)
 
         # sort by loss and prune correct classifications, if necessary
-        if classification and not multilabel:
+        if classification and not multilabel and not ner:
             y_p = np.argmax(y_pred, axis=1)
             y_t = np.argmax(y_true, axis=1)
             tups = [(i,x, class_fcn(y_t[i]), class_fcn(y_p[i])) for i, x in enumerate(losses) 
                      if y_p[i] != y_t[i]]
+        elif ner:
+            pred = np.argmax(y_pred, axis=-1)
+            y_te_true = np.argmax(y_true, axis=-1)
+            y_p = [[class_fcn[i].replace(PAD, 'O') for i in row] for row in pred]
+            y_t = [[class_fcn[i].replace(PAD, 'O') for i in row] for row in y_te_true]
+            tups = [(i,x, y_t[i], y_p[i]) for i, x in enumerate(losses)]
         else:
             tups = [(i,x, y_true[i], np.around(y_pred[i],2)) for i, x in enumerate(losses)]
         tups.sort(key=operator.itemgetter(1), reverse=True)
@@ -300,7 +313,7 @@ class Learner(ABC):
         return tups
 
 
-    def view_top_losses(self, n=8, preproc=None, val_data=None):
+    def view_top_losses(self, n=4, preproc=None, val_data=None):
         """
         Views observations with top losses in validation set.
         Args:
@@ -326,8 +339,14 @@ class Learner(ABC):
             val = self.val_data
         if val is None: raise Exception('val_data must be supplied to get_learner or view_top_losses')
 
+        # check ner 
+        ner = U.is_ner(model=self.model, data=val)
+        if ner:
+            print('view_top_losses method does not currently support bilstm-crf models')
+            return
+
         # get top losses and associated data
-        tups = self.top_losses(n=n, val_data=val, preproc=preproc)
+        tups = self.top_losses(n=n, val_data=val, preproc=preproc, ner=ner)
 
         # get multilabel status and class names
         classes = preproc.get_classes() if preproc is not None else None
@@ -348,6 +367,14 @@ class Learner(ABC):
                 plt.figure()
                 plt.title("%s | loss:%s | true:%s | pred:%s)" % (fp, round(loss,2), truth, pred))
                 show_image(fpath)
+            elif ner:
+                seq = val[idx]
+                if preproc is not None:
+                    seq = preproc.undo(seq)
+                    print("{:15} {:5}: ({})".format("Word", "Pred", "True"))
+                    print("="*30)
+                    for w, true_tag, pred_tag in zip(seq, truth, pred):
+                        print("{:15}:{:5} ({})".format(w, true_tag, pred_tag))
             else:
                 # Image Classification from Array
                 if type(val).__name__ in ['NumpyArrayIterator']:
@@ -514,7 +541,8 @@ class Learner(ABC):
 
 
 
-    def lr_find(self, start_lr=1e-7, lr_mult=1.01, max_epochs=None, verbose=1):
+    def lr_find(self, start_lr=1e-7, lr_mult=1.01, max_epochs=None,
+                show_plot=False, verbose=1):
         """
         Plots loss as learning rate is increased.
         Highest learning rate corresponding to a still
@@ -528,11 +556,12 @@ class Learner(ABC):
         Reference: https://arxiv.org/abs/1506.01186
 
         Args:
+            start_lr (float): smallest lr to start simulation
             lr_mult (float): multiplication factor to increase LR.
                              Ignored if max_epochs is supplied.
-            start_lr (float): smallest lr to start simulation
             max_epochs (int):  maximum number of epochs to simulate.
                                lr_mult is ignored if max_epoch is supplied.
+            show_plot (bool):  If True, automatically invoke lr_plot
             verbose (bool): specifies how much output to print
         Returns:
             float:  Numerical estimate of best lr.  
@@ -568,10 +597,12 @@ class Learner(ABC):
         # instructions to invoker
         U.vprint('\n', verbose=verbose)
         U.vprint('done.', verbose=verbose)
-        U.vprint('Please invoke the Learner.lr_plot() method to visually inspect '
-              'the loss plot to help identify the maximal learning rate '
-              'associated with falling loss.', verbose=verbose)
-
+        if show_plot:
+            self.lr_plot()
+        else:
+            U.vprint('Please invoke the Learner.lr_plot() method to visually inspect '
+                  'the loss plot to help identify the maximal learning rate '
+                  'associated with falling loss.', verbose=verbose)
         return 
 
 
@@ -853,6 +884,8 @@ class Learner(ABC):
         # check monitor
         if monitor not in ['val_acc', 'val_loss']:
             raise ValueError("monitor must be one of {'val_acc', val_loss'}")
+        if U.is_ner(model=self.model, data=self.train_data) and monitor == 'val_acc':
+            monitor = 'val_crf_accuracy'
 
         # setup learning rate policy 
         num_samples = U.nsamples_from_data(self.train_data)
@@ -1308,8 +1341,8 @@ def _load_model(fpath, preproc=None, train_data=None):
     if not preproc and not train_data:
         raise ValueError('Either preproc or train_data is required.')
     custom_objects=None
-    if preproc and (isinstance(preproc, BERTPreprocessor) or \
-                    type(preproc).__name__ == 'BERTPreprocessor') or\
+    if (preproc and (isinstance(preproc, BERTPreprocessor) or \
+                    type(preproc).__name__ == 'BERTPreprocessor')) or\
        train_data and U.bert_data_tuple(train_data):
         # custom BERT model
         from keras_bert.layers.embedding import TokenEmbedding
@@ -1326,6 +1359,16 @@ def _load_model(fpath, preproc=None, train_data=None):
                         'FeedForward' : FeedForward,
                         'gelu_tensorflow' : gelu_tensorflow,
                         'Extract' : Extract}
+    elif (preproc and (isinstance(preproc, NERPreprocessor) or \
+                    type(preproc).__name__ == 'NERPreprocessor')) or \
+        U.is_ner(model=self.model, data=self.train_data):
+        from .keras_contrib.losses import crf_loss
+        from .keras_contrib.metrics import crf_accuracy
+        from .keras_contrib.layers import CRF
+        custom_objects={'CRF': CRF,
+                        'crf_loss': crf_loss,
+                        'crf_accuracy': crf_accuracy}
+
     try:
         model = load_model(fpath, custom_objects=custom_objects)
     except Exception as e:

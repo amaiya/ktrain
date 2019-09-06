@@ -47,6 +47,8 @@ def entities_from_csv(train_filepath,
 
     # Get all the sentences
     sentences = getter.sentences
+    largest_sen = max(len(sen) for sen in sentences)
+    if verbose: print('Longest sentence: {} words'.format(largest_sen))
 
     # convert words to IDs
     word2idx = {w: i + 2 for i, w in enumerate(words)}

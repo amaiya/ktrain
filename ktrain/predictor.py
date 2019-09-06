@@ -11,6 +11,9 @@ class Predictor(ABC):
     def get_classes(self, filename):
         pass
 
+    def explain(self, x):
+        raise NotImplementedError('explain is not currently supported for this model')
+
     def save(self, fname):
         self.model.save(fname)
         fname_preproc = fname+'.preproc'
