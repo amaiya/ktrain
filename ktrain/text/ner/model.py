@@ -49,7 +49,8 @@ def sequence_tagger(name, preproc, verbose=1):
                           input_length=preproc.maxlen, mask_zero=False)(inp)  # default: 20-dim embedding
         model = Bidirectional(LSTM(units=512, return_sequences=True,
                                    recurrent_dropout=0.2, dropout=0.2))(model)  # variational biLSTM
-        model = TimeDistributed(Dense(512, activation="relu"))(model)  # a dense layer as suggested by neuralNer
+        model = TimeDistributed(Dense(512, activation="relu", 
+                                      kernel_initializer='he_normal'))(model)  # a dense layer as suggested by neuralNer
         crf = CRF(len(preproc.get_classes()))  # CRF layer, n_tags+1(PAD)
         out = crf(model)
         model = Model(inp, out)
