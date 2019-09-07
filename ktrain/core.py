@@ -889,7 +889,7 @@ class Learner(ABC):
 
         # setup learning rate policy 
         num_samples = U.nsamples_from_data(self.train_data)
-        steps_per_epoch = num_samples//self.batch_size
+        steps_per_epoch = math.ceil(num_samples/self.batch_size)
         step_size = math.ceil(steps_per_epoch/2)
 
         # handle missing epochs
