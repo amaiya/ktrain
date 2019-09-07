@@ -51,6 +51,13 @@ def is_ner_from_model(model):
     if callable(loss): loss = loss.__name__
     return loss == 'crf_loss'
 
+def is_crf(model):
+    """
+    This is currently simpley an alias for is_ner_from_model
+    """
+    return is_ner_from_model(model)
+
+
 def is_ner_from_data(data):
     data_arg_check(train_data=data)
     X = data[0]

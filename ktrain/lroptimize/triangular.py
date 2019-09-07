@@ -1,4 +1,5 @@
 from ..imports import * 
+from .. import utils as U
 
 class CyclicLR(Callback):
     """This callback implements a cyclical learning rate policy (CLR).
@@ -206,6 +207,16 @@ class CyclicLR(Callback):
 
     def on_epoch_end(self, epoch, logs=None):
         #print(K.eval(self.model.optimizer.lr))
+
+        # stop training if training loss becomes zero or negative
+        # to address bug in keras_contrib code for CRF
+        if U.is_crf(self.model):
+            current_loss = logs.get('loss')
+            if current_loss is not None and current_loss <= 0.0:
+                self.model.stop_training = True
+                return
+
+
         if self.patience:
             current = logs.get(self.monitor)
             if current is None:
