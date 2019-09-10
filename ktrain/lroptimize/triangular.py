@@ -106,6 +106,9 @@ class CyclicLR(Callback):
         self.trn_iterations = 0.
         self.history = {}
 
+        # restoring weights due to CRF bug
+        self.best_weights = None
+
         # LR reduction
         self.verbose = verbose
         self.patience = reduce_on_plateau
@@ -208,12 +211,22 @@ class CyclicLR(Callback):
     def on_epoch_end(self, epoch, logs=None):
         #print(K.eval(self.model.optimizer.lr))
 
-        # stop training if training loss becomes zero or negative
-        # to address bug in keras_contrib code for CRF
-        if U.is_crf(self.model):
+        # Stop training if training loss becomes zero or negative
+        # to address bug in keras_contrib code for CRF.
+        # We restore the weights from previous best epoch
+        # rather than this epoch.
+        crf = U.is_crf(self.model)
+        if crf:
             current_loss = logs.get('loss')
-            if current_loss is not None and current_loss <= 0.0:
+            current_val_loss = logs.get('val_loss', None)
+            if (current_loss is not None and current_loss <= 0.0) or\
+                    (current_val_loss is not None and current_val_loss <= 0.0):
                 self.model.stop_training = True
+                if crf and self.best_weights is not None:
+                    if self.verbose > 0:
+                        print('Restoring model weights from the end of '
+                              'the best epoch')
+                    self.model.set_weights(self.best_weights)
                 return
 
 
@@ -224,6 +237,8 @@ class CyclicLR(Callback):
             if self.monitor_op(current, self.best):
                 self.best = current
                 self.wait = 0
+                if crf:
+                    self.best_weights = self.model.get_weights()
             else:
                 self.wait += 1
                 if self.wait >= self.patience:

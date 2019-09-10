@@ -1,115 +1,183 @@
 
 from ...imports import *
 from ... import utils as U
+from . import preprocessor as pp
 from .preprocessor import NERPreprocessor, PAD, UNK
 
 
 
 MAXLEN = 128
+WORD_COL = 'Word'
+TAG_COL = 'Tag'
+SENT_COL = 'SentenceID'
 
-def entities_from_csv(train_filepath, 
-                      word_column='Word',
-                      tag_column='Tag',
-                      sentence_column='SentenceID',
+def entities_from_gmb(train_filepath, 
+                      word_column=WORD_COL,
+                      tag_column=TAG_COL,
+                      sentence_column=SENT_COL,
                       val_filepath=None,
                        maxlen=MAXLEN, 
+                       encoding='latin1',
                        val_pct=0.1, verbose=1):
     """
-    Loads sequence-labeled data from CSV file. 
+    Loads sequence-labeled data from a CSV (or character-delmited) text file in GMB format.
+    Format of file is that of the Groningen Meaning Bank (GMB) corpus
+    available on Kaggle here: 
+    https://www.kaggle.com/abhinavwalia95/entity-annotated-corpus/version/2
+
+    Text file should have the following three columns representing:
+    1) Word in a sentence
+    2) Tag assigned to Word
+    3) The ID of the Sentence to which the word belongs.
+    The names of these columns can be specified with the
+    word_column, tag_column, and sent_column fields.
+
+    Example:
+
+      SentenceID   Word     Tag    
+      1            Paul     B-PER
+      1            Newman   I-PER
+      1            is       O
+      1            a        O
+      1            great    O
+      1            actor    O
+      1            !        O
+
+
     Args:
         train_filepath(str): file path to training CSV
         word_column(str): name of column containing the text
-        tag_column(list): name of column containing lael
+        tag_column(str): name of column containing lael
+        sentence_column(str): name of column containing Sentence IDs
+        val_filepath (str): file path to validation dataset
         maxlen(int): each document can be of most <maxlen> words. 0 is used as padding ID.
+        encoding(str): the encoding to use
         val_pct(float): Proportion of training to use for validation.
         verbose (boolean): verbosity
     """
 
 
-    # read data
-    data = pd.read_csv(train_filepath, encoding="latin1")
-    data = data.fillna(method="ffill")
-    words = list(set(data[word_column].values))
-    n_words = len(words)
-    tags = list(set(data[tag_column].values))
-    n_tags = len(tags)
+    # create dataframe
+    df = pd.read_csv(train_filepath, encoding=encoding)
+    df = df.fillna(method="ffill")
 
-    # print some stats
-    if verbose:
-        print("Number of sentences: ", len(data.groupby([sentence_column])))
-        print("Number of words in the dataset: ", n_words)
-        print("Tags:", tags)
-        print("Number of Labels: ", n_tags)
-
-    # retrieve all sentences
-    getter = SentenceGetter(data, word_column, tag_column, sentence_column)
-    #sent = getter.get_next()
-
-    # Get all the sentences
-    sentences = getter.sentences
-    largest_sen = max(len(sen) for sen in sentences)
-    if verbose: print('Longest sentence: {} words'.format(largest_sen))
-
-    # convert words to IDs
-    word2idx = {w: i + 2 for i, w in enumerate(words)}
-    word2idx[UNK] = 1 # Unknown words
-    word2idx[PAD] = 0 # Padding
-    # Vocabulary Key:token_index -> Value:word
-    idx2word = {i: w for w, i in word2idx.items()}
-
-    # convert tags to IDs
-    tags.sort()
-    tag2idx = {t: i+1 for i, t in enumerate(tags)}
-    tag2idx[PAD] = 0
-    # Vocabulary Key:tag_index -> Value:Label/Tag
-    idx2tag = {i: w for w, i in tag2idx.items()}
+    # process dataframe and instantiate NERPreprocessor
+    (word2idx, tag2idx, trn_sentences) = pp.process_df(df, maxlen,
+                                                       word_column=word_column,
+                                                       tag_column=tag_column,
+                                                       sentence_column=sentence_column,
+                                                       verbose=verbose)
+    preproc = NERPreprocessor(maxlen, word2idx, tag2idx)
 
 
-    # preprocess words and tags
-    pad = sequence.pad_sequences
-    X = [[word2idx[w[0]] for w in s] for s in sentences]
-    X = pad(maxlen=maxlen, sequences=X, padding="post", value=word2idx[PAD])
+    # preprocess train and validation sets
+    if val_filepath is None:
+        random.shuffle(trn_sentences)
+        k = round(len(trn_sentences) * val_pct)
+        val_sentences = trn_sentences[:k]
+        trn_sentences = trn_sentences[k:]
+    else:
+        val_df = pd.read_csv(train_filepath, encoding=encoding)
+        val_df = val_df.fillna(method="ffill")
+        (_, _, val_sentences) = pp.process_df(val_df, maxlen,
+                                              word_column=word_column,
+                                              tag_column=tag_column,
+                                              sentence_column=sentence_column,
+                                              verbose=0)
+    X_trn, y_trn = preproc.transform(trn_sentences)
+    X_val, y_val = preproc.transform(val_sentences)
+    return ( (X_trn, y_trn), (X_val, y_val), preproc)
 
-    y = [[tag2idx[w[1]] for w in s] for s in sentences]
-    y = pad(maxlen=maxlen, sequences=y, padding="post", value=tag2idx[PAD])
-    y = [to_categorical(i, num_classes=n_tags+1) for i in y]  # n_tags+1(PAD)
-    y = np.array(y)
-
-    # split into training and validation
-    X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=val_pct)
-
-    # instantiate Preprocessor
-    class_names =  [k for k,v in sorted(tag2idx.items(), key=lambda kv: kv[1])]
-    preproc = NERPreprocessor(maxlen, len(word2idx), class_names, word2idx)
-
-    return (X_tr, y_tr), (X_te, y_te), preproc
-
-
-
-class SentenceGetter(object):
-    """Class to Get the sentence in this format:
-    [(Token_1, Part_of_Speech_1, Tag_1), ..., (Token_n, Part_of_Speech_1, Tag_1)]"""
-    def __init__(self, data, word_column, tag_column, sentence_column):
-        """Args:
-            data is the pandas.DataFrame which contains the above dataset"""
-        self.n_sent = 1
-        self.data = data
-        self.empty = False
-        agg_func = lambda s: [(w, t) for w, t in zip(s[word_column].values.tolist(),
-                                                           s[tag_column].values.tolist())]
-        self.grouped = self.data.groupby(sentence_column).apply(agg_func)
-        self.sentences = [s for s in self.grouped]
-    
-    def get_next(self):
-        """Return one sentence"""
-        try:
-            s = self.grouped["Sentence: {}".format(self.n_sent)]
-            self.n_sent += 1
-            return s
-        except:
-            return None
+        
 
 
+def entities_from_conll2003(train_filepath, 
+                            val_filepath=None,
+                            maxlen=MAXLEN, 
+                            encoding='latin1',
+                            val_pct=0.1, verbose=1):
+    """
+    Loads sequence-labeled data from CSV file (no headers).
+    Format of CSV file is that of the CoNLL 2003 shared NER task.
+    Each word appars on a separate line and there is an empty line after
+    each sentence.  The first item on each line is the word.  The 
+    last item on each line is the tag or label assigned to word.
+    Additional columns between the first and last items are ignored.
+    More information: https://www.aclweb.org/anthology/W03-0419
+    Example (each column is separated by a tab):
 
+       Paul	B-PER
+       Newman	I-PER
+       is	O
+       a	O
+       great	O
+       actor	O
+       !	O
+
+    Args:
+        train_filepath(str): file path to training CSV
+        val_filepath (str): file path to validation dataset
+        maxlen(int): each document can be of most <maxlen> words. 0 is used as padding ID.
+        encoding(str): the encoding to use
+        val_pct(float): Proportion of training to use for validation.
+        verbose (boolean): verbosity
+    """
+
+    df = conll2003_to_df(train_filepath, encoding=encoding)
+
+
+    # process dataframe and instantiate NERPreprocessor
+    (word2idx, tag2idx, trn_sentences) = pp.process_df(df, maxlen,
+                                                       word_column=WORD_COL,
+                                                       tag_column=TAG_COL,
+                                                       sentence_column=SENT_COL,
+                                                       verbose=verbose)
+    preproc = NERPreprocessor(maxlen, word2idx, tag2idx)
+
+
+    # preprocess train and validation sets
+    if val_filepath is None:
+        random.shuffle(trn_sentences)
+        k = round(len(trn_sentences) * val_pct)
+        val_sentences = trn_sentences[:k]
+        trn_sentences = trn_sentences[k:]
+    else:
+        val_df = conll2003_to_df(val_filepath, encoding=encoding)
+        (_, _, val_sentences) = pp.process_df(val_df, maxlen,
+                                              word_column=WORD_COL,
+                                              tag_column=TAG_COL,
+                                              sentence_column=SENT_COL,
+                                              verbose=0)
+    X_trn, y_trn = preproc.transform(trn_sentences)
+    X_val, y_val = preproc.transform(val_sentences)
+    return ( (X_trn, y_trn), (X_val, y_val), preproc)
+
+
+
+
+def conll2003_to_df(filepath, encoding='latin1'):
+    # read data and convert to dataframe
+    sents, words, tags = [],  [], []
+    sent_id = 0
+    docstart = False
+    with open(filepath, encoding=encoding) as f:
+        for line in f:
+            line = line.rstrip()
+            if line:
+                if line.startswith('-DOCSTART-'): 
+                    docstart=True
+                    continue
+                else:
+                    docstart=False
+                    parts = line.split()
+                    words.append(parts[0])
+                    tags.append(parts[-1])
+                    sents.append(sent_id)
+            else:
+                if not docstart:
+                    sent_id +=1
+    df = pd.DataFrame({SENT_COL: sents, WORD_COL : words, TAG_COL:tags})
+    df = df.fillna(method="ffill")
+    return df
 
 

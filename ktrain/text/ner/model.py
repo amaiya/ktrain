@@ -44,9 +44,20 @@ def sequence_tagger(name, preproc, verbose=1):
         #model = Model(inp, out)
         #model.compile(optimizer="adam", loss=crf_loss, metrics=[crf_accuracy])
         #return model
+
+        # mask_zero causes problems for CRF in Keras v2.2.5
+        # https://github.com/keras-team/keras-contrib/issues/498
+
+
+        #mask_zero = True
+        #if keras.__version__ == '2.2.5': 
+            #warnings.warn('Due to bug in keras_contrib and Keras 2.2.5, '+
+                          #'we are setting mask_zero=False.')
+            #mask_zero = False 
+        mask_zero=False
         inp = Input(shape=(preproc.maxlen,))
         model = Embedding(input_dim=preproc.max_features, output_dim=EMBEDDING, # n_words + 2 (PAD & UNK)
-                          input_length=preproc.maxlen, mask_zero=False)(inp)  # default: 20-dim embedding
+                          input_length=preproc.maxlen, mask_zero=mask_zero)(inp)  # default: 20-dim embedding
         model = Bidirectional(LSTM(units=512, return_sequences=True,
                                    recurrent_dropout=0.2, dropout=0.2))(model)  # variational biLSTM
         model = TimeDistributed(Dense(512, activation="relu", 

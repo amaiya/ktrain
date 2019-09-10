@@ -395,3 +395,15 @@ def get_ktrain_data():
     if not os.path.isdir(ktrain_data):
         os.mkdir(ktrain_data)
     return ktrain_data
+
+
+def add_headers_to_df(fname_in, header_dict, fname_out=None):
+
+    df = pd.read_csv(fname_in, header=None)
+    df.rename(columns=header_dict, inplace=True)
+    if fname_out is None:
+        name, ext = os.path.splitext(fname_in)
+        name += '-headers'
+        fname_out = name + '.' + ext
+    df.to_csv(fname_out, index=False) # save to new csv file
+    return
