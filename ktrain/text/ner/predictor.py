@@ -1,6 +1,6 @@
 from ...imports import *
 from ...predictor import Predictor
-from .preprocessor import NERPreprocessor, PAD, tokenize
+from .preprocessor import NERPreprocessor, tokenize
 from ... import utils as U
 
 class NERPredictor(Predictor):

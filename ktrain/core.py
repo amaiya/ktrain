@@ -11,7 +11,7 @@ from .vision.data import show_image
 from .text.preprocessor import TextPreprocessor, BERTPreprocessor
 from .text.predictor import TextPredictor
 from .text.ner.predictor import NERPredictor
-from .text.ner.preprocessor import NERPreprocessor, PAD, UNK
+from .text.ner.preprocessor import NERPreprocessor
 
 
 
@@ -164,6 +164,16 @@ class Learner(ABC):
         self._recompile()
         return
         
+    def ner_lengths(self, y_true):
+        lengths = []
+        for y in np.argmax(y_true, -1):
+            try:
+                i = list(y).index(0)
+            except ValueError:
+                i = len(y)
+            lengths.append(i)
+
+        return lengths
 
     def validate_ner(self, val_data=None, class_names=[]):
         if val_data is not None:
@@ -171,27 +181,30 @@ class Learner(ABC):
         else:
             val = self.val_data
 
-        if not U.is_ner(self.model):
+        if not U.is_ner(model=self.model, data=val):
             warnings.warn('learner.validate_ner is only for sequence taggers.')
             return
         if not class_names:
             raise ValueError('class_names is required by validate_ner')
 
-        pred_cat = self.predict(val_data=val)
-        y_te = val[1]
-        pred = np.argmax(pred_cat, axis=-1)
-        y_te_true = np.argmax(y_te, -1)
+        label_true = []
+        label_pred = []
+        for i in range(len(val)):
+            x_true, y_true = val[i]
+            lengths = self.ner_lengths(y_true)
+            y_pred = self.model.predict_on_batch(x_true)
 
-        # Convert the index to tag
-        pred_tag = [[class_names[i].replace(PAD, 'O') for i in row] for row in pred]
-        y_te_true_tag = [[class_names[i].replace(PAD, 'O') for i in row] for row in y_te_true] 
+            y_true = val.p.inverse_transform(y_true, lengths)
+            y_pred = val.p.inverse_transform(y_pred, lengths)
 
-        # print classification report
-        report = flat_classification_report(y_pred=pred_tag, y_true=y_te_true_tag)
-        print(report)
+            label_true.extend(y_true)
+            label_pred.extend(y_pred)
+
+        score = ner_f1_score(label_true, label_pred)
+        print('   F1: {:04.2f}'.format(score * 100))
+        print(ner_classification_report(label_true, label_pred))
+
         return
-
-
 
 
     def validate(self, val_data=None, print_report=True, class_names=[]):
@@ -301,8 +314,8 @@ class Learner(ABC):
         elif ner:
             pred = np.argmax(y_pred, axis=-1)
             y_te_true = np.argmax(y_true, axis=-1)
-            y_p = [[class_fcn[i].replace(PAD, 'O') for i in row] for row in pred]
-            y_t = [[class_fcn[i].replace(PAD, 'O') for i in row] for row in y_te_true]
+            y_p = [[class_fcn[i].replace('<pad>', 'O') for i in row] for row in pred]
+            y_t = [[class_fcn[i].replace('<pad>', 'O') for i in row] for row in y_te_true]
             tups = [(i,x, y_t[i], y_p[i]) for i, x in enumerate(losses)]
         else:
             tups = [(i,x, y_true[i], np.around(y_pred[i],2)) for i, x in enumerate(losses)]
@@ -1082,7 +1095,8 @@ class ArrayLearner(Learner):
             hist = self.model.fit(x_train, y_train,
                                  batch_size=self.batch_size,
                                  epochs=epochs,
-                                 validation_data=validation, verbose=verbose,
+                                 validation_data=validation, verbose=verbose, 
+                                 shuffle=True,
                                  callbacks=kcallbacks)
 
         if sgdr is not None: hist.history['lr'] = sgdr.history['lr']
@@ -1200,6 +1214,7 @@ class GenLearner(Learner):
                                            workers=self.workers,
                                            use_multiprocessing=self.use_multiprocessing, 
                                            verbose=verbose,
+                                           shuffle=True,
                                            callbacks=kcallbacks)
         if sgdr is not None: hist.history['lr'] = sgdr.history['lr']
         self.history = hist
