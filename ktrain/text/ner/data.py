@@ -2,7 +2,7 @@
 from ...imports import *
 from ... import utils as U
 from . import preprocessor as pp
-from .preprocessor import NERPreprocessor, PAD, UNK
+from .preprocessor import NERPreprocessor
 
 
 
@@ -123,34 +123,44 @@ def entities_from_conll2003(train_filepath,
         verbose (boolean): verbosity
     """
 
-    df = conll2003_to_df(train_filepath, encoding=encoding)
+    IndexTransformer = anago.preprocessing.IndexTransformer
+
+
+    # set dataframe converter
+    data_to_df = conll2003_to_df
+
+    # create dataframe
+    df = data_to_df(train_filepath, encoding=encoding)
 
 
     # process dataframe and instantiate NERPreprocessor
-    (word2idx, tag2idx, trn_sentences) = pp.process_df(df, maxlen,
-                                                       word_column=WORD_COL,
-                                                       tag_column=TAG_COL,
-                                                       sentence_column=SENT_COL,
-                                                       verbose=verbose)
-    preproc = NERPreprocessor(maxlen, word2idx, tag2idx)
+    x, y  = pp.process_df(df, 
+                          word_column=WORD_COL,
+                          tag_column=TAG_COL,
+                          sentence_column=SENT_COL,
+                          verbose=verbose)
 
 
-    # preprocess train and validation sets
+    # get validation set
     if val_filepath is None:
-        random.shuffle(trn_sentences)
-        k = round(len(trn_sentences) * val_pct)
-        val_sentences = trn_sentences[:k]
-        trn_sentences = trn_sentences[k:]
+        x_train, x_valid, y_train, y_valid = train_test_split(x, y, test_size=val_pct)
     else:
-        val_df = conll2003_to_df(val_filepath, encoding=encoding)
-        (_, _, val_sentences) = pp.process_df(val_df, maxlen,
-                                              word_column=WORD_COL,
-                                              tag_column=TAG_COL,
-                                              sentence_column=SENT_COL,
-                                              verbose=0)
-    X_trn, y_trn = preproc.transform(trn_sentences)
-    X_val, y_val = preproc.transform(val_sentences)
-    return ( (X_trn, y_trn), (X_val, y_val), preproc)
+        val_df = data_to_df(val_filepath, encoding=encoding)
+        x_train, y_train = x, y
+        (x_valid, y_valid)  = pp.process_df(val_df,
+                                            word_column=WORD_COL,
+                                            tag_column=TAG_COL,
+                                            sentence_column=SENT_COL,
+                                            verbose=0)
+
+    # preprocess and convert to generator
+    p = IndexTransformer(use_char=True)
+    preproc = NERPreprocessor(p)
+    preproc.fit(x_train, y_train)
+    trn = pp.NERSequence(x_train, y_train, batch_size=U.DEFAULT_BS, p=p)
+    val = pp.NERSequence(x_valid, y_valid, batch_size=U.DEFAULT_BS, p=p)
+
+    return ( trn, val, preproc)
 
 
 
@@ -179,5 +189,8 @@ def conll2003_to_df(filepath, encoding='latin1'):
     df = pd.DataFrame({SENT_COL: sents, WORD_COL : words, TAG_COL:tags})
     df = df.fillna(method="ffill")
     return df
+
+
+
 
 

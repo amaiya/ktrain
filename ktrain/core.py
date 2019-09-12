@@ -11,7 +11,7 @@ from .vision.data import show_image
 from .text.preprocessor import TextPreprocessor, BERTPreprocessor
 from .text.predictor import TextPredictor
 from .text.ner.predictor import NERPredictor
-from .text.ner.preprocessor import NERPreprocessor, PAD, UNK
+from .text.ner.preprocessor import NERPreprocessor
 
 
 
@@ -165,33 +165,38 @@ class Learner(ABC):
         return
         
 
-    def validate_ner(self, val_data=None, class_names=[]):
+    def validate_ner(self, val_data=None):
+        """
+        Validate text sequence taggers
+        """
         if val_data is not None:
             val = val_data
         else:
             val = self.val_data
 
-        if not U.is_ner(self.model):
+        if not U.is_ner(model=self.model, data=val):
             warnings.warn('learner.validate_ner is only for sequence taggers.')
             return
-        if not class_names:
-            raise ValueError('class_names is required by validate_ner')
 
-        pred_cat = self.predict(val_data=val)
-        y_te = val[1]
-        pred = np.argmax(pred_cat, axis=-1)
-        y_te_true = np.argmax(y_te, -1)
+        label_true = []
+        label_pred = []
+        for i in range(len(val)):
+            x_true, y_true = val[i]
+            #lengths = self.ner_lengths(y_true)
+            lengths = val.get_lengths(i)
+            y_pred = self.model.predict_on_batch(x_true)
 
-        # Convert the index to tag
-        pred_tag = [[class_names[i].replace(PAD, 'O') for i in row] for row in pred]
-        y_te_true_tag = [[class_names[i].replace(PAD, 'O') for i in row] for row in y_te_true] 
+            y_true = val.p.inverse_transform(y_true, lengths)
+            y_pred = val.p.inverse_transform(y_pred, lengths)
 
-        # print classification report
-        report = flat_classification_report(y_pred=pred_tag, y_true=y_te_true_tag)
-        print(report)
+            label_true.extend(y_true)
+            label_pred.extend(y_pred)
+
+        score = ner_f1_score(label_true, label_pred)
+        print('   F1: {:04.2f}'.format(score * 100))
+        print(ner_classification_report(label_true, label_pred))
+
         return
-
-
 
 
     def validate(self, val_data=None, print_report=True, class_names=[]):
@@ -214,7 +219,7 @@ class Learner(ABC):
                           'to manually validate.')
             return
         if ner:
-            return self.validate_ner(val_data=val_data, class_names=class_names)
+            return self.validate_ner(val_data=val_data)
             
         if U.is_multilabel(val) or multilabel:
             warnings.warn('multilabel confusion matrices not yet supported')
@@ -234,7 +239,50 @@ class Learner(ABC):
         return cm
 
 
-    def top_losses(self, n=4, val_data=None, preproc=None, ner=None):
+
+    def top_losses_ner(self, n=4, val_data=None):
+        """
+        Computes losses on validation set sorted by examples with top losses
+        Args:
+          n(int or tuple): a range to select in form of int or tuple
+                          e.g., n=8 is treated as n=(0,8)
+          val_data:  optional val_data to use instead of self.val_data
+        Returns:
+            list of n tuples where first element is either 
+            filepath or id of validation example and second element
+            is loss.
+
+        """
+        # check validation data and arguments
+        if val_data is not None:
+            val = val_data
+        else:
+            val = self.val_data
+        if val is None: raise Exception('val_data must be supplied to get_learner or top_losses')
+        if type(n) == type(42):
+            n = (0, n)
+
+        # get predicictions and ground truth
+        y_pred = self.predict(val_data=val)
+        y_true = self.ground_truth(val_data=val)
+
+        # compute losses and sort
+        losses = []
+        for idx, y_t in enumerate(y_true):
+            y_p = y_pred[idx]
+            #err = 1- sum(1 for x,y in zip(y_t,y_p) if x == y) / len(y_t)
+            err = sum(1 for x,y in zip(y_t,y_p) if x != y) 
+            losses.append(err)
+        tups = [(i,x, y_true[i], y_pred[i]) for i, x in enumerate(losses) if x > 0]
+        tups.sort(key=operator.itemgetter(1), reverse=True)
+
+        # prune by given range
+        tups = tups[n[0]:n[1]] if n is not None else tups
+        return tups
+
+
+
+    def top_losses(self, n=4, val_data=None, preproc=None):
         """
         Computes losses on validation set sorted by examples with top losses
         Args:
@@ -245,7 +293,6 @@ class Learner(ABC):
                                   For some data like text data, a preprocessor
                                   is required to undo the pre-processing
                                    to correctly view raw data.
-          ner(bool):  Flag to indicate that model is a sequence labeler
         Returns:
             list of n tuples where first element is either 
             filepath or id of validation example and second element
@@ -268,15 +315,12 @@ class Learner(ABC):
 
         #multilabel = True if U.is_multilabel(val) else False
         classification, multilabel = U.is_classifier(self.model)
-        if ner is None:
-            ner = U.is_ner(model=self.model, data=val)
 
 
         # get predicictions and ground truth
         y_pred = self.predict(val_data=val)
         y_true = self.ground_truth(val_data=val)
         y_true = y_true.astype('float32')
-
 
         # compute loss
         losses = self.model.loss_functions[0](tf.convert_to_tensor(y_true), tf.convert_to_tensor(y_pred))
@@ -298,12 +342,6 @@ class Learner(ABC):
             y_t = np.argmax(y_true, axis=1)
             tups = [(i,x, class_fcn(y_t[i]), class_fcn(y_p[i])) for i, x in enumerate(losses) 
                      if y_p[i] != y_t[i]]
-        elif ner:
-            pred = np.argmax(y_pred, axis=-1)
-            y_te_true = np.argmax(y_true, axis=-1)
-            y_p = [[class_fcn[i].replace(PAD, 'O') for i in row] for row in pred]
-            y_t = [[class_fcn[i].replace(PAD, 'O') for i in row] for row in y_te_true]
-            tups = [(i,x, y_t[i], y_p[i]) for i, x in enumerate(losses)]
         else:
             tups = [(i,x, y_true[i], np.around(y_pred[i],2)) for i, x in enumerate(losses)]
         tups.sort(key=operator.itemgetter(1), reverse=True)
@@ -341,12 +379,13 @@ class Learner(ABC):
 
         # check ner 
         ner = U.is_ner(model=self.model, data=val)
-        if ner:
-            print('view_top_losses method does not currently support bilstm-crf models')
-            return
-
         # get top losses and associated data
-        tups = self.top_losses(n=n, val_data=val, preproc=preproc, ner=ner)
+        if ner:
+            #print('view_top_losses method does not currently support sequence taggers')
+            #return
+            tups = self.top_losses_ner(n=n, val_data=val)
+        else:
+            tups = self.top_losses(n=n, val_data=val, preproc=preproc, ner=ner)
 
         # get multilabel status and class names
         classes = preproc.get_classes() if preproc is not None else None
@@ -368,13 +407,13 @@ class Learner(ABC):
                 plt.title("%s | loss:%s | true:%s | pred:%s)" % (fp, round(loss,2), truth, pred))
                 show_image(fpath)
             elif ner:
-                seq = val[idx]
-                if preproc is not None:
-                    seq = preproc.undo(seq)
-                    print("{:15} {:5}: ({})".format("Word", "Pred", "True"))
-                    print("="*30)
-                    for w, true_tag, pred_tag in zip(seq, truth, pred):
-                        print("{:15}:{:5} ({})".format(w, true_tag, pred_tag))
+                seq = val.x[idx]
+                print('total incorrect: %s' % (loss))
+                print("{:15} {:5}: ({})".format("Word", "True", "Pred"))
+                print("="*30)
+                for w, true_tag, pred_tag in zip(seq, truth, pred):
+                    print("{:15}:{:5} ({})".format(w, true_tag, pred_tag))
+                print('\n')
             else:
                 # Image Classification from Array
                 if type(val).__name__ in ['NumpyArrayIterator']:
@@ -404,6 +443,9 @@ class Learner(ABC):
         """
         a wrapper to model.save
         """
+        if U.is_ner(model=self.model):
+            from .text.ner.model import crf_loss
+            self.model.compile(loss=crf_loss, optimizer=U.DEFAULT_OPT)
         self.model.save(fpath)
         return
 
@@ -976,7 +1018,16 @@ class Learner(ABC):
         if val is None: raise Exception('val_data must be supplied to get_learner or predict')
         if U.is_iter(val):
             steps = np.ceil(U.nsamples_from_data(val)/val.batch_size)
-            return self.model.predict_generator(val, steps=steps)
+            if U.is_ner(model=self.model, data=val):
+                results = []
+                for idx, (X, y) in enumerate(val):
+                    y_pred = self.model.predict_on_batch(X)
+                    lengths = val.get_lengths(idx)
+                    y_pred = val.p.inverse_transform(y_pred, lengths)
+                    results.extend(y_pred)
+                return results
+            else:
+                return self.model.predict_generator(val, steps=steps)
         else:
             return self.model.predict(val[0])
 
@@ -1082,7 +1133,8 @@ class ArrayLearner(Learner):
             hist = self.model.fit(x_train, y_train,
                                  batch_size=self.batch_size,
                                  epochs=epochs,
-                                 validation_data=validation, verbose=verbose,
+                                 validation_data=validation, verbose=verbose, 
+                                 shuffle=True,
                                  callbacks=kcallbacks)
 
         if sgdr is not None: hist.history['lr'] = sgdr.history['lr']
@@ -1164,10 +1216,10 @@ class GenLearner(Learner):
         
         # handle callbacks
         num_samples = U.nsamples_from_data(self.train_data)
-        steps_per_epoch = num_samples // self.train_data.batch_size
+        steps_per_epoch = math.ceil(num_samples/self.train_data.batch_size)
         validation_steps = None
         if self.val_data is not None:
-            validation_steps = U.nsamples_from_data(self.val_data)//self.val_data.batch_size
+            validation_steps = math.ceil(U.nsamples_from_data(self.val_data)/self.val_data.batch_size)
 
         epochs = self._check_cycles(n_cycles, cycle_len, cycle_mult)
         self.set_lr(lr)
@@ -1200,6 +1252,7 @@ class GenLearner(Learner):
                                            workers=self.workers,
                                            use_multiprocessing=self.use_multiprocessing, 
                                            verbose=verbose,
+                                           shuffle=True,
                                            callbacks=kcallbacks)
         if sgdr is not None: hist.history['lr'] = sgdr.history['lr']
         self.history = hist
@@ -1362,12 +1415,10 @@ def _load_model(fpath, preproc=None, train_data=None):
     elif (preproc and (isinstance(preproc, NERPreprocessor) or \
                     type(preproc).__name__ == 'NERPreprocessor')) or \
         U.is_ner(model=self.model, data=self.train_data):
-        from .keras_contrib.losses import crf_loss
-        from .keras_contrib.metrics import crf_accuracy
-        from .keras_contrib.layers import CRF
+        from anago.layers import CRF
+        from .text.ner.model import crf_loss
         custom_objects={'CRF': CRF,
-                        'crf_loss': crf_loss,
-                        'crf_accuracy': crf_accuracy}
+                        'crf_loss': crf_loss}
 
     try:
         model = load_model(fpath, custom_objects=custom_objects)

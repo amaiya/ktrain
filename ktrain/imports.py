@@ -38,7 +38,11 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 import eli5
 from eli5.lime import TextExplainer
-from seqeval.metrics import classification_report as flat_classification_report
+from seqeval.metrics import classification_report as ner_classification_report
+from seqeval.metrics import f1_score as ner_f1_score
+with warnings.catch_warnings():
+    warnings.filterwarnings("ignore",category=DeprecationWarning)
+    import anago
 
 
 
@@ -75,6 +79,8 @@ from keras.preprocessing.text import Tokenizer
 from keras.utils import Sequence, to_categorical
 from keras.utils import multi_gpu_model
 from keras.activations import sigmoid
+from keras.losses import categorical_crossentropy
+from keras.losses import sparse_categorical_crossentropy
 
 from keras.applications.resnet50 import ResNet50
 from keras.applications.mobilenet import MobileNet

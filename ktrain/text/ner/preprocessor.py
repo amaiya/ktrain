@@ -2,8 +2,6 @@ from ...imports import *
 from ... import utils as U
 from ...preprocessor import Preprocessor
 
-PAD='[PAD]'
-UNK = '[UNK]'
 OTHER = 'O'
 
 #tokenizer_filter = rs='!"#$%&()*+,-./:;<=>?@[\\]^_`{|}~\t\n'
@@ -16,93 +14,59 @@ class NERPreprocessor(Preprocessor):
     NER preprocessing base class
     """
 
-    def __init__(self, maxlen, word2idx, tag2idx):
-        self.maxlen = maxlen
-        self.w2idx = word2idx
-        self.t2idx = tag2idx
-        self.idx2w = {i: w for w, i in word2idx.items()}
-        self.c = [k for k,v in sorted(tag2idx.items(), key=lambda kv: kv[1])]
-        self.max_features = len(word2idx)
+    def __init__(self, p):
+        self.p = p
+        self.c = p._label_vocab._id2token
 
-
-    def check(self):
-        if self.w2idx is None: raise Exception('perprocess_train must be called')
 
 
     def get_preprocessor(self):
-        return self.w2idx
+        return self.p
 
 
     def get_classes(self):
         return self.c
 
 
-    def preprocess(self, sentence, filter_padding=True):
-        self.check()
-
-        unk_id = self.w2idx[UNK]
-        pad_id = self.w2idx[PAD]
-        s = tokenize(sentence)
-        x = [self.w2idx.get(w, unk_id) for w in s]
-        x = sequence.pad_sequences(maxlen=self.maxlen, sequences=[x],
-                                   padding='post', value=pad_id)
-        x = np.array(x)
-        return x
+    def preprocess(self, sentences):
+        X = []
+        y = []
+        for s in sentences:
+            tokens = tokenize(s)
+            X.append(tokens)
+            y.append([OTHER] * len(tokens))
+        nerseq = NERSequence(X, y, p=self.p)
+        return nerseq
 
 
-    def undo(self, seq):
+    def undo(self, nerseq):
         """
         undoes preprocessing and returns raw data by:
         converting a list or array of Word IDs back to words
         """
-        self.check()
-
-        pad_id = self.w2idx[PAD]
-        #s = text_to_word_sequence(sentence, lower=False)
-        x = [self.idx2w.get(wid, UNK) for wid in seq if wid != pad_id]
-        return x
+        return [" ".join(e) for e in nerseq.x]
 
 
-    def undo_val(self, val_data, val_id=0):
+
+
+    def fit(self, X, y):
         """
-        undoes preprocessing for a particular entry 
-        in a validatio nset.
+        Learn vocabulary from training set
         """
-        self.check()
-        pad_id = self.w2idx[PAD]
-        sentence = self.undo(val_data[0][val_id])
-        tags = [self.c[tid] for tid in np.argmax(val_data[1][val_id], axis=-1) if tid != pad_id]
-        return list(zip(sentence, tags))
+        self.p.fit(X, y)
+        return
 
 
-
-    def transform(self, sentences_with_labels):
+    def transform(self, X, y=None):
         """
-        process tagged-sentences into sequences of word IDs and sequences of tag IDs
+        Transform documents to sequences of word IDs
         """
-
-
-        unk_id = self.w2idx[UNK]
-        pad_id = self.w2idx[PAD]
-        o_id = self.t2idx[OTHER]
-
-        # preprocess words and tags
-        pad = sequence.pad_sequences
-        X = [[self.w2idx.get(w[0], unk_id) for w in s] for s in sentences_with_labels]
-        X = pad(maxlen=self.maxlen, sequences=X, padding="post", value=self.w2idx[PAD])
-        y = [[self.t2idx.get(w[1], o_id) for w in s] for s in sentences_with_labels]
-        y = pad(maxlen=self.maxlen, sequences=y, padding="post", value=self.t2idx[PAD])
-        y = [to_categorical(i, num_classes=len(self.c)) for i in y]  # n_tags+1(PAD)
-        y = np.array(y)
-
-        # split into training and validation
-        #X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=val_pct)
-        return (X, y)
+        return self.p.transform(X, y=y)
 
 
 
 
-def process_df(df, maxlen, 
+def process_df(df, 
                sentence_column='SentenceID', 
                word_column='Word', 
                tag_column='Tag',
@@ -123,23 +87,16 @@ def process_df(df, maxlen,
         print("Tags:", tags)
         print("Number of Labels: ", n_tags)
 
-    # convert words to IDs
-    w2idx = {w: i + 2 for i, w in enumerate(words)}
-    w2idx[UNK] = 1 # Unknown words
-    w2idx[PAD] = 0 # Padding
-
-    # convert tags to IDs
-    tags.sort()
-    t2idx = {t: i+1 for i, t in enumerate(tags)}
-    t2idx[PAD] = 0
 
     # retrieve all sentences
     getter = SentenceGetter(df, word_column, tag_column, sentence_column)
     sentences = getter.sentences
     largest_sen = max(len(sen) for sen in sentences)
     if verbose: print('Longest sentence: {} words'.format(largest_sen))
-
-    return (w2idx, t2idx, sentences)
+    data = [list(zip(*s)) for s in sentences]
+    X = [list(e[0]) for e in data]
+    y = [list(e[1]) for e in data]
+    return (X, y)
 
 
 
@@ -170,5 +127,33 @@ class SentenceGetter(object):
 
 
 
+class NERSequence(Sequence):
 
+    def __init__(self, x, y, batch_size=1, p=None):
+        self.x = x
+        self.y = y
+        self.batch_size = batch_size
+        self.p = p
+
+    def __getitem__(self, idx):
+        batch_x = self.x[idx * self.batch_size: (idx + 1) * self.batch_size]
+        batch_y = self.y[idx * self.batch_size: (idx + 1) * self.batch_size]
+
+        return self.p.transform(batch_x, batch_y)
+
+    def __len__(self):
+        return math.ceil(len(self.x) / self.batch_size)
+
+
+    def get_lengths(self, idx):
+        x_true, y_true = self[idx]
+        lengths = []
+        for y in np.argmax(y_true, -1):
+            try:
+                i = list(y).index(0)
+            except ValueError:
+                i = len(y)
+            lengths.append(i)
+
+        return lengths
 

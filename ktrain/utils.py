@@ -3,6 +3,7 @@ from .imports import *
 DEFAULT_BS = 32
 DEFAULT_ES = 5 
 DEFAULT_ROP = 2 
+DEFAULT_OPT = 'adam'
 
 
 def is_classifier(model):
@@ -49,7 +50,8 @@ def is_ner_from_model(model):
     """
     loss = model.loss
     if callable(loss): loss = loss.__name__
-    return loss == 'crf_loss'
+    return loss == 'crf_loss' or 'CRF.loss_function' in str(model.loss)
+
 
 def is_crf(model):
     """
@@ -59,14 +61,7 @@ def is_crf(model):
 
 
 def is_ner_from_data(data):
-    data_arg_check(train_data=data)
-    X = data[0]
-    y = data[1]
-    ner = False
-    if len(X.shape) == 2 and len(y.shape) == 3 and\
-            tuple(X.shape[:2]) == tuple(y.shape[:2]):
-        ner = True
-    return ner 
+    return type(data).__name__ == 'NERSequence'
         
 
 
@@ -76,6 +71,7 @@ def is_multilabel(data):
     """
     data_arg_check(val_data=data, val_required=True)
     if is_iter(data):
+        if is_ner(data=data): return False   # NERSequence
         multilabel = False
         for idx, v in enumerate(data):
             if idx >= 16: break
@@ -102,7 +98,8 @@ def is_multilabel(data):
 def shape_from_data(data):
     err_msg = 'could not determine shape from %s' % (type(data))
     if is_iter(data):
-        if hasattr(data, 'image_shape'): return data.image_shape
+        if is_ner(data=data): return (len(data.x), data[0][0][0].shape[1])  # NERSequence
+        elif hasattr(data, 'image_shape'): return data.image_shape
         elif hasattr(data, 'x'):
             return data.x.shape[1:]
         else:
@@ -121,14 +118,16 @@ def shape_from_data(data):
 
 
 def ondisk(data):
-    ondisk = is_iter(data) and (type(data).__name__ != 'NumpyArrayIterator')
+    ondisk = is_iter(data) and \
+             (type(data).__name__ not in  ['NumpyArrayIterator', 'NERSequence'])
     return ondisk
 
 
 def nsamples_from_data(data):
     err_msg = 'could not determine number of samples from %s' % (type(data))
     if is_iter(data):
-        if hasattr(data, 'samples'):
+        if is_ner(data=data): return len(data.x)
+        elif hasattr(data, 'samples'):
             return data.samples
         elif hasattr(data, 'n'):
             return data.n
@@ -146,7 +145,8 @@ def nsamples_from_data(data):
 
 def nclasses_from_data(data):
     if is_iter(data):
-        if hasattr(data, 'classes'):
+        if is_ner(data=data): return len(data.p._label_vocab._id2token)
+        elif hasattr(data, 'classes'):
             return len(set(data.classes))
         else:
             try:
@@ -162,7 +162,8 @@ def nclasses_from_data(data):
 
 def y_from_data(data):
     if is_iter(data):
-        if hasattr(data, 'classes'): # DirectoryIterator
+        if is_ner(data=data): return data.y
+        elif hasattr(data, 'classes'): # DirectoryIterator
             return to_categorical(data.classes)
         elif hasattr(data, 'labels'):  # DataFrameIterator
             return data.labels
@@ -187,7 +188,8 @@ def vprint(s=None, verbose=1):
 def is_iter(data, ignore=False):
     if ignore: return True
     iter_classes = ["NumpyArrayIterator", "DirectoryIterator",
-                    "DataFrameIterator", "Iterator", "Sequence"]
+                    "DataFrameIterator", "Iterator", "Sequence", 
+                    "NERSequence"]
     return data.__class__.__name__ in iter_classes
 
 
