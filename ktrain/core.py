@@ -445,7 +445,7 @@ class Learner(ABC):
         """
         if U.is_ner(model=self.model):
             from .text.ner.model import crf_loss
-            model.compile(loss=crf_loss, optimizer=U.DEFAULT_OPT)
+            self.model.compile(loss=crf_loss, optimizer=U.DEFAULT_OPT)
         self.model.save(fpath)
         return
 
