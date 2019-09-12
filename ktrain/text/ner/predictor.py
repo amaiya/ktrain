@@ -24,32 +24,19 @@ class NERPredictor(Predictor):
         return self.c
 
 
-    def predict(self, sentence, return_proba=False, include_tokens=True):
+    def predict(self, sentence):
         """
         Makes predictions for a string-representation of a sentence
         If return_proba is True, returns probabilities of each class.
         """
         if not isinstance(sentence, str):
             raise ValueError('Param sentence must be a string-representation of a sentence')
-        tokens = tokenize(sentence)
-        x = self.preproc.preprocess(sentence)
-        preds = self.model.predict(x)
-        preds = np.squeeze(preds)
-        preds = preds[:len(tokens)]
-        result =  preds if return_proba else [self.c[np.argmax(pred)] for pred in preds] 
-        #result = result if return_proba else np.array([r for r in result if r != PAD] )
-        if include_tokens: result = list(zip(tokens, result))
-        return result
-
-
-
-    def predict_proba(self, texts):
-        """
-        Makes predictions for a string-represneta
-        or text snippet.
-        Returns probabilities of each class.
-        """
-        return self.predict(texts, return_proba=True)
-
+        nerseq = self.preproc.preprocess([sentence])
+        x_true, _ = nerseq[0]
+        lengths = nerseq.get_lengths(0)
+        y_pred = self.model.predict_on_batch(x_true)
+        y_pred = self.preproc.p.inverse_transform(y_pred, lengths)
+        y_pred = y_pred[0]
+        return list(zip(nerseq.x[0], y_pred))
 
 

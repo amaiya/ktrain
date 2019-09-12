@@ -157,8 +157,8 @@ def entities_from_conll2003(train_filepath,
     p = IndexTransformer(use_char=True)
     preproc = NERPreprocessor(p)
     preproc.fit(x_train, y_train)
-    trn = NERSequence(x_train, y_train, batch_size=U.DEFAULT_BS, p=p)
-    val = NERSequence(x_valid, y_valid, batch_size=U.DEFAULT_BS, p=p)
+    trn = pp.NERSequence(x_train, y_train, batch_size=U.DEFAULT_BS, p=p)
+    val = pp.NERSequence(x_valid, y_valid, batch_size=U.DEFAULT_BS, p=p)
 
     return ( trn, val, preproc)
 
@@ -192,20 +192,5 @@ def conll2003_to_df(filepath, encoding='latin1'):
 
 
 
-class NERSequence(Sequence):
 
-    def __init__(self, x, y, batch_size=1, p=None):
-        self.x = x
-        self.y = y
-        self.batch_size = batch_size
-        self.p = p
-
-    def __getitem__(self, idx):
-        batch_x = self.x[idx * self.batch_size: (idx + 1) * self.batch_size]
-        batch_y = self.y[idx * self.batch_size: (idx + 1) * self.batch_size]
-
-        return self.p.transform(batch_x, batch_y)
-
-    def __len__(self):
-        return math.ceil(len(self.x) / self.batch_size)
 

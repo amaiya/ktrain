@@ -989,7 +989,13 @@ class Learner(ABC):
         if val is None: raise Exception('val_data must be supplied to get_learner or predict')
         if U.is_iter(val):
             steps = np.ceil(U.nsamples_from_data(val)/val.batch_size)
-            return self.model.predict_generator(val, steps=steps)
+            if U.is_ner(model=self.model, data=val):
+                results = []
+                for X, y in val:
+                    results.append(self.model.predict_on_batch(X))
+                return results
+            else:
+                return self.model.predict_generator(val, steps=steps)
         else:
             return self.model.predict(val[0])
 

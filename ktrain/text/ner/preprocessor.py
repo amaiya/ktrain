@@ -28,36 +28,24 @@ class NERPreprocessor(Preprocessor):
         return self.c
 
 
-    def preprocess(self, sentence, filter_padding=True):
+    def preprocess(self, sentences):
+        X = []
+        y = []
+        for s in sentences:
+            tokens = tokenize(s)
+            X.append(tokens)
+            y.append([OTHER] * len(tokens))
+        nerseq = NERSequence(X, y, p=self.p)
+        return nerseq
 
-        #s = tokenize(sentence)
-        #x = [self.w2idx.get(w, unk_id) for w in s]
-        #x = sequence.pad_sequences(maxlen=self.maxlen, sequences=[x],
-                                   #padding='post', value=pad_id)
-        #x = np.array(x)
-        #return x
-        return
 
-
-    def undo(self, seq):
+    def undo(self, nerseq):
         """
         undoes preprocessing and returns raw data by:
         converting a list or array of Word IDs back to words
         """
-        #x = [self.idx2w.get(wid, UNK) for wid in seq if wid != pad_id]
-        #return x
-        return None
+        return [" ".join(e) for e in nerseq.x]
 
-
-    def undo_val(self, val_data, val_id=0):
-        """
-        undoes preprocessing for a particular entry 
-        in a validatio nset.
-        """
-        #sentence = self.undo(val_data[0][val_id])
-        #tags = [self.c[tid] for tid in np.argmax(val_data[1][val_id], axis=-1) if tid != pad_id]
-        #return list(zip(sentence, tags))
-        return None
 
 
 
@@ -139,5 +127,33 @@ class SentenceGetter(object):
 
 
 
+class NERSequence(Sequence):
 
+    def __init__(self, x, y, batch_size=1, p=None):
+        self.x = x
+        self.y = y
+        self.batch_size = batch_size
+        self.p = p
+
+    def __getitem__(self, idx):
+        batch_x = self.x[idx * self.batch_size: (idx + 1) * self.batch_size]
+        batch_y = self.y[idx * self.batch_size: (idx + 1) * self.batch_size]
+
+        return self.p.transform(batch_x, batch_y)
+
+    def __len__(self):
+        return math.ceil(len(self.x) / self.batch_size)
+
+
+    def get_lengths(self, idx):
+        x_true, y_true = self[idx]
+        lengths = []
+        for y in np.argmax(y_true, -1):
+            try:
+                i = list(y).index(0)
+            except ValueError:
+                i = len(y)
+            lengths.append(i)
+
+        return lengths
 
