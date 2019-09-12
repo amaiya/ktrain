@@ -164,18 +164,11 @@ class Learner(ABC):
         self._recompile()
         return
         
-    def ner_lengths(self, y_true):
-        lengths = []
-        for y in np.argmax(y_true, -1):
-            try:
-                i = list(y).index(0)
-            except ValueError:
-                i = len(y)
-            lengths.append(i)
 
-        return lengths
-
-    def validate_ner(self, val_data=None, class_names=[]):
+    def validate_ner(self, val_data=None):
+        """
+        Validate text sequence taggers
+        """
         if val_data is not None:
             val = val_data
         else:
@@ -184,14 +177,13 @@ class Learner(ABC):
         if not U.is_ner(model=self.model, data=val):
             warnings.warn('learner.validate_ner is only for sequence taggers.')
             return
-        if not class_names:
-            raise ValueError('class_names is required by validate_ner')
 
         label_true = []
         label_pred = []
         for i in range(len(val)):
             x_true, y_true = val[i]
-            lengths = self.ner_lengths(y_true)
+            #lengths = self.ner_lengths(y_true)
+            lengths = val.get_lengths(i)
             y_pred = self.model.predict_on_batch(x_true)
 
             y_true = val.p.inverse_transform(y_true, lengths)
@@ -227,7 +219,7 @@ class Learner(ABC):
                           'to manually validate.')
             return
         if ner:
-            return self.validate_ner(val_data=val_data, class_names=class_names)
+            return self.validate_ner(val_data=val_data)
             
         if U.is_multilabel(val) or multilabel:
             warnings.warn('multilabel confusion matrices not yet supported')
@@ -1383,12 +1375,10 @@ def _load_model(fpath, preproc=None, train_data=None):
     elif (preproc and (isinstance(preproc, NERPreprocessor) or \
                     type(preproc).__name__ == 'NERPreprocessor')) or \
         U.is_ner(model=self.model, data=self.train_data):
-        from .keras_contrib.losses import crf_loss
-        from .keras_contrib.metrics import crf_accuracy
-        from .keras_contrib.layers import CRF
+        from anago.layers import CRF
+        from .text.ner.model import crf_loss
         custom_objects={'CRF': CRF,
-                        'crf_loss': crf_loss,
-                        'crf_accuracy': crf_accuracy}
+                        'crf_loss': crf_loss}
 
     try:
         model = load_model(fpath, custom_objects=custom_objects)
