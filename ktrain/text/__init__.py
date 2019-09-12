@@ -1,6 +1,6 @@
 from .models import *
 from .data import *
-from .ner.data import entities_from_gmb, entities_from_conll2003
+from .ner.data import entities_from_gmb, entities_from_conll2003, entities_from_txt
 from .ner.model import sequence_tagger, print_sequence_taggers
 __all__ = [
            'text_classifier', 
@@ -8,6 +8,7 @@ __all__ = [
            'texts_from_folder', 'texts_from_csv',
            'entities_from_gmb',
            'entities_from_conll2003',
+           'entities_from_txt',
            'sequence_tagger',
            'print_sequence_taggers'
            ]

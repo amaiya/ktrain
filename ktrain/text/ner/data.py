@@ -20,91 +20,66 @@ def entities_from_gmb(train_filepath,
                        encoding='latin1',
                        val_pct=0.1, verbose=1):
     """
-    Loads sequence-labeled data from a CSV (or character-delmited) text file in GMB format.
-    Format of file is that of the Groningen Meaning Bank (GMB) corpus
-    available on Kaggle here: 
-    https://www.kaggle.com/abhinavwalia95/entity-annotated-corpus/version/2
-
-    Text file should have the following three columns representing:
-    1) Word in a sentence
-    2) Tag assigned to Word
-    3) The ID of the Sentence to which the word belongs.
-    The names of these columns can be specified with the
-    word_column, tag_column, and sent_column fields.
-
-    Example:
-
-      SentenceID   Word     Tag    
-      1            Paul     B-PER
-      1            Newman   I-PER
-      1            is       O
-      1            a        O
-      1            great    O
-      1            actor    O
-      1            !        O
-
-
-    Args:
-        train_filepath(str): file path to training CSV
-        word_column(str): name of column containing the text
-        tag_column(str): name of column containing lael
-        sentence_column(str): name of column containing Sentence IDs
-        val_filepath (str): file path to validation dataset
-        maxlen(int): each document can be of most <maxlen> words. 0 is used as padding ID.
-        encoding(str): the encoding to use
-        val_pct(float): Proportion of training to use for validation.
-        verbose (boolean): verbosity
+    Loads sequence-labeled data from text file in the  Groningen
+    Meaning Bank  (GMB) format.
     """
 
 
-    # create dataframe
-    df = pd.read_csv(train_filepath, encoding=encoding)
-    df = df.fillna(method="ffill")
+    return entities_from_txt(train_filepath=train_filepath,
+                             val_filepath=val_filepath,
+                             word_column=word_column,
+                             tag_column=tag_column,
+                             sentence_column=sentence_column,
+                             data_format='gmb',
+                             encoding=encoding,
+                             val_pct=val_pct, verbose=verbose)
 
-    # process dataframe and instantiate NERPreprocessor
-    (word2idx, tag2idx, trn_sentences) = pp.process_df(df, maxlen,
-                                                       word_column=word_column,
-                                                       tag_column=tag_column,
-                                                       sentence_column=sentence_column,
-                                                       verbose=verbose)
-    preproc = NERPreprocessor(maxlen, word2idx, tag2idx)
-
-
-    # preprocess train and validation sets
-    if val_filepath is None:
-        random.shuffle(trn_sentences)
-        k = round(len(trn_sentences) * val_pct)
-        val_sentences = trn_sentences[:k]
-        trn_sentences = trn_sentences[k:]
-    else:
-        val_df = pd.read_csv(train_filepath, encoding=encoding)
-        val_df = val_df.fillna(method="ffill")
-        (_, _, val_sentences) = pp.process_df(val_df, maxlen,
-                                              word_column=word_column,
-                                              tag_column=tag_column,
-                                              sentence_column=sentence_column,
-                                              verbose=0)
-    X_trn, y_trn = preproc.transform(trn_sentences)
-    X_val, y_val = preproc.transform(val_sentences)
-    return ( (X_trn, y_trn), (X_val, y_val), preproc)
 
         
-
-
 def entities_from_conll2003(train_filepath, 
                             val_filepath=None,
-                            maxlen=MAXLEN, 
                             encoding='latin1',
                             val_pct=0.1, verbose=1):
     """
-    Loads sequence-labeled data from CSV file (no headers).
-    Format of CSV file is that of the CoNLL 2003 shared NER task.
-    Each word appars on a separate line and there is an empty line after
-    each sentence.  The first item on each line is the word.  The 
-    last item on each line is the tag or label assigned to word.
-    Additional columns between the first and last items are ignored.
-    More information: https://www.aclweb.org/anthology/W03-0419
-    Example (each column is separated by a tab):
+    Loads sequence-labeled data from a file in CoNLL2003 format.
+    """
+    return entities_from_txt(train_filepath=train_filepath,
+                             val_filepath=val_filepath,
+                             data_format='conll2003',
+                             encoding=encoding,
+                             val_pct=val_pct, verbose=verbose)
+
+
+
+
+def entities_from_txt(train_filepath, 
+                      val_filepath=None,
+                      word_column=WORD_COL,
+                      tag_column=TAG_COL,
+                      sentence_column=SENT_COL,
+                      data_format='conll2003',
+                      encoding='latin1',
+                      val_pct=0.1, verbose=1):
+    """
+    Loads sequence-labeled data from comma or tab-delmited text file.
+    Format of file is either the CoNLL2003 format or Groningen Meaning
+    Bank (GMB) format - specified with data_format parameter.
+
+    In both formats, each word appars on a separate line along with
+    its associated tag (or label).  
+    The last item on each line should be the tag or label assigned to word.
+    
+    In the CoNLL2003 format, there is an empty line after
+    each sentence.  In the GMB format, sentences are deliniated
+    with a third column denoting the Sentence ID.
+
+
+    
+    More information on CoNLL2003 format: 
+       https://www.aclweb.org/anthology/W03-0419
+
+    CoNLL Example (each column is typically separated by space or tab)
+    and  no column headings:
 
        Paul	B-PER
        Newman	I-PER
@@ -114,10 +89,32 @@ def entities_from_conll2003(train_filepath,
        actor	O
        !	O
 
+    More information on GMB format:
+    Refer to ner_dataset.csv on Kaggle here:
+       https://www.kaggle.com/abhinavwalia95/entity-annotated-corpus/version/2
+
+    GMB example (each column separated by comma or tab)
+    with column headings:
+
+      SentenceID   Word     Tag    
+      1            Paul     B-PER
+      1            Newman   I-PER
+      1            is       O
+      1            a        O
+      1            great    O
+      1            actor    O
+      1            !        O
+    
+
     Args:
         train_filepath(str): file path to training CSV
         val_filepath (str): file path to validation dataset
-        maxlen(int): each document can be of most <maxlen> words. 0 is used as padding ID.
+        word_column(str): name of column containing the text
+        tag_column(str): name of column containing lael
+        sentence_column(str): name of column containing Sentence IDs
+        data_format(str): one of colnll2003 or gmb
+                          word_column, tag_column, and sentence_column
+                          ignored if 'conll2003'
         encoding(str): the encoding to use
         val_pct(float): Proportion of training to use for validation.
         verbose (boolean): verbosity
@@ -127,7 +124,11 @@ def entities_from_conll2003(train_filepath,
 
 
     # set dataframe converter
-    data_to_df = conll2003_to_df
+    if data_format == 'gmb':
+        data_to_df = gmb_to_df
+    else:
+        data_to_df = conll2003_to_df
+        word_column, tag_column, sentence_column = WORD_COL, TAG_COL, SENT_COL
 
     # create dataframe
     df = data_to_df(train_filepath, encoding=encoding)
@@ -135,9 +136,9 @@ def entities_from_conll2003(train_filepath,
 
     # process dataframe and instantiate NERPreprocessor
     x, y  = pp.process_df(df, 
-                          word_column=WORD_COL,
-                          tag_column=TAG_COL,
-                          sentence_column=SENT_COL,
+                          word_column=word_column,
+                          tag_column=tag_column,
+                          sentence_column=sentence_column,
                           verbose=verbose)
 
 
@@ -148,9 +149,9 @@ def entities_from_conll2003(train_filepath,
         val_df = data_to_df(val_filepath, encoding=encoding)
         x_train, y_train = x, y
         (x_valid, y_valid)  = pp.process_df(val_df,
-                                            word_column=WORD_COL,
-                                            tag_column=TAG_COL,
-                                            sentence_column=SENT_COL,
+                                            word_column=word_column,
+                                            tag_column=tag_column,
+                                            sentence_column=sentence_column,
                                             verbose=0)
 
     # preprocess and convert to generator
@@ -190,6 +191,11 @@ def conll2003_to_df(filepath, encoding='latin1'):
     df = df.fillna(method="ffill")
     return df
 
+
+def gmb_to_df(filepath, encoding='latin1'):
+    df = pd.read_csv(filepath, encoding=encoding)
+    df = df.fillna(method="ffill")
+    return df
 
 
 
