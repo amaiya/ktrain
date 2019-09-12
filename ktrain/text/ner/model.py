@@ -45,7 +45,7 @@ def sequence_tagger(name, preproc, verbose=1):
                           use_crf=True)
         model, loss = model.build()
         loss = crf_loss
-        model.compile(loss=loss, optimizer='adam')
+        model.compile(loss=loss, optimizer=U.DEFAULT_OPT)
         return model
     else:
         raise ValueError('Invalid value for name:  %s' % (name))

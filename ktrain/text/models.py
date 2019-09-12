@@ -183,7 +183,7 @@ def _build_logreg(x_train, y_train, num_classes,
     x = Activation(activation)(x)
     model = Model(inputs=inp, outputs=x)
     model.compile(loss=loss_func,
-                  optimizer='adam',
+                  optimizer=U.DEFAULT_OPT,
                   metrics=['accuracy'])
     return model
 
@@ -207,7 +207,7 @@ def _build_bert(x_train, y_train, num_classes,
     outputs = keras.layers.Dense(units=num_classes, activation='softmax')(dense)
     model = keras.models.Model(inputs, outputs)
     model.compile(loss=loss_func,
-                  optimizer='adam',
+                  optimizer=U.DEFAULT_OPT,
                   metrics=['accuracy'])
     return model
 
@@ -263,7 +263,7 @@ def _build_nbsvm(x_train, y_train, num_classes,
     x = Activation(activation)(x)
     model = Model(inputs=inp, outputs=x)
     model.compile(loss=loss_func,
-                  optimizer='adam',
+                  optimizer=U.DEFAULT_OPT,
                   metrics=['accuracy'])
     return model
 
@@ -281,7 +281,7 @@ def _build_fasttext(x_train, y_train, num_classes,
     model.add(Dense(64, activation='relu', kernel_initializer='he_normal'))
     model.add(Dropout(0.5))
     model.add(Dense(num_classes, activation=activation))
-    model.compile(loss=loss_func, optimizer='adam', metrics=['accuracy'])
+    model.compile(loss=loss_func, optimizer=U.DEFAULT_OPT, metrics=['accuracy'])
 
     return model
 
@@ -325,7 +325,7 @@ def _build_bigru(x_train, y_train, num_classes,
     outp = Dense(num_classes, activation=activation)(conc)
     model = Model(inputs=inp, outputs=outp)
     model.compile(loss=loss_func,
-                  optimizer='adam',
+                  optimizer=U.DEFAULT_OPT,
                   metrics=['accuracy'])
     return model
 

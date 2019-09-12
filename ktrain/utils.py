@@ -3,6 +3,7 @@ from .imports import *
 DEFAULT_BS = 32
 DEFAULT_ES = 5 
 DEFAULT_ROP = 2 
+DEFAULT_OPT = 'adam'
 
 
 def is_classifier(model):
