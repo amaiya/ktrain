@@ -1178,10 +1178,10 @@ class GenLearner(Learner):
         
         # handle callbacks
         num_samples = U.nsamples_from_data(self.train_data)
-        steps_per_epoch = num_samples // self.train_data.batch_size
+        steps_per_epoch = math.ceil(num_samples/self.train_data.batch_size)
         validation_steps = None
         if self.val_data is not None:
-            validation_steps = U.nsamples_from_data(self.val_data)//self.val_data.batch_size
+            validation_steps = math.ceil(U.nsamples_from_data(self.val_data)/self.val_data.batch_size)
 
         epochs = self._check_cycles(n_cycles, cycle_len, cycle_mult)
         self.set_lr(lr)
