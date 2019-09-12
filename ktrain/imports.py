@@ -40,7 +40,9 @@ import eli5
 from eli5.lime import TextExplainer
 from seqeval.metrics import classification_report as ner_classification_report
 from seqeval.metrics import f1_score as ner_f1_score
-import anago
+with warnings.catch_warnings():
+    warnings.filterwarnings("ignore",category=DeprecationWarning)
+    import anago
 
 
 

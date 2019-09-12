@@ -44,7 +44,7 @@ def sequence_tagger(name, preproc, verbose=1):
                           use_char=preproc.p._use_char,
                           use_crf=True)
         model, loss = model.build()
-        loss = crf_loss
+        #loss = crf_loss
         model.compile(loss=loss, optimizer=U.DEFAULT_OPT)
         return model
     else:

@@ -239,7 +239,50 @@ class Learner(ABC):
         return cm
 
 
-    def top_losses(self, n=4, val_data=None, preproc=None, ner=None):
+
+    def top_losses_ner(self, n=4, val_data=None):
+        """
+        Computes losses on validation set sorted by examples with top losses
+        Args:
+          n(int or tuple): a range to select in form of int or tuple
+                          e.g., n=8 is treated as n=(0,8)
+          val_data:  optional val_data to use instead of self.val_data
+        Returns:
+            list of n tuples where first element is either 
+            filepath or id of validation example and second element
+            is loss.
+
+        """
+        # check validation data and arguments
+        if val_data is not None:
+            val = val_data
+        else:
+            val = self.val_data
+        if val is None: raise Exception('val_data must be supplied to get_learner or top_losses')
+        if type(n) == type(42):
+            n = (0, n)
+
+        # get predicictions and ground truth
+        y_pred = self.predict(val_data=val)
+        y_true = self.ground_truth(val_data=val)
+
+        # compute losses and sort
+        losses = []
+        for idx, y_t in enumerate(y_true):
+            y_p = y_pred[idx]
+            #err = 1- sum(1 for x,y in zip(y_t,y_p) if x == y) / len(y_t)
+            err = sum(1 for x,y in zip(y_t,y_p) if x != y) 
+            losses.append(err)
+        tups = [(i,x, y_true[i], y_pred[i]) for i, x in enumerate(losses) if x > 0]
+        tups.sort(key=operator.itemgetter(1), reverse=True)
+
+        # prune by given range
+        tups = tups[n[0]:n[1]] if n is not None else tups
+        return tups
+
+
+
+    def top_losses(self, n=4, val_data=None, preproc=None):
         """
         Computes losses on validation set sorted by examples with top losses
         Args:
@@ -250,7 +293,6 @@ class Learner(ABC):
                                   For some data like text data, a preprocessor
                                   is required to undo the pre-processing
                                    to correctly view raw data.
-          ner(bool):  Flag to indicate that model is a sequence labeler
         Returns:
             list of n tuples where first element is either 
             filepath or id of validation example and second element
@@ -273,15 +315,12 @@ class Learner(ABC):
 
         #multilabel = True if U.is_multilabel(val) else False
         classification, multilabel = U.is_classifier(self.model)
-        if ner is None:
-            ner = U.is_ner(model=self.model, data=val)
 
 
         # get predicictions and ground truth
         y_pred = self.predict(val_data=val)
         y_true = self.ground_truth(val_data=val)
         y_true = y_true.astype('float32')
-
 
         # compute loss
         losses = self.model.loss_functions[0](tf.convert_to_tensor(y_true), tf.convert_to_tensor(y_pred))
@@ -303,12 +342,6 @@ class Learner(ABC):
             y_t = np.argmax(y_true, axis=1)
             tups = [(i,x, class_fcn(y_t[i]), class_fcn(y_p[i])) for i, x in enumerate(losses) 
                      if y_p[i] != y_t[i]]
-        elif ner:
-            pred = np.argmax(y_pred, axis=-1)
-            y_te_true = np.argmax(y_true, axis=-1)
-            y_p = [[class_fcn[i].replace('<pad>', 'O') for i in row] for row in pred]
-            y_t = [[class_fcn[i].replace('<pad>', 'O') for i in row] for row in y_te_true]
-            tups = [(i,x, y_t[i], y_p[i]) for i, x in enumerate(losses)]
         else:
             tups = [(i,x, y_true[i], np.around(y_pred[i],2)) for i, x in enumerate(losses)]
         tups.sort(key=operator.itemgetter(1), reverse=True)
@@ -346,12 +379,13 @@ class Learner(ABC):
 
         # check ner 
         ner = U.is_ner(model=self.model, data=val)
-        if ner:
-            print('view_top_losses method does not currently support bilstm-crf models')
-            return
-
         # get top losses and associated data
-        tups = self.top_losses(n=n, val_data=val, preproc=preproc, ner=ner)
+        if ner:
+            #print('view_top_losses method does not currently support sequence taggers')
+            #return
+            tups = self.top_losses_ner(n=n, val_data=val)
+        else:
+            tups = self.top_losses(n=n, val_data=val, preproc=preproc, ner=ner)
 
         # get multilabel status and class names
         classes = preproc.get_classes() if preproc is not None else None
@@ -373,13 +407,13 @@ class Learner(ABC):
                 plt.title("%s | loss:%s | true:%s | pred:%s)" % (fp, round(loss,2), truth, pred))
                 show_image(fpath)
             elif ner:
-                seq = val[idx]
-                if preproc is not None:
-                    seq = preproc.undo(seq)
-                    print("{:15} {:5}: ({})".format("Word", "Pred", "True"))
-                    print("="*30)
-                    for w, true_tag, pred_tag in zip(seq, truth, pred):
-                        print("{:15}:{:5} ({})".format(w, true_tag, pred_tag))
+                seq = val.x[idx]
+                print('total incorrect: %s' % (loss))
+                print("{:15} {:5}: ({})".format("Word", "True", "Pred"))
+                print("="*30)
+                for w, true_tag, pred_tag in zip(seq, truth, pred):
+                    print("{:15}:{:5} ({})".format(w, true_tag, pred_tag))
+                print('\n')
             else:
                 # Image Classification from Array
                 if type(val).__name__ in ['NumpyArrayIterator']:
@@ -409,6 +443,9 @@ class Learner(ABC):
         """
         a wrapper to model.save
         """
+        if U.is_ner(model=self.model):
+            from .text.ner.model import crf_loss
+            model.compile(loss=crf_loss, optimizer=U.DEFAULT_OPT)
         self.model.save(fpath)
         return
 
@@ -983,8 +1020,11 @@ class Learner(ABC):
             steps = np.ceil(U.nsamples_from_data(val)/val.batch_size)
             if U.is_ner(model=self.model, data=val):
                 results = []
-                for X, y in val:
-                    results.append(self.model.predict_on_batch(X))
+                for idx, (X, y) in enumerate(val):
+                    y_pred = self.model.predict_on_batch(X)
+                    lengths = val.get_lengths(idx)
+                    y_pred = val.p.inverse_transform(y_pred, lengths)
+                    results.extend(y_pred)
                 return results
             else:
                 return self.model.predict_generator(val, steps=steps)
