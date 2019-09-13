@@ -264,7 +264,7 @@ class Learner(ABC):
             y_pred = np.around(y_pred, 2)
 
         # sort by loss and prune correct classifications, if necessary
-        if classification and not multilabel and not ner:
+        if classification and not multilabel:
             y_p = np.argmax(y_pred, axis=1)
             y_t = np.argmax(y_true, axis=1)
             tups = [(i,x, class_fcn(y_t[i]), class_fcn(y_p[i])) for i, x in enumerate(losses) 
@@ -305,7 +305,7 @@ class Learner(ABC):
         if val is None: raise Exception('val_data must be supplied to get_learner or view_top_losses')
 
         # get top losses and associated data
-        tups = self.top_losses(n=n, val_data=val, preproc=preproc, ner=ner)
+        tups = self.top_losses(n=n, val_data=val, preproc=preproc)
 
         # get multilabel status and class names
         classes = preproc.get_classes() if preproc is not None else None
