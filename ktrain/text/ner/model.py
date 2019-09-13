@@ -2,9 +2,6 @@
 from ...imports import *
 from ... import utils as U
 from .. import preprocessor as tpp
-from ...keras_contrib.layers import CRF
-from ...keras_contrib.metrics import crf_accuracy
-from ...keras_contrib.losses import crf_loss
 
 
 BILSTM_CRF = 'bilstm-crf'
