@@ -9,7 +9,10 @@ Most recent releases are shown at the top. Each release shows:
 ## 0.2.6 (TBD)
 
 ### New:
-- 
+- Support for sequence tagging with Bidirectional LSTM-CRF. Word embeddings can currently be either
+  random or cbow.  If latter chosen, word vectors will be downloaded automaticlaly from Facebook fasttext 
+  site.
+- Added `texts_from_df` function
 
 ### Changed:
 - Added FutureWarning in ```text.text_classifier```, that ```preproc``` will be required argument in future.
