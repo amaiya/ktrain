@@ -113,7 +113,7 @@ def text_classifier(name, train_data, preproc=None, multilabel=None, verbose=1):
             features.update(x)
         #max_features = len(features)
         max_features = max(features)+1
-    U.vprint('max_features is %s' % (max_features), verbose=verbose)
+        U.vprint('max_features is %s' % (max_features), verbose=verbose)
     U.vprint('maxlen is %s' % (maxlen), verbose=verbose)
 
 
