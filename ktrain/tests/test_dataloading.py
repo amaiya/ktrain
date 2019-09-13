@@ -38,6 +38,12 @@ def texts_from_csv(preprocess_mode='standard'):
     return (trn, val, preproc)
 
 
+def entities_from_conll2003():
+    TDATA = 'conll2003/train.txt'
+    VDATA = 'conll2003/valid.txt'
+    (trn, val, preproc) = txt.entities_from_conll2003(TDATA, val_filepath=VDATA)
+    return (trn, val, preproc)
+
 
 def images_from_folder():
     (trn, val, preproc) = vis.images_from_folder(
@@ -122,6 +128,31 @@ class TestTextData(TestCase):
         self.assertEqual(preproc.preprocess(['hello book'])[0].shape, (1, 10))
         self.assertEqual(preproc.undo(val[0][0][0]), '[CLS] the book is bad . [SEP]')
 
+
+
+class TestNERData(TestCase):
+
+    def test_entities_from_conll2003(self):
+        (trn, val, preproc)  = entities_from_conll2003()
+        self.__test_ner(trn, val, preproc)
+
+
+
+    def __test_ner(self, trn, val, preproc):
+        self.assertTrue(U.is_iter(trn))
+        self.assertTrue(U.is_ner(data=trn))
+        self.assertFalse(U.is_multilabel(trn))
+        self.assertEqual(U.shape_from_data(trn), (14041, 47))
+        self.assertFalse(U.ondisk(trn))
+        self.assertEqual(U.nsamples_from_data(trn), 14041)
+        self.assertEqual(U.nclasses_from_data(trn), 10)
+        self.assertEqual(len(U.y_from_data(trn)), 14041)
+        self.assertFalse(U.bert_data_tuple(trn))
+        self.assertEqual(preproc.get_classes(), ['<pad>', 'O', 'B-LOC', 'B-PER', 'B-ORG', 'I-PER', 
+                                                 'I-ORG', 'B-MISC', 'I-LOC', 'I-MISC'])
+        nerseq = preproc.preprocess(['hello world'])
+        self.assertEqual(len(nerseq), 1)
+        self.assertEqual(nerseq[0][0][0][0].tolist(), [21010, 100])
 
 
 class TestImageData(TestCase):

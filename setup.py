@@ -24,7 +24,8 @@ setup(
           'fastprogress >= 0.1.21',
           'keras_bert',
           'requests',
-          'eli5 >= 0.10.0'
+          'eli5 >= 0.10.0',
+          'seqeval'
       ],
   classifiers=[  # Optional
     # How mature is this project? Common values are

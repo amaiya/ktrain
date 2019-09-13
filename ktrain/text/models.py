@@ -11,7 +11,7 @@ TEXT_CLASSIFIERS = {
                     FASTTEXT: "a fastText-like model (http://arxiv.org/pdf/1607.01759.pdf)",
                     LOGREG:   "logistic regression using a trainable Embedding layer",
                     NBSVM:    "NBSVM model (http://www.aclweb.org/anthology/P12-2018)",
-                    BIGRU:    'Bidirectional GRU with pretrained word vectors',
+                    BIGRU:    'Bidirectional GRU with pretrained word vectors (https://arxiv.org/abs/1712.09405)',
                     BERT:  'Bidirectional Encoder Representations from Transformers (https://arxiv.org/abs/1810.04805)'} 
 
 
@@ -183,7 +183,7 @@ def _build_logreg(x_train, y_train, num_classes,
     x = Activation(activation)(x)
     model = Model(inputs=inp, outputs=x)
     model.compile(loss=loss_func,
-                  optimizer='adam',
+                  optimizer=U.DEFAULT_OPT,
                   metrics=['accuracy'])
     return model
 
@@ -207,7 +207,7 @@ def _build_bert(x_train, y_train, num_classes,
     outputs = keras.layers.Dense(units=num_classes, activation='softmax')(dense)
     model = keras.models.Model(inputs, outputs)
     model.compile(loss=loss_func,
-                  optimizer='adam',
+                  optimizer=U.DEFAULT_OPT,
                   metrics=['accuracy'])
     return model
 
@@ -263,7 +263,7 @@ def _build_nbsvm(x_train, y_train, num_classes,
     x = Activation(activation)(x)
     model = Model(inputs=inp, outputs=x)
     model.compile(loss=loss_func,
-                  optimizer='adam',
+                  optimizer=U.DEFAULT_OPT,
                   metrics=['accuracy'])
     return model
 
@@ -281,7 +281,7 @@ def _build_fasttext(x_train, y_train, num_classes,
     model.add(Dense(64, activation='relu', kernel_initializer='he_normal'))
     model.add(Dropout(0.5))
     model.add(Dense(num_classes, activation=activation))
-    model.compile(loss=loss_func, optimizer='adam', metrics=['accuracy'])
+    model.compile(loss=loss_func, optimizer=U.DEFAULT_OPT, metrics=['accuracy'])
 
     return model
 
@@ -297,14 +297,12 @@ def _build_bigru(x_train, y_train, num_classes,
 
     if tokenizer is None: raise ValueError('bigru requires valid Tokenizer object')
 
-    wv_fpath = tpp.get_wv_path()
-
-    
 
     # setup pre-trained word embeddings
     embed_size = 300
     U.vprint('processing pretrained word vectors...', verbose=verbose)
-    embeddings_index = dict(get_coefs(*o.rstrip().rsplit(' ')) for o in open(wv_fpath))
+    #embeddings_index = dict(get_coefs(*o.rstrip().rsplit(' ')) for o in open(tpp.get_wv_path()))
+    embeddings_index = tpp.load_wv(verbose=verbose)
     word_index = tokenizer.word_index
     nb_words = min(max_features, len(word_index))
     #nb_words = max_features
@@ -325,7 +323,7 @@ def _build_bigru(x_train, y_train, num_classes,
     outp = Dense(num_classes, activation=activation)(conc)
     model = Model(inputs=inp, outputs=outp)
     model.compile(loss=loss_func,
-                  optimizer='adam',
+                  optimizer=U.DEFAULT_OPT,
                   metrics=['accuracy'])
     return model
 

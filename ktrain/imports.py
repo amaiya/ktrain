@@ -17,6 +17,8 @@ import glob
 import codecs
 import urllib.request
 import zipfile
+import string
+import random
 
 
 
@@ -36,6 +38,11 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 import eli5
 from eli5.lime import TextExplainer
+from seqeval.metrics import classification_report as ner_classification_report
+from seqeval.metrics import f1_score as ner_f1_score
+with warnings.catch_warnings():
+    warnings.filterwarnings("ignore",category=DeprecationWarning)
+    import anago
 
 
 
@@ -51,12 +58,13 @@ from keras import backend as K
 from keras.engine.training import Model
 from keras.models import load_model, Model, Sequential
 from keras.callbacks import ModelCheckpoint, EarlyStopping,LambdaCallback, Callback
-from keras.layers import Dense, Embedding, Input, Flatten, GRU, Bidirectional
+from keras.layers import Dense, Embedding, Input, Flatten, GRU, Bidirectional, LSTM
 from keras.layers import SpatialDropout1D, GlobalMaxPool1D, GlobalAveragePooling1D
 from keras.layers import concatenate, dot, Dropout, BatchNormalization, Add
 from keras.layers.convolutional import Convolution2D, MaxPooling2D, AveragePooling2D
-from keras.layers import Conv2D, MaxPooling2D
+from keras.layers import Conv2D, MaxPooling2D, TimeDistributed, Lambda
 from keras.layers.core import Activation
+from keras.layers.merge import add
 from keras.initializers import glorot_uniform  
 from keras import regularizers
 from keras.regularizers import l2
@@ -71,6 +79,8 @@ from keras.preprocessing.text import Tokenizer
 from keras.utils import Sequence, to_categorical
 from keras.utils import multi_gpu_model
 from keras.activations import sigmoid
+from keras.losses import categorical_crossentropy
+from keras.losses import sparse_categorical_crossentropy
 
 from keras.applications.resnet50 import ResNet50
 from keras.applications.mobilenet import MobileNet
