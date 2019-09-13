@@ -29,6 +29,8 @@ class NERPreprocessor(Preprocessor):
 
 
     def preprocess(self, sentences):
+        if type(sentences) != list:
+            raise ValueError('Param sentences must be a list of strings')
         X = []
         y = []
         for s in sentences:

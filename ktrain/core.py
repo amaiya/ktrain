@@ -196,7 +196,7 @@ class Learner(ABC):
         print('   F1: {:04.2f}'.format(score * 100))
         print(ner_classification_report(label_true, label_pred))
 
-        return
+        return score
 
 
     def validate(self, val_data=None, print_report=True, class_names=[]):
@@ -1414,7 +1414,7 @@ def _load_model(fpath, preproc=None, train_data=None):
                         'Extract' : Extract}
     elif (preproc and (isinstance(preproc, NERPreprocessor) or \
                     type(preproc).__name__ == 'NERPreprocessor')) or \
-        U.is_ner(model=self.model, data=self.train_data):
+        train_data and U.is_ner(data=train_data):
         from anago.layers import CRF
         from .text.ner.model import crf_loss
         custom_objects={'CRF': CRF,
