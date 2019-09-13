@@ -33,11 +33,11 @@ class TestNERClassification(TestCase):
 
         # test training results
         #self.assertAlmostEqual(max(hist.history['lr']), lr)
-        self.assertGreater(learner.validate(), 0.6)
+        self.assertGreater(learner.validate(), 0.65)
 
 
         # test top losses
-        obs = learner.top_losses_ner(n=1)
+        obs = learner.top_losses(n=1)
         self.assertIn(obs[0][0], list(range(len(self.val.x))))
         learner.view_top_losses(n=1)
 
