@@ -2,6 +2,7 @@
 from ...imports import *
 from ... import utils as U
 from .. import preprocessor as tpp
+from . import preprocessor as pp
 
 
 BILSTM_CRF = 'bilstm-crf'
@@ -14,7 +15,7 @@ def print_sequence_taggers():
         print("%s: %s" % (k,v))
 
 
-def sequence_tagger(name, preproc, embeddings=None, 
+def sequence_tagger(name, preproc, 
                     word_embedding_dim=100,
                     char_embedding_dim=25,
                     word_lstm_size=100,
@@ -50,7 +51,8 @@ def sequence_tagger(name, preproc, embeddings=None,
     filter_embeddings = anago.utils.filter_embeddings
 
     emb_model = None
-    if embeddings == 'cbow':
+    if preproc.e == pp.CBOW:
+        if verbose: print('pretrained %s word embeddings will be used with bilstm-crf' % (preproc.e))
         word_embedding_dim = 300
         emb_dict = tpp.load_wv(verbose=verbose)
         emb_model = filter_embeddings(emb_dict, preproc.p._word_vocab.vocab, word_embedding_dim)
