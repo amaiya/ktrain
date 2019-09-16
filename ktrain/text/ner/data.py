@@ -54,6 +54,7 @@ def entities_from_conll2003(train_filepath,
 
 def entities_from_txt(train_filepath, 
                       val_filepath=None,
+                      embeddings=None,
                       word_column=WORD_COL,
                       tag_column=TAG_COL,
                       sentence_column=SENT_COL,
@@ -109,6 +110,11 @@ def entities_from_txt(train_filepath,
     Args:
         train_filepath(str): file path to training CSV
         val_filepath (str): file path to validation dataset
+        embeddings(str): Currently, either None or 'cbow' is supported
+                         If 'cbow' is specified, pretrained word vectors
+                         are automatically downloaded to <home>/ktran_data
+                         and used as weights in the Embedding layer.
+                         If None, random embeddings used.
         word_column(str): name of column containing the text
         tag_column(str): name of column containing lael
         sentence_column(str): name of column containing Sentence IDs
@@ -156,7 +162,7 @@ def entities_from_txt(train_filepath,
 
     # preprocess and convert to generator
     p = IndexTransformer(use_char=True)
-    preproc = NERPreprocessor(p)
+    preproc = NERPreprocessor(p, embeddings=embeddings)
     preproc.fit(x_train, y_train)
     trn = pp.NERSequence(x_train, y_train, batch_size=U.DEFAULT_BS, p=p)
     val = pp.NERSequence(x_valid, y_valid, batch_size=U.DEFAULT_BS, p=p)

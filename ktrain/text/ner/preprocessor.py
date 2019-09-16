@@ -3,6 +3,8 @@ from ... import utils as U
 from ...preprocessor import Preprocessor
 
 OTHER = 'O'
+CBOW = 'cbow'
+SUPPORTED_EMBEDDINGS = [CBOW]
 
 #tokenizer_filter = rs='!"#$%&()*+,-./:;<=>?@[\\]^_`{|}~\t\n'
 re_tok = re.compile(f'([{string.punctuation}“”¨«»®´·º½¾¿¡§£₤‘’])')
@@ -14,9 +16,12 @@ class NERPreprocessor(Preprocessor):
     NER preprocessing base class
     """
 
-    def __init__(self, p):
+    def __init__(self, p, embeddings=None):
         self.p = p
         self.c = p._label_vocab._id2token
+        self.e = embeddings
+        if embeddings is not None and embeddings not in SUPPORTED_EMBEDDINGS:
+            raise ValueError('%s is not a supported word embedding type' % (embeddings))
 
 
 
@@ -26,6 +31,9 @@ class NERPreprocessor(Preprocessor):
 
     def get_classes(self):
         return self.c
+
+    def get_embedding_name(self):
+        return self.e
 
 
     def preprocess(self, sentences):
