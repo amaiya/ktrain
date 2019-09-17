@@ -97,7 +97,7 @@ learner.lr_plot()             # visually identify best learning rate
 learner.autofit(1e-4, checkpoint_folder='/tmp') 
 ```
 
-#### Example: Sequence Labeling for [Named Entity Recognition](https://www.kaggle.com/abhinavwalia95/entity-annotated-corpus/version/2) Using a randomly initialized [Bidirectional LSTM CRF](https://arxiv.org/abs/1603.01360) model
+#### Example: Sequence Labeling for [Named Entity Recognition](https://www.kaggle.com/abhinavwalia95/entity-annotated-corpus/version/2) using a randomly initialized [Bidirectional LSTM CRF](https://arxiv.org/abs/1603.01360) model
 ```
 import ktrain
 from ktrain import text as txt
