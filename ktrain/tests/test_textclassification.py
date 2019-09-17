@@ -98,7 +98,7 @@ class TestTextClassification(TestCase):
                                                  maxlen=700, 
                                                  max_features=35000,
                                                  ngram_range=3)
-        model = txt.text_classifier('nbsvm', train_data=trn)
+        model = txt.text_classifier('nbsvm', train_data=trn, preproc=preproc)
         learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=32)
         lr = 0.01
         hist = learner.fit_onecycle(lr, 10)
@@ -149,7 +149,7 @@ class TestTextClassification(TestCase):
                                                  maxlen=700, 
                                                  max_features=35000,
                                                  ngram_range=3)
-        model = txt.text_classifier('nbsvm', train_data=trn)
+        model = txt.text_classifier('logreg', train_data=trn)
         learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=32)
         lr = 0.01
         hist = learner.autofit(lr)
