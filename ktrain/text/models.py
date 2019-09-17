@@ -108,13 +108,14 @@ def text_classifier(name, train_data, preproc=None, multilabel=None, verbose=1):
     maxlen = U.shape_from_data((x_train, y_train))[1]
     max_features = preproc.max_features if preproc is not None else None
     features = set()
-    if not is_bert and max_features is None:
+    if not is_bert:
         U.vprint('compiling word ID features...', verbose=verbose)
         for x in x_train:
             features.update(x)
         #max_features = len(features)
-        max_features = max(features)+1
-        U.vprint('max_features is %s' % (max_features), verbose=verbose)
+        if max_features is None: 
+            max_features = max(features)+1
+            U.vprint('max_features is %s' % (max_features), verbose=verbose)
     U.vprint('maxlen is %s' % (maxlen), verbose=verbose)
 
 
