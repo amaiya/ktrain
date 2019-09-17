@@ -3,8 +3,8 @@ from ... import utils as U
 from ...preprocessor import Preprocessor
 
 OTHER = 'O'
-CBOW = 'cbow'
-SUPPORTED_EMBEDDINGS = [CBOW]
+W2V = 'word2vec'
+SUPPORTED_EMBEDDINGS = [W2V]
 
 #tokenizer_filter = rs='!"#$%&()*+,-./:;<=>?@[\\]^_`{|}~\t\n'
 re_tok = re.compile(f'([{string.punctuation}“”¨«»®´·º½¾¿¡§£₤‘’])')

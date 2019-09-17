@@ -4,6 +4,7 @@ from ... import utils as U
 from . import preprocessor as pp
 from .preprocessor import NERPreprocessor
 
+from .anago.preprocessing import IndexTransformer
 
 
 MAXLEN = 128
@@ -110,8 +111,8 @@ def entities_from_txt(train_filepath,
     Args:
         train_filepath(str): file path to training CSV
         val_filepath (str): file path to validation dataset
-        embeddings(str): Currently, either None or 'cbow' is supported
-                         If 'cbow' is specified, pretrained word vectors
+        embeddings(str): Currently, either None or 'word2vec' is supported
+                         If 'word2vec' is specified, pretrained word vectors
                          are automatically downloaded to <home>/ktran_data
                          and used as weights in the Embedding layer.
                          If None, random embeddings used.
@@ -126,7 +127,6 @@ def entities_from_txt(train_filepath,
         verbose (boolean): verbosity
     """
 
-    IndexTransformer = anago.preprocessing.IndexTransformer
 
 
     # set dataframe converter

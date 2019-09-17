@@ -3,7 +3,8 @@ from ...imports import *
 from ... import utils as U
 from .. import preprocessor as tpp
 from . import preprocessor as pp
-
+from .anago.models import BiLSTMCRF
+from .anago.utils import filter_embeddings
 
 BILSTM_CRF = 'bilstm-crf'
 SEQUENCE_TAGGERS = {
@@ -47,11 +48,11 @@ def sequence_tagger(name, preproc,
         model (Model): A Keras Model instance
     """
     
-    BiLSTMCRF =  anago.models.BiLSTMCRF
-    filter_embeddings = anago.utils.filter_embeddings
+
+
 
     emb_model = None
-    if preproc.e == pp.CBOW:
+    if preproc.e == pp.W2V:
         if verbose: print('pretrained %s word embeddings will be used with bilstm-crf' % (preproc.e))
         word_embedding_dim = 300
         emb_dict = tpp.load_wv(verbose=verbose)
