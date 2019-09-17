@@ -289,7 +289,6 @@ def _build_fasttext(x_train, y_train, num_classes,
 
 
 
-def get_coefs(word, *arr): return word, np.asarray(arr, dtype='float32')
 def _build_bigru(x_train, y_train, num_classes,
                   maxlen, max_features, features,
                  loss_func='categorical_crossentropy',
@@ -303,7 +302,6 @@ def _build_bigru(x_train, y_train, num_classes,
     # setup pre-trained word embeddings
     embed_size = 300
     U.vprint('processing pretrained word vectors...', verbose=verbose)
-    #embeddings_index = dict(get_coefs(*o.rstrip().rsplit(' ')) for o in open(tpp.get_wv_path()))
     embeddings_index = tpp.load_wv(verbose=verbose)
     word_index = tokenizer.word_index # no longer used - REMOVE
     #nb_words = min(max_features, len(word_index))
