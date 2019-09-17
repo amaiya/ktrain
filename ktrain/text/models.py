@@ -303,9 +303,9 @@ def _build_bigru(x_train, y_train, num_classes,
     U.vprint('processing pretrained word vectors...', verbose=verbose)
     #embeddings_index = dict(get_coefs(*o.rstrip().rsplit(' ')) for o in open(tpp.get_wv_path()))
     embeddings_index = tpp.load_wv(verbose=verbose)
-    word_index = tokenizer.word_index
-    nb_words = min(max_features, len(word_index))
-    #nb_words = max_features
+    word_index = tokenizer.word_index # no longer used - REMOVE
+    #nb_words = min(max_features, len(word_index))
+    nb_words = max_features
     embedding_matrix = np.zeros((nb_words, embed_size))
     for word, i in word_index.items():
         if i >= max_features: continue

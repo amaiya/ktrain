@@ -6,11 +6,11 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
-## 0.2.6 (TBD)
+## 0.3.0 (2019-09-17)
 
 ### New:
 - Support for sequence tagging with Bidirectional LSTM-CRF. Word embeddings can currently be either
-  random or cbow.  If latter chosen, word vectors will be downloaded automaticlaly from Facebook fasttext 
+  random or word2vec(cbow).  If latter chosen, word vectors will be downloaded automaticlaly from Facebook fasttext 
   site.
 - Added `texts_from_df` function
 
@@ -19,9 +19,10 @@ Most recent releases are shown at the top. Each release shows:
 - In ```text.text_classifier```, when ```preproc=None```, use the maximum feature ID to populate max_features.
 
 
-
 ### Fixed:
--
+- Fixed construction of custom_objects dictionary for BERT to ensure load_model works for 
+  custom BERT models
+- Resolved issue with pretrained bigru models failing when max_features >= than total word count.
 
 
 ## 0.2.5 (2019-08-27)
