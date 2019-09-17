@@ -1327,7 +1327,7 @@ class NERLearner(GenLearner):
         """
         a wrapper to model.save
         """
-        from .text.ner.model import crf_loss
+        from .text.ner.models import crf_loss
         self.model.compile(loss=crf_loss, optimizer=U.DEFAULT_OPT)
         self.model.save(fpath)
         return
@@ -1468,28 +1468,14 @@ def _load_model(fpath, preproc=None, train_data=None):
                     type(preproc).__name__ == 'BERTPreprocessor')) or\
        train_data and U.bert_data_tuple(train_data):
         # custom BERT model
-        from keras_bert.layers.embedding import TokenEmbedding
-        from keras_bert.layers.extract import Extract
-        from keras_pos_embd import PositionEmbedding
-        from keras_layer_normalization import LayerNormalization
-        from keras_multi_head.multi_head_attention import MultiHeadAttention
-        from keras_position_wise_feed_forward import FeedForward
-        from keras_bert.bert import gelu_tensorflow
-        custom_objects={'TokenEmbedding' : TokenEmbedding, 
-                        'PositionEmbedding' : PositionEmbedding,
-                        'LayerNormalization' : LayerNormalization,
-                        'MultiHeadAttention' : MultiHeadAttention,
-                        'FeedForward' : FeedForward,
-                        'gelu_tensorflow' : gelu_tensorflow,
-                        'Extract' : Extract}
+        from keras_bert import get_custom_objects
+        custom_objects = get_custom_objects()
     elif (preproc and (isinstance(preproc, NERPreprocessor) or \
                     type(preproc).__name__ == 'NERPreprocessor')) or \
         train_data and U.is_ner(data=train_data):
-        from anago.layers import CRF
-        from .text.ner.model import crf_loss
-        custom_objects={'CRF': CRF,
-                        'crf_loss': crf_loss}
-
+        from .text.ner.anago.layers import CRF
+        from .text.ner.models import crf_loss
+        custom_objects={'CRF': CRF, 'crf_loss':crf_loss}
     try:
         model = load_model(fpath, custom_objects=custom_objects)
     except Exception as e:
