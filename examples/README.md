@@ -36,7 +36,7 @@ Dataset is in the form of a CSV file.
 ### [CoNLL2003 NER Task](https://github.com/amaiya/ktrain/tree/master/ktrain/tests/conll2003):  Named Entity Recognition
 The objective of the CoNLL2003 task is to classify sequences of words as belonging to one of several categories of concepts such as Persons or Locations. See the [original paper](https://www.aclweb.org/anthology/W03-0419) for more information on the format.
 
-- [CoNLL2003-BiLSTM_CRF.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text):  A simple and fast Bidirectional LSTM-CRF model with random word embeddings.
+- [CoNLL2003-BiLSTM_CRF.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text):  A simple and fast Bidirectional LSTM-CRF model with randomly initialized word embeddings.
 
 
 ## Image Classification Datasets
