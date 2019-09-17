@@ -5,6 +5,7 @@ import re
 import numpy as np
 import warnings
 import operator
+from collections import Counter
 from distutils.version import StrictVersion
 import tempfile
 import pickle
@@ -19,6 +20,7 @@ import urllib.request
 import zipfile
 import string
 import random
+import json
 
 
 
@@ -26,6 +28,9 @@ from matplotlib import pyplot as plt
 from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.datasets import load_files
 from sklearn.model_selection import train_test_split
+from sklearn.base import BaseEstimator, TransformerMixin
+#from sklearn.externals import joblib
+import joblib
 from scipy import sparse # utils
 from scipy.sparse import csr_matrix
 import pandas as pd
@@ -40,10 +45,7 @@ import eli5
 from eli5.lime import TextExplainer
 from seqeval.metrics import classification_report as ner_classification_report
 from seqeval.metrics import f1_score as ner_f1_score
-with warnings.catch_warnings():
-    warnings.filterwarnings("ignore",category=DeprecationWarning)
-    import anago
-
+from seqeval.metrics.sequence_labeling import get_entities
 
 
 
@@ -62,7 +64,10 @@ except:
 import keras
 
 K = keras.backend
+Layer = keras.engine.Layer
+InputSpec = keras.engine.InputSpec
 Model = keras.engine.training.Model
+model_from_json = keras.models.model_from_json
 load_model = keras.models.load_model
 Sequential = keras.models.Sequential
 ModelCheckpoint = keras.callbacks.ModelCheckpoint
@@ -93,9 +98,12 @@ TimeDistributed = keras.layers.TimeDistributed
 Lambda = keras.layers.Lambda
 Activation = keras.layers.core.Activation
 add = keras.layers.merge.add
+Concatenate = keras.layers.merge.Concatenate
+initializers = keras.initializers
 glorot_uniform = keras.initializers.glorot_uniform
 regularizers = keras.regularizers
 l2 = keras.regularizers.l2
+constraints = keras.constraints
 sequence = keras.preprocessing.sequence
 image = keras.preprocessing.image
 NumpyArrayIterator = keras.preprocessing.image.NumpyArrayIterator
@@ -103,8 +111,10 @@ Iterator = keras.preprocessing.image.Iterator
 ImageDataGenerator = keras.preprocessing.image.ImageDataGenerator
 Tokenizer = keras.preprocessing.text.Tokenizer
 Sequence = keras.utils.Sequence
+get_file = keras.utils.get_file
 to_categorical = keras.utils.to_categorical
 multi_gpu_model = keras.utils.multi_gpu_model
+activations = keras.activations
 sigmoid = keras.activations.sigmoid
 categorical_crossentropy = keras.losses.categorical_crossentropy
 sparse_categorical_crossentropy = keras.losses.sparse_categorical_crossentropy

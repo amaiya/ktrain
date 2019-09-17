@@ -26,7 +26,7 @@ setup(
           'requests',
           'eli5 >= 0.10.0',
           'seqeval',
-          'anago'
+          'joblib'
       ],
   classifiers=[  # Optional
     # How mature is this project? Common values are
