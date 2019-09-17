@@ -25,6 +25,7 @@ Most recent releases are shown at the top. Each release shows:
 - Resolved issue with pretrained bigru models failing when max_features >= than total word count.
 
 
+
 ## 0.2.5 (2019-08-27)
 
 ### New:

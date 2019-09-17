@@ -2,6 +2,7 @@ from ..imports import *
 from .. import utils as U
 from . import preprocessor as tpp
 
+
 NBSVM = 'nbsvm'
 FASTTEXT = 'fasttext'
 LOGREG = 'logreg'
