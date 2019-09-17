@@ -71,20 +71,6 @@ def texts_from_folder(datadir, classes=None,
     return (trn, val, preproc)
 
 
-    #if preprocess_mode == 'bert':
-        #if maxlen > 512: raise ValueError('BERT only supports maxlen <= 512')
-        #vocab_path = os.path.join(bertpath, 'vocab.txt')
-        #token_dict = {}
-        #with codecs.open(vocab_path, 'r', 'utf8') as reader:
-            #for line in reader:
-                #token = line.strip()
-                #token_dict[token] = len(token_dict)
-        #tokenizer = BERT_Tokenizer(token_dict)
-        #x_train = bert_tokenize(x_train, tokenizer, maxlen)
-        #x_test = bert_tokenize(x_test, tokenizer, maxlen)
-        #return (x_train, y_train), (x_test, y_test), None
-
-
 
 def texts_from_csv(train_filepath, 
                    text_column,
@@ -117,14 +103,62 @@ def texts_from_csv(train_filepath,
                                 BERT text classification model.
         verbose (boolean): verbosity
     """
+    train_df = pd.read_csv(train_filepath)
+    val_df = pd.read_csv(val_filepath) if val_filepath is not None else None
+    return texts_from_df(train_df,
+                         text_column,
+                         label_columns=label_columns,
+                         val_df = val_df,
+                         max_features=max_features,
+                         maxlen=maxlen,
+                         val_pct=val_pct,
+                         ngram_range=ngram_range, 
+                         preprocess_mode=preprocess_mode,
+                         verbose=verbose)
+
+
+
+
+
+def texts_from_df(train_df, 
+                   text_column,
+                   label_columns = [],
+                   val_df=None,
+                   max_features=MAX_FEATURES, maxlen=MAXLEN, 
+                   val_pct=0.1, ngram_range=1, preprocess_mode='standard', verbose=1):
+    """
+    Loads text data from Pandas dataframe file. Class labels are assumed to one of following:
+      1. integers representing classes (e.g., 1,2,3,4)
+      2. one-hot-encoded arrays representing classes
+         classification (a single one in each array): [[1,0,0], [0,1,0]]]
+         multi-label classification (one more ones in each array): [[1,1,0], [0,1,1]]
+    Args:
+        train_df(dataframe): Pandas dataframe
+        text_column(str): name of column containing the text
+        label_column(list): list of columns that are to be treated as labels
+        val_df(dataframe): file path to test dataframe.  If not supplied,
+                               10% of documents in training df will be
+                               used for testing/validation.
+        max_features(int): max num of words to consider in vocabulary
+        maxlen(int): each document can be of most <maxlen> words. 0 is used as padding ID.
+        ngram_range(int): size of multi-word phrases to consider
+                          e.g., 2 will consider both 1-word phrases and 2-word phrases
+                               limited by max_features
+        val_pct(float): Proportion of training to use for validation.
+                        Has no effect if val_filepath is supplied.
+        preprocess_mode (str):  Either 'standard' (normal tokenization) or 'bert'
+                                tokenization and preprocessing for use with 
+                                BERT text classification model.
+        verbose (boolean): verbosity
+    """
 
     # read in train and test data
-    train = pd.read_csv(train_filepath)
+    train = train_df
 
     x = train[text_column].fillna('fillna').values
     y = train[label_columns].values
-    if val_filepath is not None:
-        test = pd.read_csv(val_filepath)
+    if val_df is not None:
+        test = val_df
         x_test = train[text_column].fillna('fillna').values
         y_test = train[label_columns].values
         x_train = x

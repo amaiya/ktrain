@@ -1,4 +1,5 @@
 from .imports import *
+from . import utils as U
 class Predictor(ABC):
     """
     Abstract class to preprocess data
@@ -11,7 +12,15 @@ class Predictor(ABC):
     def get_classes(self, filename):
         pass
 
+    def explain(self, x):
+        raise NotImplementedError('explain is not currently supported for this model')
+
     def save(self, fname):
+
+        if U.is_ner(model=self.model):
+            from .text.ner.model import crf_loss
+            self.model.compile(loss=crf_loss, optimizer=U.DEFAULT_OPT)
+
         self.model.save(fname)
         fname_preproc = fname+'.preproc'
         with open(fname_preproc, 'wb') as f:

@@ -17,14 +17,16 @@ setup(
   url = 'https://github.com/amaiya/ktrain',
   keywords = ['keras', 'deep learning', 'machine learning'],
   install_requires=[
-          'keras >= 2.2.4',
+          'keras == 2.2.4',
           'scikit-learn >= 0.20.0',
           'matplotlib >= 3.0.0',
           'pandas >= 0.24.2',
           'fastprogress >= 0.1.21',
           'keras_bert',
           'requests',
-          'eli5 >= 0.10.0'
+          'eli5 >= 0.10.0',
+          'seqeval',
+          'joblib'
       ],
   classifiers=[  # Optional
     # How mature is this project? Common values are

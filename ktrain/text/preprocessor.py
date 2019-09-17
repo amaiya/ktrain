@@ -11,6 +11,8 @@ def fname_from_url(url):
 # Word Vectors
 #------------------------------------------------------------------------------
 WV_URL = 'https://dl.fbaipublicfiles.com/fasttext/vectors-english/crawl-300d-2M.vec.zip'
+#WV_URL = 'http://nlp.stanford.edu/data/glove.6B.zip
+
 
 def get_wv_path():
     ktrain_data = U.get_ktrain_data()
@@ -35,6 +37,17 @@ def get_wv_path():
         except OSError:
             print('failed to cleanup/remove %s' % (zip_fpath))
     return wv_path
+
+
+def get_coefs(word, *arr): return word, np.asarray(arr, dtype='float32')
+
+def load_wv(wv_path=None, verbose=1):
+    if verbose: print('Loading pretrained word vectors...this may take a few moments...')
+    if wv_path is None: wv_path = get_wv_path()
+    embeddings_index = dict(get_coefs(*o.rstrip().rsplit(' ')) for o in open(wv_path))
+    if verbose: print('Done.')
+    return embeddings_index
+
 
 
 #------------------------------------------------------------------------------

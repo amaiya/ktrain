@@ -10,6 +10,8 @@ from .vision.predictor import ImagePredictor
 from .vision.data import show_image
 from .text.preprocessor import TextPreprocessor, BERTPreprocessor
 from .text.predictor import TextPredictor
+from .text.ner.predictor import NERPredictor
+from .text.ner.preprocessor import NERPreprocessor
 
 
 
@@ -86,7 +88,10 @@ def get_learner(model, train_data=None, val_data=None,
 
     # return the appropriate trainer
     if U.is_iter(train_data):
-        learner = GenLearner
+        if U.is_ner(model=model, data=train_data):
+            learner = NERLearner
+        else:
+            learner = GenLearner
     else:
         learner = ArrayLearner
     return learner(model, train_data=train_data, val_data=val_data, 
@@ -163,6 +168,8 @@ class Learner(ABC):
         return
         
 
+
+
     def validate(self, val_data=None, print_report=True, class_names=[]):
         """
         Returns confusion matrix and optionally prints
@@ -181,6 +188,7 @@ class Learner(ABC):
                           'For regression, etc., use learner.predict and learner.ground_truth '
                           'to manually validate.')
             return
+            
         if U.is_multilabel(val) or multilabel:
             warnings.warn('multilabel confusion matrices not yet supported')
             return
@@ -199,17 +207,19 @@ class Learner(ABC):
         return cm
 
 
-    def top_losses(self, n=8, val_data=None, preproc=None):
+
+
+    def top_losses(self, n=4, val_data=None, preproc=None):
         """
         Computes losses on validation set sorted by examples with top losses
         Args:
           n(int or tuple): a range to select in form of int or tuple
                           e.g., n=8 is treated as n=(0,8)
+          val_data:  optional val_data to use instead of self.val_data
           preproc (Preprocessor): A TextPreprocessor or ImagePreprocessor.
                                   For some data like text data, a preprocessor
                                   is required to undo the pre-processing
                                    to correctly view raw data.
-          val_data:  optional val_data to use instead of self.val_data
         Returns:
             list of n tuples where first element is either 
             filepath or id of validation example and second element
@@ -217,8 +227,8 @@ class Learner(ABC):
 
         """
         import tensorflow as tf
-        #multilabel = True if U.is_multilabel(val) else False
-        classification, multilabel = U.is_classifier(self.model)
+
+
 
         # check validation data and arguments
         if val_data is not None:
@@ -230,18 +240,21 @@ class Learner(ABC):
             n = (0, n)
 
 
+        #multilabel = True if U.is_multilabel(val) else False
+        classification, multilabel = U.is_classifier(self.model)
+
+
         # get predicictions and ground truth
         y_pred = self.predict(val_data=val)
         y_true = self.ground_truth(val_data=val)
         y_true = y_true.astype('float32')
-
 
         # compute loss
         losses = self.model.loss_functions[0](tf.convert_to_tensor(y_true), tf.convert_to_tensor(y_pred))
         losses = tf.Session().run(losses)
         class_names = [] if preproc is None else preproc.get_classes()
         if preproc is None: 
-            class_fcn = lambda x:x
+            class_fcn = lambda x:"%s" % (x)
         else:
             class_fcn = lambda x:class_names[x]
 
@@ -265,7 +278,7 @@ class Learner(ABC):
         return tups
 
 
-    def view_top_losses(self, n=8, preproc=None, val_data=None):
+    def view_top_losses(self, n=4, preproc=None, val_data=None):
         """
         Views observations with top losses in validation set.
         Args:
@@ -479,7 +492,8 @@ class Learner(ABC):
 
 
 
-    def lr_find(self, start_lr=1e-7, lr_mult=1.01, max_epochs=None, verbose=1):
+    def lr_find(self, start_lr=1e-7, lr_mult=1.01, max_epochs=None,
+                show_plot=False, verbose=1):
         """
         Plots loss as learning rate is increased.
         Highest learning rate corresponding to a still
@@ -493,11 +507,12 @@ class Learner(ABC):
         Reference: https://arxiv.org/abs/1506.01186
 
         Args:
+            start_lr (float): smallest lr to start simulation
             lr_mult (float): multiplication factor to increase LR.
                              Ignored if max_epochs is supplied.
-            start_lr (float): smallest lr to start simulation
             max_epochs (int):  maximum number of epochs to simulate.
                                lr_mult is ignored if max_epoch is supplied.
+            show_plot (bool):  If True, automatically invoke lr_plot
             verbose (bool): specifies how much output to print
         Returns:
             float:  Numerical estimate of best lr.  
@@ -533,10 +548,12 @@ class Learner(ABC):
         # instructions to invoker
         U.vprint('\n', verbose=verbose)
         U.vprint('done.', verbose=verbose)
-        U.vprint('Please invoke the Learner.lr_plot() method to visually inspect '
-              'the loss plot to help identify the maximal learning rate '
-              'associated with falling loss.', verbose=verbose)
-
+        if show_plot:
+            self.lr_plot()
+        else:
+            U.vprint('Please invoke the Learner.lr_plot() method to visually inspect '
+                  'the loss plot to help identify the maximal learning rate '
+                  'associated with falling loss.', verbose=verbose)
         return 
 
 
@@ -821,7 +838,7 @@ class Learner(ABC):
 
         # setup learning rate policy 
         num_samples = U.nsamples_from_data(self.train_data)
-        steps_per_epoch = num_samples//self.batch_size
+        steps_per_epoch = math.ceil(num_samples/self.batch_size)
         step_size = math.ceil(steps_per_epoch/2)
 
         # handle missing epochs
@@ -1014,7 +1031,8 @@ class ArrayLearner(Learner):
             hist = self.model.fit(x_train, y_train,
                                  batch_size=self.batch_size,
                                  epochs=epochs,
-                                 validation_data=validation, verbose=verbose,
+                                 validation_data=validation, verbose=verbose, 
+                                 shuffle=True,
                                  callbacks=kcallbacks)
 
         if sgdr is not None: hist.history['lr'] = sgdr.history['lr']
@@ -1096,10 +1114,10 @@ class GenLearner(Learner):
         
         # handle callbacks
         num_samples = U.nsamples_from_data(self.train_data)
-        steps_per_epoch = num_samples // self.train_data.batch_size
+        steps_per_epoch = math.ceil(num_samples/self.train_data.batch_size)
         validation_steps = None
         if self.val_data is not None:
-            validation_steps = U.nsamples_from_data(self.val_data)//self.val_data.batch_size
+            validation_steps = math.ceil(U.nsamples_from_data(self.val_data)/self.val_data.batch_size)
 
         epochs = self._check_cycles(n_cycles, cycle_len, cycle_mult)
         self.set_lr(lr)
@@ -1132,6 +1150,7 @@ class GenLearner(Learner):
                                            workers=self.workers,
                                            use_multiprocessing=self.use_multiprocessing, 
                                            verbose=verbose,
+                                           shuffle=True,
                                            callbacks=kcallbacks)
         if sgdr is not None: hist.history['lr'] = sgdr.history['lr']
         self.history = hist
@@ -1162,6 +1181,178 @@ class GenLearner(Learner):
         return layer_out
 
 
+
+class NERLearner(GenLearner):
+    """
+    Learner for Sequence Taggers.
+    """
+
+
+    def __init__(self, model, train_data=None, val_data=None, 
+                 batch_size=U.DEFAULT_BS, workers=1, use_multiprocessing=False,
+                 multigpu=False):
+        super().__init__(model, train_data=train_data, val_data=val_data, 
+                         batch_size=batch_size, 
+                         workers=workers, use_multiprocessing=use_multiprocessing, 
+                         multigpu=multigpu)
+        return
+
+
+
+    def validate(self, val_data=None, print_report=True, class_names=[]):
+        """
+        Validate text sequence taggers
+        """
+        if val_data is not None:
+            val = val_data
+        else:
+            val = self.val_data
+
+        if not U.is_ner(model=self.model, data=val):
+            warnings.warn('learner.validate_ner is only for sequence taggers.')
+            return
+
+        label_true = []
+        label_pred = []
+        for i in range(len(val)):
+            x_true, y_true = val[i]
+            #lengths = self.ner_lengths(y_true)
+            lengths = val.get_lengths(i)
+            y_pred = self.model.predict_on_batch(x_true)
+
+            y_true = val.p.inverse_transform(y_true, lengths)
+            y_pred = val.p.inverse_transform(y_pred, lengths)
+
+            label_true.extend(y_true)
+            label_pred.extend(y_pred)
+
+        score = ner_f1_score(label_true, label_pred)
+        if print_report:
+            print('   F1: {:04.2f}'.format(score * 100))
+            print(ner_classification_report(label_true, label_pred))
+
+        return score
+
+    def top_losses(self, n=4, val_data=None, preproc=None):
+        """
+        Computes losses on validation set sorted by examples with top losses
+        Args:
+          n(int or tuple): a range to select in form of int or tuple
+                          e.g., n=8 is treated as n=(0,8)
+          val_data:  optional val_data to use instead of self.val_data
+        Returns:
+            list of n tuples where first element is either 
+            filepath or id of validation example and second element
+            is loss.
+
+        """
+        # check validation data and arguments
+        if val_data is not None:
+            val = val_data
+        else:
+            val = self.val_data
+        if val is None: raise Exception('val_data must be supplied to get_learner or top_losses')
+        if type(n) == type(42):
+            n = (0, n)
+
+        # get predicictions and ground truth
+        y_pred = self.predict(val_data=val)
+        y_true = self.ground_truth(val_data=val)
+
+        # compute losses and sort
+        losses = []
+        for idx, y_t in enumerate(y_true):
+            y_p = y_pred[idx]
+            #err = 1- sum(1 for x,y in zip(y_t,y_p) if x == y) / len(y_t)
+            err = sum(1 for x,y in zip(y_t,y_p) if x != y) 
+            losses.append(err)
+        tups = [(i,x, y_true[i], y_pred[i]) for i, x in enumerate(losses) if x > 0]
+        tups.sort(key=operator.itemgetter(1), reverse=True)
+
+        # prune by given range
+        tups = tups[n[0]:n[1]] if n is not None else tups
+        return tups
+
+
+    def view_top_losses(self, n=4, preproc=None, val_data=None):
+        """
+        Views observations with top losses in validation set.
+        Args:
+         n(int or tuple): a range to select in form of int or tuple
+                          e.g., n=8 is treated as n=(0,8)
+         preproc (Preprocessor): A TextPreprocessor or ImagePreprocessor.
+                                 For some data like text data, a preprocessor
+                                 is required to undo the pre-processing
+                                 to correctly view raw data.
+          val_data:  optional val_data to use instead of self.val_data
+        Returns:
+            list of n tuples where first element is either 
+            filepath or id of validation example and second element
+            is loss.
+
+        """
+
+        # check validation data and arguments
+        if val_data is not None:
+            val = val_data
+        else:
+            val = self.val_data
+        if val is None: raise Exception('val_data must be supplied to get_learner or view_top_losses')
+
+        tups = self.top_losses(n=n, val_data=val)
+
+        # get multilabel status and class names
+        classes = preproc.get_classes() if preproc is not None else None
+
+        # iterate through losses
+        for tup in tups:
+
+            # get data
+            idx = tup[0]
+            loss = tup[1]
+            truth = tup[2]
+            pred = tup[3]
+
+            seq = val.x[idx]
+            print('total incorrect: %s' % (loss))
+            print("{:15} {:5}: ({})".format("Word", "True", "Pred"))
+            print("="*30)
+            for w, true_tag, pred_tag in zip(seq, truth, pred):
+                print("{:15}:{:5} ({})".format(w, true_tag, pred_tag))
+            print('\n')
+        return
+
+
+    def save_model(self, fpath):
+        """
+        a wrapper to model.save
+        """
+        from .text.ner.models import crf_loss
+        self.model.compile(loss=crf_loss, optimizer=U.DEFAULT_OPT)
+        self.model.save(fpath)
+        return
+
+
+    def predict(self, val_data=None):
+        """
+        Makes predictions on validation set
+        """
+        if val_data is not None:
+            val = val_data
+        else:
+            val = self.val_data
+        if val is None: raise Exception('val_data must be supplied to get_learner or predict')
+        steps = np.ceil(U.nsamples_from_data(val)/val.batch_size)
+        results = []
+        for idx, (X, y) in enumerate(val):
+            y_pred = self.model.predict_on_batch(X)
+            lengths = val.get_lengths(idx)
+            y_pred = val.p.inverse_transform(y_pred, lengths)
+            results.extend(y_pred)
+        return results
+
+
+
 def get_predictor(model, preproc):
     """
     Returns a Predictor instance that can be used to make predictions on
@@ -1170,7 +1361,8 @@ def get_predictor(model, preproc):
 
     Args
         model (Model):        A compiled instance of keras.engine.training.Model
-        preproc(Preprocessor):   An instance of TextPreprocessor or ImagePreprocessor.
+        preproc(Preprocessor):   An instance of TextPreprocessor,ImagePreprocessor,
+                                 or NERPreprocessor.
                                  These instances are returned from the data loading
                                  functions in the ktrain vision and text modules:
 
@@ -1179,19 +1371,21 @@ def get_predictor(model, preproc):
                                  ktrain.vision.images_from_array
                                  ktrain.text.texts_from_folder
                                  ktrain.text.texts_from_csv
+                                 ktrain.text.ner.entities_from_csv
     """
 
     # check arguments
     if not isinstance(model, Model):
         raise ValueError('model must be of instance Model')
-    if not isinstance(preproc, ImagePreprocessor) and not isinstance(preproc, TextPreprocessor):
-    #if not isinstance(preproc, ImagePreprocessor) and type(preproc).__name__ != 'TextPreprocessor':
-        raise ValueError('preproc must be instance of ImagePreprocessor or TextPreprocessor')
+    if not isinstance(preproc, (ImagePreprocessor,TextPreprocessor, NERPreprocessor)):
+        raise ValueError('preproc must be instance of ktrain.preprocessor.Preprocessor')
     if isinstance(preproc, ImagePreprocessor):
         return ImagePredictor(model, preproc)
     elif isinstance(preproc, TextPreprocessor):
     #elif type(preproc).__name__ == 'TextPreprocessor':
         return TextPredictor(model, preproc)
+    if isinstance(preproc, NERPreprocessor):
+        return NERPredictor(model, preproc)
     else:
         raise Exception('preproc of type %s not currently supported' % (type(preproc)))
 
@@ -1231,12 +1425,14 @@ def load_predictor(fpath):
     # return the appropriate predictor
     if not isinstance(model, Model):
         raise ValueError('model must be of instance Model')
-    if not isinstance(preproc, ImagePreprocessor) and not isinstance(preproc, TextPreprocessor):
-        raise ValueError('preproc must be instance of ImagePreprocessor or TextPreprocessor')
+    if not isinstance(preproc, (ImagePreprocessor, TextPreprocessor, NERPreprocessor)):
+        raise ValueError('preproc must be instance of ktrain.preprocessor.Preprocessor')
     if isinstance(preproc, ImagePreprocessor):
         return ImagePredictor(model, preproc)
     elif isinstance(preproc, TextPreprocessor):
         return TextPredictor(model, preproc)
+    elif isinstance(preproc, NERPreprocessor):
+        return NERPredictor(model, preproc)
     else:
         raise Exception('preprocessor not currently supported')
 
@@ -1268,24 +1464,18 @@ def _load_model(fpath, preproc=None, train_data=None):
     if not preproc and not train_data:
         raise ValueError('Either preproc or train_data is required.')
     custom_objects=None
-    if preproc and (isinstance(preproc, BERTPreprocessor) or \
-                    type(preproc).__name__ == 'BERTPreprocessor') or\
+    if (preproc and (isinstance(preproc, BERTPreprocessor) or \
+                    type(preproc).__name__ == 'BERTPreprocessor')) or\
        train_data and U.bert_data_tuple(train_data):
         # custom BERT model
-        from keras_bert.layers.embedding import TokenEmbedding
-        from keras_bert.layers.extract import Extract
-        from keras_pos_embd import PositionEmbedding
-        from keras_layer_normalization import LayerNormalization
-        from keras_multi_head.multi_head_attention import MultiHeadAttention
-        from keras_position_wise_feed_forward import FeedForward
-        from keras_bert.bert import gelu_tensorflow
-        custom_objects={'TokenEmbedding' : TokenEmbedding, 
-                        'PositionEmbedding' : PositionEmbedding,
-                        'LayerNormalization' : LayerNormalization,
-                        'MultiHeadAttention' : MultiHeadAttention,
-                        'FeedForward' : FeedForward,
-                        'gelu_tensorflow' : gelu_tensorflow,
-                        'Extract' : Extract}
+        from keras_bert import get_custom_objects
+        custom_objects = get_custom_objects()
+    elif (preproc and (isinstance(preproc, NERPreprocessor) or \
+                    type(preproc).__name__ == 'NERPreprocessor')) or \
+        train_data and U.is_ner(data=train_data):
+        from .text.ner.anago.layers import CRF
+        from .text.ner.models import crf_loss
+        custom_objects={'CRF': CRF, 'crf_loss':crf_loss}
     try:
         model = load_model(fpath, custom_objects=custom_objects)
     except Exception as e:

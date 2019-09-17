@@ -11,7 +11,7 @@ TEXT_CLASSIFIERS = {
                     FASTTEXT: "a fastText-like model (http://arxiv.org/pdf/1607.01759.pdf)",
                     LOGREG:   "logistic regression using a trainable Embedding layer",
                     NBSVM:    "NBSVM model (http://www.aclweb.org/anthology/P12-2018)",
-                    BIGRU:    'Bidirectional GRU with pretrained word vectors',
+                    BIGRU:    'Bidirectional GRU with pretrained word vectors (https://arxiv.org/abs/1712.09405)',
                     BERT:  'Bidirectional Encoder Representations from Transformers (https://arxiv.org/abs/1810.04805)'} 
 
 
@@ -66,6 +66,11 @@ def text_classifier(name, train_data, preproc=None, multilabel=None, verbose=1):
 
     if name == BIGRU and not isinstance(preproc, tpp.TextPreprocessor):
         raise ValueError('A valid TextPreprocessor object is required for bigru')
+    elif not isinstance(preproc, tpp.TextPreprocessor):
+        msg = 'The preproc argument will be required in future versions of ktrain.'
+        msg += ' The preproc arg should be an instance of TextPreprocessor, which is '
+        msg += ' the third return value from texts_from_folder, texts_from_csv, etc.'
+        warnings.warn(msg, FutureWarning)
     if name == BIGRU and preproc.ngram_count() != 1:
         raise ValueError('Data should be processed with ngram_range=1 for bigru model.')
     is_bert = U.bert_data_tuple(train_data)
@@ -100,16 +105,16 @@ def text_classifier(name, train_data, preproc=None, multilabel=None, verbose=1):
 
     # determine number of classes, maxlen, and max_features
     maxlen = U.shape_from_data((x_train, y_train))[1]
-    max_features = None
+    max_features = preproc.max_features if preproc is not None else None
     features = set()
-    if not is_bert:
+    if not is_bert and max_features is None:
         U.vprint('compiling word ID features...', verbose=verbose)
         for x in x_train:
             features.update(x)
-        max_features = len(features)
+        #max_features = len(features)
+        max_features = max(features)+1
         U.vprint('max_features is %s' % (max_features), verbose=verbose)
     U.vprint('maxlen is %s' % (maxlen), verbose=verbose)
-
 
 
     # return appropriate model
@@ -178,7 +183,7 @@ def _build_logreg(x_train, y_train, num_classes,
     x = Activation(activation)(x)
     model = Model(inputs=inp, outputs=x)
     model.compile(loss=loss_func,
-                  optimizer='adam',
+                  optimizer=U.DEFAULT_OPT,
                   metrics=['accuracy'])
     return model
 
@@ -202,7 +207,7 @@ def _build_bert(x_train, y_train, num_classes,
     outputs = keras.layers.Dense(units=num_classes, activation='softmax')(dense)
     model = keras.models.Model(inputs, outputs)
     model.compile(loss=loss_func,
-                  optimizer='adam',
+                  optimizer=U.DEFAULT_OPT,
                   metrics=['accuracy'])
     return model
 
@@ -258,7 +263,7 @@ def _build_nbsvm(x_train, y_train, num_classes,
     x = Activation(activation)(x)
     model = Model(inputs=inp, outputs=x)
     model.compile(loss=loss_func,
-                  optimizer='adam',
+                  optimizer=U.DEFAULT_OPT,
                   metrics=['accuracy'])
     return model
 
@@ -276,7 +281,7 @@ def _build_fasttext(x_train, y_train, num_classes,
     model.add(Dense(64, activation='relu', kernel_initializer='he_normal'))
     model.add(Dropout(0.5))
     model.add(Dense(num_classes, activation=activation))
-    model.compile(loss=loss_func, optimizer='adam', metrics=['accuracy'])
+    model.compile(loss=loss_func, optimizer=U.DEFAULT_OPT, metrics=['accuracy'])
 
     return model
 
@@ -292,17 +297,15 @@ def _build_bigru(x_train, y_train, num_classes,
 
     if tokenizer is None: raise ValueError('bigru requires valid Tokenizer object')
 
-    wv_fpath = tpp.get_wv_path()
-
-    
 
     # setup pre-trained word embeddings
     embed_size = 300
     U.vprint('processing pretrained word vectors...', verbose=verbose)
-    embeddings_index = dict(get_coefs(*o.rstrip().rsplit(' ')) for o in open(wv_fpath))
-    word_index = tokenizer.word_index
-    nb_words = min(max_features, len(word_index))
-    #nb_words = max_features
+    #embeddings_index = dict(get_coefs(*o.rstrip().rsplit(' ')) for o in open(tpp.get_wv_path()))
+    embeddings_index = tpp.load_wv(verbose=verbose)
+    word_index = tokenizer.word_index # no longer used - REMOVE
+    #nb_words = min(max_features, len(word_index))
+    nb_words = max_features
     embedding_matrix = np.zeros((nb_words, embed_size))
     for word, i in word_index.items():
         if i >= max_features: continue
@@ -320,7 +323,7 @@ def _build_bigru(x_train, y_train, num_classes,
     outp = Dense(num_classes, activation=activation)(conc)
     model = Model(inputs=inp, outputs=outp)
     model.compile(loss=loss_func,
-                  optimizer='adam',
+                  optimizer=U.DEFAULT_OPT,
                   metrics=['accuracy'])
     return model
 
