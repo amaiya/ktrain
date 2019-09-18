@@ -60,6 +60,9 @@ except:
 #------------------------
 # Keras imports
 #------------------------
+import tensorflow as tf
+#tf.logging.set_verbosity(tf.logging.ERROR)
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
 import keras
 
