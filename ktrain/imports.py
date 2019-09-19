@@ -128,39 +128,3 @@ pre_resnet50 = keras.applications.resnet50.preprocess_input
 pre_mobilenet = keras.applications.mobilenet.preprocess_input
 pre_inception = keras.applications.inception_v3.preprocess_input
 
-
-#from keras import backend as K
-#from keras.engine.training import Model
-#from keras.models import load_model, Model, Sequential
-#from keras.callbacks import ModelCheckpoint, EarlyStopping,LambdaCallback, Callback
-#from keras.layers import Dense, Embedding, Input, Flatten, GRU, Bidirectional, LSTM
-#from keras.layers import SpatialDropout1D, GlobalMaxPool1D, GlobalAveragePooling1D
-#from keras.layers import concatenate, dot, Dropout, BatchNormalization, Add
-#from keras.layers.convolutional import Convolution2D, MaxPooling2D, AveragePooling2D
-#from keras.layers import Conv2D, MaxPooling2D, TimeDistributed, Lambda
-#from keras.layers.core import Activation
-#from keras.layers.merge import add
-#from keras.initializers import glorot_uniform  
-#from keras import regularizers
-#from keras.regularizers import l2
-#from keras.models import load_model
-#from keras.preprocessing import sequence
-#from keras.preprocessing import image
-#from keras.preprocessing import sequence
-#from keras.preprocessing.image import NumpyArrayIterator
-#from keras.preprocessing.image import Iterator
-#from keras.preprocessing.image import ImageDataGenerator
-#from keras.preprocessing.text import Tokenizer
-#from keras.utils import Sequence, to_categorical
-#from keras.utils import multi_gpu_model
-#from keras.activations import sigmoid
-#from keras.losses import categorical_crossentropy
-#from keras.losses import sparse_categorical_crossentropy
-
-#from keras.applications.resnet50 import ResNet50
-#from keras.applications.mobilenet import MobileNet
-#from keras.applications.inception_v3 import InceptionV3
-#from keras.applications.resnet50 import preprocess_input as pre_resnet50
-#from keras.applications.mobilenet import preprocess_input as pre_mobilenet
-#from keras.applications.inception_v3 import preprocess_input as pre_inception
-

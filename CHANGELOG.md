@@ -6,7 +6,7 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
-## 0.3.1 (TBD)
+## 0.3.1 (2019-09-19)
 
 ### New:
 - N/A
@@ -17,7 +17,7 @@ Most recent releases are shown at the top. Each release shows:
 
 
 ### Fixed:
--
+- Resolved issue with `text_classifier` failing when BERT is selected and Preprocessor is supplied.
 
 
 ## 0.3.0 (2019-09-17)

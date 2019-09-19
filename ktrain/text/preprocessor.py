@@ -316,6 +316,8 @@ class BERTPreprocessor(TextPreprocessor):
         self.tok = tokenizer
         self.tok_dct = dict((v,k) for k,v in token_dict.items())
 
+        self.max_features = max_features
+
 
     def get_preprocessor(self):
         return (self.tok, self.tok_dct)
