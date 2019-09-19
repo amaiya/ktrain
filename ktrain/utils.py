@@ -6,6 +6,10 @@ DEFAULT_ROP = 2
 DEFAULT_OPT = 'adam'
 
 
+def is_tf_keras():
+    return keras.__version__[-3:] == '-tf'
+
+
 def is_classifier(model):
     """
     checks for classification and mutlilabel from model

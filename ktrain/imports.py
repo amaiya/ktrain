@@ -1,70 +1,31 @@
-import sys
-import os
-import os.path
-import re
-import numpy as np
-import warnings
-import operator
-from collections import Counter
-from distutils.version import StrictVersion
-import tempfile
-import pickle
-from abc import ABC, abstractmethod
-import math
-import itertools
-import csv
-import copy
-import glob
-import codecs
-import urllib.request
-import zipfile
-import string
-import random
-import json
-
-
-
-from matplotlib import pyplot as plt
-from sklearn.metrics import classification_report, confusion_matrix
-from sklearn.datasets import load_files
-from sklearn.model_selection import train_test_split
-from sklearn.base import BaseEstimator, TransformerMixin
-#from sklearn.externals import joblib
-import joblib
-from scipy import sparse # utils
-from scipy.sparse import csr_matrix
-import pandas as pd
-from fastprogress import master_bar, progress_bar 
-import keras_bert
-from keras_bert import Tokenizer as BERT_Tokenizer
-import requests
-# verify=False added to avoid headaches from some corporate networks
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
-requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
-import eli5
-from eli5.lime import TextExplainer
-from seqeval.metrics import classification_report as ner_classification_report
-from seqeval.metrics import f1_score as ner_f1_score
-from seqeval.metrics.sequence_labeling import get_entities
-
-
-
-try:
-    from PIL import Image
-    PIL_INSTALLED = True
-except:
-    PIL_INSTALLED = False
-
-
 
 #------------------------
 # Keras imports
 #------------------------
+
+import logging
+import os
 import tensorflow as tf
 #tf.logging.set_verbosity(tf.logging.ERROR)
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
-import keras
+TF_KERAS = False
+EAGER_MODE = False
+
+if os.environ.get('TF_KERAS', '0') != '0':
+    import tensorflow as tf
+    from tensorflow.python import keras
+    TF_KERAS = True
+    if os.environ.get('TF_EAGER', '0') != '0':
+        try:
+            tf.enable_eager_execution()
+            raise AttributeError()
+        except AttributeError as e:
+            pass
+    EAGER_MODE = tf.executing_eagerly()
+else:
+    import keras
+logging.warning("using Keras version: %s" % (keras.__version__))
 
 K = keras.backend
 Layer = keras.engine.Layer
@@ -115,6 +76,7 @@ ImageDataGenerator = keras.preprocessing.image.ImageDataGenerator
 Tokenizer = keras.preprocessing.text.Tokenizer
 Sequence = keras.utils.Sequence
 get_file = keras.utils.get_file
+plot_model = keras.utils.plot_model
 to_categorical = keras.utils.to_categorical
 multi_gpu_model = keras.utils.multi_gpu_model
 activations = keras.activations
@@ -127,4 +89,144 @@ InceptionV3 = keras.applications.inception_v3.InceptionV3
 pre_resnet50 = keras.applications.resnet50.preprocess_input
 pre_mobilenet = keras.applications.mobilenet.preprocess_input
 pre_inception = keras.applications.inception_v3.preprocess_input
+
+
+#----------------------------------------------------------
+# standards
+#----------------------------------------------------------
+
+import sys
+import os
+import os.path
+import re
+import warnings
+import operator
+from collections import Counter
+from distutils.version import StrictVersion
+import tempfile
+import pickle
+from abc import ABC, abstractmethod
+import math
+import itertools
+import csv
+import copy
+import glob
+import codecs
+import urllib.request
+import zipfile
+import string
+import random
+import json
+
+
+
+#----------------------------------------------------------
+# external dependencies
+#----------------------------------------------------------
+
+
+import numpy as np
+from matplotlib import pyplot as plt
+from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.datasets import load_files
+from sklearn.model_selection import train_test_split
+from sklearn.base import BaseEstimator, TransformerMixin
+#from sklearn.externals import joblib
+import joblib
+from scipy import sparse # utils
+from scipy.sparse import csr_matrix
+import pandas as pd
+from fastprogress import master_bar, progress_bar 
+import keras_bert
+from keras_bert import Tokenizer as BERT_Tokenizer
+import requests
+# verify=False added to avoid headaches from some corporate networks
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+import eli5
+from eli5.lime import TextExplainer
+from seqeval.metrics import classification_report as ner_classification_report
+from seqeval.metrics import f1_score as ner_f1_score
+from seqeval.metrics.sequence_labeling import get_entities
+
+
+
+try:
+    from PIL import Image
+    PIL_INSTALLED = True
+except:
+    PIL_INSTALLED = False
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

@@ -167,9 +167,6 @@ def create_wide_residual_network(input_dim, nb_classes=100, N=2, k=1,
     return model
 
 if __name__ == "__main__":
-    from keras.utils import plot_model
-    from keras.layers import Input
-    from keras.models import Model
 
     init = (32, 32, 3)
 

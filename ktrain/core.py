@@ -248,8 +248,17 @@ class Learner(ABC):
         y_true = y_true.astype('float32')
 
         # compute loss
-        losses = self.model.loss_functions[0](tf.convert_to_tensor(y_true), tf.convert_to_tensor(y_pred))
+
+        # this doesn't work in tf.keras 1.14
+        #losses = self.model.loss_functions[0](tf.convert_to_tensor(y_true), tf.convert_to_tensor(y_pred))
+        if U.is_tf_keras():
+            L = self.model.loss_functions[0].fn
+        else:
+            L = self.model.loss_functions[0]
+        losses = L(tf.convert_to_tensor(y_true), tf.convert_to_tensor(y_pred))
         losses = tf.Session().run(losses)
+
+
         class_names = [] if preproc is None else preproc.get_classes()
         if preproc is None: 
             class_fcn = lambda x:"%s" % (x)
@@ -380,11 +389,12 @@ class Learner(ABC):
             with tf.device("/cpu:0"):
                 self.model.compile(optimizer=self.model.optimizer,
                                    loss=self.model.loss,
-                                   metrics=self.model.metrics)
+                                   metrics=[m.name for m in self.model.metrics])
         else:
             self.model.compile(optimizer=self.model.optimizer,
                                loss=self.model.loss,
-                               metrics=self.model.metrics)
+                               metrics=[m.name for m in self.model.metrics])
+
         return
 
 
