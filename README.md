@@ -148,9 +148,7 @@ The following software/libraries should be installed:
 
 
 
-This code was tested on Ubuntu 18.04 LTS using Keras 2.2.4 with a TensorFlow 1.10 backend.
-There are a few portions of the code that may explicitly depend on TensorFlow, but
-such dependencies are kept to a minimum.
+This code was tested on Ubuntu 18.04 LTS using Keras 2.2.4 with a TensorFlow 1.14 backend.
 
 ----
 **Creator:  [Arun S. Maiya](http://arun.maiya.net)**

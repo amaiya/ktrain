@@ -226,8 +226,6 @@ class Learner(ABC):
             is loss.
 
         """
-        import tensorflow as tf
-
 
 
         # check validation data and arguments
@@ -379,7 +377,6 @@ class Learner(ABC):
             raise Exception(err_msg)
 
         if self.multigpu:
-            import tensorflow as tf
             with tf.device("/cpu:0"):
                 self.model.compile(optimizer=self.model.optimizer,
                                    loss=self.model.loss,
