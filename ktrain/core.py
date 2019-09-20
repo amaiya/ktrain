@@ -157,13 +157,14 @@ class Learner(ABC):
           None
               
         """
+        # NOTE: zero argument lambda required when TF_EAGER=1
         for layer in self.model.layers:
             if hasattr(layer, 'kernel_regularizer') and hasattr(layer, 'kernel'):
                 layer.kernel_regularizer= regularizers.l2(wd)
-                layer.add_loss(regularizers.l2(wd)(layer.kernel))
+                layer.add_loss(lambda:regularizers.l2(wd)(layer.kernel))
             if hasattr(layer, 'bias_regularizer') and hasattr(layer, 'bias'):
                 layer.bias_regularizer= regularizers.l2(wd)
-                layer.add_loss(regularizers.l2(wd)(layer.bias))
+                layer.add_loss(lambda:regularizers.l2(wd)(layer.bias))
         self._recompile()
         return
         
