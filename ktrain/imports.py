@@ -3,7 +3,6 @@
 # Keras imports
 #------------------------
 
-import logging
 import os
 import tensorflow as tf
 #tf.logging.set_verbosity(tf.logging.ERROR)
@@ -25,7 +24,7 @@ if os.environ.get('TF_KERAS', '0') != '0':
     EAGER_MODE = tf.executing_eagerly()
 else:
     import keras
-logging.warning("using Keras version: %s" % (keras.__version__))
+print("using Keras version: %s" % (keras.__version__))
 
 K = keras.backend
 Layer = keras.engine.Layer
