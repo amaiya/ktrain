@@ -32,7 +32,7 @@ class ImagePredictor(Predictor):
         """
         if U.is_tf_keras():
             warnings.warn("explain() method is not available because tf.keras is "+\
-                          "not adequately supported by the eli5 library. You can switch to " +\
+                          "not yet adequately supported by the eli5 library. You can switch to " +\
                           "stand-alone Keras by setting os.environ['TF_KERAS']='0'" )
             return
 
