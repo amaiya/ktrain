@@ -1335,7 +1335,7 @@ class NERLearner(GenLearner):
         """
         a wrapper to model.save
         """
-        from .text.ner.models import crf_loss
+        from .text.ner import crf_loss
         self.model.compile(loss=crf_loss, optimizer=U.DEFAULT_OPT)
         self.model.save(fpath)
         return
@@ -1482,7 +1482,7 @@ def _load_model(fpath, preproc=None, train_data=None):
                     type(preproc).__name__ == 'NERPreprocessor')) or \
         train_data and U.is_ner(data=train_data):
         from .text.ner.anago.layers import CRF
-        from .text.ner.models import crf_loss
+        from .text.ner import crf_loss
         custom_objects={'CRF': CRF, 'crf_loss':crf_loss}
     try:
         model = load_model(fpath, custom_objects=custom_objects)

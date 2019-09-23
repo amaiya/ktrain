@@ -7,7 +7,15 @@ DEFAULT_OPT = 'adam'
 
 
 def is_tf_keras():
-    return keras.__version__[-3:] == '-tf'
+
+    if keras.__name__ == 'keras':
+        is_tf_keras = False
+    elif keras.__name__ in ['tensorflow.keras', 'tensorflow.python.keras'] or\
+         keras.__version__[:3] == '-tf':
+        is_tf_keras = True
+    else:
+        raise KeyError('Cannot detect if using keras or tf.keras.')
+    #return keras.__version__[-3:] == '-tf' 
 
 
 def is_classifier(model):

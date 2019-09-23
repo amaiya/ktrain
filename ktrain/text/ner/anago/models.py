@@ -2,7 +2,11 @@
 Model definition.
 """
 from ....imports import *
-from .layers import CRF
+from .... import utils as U
+if U.is_tf_keras():
+    from .layers import CRF
+else:
+    from .layers_standalone import CRF
 
 
 def save_model(model, weights_file, params_file):
