@@ -26,7 +26,9 @@ setup(
           'requests',
           'eli5 >= 0.10.0',
           'seqeval',
-          'joblib'
+          'joblib',
+          'networkx',
+          'stellargraph==0.7.1'
       ],
   classifiers=[  # Optional
     # How mature is this project? Common values are
