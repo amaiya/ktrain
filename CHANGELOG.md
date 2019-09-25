@@ -14,7 +14,7 @@ Most recent releases are shown at the top. Each release shows:
   Some capabilities (e.g., `predictor.explain` for images) are not yet supported for tf.keras
 
 ### Changed:
-- N/A
+- When BERT is selected, check to make sure dataset is correctly preprocessed for BERT
 
 
 ### Fixed:
