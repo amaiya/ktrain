@@ -14,90 +14,6 @@ from .text.ner.predictor import NERPredictor
 from .text.ner.preprocessor import NERPreprocessor
 
 
-
-def get_learner(model, train_data=None, val_data=None, 
-                batch_size=U.DEFAULT_BS, workers=1, use_multiprocessing=False,
-                multigpu=False):
-    """
-    Returns a Learner instance that can be used to tune and train Keras models.
-
-    model (Model):        A compiled instance of keras.engine.training.Model
-    train_data (tuple or generator): Either a: 
-                                   1) tuple of (x_train, y_train), where x_train and 
-                                      y_train are numpy.ndarrays or 
-                                   2) Iterator
-    val_data (tuple or generator): Either a: 
-                                   1) tuple of (x_test, y_test), where x_testand 
-                                      y_test are numpy.ndarrays or 
-                                   2) Iterator
-                                   Note: Should be same type as train_data.
-    batch_size (int):              Batch size to use in training
-    workers (int): number of cpu processes used to load data.
-                   only applicable if train_data is is a generator.
-    use_multiprocessing(bool):  whether or not to use multiprocessing for workers
-    multigpu(bool):             Lets the Learner know that the model has been 
-                                replicated on more than 1 GPU.
-                                Only supported for models from vision.image_classifiers
-                                at this time.
-    """
-
-    # check arguments
-    if not isinstance(model, Model):
-        raise ValueError('model must be of instance Model')
-    U.data_arg_check(train_data=train_data, val_data=val_data)
-    if type(workers) != type(1) or workers < 1:
-        workers =1
-    # check for NumpyArrayIterator 
-    if train_data and not U.ondisk(train_data):
-        if workers > 1 and not use_multiprocessing:
-            use_multiprocessing = True
-            wrn_msg = 'Changed use_multiprocessing to True because NumpyArrayIterator with workers>1'
-            wrn_msg +=' is slow when use_multiprocessing=False.'
-            wrn_msg += ' If you experience issues with this, please set workers=1 and use_multiprocessing=False.'
-            warnings.warn(wrn_msg)
-
-    # verify BERT
-    if U.bert_data_tuple(train_data):
-        maxlen = U.shape_from_data(train_data)[1]
-        msg = """For a GPU with 12GB of RAM, the following maxima apply:
-        sequence len=64, max_batch_size=64
-        sequence len=128, max_batch_size=32
-        sequence len=256, max_batch_size=16
-        sequence len=320, max_batch_size=14
-        sequence len=384, max_batch_size=12
-        sequence len=512, max_batch_size=6
-        
-        You've exceeded these limits.
-        If using a GPU with <=12GB of memory, you may run out of memory during training.
-        If necessary, adjust sequence length or batch size based on above."""
-        wrn = False
-        if maxlen > 64 and batch_size > 64:
-            wrn=True
-        elif maxlen > 128 and batch_size>32:
-            wrn=True
-        elif maxlen>256 and batch_size>16:
-            wrn=True
-        elif maxlen>320 and batch_size>14:
-            wrn=True
-        elif maxlen>384 and batch_size>12:
-            wrn=True
-        elif maxlen > 512 and batch_size>6:
-            wrn=True
-        if wrn: warnings.warn(msg)
-
-
-    # return the appropriate trainer
-    if U.is_iter(train_data):
-        if U.is_ner(model=model, data=train_data):
-            learner = NERLearner
-        else:
-            learner = GenLearner
-    else:
-        learner = ArrayLearner
-    return learner(model, train_data=train_data, val_data=val_data, 
-                   batch_size=batch_size, workers=workers, use_multiprocessing=use_multiprocessing, multigpu=multigpu)
-
-
 class Learner(ABC):
     """
     Abstract class used to tune and train Keras models. The fit method is
@@ -161,10 +77,17 @@ class Learner(ABC):
         for layer in self.model.layers:
             if hasattr(layer, 'kernel_regularizer') and hasattr(layer, 'kernel'):
                 layer.kernel_regularizer= regularizers.l2(wd)
-                layer.add_loss(lambda:regularizers.l2(wd)(layer.kernel))
+                if U.is_tf_keras():
+                    layer.add_loss(lambda:regularizers.l2(wd)(layer.kernel))
+                else:
+                    layer.add_loss(regularizers.l2(wd)(layer.kernel))
+
             if hasattr(layer, 'bias_regularizer') and hasattr(layer, 'bias'):
                 layer.bias_regularizer= regularizers.l2(wd)
-                layer.add_loss(lambda:regularizers.l2(wd)(layer.bias))
+                if U.is_tf_keras():
+                    layer.add_loss(lambda:regularizers.l2(wd)(layer.bias))
+                else:
+                    layer.add_loss(regularizers.l2(wd)(layer.bias))
         self._recompile()
         return
         
@@ -386,15 +309,18 @@ class Learner(ABC):
                    """
             raise Exception(err_msg)
 
+        
         if self.multigpu:
             with tf.device("/cpu:0"):
+                metrics = [m.name for m in self.model.metrics] if U.is_tf_keras() else self.model.metrics
                 self.model.compile(optimizer=self.model.optimizer,
                                    loss=self.model.loss,
-                                   metrics=[m.name for m in self.model.metrics])
+                                   metrics=metrics)
         else:
+            metrics = [m.name for m in self.model.metrics] if U.is_tf_keras() else self.model.metrics
             self.model.compile(optimizer=self.model.optimizer,
                                loss=self.model.loss,
-                               metrics=[m.name for m in self.model.metrics])
+                               metrics=metrics)
 
         return
 
@@ -1057,8 +983,6 @@ class ArrayLearner(Learner):
 
 
 
-
-
 class GenLearner(Learner):
     """
     Main class used to tune and train Keras models
@@ -1189,177 +1113,9 @@ class GenLearner(Learner):
         return layer_out
 
 
-
-class NERLearner(GenLearner):
-    """
-    Learner for Sequence Taggers.
-    """
-
-
-    def __init__(self, model, train_data=None, val_data=None, 
-                 batch_size=U.DEFAULT_BS, workers=1, use_multiprocessing=False,
-                 multigpu=False):
-        super().__init__(model, train_data=train_data, val_data=val_data, 
-                         batch_size=batch_size, 
-                         workers=workers, use_multiprocessing=use_multiprocessing, 
-                         multigpu=multigpu)
-        return
-
-
-
-    def validate(self, val_data=None, print_report=True, class_names=[]):
-        """
-        Validate text sequence taggers
-        """
-        if val_data is not None:
-            val = val_data
-        else:
-            val = self.val_data
-
-        if not U.is_ner(model=self.model, data=val):
-            warnings.warn('learner.validate_ner is only for sequence taggers.')
-            return
-
-        label_true = []
-        label_pred = []
-        for i in range(len(val)):
-            x_true, y_true = val[i]
-            #lengths = self.ner_lengths(y_true)
-            lengths = val.get_lengths(i)
-            y_pred = self.model.predict_on_batch(x_true)
-
-            y_true = val.p.inverse_transform(y_true, lengths)
-            y_pred = val.p.inverse_transform(y_pred, lengths)
-
-            label_true.extend(y_true)
-            label_pred.extend(y_pred)
-
-        score = ner_f1_score(label_true, label_pred)
-        if print_report:
-            print('   F1: {:04.2f}'.format(score * 100))
-            print(ner_classification_report(label_true, label_pred))
-
-        return score
-
-    def top_losses(self, n=4, val_data=None, preproc=None):
-        """
-        Computes losses on validation set sorted by examples with top losses
-        Args:
-          n(int or tuple): a range to select in form of int or tuple
-                          e.g., n=8 is treated as n=(0,8)
-          val_data:  optional val_data to use instead of self.val_data
-        Returns:
-            list of n tuples where first element is either 
-            filepath or id of validation example and second element
-            is loss.
-
-        """
-        # check validation data and arguments
-        if val_data is not None:
-            val = val_data
-        else:
-            val = self.val_data
-        if val is None: raise Exception('val_data must be supplied to get_learner or top_losses')
-        if type(n) == type(42):
-            n = (0, n)
-
-        # get predicictions and ground truth
-        y_pred = self.predict(val_data=val)
-        y_true = self.ground_truth(val_data=val)
-
-        # compute losses and sort
-        losses = []
-        for idx, y_t in enumerate(y_true):
-            y_p = y_pred[idx]
-            #err = 1- sum(1 for x,y in zip(y_t,y_p) if x == y) / len(y_t)
-            err = sum(1 for x,y in zip(y_t,y_p) if x != y) 
-            losses.append(err)
-        tups = [(i,x, y_true[i], y_pred[i]) for i, x in enumerate(losses) if x > 0]
-        tups.sort(key=operator.itemgetter(1), reverse=True)
-
-        # prune by given range
-        tups = tups[n[0]:n[1]] if n is not None else tups
-        return tups
-
-
-    def view_top_losses(self, n=4, preproc=None, val_data=None):
-        """
-        Views observations with top losses in validation set.
-        Args:
-         n(int or tuple): a range to select in form of int or tuple
-                          e.g., n=8 is treated as n=(0,8)
-         preproc (Preprocessor): A TextPreprocessor or ImagePreprocessor.
-                                 For some data like text data, a preprocessor
-                                 is required to undo the pre-processing
-                                 to correctly view raw data.
-          val_data:  optional val_data to use instead of self.val_data
-        Returns:
-            list of n tuples where first element is either 
-            filepath or id of validation example and second element
-            is loss.
-
-        """
-
-        # check validation data and arguments
-        if val_data is not None:
-            val = val_data
-        else:
-            val = self.val_data
-        if val is None: raise Exception('val_data must be supplied to get_learner or view_top_losses')
-
-        tups = self.top_losses(n=n, val_data=val)
-
-        # get multilabel status and class names
-        classes = preproc.get_classes() if preproc is not None else None
-
-        # iterate through losses
-        for tup in tups:
-
-            # get data
-            idx = tup[0]
-            loss = tup[1]
-            truth = tup[2]
-            pred = tup[3]
-
-            seq = val.x[idx]
-            print('total incorrect: %s' % (loss))
-            print("{:15} {:5}: ({})".format("Word", "True", "Pred"))
-            print("="*30)
-            for w, true_tag, pred_tag in zip(seq, truth, pred):
-                print("{:15}:{:5} ({})".format(w, true_tag, pred_tag))
-            print('\n')
-        return
-
-
-    def save_model(self, fpath):
-        """
-        a wrapper to model.save
-        """
-        from .text.ner import crf_loss
-        self.model.compile(loss=crf_loss, optimizer=U.DEFAULT_OPT)
-        self.model.save(fpath)
-        return
-
-
-    def predict(self, val_data=None):
-        """
-        Makes predictions on validation set
-        """
-        if val_data is not None:
-            val = val_data
-        else:
-            val = self.val_data
-        if val is None: raise Exception('val_data must be supplied to get_learner or predict')
-        steps = np.ceil(U.nsamples_from_data(val)/val.batch_size)
-        results = []
-        for idx, (X, y) in enumerate(val):
-            y_pred = self.model.predict_on_batch(X)
-            lengths = val.get_lengths(idx)
-            y_pred = val.p.inverse_transform(y_pred, lengths)
-            results.extend(y_pred)
-        return results
-
-
+#------------------------------------------------------------------------------
+# Predictor functions
+#------------------------------------------------------------------------------
 
 def get_predictor(model, preproc):
     """
