@@ -228,8 +228,9 @@ def bert_data_tuple(data):
     """
     checks if data tuple is BERT-style format
     """
-    if type(data[0]) == list and type(data[0][0]) is np.ndarray and\
-       type(data[0] is np.ndarray):
+    if type(data[0]) == list and len(data[0]) == 2 and\ 
+       type(data[0][0]) is np.ndarray and type(data[0][1]) is np.ndarray and\
+       type(data[1]) is np.ndarray and np.count_nonzero(data[0][1]) == 0:
            return True
     else:
         return False

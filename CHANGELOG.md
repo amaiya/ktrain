@@ -6,6 +6,21 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.3.2 (TBD)
+
+### New:
+- Added experimental support for tf.keras. By default, *ktrain* will use standalone Keras.
+  If `os.environ['TF_KERAS']` is set, *ktrian* will attempt to use tf.keras. 
+  Some capabilities (e.g., `predictor.explain` for images) are not yet supported for tf.keras
+
+### Changed:
+- N/A
+
+
+### Fixed:
+- Fixed `utils.bert_data_type` and ensures it does more checks to validate BERT-style data
+
+
 ## 0.3.1 (2019-09-19)
 
 ### New:
