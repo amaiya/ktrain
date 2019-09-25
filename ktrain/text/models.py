@@ -75,9 +75,8 @@ def text_classifier(name, train_data, preproc=None, multilabel=None, verbose=1):
     if name == BIGRU and preproc.ngram_count() != 1:
         raise ValueError('Data should be processed with ngram_range=1 for bigru model.')
     is_bert = U.bert_data_tuple(train_data)
-    if is_bert and name != BERT:
-        raise ValueError('data is preprocessed for %s but %s was not specified as model' % (BERT, BERT))
-
+    if (is_bert and name != BERT) or (not is_bert and name == BERT):
+        raise ValueError("if '%s' is selected model, then preprocess_mode='%s' should be used and vice versa" % (BERT, BERT))
     
 
     # set number of classes and multilabel flag
