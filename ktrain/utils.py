@@ -111,8 +111,8 @@ def shape_from_data(data):
     err_msg = 'could not determine shape from %s' % (type(data))
     if is_iter(data):
         if is_ner(data=data): return (len(data.x), data[0][0][0].shape[1])  # NERSequence
-        elif hasattr(data, 'image_shape'): return data.image_shape
-        elif hasattr(data, 'x'):
+        elif hasattr(data, 'image_shape'): return data.image_shape          # DirectoryIterator/DataFrameIterator
+        elif hasattr(data, 'x'):                                            # NumpyIterator
             return data.x.shape[1:]
         else:
             try:
@@ -138,10 +138,10 @@ def ondisk(data):
 def nsamples_from_data(data):
     err_msg = 'could not determine number of samples from %s' % (type(data))
     if is_iter(data):
-        if is_ner(data=data): return len(data.x)
-        elif hasattr(data, 'samples'):
+        if is_ner(data=data): return len(data.x)      # NERSequence
+        elif hasattr(data, 'samples'):                # DirectoryIterator/DataFrameIterator
             return data.samples
-        elif hasattr(data, 'n'):
+        elif hasattr(data, 'n'):                      # DirectoryIterator/DataFrameIterator/NumpyIterator
             return data.n
         else:
             raise Exception(err_msg)
@@ -157,12 +157,12 @@ def nsamples_from_data(data):
 
 def nclasses_from_data(data):
     if is_iter(data):
-        if is_ner(data=data): return len(data.p._label_vocab._id2token)
-        elif hasattr(data, 'classes'):
+        if is_ner(data=data): return len(data.p._label_vocab._id2token)    # NERSequence
+        elif hasattr(data, 'classes'):                                     # DirectoryIterator
             return len(set(data.classes))
         else:
             try:
-                return data[0][1].shape[1]
+                return data[0][1].shape[1]                                 # DataFrameIterator/NumpyIterator
             except:
                 raise Exception('could not determine number of classes from %s' % (type(data)))
     else:
