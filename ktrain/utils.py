@@ -1,22 +1,19 @@
 from .imports import *
 
+
+#------------------------------------------------------------------------------
+# KTRAIN DEFAULTS
+#------------------------------------------------------------------------------
 DEFAULT_BS = 32
 DEFAULT_ES = 5 
 DEFAULT_ROP = 2 
 DEFAULT_OPT = 'adam'
 
 
-def is_tf_keras():
 
-    if keras.__name__ == 'keras':
-        is_tf_keras = False
-    elif keras.__name__ in ['tensorflow.keras', 'tensorflow.python.keras'] or\
-         keras.__version__[:3] == '-tf':
-        is_tf_keras = True
-    else:
-        raise KeyError('Cannot detect if using keras or tf.keras.')
-    #return keras.__version__[-3:] == '-tf' 
-
+#------------------------------------------------------------------------------
+# DATA/MODEL INSPECTORS
+#------------------------------------------------------------------------------
 
 def is_classifier(model):
     """
@@ -65,16 +62,15 @@ def is_ner_from_model(model):
     return loss == 'crf_loss' or 'CRF.loss_function' in str(model.loss)
 
 
+def is_ner_from_data(data):
+    return type(data).__name__ == 'NERSequence'
+
+
 def is_crf(model):
     """
     This is currently simpley an alias for is_ner_from_model
     """
     return is_ner_from_model(model)
-
-
-def is_ner_from_data(data):
-    return type(data).__name__ == 'NERSequence'
-        
 
 
 def is_multilabel(data):
@@ -190,19 +186,13 @@ def y_from_data(data):
             raise Exception('could not determine number of classes from %s' % (type(data)))
 
 
-
-def vprint(s=None, verbose=1):
-    if not s: s = '\n'
-    if verbose:
-        print(s)
-
-
 def is_iter(data, ignore=False):
     if ignore: return True
     iter_classes = ["NumpyArrayIterator", "DirectoryIterator",
                     "DataFrameIterator", "Iterator", "Sequence", 
                     "NERSequence"]
     return data.__class__.__name__ in iter_classes
+
 
 
 def data_arg_check(train_data=None, val_data=None, train_required=False, val_required=False,
@@ -250,54 +240,9 @@ def bad_data_tuple(data):
 
 
 
-def set_row_csr(A, row_idx, new_row):
-    '''
-    Replace a row in a CSR sparse matrix A.
-
-    Parameters
-    ----------
-    A: csr_matrix
-        Matrix to change
-    row_idx: int
-        index of the row to be changed
-    new_row: np.array
-        list of new values for the row of A
-
-    Returns
-    -------
-    None (the matrix A is changed in place)
-
-    Prerequisites
-    -------------
-    The row index shall be smaller than the number of rows in A
-    The number of elements in new row must be equal to the number of columns in matrix A
-    '''
-    assert sparse.isspmatrix_csr(A), 'A shall be a csr_matrix'
-    assert row_idx < A.shape[0], \
-            'The row index ({0}) shall be smaller than the number of rows in A ({1})' \
-            .format(row_idx, A.shape[0])
-    try:
-        N_elements_new_row = len(new_row)
-    except TypeError:
-        msg = 'Argument new_row shall be a list or numpy array, is now a {0}'\
-        .format(type(new_row))
-        raise AssertionError(msg)
-    N_cols = A.shape[1]
-    assert N_cols == N_elements_new_row, \
-            'The number of elements in new row ({0}) must be equal to ' \
-            'the number of columns in matrix A ({1})' \
-            .format(N_elements_new_row, N_cols)
-
-    idx_start_row = A.indptr[row_idx]
-    idx_end_row = A.indptr[row_idx + 1]
-    additional_nnz = N_cols - (idx_end_row - idx_start_row)
-
-    A.data = np.r_[A.data[:idx_start_row], new_row, A.data[idx_end_row:]]
-    A.indices = np.r_[A.indices[:idx_start_row], np.arange(N_cols), A.indices[idx_end_row:]]
-    A.indptr = np.r_[A.indptr[:row_idx + 1], A.indptr[(row_idx + 1):] + additional_nnz]
-
-
-
+#------------------------------------------------------------------------------
+# PLOTTING UTILITIES
+#------------------------------------------------------------------------------
 
 
 # plots images with labels within jupyter notebook
@@ -349,40 +294,11 @@ def plot_confusion_matrix(cm, classes,
     plt.xlabel('Predicted label')
 
 
-def get_img_fit_flow(image_config, fit_smpl_size, directory, target_size, batch_size, shuffle):   
-    '''                                                                            
-    Sample the generators to get fit data    
-    image_config  dict   holds the vars for data augmentation & 
-    fit_smpl_size float  subunit multiplier to get the sample size for normalization
-    
-    directory     str    folder of the images
-    target_size   tuple  images processed size
-    batch_size    str    
-    shuffle       bool
-    '''                                                                            
-    if 'featurewise_std_normalization' in image_config and image_config['image_config']:                                      
-       img_gen = ImageDataGenerator()                                              
-       batches = img_gen.flow_from_directory(                                      
-          directory=directory,                                                     
-          target_size=target_size,                                                 
-          batch_size=batch_size,                                                   
-          shuffle=shuffle,                                                         
-        )                                                                          
-       fit_samples = np.array([])                                                  
-       fit_samples.resize((0, target_size[0], target_size[1], 3))                  
-       for i in range(batches.samples/batch_size):                                 
-           imgs, labels = next(batches)                                            
-           idx = np.random.choice(imgs.shape[0], batch_size*fit_smpl_size, replace=False)     
-           np.vstack((fit_samples, imgs[idx]))                                     
-    new_img_gen = ImageDataGenerator(**image_config)                               
-    if 'featurewise_std_normalization' in image_config and image_config['image_config']:                                      
-        new_img_gen.fit(fit_samples)                                               
-    return new_img_gen.flow_from_directory(                                        
-       directory=directory,                                                        
-       target_size=target_size,                                                    
-       batch_size=batch_size,                                                      
-       shuffle=shuffle,                                                            
-    )
+
+#------------------------------------------------------------------------------
+# DOWNLOAD UTILITIES
+#------------------------------------------------------------------------------
+
 
 def download(url, filename):
     with open(filename, 'wb') as f:
@@ -402,14 +318,35 @@ def download(url, filename):
                 sys.stdout.flush()
 
 
-
-
 def get_ktrain_data():
     home = os.path.expanduser('~')
     ktrain_data = os.path.join(home, 'ktrain_data')
     if not os.path.isdir(ktrain_data):
         os.mkdir(ktrain_data)
     return ktrain_data
+
+
+
+#------------------------------------------------------------------------------
+# MISC UTILITIES
+#------------------------------------------------------------------------------
+
+def is_tf_keras():
+
+    if keras.__name__ == 'keras':
+        is_tf_keras = False
+    elif keras.__name__ in ['tensorflow.keras', 'tensorflow.python.keras'] or\
+         keras.__version__[:3] == '-tf':
+        is_tf_keras = True
+    else:
+        raise KeyError('Cannot detect if using keras or tf.keras.')
+    #return keras.__version__[-3:] == '-tf' 
+
+
+def vprint(s=None, verbose=1):
+    if not s: s = '\n'
+    if verbose:
+        print(s)
 
 
 def add_headers_to_df(fname_in, header_dict, fname_out=None):
