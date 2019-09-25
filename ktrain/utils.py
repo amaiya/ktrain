@@ -74,7 +74,19 @@ def is_crf(model):
 
 def is_ner_from_data(data):
     return type(data).__name__ == 'NERSequence'
-        
+ 
+
+
+
+def is_graph(model=None, data=None):
+    graph_bool = False
+    if is_node_from_data(data):
+        graph_bool = True
+    return graph_bool
+
+
+def is_node_from_data(data):
+    return type(data).__name__ == 'KT_NodeSequence'
 
 
 def is_multilabel(data):
@@ -84,6 +96,7 @@ def is_multilabel(data):
     data_arg_check(val_data=data, val_required=True)
     if is_iter(data):
         if is_ner(data=data): return False   # NERSequence
+        elif is_node_from_data(data=data): return False # NodeSequence
         multilabel = False
         for idx, v in enumerate(data):
             if idx >= 16: break
