@@ -23,7 +23,7 @@ IMAGE_CLASSIFIERS = {
                      PRETRAINED_INCEPTION: 'Inception Version 3  (pretrained on ImageNet)',
                      INCEPTION:  'Inception Version 3 (randomly initialized)',
                      WRN22: '22-layer Wide Residual Network (randomly initialized)',
-                     CNN : 'a default Convolutional Neural Network'}
+                     CNN : 'a default LeNet-like Convolutional Neural Network'}
 
 def print_image_classifiers():
     for k,v in IMAGE_CLASSIFIERS.items():
