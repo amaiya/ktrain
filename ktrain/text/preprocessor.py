@@ -102,6 +102,22 @@ def bert_tokenize(docs, tokenizer, maxlen, verbose=1):
 #------------------------------------------------------------------------------
 
 
+def decode_by_line(texts, encoding='utf-8'):
+    """
+    Decode text line by line and skip over errors.
+    """
+    new_texts = []
+    for doc in texts:
+        text = ""
+        for line in doc.splitlines():
+            try:
+                line = line.decode(encoding)
+            except:
+                continue
+            text += line
+        new_texts.append(text)
+    return new_texts
+
 
 class TextPreprocessor(Preprocessor):
     """
@@ -132,6 +148,19 @@ class TextPreprocessor(Preprocessor):
         converting a list or array of Word IDs back to words
         """
         raise NotImplementedError
+
+
+    def process_chinese(self, texts):
+        lang = langdetect.detect(texts[0])
+        if not lang.startswith('zh-'): return texts
+        split_texts = []
+        for doc in texts:
+            seg_list = jieba.cut(doc, cut_all=False)
+            seg_list = list(seg_list)
+            split_texts.append(seg_list)
+        return [" ".join(tokens) for tokens in split_texts] 
+
+
 
 
 class StandardTextPreprocessor(TextPreprocessor):
@@ -168,6 +197,10 @@ class StandardTextPreprocessor(TextPreprocessor):
         """
         preprocess training set
         """
+
+        # check for and process chinese
+        train_text = self.process_chinese(train_text)
+
         # extract vocabulary
         self.tok = Tokenizer(num_words=self.max_features)
         self.tok.fit_on_texts(train_text)
@@ -201,6 +234,9 @@ class StandardTextPreprocessor(TextPreprocessor):
         """
         if self.tok is None:
             raise Exception('No tokenizer fitted. Did you run preprocess_train first?')
+
+        # check for and process chinese
+        test_text = self.process_chinese(test_text)
 
         # convert to word IDs
         x_test = self.tok.texts_to_sequences(test_text)
