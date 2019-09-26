@@ -131,6 +131,13 @@ class Learner(ABC):
         return cm
 
 
+    def _check_val(self, val_data):
+        if val_data is not None:
+            val = val_data
+        else:
+            val = self.val_data
+        if val is None: raise Exception('val_data must be supplied to get_learner or view_top_losses')
+        return val
 
 
     def top_losses(self, n=4, val_data=None, preproc=None):
@@ -212,74 +219,9 @@ class Learner(ABC):
     def view_top_losses(self, n=4, preproc=None, val_data=None):
         """
         Views observations with top losses in validation set.
-        Args:
-         n(int or tuple): a range to select in form of int or tuple
-                          e.g., n=8 is treated as n=(0,8)
-         preproc (Preprocessor): A TextPreprocessor or ImagePreprocessor.
-                                 For some data like text data, a preprocessor
-                                 is required to undo the pre-processing
-                                 to correctly view raw data.
-          val_data:  optional val_data to use instead of self.val_data
-        Returns:
-            list of n tuples where first element is either 
-            filepath or id of validation example and second element
-            is loss.
-
+        Musta be overridden by Learner subclasses.
         """
-        # TODO: fix this mess
-
-        # check validation data and arguments
-        if val_data is not None:
-            val = val_data
-        else:
-            val = self.val_data
-        if val is None: raise Exception('val_data must be supplied to get_learner or view_top_losses')
-
-        # get top losses and associated data
-        tups = self.top_losses(n=n, val_data=val, preproc=preproc)
-
-        # get multilabel status and class names
-        classes = preproc.get_classes() if preproc is not None else None
-
-        # iterate through losses
-        for tup in tups:
-
-            # get data
-            idx = tup[0]
-            loss = tup[1]
-            truth = tup[2]
-            pred = tup[3]
-
-            # Image Classification
-            if type(val).__name__ in ['DirectoryIterator', 'DataFrameIterator']:
-                fpath = val.filepaths[tup[0]]
-                fp = os.path.join(os.path.basename(os.path.dirname(fpath)), os.path.basename(fpath))
-                plt.figure()
-                plt.title("%s | loss:%s | true:%s | pred:%s)" % (fp, round(loss,2), truth, pred))
-                show_image(fpath)
-            else:
-                # Image Classification from Array
-                if type(val).__name__ in ['NumpyArrayIterator']:
-                    obs = val.x[idx]
-                    if preproc is not None: obs = preproc.undo(obs)
-                    plt.figure()
-                    plt.title("id:%s | loss:%s | true:%s | pred:%s)" % (idx, round(loss,2), truth, pred))
-                    plt.imshow(np.squeeze(obs))
-                # everything else including text classification
-                else:
-                    if U.bert_data_tuple(val):
-                        obs = val[0][0][idx]
-                    else:
-                        obs = val[0][idx]
-                    if preproc is not None: obs = preproc.undo(obs)
-                    if type(obs) == str:
-                        obs = ' '.join(obs.split()[:512])
-                    print('----------')
-                    print("id:%s | loss:%s | true:%s | pred:%s)\n" % (idx, round(loss,2), truth, pred))
-                    print(obs)
-        return
-
-
+        raise NotImplementedError('view_top_losses must be overriden by Learner subclass')
 
 
     def save_model(self, fpath):
@@ -889,22 +831,6 @@ class ArrayLearner(Learner):
         self.batch_size = batch_size
         return
 
-    def layer_output(self, layer_id, example_id=0, use_val=False):
-        """
-        Prints output of layer with index <layer_id> to help debug models.
-        Uses first example (example_id=0) from training set, by default.
-        """
-                                                                                
-        inp = self.model.layers[0].input
-        outp = self.model.layers[layer_id].output
-        f_out = K.function([inp], [outp])
-        if not use_val:
-            example = self.train_data[0][example_id]
-        else:
-            example = self.val_data[0][example_id]
-        layer_out = f_out([np.array([example,])])[0]
-        return layer_out
-
     
     def fit(self, lr, n_cycles, cycle_len=None, cycle_mult=1, 
             lr_decay=1, checkpoint_folder = None, early_stopping=None,
@@ -980,6 +906,68 @@ class ArrayLearner(Learner):
             #U.vprint('final loss:%s, final score:%s' % (loss, acc), verbose=verbose)
 
         return hist
+
+
+    def layer_output(self, layer_id, example_id=0, use_val=False):
+        """
+        Prints output of layer with index <layer_id> to help debug models.
+        Uses first example (example_id=0) from training set, by default.
+        """
+                                                                                
+        inp = self.model.layers[0].input
+        outp = self.model.layers[layer_id].output
+        f_out = K.function([inp], [outp])
+        if not use_val:
+            example = self.train_data[0][example_id]
+        else:
+            example = self.val_data[0][example_id]
+        layer_out = f_out([np.array([example,])])[0]
+        return layer_out
+
+
+    def view_top_losses(self, n=4, preproc=None, val_data=None):
+        """
+        Views observations with top losses in validation set.
+        Typically over-ridden by Learner subclasses.
+        Args:
+         n(int or tuple): a range to select in form of int or tuple
+                          e.g., n=8 is treated as n=(0,8)
+         preproc (Preprocessor): A TextPreprocessor or ImagePreprocessor.
+                                 For some data like text data, a preprocessor
+                                 is required to undo the pre-processing
+                                 to correctly view raw data.
+          val_data:  optional val_data to use instead of self.val_data
+        Returns:
+            list of n tuples where first element is either 
+            filepath or id of validation example and second element
+            is loss.
+
+        """
+        val = self._check_val(val_data)
+
+
+        # get top losses and associated data
+        tups = self.top_losses(n=n, val_data=val, preproc=preproc)
+
+        # get multilabel status and class names
+        classes = preproc.get_classes() if preproc is not None else None
+        # iterate through losses
+        for tup in tups:
+
+            # get data
+            idx = tup[0]
+            loss = tup[1]
+            truth = tup[2]
+            pred = tup[3]
+
+            obs = val[0][idx]
+            if preproc is not None: obs = preproc.undo(obs)
+            if type(obs) == str:
+                obs = ' '.join(obs.split()[:512])
+            print('----------')
+            print("id:%s | loss:%s | true:%s | pred:%s)\n" % (idx, round(loss,2), truth, pred))
+            print(obs)
+        return
 
 
 
@@ -1111,6 +1099,15 @@ class GenLearner(Learner):
             example = self.val_data[0][batch_id][example_id]
         layer_out = f_out([np.array([example,])])[0]
         return layer_out
+
+
+    def view_top_losses(self, n=4, preproc=None, val_data=None):
+        """
+        Views observations with top losses in validation set.
+        Musta be overridden by Learner subclasses.
+        """
+        raise NotImplementedError('view_top_losses must be overriden by GenLearner subclass')
+
 
 
 #------------------------------------------------------------------------------

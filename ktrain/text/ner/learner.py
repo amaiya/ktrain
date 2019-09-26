@@ -24,10 +24,7 @@ class NERLearner(GenLearner):
         """
         Validate text sequence taggers
         """
-        if val_data is not None:
-            val = val_data
-        else:
-            val = self.val_data
+        val = self._check_val(val_data)
 
         if not U.is_ner(model=self.model, data=val):
             warnings.warn('learner.validate_ner is only for sequence taggers.')
@@ -67,12 +64,7 @@ class NERLearner(GenLearner):
             is loss.
 
         """
-        # check validation data and arguments
-        if val_data is not None:
-            val = val_data
-        else:
-            val = self.val_data
-        if val is None: raise Exception('val_data must be supplied to get_learner or top_losses')
+        val = self._check_val(val_data)
         if type(n) == type(42):
             n = (0, n)
 
@@ -114,11 +106,7 @@ class NERLearner(GenLearner):
         """
 
         # check validation data and arguments
-        if val_data is not None:
-            val = val_data
-        else:
-            val = self.val_data
-        if val is None: raise Exception('val_data must be supplied to get_learner or view_top_losses')
+        val = self._check_val(val_data)
 
         tups = self.top_losses(n=n, val_data=val)
 
@@ -148,7 +136,7 @@ class NERLearner(GenLearner):
         """
         a wrapper to model.save
         """
-        from .text.ner import crf_loss
+        from .anago.layers import crf_loss
         self.model.compile(loss=crf_loss, optimizer=U.DEFAULT_OPT)
         self.model.save(fpath)
         return

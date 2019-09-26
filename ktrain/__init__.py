@@ -1,7 +1,10 @@
 from .version import __version__
 from .imports import *
 from .core import ArrayLearner, GenLearner, get_predictor, load_predictor, release_gpu_memory
+from .vision.learner import ImageClassLearner
+from .text.learner import BERTTextClassLearner
 from .text.ner.learner import NERLearner
+
 from . import utils as U
 
 __all__ = ['get_learner', 'get_predictor', 'load_predictor', 'release_gpu_memory']
@@ -51,7 +54,8 @@ def get_learner(model, train_data=None, val_data=None,
             warnings.warn(wrn_msg)
 
     # verify BERT
-    if U.bert_data_tuple(train_data):
+    is_bert = U.bert_data_tuple(train_data)
+    if is_bert:
         maxlen = U.shape_from_data(train_data)[1]
         msg = """For a GPU with 12GB of RAM, the following maxima apply:
         sequence len=64, max_batch_size=64
@@ -84,9 +88,14 @@ def get_learner(model, train_data=None, val_data=None,
     if U.is_iter(train_data):
         if U.is_ner(model=model, data=train_data):
             learner = NERLearner
+        elif U.is_imageclass_from_data(train_data):
+            learner = ImageClassLearner
         else:
             learner = GenLearner
     else:
-        learner = ArrayLearner
+        if is_bert: 
+            learner = BERTTextClassLearner
+        else: # vanilla text classifiers use standard ArrayLearners
+            learner = ArrayLearner
     return learner(model, train_data=train_data, val_data=val_data, 
                    batch_size=batch_size, workers=workers, use_multiprocessing=use_multiprocessing, multigpu=multigpu)
