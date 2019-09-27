@@ -15,6 +15,7 @@ def texts_from_folder(datadir, classes=None,
                       train_test_names=['train', 'test'],
                       preprocess_mode='standard',
                       encoding=None, # detected automatically
+                      lang=None, # detected automatically
                       val_pct=0.1,
                       verbose=1):
     """
@@ -48,8 +49,8 @@ def texts_from_folder(datadir, classes=None,
         preprocess_mode (str):  Either 'standard' (normal tokenization) or 'bert'
                                 tokenization and preprocessing for use with 
                                 BERT text classification model.
-        encoding (str):        character encoding to use.
-                               If None, encoding is detected automatically.
+        encoding (str):        character encoding to use. Auto-detected if None
+        lang (str):            language.  Auto-detected if None.
         val_pct(float):        Onlyl used if train_test_names  has 1 and not 2 names
         verbose (bool):         verbosity
         
@@ -77,14 +78,9 @@ def texts_from_folder(datadir, classes=None,
     # decode based on supplied encoding
     if encoding is None:
         # detect encoding from first training example
-        if verbose:
-            print('detecting character encoding from random sample of training set...')
-            lst = [chardet.detect(doc)['encoding'] for doc in x_train[:32]]
-            encoding = max(set(lst), key=lst.count)
-            print('inferred encoding is: %s.' % (encoding))
-            print('If %s is incorrect, please set manually (e.g, encoding="utf-8").\n'  %(encoding))
-
-
+        lst = [chardet.detect(doc)['encoding'] for doc in x_train[:32]]
+        encoding = max(set(lst), key=lst.count)
+        U.vprint('detected encoding: %s (if wrong, set manually)' % (encoding), verbose=verbose)
     try:
         x_train = [x.decode(encoding) for x in x_train]
         x_test = [x.decode(encoding) for x in x_test]
@@ -93,13 +89,17 @@ def texts_from_folder(datadir, classes=None,
         x_test = tpp.decode_by_line(x_test, encoding=encoding)
 
 
+    # detect language
+    if lang is None: lang = tpp.detect_lang(x_train)
+
+
     # return preprocessed the texts
     preproc_type = tpp.TEXT_PREPROCESSORS.get(preprocess_mode, None)
     if None: raise ValueError('unsupported preprocess_mode')
     preproc = preproc_type(maxlen,
                            max_features,
                            classes = train_b.target_names,
-                           ngram_range=ngram_range)
+                           lang=lang, ngram_range=ngram_range)
     trn = preproc.preprocess_train(x_train, y_train, verbose=verbose)
     val = preproc.preprocess_test(x_test,  y_test, verbose=verbose)
     return (trn, val, preproc)
@@ -113,7 +113,9 @@ def texts_from_csv(train_filepath,
                    label_columns = [],
                    val_filepath=None,
                    max_features=MAX_FEATURES, maxlen=MAXLEN, 
-                   val_pct=0.1, ngram_range=1, preprocess_mode='standard', encoding='utf-8', 
+                   val_pct=0.1, ngram_range=1, preprocess_mode='standard', 
+                   encoding=None,  # auto-detected
+                   lang=None,      # auto-detected
                    verbose=1):
     """
     Loads text data from CSV file. Class labels are assumed to one of following:
@@ -138,9 +140,15 @@ def texts_from_csv(train_filepath,
         preprocess_mode (str):  Either 'standard' (normal tokenization) or 'bert'
                                 tokenization and preprocessing for use with 
                                 BERT text classification model.
-        encoding (str):        character encoding to use
+        encoding (str):        character encoding to use. Auto-detected if None
+        lang (str):            language.  Auto-detected if None.
         verbose (boolean): verbosity
     """
+    if encoding is None:
+        with open(train_filepath, 'rb') as f:
+            encoding = chardet.detect(f.read())['encoding']
+            U.vprint('detected encoding: %s (if wrong, set manually)' % (encoding), verbose=verbose)
+
     train_df = pd.read_csv(train_filepath, encoding=encoding)
     val_df = pd.read_csv(val_filepath, encoding=encoding) if val_filepath is not None else None
     return texts_from_df(train_df,
@@ -152,6 +160,7 @@ def texts_from_csv(train_filepath,
                          val_pct=val_pct,
                          ngram_range=ngram_range, 
                          preprocess_mode=preprocess_mode,
+                         lang=lang,
                          verbose=verbose)
 
 
@@ -164,6 +173,7 @@ def texts_from_df(train_df,
                    val_df=None,
                    max_features=MAX_FEATURES, maxlen=MAXLEN, 
                    val_pct=0.1, ngram_range=1, preprocess_mode='standard', 
+                   lang=None, # auto-detected
                    verbose=1):
     """
     Loads text data from Pandas dataframe file. Class labels are assumed to one of following:
@@ -188,6 +198,7 @@ def texts_from_df(train_df,
         preprocess_mode (str):  Either 'standard' (normal tokenization) or 'bert'
                                 tokenization and preprocessing for use with 
                                 BERT text classification model.
+        lang (str):            language.  Auto-detected if None.
         verbose (boolean): verbosity
     """
 
@@ -206,13 +217,18 @@ def texts_from_df(train_df,
         x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=val_pct)
     y_train = np.squeeze(y_train)
     y_test = np.squeeze(y_test)
+
+    # detect language
+    if lang is None: lang = tpp.detect_lang(x_train)
+
+
     # return preprocessed the texts
     preproc_type = tpp.TEXT_PREPROCESSORS.get(preprocess_mode, None)
     if None: raise ValueError('unsupported preprocess_mode')
     preproc = preproc_type(maxlen,
                            max_features,
                            classes = label_columns,
-                           ngram_range=ngram_range)
+                           lang=lang, ngram_range=ngram_range)
     trn = preproc.preprocess_train(x_train, y_train, verbose=verbose)
     val = preproc.preprocess_test(x_test,  y_test, verbose=verbose)
     return (trn, val, preproc)
@@ -223,6 +239,7 @@ def texts_from_array(x_train, y_train, x_test=None, y_test=None,
                    class_names = [],
                    max_features=MAX_FEATURES, maxlen=MAXLEN, 
                    val_pct=0.1, ngram_range=1, preprocess_mode='standard', 
+                   lang=None, # auto-detected
                    verbose=1):
     """
     Loads and preprocesses text data from arrays.
@@ -243,6 +260,7 @@ def texts_from_array(x_train, y_train, x_test=None, y_test=None,
         preprocess_mode (str):  Either 'standard' (normal tokenization) or 'bert'
                                 tokenization and preprocessing for use with 
                                 BERT text classification model.
+        lang (str):            language.  Auto-detected if None.
         verbose (boolean): verbosity
     """
 
@@ -256,13 +274,16 @@ def texts_from_array(x_train, y_train, x_test=None, y_test=None,
     y_test = to_categorical(y_test)
 
 
+    # detect language
+    if lang is None: lang = tpp.detect_lang(x_train)
+
     # return preprocessed the texts
     preproc_type = tpp.TEXT_PREPROCESSORS.get(preprocess_mode, None)
     if None: raise ValueError('unsupported preprocess_mode')
     preproc = preproc_type(maxlen,
                            max_features,
                            classes = class_names,
-                           ngram_range=ngram_range)
+                           lang=lang, ngram_range=ngram_range)
     trn = preproc.preprocess_train(x_train, y_train, verbose=verbose)
     val = preproc.preprocess_test(x_test,  y_test, verbose=verbose)
     return (trn, val, preproc)
