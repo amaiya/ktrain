@@ -28,7 +28,7 @@ setup(
           'seqeval',
           'joblib',
           'langdetect',
-          'jieba'
+          'jieba',
           'cchardet',
           #'networkx',
           #'stellargraph==0.7.1'
