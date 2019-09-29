@@ -73,7 +73,7 @@ def get_bert_path(lang='en'):
        not os.path.isfile(os.path.join(bert_path, 'bert_model.ckpt.meta')) or\
        not os.path.isfile(os.path.join(bert_path, 'vocab.txt')):
         # download zip
-        print('downloading pretrained BERT model (%s)...' % (fname_from_url(bert_url)))
+        print('downloading pretrained BERT model...(%s)...' % (fname_from_url(bert_url)))
         U.download(bert_url, zip_fpath)
 
         # unzip
@@ -131,13 +131,9 @@ def detect_lang(texts, sample_size=32):
     detect language
     """
     if not isinstance(texts, (list, np.ndarray)): texts = [texts]
-    lst = []
-    for doc in texts[:sample_size]:
-        try:
-            lst.append(langdetect.detect(doc))
-        except:
-            continue
+    lst = [langdetect.detect(doc) for doc in texts[:sample_size]]
     return max(set(lst), key=lst.count)
+
 
 
 

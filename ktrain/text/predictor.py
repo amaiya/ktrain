@@ -68,9 +68,6 @@ class TextPredictor(Predictor):
         Highlights text to explain prediction
         """
         if not isinstance(doc, str): raise Exception('text must of type str')
-        if self.preproc.lang != 'en': 
-            warnings.warn('explain currently only supports English')
-            return
         doc = ' '.join(doc.split()[:512])
         te = TextExplainer(random_state=42)
         _ = te.fit(doc, self.predict_proba)
