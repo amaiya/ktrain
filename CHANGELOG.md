@@ -6,9 +6,10 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
-## 0.3.2 (TBD)
+## 0.4.0 (TBD)
 
 ### New:
+- Added multilingual support.  
 - Added experimental support for tf.keras. By default, *ktrain* will use standalone Keras.
   If `os.environ['TF_KERAS']` is set, *ktrian* will attempt to use tf.keras. 
   Some capabilities (e.g., `predictor.explain` for images) are not yet supported for tf.keras

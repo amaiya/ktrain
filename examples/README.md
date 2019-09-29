@@ -15,6 +15,13 @@ The dataset is in the form of folders of images.
 - [IMDb-BERT.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text):  BERT text classification to predict sentiment of movie reviews.
 
 
+### [Chinese Sentiment Analysis](https://github.com/amaiya/ktrain/tree/master/ktrain/tests/ChnSentiCorp_htl_ba_6000):  Binary Classification
+
+This dataset consists of roughly 6000 hotel reviews in Chinese.  The objective is to predict the positive or negative sentiment of each review. This notebook shows an example of using *ktrain* with non-English text.
+
+- [ChineseHotelReviews-BERT.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text):  BERT text classification to predict sentiment of hotel reviews.
+
+
 ### [20 News Groups](http://qwone.com/~jason/20Newsgroups/): Multiclass Classification
 This is a small sample of the 20newsgroups dataset based on considering 4 newsgroups similar to what was done in the
 [Working with Text Data](https://scikit-learn.org/stable/tutorial/text_analytics/working_with_text_data.html) scikit-learn tutorial. 
