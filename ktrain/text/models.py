@@ -7,12 +7,14 @@ NBSVM = 'nbsvm'
 FASTTEXT = 'fasttext'
 LOGREG = 'logreg'
 BIGRU = 'bigru'
+STANDARD_GRU = 'standard_gru'
 BERT = 'bert'
 TEXT_CLASSIFIERS = {
                     FASTTEXT: "a fastText-like model (http://arxiv.org/pdf/1607.01759.pdf)",
-                    LOGREG:   "logistic regression using a trainable Embedding layer",
-                    NBSVM:    "NBSVM model (http://www.aclweb.org/anthology/P12-2018)",
-                    BIGRU:    'Bidirectional GRU with pretrained word vectors (https://arxiv.org/abs/1712.09405)',
+                    LOGREG:  "logistic regression using a trainable Embedding layer",
+                    NBSVM:  "NBSVM model (http://www.aclweb.org/anthology/P12-2018)",
+                    BIGRU:  'Bidirectional GRU with pretrained word vectors (https://arxiv.org/abs/1712.09405)',
+                    STANDARD_GRU: 'simple 2-layer GRU with randomly initialized embeddings',
                     BERT:  'Bidirectional Encoder Representations from Transformers (https://arxiv.org/abs/1810.04805)'} 
 
 
@@ -75,9 +77,8 @@ def text_classifier(name, train_data, preproc=None, multilabel=None, verbose=1):
     if name == BIGRU and preproc.ngram_count() != 1:
         raise ValueError('Data should be processed with ngram_range=1 for bigru model.')
     is_bert = U.bert_data_tuple(train_data)
-    if is_bert and name != BERT:
-        raise ValueError('data is preprocessed for %s but %s was not specified as model' % (BERT, BERT))
-
+    if (is_bert and name != BERT) or (not is_bert and name == BERT):
+        raise ValueError("if '%s' is selected model, then preprocess_mode='%s' should be used and vice versa" % (BERT, BERT))
     
 
     # set number of classes and multilabel flag
@@ -149,6 +150,13 @@ def text_classifier(name, train_data, preproc=None, multilabel=None, verbose=1):
                             features,
                             loss_func=loss_func,
                             activation=activation, verbose=verbose)
+    elif name==STANDARD_GRU:
+        model = _build_standard_gru(x_train, y_train, num_classes, 
+                                    maxlen,
+                                    max_features,
+                                    features,
+                                    loss_func=loss_func,
+                                    activation=activation, verbose=verbose)
 
     elif name==BIGRU:
         (tokenizer, tok_dct) = preproc.get_preprocessor()
@@ -206,8 +214,8 @@ def _build_bert(x_train, y_train, num_classes,
                                     seq_len=maxlen)
     inputs = model.inputs[:2]
     dense = model.get_layer('NSP-Dense').output
-    outputs = keras.layers.Dense(units=num_classes, activation='softmax')(dense)
-    model = keras.models.Model(inputs, outputs)
+    outputs = Dense(units=num_classes, activation='softmax')(dense)
+    model = Model(inputs, outputs)
     model.compile(loss=loss_func,
                   optimizer=U.DEFAULT_OPT,
                   metrics=['accuracy'])
@@ -285,6 +293,19 @@ def _build_fasttext(x_train, y_train, num_classes,
     model.add(Dense(num_classes, activation=activation))
     model.compile(loss=loss_func, optimizer=U.DEFAULT_OPT, metrics=['accuracy'])
 
+    return model
+
+
+def _build_standard_gru(x_train, y_train, num_classes,
+                 maxlen, max_features, features,
+                 loss_func='categorical_crossentropy',
+                 activation = 'softmax', verbose=1):
+    model = Sequential()
+    model.add(Embedding(max_features, 256, input_length = maxlen))
+    model.add(GRU(256, dropout=0.9, return_sequences=True))
+    model.add(GRU(256, dropout=0.9))
+    model.add(Dense(num_classes, activation=activation))
+    model.compile(loss=loss_func, optimizer=U.DEFAULT_OPT, metrics=['accuracy'])
     return model
 
 
