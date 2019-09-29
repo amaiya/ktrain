@@ -140,7 +140,7 @@ def detect_lang(texts, sample_size=32):
     return max(set(lst), key=lst.count)
 
 
-
+NOSPACE_LANGS = ['zh-cn', 'zh-tw', 'ja']
 
 
 
@@ -179,8 +179,9 @@ class TextPreprocessor(Preprocessor):
 
 
     def process_chinese(self, texts, lang=None):
-        if lang is None: lang = langdetect.detect(texts[0])
-        if not lang.startswith('zh-'): return texts
+        #if lang is None: lang = langdetect.detect(texts[0])
+        if lang is None: lang = detect_lang(texts)
+        if lang not in NOSPACE_LANGS: return texts
         split_texts = []
         for doc in texts:
             seg_list = jieba.cut(doc, cut_all=False)

@@ -91,6 +91,9 @@ def texts_from_folder(datadir, classes=None,
 
     # detect language
     if lang is None: lang = tpp.detect_lang(x_train)
+    if lang in tpp.NOSPACE_LANGS and preprocess_mode != 'bert':
+        raise ValueError('language %s is currently only supported by the BERT model. '+
+                         'Please select preprocess_mode="bert"')
 
 
     # return preprocessed the texts
@@ -276,6 +279,9 @@ def texts_from_array(x_train, y_train, x_test=None, y_test=None,
 
     # detect language
     if lang is None: lang = tpp.detect_lang(x_train)
+    if lang in tpp.NOSPACE_LANGS and preprocess_mode != 'bert':
+        raise ValueError('language %s is currently only supported by the BERT model. '+
+                         'Please select preprocess_mode="bert"')
 
     # return preprocessed the texts
     preproc_type = tpp.TEXT_PREPROCESSORS.get(preprocess_mode, None)
