@@ -56,11 +56,16 @@ def load_wv(wv_path=None, verbose=1):
 
 #BERT_PATH = os.path.join(os.path.dirname(os.path.abspath(localbert.__file__)), 'uncased_L-12_H-768_A-12')
 BERT_URL = 'https://storage.googleapis.com/bert_models/2018_10_18/uncased_L-12_H-768_A-12.zip'
+BERT_URL_MULTI = 'https://storage.googleapis.com/bert_models/2018_11_23/multi_cased_L-12_H-768_A-12.zip'
 
-def get_bert_path():
+def get_bert_path(lang='en'):
+    if lang == 'en':
+        bert_url = BERT_URL
+    else:
+        bert_url = BERT_URL_MULTI
     ktrain_data = U.get_ktrain_data()
-    zip_fpath = os.path.join(ktrain_data, fname_from_url(BERT_URL))
-    bert_path = os.path.join( ktrain_data, os.path.splitext(fname_from_url(BERT_URL))[0] )
+    zip_fpath = os.path.join(ktrain_data, fname_from_url(bert_url))
+    bert_path = os.path.join( ktrain_data, os.path.splitext(fname_from_url(bert_url))[0] )
     if not os.path.isdir(bert_path) or \
        not os.path.isfile(os.path.join(bert_path, 'bert_config.json')) or\
        not os.path.isfile(os.path.join(bert_path, 'bert_model.ckpt.data-00000-of-00001')) or\
@@ -68,11 +73,11 @@ def get_bert_path():
        not os.path.isfile(os.path.join(bert_path, 'bert_model.ckpt.meta')) or\
        not os.path.isfile(os.path.join(bert_path, 'vocab.txt')):
         # download zip
-        print('downloading pretrained BERT model and vocabulary...')
-        U.download(BERT_URL, zip_fpath)
+        print('downloading pretrained BERT model (%s)...' % (fname_from_url(bert_url)))
+        U.download(bert_url, zip_fpath)
 
         # unzip
-        print('\nextracting pretrained BERT model and vocabulary...')
+        print('\nextracting pretrained BERT model...')
         with zipfile.ZipFile(zip_fpath, 'r') as zip_ref:
             zip_ref.extractall(ktrain_data)
         print('done.\n')
@@ -100,7 +105,46 @@ def bert_tokenize(docs, tokenizer, maxlen, verbose=1):
     return [np.array(indices), np.array(zeros)]
 
 #------------------------------------------------------------------------------
+# MISC UTILITIES
+#------------------------------------------------------------------------------
 
+def decode_by_line(texts, encoding='utf-8'):
+    """
+    Decode text line by line and skip over errors.
+    """
+    new_texts = []
+    for doc in texts:
+        text = ""
+        for line in doc.splitlines():
+            try:
+                line = line.decode(encoding)
+            except:
+                continue
+            text += line
+        new_texts.append(text)
+    return new_texts
+
+
+
+def detect_lang(texts, sample_size=32):
+    """
+    detect language
+    """
+    if not isinstance(texts, (list, np.ndarray)): texts = [texts]
+    lst = []
+    for doc in texts[:sample_size]:
+        try:
+            lst.append(langdetect.detect(doc))
+        except:
+            continue
+    return max(set(lst), key=lst.count)
+
+
+NOSPACE_LANGS = ['zh-cn', 'zh-tw', 'ja']
+
+
+
+#------------------------------------------------------------------------------
 
 
 class TextPreprocessor(Preprocessor):
@@ -134,16 +178,32 @@ class TextPreprocessor(Preprocessor):
         raise NotImplementedError
 
 
+    def process_chinese(self, texts, lang=None):
+        #if lang is None: lang = langdetect.detect(texts[0])
+        if lang is None: lang = detect_lang(texts)
+        if lang not in NOSPACE_LANGS: return texts
+        split_texts = []
+        for doc in texts:
+            seg_list = jieba.cut(doc, cut_all=False)
+            seg_list = list(seg_list)
+            split_texts.append(seg_list)
+        return [" ".join(tokens) for tokens in split_texts] 
+
+
+
+
 class StandardTextPreprocessor(TextPreprocessor):
     """
     Standard text preprocessing
     """
 
-    def __init__(self, maxlen, max_features, classes=[], ngram_range=1):
+    def __init__(self, maxlen, max_features, classes=[], 
+                 lang='en', ngram_range=1):
         super().__init__(maxlen, classes)
         self.tok = None
         self.tok_dct = {}
         self.max_features = max_features
+        self.lang = lang
         self.ngram_range = ngram_range
 
 
@@ -168,6 +228,13 @@ class StandardTextPreprocessor(TextPreprocessor):
         """
         preprocess training set
         """
+
+
+        U.vprint('language: %s (if wrong, set manually)' % (self.lang), verbose=verbose)
+
+        # special processing if Chinese
+        train_text = self.process_chinese(train_text, lang=self.lang)
+
         # extract vocabulary
         self.tok = Tokenizer(num_words=self.max_features)
         self.tok.fit_on_texts(train_text)
@@ -199,8 +266,11 @@ class StandardTextPreprocessor(TextPreprocessor):
         """
         preprocess validation or test dataset
         """
-        if self.tok is None:
-            raise Exception('No tokenizer fitted. Did you run preprocess_train first?')
+        if self.tok is None or self.lang is None:
+            raise Exception('Unfitted tokenizer or missing language. Did you run preprocess_train first?')
+
+        # check for and process chinese
+        test_text = self.process_chinese(test_text, self.lang)
 
         # convert to word IDs
         x_test = self.tok.texts_to_sequences(test_text)
@@ -301,12 +371,13 @@ class BERTPreprocessor(TextPreprocessor):
     text preprocessing for BERT model
     """
 
-    def __init__(self, maxlen, max_features, classes=[], ngram_range=1):
+    def __init__(self, maxlen, max_features, classes=[], 
+                lang='en', ngram_range=1):
 
         if maxlen > 512: raise ValueError('BERT only supports maxlen <= 512')
 
         super().__init__(maxlen, classes)
-        vocab_path = os.path.join(get_bert_path(), 'vocab.txt')
+        vocab_path = os.path.join(get_bert_path(lang=lang), 'vocab.txt')
         token_dict = {}
         with codecs.open(vocab_path, 'r', 'utf8') as reader:
             for line in reader:
@@ -315,8 +386,9 @@ class BERTPreprocessor(TextPreprocessor):
         tokenizer = BERT_Tokenizer(token_dict)
         self.tok = tokenizer
         self.tok_dct = dict((v,k) for k,v in token_dict.items())
-
         self.max_features = max_features
+        self.ngram_range = 1 # ignored
+        self.lang = lang
 
 
     def get_preprocessor(self):
@@ -342,6 +414,11 @@ class BERTPreprocessor(TextPreprocessor):
         preprocess training set
         """
         U.vprint('preprocessing %s...' % (mode), verbose=verbose)
+        U.vprint('language: %s (if wrong, set manually)' % (self.lang), verbose=verbose)
+
+        # special processing if Chinese
+        texts = self.process_chinese(texts, lang=self.lang)
+
         x = bert_tokenize(texts, self.tok, self.maxlen, verbose=verbose)
         if y is not None:
             if len(y.shape) == 1:

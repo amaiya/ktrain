@@ -27,8 +27,11 @@ setup(
           'eli5 >= 0.10.0',
           'seqeval',
           'joblib',
-          'networkx',
-          'stellargraph==0.7.1'
+          'langdetect',
+          'jieba'
+          'cchardet',
+          #'networkx',
+          #'stellargraph==0.7.1'
       ],
   classifiers=[  # Optional
     # How mature is this project? Common values are

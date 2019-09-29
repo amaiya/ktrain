@@ -151,12 +151,17 @@ from seqeval.metrics import classification_report as ner_classification_report
 from seqeval.metrics import f1_score as ner_f1_score
 from seqeval.metrics.sequence_labeling import get_entities
 
+# multilingual
+import langdetect
+import jieba
+import cchardet as chardet
+
 # graphs
-import networkx as nx
-import stellargraph as sg
-from stellargraph.mapper import GraphSAGENodeGenerator, GraphSAGELinkGenerator
-from stellargraph.layer import GraphSAGE
-from stellargraph.data import EdgeSplitter
+#import networkx as nx
+#import stellargraph as sg
+#from stellargraph.mapper import GraphSAGENodeGenerator, GraphSAGELinkGenerator
+#from stellargraph.layer import GraphSAGE
+#from stellargraph.data import EdgeSplitter
 #from sklearn import preprocessing, feature_extraction, model_selection
 
 
