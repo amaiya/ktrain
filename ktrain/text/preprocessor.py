@@ -108,20 +108,29 @@ def bert_tokenize(docs, tokenizer, maxlen, verbose=1):
 # MISC UTILITIES
 #------------------------------------------------------------------------------
 
-def decode_by_line(texts, encoding='utf-8'):
+def decode_by_line(texts, encoding='utf-8', verbose=1):
     """
     Decode text line by line and skip over errors.
     """
     new_texts = []
+    skips=0
+    num_lines = 0
     for doc in texts:
         text = ""
         for line in doc.splitlines():
+            num_lines +=1
             try:
                 line = line.decode(encoding)
             except:
+                skips +=1
                 continue
             text += line
         new_texts.append(text)
+    pct = round((skips*1./num_lines) * 100, 1)
+    if verbose: 
+        print('skipped %s lines (%s%%) due to character decoding errors' % (skips, pct))
+        if pct > 10:
+            print('If this is too many, try a different encoding')
     return new_texts
 
 
@@ -137,6 +146,8 @@ def detect_lang(texts, sample_size=32):
             lst.append(langdetect.detect(doc))
         except:
             continue
+    if len(lst) == 0: 
+        raise Exception('could not detect language in random sample of %s docs.'  % (sample_size))
     return max(set(lst), key=lst.count)
 
 
@@ -230,7 +241,7 @@ class StandardTextPreprocessor(TextPreprocessor):
         """
 
 
-        U.vprint('language: %s (if wrong, set manually)' % (self.lang), verbose=verbose)
+        U.vprint('language: %s' % (self.lang), verbose=verbose)
 
         # special processing if Chinese
         train_text = self.process_chinese(train_text, lang=self.lang)
@@ -414,7 +425,7 @@ class BERTPreprocessor(TextPreprocessor):
         preprocess training set
         """
         U.vprint('preprocessing %s...' % (mode), verbose=verbose)
-        U.vprint('language: %s (if wrong, set manually)' % (self.lang), verbose=verbose)
+        U.vprint('language: %s' % (self.lang), verbose=verbose)
 
         # special processing if Chinese
         texts = self.process_chinese(texts, lang=self.lang)

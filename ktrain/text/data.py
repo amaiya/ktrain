@@ -80,13 +80,18 @@ def texts_from_folder(datadir, classes=None,
         # detect encoding from first training example
         lst = [chardet.detect(doc)['encoding'] for doc in x_train[:32]]
         encoding = max(set(lst), key=lst.count)
-        U.vprint('detected encoding: %s (if wrong, set manually)' % (encoding), verbose=verbose)
+        encoding = standardize_to_utf8(encoding)
+        U.vprint('detected encoding: %s' % (encoding), verbose=verbose)
+    
     try:
         x_train = [x.decode(encoding) for x in x_train]
         x_test = [x.decode(encoding) for x in x_test]
     except:
-        x_train = tpp.decode_by_line(x_train, encoding=encoding)
-        x_test = tpp.decode_by_line(x_test, encoding=encoding)
+        U.vprint('Decoding with %s failed 1st attempt - using %s with skips' % (default_encoding, 
+                                                                                encoding),
+                                                                                verbose=verbose)
+        x_train = tpp.decode_by_line(x_train, encoding=encoding, verbose=verbose)
+        x_test = tpp.decode_by_line(x_test, encoding=encoding, verbose=verbose)
 
 
     # detect language
@@ -150,6 +155,7 @@ def texts_from_csv(train_filepath,
     if encoding is None:
         with open(train_filepath, 'rb') as f:
             encoding = chardet.detect(f.read())['encoding']
+            encoding = standardize_to_utf8(encoding)
             U.vprint('detected encoding: %s (if wrong, set manually)' % (encoding), verbose=verbose)
 
     train_df = pd.read_csv(train_filepath, encoding=encoding)
@@ -293,6 +299,17 @@ def texts_from_array(x_train, y_train, x_test=None, y_test=None,
     trn = preproc.preprocess_train(x_train, y_train, verbose=verbose)
     val = preproc.preprocess_test(x_test,  y_test, verbose=verbose)
     return (trn, val, preproc)
+
+
+
+def standardize_to_utf8(encoding):
+    """
+    standardize to utf-8 if necessary.
+    NOTE: mainly used to use utf-8 if ASCII is detected, as
+    BERT performance suffers otherwise.
+    """
+    encoding = 'utf-8' if encoding.lower() in ['ascii', 'utf8', 'utf-8'] else encoding
+    return encoding
 
 
 
