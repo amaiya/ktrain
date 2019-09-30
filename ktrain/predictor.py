@@ -18,7 +18,7 @@ class Predictor(ABC):
     def save(self, fname):
 
         if U.is_ner(model=self.model):
-            from .text.ner.models import crf_loss
+            from .text.ner import crf_loss
             self.model.compile(loss=crf_loss, optimizer=U.DEFAULT_OPT)
 
         self.model.save(fname)
