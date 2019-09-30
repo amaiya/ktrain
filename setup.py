@@ -26,7 +26,10 @@ setup(
           'requests',
           'eli5 >= 0.10.0',
           'seqeval',
-          'joblib'
+          'joblib',
+          'langdetect',
+          'jieba',
+          'cchardet'
       ],
   classifiers=[  # Optional
     # How mature is this project? Common values are

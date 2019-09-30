@@ -80,6 +80,9 @@ def is_node_classifier(model=None, data=None):
     return result
 
 
+def is_imageclass_from_data(data):
+    return type(data).__name__ in ['DirectoryIterator', 'DataFrameIterator', 'NumpyArrayIterator']
+
 
 def is_multilabel(data):
     """
