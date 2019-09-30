@@ -87,7 +87,7 @@ def texts_from_folder(datadir, classes=None,
         x_train = [x.decode(encoding) for x in x_train]
         x_test = [x.decode(encoding) for x in x_test]
     except:
-        U.vprint('Decoding with %s failed 1st attempt - using %s with skips' % (default_encoding, 
+        U.vprint('Decoding with %s failed 1st attempt - using %s with skips' % (encoding, 
                                                                                 encoding),
                                                                                 verbose=verbose)
         x_train = tpp.decode_by_line(x_train, encoding=encoding, verbose=verbose)
@@ -96,9 +96,8 @@ def texts_from_folder(datadir, classes=None,
 
     # detect language
     if lang is None: lang = tpp.detect_lang(x_train)
-    if lang in tpp.NOSPACE_LANGS and preprocess_mode != 'bert':
-        raise ValueError('language %s is currently only supported by the BERT model. '+
-                         'Please select preprocess_mode="bert"')
+    check_unsupported_lang(lang, preprocess_mode)
+
 
 
     # return preprocessed the texts
@@ -229,6 +228,7 @@ def texts_from_df(train_df,
 
     # detect language
     if lang is None: lang = tpp.detect_lang(x_train)
+    check_unsupported_lang(lang, preprocess_mode)
 
 
     # return preprocessed the texts
@@ -285,9 +285,7 @@ def texts_from_array(x_train, y_train, x_test=None, y_test=None,
 
     # detect language
     if lang is None: lang = tpp.detect_lang(x_train)
-    if lang in tpp.NOSPACE_LANGS and preprocess_mode != 'bert':
-        raise ValueError('language %s is currently only supported by the BERT model. '+
-                         'Please select preprocess_mode="bert"')
+    check_unsupported_lang(lang, preprocess_mode)
 
     # return preprocessed the texts
     preproc_type = tpp.TEXT_PREPROCESSORS.get(preprocess_mode, None)
@@ -312,4 +310,13 @@ def standardize_to_utf8(encoding):
     return encoding
 
 
+
+def check_unsupported_lang(lang, preprocess_mode):
+    """
+    check for unsupported language
+    """
+    unsupported = preprocess_mode=='standard' and lang in tpp.NOSPACE_LANGS and not lang.startswith('zh-')
+    if unsupported:
+        raise ValueError('language %s is currently only supported by the BERT model. ' % (lang) +
+                         'Please select preprocess_mode="bert"')
 
