@@ -9,7 +9,7 @@ Most recent releases are shown at the top. Each release shows:
 ## 0.4.0 (TBD)
 
 ### New:
-- Added multilingual support.  
+- Added multilingual support for text classification.  
 - Added experimental support for tf.keras. By default, *ktrain* will use standalone Keras.
   If `os.environ['TF_KERAS']` is set, *ktrian* will attempt to use tf.keras. 
   Some capabilities (e.g., `predictor.explain` for images) are not yet supported for tf.keras
