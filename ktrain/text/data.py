@@ -123,6 +123,7 @@ def texts_from_csv(train_filepath,
                    val_pct=0.1, ngram_range=1, preprocess_mode='standard', 
                    encoding=None,  # auto-detected
                    lang=None,      # auto-detected
+                   sep=',',       
                    verbose=1):
     """
     Loads text data from CSV file. Class labels are assumed to one of following:
@@ -149,6 +150,7 @@ def texts_from_csv(train_filepath,
                                 BERT text classification model.
         encoding (str):        character encoding to use. Auto-detected if None
         lang (str):            language.  Auto-detected if None.
+        sep(str):              delimiter for CSV (comma is default)
         verbose (boolean): verbosity
     """
     if encoding is None:
@@ -157,8 +159,8 @@ def texts_from_csv(train_filepath,
             encoding = standardize_to_utf8(encoding)
             U.vprint('detected encoding: %s (if wrong, set manually)' % (encoding), verbose=verbose)
 
-    train_df = pd.read_csv(train_filepath, encoding=encoding)
-    val_df = pd.read_csv(val_filepath, encoding=encoding) if val_filepath is not None else None
+    train_df = pd.read_csv(train_filepath, encoding=encoding,sep=sep)
+    val_df = pd.read_csv(val_filepath, encoding=encoding,sep=sep) if val_filepath is not None else None
     return texts_from_df(train_df,
                          text_column,
                          label_columns=label_columns,
