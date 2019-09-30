@@ -7,7 +7,6 @@ from . import utils as U
 
 from .vision.preprocessor import ImagePreprocessor
 from .vision.predictor import ImagePredictor
-from .vision.data import show_image
 from .text.preprocessor import TextPreprocessor, BERTPreprocessor
 from .text.predictor import TextPredictor
 from .text.ner.predictor import NERPredictor
