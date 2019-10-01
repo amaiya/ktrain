@@ -68,7 +68,7 @@ def text_classifier(name, train_data, preproc=None, multilabel=None, verbose=1):
         raise Exception(err)
 
     if name in  [BIGRU, BERT] and not isinstance(preproc, tpp.TextPreprocessor):
-        raise ValueError('A valid TextPreprocessor object is required for bigru')
+        raise ValueError('A valid TextPreprocessor object is required for bert/bigru')
     elif not isinstance(preproc, tpp.TextPreprocessor):
         msg = 'The preproc argument will be required in future versions of ktrain.'
         msg += ' The preproc arg should be an instance of TextPreprocessor, which is '
