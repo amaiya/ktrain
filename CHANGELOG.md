@@ -9,7 +9,7 @@ Most recent releases are shown at the top. Each release shows:
 ## 0.4.2 (TBD)
 
 ### New:
-- N/A
+- All `fit` methods in *ktrain* now accept `class_weight` parameter to handle imbalanced datasets.
 
 ### Changed:
 - N/A
