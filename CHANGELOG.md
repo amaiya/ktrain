@@ -19,7 +19,8 @@ Most recent releases are shown at the top. Each release shows:
 - Resolved problem with `text_classifier` incorrectly using `uncased_L-12_H-768_A-12` to build BERT model
   instead of `multi_cased_L-12_H-768_A-12` when non-English language was detected.
 - Fixed error messages releated to preproc requirement in `text_classifier`
-- Fixed test for multingual text classification
+- Fixed test script for multingual text classification
+- Fixed rendering of Chinese in `view_top_losses`
 
 
 
