@@ -67,7 +67,7 @@ def text_classifier(name, train_data, preproc=None, multilabel=None, verbose=1):
             """
         raise Exception(err)
 
-    if name == BIGRU and not isinstance(preproc, tpp.TextPreprocessor):
+    if name in  [BIGRU, BERT] and not isinstance(preproc, tpp.TextPreprocessor):
         raise ValueError('A valid TextPreprocessor object is required for bigru')
     elif not isinstance(preproc, tpp.TextPreprocessor):
         msg = 'The preproc argument will be required in future versions of ktrain.'
@@ -134,7 +134,8 @@ def text_classifier(name, train_data, preproc=None, multilabel=None, verbose=1):
                             max_features,
                             features,
                             loss_func=loss_func,
-                            activation=activation, verbose=verbose)
+                            activation=activation, verbose=verbose,
+                            lang=preproc.lang)
 
     elif name==NBSVM:
         model = _build_nbsvm(x_train, y_train, num_classes, 
@@ -201,10 +202,11 @@ def _build_logreg(x_train, y_train, num_classes,
 def _build_bert(x_train, y_train, num_classes,
                 maxlen, max_features, features,
                loss_func='categorical_crossentropy',
-               activation = 'softmax', verbose=1):
-
-    config_path = os.path.join(tpp.get_bert_path(), 'bert_config.json')
-    checkpoint_path = os.path.join(tpp.get_bert_path(), 'bert_model.ckpt')
+               activation = 'softmax', verbose=1,
+               lang=None):
+    if lang is None: raise ValueError('lang is missing')
+    config_path = os.path.join(tpp.get_bert_path(lang=lang), 'bert_config.json')
+    checkpoint_path = os.path.join(tpp.get_bert_path(lang=lang), 'bert_model.ckpt')
 
     model = keras_bert.load_trained_model_from_checkpoint(
                                     config_path,

@@ -6,6 +6,22 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.4.1 (2019-10-01)
+
+### New:
+- N/A
+
+### Changed:
+- N/A
+
+
+### Fixed:
+- Fix problem with `text_classifier` incorrectly using `uncased_L-12_H-768_A-12` to build BERT model
+  instead of `multi_cased_L-12_H-768_A-12` when non-English language was detected.
+
+
+
+
 ## 0.4.0 (2019-09-30)
 
 ### New:
