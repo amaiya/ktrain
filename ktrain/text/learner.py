@@ -56,10 +56,13 @@ class BERTTextClassLearner(ArrayLearner):
             pred = tup[3]
 
             # BERT-style tuple
+            join_char = ' '
             obs = val[0][0][idx]
-            if preproc is not None: obs = preproc.undo(obs)
+            if preproc is not None: 
+                obs = preproc.undo(obs)
+                if preproc.is_nospace_lang(): join_char = ''
             if type(obs) == str:
-                obs = ' '.join(obs.split()[:512])
+                obs = join_char.join(obs.split()[:512])
             print('----------')
             print("id:%s | loss:%s | true:%s | pred:%s)\n" % (idx, round(loss,2), truth, pred))
             print(obs)

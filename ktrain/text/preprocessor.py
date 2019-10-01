@@ -3,6 +3,16 @@ from .. import utils as U
 from ..preprocessor import Preprocessor
 
 
+NOSPACE_LANGS = ['zh-cn', 'zh-tw', 'ja']
+
+def is_chinese(lang):
+    return lang is not None and lang.startswith('zh-')
+
+
+def is_nospace_lang(lang):
+    return lang in NOSPACE_LANGS
+
+
 def fname_from_url(url):
     return os.path.split(url)[-1]
 
@@ -57,10 +67,13 @@ def load_wv(wv_path=None, verbose=1):
 #BERT_PATH = os.path.join(os.path.dirname(os.path.abspath(localbert.__file__)), 'uncased_L-12_H-768_A-12')
 BERT_URL = 'https://storage.googleapis.com/bert_models/2018_10_18/uncased_L-12_H-768_A-12.zip'
 BERT_URL_MULTI = 'https://storage.googleapis.com/bert_models/2018_11_23/multi_cased_L-12_H-768_A-12.zip'
+BERT_URL_CN = 'https://storage.googleapis.com/bert_models/2018_11_03/chinese_L-12_H-768_A-12.zip'
 
 def get_bert_path(lang='en'):
     if lang == 'en':
         bert_url = BERT_URL
+    elif lang.startswith('zh-'):
+        bert_url = BERT_URL_CN
     else:
         bert_url = BERT_URL_MULTI
     ktrain_data = U.get_ktrain_data()
@@ -151,7 +164,6 @@ def detect_lang(texts, sample_size=32):
     return max(set(lst), key=lst.count)
 
 
-NOSPACE_LANGS = ['zh-cn', 'zh-tw', 'ja']
 
 
 
@@ -163,10 +175,11 @@ class TextPreprocessor(Preprocessor):
     Text preprocessing base class
     """
 
-    def __init__(self, maxlen, classes):
+    def __init__(self, maxlen, classes, lang='en'):
 
         self.c = classes
         self.maxlen = maxlen
+        self.lang = lang
 
 
     def get_preprocessor(self):
@@ -189,10 +202,18 @@ class TextPreprocessor(Preprocessor):
         raise NotImplementedError
 
 
+    def is_chinese(self):
+        return is_chinese(self.lang)
+
+
+    def is_nospace_lang(self):
+        return is_nospace_lang(self.lang)
+
+
     def process_chinese(self, texts, lang=None):
         #if lang is None: lang = langdetect.detect(texts[0])
         if lang is None: lang = detect_lang(texts)
-        if lang not in NOSPACE_LANGS: return texts
+        if not is_nospace_lang(lang): return texts
         split_texts = []
         for doc in texts:
             seg_list = jieba.cut(doc, cut_all=False)
@@ -210,11 +231,10 @@ class StandardTextPreprocessor(TextPreprocessor):
 
     def __init__(self, maxlen, max_features, classes=[], 
                  lang='en', ngram_range=1):
-        super().__init__(maxlen, classes)
+        super().__init__(maxlen, classes, lang=lang)
         self.tok = None
         self.tok_dct = {}
         self.max_features = max_features
-        self.lang = lang
         self.ngram_range = ngram_range
 
 
@@ -387,7 +407,7 @@ class BERTPreprocessor(TextPreprocessor):
 
         if maxlen > 512: raise ValueError('BERT only supports maxlen <= 512')
 
-        super().__init__(maxlen, classes)
+        super().__init__(maxlen, classes, lang=lang)
         vocab_path = os.path.join(get_bert_path(lang=lang), 'vocab.txt')
         token_dict = {}
         with codecs.open(vocab_path, 'r', 'utf8') as reader:
@@ -399,7 +419,6 @@ class BERTPreprocessor(TextPreprocessor):
         self.tok_dct = dict((v,k) for k,v in token_dict.items())
         self.max_features = max_features
         self.ngram_range = 1 # ignored
-        self.lang = lang
 
 
     def get_preprocessor(self):
@@ -426,9 +445,6 @@ class BERTPreprocessor(TextPreprocessor):
         """
         U.vprint('preprocessing %s...' % (mode), verbose=verbose)
         U.vprint('language: %s' % (self.lang), verbose=verbose)
-
-        # special processing if Chinese
-        texts = self.process_chinese(texts, lang=self.lang)
 
         x = bert_tokenize(texts, self.tok, self.maxlen, verbose=verbose)
         if y is not None:

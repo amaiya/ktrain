@@ -257,7 +257,7 @@ class TestTextClassification(TestCase):
                                                  preprocess_mode='bert',
                                                  maxlen=350, 
                                                  max_features=35000)
-        model = txt.text_classifier('bert', train_data=trn)
+        model = txt.text_classifier('bert', train_data=trn, preproc=preproc)
         learner = ktrain.get_learner(model, train_data=trn, batch_size=6)
         lr = 2e-5
         hist = learner.fit_onecycle(lr, 1)

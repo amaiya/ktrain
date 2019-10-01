@@ -6,6 +6,24 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.4.2 (2019-10-01)
+
+### New:
+- All `fit` methods in *ktrain* now accept `class_weight` parameter to handle imbalanced datasets.
+
+### Changed:
+- N/A
+
+
+### Fixed:
+- Resolved problem with `text_classifier` incorrectly using `uncased_L-12_H-768_A-12` to build BERT model
+  instead of `multi_cased_L-12_H-768_A-12` when non-English language was detected.
+- Fixed error messages releated to preproc requirement in `text_classifier`
+- Fixed test script for multingual text classification
+- Fixed rendering of Chinese in `view_top_losses`
+
+
+
 ## 0.4.1 (2019-10-01)
 
 ### New:

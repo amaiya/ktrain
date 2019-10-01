@@ -315,9 +315,9 @@ def standardize_to_utf8(encoding):
 
 def check_unsupported_lang(lang, preprocess_mode):
     """
-    check for unsupported language
+    check for unsupported language (e.g., nospace langs no supported by Jieba)
     """
-    unsupported = preprocess_mode=='standard' and lang in tpp.NOSPACE_LANGS and not lang.startswith('zh-')
+    unsupported = preprocess_mode=='standard' and tpp.is_nospace_lang(lang) and not tpp.is_chinese(lang)
     if unsupported:
         raise ValueError('language %s is currently only supported by the BERT model. ' % (lang) +
                          'Please select preprocess_mode="bert"')
