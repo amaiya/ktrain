@@ -19,6 +19,8 @@ The dataset is in the form of folders of images.
 
 This pipe-delimited dataset consists of roughly 6000 hotel reviews in Chinese.  The objective is to predict the positive or negative sentiment of each review. This notebook shows an example of using *ktrain* with non-English text.
 
+- [ChineseHotelReviews-nbsvm.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text):  Training a simple and fast NBSVM model on this dataset with bigram/trigram features can achieve a validation accuracy of **92%** with only 7 seconds of training.  
+
 - [ChineseHotelReviews-fasttext.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text):  Using a fast and simple fasttext-like model to predict sentiment of Chinese-language hotel reviews. 
 
 - [ChineseHotelReviews-BERT.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text):  BERT text classification to predict sentiment of Chinese-language hotel reviews.
