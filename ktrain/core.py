@@ -594,7 +594,7 @@ class Learner(ABC):
 
 
     def fit_onecycle(self, lr, epochs, checkpoint_folder=None, cycle_momentum=True,
-                     verbose=1, callbacks=[]):
+                     verbose=1, class_weight=None, callbacks=[]):
         """
         Train model using a version of Leslie Smith's 1cycle policy.
         This method can be used with any optimizer. Thus,
@@ -614,6 +614,8 @@ class Learner(ABC):
                                       optimzer will be cycled between 0.95 and 0.85 as described in 
                                       https://arxiv.org/abs/1803.09820.
                                       Only takes effect if Adam, Nadam, or Adamax optimizer is used.
+
+            class_weight (dict):       Optional dictionary mapping class indices (integers) to a weight (float) 
             callbacks (list): list of Callback instances to employ during training
             verbose (bool):  verbose mode
         """
@@ -646,7 +648,7 @@ class Learner(ABC):
                 verbose=verbose)
         hist = self.fit(lr, epochs, early_stopping=None,
                         checkpoint_folder=checkpoint_folder,
-                        verbose=verbose, callbacks=kcallbacks)
+                        verbose=verbose, class_weight=class_weight, callbacks=kcallbacks)
         hist.history['lr'] = clr.history['lr']
         hist.history['iterations'] = clr.history['iterations']
         if cycle_momentum:
@@ -659,7 +661,8 @@ class Learner(ABC):
     def autofit(self, lr, epochs=None,  
                 early_stopping=None, reduce_on_plateau=None, reduce_factor=2, 
                 cycle_momentum=True,
-                monitor='val_loss', checkpoint_folder=None, verbose=1, callbacks=[]):
+                monitor='val_loss', checkpoint_folder=None, verbose=1, 
+                class_weight=None, callbacks=[]):
         """
         Automatically train model using a default learning rate schedule shown to work well
         in practice.  This method currently employs a triangular learning 
@@ -704,6 +707,7 @@ class Learner(ABC):
                                         and reduce_on_plateau (either val_loss or val_acc).
                                         Only used if early_stopping or reduce_on_plateau
                                         is enabled.
+            class_weight (dict):       Optional dictionary mapping class indices (integers) to a weight (float) 
             callbacks (list): list of Callback instances to employ during training
             verbose (bool):  verbose mode
         """
@@ -771,7 +775,7 @@ class Learner(ABC):
                 verbose=verbose)
         hist = self.fit(lr, epochs, early_stopping=early_stopping,
                         checkpoint_folder=checkpoint_folder,
-                        verbose=verbose, callbacks=kcallbacks)
+                        verbose=verbose, class_weight=class_weight, callbacks=kcallbacks)
         hist.history['lr'] = clr.history['lr']
         hist.history['iterations'] = clr.history['iterations']
         if cycle_momentum:
@@ -833,7 +837,7 @@ class ArrayLearner(Learner):
     
     def fit(self, lr, n_cycles, cycle_len=None, cycle_mult=1, 
             lr_decay=1, checkpoint_folder = None, early_stopping=None,
-            verbose=1, callbacks=[]):
+            verbose=1, class_weight=None, callbacks=[]):
         """
         Trains the model. By default, fit is simply a wrapper for model.fit.
         When cycle_len parameter is supplied, an SGDR learning rate schedule is used.
@@ -857,6 +861,7 @@ class ArrayLearner(Learner):
                                   Upon completion, model will be loaded with weights from epoch
                                   with lowest validation loss.
         callbacks (list):         list of Callback instances to employ during training
+        class_weight (dict):       Optional dictionary mapping class indices (integers) to a weight (float) 
         verbose (bool):           whether or not to show progress bar
         """
 
@@ -892,6 +897,7 @@ class ArrayLearner(Learner):
                                  epochs=epochs,
                                  validation_data=validation, verbose=verbose, 
                                  shuffle=True,
+                                 class_weight=class_weight,
                                  callbacks=kcallbacks)
 
         if sgdr is not None: hist.history['lr'] = sgdr.history['lr']
@@ -1000,7 +1006,7 @@ class GenLearner(Learner):
     
     def fit(self, lr, n_cycles, cycle_len=None, cycle_mult=1,
             lr_decay=1.0, checkpoint_folder=None, early_stopping=None, 
-            callbacks=[], verbose=1):
+            class_weight=None, callbacks=[], verbose=1):
         """
         Trains the model. By default, fit is simply a wrapper for model.fit_generator.
         When cycle_len parameter is supplied, an SGDR learning rate schedule is used.
@@ -1023,6 +1029,7 @@ class GenLearner(Learner):
                                   epochs of no improvement in validation loss.
                                   Upon completion, model will be loaded with weights from epoch
                                   with lowest validation loss.
+        class_weight (dict):       Optional dictionary mapping class indices (integers) to a weight (float) 
         callbacks (list):         list of Callback instances to employ during training
         verbose (boolean):       whether or not to print progress bar
         """
@@ -1070,6 +1077,7 @@ class GenLearner(Learner):
                                            use_multiprocessing=self.use_multiprocessing, 
                                            verbose=verbose,
                                            shuffle=True,
+                                           class_weight=class_weight,
                                            callbacks=kcallbacks)
         if sgdr is not None: hist.history['lr'] = sgdr.history['lr']
         self.history = hist
