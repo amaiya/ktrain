@@ -8,7 +8,7 @@
   - **text classification** (e.g., [BERT](https://arxiv.org/abs/1810.04805), [NBSVM](https://www.aclweb.org/anthology/P12-2018), [fastText](https://arxiv.org/abs/1607.01759), GRUs with [pretrained word vectors](https://fasttext.cc/docs/en/english-vectors.html))
   - **image classification** (e.g., [ResNet](https://arxiv.org/abs/1512.03385), [Wide ResNet](https://arxiv.org/abs/1605.07146), [Inception](https://www.cs.unc.edu/~wliu/papers/GoogLeNet.pdf))
   - **text sequence labeling** (e.g., [Bidirectional LSTM-CRF](https://arxiv.org/abs/1603.01360) with optional pretrained word embeddings)
-- Support for multilingual text classification (e.g., [Sentiment Analysis in Chinese with BERT](https://github.com/amaiya/ktrain/blob/master/examples/text/ChineseHotelReviews-BERT.ipynb))
+- perform multilingual text classification (e.g., [Sentiment Analysis in Chinese with BERT](https://github.com/amaiya/ktrain/blob/master/examples/text/ChineseHotelReviews-BERT.ipynb))
 - load and preprocess text and image data from a variety of formats 
 - inspect data points that were misclassified and [provide explanations](https://eli5.readthedocs.io/en/latest/) to help improve your model
 - leverage a simple prediction API for saving and deploying both models and data-preprocessing steps to make predictions on new raw data
