@@ -73,7 +73,7 @@ def is_crf(model):
     return is_ner_from_model(model)
 
 
-def is_node_classifier(model=None, data=None):
+def is_nodeclass(model=None, data=None):
     result = False
     if data is not None and type(data).__name__ == 'NodeSequenceWrapper':
         result = True
@@ -91,7 +91,7 @@ def is_multilabel(data):
     data_arg_check(val_data=data, val_required=True)
     if is_iter(data):
         if is_ner(data=data): return False   # NERSequence
-        elif is_node_classifier(data=data): return False  # NodeSequenceWrapper
+        elif is_nodeclass(data=data): return False  # NodeSequenceWrapper
         multilabel = False
         for idx, v in enumerate(data):
             if idx >= 16: break
@@ -119,7 +119,7 @@ def shape_from_data(data):
     err_msg = 'could not determine shape from %s' % (type(data))
     if is_iter(data):
         if is_ner(data=data): return (len(data.x), data[0][0][0].shape[1])  # NERSequence
-        elif is_node_classifier(data=data):                                 # NodeSequence
+        elif is_nodeclass(data=data):                                 # NodeSequence
             return data[0][0][0].shape[1:]  # returns 1st neighborhood only
         elif hasattr(data, 'image_shape'): return data.image_shape          # DirectoryIterator/DataFrameIterator
         elif hasattr(data, 'x'):                                            # NumpyIterator
@@ -149,7 +149,7 @@ def nsamples_from_data(data):
     err_msg = 'could not determine number of samples from %s' % (type(data))
     if is_iter(data):
         if is_ner(data=data): return len(data.x)      # NERSequence
-        elif is_node_classifier(data=data):           # NodeSequenceWrapper
+        elif is_nodeclass(data=data):           # NodeSequenceWrapper
             return data.targets.shape[0]
         elif hasattr(data, 'samples'):                # DirectoryIterator/DataFrameIterator
             return data.samples
@@ -170,7 +170,7 @@ def nsamples_from_data(data):
 def nclasses_from_data(data):
     if is_iter(data):
         if is_ner(data=data): return len(data.p._label_vocab._id2token)    # NERSequence
-        elif is_node_classifier(data=data):                                # NodeSequenceWrapper
+        elif is_nodeclass(data=data):                                # NodeSequenceWrapper
             return data[0][1].shape[1]                                   
         elif hasattr(data, 'classes'):                                     # DirectoryIterator
             return len(set(data.classes))
@@ -189,7 +189,7 @@ def nclasses_from_data(data):
 def y_from_data(data):
     if is_iter(data):
         if is_ner(data=data): return data.y    # NERSequence
-        elif is_node_classifier(data=data):      # NodeSequenceWrapper
+        elif is_nodeclass(data=data):      # NodeSequenceWrapper
             return data.targets
         elif hasattr(data, 'classes'): # DirectoryIterator
             return to_categorical(data.classes)
