@@ -6,6 +6,19 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.4.3 (TBD)
+
+### New:
+- N/A
+
+### Changed:
+- N/A
+
+
+### Fixed:
+- Call `reset` before `predict_generator` for consistent  ordering of `view_top_losses` results
+
+
 ## 0.4.2 (2019-10-01)
 
 ### New:
