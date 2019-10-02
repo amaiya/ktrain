@@ -77,8 +77,8 @@ def graph_nodes_from_csv(nodes_filepath,
     # create generators for training and validation
     G = sg.StellarGraph(g_nx, node_features=node_data[feature_names])
     generator = GraphSAGENodeGenerator(G, U.DEFAULT_BS, [sample_size, sample_size])
-    train_gen = generator.flow(tr_data.index, train_targets)
-    test_gen = generator.flow(te_data.index, test_targets)
+    train_gen = generator.flow(tr_data.index, train_targets, shuffle=True)
+    test_gen = generator.flow(te_data.index, test_targets, shuffle=False)
 
     preproc = NodePreprocessor(class_names)
     return (NodeSequenceWrapper(train_gen), NodeSequenceWrapper(test_gen), preproc)
