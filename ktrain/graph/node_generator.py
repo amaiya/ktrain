@@ -15,6 +15,7 @@ class NodeSequenceWrapper(node_mappers.NodeSequence):
 
 
 
+
     def __setattr__(self, name, value):
         if name == 'batch_size':
             self.generator.batch_size = value
@@ -43,6 +44,10 @@ class NodeSequenceWrapper(node_mappers.NodeSequence):
             return self.node_seq.head_node_types
         elif name == '_sampling_schema':
             return self.node_seq._sampling_schema
+        elif name == 'reset':
+            # stellargraph did not implement reset for its generators
+            # return a zero-argument lambda that returns None
+            return lambda:None 
         else:
             try:
                 return self.__dict__[name] 
