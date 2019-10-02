@@ -803,7 +803,7 @@ class Learner(ABC):
             val = self.val_data
         if val is None: raise Exception('val_data must be supplied to get_learner or predict')
         if U.is_iter(val):
-            val.reset()
+            if hasattr(val, 'reset'): val.reset()
             steps = np.ceil(U.nsamples_from_data(val)/val.batch_size)
             return self.model.predict_generator(val, steps=steps)
         else:
