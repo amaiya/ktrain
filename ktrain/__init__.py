@@ -4,6 +4,7 @@ from .core import ArrayLearner, GenLearner, get_predictor, load_predictor, relea
 from .vision.learner import ImageClassLearner
 from .text.learner import BERTTextClassLearner
 from .text.ner.learner import NERLearner
+from .graph.learner import NodeClassLearner
 
 from . import utils as U
 
@@ -90,6 +91,8 @@ def get_learner(model, train_data=None, val_data=None,
             learner = NERLearner
         elif U.is_imageclass_from_data(train_data):
             learner = ImageClassLearner
+        elif U.is_nodeclass(data=train_data):
+            learner = NodeClassLearner
         else:
             learner = GenLearner
     else:

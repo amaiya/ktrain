@@ -157,11 +157,11 @@ import jieba
 import cchardet as chardet
 
 # graphs
-#import networkx as nx
-#import stellargraph as sg
-#from stellargraph.mapper import GraphSAGENodeGenerator, GraphSAGELinkGenerator
-#from stellargraph.layer import GraphSAGE
-#from stellargraph.data import EdgeSplitter
+import networkx as nx
+import stellargraph as sg
+from stellargraph.mapper import GraphSAGENodeGenerator, GraphSAGELinkGenerator
+from stellargraph.layer import GraphSAGE
+from stellargraph.data import EdgeSplitter
 #from sklearn import preprocessing, feature_extraction, model_selection
 
 
