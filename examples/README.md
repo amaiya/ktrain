@@ -26,6 +26,16 @@ This dataset consists of roughly 6000 hotel reviews in Chinese.  The objective i
 - [ChineseHotelReviews-BERT.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text):  BERT text classification to predict sentiment of Chinese-language hotel reviews.
 
 
+### [Arabic Sentiment Analysis](https://github.com/elnagara/HARD-Arabic-Dataset):  Binary Classification
+
+This dataset consists of hotel reviews in Arabic.  We convert the rating score (1-5) to positive (above 3) and negative (below 3) labels.  The objective is to predict the positive or negative sentiment of each review. This notebook shows an example of using *ktrain* with non-English text.
+
+- [ArabicHotelReviews-nbsvm.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text):  Training a simple and fast NBSVM model on this dataset with bigram/trigram features can achieve a validation accuracy of above **92%** with only 20 seconds of training.  
+
+- [ArabicHotelReviews-BERT.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text):  Fine-tuning a BERT model on this dataset achieves a validation accuracy of **95.5%** in a single epoch.  
+
+
+
 ### [20 News Groups](http://qwone.com/~jason/20Newsgroups/): Multiclass Classification
 This is a small sample of the 20newsgroups dataset based on considering 4 newsgroups similar to what was done in the
 [Working with Text Data](https://scikit-learn.org/stable/tutorial/text_analytics/working_with_text_data.html) scikit-learn tutorial. 
