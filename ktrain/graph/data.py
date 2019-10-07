@@ -16,7 +16,8 @@ def graph_nodes_from_csv(nodes_filepath,
                          links_filepath,
                          use_lcc=True,
                          sample_size=10,
-                         train_pct=0.1, sep=',', verbose=1):
+                         train_pct=0.1, sep=',', 
+                         holdout_pct=0.2, verbose=1):
     """
     Loads graph data from CSV files. 
     Returns generators for nodes in graph for use with GraphSAGE model.
@@ -28,13 +29,22 @@ def graph_nodes_from_csv(nodes_filepath,
         train_pct(float): Proportion of nodes to use for training.
                           Default is 0.1.
         sep (str):  delimiter for CSVs. Default is comma.
+        holdout(float): Percentage of nodes to remove and return separately
+                        for later inductive inference.
+                        Example -->  train_pct=0.1 and holdout_pct=0.2:
+
+                        Out of 1000 nodes, 200 (holdout_pct*1000) will be held out.
+                        Of the remaining 800, 80 (train_pct*800) will be used for training
+                        and 720 ((1-train_pct)*800) will be used for validation.
+                        That is, 720 nodes will be used for transductive inference
+                        and 200 nodes will be used for inductive inference.
         verbose (boolean): verbosity
     Return:
         tuple of NodeSequenceWrapper objects for train and validation sets
     """
 
     #----------------------------------------------------------------
-    # process graph structure
+    # read graph structure
     #----------------------------------------------------------------
     g_nx = nx.read_edgelist(path=links_filepath, delimiter=sep)
 
@@ -55,7 +65,7 @@ def graph_nodes_from_csv(nodes_filepath,
 
 
     #----------------------------------------------------------------
-    # process node attributes
+    # read node attributes and split into train/validation
     #----------------------------------------------------------------
     node_attr = pd.read_csv(nodes_filepath, sep=sep, header=None)
     num_features = len(node_attr.columns.values) - 2 # subract ID and target
@@ -65,6 +75,8 @@ def graph_nodes_from_csv(nodes_filepath,
     node_data.index = node_data.index.map(str)
     node_data = node_data[node_data.index.isin(list(g_nx.nodes()))]
 
+
+
     # split into train and validation
     tr_data, te_data = sklearn.model_selection.train_test_split(node_data, 
                                                         train_size=None, 
@@ -72,25 +84,13 @@ def graph_nodes_from_csv(nodes_filepath,
                                                         stratify=node_data['target'], 
                                                         random_state=42)
 
-    # one-hot-encode target
-    target_encoding = sklearn.feature_extraction.DictVectorizer(sparse=False)
-    train_targets = target_encoding.fit_transform(tr_data[["target"]].to_dict('records'))
-    test_targets = target_encoding.transform(te_data[["target"]].to_dict('records'))
-    class_names = list(set([c[0] for c in node_data[['target']].values]))
-    class_names.sort()
-
     #----------------------------------------------------------------
-    # setup generators
+    # Preprocess training and validation datasets using NodePreprocessor
     #----------------------------------------------------------------
-
-    # create generators for training and validation
-    G = sg.StellarGraph(g_nx, node_features=node_data[feature_names])
-    generator = GraphSAGENodeGenerator(G, U.DEFAULT_BS, [sample_size, sample_size])
-    train_gen = generator.flow(tr_data.index, train_targets, shuffle=True)
-    test_gen = generator.flow(te_data.index, test_targets, shuffle=False)
-
-    preproc = NodePreprocessor(class_names)
-    return (NodeSequenceWrapper(train_gen), NodeSequenceWrapper(test_gen), preproc)
+    preproc = NodePreprocessor(g_nx, node_data, sample_size=sample_size)
+    trn = preproc.preprocess_train(list(tr_data.index))
+    val = preproc.preprocess_valid(list(te_data.index))
+    return (NodeSequenceWrapper(trn), NodeSequenceWrapper(val), preproc)
 
 
 
