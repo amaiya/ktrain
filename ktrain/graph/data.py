@@ -33,15 +33,17 @@ def graph_nodes_from_csv(nodes_filepath,
         tuple of NodeSequenceWrapper objects for train and validation sets
     """
 
-    # read edge list
+    #----------------------------------------------------------------
+    # process graph structure
+    #----------------------------------------------------------------
     g_nx = nx.read_edgelist(path=links_filepath, delimiter=sep)
 
     # read node attributes
-    node_attr = pd.read_csv(nodes_filepath, sep=sep, header=None)
+    #node_attr = pd.read_csv(nodes_filepath, sep=sep, header=None)
 
     # store class labels within graph nodes
-    values = { str(row.tolist()[0]): row.tolist()[-1] for _, row in node_attr.iterrows()}
-    nx.set_node_attributes(g_nx, values, 'target')
+    #values = { str(row.tolist()[0]): row.tolist()[-1] for _, row in node_attr.iterrows()}
+    #nx.set_node_attributes(g_nx, values, 'target')
 
     # select largest connected component
     if use_lcc:
@@ -52,7 +54,10 @@ def graph_nodes_from_csv(nodes_filepath,
             g_nx.number_of_nodes(), g_nx.number_of_edges()))
 
 
-    # set up the features
+    #----------------------------------------------------------------
+    # process node attributes
+    #----------------------------------------------------------------
+    node_attr = pd.read_csv(nodes_filepath, sep=sep, header=None)
     num_features = len(node_attr.columns.values) - 2 # subract ID and target
     feature_names = ["w_{}".format(ii) for ii in range(num_features)]
     column_names =  feature_names + ["target"]
@@ -73,6 +78,10 @@ def graph_nodes_from_csv(nodes_filepath,
     test_targets = target_encoding.transform(te_data[["target"]].to_dict('records'))
     class_names = list(set([c[0] for c in node_data[['target']].values]))
     class_names.sort()
+
+    #----------------------------------------------------------------
+    # setup generators
+    #----------------------------------------------------------------
 
     # create generators for training and validation
     G = sg.StellarGraph(g_nx, node_features=node_data[feature_names])

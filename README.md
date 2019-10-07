@@ -54,7 +54,7 @@ from ktrain import text as txt
                                                                      classes=['pos', 'neg'])
 
 # load model
-model = txt.text_classifier('bert', (x_train, y_train))
+model = txt.text_classifier('bert', (x_train, y_train), preproc=preproc)
 
 # wrap model and data in ktrain.Learner object
 learner = ktrain.get_learner(model, 
