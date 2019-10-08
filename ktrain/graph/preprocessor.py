@@ -1,6 +1,7 @@
 from ..imports import *
 from .. import utils as U
 from ..preprocessor import Preprocessor
+from .node_generator import NodeSequenceWrapper
 
 
 class NodePreprocessor(Preprocessor):
@@ -71,7 +72,7 @@ class NodePreprocessor(Preprocessor):
         G_sg = sg.StellarGraph(self.G, node_features=self.df[self.feature_names])
         generator = GraphSAGENodeGenerator(G_sg, U.DEFAULT_BS, [self.sampsize, self.sampsize])
         train_gen = generator.flow(df_tr.index, train_targets, shuffle=True)
-        return train_gen
+        return NodeSequenceWrapper(train_gen)
 
 
     def preprocess_valid(self, node_ids):
@@ -94,7 +95,7 @@ class NodePreprocessor(Preprocessor):
         G_sg = sg.StellarGraph(self.G, node_features=self.df[self.feature_names])
         generator = GraphSAGENodeGenerator(G_sg, U.DEFAULT_BS, [self.sampsize,self.sampsize])
         val_gen = generator.flow(df_val.index, val_targets, shuffle=False)
-        return val_gen
+        return NodeSequenceWrapper(val_gen)
 
 
 
@@ -108,21 +109,28 @@ class NodePreprocessor(Preprocessor):
             raise Exception('Unset parameters. Are you sure you called preprocess_train first?')
 
         # get aggregrated df
-        df_agg = pd.concat([df_te, self.df]).drop_duplicates(keep=False)
+        #df_agg = pd.concat([df_te, self.df]).drop_duplicates(keep='last')
+        df_agg = pd.concat([df_te, self.df])
+        print('7658949' in df_agg.index.tolist())
+        print('7674869' in df_agg.index.tolist())
 
 
         # get aggregrated graph
         G_agg = nx.compose(self.G, G_te)    
+        print(len(G_agg.nodes()))
 
         
         # one-hot-encode target
-        test_targets = self.y_encoding.transform(df_te[["target"]].to_dict('records'))
+        if 'target' in df_te.columns:
+            test_targets = self.y_encoding.transform(df_te[["target"]].to_dict('records'))
+        else:
+            test_targets = [-1] * len(df_te.shape[0])
 
         # return generator
         G_sg = sg.StellarGraph(G_agg, node_features=df_agg[self.feature_names])
         generator = GraphSAGENodeGenerator(G_sg, U.DEFAULT_BS, [self.sampsize,self.sampsize])
         test_gen = generator.flow(df_te.index, test_targets, shuffle=False)
-        return test_gen
+        return NodeSequenceWrapper(test_gen)
 
 
 

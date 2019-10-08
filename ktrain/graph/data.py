@@ -17,7 +17,7 @@ def graph_nodes_from_csv(nodes_filepath,
                          use_lcc=True,
                          sample_size=10,
                          train_pct=0.1, sep=',', 
-                         holdout_pct=0.2, verbose=1):
+                         holdout_pct=None, verbose=1):
     """
     Loads graph data from CSV files. 
     Returns generators for nodes in graph for use with GraphSAGE model.
@@ -29,7 +29,7 @@ def graph_nodes_from_csv(nodes_filepath,
         train_pct(float): Proportion of nodes to use for training.
                           Default is 0.1.
         sep (str):  delimiter for CSVs. Default is comma.
-        holdout(float): Percentage of nodes to remove and return separately
+        holdout_pct(float): Percentage of nodes to remove and return separately
                         for later inductive inference.
                         Example -->  train_pct=0.1 and holdout_pct=0.2:
 
@@ -40,7 +40,9 @@ def graph_nodes_from_csv(nodes_filepath,
                         and 200 nodes will be used for inductive inference.
         verbose (boolean): verbosity
     Return:
-        tuple of NodeSequenceWrapper objects for train and validation sets
+        tuple of NodeSequenceWrapper objects for train and validation sets and NodePreprocessor
+        If holdout_pct is not None, fourth and fifth return values are pd.DataFrame and nx.Graph
+        comprising the held out nodes.
     """
 
     #----------------------------------------------------------------
@@ -77,20 +79,40 @@ def graph_nodes_from_csv(nodes_filepath,
 
 
 
+    #----------------------------------------------------------------
+    # set df and G and optionally holdout nodes
+    #----------------------------------------------------------------
+    if holdout_pct is not None:
+        df = node_data.sample(frac=1-holdout_pct, replace=False, random_state=101)
+        G = g_nx.subgraph(df.index).copy()
+        df_holdout = node_data[~node_data.index.isin(df.index)]
+        G_holdout = g_nx.subgraph(df_holdout.index).copy()
+
+    else:
+        df = node_data
+        G = g_nx
+        df_holdout = None
+        G_holdout = None
+
+
+
     # split into train and validation
-    tr_data, te_data = sklearn.model_selection.train_test_split(node_data, 
+    tr_data, te_data = sklearn.model_selection.train_test_split(df, 
                                                         train_size=None, 
                                                         test_size=1-train_pct, 
-                                                        stratify=node_data['target'], 
+                                                        stratify=df['target'], 
                                                         random_state=42)
 
     #----------------------------------------------------------------
     # Preprocess training and validation datasets using NodePreprocessor
     #----------------------------------------------------------------
-    preproc = NodePreprocessor(g_nx, node_data, sample_size=sample_size)
+    preproc = NodePreprocessor(G, df, sample_size=sample_size)
     trn = preproc.preprocess_train(list(tr_data.index))
     val = preproc.preprocess_valid(list(te_data.index))
-    return (NodeSequenceWrapper(trn), NodeSequenceWrapper(val), preproc)
+    if holdout_pct is not None:
+        return (NodeSequenceWrapper(trn), NodeSequenceWrapper(val), preproc, df_holdout, G_holdout)
+    else:
+        return (NodeSequenceWrapper(trn), NodeSequenceWrapper(val), preproc)
 
 
 

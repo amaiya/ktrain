@@ -11,6 +11,8 @@ from .text.preprocessor import TextPreprocessor, BERTPreprocessor
 from .text.predictor import TextPredictor
 from .text.ner.predictor import NERPredictor
 from .text.ner.preprocessor import NERPreprocessor
+from .graph.predictor import NodePredictor
+from .graph.preprocessor import NodePreprocessor
 
 
 class Learner(ABC):
