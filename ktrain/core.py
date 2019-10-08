@@ -1151,15 +1151,17 @@ def get_predictor(model, preproc):
     # check arguments
     if not isinstance(model, Model):
         raise ValueError('model must be of instance Model')
-    if not isinstance(preproc, (ImagePreprocessor,TextPreprocessor, NERPreprocessor)):
+    if not isinstance(preproc, (ImagePreprocessor,TextPreprocessor, NERPreprocessor, NodePreprocessor)):
         raise ValueError('preproc must be instance of ktrain.preprocessor.Preprocessor')
     if isinstance(preproc, ImagePreprocessor):
         return ImagePredictor(model, preproc)
     elif isinstance(preproc, TextPreprocessor):
     #elif type(preproc).__name__ == 'TextPreprocessor':
         return TextPredictor(model, preproc)
-    if isinstance(preproc, NERPreprocessor):
+    elif isinstance(preproc, NERPreprocessor):
         return NERPredictor(model, preproc)
+    elif isinstance(preproc, NodePreprocessor):
+        return NodePredictor(model, preproc)
     else:
         raise Exception('preproc of type %s not currently supported' % (type(preproc)))
 
@@ -1207,6 +1209,8 @@ def load_predictor(fpath):
         return TextPredictor(model, preproc)
     elif isinstance(preproc, NERPreprocessor):
         return NERPredictor(model, preproc)
+    elif isinstance(preproc, NodePreprocessor):
+        return NodePredictor(model, preproc)
     else:
         raise Exception('preprocessor not currently supported')
 

@@ -21,6 +21,7 @@ class NodePreprocessor(Preprocessor):
 
         # class names
         self.c = list(set([c[0] for c in df[['target']].values]))
+        self.c.sort()
 
         # feature names + target
         self.colnames = list(df.columns.values)
@@ -48,7 +49,9 @@ class NodePreprocessor(Preprocessor):
 
 
     def ids_exist(self, node_ids):
-        # TODO: check graph, too
+        """
+        check validity of node IDs
+        """
         df = self.df[self.df.index.isin(node_ids)]
         return df.shape[0] > 0
 
@@ -70,6 +73,7 @@ class NodePreprocessor(Preprocessor):
 
         # return generator
         G_sg = sg.StellarGraph(self.G, node_features=self.df[self.feature_names])
+        #print(G_sg.info())
         generator = GraphSAGENodeGenerator(G_sg, U.DEFAULT_BS, [self.sampsize, self.sampsize])
         train_gen = generator.flow(df_tr.index, train_targets, shuffle=True)
         return NodeSequenceWrapper(train_gen)
@@ -111,13 +115,14 @@ class NodePreprocessor(Preprocessor):
         # get aggregrated df
         #df_agg = pd.concat([df_te, self.df]).drop_duplicates(keep='last')
         df_agg = pd.concat([df_te, self.df])
-        print('7658949' in df_agg.index.tolist())
-        print('7674869' in df_agg.index.tolist())
+        #df_te = pd.concat([self.df, df_agg]).drop_duplicates(keep=False)
 
 
         # get aggregrated graph
+        is_subset = set(self.G.nodes()) <= set(G_te.nodes())
+        if not is_subset:
+            raise ValueError('Nodes in self.G must be subset of G_te')
         G_agg = nx.compose(self.G, G_te)    
-        print(len(G_agg.nodes()))
 
         
         # one-hot-encode target

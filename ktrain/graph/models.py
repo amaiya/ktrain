@@ -6,7 +6,7 @@ from .node_generator import NodeSequenceWrapper
 
 GRAPHSAGE = 'graphsage'
 NODE_CLASSIFIERS = {
-        GRAPHSAGE: 'GraphSAGE:  http://arxiv.org/pdf/1607.01759.pdf)'}
+        GRAPHSAGE: 'GraphSAGE:  http://arxiv.org/pdf/1607.01759.pdf'}
 
 def print_node_classifiers():
     for k,v in NODE_CLASSIFIERS.items():

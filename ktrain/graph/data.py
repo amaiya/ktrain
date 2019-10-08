@@ -86,7 +86,8 @@ def graph_nodes_from_csv(nodes_filepath,
         df = node_data.sample(frac=1-holdout_pct, replace=False, random_state=101)
         G = g_nx.subgraph(df.index).copy()
         df_holdout = node_data[~node_data.index.isin(df.index)]
-        G_holdout = g_nx.subgraph(df_holdout.index).copy()
+        #G_holdout = g_nx.subgraph(df_holdout.index).copy()
+        G_holdout = g_nx
 
     else:
         df = node_data
@@ -96,12 +97,17 @@ def graph_nodes_from_csv(nodes_filepath,
 
 
 
+
     # split into train and validation
-    tr_data, te_data = sklearn.model_selection.train_test_split(df, 
-                                                        train_size=None, 
-                                                        test_size=1-train_pct, 
-                                                        stratify=df['target'], 
-                                                        random_state=42)
+    tr_data, test_data = sklearn.model_selection.train_test_split(df, 
+                                                        train_size=train_pct,
+                                                        test_size=None,
+                                                        stratify=df['target'], random_state=42)
+    te_data, test_data = sklearn.model_selection.train_test_split(test_data,
+                                                                train_size=0.2,
+                                                                test_size=None,
+                                                                 stratify=test_data["target"],
+                                                                 random_state=100)
 
     #----------------------------------------------------------------
     # Preprocess training and validation datasets using NodePreprocessor
