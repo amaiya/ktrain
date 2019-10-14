@@ -12,8 +12,10 @@ class NodePreprocessor(Preprocessor):
     def __init__(self, G_nx, df, sample_size=10, missing_label_value=None):
 
         self.sampsize = sample_size       # neighbor sample size
-        self.G = G_nx                     # networkx graph
         self.df = df                      # node attributes and targets
+        # TODO: eliminate storage redundancy
+        self.G = G_nx                     # networkx graph
+        self.G_sg = None                  # StellarGraph 
 
         # clean df
         df.index = df.index.map(str)
@@ -74,6 +76,7 @@ class NodePreprocessor(Preprocessor):
 
         # return generator
         G_sg = sg.StellarGraph(self.G, node_features=self.df[self.feature_names])
+        self.G_sg = G_sg
         #print(G_sg.info())
         generator = GraphSAGENodeGenerator(G_sg, U.DEFAULT_BS, [self.sampsize, self.sampsize])
         train_gen = generator.flow(df_tr.index, train_targets, shuffle=True)
@@ -97,8 +100,9 @@ class NodePreprocessor(Preprocessor):
         val_targets = self.y_encoding.transform(df_val[["target"]].to_dict('records'))
 
         # return generator
-        G_sg = sg.StellarGraph(self.G, node_features=self.df[self.feature_names])
-        generator = GraphSAGENodeGenerator(G_sg, U.DEFAULT_BS, [self.sampsize,self.sampsize])
+        if self.G_sg is None:
+            self.G_sg = sg.StellarGraph(self.G, node_features=self.df[self.feature_names])
+        generator = GraphSAGENodeGenerator(self.G_sg, U.DEFAULT_BS, [self.sampsize,self.sampsize])
         val_gen = generator.flow(df_val.index, val_targets, shuffle=False)
         return NodeSequenceWrapper(val_gen)
 
@@ -108,7 +112,7 @@ class NodePreprocessor(Preprocessor):
         """
         preprocess for inductive inference
         df_te (DataFrame): pandas dataframe containing new node attributes
-        G (Graph):  a networkx Graph containing new nodes
+        G_te (Graph):  a networkx Graph containing new nodes
         """
         if self.y_encoding is None:
             raise Exception('Unset parameters. Are you sure you called preprocess_train first?')
