@@ -1201,7 +1201,7 @@ def load_predictor(fpath):
     # return the appropriate predictor
     if not isinstance(model, Model):
         raise ValueError('model must be of instance Model')
-    if not isinstance(preproc, (ImagePreprocessor, TextPreprocessor, NERPreprocessor)):
+    if not isinstance(preproc, (ImagePreprocessor, TextPreprocessor, NERPreprocessor, NodePreprocessor)):
         raise ValueError('preproc must be instance of ktrain.preprocessor.Preprocessor')
     if isinstance(preproc, ImagePreprocessor):
         return ImagePredictor(model, preproc)
@@ -1254,6 +1254,11 @@ def _load_model(fpath, preproc=None, train_data=None):
         from .text.ner.anago.layers import CRF
         from .text.ner import crf_loss
         custom_objects={'CRF': CRF, 'crf_loss':crf_loss}
+    elif (preproc and (isinstance(preproc, NodePreprocessor) or \
+                    type(preproc).__name__ == 'NodePreprocessor')) or \
+        train_data and U.is_nodeclass(data=train_data):
+        from stellargraph.layer import MeanAggregator
+        custom_objects={'MeanAggregator': MeanAggregator}
     try:
         model = load_model(fpath, custom_objects=custom_objects)
     except Exception as e:

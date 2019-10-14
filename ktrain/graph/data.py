@@ -129,7 +129,7 @@ def graph_nodes_from_csv(nodes_filepath,
         G = g_nx.subgraph(df_annotated.index).copy() if holdout_for_inductive else g_nx
         U.vprint('using %s nodes with missing target as holdout set' % (num_missing), verbose=verbose)
     elif holdout_pct is not None:
-        df_annotated = node_data.sample(frac=1-holdout_pct, replace=False, random_state=101)
+        df_annotated = node_data.sample(frac=1-holdout_pct, replace=False, random_state=None)
         df_holdout = node_data[~node_data.index.isin(df_annotated.index)]
         G_holdout = g_nx
         df_G = df_annotated if holdout_for_inductive else node_data
@@ -152,7 +152,7 @@ def graph_nodes_from_csv(nodes_filepath,
                                                         train_size=train_pct,
                                                         test_size=None,
                                                         stratify=df_annotated['target'], 
-                                                        random_state=42)
+                                                        random_state=None)
     #te_data, test_data = sklearn.model_selection.train_test_split(test_data,
                                                                 #train_size=0.2,
                                                                 #test_size=None,
