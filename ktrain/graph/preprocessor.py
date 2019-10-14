@@ -9,7 +9,7 @@ class NodePreprocessor(Preprocessor):
     Text preprocessing base class
     """
 
-    def __init__(self, G_nx, df, sample_size=10):
+    def __init__(self, G_nx, df, sample_size=10, missing_label_value=None):
 
         self.sampsize = sample_size       # neighbor sample size
         self.G = G_nx                     # networkx graph
@@ -21,6 +21,7 @@ class NodePreprocessor(Preprocessor):
 
         # class names
         self.c = list(set([c[0] for c in df[['target']].values]))
+        if missing_label_value is not None: self.c.remove(missing_label_value)
         self.c.sort()
 
         # feature names + target

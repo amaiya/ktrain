@@ -17,7 +17,10 @@ def graph_nodes_from_csv(nodes_filepath,
                          use_lcc=True,
                          sample_size=10,
                          train_pct=0.1, sep=',', 
-                         holdout_pct=None, verbose=1):
+                         holdout_pct=None, 
+                         holdout_for_inductive=False,
+                         missing_label_value=None,
+                         verbose=1):
     """
     Loads graph data from CSV files. 
     Returns generators for nodes in graph for use with GraphSAGE model.
@@ -30,25 +33,37 @@ def graph_nodes_from_csv(nodes_filepath,
                           Default is 0.1.
         sep (str):  delimiter for CSVs. Default is comma.
         holdout_pct(float): Percentage of nodes to remove and return separately
-                        for later inductive inference.
+                        for later transductive/inductive inference.
                         Example -->  train_pct=0.1 and holdout_pct=0.2:
 
                         Out of 1000 nodes, 200 (holdout_pct*1000) will be held out.
                         Of the remaining 800, 80 (train_pct*800) will be used for training
                         and 720 ((1-train_pct)*800) will be used for validation.
-                        That is, 720 nodes will be used for transductive inference
-                        and 200 nodes will be used for inductive inference.
+                        200 nodes will be used for transductive or inductive inference.
+
+                        Note that holdout_pct is ignored if at least one node has
+                        a missing label in nodes_filepath, in which case
+                        these nodes are assumed to be the holdout set.
+        holdout_for_inductive(bool):  If True, the holdout nodes will be removed from 
+                                      training graph and their features will not be visible
+                                      during training.  Only features of training and
+                                      validation nodes will be visible.
+                                      If False, holdout nodes will be included in graph
+                                      and their features (but not labels) are accessible
+                                      during training.
         verbose (boolean): verbosity
     Return:
         tuple of NodeSequenceWrapper objects for train and validation sets and NodePreprocessor
-        If holdout_pct is not None, fourth and fifth return values are pd.DataFrame and nx.Graph
+        If holdout_pct is not None or number of nodes with missing labels is non-zero, 
+        fourth and fifth return values are pd.DataFrame and nx.Graph
         comprising the held out nodes.
     """
 
     #----------------------------------------------------------------
     # read graph structure
     #----------------------------------------------------------------
-    g_nx = nx.read_edgelist(path=links_filepath, delimiter=sep)
+    nx_sep = None if sep in [' ', '\t'] else sep
+    g_nx = nx.read_edgelist(path=links_filepath, delimiter=nx_sep)
 
     # read node attributes
     #node_attr = pd.read_csv(nodes_filepath, sep=sep, header=None)
@@ -78,44 +93,97 @@ def graph_nodes_from_csv(nodes_filepath,
     node_data = node_data[node_data.index.isin(list(g_nx.nodes()))]
 
 
+    #----------------------------------------------------------------
+    # check for holdout nodes
+    #----------------------------------------------------------------
+    num_null = node_data[node_data.target.isnull()].shape[0]
+    num_missing = 0
+    if missing_label_value is not None:
+        num_missing = node_data[node_data.target == missing_label_value].shape[0]
+
+    if num_missing > 0 and num_null >0:
+        raise ValueError('Param missing_label_value is not None but there are ' +\
+                         'NULLs in last column. Replace these with missing_label_value.')
+
+    if (num_null > 0 or num_missing > 0) and holdout_pct is not None:
+        warnings.warn('Number of nodes in having NULL  or missing_label_value in target '+\
+                      'column is non-zero. Using these as holdout nodes and ignoring holdout_pct.')
+
+
 
     #----------------------------------------------------------------
     # set df and G and optionally holdout nodes
     #----------------------------------------------------------------
-    if holdout_pct is not None:
-        df = node_data.sample(frac=1-holdout_pct, replace=False, random_state=101)
-        G = g_nx.subgraph(df.index).copy()
-        df_holdout = node_data[~node_data.index.isin(df.index)]
-        #G_holdout = g_nx.subgraph(df_holdout.index).copy()
+    if num_null > 0:
+        df_annotated = node_data[~node_data.target.isnull()]
+        df_holdout = node_data[~node_data.target.isnull()]
         G_holdout = g_nx
-
+        df_G = df_annotated if holdout_for_inductive else node_data
+        G = g_nx.subgraph(df_annotated.index).copy() if holdout_for_inductive else g_nx
+        U.vprint('using %s nodes with target=NULL as holdout set' % (num_null), verbose=verbose)
+    elif num_missing > 0:
+        df_annotated = node_data[node_data.target != missing_label_value]
+        df_holdout = node_data[node_data.target == missing_label_value]
+        G_holdout = g_nx
+        df_G = df_annotated if holdout_for_inductive else node_data
+        G = g_nx.subgraph(df_annotated.index).copy() if holdout_for_inductive else g_nx
+        U.vprint('using %s nodes with missing target as holdout set' % (num_missing), verbose=verbose)
+    elif holdout_pct is not None:
+        df_annotated = node_data.sample(frac=1-holdout_pct, replace=False, random_state=101)
+        df_holdout = node_data[~node_data.index.isin(df_annotated.index)]
+        G_holdout = g_nx
+        df_G = df_annotated if holdout_for_inductive else node_data
+        G = g_nx.subgraph(df_annotated.index).copy() if holdout_for_inductive else g_nx
     else:
-        df = node_data
-        G = g_nx
+        if holdout_for_inductive:
+            warnings.warn('holdout_for_inductive is True but no nodes were heldout '
+                          'because holdout_pct is None and no missing targets')
+        df_annotated = node_data
         df_holdout = None
         G_holdout = None
+        df_G = node_data
+        G = g_nx
 
 
-
-
+    #----------------------------------------------------------------
     # split into train and validation
-    tr_data, test_data = sklearn.model_selection.train_test_split(df, 
+    #----------------------------------------------------------------
+    tr_data, te_data = sklearn.model_selection.train_test_split(df_annotated, 
                                                         train_size=train_pct,
                                                         test_size=None,
-                                                        stratify=df['target'], random_state=42)
-    te_data, test_data = sklearn.model_selection.train_test_split(test_data,
-                                                                train_size=0.2,
-                                                                test_size=None,
-                                                                 stratify=test_data["target"],
-                                                                 random_state=100)
+                                                        stratify=df_annotated['target'], 
+                                                        random_state=42)
+    #te_data, test_data = sklearn.model_selection.train_test_split(test_data,
+                                                                #train_size=0.2,
+                                                                #test_size=None,
+                                                                 #stratify=test_data["target"],
+                                                                 #random_state=100)
+
+    #----------------------------------------------------------------
+    # print summary
+    #----------------------------------------------------------------
+    if verbose:
+        print("Size of training graph: %s nodes" % (G.number_of_nodes()))
+        print("Training nodes: %s" % (tr_data.shape[0]))
+        print("Validation nodes: %s" % (te_data.shape[0]))
+        if df_holdout is not None and G_holdout is not None:
+            print("Nodes treated as unlabeled for testing/inference: %s" % (df_holdout.shape[0]))
+            if holdout_for_inductive:
+                print("Size of graph with added holdout nodes: %s" % (G_holdout.number_of_nodes()))
+                print("Holdout node features are not visible during training (inductive_inference)")
+            else:
+                print("Holdout node features are visible during training (transductive inference)")
+        print()
+
+
 
     #----------------------------------------------------------------
     # Preprocess training and validation datasets using NodePreprocessor
     #----------------------------------------------------------------
-    preproc = NodePreprocessor(G, df, sample_size=sample_size)
+    preproc = NodePreprocessor(G, df_G, sample_size=sample_size, missing_label_value=missing_label_value)
     trn = preproc.preprocess_train(list(tr_data.index))
     val = preproc.preprocess_valid(list(te_data.index))
-    if holdout_pct is not None:
+    if df_holdout is not None and G_holdout is not None: 
         return (NodeSequenceWrapper(trn), NodeSequenceWrapper(val), preproc, df_holdout, G_holdout)
     else:
         return (NodeSequenceWrapper(trn), NodeSequenceWrapper(val), preproc)
@@ -145,7 +213,8 @@ def graph_edges_from_csv(nodes_filepath,
     """
 
     # read edge list
-    g_nx = nx.read_edgelist(path=links_filepath, delimiter=sep)
+    nx_sep = None if sep in [' ', '\t'] else sep
+    g_nx = nx.read_edgelist(path=links_filepath, delimiter=nx_sep)
 
     # read node attributes
     node_attr = pd.read_csv(nodes_filepath, sep=sep, header=None)
