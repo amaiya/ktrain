@@ -11,6 +11,8 @@ from .text.preprocessor import TextPreprocessor, BERTPreprocessor
 from .text.predictor import TextPredictor
 from .text.ner.predictor import NERPredictor
 from .text.ner.preprocessor import NERPreprocessor
+from .graph.predictor import NodePredictor
+from .graph.preprocessor import NodePreprocessor
 
 
 class Learner(ABC):
@@ -1149,15 +1151,17 @@ def get_predictor(model, preproc):
     # check arguments
     if not isinstance(model, Model):
         raise ValueError('model must be of instance Model')
-    if not isinstance(preproc, (ImagePreprocessor,TextPreprocessor, NERPreprocessor)):
+    if not isinstance(preproc, (ImagePreprocessor,TextPreprocessor, NERPreprocessor, NodePreprocessor)):
         raise ValueError('preproc must be instance of ktrain.preprocessor.Preprocessor')
     if isinstance(preproc, ImagePreprocessor):
         return ImagePredictor(model, preproc)
     elif isinstance(preproc, TextPreprocessor):
     #elif type(preproc).__name__ == 'TextPreprocessor':
         return TextPredictor(model, preproc)
-    if isinstance(preproc, NERPreprocessor):
+    elif isinstance(preproc, NERPreprocessor):
         return NERPredictor(model, preproc)
+    elif isinstance(preproc, NodePreprocessor):
+        return NodePredictor(model, preproc)
     else:
         raise Exception('preproc of type %s not currently supported' % (type(preproc)))
 
@@ -1197,7 +1201,7 @@ def load_predictor(fpath):
     # return the appropriate predictor
     if not isinstance(model, Model):
         raise ValueError('model must be of instance Model')
-    if not isinstance(preproc, (ImagePreprocessor, TextPreprocessor, NERPreprocessor)):
+    if not isinstance(preproc, (ImagePreprocessor, TextPreprocessor, NERPreprocessor, NodePreprocessor)):
         raise ValueError('preproc must be instance of ktrain.preprocessor.Preprocessor')
     if isinstance(preproc, ImagePreprocessor):
         return ImagePredictor(model, preproc)
@@ -1205,6 +1209,8 @@ def load_predictor(fpath):
         return TextPredictor(model, preproc)
     elif isinstance(preproc, NERPreprocessor):
         return NERPredictor(model, preproc)
+    elif isinstance(preproc, NodePreprocessor):
+        return NodePredictor(model, preproc)
     else:
         raise Exception('preprocessor not currently supported')
 
@@ -1248,6 +1254,11 @@ def _load_model(fpath, preproc=None, train_data=None):
         from .text.ner.anago.layers import CRF
         from .text.ner import crf_loss
         custom_objects={'CRF': CRF, 'crf_loss':crf_loss}
+    elif (preproc and (isinstance(preproc, NodePreprocessor) or \
+                    type(preproc).__name__ == 'NodePreprocessor')) or \
+        train_data and U.is_nodeclass(data=train_data):
+        from stellargraph.layer import MeanAggregator
+        custom_objects={'MeanAggregator': MeanAggregator}
     try:
         model = load_model(fpath, custom_objects=custom_objects)
     except Exception as e:

@@ -3,6 +3,7 @@
 This directory contains various example notebooks using *ktrain*.  The directory currently has two folders:
 - **text**:  text classification examples using various models and datasets
 - **vision**:  image classification examples using various models and datasets
+- **graphs**:  node classification in graphs or networks
 
 ## Text Classification Datasets
 
@@ -82,4 +83,17 @@ Image labels are in the form of a CSV containing paths to images.
 - [planet-ResNet50.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/vision):  Using a pretrained ResNet50 model for multi-label classification.
 
 
+
+## Graph Datasets
+
+### [PubMed-Diabetes](https://github.com/amaiya/ktrain/tree/master/ktrain/tests/graph_data/pubmed/):  Node Classification
+
+In the PubMed graph, each node represents a paper pertaining to one of three topics:  *Diabetes Mellitus - Experimental*, *Diabetes Mellitus - Type 1*, and *Diabetes Mellitus - Type 2*.  Links represent citations between papers.  The attributes or features assigned to each node is a vector of words in each paper and their corresponding TF-IDF scores.
+
+- [pubmed-GraphSAGE.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/graphs): GraphSAGE model for transductive and inductive inference.
+
+### [Hateful Twitter Users](https://www.kaggle.com/manoelribeiro/hateful-users-on-twitter/home):  Node Classification
+Dataset of Twitter users and their attributes.  A small portion of the user accounts are annotated as `hateful` or `normal`.  The goal is to predict hateful accounts based on user features and graph structure.
+
+- [hateful_twitter_users-GraphSAGE.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/graphs): GraphSAGE model to predict hateful Twitter users using transductive inference.
 
