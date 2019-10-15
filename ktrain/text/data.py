@@ -219,8 +219,8 @@ def texts_from_df(train_df,
     y = train[label_columns].values
     if val_df is not None:
         test = val_df
-        x_test = train[text_column].fillna('fillna').values
-        y_test = train[label_columns].values
+        x_test = test[text_column].fillna('fillna').values
+        y_test = test[label_columns].values
         x_train = x
         y_train = y
     else:

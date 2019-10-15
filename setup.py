@@ -29,7 +29,9 @@ setup(
           'joblib',
           'langdetect',
           'jieba',
-          'cchardet'
+          'cchardet',
+          'stellargraph==0.7.1',
+          'networkx'
       ],
   classifiers=[  # Optional
     # How mature is this project? Common values are

@@ -170,7 +170,7 @@ def graph_nodes_from_csv(nodes_filepath,
             print("Nodes treated as unlabeled for testing/inference: %s" % (df_holdout.shape[0]))
             if holdout_for_inductive:
                 print("Size of graph with added holdout nodes: %s" % (G_holdout.number_of_nodes()))
-                print("Holdout node features are not visible during training (inductive_inference)")
+                print("Holdout node features are not visible during training (inductive inference)")
             else:
                 print("Holdout node features are visible during training (transductive inference)")
         print()
