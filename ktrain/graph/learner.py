@@ -65,3 +65,14 @@ class NodeClassLearner(GenLearner):
         return
 
 
+
+    def layer_output(self, layer_id, example_id=0, batch_id=0, use_val=False):
+        """
+        Prints output of layer with index <layer_id> to help debug models.
+        Uses first example (example_id=0) from training set, by default.
+        """
+        warnings.warn('currently_unsupported: layer_output method is not yet supported for ' +
+                      'graph neural networks in ktrain')
+        return
+
+
