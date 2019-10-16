@@ -58,6 +58,7 @@ class TestNodeClassification(TestCase):
         learner.load_model('/tmp/test_model')
 
         # test validate
+        learner.validate(val_data=val)
         cm = learner.validate(val_data=val)
         print(cm)
         for i, row in enumerate(cm):
