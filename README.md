@@ -138,7 +138,7 @@ learner.fit(1e-3, 1)
 import ktrain
 from ktrain import graph as gr
 
-# load data
+# load data with supervision ration of 10%
 (trn, val, preproc)  = gr.graph_nodes_from_csv(
                                                'cora.content', # node attributes/labels
                                                'cora.cites',   # edge list
