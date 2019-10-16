@@ -3,6 +3,7 @@
 This directory contains various example notebooks using *ktrain*.  The directory currently has two folders:
 - **text**:  text classification examples using various models and datasets
 - **vision**:  image classification examples using various models and datasets
+- **graphs**:  node classification in graphs or networks
 
 ## Text Classification Datasets
 
@@ -24,6 +25,15 @@ This dataset consists of roughly 6000 hotel reviews in Chinese.  The objective i
 - [ChineseHotelReviews-fasttext.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text):  Using a fast and simple fasttext-like model to predict sentiment of Chinese-language hotel reviews. 
 
 - [ChineseHotelReviews-BERT.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text):  BERT text classification to predict sentiment of Chinese-language hotel reviews.
+
+
+### [Arabic Sentiment Analysis](https://github.com/elnagara/HARD-Arabic-Dataset):  Binary Classification
+
+This dataset consists contains hotel reviews in Arabic.  The objective is to predict the positive or negative sentiment of each review. This notebook shows an example of using *ktrain* with non-English text.
+
+- [ArabicHotelReviews-nbsvm.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text):  Training a simple and fast NBSVM model on this dataset with bigram/trigram features can achieve a validation accuracy of **94%** with only seconds of training.
+
+- [ArabicHotelReviews-BERT.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text):  BERT text classification to predict sentiment of Arabic-language hotel reviews.
 
 
 ### [20 News Groups](http://qwone.com/~jason/20Newsgroups/): Multiclass Classification
@@ -72,4 +82,24 @@ Image labels are in the form of a CSV containing paths to images.
 - [planet-ResNet50.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/vision):  Using a pretrained ResNet50 model for multi-label classification.
 
 
+
+## Graph Datasets
+
+### [PubMed-Diabetes](https://linqs-data.soe.ucsc.edu/public/Pubmed-Diabetes.tgz):  Node Classification
+
+In the PubMed graph, each node represents a paper pertaining to one of three topics:  *Diabetes Mellitus - Experimental*, *Diabetes Mellitus - Type 1*, and *Diabetes Mellitus - Type 2*.  Links represent citations between papers.  The attributes or features assigned to each node are in the form of a vector of words in each paper and their corresponding TF-IDF scores.
+
+- [pubmed-GraphSAGE.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/graphs): GraphSAGE model for transductive and inductive inference.
+
+### [Cora Citation Graph](https://linqs-data.soe.ucsc.edu/public/lbc/cora.tgz):  Node Classification
+
+In the Cora citation graph, each node represents a paper pertaining to one of several topic categories.  Links represent citations between papers.  The attributes or features assigned to each node is in the form of a multi-hot-encoded vector of words in each paper.
+
+- [cora-GraphSAGE.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/graphs): GraphSAGE model for transductive inference on validation and test set of nodes in graph.
+
+
+### [Hateful Twitter Users](https://www.kaggle.com/manoelribeiro/hateful-users-on-twitter/home):  Node Classification
+Dataset of Twitter users and their attributes.  A small portion of the user accounts are annotated as `hateful` or `normal`.  The goal is to predict hateful accounts based on user features and graph structure.
+
+- [hateful_twitter_users-GraphSAGE.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/graphs): GraphSAGE model to predict hateful Twitter users using transductive inference.
 
