@@ -1,3 +1,12 @@
+### News and Announcements
+- **Coming Soon**:
+  - better support for custom data formats and models
+  - support for using *ktrain* with `tf.keras`
+- **2019-10-16:**  
+  - *ktrain v0.5.0* is released and includes pre-canned support for [node classification in graphs](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/graphs/hateful_twitter_users-GraphSAGE.ipynb).
+----
+
+
 # ktrain
 
 *ktrain* is a lightweight wrapper for the deep learning library [Keras](https://keras.io/) to help build, train, and deploy neural networks.  With only a few lines of code, ktrain allows you to easily and quickly:
@@ -8,7 +17,8 @@
   - **text classification** (e.g., [BERT](https://arxiv.org/abs/1810.04805), [NBSVM](https://www.aclweb.org/anthology/P12-2018), [fastText](https://arxiv.org/abs/1607.01759), GRUs with [pretrained word vectors](https://fasttext.cc/docs/en/english-vectors.html))
   - **image classification** (e.g., [ResNet](https://arxiv.org/abs/1512.03385), [Wide ResNet](https://arxiv.org/abs/1605.07146), [Inception](https://www.cs.unc.edu/~wliu/papers/GoogLeNet.pdf))
   - **text sequence labeling** (e.g., [Bidirectional LSTM-CRF](https://arxiv.org/abs/1603.01360) with optional pretrained word embeddings)
-- perform multilingual text classification (e.g., [Sentiment Analysis in Chinese with BERT](https://github.com/amaiya/ktrain/blob/master/examples/text/ChineseHotelReviews-BERT.ipynb))
+  - **graph node classification** (e.g., [GraphSAGE](https://cs.stanford.edu/people/jure/pubs/graphsage-nips17.pdf))
+- perform multilingual text classification (e.g., [Chinese Sentiment Analysis with BERT](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/ChineseHotelReviews-BERT.ipynb), [Arabic Sentiment Analysis with NBSVM](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/ArabicHotelReviews-nbsvm.ipynb))
 - load and preprocess text and image data from a variety of formats 
 - inspect data points that were misclassified and [provide explanations](https://eli5.readthedocs.io/en/latest/) to help improve your model
 - leverage a simple prediction API for saving and deploying both models and data-preprocessing steps to make predictions on new raw data
@@ -16,13 +26,14 @@
 
 ### Tutorials
 Please see the following tutorial notebooks for a guide on how to use *ktrain* on your projects:
-* Tutorial 1:  [Introduction](https://github.com/amaiya/ktrain/blob/master/tutorial-01-introduction.ipynb)
-* Tutorial 2:  [Tuning Learning Rates](https://github.com/amaiya/ktrain/blob/master/tutorial-02-tuning-learning-rates.ipynb)
-* Tutorial 3: [Image Classification](https://github.com/amaiya/ktrain/blob/master/tutorial-03-image-classification.ipynb)
-* Tutorial 4: [Text Classification](https://github.com/amaiya/ktrain/blob/master/tutorial-04-text-classification.ipynb)
-* Tutorial 5: [Explaining Predictions and Misclassifications](https://github.com/amaiya/ktrain/blob/master/tutorial-05-explaining-predictions.ipynb)
-* Tutorial 6: [Text Sequence Tagging](https://github.com/amaiya/ktrain/blob/master/tutorial-06-sequence-tagging.ipynb) for Named Entity Recognition
-* Tutorial A1: [Additional tricks](https://github.com/amaiya/ktrain/blob/master/tutorial-A1-additional-tricks.ipynb), which covers topics such as previewing data augmentation schemes, inspecting intermediate output of Keras models for debugging, setting global weight decay, and use of built-in and custom callbacks.
+* Tutorial 1:  [Introduction](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorial-01-introduction.ipynb)
+* Tutorial 2:  [Tuning Learning Rates](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorial-02-tuning-learning-rates.ipynb)
+* Tutorial 3: [Image Classification](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorial-03-image-classification.ipynb)
+* Tutorial 4: [Text Classification](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorial-04-text-classification.ipynb)
+* Tutorial 5: [Explaining Predictions and Misclassifications](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorial-05-explaining-predictions.ipynb)
+* Tutorial 6: [Text Sequence Tagging](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorial-06-sequence-tagging.ipynb) for Named Entity Recognition
+* Tutorial 7: [Graph Node Classification](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorial-07-graph-node_classification.ipynb) with Graph Neural Networks
+* Tutorial A1: [Additional tricks](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorial-A1-additional-tricks.ipynb), which covers topics such as previewing data augmentation schemes, inspecting intermediate output of Keras models for debugging, setting global weight decay, and use of built-in and custom callbacks.
 
 
 Some blog tutorials about *ktrain* are shown below:
@@ -119,6 +130,36 @@ learner = ktrain.get_learner(model, train_data=trn, val_data=val)
 
 # conventional training for 1 epoch using a learning rate of 0.001 (Keras default for Adam optmizer)
 learner.fit(1e-3, 1) 
+```
+
+
+#### Example: Node Classification on [Cora Citation Graph](https://linqs-data.soe.ucsc.edu/public/lbc/cora.tgz) using a [GraphSAGE](https://arxiv.org/abs/1706.02216) model
+```
+import ktrain
+from ktrain import graph as gr
+
+# load data
+(trn, val, preproc)  = gr.graph_nodes_from_csv(
+                                               'cora.content', # node attributes/labels
+                                               'cora.cites',   # edge list
+                                               sample_size=20, 
+                                               holdout_pct=None, 
+                                               holdout_for_inductive=False,
+                                              train_pct=0.1, sep='\t')
+
+# load model
+model=gr.graph_node_classifier('graphsage', trn)
+
+# wrap model and data in ktrain.Learner object
+learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=64)
+
+
+# find good learning rate
+learner.lr_find(max_epochs=100) # briefly simulate training to find good learning rate
+learner.lr_plot()               # visually identify best learning rate
+
+# train using triangular policy with ModelCheckpoint and implicit ReduceLROnPlateau and EarlyStopping
+learner.autofit(0.01, checkpoint_folder='/tmp/saved_weights')
 ```
 
 

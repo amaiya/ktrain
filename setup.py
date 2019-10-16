@@ -30,7 +30,7 @@ setup(
           'langdetect',
           'jieba',
           'cchardet',
-          'stellargraph==0.7.1',
+          'stellargraph==0.7.2',
           'networkx'
       ],
   classifiers=[  # Optional
