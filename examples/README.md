@@ -1,6 +1,6 @@
 # Example Notebooks
 
-This directory contains various example notebooks using *ktrain*.  The directory currently has two folders:
+This directory contains various example notebooks using *ktrain*.  The directory currently has three folders:
 - **text**:  text classification examples using various models and datasets
 - **vision**:  image classification examples using various models and datasets
 - **graphs**:  node classification in graphs or networks
