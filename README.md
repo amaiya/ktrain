@@ -106,7 +106,7 @@ learner.lr_find()             # briefly simulate training to find good learning 
 learner.lr_plot()             # visually identify best learning rate
 
 # train using triangular policy with ModelCheckpoint and implicit ReduceLROnPlateau and EarlyStopping
-learner.autofit(1e-4, checkpoint_folder='/tmp') 
+learner.autofit(1e-4, checkpoint_folder='/tmp/saved_weights') 
 ```
 
 #### Example: Sequence Labeling for [Named Entity Recognition](https://www.kaggle.com/abhinavwalia95/entity-annotated-corpus/version/2) using a randomly initialized [Bidirectional LSTM CRF](https://arxiv.org/abs/1603.01360) model
