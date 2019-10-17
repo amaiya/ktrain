@@ -31,7 +31,7 @@ setup(
           'jieba',
           'cchardet',
           'networkx==2.3',
-
+          'pillow'
       ],
   classifiers=[  # Optional
     # How mature is this project? Common values are
