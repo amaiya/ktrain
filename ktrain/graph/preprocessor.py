@@ -3,6 +3,11 @@ from .. import utils as U
 from ..preprocessor import Preprocessor
 from .node_generator import NodeSequenceWrapper
 
+from . import stellargraph as sg
+from .stellargraph.mapper import GraphSAGENodeGenerator, GraphSAGELinkGenerator
+from .stellargraph.layer import GraphSAGE
+
+
 
 class NodePreprocessor(Preprocessor):
     """
@@ -77,7 +82,6 @@ class NodePreprocessor(Preprocessor):
         # return generator
         G_sg = sg.StellarGraph(self.G, node_features=self.df[self.feature_names])
         self.G_sg = G_sg
-        #print(G_sg.info())
         generator = GraphSAGENodeGenerator(G_sg, U.DEFAULT_BS, [self.sampsize, self.sampsize])
         train_gen = generator.flow(df_tr.index, train_targets, shuffle=True)
         return NodeSequenceWrapper(train_gen)
