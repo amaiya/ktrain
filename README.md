@@ -163,7 +163,7 @@ learner.autofit(0.01, checkpoint_folder='/tmp/saved_weights')
 ```
 
 
-Additional examples can be found [here](https://nbviewer.jupyter.org/github/amaiya/ktrain/tree/master/examples).
+Additional examples can be found [here](https://github.com/amaiya/ktrain/tree/master/examples).
 
 
 
