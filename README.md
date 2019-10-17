@@ -3,7 +3,7 @@
   - better support for custom data formats and models
   - support for using *ktrain* with `tf.keras`
 - **2019-10-16:**  
-  - *ktrain v0.5.0* is released and includes pre-canned support for [node classification in graphs](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/graphs/hateful_twitter_users-GraphSAGE.ipynb).
+  - *ktrain v0.5.x* is released and includes pre-canned support for [node classification in graphs](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/graphs/hateful_twitter_users-GraphSAGE.ipynb).
 ----
 
 

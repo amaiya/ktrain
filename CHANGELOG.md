@@ -6,6 +6,22 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.5.1 (2019-10-17)
+
+### New:
+- N/A
+
+### Changed:
+- N/A
+
+
+### Fixed:
+- store a local version of `stellargraph` to prevent it from installing `tensorflow-cpu`
+  and overriding existing `tensorflow-gpu` installation
+
+
+
+
 ## 0.5.0 (2019-10-16)
 
 ### New:

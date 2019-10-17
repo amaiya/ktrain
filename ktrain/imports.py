@@ -44,6 +44,10 @@ Flatten = keras.layers.Flatten
 GRU = keras.layers.GRU
 Bidirectional = keras.layers.Bidirectional
 LSTM = keras.layers.LSTM
+LeakyReLU = keras.layers.LeakyReLU # SG
+Multiply = keras.layers.Multiply   # SG
+Average = keras.layers.Average     # SG
+Reshape = keras.layers.Reshape     #SG
 SpatialDropout1D = keras.layers.SpatialDropout1D
 GlobalMaxPool1D = keras.layers.GlobalMaxPool1D
 GlobalAveragePooling1D = keras.layers.GlobalAveragePooling1D
@@ -131,6 +135,7 @@ from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.datasets import load_files
 from sklearn.model_selection import train_test_split
 from sklearn.base import BaseEstimator, TransformerMixin
+
 #from sklearn.externals import joblib
 import joblib
 from scipy import sparse # utils
@@ -158,10 +163,6 @@ import cchardet as chardet
 
 # graphs
 import networkx as nx
-import stellargraph as sg
-from stellargraph.mapper import GraphSAGENodeGenerator, GraphSAGELinkGenerator
-from stellargraph.layer import GraphSAGE
-from stellargraph.data import EdgeSplitter
 #from sklearn import preprocessing, feature_extraction, model_selection
 
 

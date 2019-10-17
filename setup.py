@@ -30,8 +30,8 @@ setup(
           'langdetect',
           'jieba',
           'cchardet',
-          'stellargraph==0.7.2',
-          'networkx'
+          'networkx==2.3',
+
       ],
   classifiers=[  # Optional
     # How mature is this project? Common values are

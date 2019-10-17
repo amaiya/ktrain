@@ -1,4 +1,4 @@
-from stellargraph.mapper import node_mappers
+from .stellargraph.mapper import node_mappers
 
 class NodeSequenceWrapper(node_mappers.NodeSequence):
     def __init__(self, node_seq):
