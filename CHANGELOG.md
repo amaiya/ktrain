@@ -16,7 +16,7 @@ Most recent releases are shown at the top. Each release shows:
 
 
 ### Fixed:
-- Removed dangling reference to external 'stellargraph' dependency to rely solely on
+- Removed dangling reference to external 'stellargraph' dependency so that we rely solely on
   local version of stellargraph
 
 
