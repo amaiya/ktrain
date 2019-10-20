@@ -19,7 +19,7 @@ Ensembles of graph neural network models, GraphSAGE, GCN, GAT, with optional boo
 """
 from ....imports import *
 
-from stellargraph.layer import *
+from ..layer import *
 
 __all__ = ["Ensemble"]
 
