@@ -448,7 +448,7 @@ class TFIDFTextPreprocessor(StandardTextPreprocessor):
         test_text = self.process_chinese(test_text, self.lang)
 
         # convert to word IDs
-        x_test = self.tok.texts_to_matrix(train_text, mode='tfidf')
+        x_test = self.tok.texts_to_matrix(test_text, mode='tfidf')
         U.vprint('{} test sequences'.format(len(x_test)), verbose=verbose)
         U.vprint('Average test sequence length: {}'.format(np.mean(list(map(len, x_test)), 
                                                                  dtype=int)), verbose=verbose)
