@@ -397,6 +397,80 @@ class StandardTextPreprocessor(TextPreprocessor):
         return max(list(s))
 
 
+class TFIDFTextPreprocessor(StandardTextPreprocessor):
+
+    def preprocess_train(self, train_text, y_train, verbose=1):
+        """
+        preprocess training set
+        """
+
+
+        U.vprint('language: %s' % (self.lang), verbose=verbose)
+
+        # special processing if Chinese
+        train_text = self.process_chinese(train_text, lang=self.lang)
+
+        # extract vocabulary
+        self.tok = Tokenizer(num_words=self.max_features)
+        self.tok.fit_on_texts(train_text)
+        U.vprint('Word Counts: {}'.format(len(self.tok.word_counts)), verbose=verbose)
+        U.vprint('Nrows: {}'.format(len(train_text)), verbose=verbose)
+
+        # convert to word IDs
+        x_train = self.tok.texts_to_matrix(train_text, mode='tfidf')
+        U.vprint('{} train sequences'.format(len(x_train)), verbose=verbose)
+        U.vprint('Average train sequence length: {}'.format(np.mean(list(map(len, x_train)), dtype=int)), verbose=verbose)
+
+        # add ngrams
+        x_train = self._fit_ngrams(x_train, verbose=verbose)
+
+        # pad sequences
+        #x_train = sequence.pad_sequences(x_train, maxlen=self.maxlen)
+
+        # transform y
+        if len(y_train.shape) == 1:
+            y_train = to_categorical(y_train)
+        U.vprint('x_train shape: ({},{})'.format(x_train.shape[0], x_train.shape[1]), verbose=verbose)
+        U.vprint('y_train shape: ({},{})'.format(y_train.shape[0], y_train.shape[1]), verbose=verbose)
+
+        # return
+        return (x_train, y_train)
+
+
+    def preprocess_test(self, test_text, y_test=None, verbose=1):
+        """
+        preprocess validation or test dataset
+        """
+        if self.tok is None or self.lang is None:
+            raise Exception('Unfitted tokenizer or missing language. Did you run preprocess_train first?')
+
+        # check for and process chinese
+        test_text = self.process_chinese(test_text, self.lang)
+
+        # convert to word IDs
+        x_test = self.tok.texts_to_matrix(train_text, mode='tfidf')
+        U.vprint('{} test sequences'.format(len(x_test)), verbose=verbose)
+        U.vprint('Average test sequence length: {}'.format(np.mean(list(map(len, x_test)), 
+                                                                 dtype=int)), verbose=verbose)
+
+        # add n-grams
+        x_test = self._add_ngrams(x_test, mode='test', verbose=verbose)
+
+
+        # pad sequences
+        #x_test = sequence.pad_sequences(x_test, maxlen=self.maxlen)
+        U.vprint('x_test shape: ({},{})'.format(x_test.shape[0], x_test.shape[1]), verbose=verbose)
+
+        # convert y
+        if y_test is not None:
+            if len(y_test.shape) == 1:
+                y_test = to_categorical(y_test)
+            U.vprint('y_test shape: ({},{})'.format(y_test.shape[0], y_test.shape[1]), verbose=verbose)
+
+        # return
+        return (x_test, y_test)
+
+
 class BERTPreprocessor(TextPreprocessor):
     """
     text preprocessing for BERT model
@@ -464,5 +538,6 @@ class BERTPreprocessor(TextPreprocessor):
 
 # preprocessors
 TEXT_PREPROCESSORS = {'standard': StandardTextPreprocessor,
-                      'bert': BERTPreprocessor}
+                      'bert': BERTPreprocessor,
+                      'tfidf': TFIDFTextPreprocessor}
 
