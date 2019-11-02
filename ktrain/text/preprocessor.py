@@ -399,6 +399,16 @@ class StandardTextPreprocessor(TextPreprocessor):
 
 class TFIDFTextPreprocessor(StandardTextPreprocessor):
 
+    def undo(self, doc):
+        """
+        undoes preprocessing and returns raw data by:
+        converting a list or array of Word IDs back to words
+        """
+        dct = self.tok.index_word
+        return " ".join([dct[wid] for wid in range(len(doc)) if doc[wid] != 0 and wid in dct])
+
+
+
     def preprocess_train(self, train_text, y_train, verbose=1):
         """
         preprocess training set
@@ -422,7 +432,7 @@ class TFIDFTextPreprocessor(StandardTextPreprocessor):
         U.vprint('Average train sequence length: {}'.format(np.mean(list(map(len, x_train)), dtype=int)), verbose=verbose)
 
         # add ngrams
-        x_train = self._fit_ngrams(x_train, verbose=verbose)
+        #x_train = self._fit_ngrams(x_train, verbose=verbose)
 
         # pad sequences
         #x_train = sequence.pad_sequences(x_train, maxlen=self.maxlen)
@@ -454,7 +464,7 @@ class TFIDFTextPreprocessor(StandardTextPreprocessor):
                                                                  dtype=int)), verbose=verbose)
 
         # add n-grams
-        x_test = self._add_ngrams(x_test, mode='test', verbose=verbose)
+        #x_test = self._add_ngrams(x_test, mode='test', verbose=verbose)
 
 
         # pad sequences

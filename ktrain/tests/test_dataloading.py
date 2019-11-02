@@ -79,6 +79,14 @@ class TestTextData(TestCase):
         (trn, val, preproc)  = texts_from_csv()
         self.__test_texts_standard(trn, val, preproc)
 
+    def test_texts_from_folder_tfidf(self):
+        (trn, val, preproc)  = texts_from_folder(preprocess_mode='tfidf')
+        self.__test_texts_tfidf(trn, val, preproc)
+
+
+    def test_texts_from_csv_tfidf(self):
+        (trn, val, preproc)  = texts_from_csv(preprocess_mode='tfidf')
+        self.__test_texts_tfidf(trn, val, preproc)
 
     def test_texts_from_folder_bert(self):
         (trn, val, preproc)  = texts_from_folder(preprocess_mode='bert')
@@ -108,6 +116,25 @@ class TestTextData(TestCase):
         self.assertEqual(preproc.preprocess(['hello book'])[0][-1], 1)
         self.assertEqual(preproc.preprocess(['hello book']).shape, (1, 10))
         self.assertEqual(preproc.undo(val[0][0]), 'the book is bad')
+
+    def __test_texts_tfidf(self, trn, val, preproc):
+        self.assertFalse(U.is_iter(trn))
+        self.assertEqual(trn[0].shape, (4, 100))
+        self.assertEqual(trn[1].shape, (4, 2))
+        self.assertEqual(val[0].shape, (4, 100))
+        self.assertEqual(val[1].shape, (4, 2))
+        self.assertFalse(U.is_multilabel(trn))
+        self.assertEqual(U.shape_from_data(trn), (4, 100))
+        self.assertFalse(U.ondisk(trn))
+        self.assertEqual(U.nsamples_from_data(trn), 4)
+        self.assertEqual(U.nclasses_from_data(trn), 2)
+        self.assertEqual(U.y_from_data(trn).shape, (4,2))
+        self.assertFalse(U.bert_data_tuple(trn))
+        self.assertEqual(preproc.get_classes(), ['neg', 'pos'])
+        self.assertEqual(preproc.ngram_count(), 1)
+        self.assertEqual('%.4f'%(preproc.preprocess(['hello book'])[0][1]),  '0.5878')
+        self.assertEqual(preproc.preprocess(['hello book']).shape, (1, 100))
+        self.assertEqual(preproc.undo(val[0][0]), 'book is the bad')
 
 
     def __test_texts_bert(self, trn, val, preproc):
