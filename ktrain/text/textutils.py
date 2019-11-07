@@ -2,6 +2,10 @@ from ..imports import *
 from subprocess import Popen, PIPE, DEVNULL
 
 
+DEFAULT_TOKEN_PATTERN = (r"\b[a-zA-Z][a-zA-Z0-9]*(?:[_/&-][a-zA-Z0-9]+)+\b|"
+                         r"\b\d*[a-zA-Z][a-zA-Z0-9][a-zA-Z0-9]+\b")
+
+
 
 def extract_copy(corpus_path, output_path):
     """
@@ -100,3 +104,79 @@ def extract_filenames(corpus_path, follow_links=False):
             except:
                 continue
 
+
+def strip_control_characters(data):
+    if data:
+        # unicode invalid characters
+        re_xml_illegal = (
+            '([\u0000-\u0008\u000b-\u000c\u000e-\u001f\ufffe-\uffff])|'
+            '([%s-%s][^%s-%s])|([^%s-%s][%s-%s])|([%s-%s]$)|(^[%s-%s])'
+            % (chr(0xd800), chr(0xdbff), chr(0xdc00), chr(0xdfff), chr(0xd800),
+               chr(0xdbff), chr(0xdc00), chr(0xdfff), chr(0xd800), chr(0xdbff),
+               chr(0xdc00), chr(0xdfff))
+        )
+        data = re.sub(re_xml_illegal, "", data)
+        # ascii control characters
+        #data = re.sub(r"[\x01-\x1F\x7F]", "", data)
+        # See:  http://w3.org/International/questions/qa-forms-utf-8.html
+        # Printable utf-8 does not include any of these chars below x7F
+        data = re.sub(r"[\x00-\x08\x0B\x0C\x0E-\x1F]", "", data)
+    return data
+
+
+
+def to_ascii(data):
+    """Transform accentuated unicode symbols into ascii or nothing
+
+    Warning: this solution is only suited for languages that have a direct
+    transliteration to ASCII symbols.
+
+    A better solution would be to use transliteration based on a precomputed
+    unidecode map to be used by translate as explained here:
+
+        http://stackoverflow.com/questions/2854230/
+
+    """
+    import unicodedata
+    if isinstance(data, bytes):
+        data = data.decode()
+    nkfd_form = unicodedata.normalize('NFKD', data)
+    only_ascii = nkfd_form.encode('ASCII', 'ignore')
+
+    # Return a string
+    return only_ascii.decode('ascii')
+
+
+
+def load_text_files(corpus_path, truncate_len=None, 
+                    clean=True, return_fnames=False):
+    """
+    load text files
+    """
+    
+    texts = []
+    filenames = []
+    mb = master_bar(range(1))
+    for i in mb:
+        for filename in progress_bar(list(extract_filenames(corpus_path)), parent=mb):
+            with open(filename, 'r') as f:
+                text = f.read()
+            if clean:
+                text = strip_control_characters(text)
+                text = to_ascii(text)
+            if truncate_len is not None:
+                text = " ".join(text.split()[:truncate_len])
+            texts.append(text)
+            filenames.append(filename)
+        mb.write('done.')
+    if return_fnames:
+        return (texts, filenames)
+    else:
+        return texts
+
+
+def filter_by_id(lst, ids=[]):
+    """
+    filter list by supplied IDs
+    """
+    return [x for i,x in enumerate(lst) if i in ids]

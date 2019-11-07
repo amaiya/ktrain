@@ -1,11 +1,15 @@
 from ..imports import *
 from .. import utils as U
-
+from . import textutils as TU
+import time
 
 class TopicModel():
-    def __init__(self,texts, n_topics=None, n_features=10000, 
+
+
+    def __init__(self,texts=None, n_topics=None, n_features=10000, 
                  min_df=5, max_df=0.5,  stop_words='english',
-                 lda_max_iter=5, lda_mode='online', verbose=1):
+                 lda_max_iter=5, lda_mode='online', 
+                 token_pattern=None, verbose=1):
         """
         Fits a topic model to documents in <texts>.
         Example:
@@ -16,7 +20,6 @@ class TopicModel():
             n_topics (int): number of topics.
                             If None, n_topics = min{400, sqrt[# documents/2]})
             n_features (int):  maximum words to consider
-            model_type (str): one of {'lda', 'nmf'}
             max_df (float): words in more than max_df proportion of docs discarded
             stop_words (str or list): either 'english' for built-in stop words or
                                       a list of stop words to ignore
@@ -24,49 +27,39 @@ class TopicModel():
                                 If lda_mode='batch', this should be increased (e.g., 1500).
                                 Ignored if model_type != 'lda'
             lda_mode (str):  one of {'online', 'batch'}. Ignored of model_type !='lda'
+            token_pattern(str): regex pattern to use to tokenize documents. 
             verbose(bool): verbosity
 
         """
-
-        model_type='lda'
+        self.verbose=verbose
 
         # estimate n_topics
         if n_topics is None:
+            if texts is None:
+                raise ValueError('If n_topics is None, texts must be supplied')
             estimated = max(1, int(math.floor(math.sqrt(len(texts) / 2))))
             n_topics = min(400, estimated)
             print('n_topics automatically set to %s' % (n_topics))
 
-
-        # preprocess texts
-        if verbose: print('preprocessing texts...')
-        if model_type == 'nmf':
-            vectorizer = TfidfVectorizer(max_df=max_df, min_df=min_df, 
-                                         max_features=n_features, stop_words=stop_words)
+        # train model
+        if texts is not None:
+            (model, vectorizer) = self.train(texts, 
+                                             n_topics=n_topics, n_features=n_features,
+                                             min_df = min_df, max_df = max_df, 
+                                             stop_words=stop_words,
+                                             lda_max_iter=lda_max_iter, lda_mode=lda_mode,
+                                             token_pattern=token_pattern)
         else:
-            vectorizer = CountVectorizer(max_df=max_df, min_df=min_df, 
-                                         max_features=n_features, stop_words=stop_words)
-        x_train = vectorizer.fit_transform(texts)
+            vectorizer = None
+            model = None
 
-        # fit model
-        alpha = 5./n_topics
-        beta = 0.01
-        if verbose: print('fitting model...')
-        if model_type == 'nmf':
-            model = NMF(n_components=n_topics, verbose=0, random_state=1)
-        else:
-            model = LatentDirichletAllocation(n_components=n_topics, max_iter=lda_max_iter,
-                                              learning_method=lda_mode, learning_offset=50.,
-                                              doc_topic_prior=alpha, topic_word_prior=beta,
-                                              verbose=verbose, random_state=0)
-        model.fit(x_train)
+
 
         # save model and vectorizer and hyperparameter settings
         self.vectorizer = vectorizer
         self.model = model
-        self.model_type = model_type
         self.n_topics = n_topics
         self.n_features = n_features
-        self.verbose=verbose
         if verbose: print('done.')
 
         # these variables are set by self.build():
@@ -77,6 +70,57 @@ class TopicModel():
         self.scorer = None       # set by self.train_scorer()
         self.recommender = None  # set by self.train_recommender()
         return
+
+    def train(self,texts, n_topics=None, n_features=10000, 
+              min_df=5, max_df=0.5,  stop_words='english',
+              lda_max_iter=5, lda_mode='online',
+              token_pattern=None):
+        """
+        Fits a topic model to documents in <texts>.
+        Example:
+            tm = ktrain.text.get_topic_model(docs, n_topics=20, 
+                                            n_features=1000, min_df=2, max_df=0.95)
+        Args:
+            texts (list of str): list of texts
+            n_topics (int): number of topics.
+                            If None, n_topics = min{400, sqrt[# documents/2]})
+            n_features (int):  maximum words to consider
+            max_df (float): words in more than max_df proportion of docs discarded
+            stop_words (str or list): either 'english' for built-in stop words or
+                                      a list of stop words to ignore
+            lda_max_iter (int): maximum iterations for 'lda'.  5 is default if using lda_mode='online'.
+                                If lda_mode='batch', this should be increased (e.g., 1500).
+                                Ignored if model_type != 'lda'
+            lda_mode (str):  one of {'online', 'batch'}. Ignored of model_type !='lda'
+            token_pattern(str): regex pattern to use to tokenize documents. 
+                                If None, a default tokenizer will be used
+        Returns:
+            tuple: (model, vectorizer)
+        """
+
+        # preprocess texts
+        if self.verbose: print('preprocessing texts...')
+        if token_pattern is None: token_pattern = TU.DEFAULT_TOKEN_PATTERN
+        #if token_pattern is None: token_pattern = r'(?u)\b\w\w+\b'
+        vectorizer = CountVectorizer(max_df=max_df, min_df=min_df,
+                                     max_features=n_features, stop_words=stop_words,
+                                     token_pattern=token_pattern)
+        
+
+        x_train = vectorizer.fit_transform(texts)
+
+        # fit model
+        alpha = 5./n_topics
+        beta = 0.01
+        if self.verbose: print('fitting model...')
+        model = LatentDirichletAllocation(n_components=n_topics, max_iter=lda_max_iter,
+                                          learning_method=lda_mode, learning_offset=50.,
+                                          doc_topic_prior=alpha, topic_word_prior=beta,
+                                          verbose=self.verbose, random_state=0)
+        model.fit(x_train)
+
+        # save model and vectorizer and hyperparameter settings
+        return (model, vectorizer)
 
 
     @property
@@ -94,6 +138,7 @@ class TopicModel():
             n_words(int): number of words to use in topic summary
             as_string(bool): If True, each summary is a space-delimited string instead of list of words
         """
+        self._check_model()
         feature_names = self.vectorizer.get_feature_names()
         topic_summaries = []
         for topic_idx, topic in enumerate(self.model.components_):
@@ -157,7 +202,7 @@ class TopicModel():
                            
 
     
-    def get_docs(self, topic_ids=[], doc_ids=[]):
+    def get_docs(self, topic_ids=[], doc_ids=[], rank=False):
         """
         Returns document entries for supplied topic_ids
         Args:
@@ -165,12 +210,14 @@ class TopicModel():
                                      of range(self.n_topics).
             doc_ids (list of ints): list of document IDs where each id is an index
                                     into self.doctopics
+            rank(bool): If True, the list is sorted first by topic_id (ascending)
+                        and then ty topic probability (descending).
+                        Otherwise, list is sorted by doc_id (i.e., the order
+                        of texts supplied to self.build (which is the order of self.doc_topics).
+
         Returns:
             list of tuples:  list of tuples where each tuple is of the form 
                              (text, doc_id, topic_probability, topic_id).
-
-                             The list is sorted first by topic_id (ascending)
-                             and then by topic probability (descending order).
             
         """
         self._check_build()
@@ -182,6 +229,8 @@ class TopicModel():
             texts = [tup + (topic_id,) for tup in self.topic_dict[topic_id] 
                                            if not doc_ids or tup[1] in doc_ids]
             result_texts.extend(texts)
+        if not rank:
+            result_texts = sorted(result_texts, key=lambda x:x[1])
         return result_texts
 
 
@@ -232,12 +281,13 @@ class TopicModel():
             else:
                 (np.ndarray, np.ndarray): topic distribution and boolean array
         """
+        self._check_model()
         transformed_texts = self.vectorizer.transform(texts)
         X_topics = self.model.transform(transformed_texts)
-        if self.model_type == 'nmf':
-            scores = np.matrix(X_topics)
-            scores_normalized= scores/scores.sum(axis=1)
-            X_topics = scores_normalized
+        #if self.model_type == 'nmf':
+            #scores = np.matrix(X_topics)
+            #scores_normalized= scores/scores.sum(axis=1)
+            #X_topics = scores_normalized
         _idx = np.array([True] * len(texts))
         if threshold is not None:
             _idx = np.amax(X_topics, axis=1) > threshold  # idx of doc that above the threshold
@@ -324,7 +374,7 @@ class TopicModel():
         # generate inline visualization in Jupyter notebook
         lda_keys = self._harden_topics(X_topics)
         if colors is None: colors = colormap[lda_keys]
-        topic_summaries = self.get_topics()
+        topic_summaries = self.get_topics(n_words=5)
         os.environ["BOKEH_RESOURCES"]="inline"
         output_notebook()
         dct = { 
@@ -478,6 +528,37 @@ class TopicModel():
         return self.scorer.decision_function(x_test)
 
 
+    def search(self, query, topic_ids=[], doc_ids=[], case_sensitive=False):
+        """
+        search documents for query string.
+        Args:
+            query(str):  the word or phrase to search
+            topic_ids(list of ints): list of topid IDs where each id is in the range
+                                     of range(self.n_topics).
+            doc_ids (list of ints): list of document IDs where each id is an index
+                                    into self.doctopics
+            case_sensitive(bool):  If True, case sensitive search
+        """
+
+        # setup pattern
+        if not case_sensitive: query = query.lower()
+        pattern = re.compile(r'\b%s\b' % query)
+
+        # retrive docs
+        docs = self.get_docs(topic_ids=topic_ids, doc_ids=doc_ids)
+
+        # search
+        mb = master_bar(range(1))
+        results = []
+        for i in mb:
+            for doc in progress_bar(docs, parent=mb):
+                text = doc[0]
+                if not case_sensitive: text = text.lower()
+                matches = pattern.findall(text)
+                if matches: results.append(doc)
+            if self.verbose: mb.write('done.')
+        return results
+
 
 
     def _rank_documents(self, 
@@ -531,6 +612,7 @@ class TopicModel():
 
 
     def _check_build(self):
+        self._check_model()
         if self.topic_dict is None: 
             raise Exception('Must call build() method.')
 
@@ -543,9 +625,51 @@ class TopicModel():
             raise Exception('Must call train_recommender()')
 
 
+    def _check_model(self):
+        if self.model is None or self.vectorizer is None:
+            raise Exception('Must call train()')
 
+
+
+    def save(self, fname):
+        """
+        save TopicModel object
+        """
+
+        
+        with open(fname+'.tm_vect', 'wb') as f:
+            pickle.dump(self.vectorizer, f)
+        with open(fname+'.tm_model', 'wb') as f:
+            pickle.dump(self.model, f)
+        params = {'n_topics': self.n_topics,
+                  'n_features': self.n_features,
+                  'verbose': self.verbose}
+        with open(fname+'.tm_params', 'wb') as f:
+            pickle.dump(params, f)
+
+        return
 
 get_topic_model = TopicModel 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
