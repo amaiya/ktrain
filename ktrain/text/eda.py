@@ -441,6 +441,8 @@ class TopicModel():
                             (text, doc_id, topic_probability, topic_id)
 
         """
+        n_neighbors = 100 
+
         # error-checks
         if text is not None and doc_topic is not None:
             raise ValueError('text is mutually-exclusive with doc_topic')
@@ -451,12 +453,15 @@ class TopicModel():
         if  doc_topic is not None and type(doc_topic) not in [np.ndarray]:
             raise ValueError('doc_topic must be a np.ndarray')
 
+        if n > n_neighbors: n_neighbors = n
+
         x_test = [doc_topic]
         if text:
             x_test = self.predict([text])
         docs = self.get_docs()
-        indices = self.recommender.kneighbors(x_test, return_distance=False, n_neighbors=n)
-        return [doc for i, doc in enumerate(docs) if i in indices]
+        indices = self.recommender.kneighbors(x_test, return_distance=False, n_neighbors=n_neighbors)
+        results = [doc for i, doc in enumerate(docs) if i in indices]
+        return results[:n]
 
 
 

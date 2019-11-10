@@ -13,11 +13,17 @@
 
 - estimate an optimal learning rate for your model given your data using a Learning Rate Finder
 - utilize learning rate schedules such as the [triangular policy](https://arxiv.org/abs/1506.01186), the [1cycle policy](https://arxiv.org/abs/1803.09820), and [SGDR](https://arxiv.org/abs/1608.03983) to effectively minimize loss and improve generalization
-- employ fast and easy-to-use pre-canned models for:
-  - **text classification** (e.g., [BERT](https://arxiv.org/abs/1810.04805), [NBSVM](https://www.aclweb.org/anthology/P12-2018), [fastText](https://arxiv.org/abs/1607.01759), GRUs with [pretrained word vectors](https://fasttext.cc/docs/en/english-vectors.html))
-  - **image classification** (e.g., [ResNet](https://arxiv.org/abs/1512.03385), [Wide ResNet](https://arxiv.org/abs/1605.07146), [Inception](https://www.cs.unc.edu/~wliu/papers/GoogLeNet.pdf))
-  - **text sequence labeling** (e.g., [Bidirectional LSTM-CRF](https://arxiv.org/abs/1603.01360) with optional pretrained word embeddings)
-  - **graph node classification** (e.g., [GraphSAGE](https://cs.stanford.edu/people/jure/pubs/graphsage-nips17.pdf))
+- employ fast and easy-to-use pre-canned models for  **text**, **images**, and **graphs**:
+  - *text*
+     - **Text Classification**: [BERT](https://arxiv.org/abs/1810.04805), [NBSVM](https://www.aclweb.org/anthology/P12-2018), [fastText](https://arxiv.org/abs/1607.01759), GRUs with [pretrained word vectors](https://fasttext.cc/docs/en/english-vectors.html), and other models
+     - **Sequence Labeling**:  [Bidirectional LSTM-CRF](https://arxiv.org/abs/1603.01360) with optional pretrained word embeddings
+     - **Unsupervised Topic Modeling**: [LDA](http://www.jmlr.org/papers/volume3/blei03a/blei03a.pdf)
+     - **One-Class Text Classification**:  given a sample of interesting documents, find and score documents that are semantically similar to it using [One Class Classification](https://en.wikipedia.org/wiki/One-class_classification)
+     - **Document Recommendation Engine**:  given text from a sample document, recommend documents that are semantically similar to it from a larger corpus
+  - *images*
+    - **image classification** (e.g., [ResNet](https://arxiv.org/abs/1512.03385), [Wide ResNet](https://arxiv.org/abs/1605.07146), [Inception](https://www.cs.unc.edu/~wliu/papers/GoogLeNet.pdf))
+  - *graphs*
+    - **graph node classification** (e.g., [GraphSAGE](https://cs.stanford.edu/people/jure/pubs/graphsage-nips17.pdf))
 - perform multilingual text classification (e.g., [Chinese Sentiment Analysis with BERT](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/ChineseHotelReviews-BERT.ipynb), [Arabic Sentiment Analysis with NBSVM](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/ArabicHotelReviews-nbsvm.ipynb))
 - load and preprocess text and image data from a variety of formats 
 - inspect data points that were misclassified and [provide explanations](https://eli5.readthedocs.io/en/latest/) to help improve your model
@@ -30,10 +36,11 @@ Please see the following tutorial notebooks for a guide on how to use *ktrain* o
 * Tutorial 2:  [Tuning Learning Rates](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorial-02-tuning-learning-rates.ipynb)
 * Tutorial 3: [Image Classification](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorial-03-image-classification.ipynb)
 * Tutorial 4: [Text Classification](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorial-04-text-classification.ipynb)
-* Tutorial 5: [Explaining Predictions and Misclassifications](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorial-05-explaining-predictions.ipynb)
+* Tutorial 5: [Learning from Unlabeled Text Data](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorial-05-learning_from_unlabeled_text_data.ipynb)
 * Tutorial 6: [Text Sequence Tagging](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorial-06-sequence-tagging.ipynb) for Named Entity Recognition
 * Tutorial 7: [Graph Node Classification](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorial-07-graph-node_classification.ipynb) with Graph Neural Networks
 * Tutorial A1: [Additional tricks](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorial-A1-additional-tricks.ipynb), which covers topics such as previewing data augmentation schemes, inspecting intermediate output of Keras models for debugging, setting global weight decay, and use of built-in and custom callbacks.
+* Tutorial A2: [Explaining Predictions and Misclassifications](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorial-A2-explaining-predictions.ipynb)
 
 
 Some blog tutorials about *ktrain* are shown below:
