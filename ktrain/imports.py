@@ -120,6 +120,7 @@ import zipfile
 import string
 import random
 import json
+import mimetypes
 
 
 
@@ -130,11 +131,16 @@ import json
 
 import numpy as np
 from matplotlib import pyplot as plt
+from matplotlib.colors import rgb2hex
 import sklearn
 from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.datasets import load_files
 from sklearn.model_selection import train_test_split
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.decomposition import NMF, LatentDirichletAllocation
+from sklearn.manifold import TSNE
+
 
 #from sklearn.externals import joblib
 import joblib

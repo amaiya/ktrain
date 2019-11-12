@@ -379,3 +379,17 @@ def add_headers_to_df(fname_in, header_dict, fname_out=None):
         fname_out = name + '.' + ext
     df.to_csv(fname_out, index=False) # save to new csv file
     return
+
+
+def get_random_colors(n, name='hsv', hex_format=True):
+    '''Returns a function that maps each index in 0, 1, ..., n-1 to a distinct
+    RGB color; the keyword argument name must be a standard mpl colormap name.'''
+    cmap = plt.cm.get_cmap(name, n)
+    result = []
+    for i in range(n):
+        color = cmap(i)
+        if hex_format: color = rgb2hex(color)
+        result.append(color)
+    return np.array(result)
+
+
