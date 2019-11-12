@@ -5,7 +5,7 @@ This directory contains various example notebooks using *ktrain*.  The directory
   - [text classification](#textclass): examples using various text classification models and datasets
   - [text sequence labeling](#seqlab):  sequence tagging models
   - [topic modeling](#lda):  unsupervised learning from unlabeled text data
-  - [one-class text classification](#docsim): given a sample of interesting documents, find and score new documents that are semantically similar to it using One-Class text classification
+  - [document similarity with one-class learning](#docsim): given a sample of interesting documents, find and score new documents that are semantically similar to it using One-Class text classification
   - [document recommender system](#docrec):  given text from a sample document, recommend documents that are semantically similar to it from a larger corpus 
 - `vision`:  
   - [image classification](#imageclass):  models for image datasetsimage classification examples using various models and datasets

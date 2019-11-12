@@ -1257,7 +1257,7 @@ def _load_model(fpath, preproc=None, train_data=None):
     elif (preproc and (isinstance(preproc, NodePreprocessor) or \
                     type(preproc).__name__ == 'NodePreprocessor')) or \
         train_data and U.is_nodeclass(data=train_data):
-        from stellargraph.layer import MeanAggregator
+        from .graph.stellargraph.layer import MeanAggregator
         custom_objects={'MeanAggregator': MeanAggregator}
     try:
         model = load_model(fpath, custom_objects=custom_objects)

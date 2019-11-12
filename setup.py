@@ -31,6 +31,7 @@ setup(
           'jieba',
           'cchardet',
           'networkx==2.3',
+          'bokeh',
           #'pillow'
       ],
   classifiers=[  # Optional
