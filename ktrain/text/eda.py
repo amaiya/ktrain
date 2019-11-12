@@ -336,7 +336,7 @@ class TopicModel():
         if texts is None and doc_topics is None:
             raise ValueError('One of texts or doc_topics is required.')
         if extra_info:
-            invalid_keys = ['x', 'y', 'topic', 'fill_color', 'doc_id']
+            invalid_keys = ['x', 'y', 'topic', 'fill_color']
             for k in extra_info.keys():
                 if k in invalid_keys:
                     raise ValueError('cannot use "%s" as key in extra_info' %(k))
