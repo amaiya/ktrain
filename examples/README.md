@@ -70,7 +70,7 @@ The objective of the CoNLL2003 task is to classify sequences of words as belongi
 - [CoNLL2003-BiLSTM_CRF.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text):  A simple and fast Bidirectional LSTM-CRF model with randomly initialized word embeddings.
 
 
-### <a name="docsim"></a> One-Class Text Classification
+### <a name="lda"></a> Topic Modeling
 
 #### [20 News Groups](http://qwone.com/~jason/20Newsgroups/): unsupervised learning on 20newsgroups corpus
 - [20newsgroups-topic_modeling.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text):  Discover latent topics and themes in the 20 newsgroups corpus 
