@@ -6,6 +6,23 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.6.0 (2019-11-12)
+
+### New:
+- support for learning from unlabeled or partially-labeled text data
+  - unsupervised topic modeling with LDA
+  - one-class text classification to score documents based on similarity to a set of positive examples
+  - document recommendation engine
+
+### Changed:
+- N/A
+
+
+### Fixed:
+- Removed dangling reference to external 'stellargraph' dependency from `_load_model`, so that we rely solely on
+  local version of stellargraph
+
+
 ## 0.5.2 (2019-10-20)
 
 ### New:
