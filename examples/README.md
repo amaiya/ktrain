@@ -10,7 +10,7 @@ This directory contains various example notebooks using *ktrain*.  The directory
 - `vision`:  
   - [image classification](#imageclass):  models for image datasetsimage classification examples using various models and datasets
 - `graphs`: 
-  - [node classification](#nodeclass): node classification in graphs or networks
+  - [node classification](#-graph-node-classification-datasets): node classification in graphs or networks
 
 
 ## Text Data
