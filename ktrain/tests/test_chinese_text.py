@@ -61,8 +61,8 @@ class TestTextClassification(TestCase):
         p = ktrain.load_predictor('/tmp/test_predictor')
         self.assertEqual(p.predict(TEST_DOC), 'pos')
         self.assertEqual(np.argmax(p.predict_proba([TEST_DOC])[0]), 0)
-        #self.assertEqual(type(p.explain(TEST_DOC)), IPython.core.display.HTML)
-        self.assertEqual(type(p.explain(TEST_DOC)), type(None))
+        self.assertEqual(type(p.explain(TEST_DOC)), IPython.core.display.HTML)
+        #self.assertEqual(type(p.explain(TEST_DOC)), type(None))
 
 
 if __name__ == "__main__":
