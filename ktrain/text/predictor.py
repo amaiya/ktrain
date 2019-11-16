@@ -63,15 +63,18 @@ class TextPredictor(Predictor):
         return self.predict(texts, return_proba=True)
 
 
-    def explain(self, doc):
+    def explain(self, doc, truncate=512):
         """
         Highlights text to explain prediction
+        Args:
+            doc (str): text of documnet
+            truncate_to(int): truncate document to this many words
         """
         if not isinstance(doc, str): raise Exception('text must of type str')
-        if self.preproc.lang != 'en': 
-            warnings.warn('explain currently only supports English')
-            return
-        doc = ' '.join(doc.split()[:512])
+        if self.preproc.is_nospace_lang():
+            doc = self.preproc.process_chinese([doc])
+            doc = doc[0]
+        doc = ' '.join(doc.split()[:truncate_to])
         te = TextExplainer(random_state=42)
         _ = te.fit(doc, self.predict_proba)
         return te.show_prediction(target_names=self.preproc.get_classes())

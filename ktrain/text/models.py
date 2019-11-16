@@ -216,7 +216,7 @@ def _build_bert(x_train, y_train, num_classes,
                                     seq_len=maxlen)
     inputs = model.inputs[:2]
     dense = model.get_layer('NSP-Dense').output
-    outputs = Dense(units=num_classes, activation='softmax')(dense)
+    outputs = Dense(units=num_classes, activation=activation)(dense)
     model = Model(inputs, outputs)
     model.compile(loss=loss_func,
                   optimizer=U.DEFAULT_OPT,
