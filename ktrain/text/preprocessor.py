@@ -54,7 +54,7 @@ def get_coefs(word, *arr): return word, np.asarray(arr, dtype='float32')
 def load_wv(wv_path=None, verbose=1):
     if verbose: print('Loading pretrained word vectors...this may take a few moments...')
     if wv_path is None: wv_path = get_wv_path()
-    embeddings_index = dict(get_coefs(*o.rstrip().rsplit(' ')) for o in open(wv_path))
+    embeddings_index = dict(get_coefs(*o.rstrip().rsplit(' ')) for o in open(wv_path, encoding='utf-8'))
     if verbose: print('Done.')
     return embeddings_index
 
