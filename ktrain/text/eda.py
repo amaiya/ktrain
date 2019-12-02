@@ -111,6 +111,7 @@ class TopicModel():
                 for t in texts:
                     text_list.append(' '.join(jieba.cut(t, HMM=False)))
                 texts = text_list
+            if self.verbose: print('lang: %s' % (lang))
 
 
         # preprocess texts
