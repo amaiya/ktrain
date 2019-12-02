@@ -6,6 +6,19 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.6.2 (TBD)
+
+### New:
+- N/A
+
+### Changed:
+
+### Fixed:
+- added encoding argument when reading in word vectors to bypass error on Windows systems (PR #31)
+- Change preprocessing defaults and apply special preprocessing in `text.eda.get_topic_model` 
+  when non-English is detected.
+
+
 ## 0.6.1 (2019-11-16)
 
 ### New:
