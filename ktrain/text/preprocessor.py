@@ -34,7 +34,7 @@ def get_wv_path():
         U.download(WV_URL, zip_fpath)
 
         # unzip
-        print('\nextracting pretrained pretrained word vectors...')
+        print('\nextracting pretrained word vectors...')
         with zipfile.ZipFile(zip_fpath, 'r') as zip_ref:
             zip_ref.extractall(ktrain_data)
         print('done.\n')
