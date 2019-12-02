@@ -1,6 +1,7 @@
 from ..imports import *
 from .. import utils as U
 from . import textutils as TU
+from . import preprocessor as pp
 import time
 
 class TopicModel():
@@ -71,6 +72,7 @@ class TopicModel():
         self.recommender = None  # set by self.train_recommender()
         return
 
+
     def train(self,texts, n_topics=None, n_features=10000, 
               min_df=5, max_df=0.5,  stop_words='english',
               lda_max_iter=5, lda_mode='online',
@@ -97,6 +99,19 @@ class TopicModel():
         Returns:
             tuple: (model, vectorizer)
         """
+
+        # adjust defaults based on language detected
+        if texts is not None:
+            lang = pp.detect_lang(texts)
+            if lang != 'en':
+                stopwords = None if stop_words=='english' else stop_words
+                token_pattern = r'(?u)\b\w+\b' if token_pattern is None else token_pattern
+            if pp.is_nospace_lang(lang):
+                text_list = []
+                for t in texts:
+                    text_list.append(' '.join(jieba.cut(t, HMM=False)))
+                texts = text_list
+
 
         # preprocess texts
         if self.verbose: print('preprocessing texts...')
