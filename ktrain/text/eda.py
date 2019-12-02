@@ -104,8 +104,8 @@ class TopicModel():
         if texts is not None:
             lang = pp.detect_lang(texts)
             if lang != 'en':
-                stopwords = None if stop_words='english' else stop_words
-                token_pattern = r'(?u)\b\w+\b' if token_pattern = None else token_pattern
+                stopwords = None if stop_words=='english' else stop_words
+                token_pattern = r'(?u)\b\w+\b' if token_pattern is None else token_pattern
             if pp.is_nospace_lang(lang):
                 text_list = []
                 for t in texts:
