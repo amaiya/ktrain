@@ -5,7 +5,7 @@
   - *ktrain* v0.5.x is released and includes pre-canned support for [node classification in graphs](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/graphs/hateful_twitter_users-GraphSAGE.ipynb).
 - **Coming Soon**:
   - better support for custom data formats and models
-  - support for using *ktrain* with `tf.keras`
+  - support for using *ktrain* with `tf.keras` and TensorFlow 2.0
 ----
 
 
