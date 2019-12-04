@@ -352,7 +352,6 @@ def get_ktrain_data():
 #------------------------------------------------------------------------------
 
 def is_tf_keras():
-
     if keras.__name__ == 'keras':
         is_tf_keras = False
     elif keras.__name__ in ['tensorflow.keras', 'tensorflow.python.keras'] or\
@@ -361,6 +360,7 @@ def is_tf_keras():
     else:
         raise KeyError('Cannot detect if using keras or tf.keras.')
     #return keras.__version__[-3:] == '-tf' 
+    return is_tf_keras
 
 
 def vprint(s=None, verbose=1):
