@@ -2,18 +2,20 @@
 """
 Tests of ktrain text classification flows
 """
-import sys
-import os
-os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID";
-os.environ["CUDA_VISIBLE_DEVICES"]="0"
-sys.path.insert(0,'../..')
+import testenv
+import numpy as np
 from unittest import TestCase, main, skip
 import ktrain
+
+
+Sequential = ktrain.imports.Sequential
+Dense = ktrain.imports.Dense
+Embedding = ktrain.imports.Embedding
+GlobalAveragePooling1D = ktrain.imports.GlobalAveragePooling1D
 
 def synthetic_multilabel():
 
 
-    import numpy as np
 
     # data
     X = [[1,0,0,0,0,0,0],
@@ -57,13 +59,7 @@ def synthetic_multilabel():
         [0,0,0,1],
         [0,0,1,0],
         [1,0,0,1]]
-        
-    # model   
-    from keras.models import Sequential
-    from keras.layers import Dense
-    from keras.layers import Embedding
-    from keras.layers import GlobalAveragePooling1D
-    import numpy as np
+
 
     X = np.array(X)
     Y = np.array(Y)
