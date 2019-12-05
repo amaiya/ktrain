@@ -32,6 +32,7 @@ setup(
           'networkx==2.3',
           'bokeh',
           'eli5 >= 0.10.0',
+          'sg_ktrain @ git+https://github.com/amaiya/stellargraph@v0.7.3-pretf#egg=sg_ktrain'
           'https://github.com/amaiya/stellargraph@sg_ktrain_standalone#egg=stellargraph'
           #'pillow'
       ],
