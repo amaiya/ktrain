@@ -1,9 +1,9 @@
-from .stellargraph.mapper import node_mappers
+from stellargraph.mapper import node_mappers
 
 class NodeSequenceWrapper(node_mappers.NodeSequence):
     def __init__(self, node_seq):
         if not isinstance(node_seq, node_mappers.NodeSequence):
-            raise ValueError('node_seq must by a stellargraph NodeSequene object')
+            raise ValueError('node_seq must by a stellargraph NodeSequence object')
         self.node_seq = node_seq
         self.targets = node_seq.targets
         self.generator = node_seq.generator
