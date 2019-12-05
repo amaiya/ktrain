@@ -32,7 +32,7 @@ setup(
           'networkx==2.3',
           'bokeh',
           'eli5 >= 0.10.0',
-          'stellargraph @ git+https://github.com/amaiya/stellargraph@sg_ktrain_standalone#egg=stellargraph'
+          'stellargraph @ https://github.com/amaiya/stellargraph@sg_ktrain_standalone#egg=stellargraph'
           #'pillow'
       ],
   classifiers=[  # Optional
