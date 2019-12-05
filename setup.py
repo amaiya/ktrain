@@ -32,10 +32,10 @@ setup(
           'networkx==2.3',
           'bokeh',
           'eli5 >= 0.10.0',
-          'stellargraph==0.7.3'
+          'stellargraph_ktrain'
           #'pillow'
       ],
-  dependency_links=['git+https://git@github.com/amaiya/stellargraph@sg_ktrain_standalone#egg=stellargraph-0.7.3'],
+  dependency_links=['git+https://git@github.com/amaiya/stellargraph@sg_ktrain_standalone#egg=stellargraph_ktrain'],
   classifiers=[  # Optional
     # How mature is this project? Common values are
     #   3 - Alpha
