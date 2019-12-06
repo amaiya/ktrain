@@ -16,10 +16,10 @@ import sys
 if 'install' in sys.argv[1:]:
     # stellargraph fork
     # reason:  avoid installing tensorflow and overwriting tensorflow-gpu
-    install('git+https://github.com/amaiya/stellargraph@no_tf_dep_073')
+    install('git+https://github.com/amaiya/stellargraph@no_tf_dep_082')
     ## eli5 fork 
-    ## reason: eli5 support for tf.keras
-    #install('git+https://github.com/amaiya/eli5@tfkeras_0_10_1')
+    # reason: eli5 support for tf.keras
+    install('git+https://github.com/amaiya/eli5@tfkeras_0_10_1')
 
 
 setup(
@@ -49,7 +49,7 @@ setup(
           'cchardet',
           'networkx==2.3',
           'bokeh',
-          'eli5 >= 0.10.0',
+          #'eli5 >= 0.10.0',
           #'pillow'
       ],
   classifiers=[  # Optional
