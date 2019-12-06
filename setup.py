@@ -5,7 +5,7 @@ with open('README.md') as readme_file: readme = readme_file.read()
 exec(open('ktrain/version.py').read())
 
 
-# install forked versions of libraries
+# install forked versions of libraries when necessary
 import pip
 def install(package):
     if hasattr(pip, 'main'):
@@ -14,9 +14,12 @@ def install(package):
         pip._internal.main(['install', package])
 import sys
 if 'install' in sys.argv[1:]:
-    # stellargraph
+    # stellargraph fork
     # reason:  avoid installing tensorflow and overwriting tensorflow-gpu
     install('git+https://github.com/amaiya/stellargraph@no_tf_dep_073')
+    ## eli5 fork 
+    ## reason: eli5 support for tf.keras
+    #install('git+https://github.com/amaiya/eli5@tfkeras_0_10_1')
 
 
 setup(
