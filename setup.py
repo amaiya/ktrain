@@ -4,6 +4,19 @@ import setuptools
 with open('README.md') as readme_file: readme = readme_file.read()
 exec(open('ktrain/version.py').read())
 
+
+# install forked versions of libraries
+import pip
+def install(package):
+    if hasattr(pip, 'main'):
+        pip.main(['install', package])
+    else:
+        pip._internal.main(['install', package])
+# stellargraph
+# reason:  avoid installing tensorflow and overwriting tensorflow-gpu
+install('git+https://github.com/amaiya/stellargraph@sg_ktrain_standalone')
+
+
 setup(
   name = 'ktrain',
   packages = setuptools.find_packages(),
@@ -32,7 +45,6 @@ setup(
           'networkx==2.3',
           'bokeh',
           'eli5 >= 0.10.0',
-          'git+git://github.com/amaiya/stellargraph@sg_ktrain_standalone#egg=stellargraph'
           #'pillow'
       ],
   classifiers=[  # Optional
