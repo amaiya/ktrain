@@ -7,7 +7,6 @@ from stellargraph.layer import GraphSAGE
 
 
 
-
 GRAPHSAGE = 'graphsage'
 NODE_CLASSIFIERS = {
         GRAPHSAGE: 'GraphSAGE:  http://arxiv.org/pdf/1607.01759.pdf'}

@@ -1,11 +1,17 @@
+
+
+
 ### News and Announcements
+- **2019-12-09:**  
+  - *ktrain* v0.7.x is released and now uses TensorFlow Keras (i.e., `tf.keras`) instead of stand-alone Keras.  If you're using custom Keras models with *ktrain*, you must change all `keras` references to `tensorflow.keras`. That is, don't import Keras like this: `from keras.layers import Dense`. Do this instead:  `from tensorflow.keras.layers import Dense`
 - **2019-11-12:**  
   - *ktrain* v0.6.x is released and includes pre-canned support for [learning from unlabeled or partially labeled text data](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorial-05-learning_from_unlabeled_text_data.ipynb).
-- **2019-10-16:**  
-  - *ktrain* v0.5.x is released and includes pre-canned support for [node classification in graphs](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/graphs/hateful_twitter_users-GraphSAGE.ipynb).
 - **Coming Soon**:
   - better support for custom data formats and models
-  - support for using *ktrain* with `tf.keras` and TensorFlow 2.0
+  - support for using *ktrain* with TensorFlow 2.0
+
+**IMPORTANT NOTE:** As mentioned above, as of v0.7.0, `ktrain` uses tf.keras instead of stand-alone Keras.  This means that you must import Keras modules like this: `from tensorflow.keras.layers import Dense`. 
+If you mix tf.keras and Keras, you will experience problems.
 ----
 
 
@@ -177,9 +183,20 @@ Additional examples can be found [here](https://github.com/amaiya/ktrain/tree/ma
 
 ### Installation
 
+1. Ensure Tensorflow [is installed](https://www.tensorflow.org/install/pip?lang=python3) if it is not already
+
+> For GPU: `pip3 install "tensorflow_gpu>=1.14,<2"`
+
+> For CPU: `pip3 install "tensorflow>=1.14,<2"`
+
+
+2. Install `ktrain`:
 ```
 pip3 install ktrain
 ```
+
+TensorFlow 2 is not yet supported by *ktrain* but will be in the future.
+
 
 <!--
 ### Requirements
@@ -197,8 +214,7 @@ The following software/libraries should be installed:
 -->
 
 
-
-This code was tested on Ubuntu 18.04 LTS using Keras 2.2.4 with a TensorFlow 1.14 backend.
+This code was tested on Ubuntu 18.04 LTS using TensorFlow 1.14 (and Keras v2.2.4).
 
 ----
 **Creator:  [Arun S. Maiya](http://arun.maiya.net)**
