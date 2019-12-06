@@ -10,9 +10,12 @@
   - better support for custom data formats and models
   - support for using *ktrain* with TensorFlow 2.0
 
+
 *IMPORTANT NOTE:* 
 As mentioned above, as of v0.7.0, `ktrain` uses tf.keras instead of stand-alone Keras.  This means that you must import Keras modules like this: `from tensorflow.keras.layers import Dense`. 
 If you mix tf.keras and Keras, you will experience problems.
+
+
 ----
 
 
