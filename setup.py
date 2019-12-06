@@ -12,9 +12,11 @@ def install(package):
         pip.main(['install', package])
     else:
         pip._internal.main(['install', package])
-# stellargraph
-# reason:  avoid installing tensorflow and overwriting tensorflow-gpu
-install('git+https://github.com/amaiya/stellargraph@sg_ktrain_standalone')
+import sys
+if 'install' in sys.argv[1:]:
+    # stellargraph
+    # reason:  avoid installing tensorflow and overwriting tensorflow-gpu
+    install('git+https://github.com/amaiya/stellargraph@no_tf_dep_073')
 
 
 setup(
