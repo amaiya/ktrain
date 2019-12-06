@@ -10,7 +10,7 @@ tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
 TF_KERAS = False
 EAGER_MODE = False
-
+os.environ['TF_KERAS'] = '1' # force tf.keras as of 0.7.x
 if os.environ.get('TF_KERAS', '0') != '0':
     import tensorflow as tf
     from tensorflow.python import keras
