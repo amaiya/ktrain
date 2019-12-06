@@ -2,7 +2,7 @@
 
 
 ### News and Announcements
-- **2019-12-09:**  
+- **2019-12-??:**  
   - *ktrain* v0.7.x is released and now uses TensorFlow Keras (i.e., `tf.keras`) instead of stand-alone Keras.  If you're using custom Keras models with *ktrain*, you must change all `keras` references to `tensorflow.keras`. That is, don't import Keras like this: `from keras.layers import Dense`. Do this instead:  `from tensorflow.keras.layers import Dense`
 - **2019-11-12:**  
   - *ktrain* v0.6.x is released and includes pre-canned support for [learning from unlabeled or partially labeled text data](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorial-05-learning_from_unlabeled_text_data.ipynb).
@@ -10,8 +10,12 @@
   - better support for custom data formats and models
   - support for using *ktrain* with TensorFlow 2.0
 
-**IMPORTANT NOTE:** As mentioned above, as of v0.7.0, `ktrain` uses tf.keras instead of stand-alone Keras.  This means that you must import Keras modules like this: `from tensorflow.keras.layers import Dense`. 
+
+**IMPORTANT NOTE:**
+As mentioned above, as of v0.7.0, `ktrain` uses tf.keras instead of stand-alone Keras.  This means that you must import Keras modules like this: `from tensorflow.keras.layers import Dense`. 
 If you mix tf.keras and Keras, you will experience problems.
+
+
 ----
 
 
