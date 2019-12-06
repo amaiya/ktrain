@@ -1,5 +1,5 @@
 from ..imports import *
-from .. import Urals as U
+from .. import utils as U
 from .node_generator import NodeSequenceWrapper
 import stellargraph as sg
 from stellargraph.mapper import GraphSAGENodeGenerator, GraphSAGELinkGenerator
