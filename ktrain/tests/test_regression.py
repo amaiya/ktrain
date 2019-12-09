@@ -30,7 +30,7 @@ class TestRegression(TestCase):
         hist  = bostonhousing()
         min_loss = min(hist.history['val_loss'])
         print(min_loss)
-        self.assertLess(min_loss, 45)
+        self.assertLess(min_loss, 55)
 
 if __name__ == "__main__":
     main()
