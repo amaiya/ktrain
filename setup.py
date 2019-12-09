@@ -10,7 +10,14 @@ import subprocess
 import sys
 def install(package):
     subprocess.check_call([sys.executable, "-m", "pip", "install", package])
-if 'install' in sys.argv[1:]:
+
+
+import tempfile
+import os.path
+with open(os.path.join(tempfile.gettempdir(), 'ktrain_pip_install'), 'w') as f:
+    f.write(" ".join(sys.argv))
+
+if 'install' in sys.argv[1:] or 'bdist_wheel' in sys.argv[1:]:
     # stellargraph fork
     # reason:  avoid installing tensorflow and overwriting tensorflow-gpu
     install('git+https://github.com/amaiya/stellargraph@no_tf_dep_082')
