@@ -6,6 +6,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.7.0b0 (TBD)
+
+### New:
+- *ktrain* now uses tf.keras (`tensorflow>=1.14,<2) instead of stand-alone Keras.  
+
+### Changed:
+- N/A
+
+### Fixed:
+- N/A
+
+
 ## 0.6.2 (2019-12-02)
 
 ### New:
