@@ -4,16 +4,27 @@
 #------------------------
 
 import os
-import tensorflow as tf
-#tf.logging.set_verbosity(tf.logging.ERROR)
-tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
+# TF1
+#import tensorflow as tf
+#tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
+
+# TF2-transition
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
+tf.logging.set_verbosity(tf.logging.ERROR)
+
+
 
 TF_KERAS = False
 EAGER_MODE = False
 os.environ['TF_KERAS'] = '1' # force tf.keras as of 0.7.x
 if os.environ.get('TF_KERAS', '0') != '0':
-    import tensorflow as tf
-    from tensorflow import keras
+    # TF1
+    #from tensorflow import keras
+
+    # TF2-transition
+    from tensorflow.compat.v1 import keras
+
     TF_KERAS = True
     if os.environ.get('TF_EAGER', '0') != '0':
         try:
