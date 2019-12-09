@@ -12,10 +12,8 @@ def install(package):
     subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
 
-import tempfile
-import os.path
-with open(os.path.join(tempfile.gettempdir(), 'ktrain_pip_install'), 'w') as f:
-    f.write(" ".join(sys.argv))
+#with open('/tmp/ktrain_pip_install', 'w') as f:
+    #f.write(" ".join(sys.argv))
 
 if 'install' in sys.argv[1:] or 'bdist_wheel' in sys.argv[1:]:
     # stellargraph fork

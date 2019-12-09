@@ -183,7 +183,7 @@ Additional examples can be found [here](https://github.com/amaiya/ktrain/tree/ma
 
 ### Installation
 
-<!-- Make sure pip is updated with: `pip3 install -U pip`. -->
+Make sure pip is up-to-date with: `pip3 install -U pip`.
 
 1. Ensure Tensorflow 1.14 or TensorFlow 2 [is installed](https://www.tensorflow.org/install/pip?lang=python3) if it is not already
 
@@ -192,7 +192,7 @@ Additional examples can be found [here](https://github.com/amaiya/ktrain/tree/ma
 > For CPU: `pip3 install "tensorflow>=1.14,<=2"`
 
 
-2. Install `ktrain`:
+2. Install *ktrain*:
 ```
 pip3 install ktrain
 ```
