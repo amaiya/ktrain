@@ -2,18 +2,14 @@
 
 
 ### News and Announcements
-- **2019-12-??:**  
-  - *ktrain* v0.7.x is released and now uses TensorFlow Keras (i.e., `tf.keras`) instead of stand-alone Keras.  If you're using custom Keras models with *ktrain*, you must change all `keras` references to `tensorflow.keras`. That is, don't import Keras like this: `from keras.layers import Dense`. Do this instead:  `from tensorflow.keras.layers import Dense`
+- **2019-12-10:**  
+  - ***ktrain*** **v0.7.x is released and now uses TensorFlow Keras** (i.e., `tf.keras`) instead of stand-alone Keras.  If you're using custom Keras models with *ktrain*, you must change all `keras` references to `tensorflow.keras`. That is, don't import Keras like this: `from keras.layers import Dense`. Do this instead:  `from tensorflow.keras.layers import Dense`.  If you mix calls to tf.keras with Keras, you will experience problems.  Supported versions of TensorFlow include 1.14 and 2.0.
 - **2019-11-12:**  
   - *ktrain* v0.6.x is released and includes pre-canned support for [learning from unlabeled or partially labeled text data](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorial-05-learning_from_unlabeled_text_data.ipynb).
 - **Coming Soon**:
   - better support for custom data formats and models
-  - support for using *ktrain* with TensorFlow 2.0
-
-
-**IMPORTANT NOTE:**
-As mentioned above, as of v0.7.0, `ktrain` uses tf.keras instead of stand-alone Keras.  This means that you must import Keras modules like this: `from tensorflow.keras.layers import Dense`. 
-If you mix tf.keras and Keras, you will experience problems.
+  - ability to train [HuggingFace Transformer models](https://github.com/huggingface/transformers) within *ktrain*
+  
 
 
 ----
@@ -187,11 +183,11 @@ Additional examples can be found [here](https://github.com/amaiya/ktrain/tree/ma
 
 ### Installation
 
-1. Ensure Tensorflow [is installed](https://www.tensorflow.org/install/pip?lang=python3) if it is not already
+1. Ensure Tensorflow 1.14 or TensorFlow 2 [is installed](https://www.tensorflow.org/install/pip?lang=python3) if it is not already
 
-> For GPU: `pip3 install "tensorflow_gpu>=1.14,<2"`
+> For GPU: `pip3 install "tensorflow_gpu>=1.14,<=2"`
 
-> For CPU: `pip3 install "tensorflow>=1.14,<2"`
+> For CPU: `pip3 install "tensorflow>=1.14,<=2"`
 
 
 2. Install `ktrain`:
@@ -199,7 +195,8 @@ Additional examples can be found [here](https://github.com/amaiya/ktrain/tree/ma
 pip3 install ktrain
 ```
 
-TensorFlow 2 is not yet supported by *ktrain* but will be in the future.
+The *ktrain* package can be used with TensorFlow versions 1.14 and 2.0.  If using TensorFlow 2.0, *ktrain*
+presently runs in 1.x mode using [tf.compat.v1.disable_v2_behavior](https://www.tensorflow.org/api_docs/python/tf/compat/v1/disable_v2_behavior).  In the future, this will be removed and **only** TensorFlow 2 will be supported.
 
 
 <!--
@@ -218,7 +215,7 @@ The following software/libraries should be installed:
 -->
 
 
-This code was tested on Ubuntu 18.04 LTS using TensorFlow 1.14 (and Keras v2.2.4).
+This code was tested on Ubuntu 18.04 LTS using TensorFlow 1.14 and TensorFlow 2 (Keras version 2.2.4-tf).
 
 ----
 **Creator:  [Arun S. Maiya](http://arun.maiya.net)**
