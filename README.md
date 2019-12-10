@@ -192,10 +192,7 @@ Make sure pip is up-to-date with: `pip3 install -U pip`.
 > For CPU: `pip3 install "tensorflow>=1.14,<=2"`
 
 
-2. Install *ktrain*:
-```
-pip3 install ktrain
-```
+2. Install *ktrain*: `pip3 install ktrain`
 
 The *ktrain* package can be used with TensorFlow versions 1.14 and 2.0.  If using TensorFlow 2.0, *ktrain*
 presently runs in 1.x mode using [tf.compat.v1.disable_v2_behavior](https://www.tensorflow.org/api_docs/python/tf/compat/v1/disable_v2_behavior).  In the future, this will be removed and **only** TensorFlow 2 will be supported.

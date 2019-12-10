@@ -49,7 +49,7 @@ setup(
           'cchardet',
           'networkx==2.3',
           'bokeh',
-          'seqeval',
+          #'seqeval',
           #'eli5 >= 0.10.0',
           #'pillow'
       ],
