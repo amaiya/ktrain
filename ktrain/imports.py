@@ -4,16 +4,30 @@
 #------------------------
 
 import os
-import tensorflow as tf
-#tf.logging.set_verbosity(tf.logging.ERROR)
-tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
+import logging
+
+# TF1
+#import tensorflow as tf
+#tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
+
+# TF2-transition
+import tensorflow.compat.v1 as tf
+#logging.getLogger('tensorflow').setLevel(logging.CRITICAL)
+tf.logging.set_verbosity(tf.logging.ERROR)
+tf.disable_v2_behavior()
+
+
 
 TF_KERAS = False
 EAGER_MODE = False
-
+os.environ['TF_KERAS'] = '1' # force tf.keras as of 0.7.x
 if os.environ.get('TF_KERAS', '0') != '0':
-    import tensorflow as tf
-    from tensorflow.python import keras
+    # TF1
+    #from tensorflow import keras
+
+    # TF2-transition
+    from tensorflow.compat.v1 import keras
+
     TF_KERAS = True
     if os.environ.get('TF_EAGER', '0') != '0':
         try:
@@ -27,9 +41,9 @@ else:
 print("using Keras version: %s" % (keras.__version__))
 
 K = keras.backend
-Layer = keras.engine.Layer
-InputSpec = keras.engine.InputSpec
-Model = keras.engine.training.Model
+Layer = keras.layers.Layer
+InputSpec = keras.layers.InputSpec
+Model = keras.Model
 model_from_json = keras.models.model_from_json
 load_model = keras.models.load_model
 Sequential = keras.models.Sequential
@@ -56,16 +70,16 @@ dot = keras.layers.dot
 Dropout = keras.layers.Dropout
 BatchNormalization = keras.layers.BatchNormalization
 Add = keras.layers.Add
-Convolution2D = keras.layers.convolutional.Convolution2D
-MaxPooling2D = keras.layers.convolutional.MaxPooling2D
-AveragePooling2D = keras.layers.convolutional.AveragePooling2D
+Convolution2D = keras.layers.Convolution2D
+MaxPooling2D = keras.layers.MaxPooling2D
+AveragePooling2D = keras.layers.AveragePooling2D
 Conv2D = keras.layers.Conv2D
 MaxPooling2D = keras.layers.MaxPooling2D
 TimeDistributed = keras.layers.TimeDistributed
 Lambda = keras.layers.Lambda
-Activation = keras.layers.core.Activation
-add = keras.layers.merge.add
-Concatenate = keras.layers.merge.Concatenate
+Activation = keras.layers.Activation
+add = keras.layers.add
+Concatenate = keras.layers.Concatenate
 initializers = keras.initializers
 glorot_uniform = keras.initializers.glorot_uniform
 regularizers = keras.regularizers
@@ -86,7 +100,7 @@ activations = keras.activations
 sigmoid = keras.activations.sigmoid
 categorical_crossentropy = keras.losses.categorical_crossentropy
 sparse_categorical_crossentropy = keras.losses.sparse_categorical_crossentropy
-ResNet50 = keras.applications.resnet50.ResNet50
+ResNet50 = keras.applications.ResNet50
 MobilNet = keras.applications.mobilenet.MobileNet
 InceptionV3 = keras.applications.inception_v3.InceptionV3
 pre_resnet50 = keras.applications.resnet50.preprocess_input
@@ -98,11 +112,11 @@ pre_inception = keras.applications.inception_v3.preprocess_input
 # standards
 #----------------------------------------------------------
 
+#import warnings # imported above
 import sys
 import os
 import os.path
 import re
-import warnings
 import operator
 from collections import Counter
 from distutils.version import StrictVersion
@@ -121,6 +135,12 @@ import string
 import random
 import json
 import mimetypes
+import warnings
+# elevate warnings to errors for debugging dependencies
+#warnings.simplefilter('error', FutureWarning)
+
+
+
 
 
 
@@ -154,13 +174,6 @@ import requests
 # verify=False added to avoid headaches from some corporate networks
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
-import eli5
-from eli5.lime import TextExplainer
-
-# ner
-from seqeval.metrics import classification_report as ner_classification_report
-from seqeval.metrics import f1_score as ner_f1_score
-from seqeval.metrics.sequence_labeling import get_entities
 
 # multilingual
 import langdetect
@@ -171,7 +184,10 @@ import cchardet as chardet
 import networkx as nx
 #from sklearn import preprocessing, feature_extraction, model_selection
 
-
+# ner
+from seqeval.metrics import classification_report as ner_classification_report
+from seqeval.metrics import f1_score as ner_f1_score
+from seqeval.metrics.sequence_labeling import get_entities
 
 
 

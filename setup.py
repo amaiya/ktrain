@@ -4,6 +4,26 @@ import setuptools
 with open('README.md') as readme_file: readme = readme_file.read()
 exec(open('ktrain/version.py').read())
 
+
+# install forked versions of libraries when necessary
+import subprocess
+import sys
+def install(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+
+
+#with open('/tmp/ktrain_pip_install', 'w') as f:
+    #f.write(" ".join(sys.argv))
+
+if 'install' in sys.argv[1:] or 'bdist_wheel' in sys.argv[1:]:
+    # stellargraph fork
+    # reason:  avoid installing tensorflow and overwriting tensorflow-gpu
+    install('git+https://github.com/amaiya/stellargraph@no_tf_dep_082')
+    ## eli5 fork 
+    # reason: eli5 support for tf.keras
+    install('git+https://github.com/amaiya/eli5@tfkeras_0_10_1')
+
+
 setup(
   name = 'ktrain',
   packages = setuptools.find_packages(),
@@ -17,21 +37,21 @@ setup(
   url = 'https://github.com/amaiya/ktrain',
   keywords = ['keras', 'deep learning', 'machine learning'],
   install_requires=[
-          'keras == 2.2.4',
-          'scikit-learn >= 0.20.0',
+          'scikit-learn == 0.21.3',
           'matplotlib >= 3.0.0',
           'pandas >= 0.24.2',
           'fastprogress >= 0.1.21',
           'keras_bert',
           'requests',
-          'eli5 >= 0.10.0',
-          'seqeval',
           'joblib',
           'langdetect',
           'jieba',
           'cchardet',
           'networkx==2.3',
           'bokeh',
+          'seqeval',
+          #'stellargraph==0.8.2',
+          #'eli5 >= 0.10.0',
           #'pillow'
       ],
   classifiers=[  # Optional

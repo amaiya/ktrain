@@ -1,10 +1,9 @@
 from ..imports import *
 from .. import utils as U
 from .node_generator import NodeSequenceWrapper
-from . import stellargraph as sg
-from .stellargraph.mapper import GraphSAGENodeGenerator, GraphSAGELinkGenerator
-from .stellargraph.layer import GraphSAGE
-
+import stellargraph as sg
+from stellargraph.mapper import GraphSAGENodeGenerator, GraphSAGELinkGenerator
+from stellargraph.layer import GraphSAGE
 
 
 
@@ -61,7 +60,8 @@ def graph_node_classifier(name, train_data, layer_sizes=[32,32], verbose=1):
         bias=True,
         dropout=0.5,
 	)
-    x_inp, x_out = graphsage_model.default_model(flatten_output=True)
+    #x_inp, x_out = graphsage_model.default_model(flatten_output=True)
+    x_inp, x_out = graphsage_model.build()
     prediction = Dense(units=num_classes, activation=activation)(x_out)
     model = Model(inputs=x_inp, outputs=prediction)
     model.compile(optimizer='adam',

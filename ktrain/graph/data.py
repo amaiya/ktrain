@@ -1,11 +1,3 @@
-#import networkx as nx
-#import pandas as pd
-#import stellargraph as sg
-#from stellargraph.mapper import GraphSAGENodeGenerator, GraphSAGELinkGenerator
-#from sklearn import preprocessing, feature_extraction, model_selection
-#from stellargraph.data import EdgeSplitter
-
-
 from ..imports import *
 from .. import utils as U
 from .node_generator import NodeSequenceWrapper

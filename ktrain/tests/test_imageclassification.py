@@ -2,11 +2,7 @@
 """
 Tests of ktrain image classification flows
 """
-import sys
-import os
-os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID";
-os.environ["CUDA_VISIBLE_DEVICES"]="0"
-sys.path.insert(0,'../..')
+import testenv
 from unittest import TestCase, main, skip
 import numpy as np
 import ktrain

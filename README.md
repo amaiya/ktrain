@@ -1,11 +1,17 @@
+
+
+
 ### News and Announcements
+- **2019-12-10:**  
+  - ***ktrain*** **v0.7.x is released and now uses TensorFlow Keras** (i.e., `tf.keras`) instead of stand-alone Keras.  If you're using custom Keras models with *ktrain*, you must change all `keras` references to `tensorflow.keras`. That is, don't import Keras like this: `from keras.layers import Dense`. Do this instead:  `from tensorflow.keras.layers import Dense`.  If you mix calls to tf.keras with Keras, you will experience problems.  Supported versions of TensorFlow include 1.14 and 2.0.
 - **2019-11-12:**  
   - *ktrain* v0.6.x is released and includes pre-canned support for [learning from unlabeled or partially labeled text data](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorial-05-learning_from_unlabeled_text_data.ipynb).
-- **2019-10-16:**  
-  - *ktrain* v0.5.x is released and includes pre-canned support for [node classification in graphs](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/graphs/hateful_twitter_users-GraphSAGE.ipynb).
 - **Coming Soon**:
   - better support for custom data formats and models
-  - support for using *ktrain* with `tf.keras` and TensorFlow 2.0
+  - ability to train [HuggingFace Transformer models](https://github.com/huggingface/transformers) within *ktrain*
+  
+
+
 ----
 
 
@@ -177,9 +183,20 @@ Additional examples can be found [here](https://github.com/amaiya/ktrain/tree/ma
 
 ### Installation
 
-```
-pip3 install ktrain
-```
+Make sure pip is up-to-date with: `pip3 install -U pip`.
+
+1. Ensure Tensorflow 1.14 or TensorFlow 2 [is installed](https://www.tensorflow.org/install/pip?lang=python3) if it is not already
+
+> For GPU: `pip3 install "tensorflow_gpu>=1.14,<=2"`
+
+> For CPU: `pip3 install "tensorflow>=1.14,<=2"`
+
+
+2. Install *ktrain*: `pip3 install ktrain`
+
+The *ktrain* package can be used with TensorFlow versions 1.14 and 2.0.  If using TensorFlow 2.0, *ktrain*
+presently runs in 1.x mode using [tf.compat.v1.disable_v2_behavior](https://www.tensorflow.org/api_docs/python/tf/compat/v1/disable_v2_behavior).  In the future, this will be removed and **only** TensorFlow 2 will be supported.
+
 
 <!--
 ### Requirements
@@ -197,8 +214,7 @@ The following software/libraries should be installed:
 -->
 
 
-
-This code was tested on Ubuntu 18.04 LTS using Keras 2.2.4 with a TensorFlow 1.14 backend.
+This code was tested on Ubuntu 18.04 LTS using TensorFlow 1.14 and TensorFlow 2 (Keras version 2.2.4-tf).
 
 ----
 **Creator:  [Arun S. Maiya](http://arun.maiya.net)**
