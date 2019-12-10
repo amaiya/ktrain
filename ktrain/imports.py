@@ -169,11 +169,6 @@ import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-# ner
-from .text.ner.seqeval.metrics import classification_report as ner_classification_report
-from .text.ner.seqeval.metrics import f1_score as ner_f1_score
-from .text.ner.seqeval.metrics.sequence_labeling import get_entities
-
 # multilingual
 import langdetect
 import jieba
@@ -183,7 +178,10 @@ import cchardet as chardet
 import networkx as nx
 #from sklearn import preprocessing, feature_extraction, model_selection
 
-
+# ner
+from seqeval.metrics import classification_report as ner_classification_report
+from seqeval.metrics import f1_score as ner_f1_score
+from seqeval.metrics.sequence_labeling import get_entities
 
 
 
