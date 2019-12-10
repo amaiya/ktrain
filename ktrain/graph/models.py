@@ -31,6 +31,18 @@ def graph_node_classifier(name, train_data, layer_sizes=[32,32], verbose=1):
     Return:
         model (Model): A Keras Model instance
     """
+    sg_version_error = False
+    try:
+        from packaging import version
+        if version.parse(sg.__version__) < version.parse('0.8.0'):
+            sg_version_error = True
+    except:
+       if not sg.__version__.startswith('0.8'): sg_version_error = True
+
+    if sg_version_error:
+        warnings.warn('Please install stellargraph 0.8 or above.')
+        return
+
 
     # check argument
     if not isinstance(train_data, NodeSequenceWrapper):
