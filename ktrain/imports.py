@@ -168,13 +168,11 @@ import requests
 # verify=False added to avoid headaches from some corporate networks
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
-import eli5
-from eli5.lime import TextExplainer
 
 # ner
-from seqeval.metrics import classification_report as ner_classification_report
-from seqeval.metrics import f1_score as ner_f1_score
-from seqeval.metrics.sequence_labeling import get_entities
+from .text.ner.seqeval.metrics import classification_report as ner_classification_report
+from .text.ner.seqeval.metrics import f1_score as ner_f1_score
+from .text.ner.seqeval.metrics.sequence_labeling import get_entities
 
 # multilingual
 import langdetect

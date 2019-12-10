@@ -35,6 +35,16 @@ class ImagePredictor(Predictor):
                           #"not yet adequately supported by the eli5 library. You can switch to " +\
                           #"stand-alone Keras by setting os.environ['TF_KERAS']='0'" )
             #return
+
+        try:
+            import eli5
+            from eli5.lime import TextExplainer
+        except:
+            msg = 'ktrain requires a forked version of eli5 to support tf.keras. '+\
+                  'Install with: pip3 install git+https://github.com/amaiya/eli5@tfkeras_0_10_1'
+            warnings.warn(msg)
+            return
+
         if not hasattr(eli5, 'KTRAIN'):
             warnings.warn("Since eli5 does not yet support tf.keras, ktrain uses a forked version of eli5.  " +\
                            "We do not detect this forked version, so predictor.explain will not work.  " +\

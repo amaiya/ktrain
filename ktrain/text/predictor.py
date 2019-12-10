@@ -70,6 +70,16 @@ class TextPredictor(Predictor):
             doc (str): text of documnet
             truncate_len(int): truncate document to this many words
         """
+        try:
+            import eli5
+            from eli5.lime import TextExplainer
+        except:
+            msg = 'ktrain requires a forked version of eli5 to support tf.keras. '+\
+                  'Install with: pip3 install git+https://github.com/amaiya/eli5@tfkeras_0_10_1'
+            warnings.warn(msg)
+            return
+
+
         if not isinstance(doc, str): raise Exception('text must of type str')
         if self.preproc.is_nospace_lang():
             doc = self.preproc.process_chinese([doc])
