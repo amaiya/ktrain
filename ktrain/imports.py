@@ -4,14 +4,17 @@
 #------------------------
 
 import os
+import logging
+
 # TF1
 #import tensorflow as tf
 #tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
 # TF2-transition
 import tensorflow.compat.v1 as tf
-tf.disable_v2_behavior()
+#logging.getLogger('tensorflow').setLevel(logging.CRITICAL)
 tf.logging.set_verbosity(tf.logging.ERROR)
+tf.disable_v2_behavior()
 
 
 
@@ -109,11 +112,11 @@ pre_inception = keras.applications.inception_v3.preprocess_input
 # standards
 #----------------------------------------------------------
 
+#import warnings # imported above
 import sys
 import os
 import os.path
 import re
-import warnings
 import operator
 from collections import Counter
 from distutils.version import StrictVersion
@@ -132,9 +135,12 @@ import string
 import random
 import json
 import mimetypes
-
+import warnings
 # elevate warnings to errors for debugging dependencies
-# warnings.simplefilter('error', FutureWarning)
+#warnings.simplefilter('error', FutureWarning)
+
+
+
 
 
 
