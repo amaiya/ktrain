@@ -9,7 +9,7 @@ Most recent releases are shown at the top. Each release shows:
 ## 0.7.0 (2019-12-10)
 
 ### New:
-- *ktrain* now uses tf.keras (`tensorflow>=1.14,<=2.0) instead of stand-alone Keras.  
+- *ktrain* now uses tf.keras (`tensorflow>=1.14,<=2.0`) instead of stand-alone Keras.  
 
 ### Changed:
 - N/A
