@@ -12,7 +12,10 @@ import logging
 
 # TF2-transition
 import tensorflow.compat.v1 as tf
-#logging.getLogger('tensorflow').setLevel(logging.CRITICAL)
+if tf.__version__.startswith('1.14'):
+    try:
+        logging.getLogger('tensorflow').setLevel(logging.CRITICAL)
+    except: pass
 tf.logging.set_verbosity(tf.logging.ERROR)
 tf.disable_v2_behavior()
 
