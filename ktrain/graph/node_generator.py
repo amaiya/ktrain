@@ -3,10 +3,11 @@ from ..imports import *
 
 # import stellargraph
 try:
+    import stellargraph as sg
     from stellargraph.mapper import node_mappers
 except:
     raise Exception(SG_ERRMSG)
-if packaging.version.parse(sg.__version__) < packaging.version.parse('0.8'):
+if version.parse(sg.__version__) < version.parse('0.8'):
     raise Exception(SG_ERRMSG)
 
 

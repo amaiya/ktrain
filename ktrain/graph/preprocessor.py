@@ -80,7 +80,7 @@ class NodePreprocessor(Preprocessor):
             from stellargraph.mapper import GraphSAGENodeGenerator
         except:
             raise Exception(SG_ERRMSG)
-        if packaging.version.parse(sg.__version__) < packaging.version.parse('0.8'):
+        if version.parse(sg.__version__) < version.parse('0.8'):
             raise Exception(SG_ERRMSG)
 
 
@@ -117,7 +117,7 @@ class NodePreprocessor(Preprocessor):
             from stellargraph.mapper import GraphSAGENodeGenerator
         except:
             raise Exception(SG_ERRMSG)
-        if packaging.version.parse(sg.__version__) < packaging.version.parse('0.8'):
+        if version.parse(sg.__version__) < version.parse('0.8'):
             raise Exception(SG_ERRMSG)
 
 
@@ -166,7 +166,7 @@ class NodePreprocessor(Preprocessor):
             from stellargraph.mapper import GraphSAGENodeGenerator
         except:
             raise Exception(SG_ERRMSG)
-        if packaging.version.parse(sg.__version__) < packaging.version.parse('0.8'):
+        if version.parse(sg.__version__) < version.parse('0.8'):
             raise Exception(SG_ERRMSG)
 
 

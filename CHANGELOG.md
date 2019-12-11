@@ -13,7 +13,8 @@ Most recent releases are shown at the top. Each release shows:
 that will enable consistent reproduction of the train-test split.
 
 ### Changed:
-- updated `setup.py` to include `stellargraph>=0.8` as dependency
+- perform local checks for `stellargraph` where needed.  
+- removed `stellargraph` as dependency due to issues with it overwriting `tensorflow-gpu`
 
 ### Fixed:
 - N/A

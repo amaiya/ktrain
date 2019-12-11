@@ -60,7 +60,7 @@ def graph_node_classifier(name, train_data, layer_sizes=[32,32], verbose=1):
         from stellargraph.layer import GraphSAGE
     except:
         raise Exception(SG_ERRMSG)
-    if packaging.version.parse(sg.__version__) < packaging.version.parse('0.8'):
+    if version.parse(sg.__version__) < version.parse('0.8'):
         raise Exception(SG_ERRMSG)
 
 

@@ -192,6 +192,9 @@ from seqeval.metrics import classification_report as ner_classification_report
 from seqeval.metrics import f1_score as ner_f1_score
 from seqeval.metrics.sequence_labeling import get_entities
 
+# packaging
+from packaging import version
+
 
 
 try:
