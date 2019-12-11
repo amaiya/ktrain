@@ -76,7 +76,7 @@ def texts_from_folder(datadir, classes=None,
         x_train, x_test, y_train, y_test = train_test_split(train_b.data, 
                                                             train_b.target, 
                                                             test_size=val_pct,
-                                                            random_split=random_split)
+                                                            random_state=random_state)
 
     # decode based on supplied encoding
     if encoding is None:
