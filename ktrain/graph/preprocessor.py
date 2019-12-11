@@ -4,9 +4,7 @@ from ..preprocessor import Preprocessor
 from .node_generator import NodeSequenceWrapper
 
 import stellargraph as sg
-from stellargraph.mapper import GraphSAGENodeGenerator, GraphSAGELinkGenerator
-from stellargraph.layer import GraphSAGE
-
+from stellargraph.mapper import GraphSAGENodeGenerator
 
 
 class NodePreprocessor(Preprocessor):
@@ -139,6 +137,7 @@ class NodePreprocessor(Preprocessor):
             test_targets = self.y_encoding.transform(df_te[["target"]].to_dict('records'))
         else:
             test_targets = [-1] * len(df_te.shape[0])
+
 
         # return generator
         G_sg = sg.StellarGraph(G_agg, node_features=df_agg[self.feature_names])

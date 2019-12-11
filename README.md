@@ -194,8 +194,17 @@ Make sure pip is up-to-date with: `pip3 install -U pip`.
 
 2. Install *ktrain*: `pip3 install ktrain`
 
-The *ktrain* package can be used with TensorFlow versions 1.14 and 2.0.  If using TensorFlow 2.0, *ktrain*
+**Some things to note:**
+- The *ktrain* package can be used with TensorFlow versions 1.14 and 2.0.  If using TensorFlow 2.0, *ktrain*
 presently runs in 1.x mode using [tf.compat.v1.disable_v2_behavior](https://www.tensorflow.org/api_docs/python/tf/compat/v1/disable_v2_behavior).  In the future, this will be removed and **only** TensorFlow 2 will be supported.
+
+- *ktrain* depends on `stellargraph` for graph neural networks.  The `stellargraph` library currently installs
+tensorflow (CPU) even if there is an existing tensorflow-gpu installation. This overwrites tensorflow-gpu.
+To correct and get back `tensorflow-gpu`, you may have to do this:
+```
+pip3 uninstall tensorflow tensorflow_gpu
+pip3 install tensorflow_gpu
+```
 
 
 <!--

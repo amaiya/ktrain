@@ -6,6 +6,19 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.7.1 (2019-12-11)
+
+### New:
+- All data-loading functions (e.g., `texts_from_csv`) accept a `random_state` argument
+that will enable consistent reproduction of the train-test split.
+
+### Changed:
+- updated `setup.py` to include `stellargraph>=0.8` as dependency
+
+### Fixed:
+- N/A
+
+
 ## 0.7.0 (2019-12-10)
 
 ### New:

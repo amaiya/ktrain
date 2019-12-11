@@ -12,6 +12,7 @@ def graph_nodes_from_csv(nodes_filepath,
                          holdout_pct=None, 
                          holdout_for_inductive=False,
                          missing_label_value=None,
+                         random_state=None,
                          verbose=1):
     """
     Loads graph data from CSV files. 
@@ -43,6 +44,7 @@ def graph_nodes_from_csv(nodes_filepath,
                                       If False, holdout nodes will be included in graph
                                       and their features (but not labels) are accessible
                                       during training.
+        random_state (int):  random seed for train/test split
         verbose (boolean): verbosity
     Return:
         tuple of NodeSequenceWrapper objects for train and validation sets and NodePreprocessor
@@ -144,7 +146,7 @@ def graph_nodes_from_csv(nodes_filepath,
                                                         train_size=train_pct,
                                                         test_size=None,
                                                         stratify=df_annotated['target'], 
-                                                        random_state=None)
+                                                        random_state=random_state)
     #te_data, test_data = sklearn.model_selection.train_test_split(test_data,
                                                                 #train_size=0.2,
                                                                 #test_size=None,

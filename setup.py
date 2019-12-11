@@ -5,25 +5,6 @@ with open('README.md') as readme_file: readme = readme_file.read()
 exec(open('ktrain/version.py').read())
 
 
-# install forked versions of libraries when necessary
-import subprocess
-import sys
-def install(package):
-    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
-
-
-#with open('/tmp/ktrain_pip_install', 'w') as f:
-    #f.write(" ".join(sys.argv))
-
-if 'install' in sys.argv[1:] or 'bdist_wheel' in sys.argv[1:]:
-    # stellargraph fork
-    # reason:  avoid installing tensorflow and overwriting tensorflow-gpu
-    install('git+https://github.com/amaiya/stellargraph@no_tf_dep_082')
-    ## eli5 fork 
-    # reason: eli5 support for tf.keras
-    install('git+https://github.com/amaiya/eli5@tfkeras_0_10_1')
-
-
 setup(
   name = 'ktrain',
   packages = setuptools.find_packages(),
@@ -50,7 +31,8 @@ setup(
           'networkx==2.3',
           'bokeh',
           'seqeval',
-          #'stellargraph==0.8.2',
+          'stellargraph>=0.8.2',
+          'packaging',
           #'eli5 >= 0.10.0',
           #'pillow'
       ],

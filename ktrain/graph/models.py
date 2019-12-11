@@ -1,9 +1,10 @@
 from ..imports import *
 from .. import utils as U
 from .node_generator import NodeSequenceWrapper
+
 import stellargraph as sg
-from stellargraph.mapper import GraphSAGENodeGenerator, GraphSAGELinkGenerator
 from stellargraph.layer import GraphSAGE
+
 
 
 
@@ -52,6 +53,7 @@ def graph_node_classifier(name, train_data, layer_sizes=[32,32], verbose=1):
     # set loss and activations
     loss_func = 'categorical_crossentropy'
     activation = 'softmax'
+
 
     # build a GraphSAGE node classification model
     graphsage_model = GraphSAGE(
