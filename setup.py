@@ -31,8 +31,8 @@ setup(
           'networkx==2.3',
           'bokeh',
           'seqeval',
-          'stellargraph>=0.8.2',
           'packaging',
+          #'stellargraph>=0.8.2',
           #'eli5 >= 0.10.0',
           #'pillow'
       ],

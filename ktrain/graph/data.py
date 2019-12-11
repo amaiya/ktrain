@@ -1,6 +1,5 @@
 from ..imports import *
 from .. import utils as U
-from .node_generator import NodeSequenceWrapper
 from .preprocessor import NodePreprocessor
 
 
@@ -177,6 +176,7 @@ def graph_nodes_from_csv(nodes_filepath,
     preproc = NodePreprocessor(G, df_G, sample_size=sample_size, missing_label_value=missing_label_value)
     trn = preproc.preprocess_train(list(tr_data.index))
     val = preproc.preprocess_valid(list(te_data.index))
+    from .node_generator import NodeSequenceWrapper
     if df_holdout is not None and G_holdout is not None: 
         return (NodeSequenceWrapper(trn), NodeSequenceWrapper(val), preproc, df_holdout, G_holdout)
     else:
