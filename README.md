@@ -1,4 +1,8 @@
 
+### [Overview](#overview) | [Tutorials](#tutorials) | [Examples](#examples) |  [Installation](#installation)
+
+# ktrain
+
 
 
 ### News and Announcements
@@ -14,8 +18,8 @@
 
 ----
 
+### Overview
 
-# ktrain
 *ktrain* is a lightweight wrapper for the deep learning library [Keras](https://keras.io/) (and other libraries) to help build, train, and deploy neural networks.  With only a few lines of code, ktrain allows you to easily and quickly:
 
 - estimate an optimal learning rate for your model given your data using a Learning Rate Finder
@@ -57,12 +61,17 @@ Some blog tutorials about *ktrain* are shown below:
 
 > [**BERT Text Classification in 3 Lines of Code**](https://towardsdatascience.com/bert-text-classification-in-3-lines-of-code-using-keras-264db7e7a358)  
 
-> [**Explainable AI in Practice**](https://medium.com/@asmaiya/explainable-ai-in-practice-2e5ae2d16dc7) 
+> [**Explainable AI in Practice**](https://medium.com/@asmaiya/explainable-ai-in-practice-2e5ae2d16dc7)
 
 
-Using *ktrain* on **Google Colab**?  See [this simple demo of Multiclass Text Classification with BERT](https://colab.research.google.com/drive/1AH3fkKiEqBpVpO5ua00scp7zcHs5IDLK).
 
 
+
+
+
+
+
+### Examples
 
 Tasks such as text classification and image classification can be accomplished easily with 
 only a few lines of code.
@@ -177,7 +186,9 @@ learner.autofit(0.01, checkpoint_folder='/tmp/saved_weights')
 ```
 
 
-Additional examples can be found [here](https://github.com/amaiya/ktrain/tree/master/examples).
+Using *ktrain* on **Google Colab**?  See [this simple demo of Multiclass Text Classification with BERT](https://colab.research.google.com/drive/1AH3fkKiEqBpVpO5ua00scp7zcHs5IDLK).
+
+**Additional examples can be found [here](https://github.com/amaiya/ktrain/tree/master/examples).**
 
 
 
@@ -194,8 +205,21 @@ Make sure pip is up-to-date with: `pip3 install -U pip`.
 
 2. Install *ktrain*: `pip3 install ktrain`
 
-The *ktrain* package can be used with TensorFlow versions 1.14 and 2.0.  If using TensorFlow 2.0, *ktrain*
+**Some things to note:**
+- The *ktrain* package can be used with either TensorFlow 2.0 or TensorFlow 1.14.  If using TensorFlow 2.0, *ktrain*
 presently runs in 1.x mode using [tf.compat.v1.disable_v2_behavior](https://www.tensorflow.org/api_docs/python/tf/compat/v1/disable_v2_behavior).  In the future, this will be removed and **only** TensorFlow 2 will be supported.
+
+- Since some *ktrain* dependencies have not yet been migrated to `tf.keras` in TensorFlow 2 (or may have other issues), 
+  *ktrain* is temporarily using forked versions of some libraries. Specifically, *ktrain* uses forked versions
+  `eli5` and `stellargraph`.  If not installed, *ktrain* will complain  when a method or function needing 
+  either of these libraries is invoked.
+  To install these forked versions, you can do the following:
+```
+pip3 install git+https://github.com/amaiya/eli5@tfkeras_0_10_1
+pip3 install git+https://github.com/amaiya/stellargraph@no_tf_dep_082
+```
+
+
 
 
 <!--

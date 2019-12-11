@@ -1,6 +1,5 @@
 from ..imports import *
 from .. import utils as U
-from .node_generator import NodeSequenceWrapper
 from .preprocessor import NodePreprocessor
 
 
@@ -12,6 +11,7 @@ def graph_nodes_from_csv(nodes_filepath,
                          holdout_pct=None, 
                          holdout_for_inductive=False,
                          missing_label_value=None,
+                         random_state=None,
                          verbose=1):
     """
     Loads graph data from CSV files. 
@@ -43,6 +43,7 @@ def graph_nodes_from_csv(nodes_filepath,
                                       If False, holdout nodes will be included in graph
                                       and their features (but not labels) are accessible
                                       during training.
+        random_state (int):  random seed for train/test split
         verbose (boolean): verbosity
     Return:
         tuple of NodeSequenceWrapper objects for train and validation sets and NodePreprocessor
@@ -144,7 +145,7 @@ def graph_nodes_from_csv(nodes_filepath,
                                                         train_size=train_pct,
                                                         test_size=None,
                                                         stratify=df_annotated['target'], 
-                                                        random_state=None)
+                                                        random_state=random_state)
     #te_data, test_data = sklearn.model_selection.train_test_split(test_data,
                                                                 #train_size=0.2,
                                                                 #test_size=None,
@@ -175,6 +176,7 @@ def graph_nodes_from_csv(nodes_filepath,
     preproc = NodePreprocessor(G, df_G, sample_size=sample_size, missing_label_value=missing_label_value)
     trn = preproc.preprocess_train(list(tr_data.index))
     val = preproc.preprocess_valid(list(te_data.index))
+    from .node_generator import NodeSequenceWrapper
     if df_holdout is not None and G_holdout is not None: 
         return (NodeSequenceWrapper(trn), NodeSequenceWrapper(val), preproc, df_holdout, G_holdout)
     else:

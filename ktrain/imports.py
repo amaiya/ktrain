@@ -12,7 +12,10 @@ import logging
 
 # TF2-transition
 import tensorflow.compat.v1 as tf
-#logging.getLogger('tensorflow').setLevel(logging.CRITICAL)
+if tf.__version__.startswith('1.14'):
+    try:
+        logging.getLogger('tensorflow').setLevel(logging.CRITICAL)
+    except: pass
 tf.logging.set_verbosity(tf.logging.ERROR)
 tf.disable_v2_behavior()
 
@@ -189,6 +192,9 @@ from seqeval.metrics import classification_report as ner_classification_report
 from seqeval.metrics import f1_score as ner_f1_score
 from seqeval.metrics.sequence_labeling import get_entities
 
+# packaging
+from packaging import version
+
 
 
 try:
@@ -196,5 +202,10 @@ try:
     PIL_INSTALLED = True
 except:
     PIL_INSTALLED = False
+
+SG_ERRMSG = 'ktrain currently uses a forked version of stellargraph v0.8.2. '+\
+            'Please install with: '+\
+            'pip3 install git+https://github.com/amaiya/stellargraph@no_tf_dep_082'
+
 
 

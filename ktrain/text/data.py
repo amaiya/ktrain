@@ -16,7 +16,7 @@ def texts_from_folder(datadir, classes=None,
                       preprocess_mode='standard',
                       encoding=None, # detected automatically
                       lang=None, # detected automatically
-                      val_pct=0.1,
+                      val_pct=0.1, random_state=None,
                       verbose=1):
     """
     Returns corpus as sequence of word IDs.
@@ -52,6 +52,8 @@ def texts_from_folder(datadir, classes=None,
         encoding (str):        character encoding to use. Auto-detected if None
         lang (str):            language.  Auto-detected if None.
         val_pct(float):        Onlyl used if train_test_names  has 1 and not 2 names
+        random_state(int):      If integer is supplied, train/test split is reproducible.
+                                IF None, train/test split will be random
         verbose (bool):         verbosity
         
     """
@@ -73,7 +75,8 @@ def texts_from_folder(datadir, classes=None,
     else:
         x_train, x_test, y_train, y_test = train_test_split(train_b.data, 
                                                             train_b.target, 
-                                                            test_size=val_pct)
+                                                            test_size=val_pct,
+                                                            random_state=random_state)
 
     # decode based on supplied encoding
     if encoding is None:
@@ -123,7 +126,7 @@ def texts_from_csv(train_filepath,
                    val_pct=0.1, ngram_range=1, preprocess_mode='standard', 
                    encoding=None,  # auto-detected
                    lang=None,      # auto-detected
-                   sep=',',       
+                   sep=',', random_state=None,       
                    verbose=1):
     """
     Loads text data from CSV file. Class labels are assumed to one of following:
@@ -151,6 +154,8 @@ def texts_from_csv(train_filepath,
         encoding (str):        character encoding to use. Auto-detected if None
         lang (str):            language.  Auto-detected if None.
         sep(str):              delimiter for CSV (comma is default)
+        random_state(int):      If integer is supplied, train/test split is reproducible.
+                                If None, train/test split will be random
         verbose (boolean): verbosity
     """
     if encoding is None:
@@ -170,7 +175,7 @@ def texts_from_csv(train_filepath,
                          val_pct=val_pct,
                          ngram_range=ngram_range, 
                          preprocess_mode=preprocess_mode,
-                         lang=lang,
+                         lang=lang, random_state=random_state,
                          verbose=verbose)
 
 
@@ -184,6 +189,7 @@ def texts_from_df(train_df,
                    max_features=MAX_FEATURES, maxlen=MAXLEN, 
                    val_pct=0.1, ngram_range=1, preprocess_mode='standard', 
                    lang=None, # auto-detected
+                   random_state=None,
                    verbose=1):
     """
     Loads text data from Pandas dataframe file. Class labels are assumed to one of following:
@@ -209,6 +215,8 @@ def texts_from_df(train_df,
                                 tokenization and preprocessing for use with 
                                 BERT text classification model.
         lang (str):            language.  Auto-detected if None.
+        random_state(int):      If integer is supplied, train/test split is reproducible.
+                                If None, train/test split will be random
         verbose (boolean): verbosity
     """
 
@@ -224,7 +232,9 @@ def texts_from_df(train_df,
         x_train = x
         y_train = y
     else:
-        x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=val_pct)
+        x_train, x_test, y_train, y_test = train_test_split(x, y, 
+                                                            test_size=val_pct,
+                                                            random_state=random_state)
     y_train = np.squeeze(y_train)
     y_test = np.squeeze(y_test)
 
@@ -251,6 +261,7 @@ def texts_from_array(x_train, y_train, x_test=None, y_test=None,
                    max_features=MAX_FEATURES, maxlen=MAXLEN, 
                    val_pct=0.1, ngram_range=1, preprocess_mode='standard', 
                    lang=None, # auto-detected
+                   random_state=None,
                    verbose=1):
     """
     Loads and preprocesses text data from arrays.
@@ -272,6 +283,8 @@ def texts_from_array(x_train, y_train, x_test=None, y_test=None,
                                 tokenization and preprocessing for use with 
                                 BERT text classification model.
         lang (str):            language.  Auto-detected if None.
+        random_state(int):      If integer is supplied, train/test split is reproducible.
+                                If None, train/test split will be random.
         verbose (boolean): verbosity
     """
 
@@ -280,7 +293,9 @@ def texts_from_array(x_train, y_train, x_test=None, y_test=None,
         classes.sort()
         class_names = ["%s" % (c) for c in classes]
     if x_test is None or y_test is None:
-        x_train, x_test, y_train, y_test = train_test_split(x_train, y_train, test_size=val_pct)
+        x_train, x_test, y_train, y_test = train_test_split(x_train, y_train, 
+                                                            test_size=val_pct,
+                                                            random_state=random_state)
     y_train = to_categorical(y_train)
     y_test = to_categorical(y_test)
 

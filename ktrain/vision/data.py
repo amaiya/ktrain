@@ -390,7 +390,7 @@ def images_from_csv(train_filepath,
                    target_size=(224,224),
                     color_mode='rgb',
                     data_aug=None,
-                    val_pct=0.1):
+                    val_pct=0.1, random_state=None):
 
     """
     Returns image generator (Iterator instance).
@@ -411,6 +411,7 @@ def images_from_csv(train_filepath,
                                   for data augmentation
     val_pct(float):  proportion of training data to be used for validation
                      only used if val_filepath is None
+    random_state(int): random seed for train/test split
 
     Returns:
     batches: a tuple of two Iterators - one for train and one for test
@@ -434,6 +435,7 @@ def images_from_csv(train_filepath,
     if not val_filepath:
         if val_pct:
             prop = 1-val_pct
+            if random_state is not None: np.random.seed(42)
             msk = np.random.rand(len(df)) < prop
             train_df = df[msk]
             val_df = df[~msk]
@@ -480,7 +482,7 @@ def images_from_fname( img_folder,
                      target_size=(224,224),
                      color_mode='rgb',
                      data_aug=None,
-                     val_pct=0.1,
+                     val_pct=0.1, random_state=None,
                      verbose=1):
 
     """
@@ -498,6 +500,7 @@ def images_from_fname( img_folder,
                                   for data augmentation
     val_pct(float):  proportion of training data to be used for validation
                      only used if val_filepath is None
+    random_state(int): random seed for train/test split
     verbose(bool):   verbosity
 
     Returns:
@@ -548,6 +551,7 @@ def images_from_fname( img_folder,
     #df.to_csv('/tmp/pets.csv')
     if val_pct:
         prop = 1-val_pct
+        if random_state is not None: np.random.seed(42)
         msk = np.random.rand(len(df)) < prop
         train_df = df[msk]
         val_df = df[~msk]

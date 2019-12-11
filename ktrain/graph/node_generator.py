@@ -1,4 +1,15 @@
-from stellargraph.mapper import node_mappers
+from ..imports import *
+
+
+# import stellargraph
+try:
+    import stellargraph as sg
+    from stellargraph.mapper import node_mappers
+except:
+    raise Exception(SG_ERRMSG)
+if version.parse(sg.__version__) < version.parse('0.8'):
+    raise Exception(SG_ERRMSG)
+
 
 class NodeSequenceWrapper(node_mappers.NodeSequence):
     def __init__(self, node_seq):

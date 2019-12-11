@@ -1,9 +1,9 @@
 from ..imports import *
 from .. import utils as U
-from .node_generator import NodeSequenceWrapper
-import stellargraph as sg
-from stellargraph.mapper import GraphSAGENodeGenerator, GraphSAGELinkGenerator
-from stellargraph.layer import GraphSAGE
+
+
+
+
 
 
 
@@ -31,6 +31,7 @@ def graph_node_classifier(name, train_data, layer_sizes=[32,32], verbose=1):
     Return:
         model (Model): A Keras Model instance
     """
+    from .node_generator import NodeSequenceWrapper
 
     # check argument
     if not isinstance(train_data, NodeSequenceWrapper):
@@ -52,6 +53,19 @@ def graph_node_classifier(name, train_data, layer_sizes=[32,32], verbose=1):
     # set loss and activations
     loss_func = 'categorical_crossentropy'
     activation = 'softmax'
+
+    # import stellargraph
+    try:
+        import stellargraph as sg
+        from stellargraph.layer import GraphSAGE
+    except:
+        raise Exception(SG_ERRMSG)
+    if version.parse(sg.__version__) < version.parse('0.8'):
+        raise Exception(SG_ERRMSG)
+
+
+
+
 
     # build a GraphSAGE node classification model
     graphsage_model = GraphSAGE(

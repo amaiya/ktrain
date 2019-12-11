@@ -1,12 +1,6 @@
 from ..imports import *
 from .. import utils as U
 from ..preprocessor import Preprocessor
-from .node_generator import NodeSequenceWrapper
-
-import stellargraph as sg
-from stellargraph.mapper import GraphSAGENodeGenerator, GraphSAGELinkGenerator
-from stellargraph.layer import GraphSAGE
-
 
 
 class NodePreprocessor(Preprocessor):
@@ -79,11 +73,24 @@ class NodePreprocessor(Preprocessor):
         train_targets = self.y_encoding.fit_transform(df_tr[["target"]].to_dict('records'))
 
 
+
+        # import stellargraph
+        try:
+            import stellargraph as sg
+            from stellargraph.mapper import GraphSAGENodeGenerator
+        except:
+            raise Exception(SG_ERRMSG)
+        if version.parse(sg.__version__) < version.parse('0.8'):
+            raise Exception(SG_ERRMSG)
+
+
+
         # return generator
         G_sg = sg.StellarGraph(self.G, node_features=self.df[self.feature_names])
         self.G_sg = G_sg
         generator = GraphSAGENodeGenerator(G_sg, U.DEFAULT_BS, [self.sampsize, self.sampsize])
         train_gen = generator.flow(df_tr.index, train_targets, shuffle=True)
+        from .node_generator import NodeSequenceWrapper
         return NodeSequenceWrapper(train_gen)
 
 
@@ -103,11 +110,23 @@ class NodePreprocessor(Preprocessor):
         # one-hot-encode target
         val_targets = self.y_encoding.transform(df_val[["target"]].to_dict('records'))
 
+
+        # import stellargraph
+        try:
+            import stellargraph as sg
+            from stellargraph.mapper import GraphSAGENodeGenerator
+        except:
+            raise Exception(SG_ERRMSG)
+        if version.parse(sg.__version__) < version.parse('0.8'):
+            raise Exception(SG_ERRMSG)
+
+
         # return generator
         if self.G_sg is None:
             self.G_sg = sg.StellarGraph(self.G, node_features=self.df[self.feature_names])
         generator = GraphSAGENodeGenerator(self.G_sg, U.DEFAULT_BS, [self.sampsize,self.sampsize])
         val_gen = generator.flow(df_val.index, val_targets, shuffle=False)
+        from .node_generator import NodeSequenceWrapper
         return NodeSequenceWrapper(val_gen)
 
 
@@ -140,10 +159,22 @@ class NodePreprocessor(Preprocessor):
         else:
             test_targets = [-1] * len(df_te.shape[0])
 
+
+        # import stellargraph
+        try:
+            import stellargraph as sg
+            from stellargraph.mapper import GraphSAGENodeGenerator
+        except:
+            raise Exception(SG_ERRMSG)
+        if version.parse(sg.__version__) < version.parse('0.8'):
+            raise Exception(SG_ERRMSG)
+
+
         # return generator
         G_sg = sg.StellarGraph(G_agg, node_features=df_agg[self.feature_names])
         generator = GraphSAGENodeGenerator(G_sg, U.DEFAULT_BS, [self.sampsize,self.sampsize])
         test_gen = generator.flow(df_te.index, test_targets, shuffle=False)
+        from .node_generator import NodeSequenceWrapper
         return NodeSequenceWrapper(test_gen)
 
 
