@@ -163,7 +163,7 @@ def shape_from_data(data):
         elif is_huggingface(data=data):  # HF Transformer
             hf_size = tf.data.experimental.cardinality(data).numpy()
             hf_shape1 = tf.data.experimental.get_structure(data)[0]['input_ids'].shape
-            hf_maxlen = hf_shap1[1] if hf_shape1[0] is None else hf_shape1[0]
+            hf_maxlen = hf_shape1[1] if hf_shape1[0] is None else hf_shape1[0]
             return (hf_size, hf_maxlen)
         elif is_nodeclass(data=data):                                 # NodeSequence
             return data[0][0][0].shape[1:]  # returns 1st neighborhood only
@@ -217,9 +217,12 @@ def nsamples_from_data(data):
 
 def nclasses_from_data(data):
     if is_iter(data):
+
         if is_ner(data=data): return len(data.p._label_vocab._id2token)    # NERSequence
         elif is_huggingface(data=data):         # Hugging Face Transformer
-            return tf.data.experimental.get_structure(data)[1].shape[0]
+            hf_shape1 = tf.data.experimental.get_structure(data)[1].shape.as_list()
+            hf_nclasses = hf_shape1[1] if hf_shape1[0] is None else hf_shape1[0]
+            return hf_nclasses
         elif is_nodeclass(data=data):                                # NodeSequenceWrapper
             return data[0][1].shape[1]                                   
         elif hasattr(data, 'classes'):                                     # DirectoryIterator
