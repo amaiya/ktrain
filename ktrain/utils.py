@@ -67,7 +67,8 @@ def is_huggingface_from_model(model):
 
 
 def is_huggingface_from_data(data):
-    if not isinstance(data, tf.data.Dataset): 
+    #if not isinstance(data, tf.data.Dataset): 
+    if 'tensorflow.python.data.ops.dataset_ops' not in str(type(data)):
         return False
     try:
         klist = list(tf.data.experimental.get_structure(data)[0].keys())
