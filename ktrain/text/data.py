@@ -129,9 +129,8 @@ def texts_from_csv(train_filepath,
                    sep=',', random_state=None,       
                    verbose=1):
     """
-    Loads text data from CSV file. Class labels are assumed to one of following:
-      1. integers representing classes (e.g., 1,2,3,4)
-      2. one-hot-encoded arrays representing classes
+    Loads text data from CSV file. Class labels are assumed to be
+    one-hot-encoded arrays representing classes:
          classification (a single one in each array): [[1,0,0], [0,1,0]]]
          multi-label classification (one more ones in each array): [[1,1,0], [0,1,1]]
     Args:
@@ -192,9 +191,8 @@ def texts_from_df(train_df,
                    random_state=None,
                    verbose=1):
     """
-    Loads text data from Pandas dataframe file. Class labels are assumed to one of following:
-      1. integers representing classes (e.g., 1,2,3,4)
-      2. one-hot-encoded arrays representing classes
+    Loads text data from Pandas dataframe file. Class labels are assumed to be
+    one-hot-encoded arrays representing classes:
          classification (a single one in each array): [[1,0,0], [0,1,0]]]
          multi-label classification (one more ones in each array): [[1,1,0], [0,1,1]]
     Args:
