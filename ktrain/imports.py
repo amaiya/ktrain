@@ -17,7 +17,7 @@ if tf.__version__.startswith('1.14'):
         logging.getLogger('tensorflow').setLevel(logging.CRITICAL)
     except: pass
 tf.logging.set_verbosity(tf.logging.ERROR)
-tf.disable_v2_behavior()
+#tf.disable_v2_behavior()
 
 
 
@@ -191,6 +191,14 @@ import networkx as nx
 from seqeval.metrics import classification_report as ner_classification_report
 from seqeval.metrics import f1_score as ner_f1_score
 from seqeval.metrics.sequence_labeling import get_entities
+
+# transformers
+try:
+    logging.getLogger('transformers').setLevel(logging.CRITICAL)
+except: pass
+import transformers
+
+
 
 # packaging
 from packaging import version

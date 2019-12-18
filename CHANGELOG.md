@@ -6,6 +6,21 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.8.0 (2020-01-01)
+
+### New:
+- In addition to `bert`, the following Hugging Face transformer models are available: 
+  - `distilbert`
+
+### Changed:
+- `preproc` argument is required for `text.text_classifier`
+
+### Fixed:
+- N/A
+
+
+
+
 ## 0.7.2 (2019-12-11)
 
 ### New:

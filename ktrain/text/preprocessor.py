@@ -2,6 +2,12 @@ from ..imports import *
 from .. import utils as U
 from ..preprocessor import Preprocessor
 
+InputFeatures = transformers.data.processors.utils.InputFeatures
+InputExample = transformers.data.processors.utils.InputExample
+DistilBertTokenizer = transformers.DistilBertTokenizer
+
+DISTILBERT= 'distilbert'
+
 
 NOSPACE_LANGS = ['zh-cn', 'zh-tw', 'ja']
 
@@ -116,6 +122,160 @@ def bert_tokenize(docs, tokenizer, maxlen, verbose=1):
         if verbose: mb.write('done.')
     zeros = np.zeros_like(indices)
     return [np.array(indices), np.array(zeros)]
+
+#------------------------------------------------------------------------------
+# Transformers UTILITIES
+#------------------------------------------------------------------------------
+
+#def convert_to_tfdataset(csv):
+    #def gen():
+        #for ex in csv:
+            #yield  {'idx': ex[0],
+                     #'sentence': ex[1],
+                     #'label': str(ex[2])}
+    #return tf.data.Dataset.from_generator(gen,
+        #{'idx': tf.int64,
+          #'sentence': tf.string,
+          #'label': tf.int64})
+
+
+#def features_to_tfdataset(features):
+
+#    def gen():
+#        for ex in features:
+#            yield ({'input_ids': ex.input_ids,
+#                     'attention_mask': ex.attention_mask,
+#                     'token_type_ids': ex.token_type_ids},
+#                    ex.label)
+
+#    return tf.data.Dataset.from_generator(gen,
+#        ({'input_ids': tf.int32,
+#          'attention_mask': tf.int32,
+#          'token_type_ids': tf.int32},
+#         tf.int64),
+#        ({'input_ids': tf.TensorShape([None]),
+#          'attention_mask': tf.TensorShape([None]),
+#          'token_type_ids': tf.TensorShape([None])},
+#         tf.TensorShape([None])))
+#         #tf.TensorShape(])))
+
+
+
+def hf_features_to_tfdataset(features_list, labels):
+    features_list = np.array(features_list)
+    labels = np.array(labels) if labels is not None else None
+    tfdataset = tf.data.Dataset.from_tensor_slices((features_list, labels))
+    tfdataset = tfdataset.map(lambda x,y: ({'input_ids': x[0], 
+                                            'attention_mask': x[1], 
+                                             'token_type_ids': x[2]}, y))
+
+    return tfdataset
+
+
+
+def hf_convert_example(text, tokenizer=DistilBertTokenizer,
+                       max_length=512,
+                       pad_on_left=False,
+                       pad_token=0,
+                       pad_token_segment_id=0,
+                       mask_padding_with_zero=True):
+    """
+    convert InputExample to InputFeature for Hugging Face transformer
+    """
+
+
+    inputs = tokenizer.encode_plus(
+        text,
+        None,
+        add_special_tokens=True,
+        max_length=max_length,
+    )
+    input_ids, token_type_ids = inputs["input_ids"], inputs["token_type_ids"]
+
+    # The mask has 1 for real tokens and 0 for padding tokens. Only real
+    # tokens are attended to.
+    attention_mask = [1 if mask_padding_with_zero else 0] * len(input_ids)
+
+    # Zero-pad up to the sequence length.
+    padding_length = max_length - len(input_ids)
+    if pad_on_left:
+        input_ids = ([pad_token] * padding_length) + input_ids
+        attention_mask = ([0 if mask_padding_with_zero else 1] * padding_length) + attention_mask
+        token_type_ids = ([pad_token_segment_id] * padding_length) + token_type_ids
+    else:
+        input_ids = input_ids + ([pad_token] * padding_length)
+        attention_mask = attention_mask + ([0 if mask_padding_with_zero else 1] * padding_length)
+        token_type_ids = token_type_ids + ([pad_token_segment_id] * padding_length)
+
+    assert len(input_ids) == max_length, "Error with input length {} vs {}".format(len(input_ids), max_length)
+    assert len(attention_mask) == max_length, "Error with input length {} vs {}".format(len(attention_mask), max_length)
+    assert len(token_type_ids) == max_length, "Error with input length {} vs {}".format(len(token_type_ids), max_length)
+
+
+    #if ex_index < 1:
+        #print("*** Example ***")
+        #print("guid: %s" % (example.guid))
+        #print("input_ids: %s" % " ".join([str(x) for x in input_ids]))
+        #print("attention_mask: %s" % " ".join([str(x) for x in attention_mask]))
+        #print("token_type_ids: %s" % " ".join([str(x) for x in token_type_ids]))
+        #print("label: %s (id = %d)" % (example.label, label))
+
+    return [input_ids, attention_mask, token_type_ids]
+
+
+
+
+def hf_convert_examples(texts, y=None, tokenizer=DistilBertTokenizer,
+                        max_length=512,
+                        pad_on_left=False,
+                        pad_token=0,
+                        pad_token_segment_id=0,
+                        mask_padding_with_zero=True):
+    """
+    Loads a data file into a list of ``InputFeatures``
+    Args:
+        examples: List of ``InputExamples`` or ``tf.data.Dataset`` containing the examples.
+        tokenizer: Instance of a tokenizer that will tokenize the examples
+        max_length: Maximum example length
+        pad_on_left: If set to ``True``, the examples will be padded on the left rather than on the right (default)
+        pad_token: Padding token
+        pad_token_segment_id: The segment ID for the padding token (It is usually 0, but can vary such as for XLNet where it is 4)
+        mask_padding_with_zero: If set to ``True``, the attention mask will be filled by ``1`` for actual values
+            and by ``0`` for padded values. If set to ``False``, inverts it (``1`` for padded values, ``0`` for
+            actual values)
+    Returns:
+        If the ``examples`` input is a ``tf.data.Dataset``, will return a ``tf.data.Dataset``
+        containing the task-specific features. If the input is a list of ``InputExamples``, will return
+        a list of task-specific ``InputFeatures`` which can be fed to the model.
+    """
+
+
+
+    features_list = []
+    labels = []
+    mb = master_bar(range(1))
+    for i in mb:
+        for (idx, text) in enumerate(progress_bar(texts, parent=mb)):
+
+            features = hf_convert_example(text, tokenizer=tokenizer,
+                                          max_length=max_length,
+                                          pad_on_left=pad_on_left,
+                                          pad_token=pad_token,
+                                          pad_token_segment_id=pad_token_segment_id,
+                                          mask_padding_with_zero=mask_padding_with_zero)
+            features_list.append(features)
+            label = y[idx] if y is not None else None
+            labels.append(label)
+    tfdataset = hf_features_to_tfdataset(features_list, labels)
+    #tfdataset.kt_transformer = True
+    #tfdataset.kt_shape = (len(examples), max_length)
+    #tfdataset.kt_y = np.array(y_data)
+
+    return tfdataset
+
+
+
+
 
 #------------------------------------------------------------------------------
 # MISC UTILITIES
@@ -417,7 +577,7 @@ class BERTPreprocessor(TextPreprocessor):
         tokenizer = BERT_Tokenizer(token_dict)
         self.tok = tokenizer
         self.tok_dct = dict((v,k) for k,v in token_dict.items())
-        self.max_features = max_features
+        self.max_features = max_features # ignored
         self.ngram_range = 1 # ignored
 
 
@@ -459,10 +619,87 @@ class BERTPreprocessor(TextPreprocessor):
         return self.preprocess_train(texts, y=y, mode=mode, verbose=verbose)
 
 
+class TransformersPreprocessor(TextPreprocessor):
+    """
+    text preprocessing for Hugging Face Transformer models
+    """
 
+    def __init__(self, name, model_name, tokenizer_type, model_type,
+                maxlen, max_features, classes=[], 
+                lang='en', ngram_range=1):
+
+        if maxlen > 512: raise ValueError('Transformer models only supports maxlen <= 512')
+
+        super().__init__(maxlen, classes, lang=lang)
+
+        tokenizer = tokenizer_type.from_pretrained(model_name)
+
+        self.tok = tokenizer
+        self.tok_dct = None
+        self.max_features = max_features # ignored
+        self.ngram_range = 1 # ignored
+
+        self.name = name
+        self.model_name = model_name
+        self.tokenizer_type = tokenizer_type
+        self.model_type = model_type
+
+
+
+    def get_preprocessor(self):
+        return (self.tok, self.tok_dct)
+
+
+
+    def preprocess(self, texts):
+        return self.preprocess_test(texts, verbose=0)[0]
+
+
+    def undo(self, doc):
+        """
+        undoes preprocessing and returns raw data by:
+        converting a list or array of Word IDs back to words
+        """
+        raise Exception('currently_unsupported: Transformers.Preprocessor.undo is not yet supported')
+
+
+    def preprocess_train(self, texts, y=None, mode='train', verbose=1):
+        """
+        preprocess training set
+        """
+        U.vprint('preprocessing %s...' % (mode), verbose=verbose)
+        U.vprint('language: %s' % (self.lang), verbose=verbose)
+
+        dataset = hf_convert_examples(texts, y=y, tokenizer=self.tok, max_length=self.maxlen)
+        return dataset
+
+
+
+    def preprocess_test(self, texts, y=None, mode='test', verbose=1):
+        return self.preprocess_train(texts, y=y, mode=mode, verbose=verbose)
+
+
+
+class DistilBertPreprocessor(TransformersPreprocessor):
+    """
+    text preprocessing for Hugging Face DistlBert model
+    """
+
+    def __init__(self, maxlen, max_features, classes=[], 
+                lang='en', ngram_range=1):
+
+        name = DISTILBERT
+        model_name = 'distilbert-base-uncased'
+        tokenizer_type = transformers.DistilBertTokenizer
+        model_type = transformers.TFDistilBertForSequenceClassification
+
+        super().__init__(name, model_name, tokenizer_type, model_type,
+                         maxlen, max_features, classes=classes, 
+                         lang=lang, ngram_range=ngram_range)
 
 
 # preprocessors
 TEXT_PREPROCESSORS = {'standard': StandardTextPreprocessor,
-                      'bert': BERTPreprocessor}
+                      'bert': BERTPreprocessor,
+                      'distilbert': DistilBertPreprocessor}
 

@@ -9,13 +9,18 @@ LOGREG = 'logreg'
 BIGRU = 'bigru'
 STANDARD_GRU = 'standard_gru'
 BERT = 'bert'
+DISTILBERT = tpp.DISTILBERT
+HUGGINGFACE_MODELS = [DISTILBERT]
 TEXT_CLASSIFIERS = {
                     FASTTEXT: "a fastText-like model (http://arxiv.org/pdf/1607.01759.pdf)",
                     LOGREG:  "logistic regression using a trainable Embedding layer",
                     NBSVM:  "NBSVM model (http://www.aclweb.org/anthology/P12-2018)",
                     BIGRU:  'Bidirectional GRU with pretrained word vectors (https://arxiv.org/abs/1712.09405)',
                     STANDARD_GRU: 'simple 2-layer GRU with randomly initialized embeddings',
-                    BERT:  'Bidirectional Encoder Representations from Transformers (https://arxiv.org/abs/1810.04805)'} 
+                    BERT:  'Bidirectional Encoder Representations from Transformers (https://arxiv.org/abs/1810.04805)',
+                    DISTILBERT:  'distilled, smaller, and faster BERT from Hugging Face (https://arxiv.org/abs/1910.01108)',
+                    } 
+
 
 
 def print_text_classifiers():
@@ -43,14 +48,14 @@ def text_classifier(name, train_data, preproc=None, multilabel=None, verbose=1):
                       - 'nbsvm' for NBSVM model  
                       - 'logreg' for logistic regression
                       - 'bigru' for Bidirectional GRU with pretrained word vectors
-                      = 'bert' for BERT Text Classification
+                      - 'bert' for BERT Text Classification
+                      - 'distilbert' for Hugging Face DistilBert model
 
         train_data (tuple): a tuple of numpy.ndarrays: (x_train, y_train)
         y_train can either be a list of integers representing classes
         or one-hot-encoded
         preproc: a ktrain.text.TextPreprocessor instance.
-                   This is only required for those models
-                   that employ pretrained-word vectors (e.g., BIGRU)
+                 As of v0.8.0, this is required.
         multilabel (bool):  If True, multilabel model will be returned.
                             If false, binary/multiclass model will be returned.
                             If None, multilabel will be inferred from data.
@@ -58,35 +63,34 @@ def text_classifier(name, train_data, preproc=None, multilabel=None, verbose=1):
     Return:
         model (Model): A Keras Model instance
     """
-    # check argument
-    if not isinstance(train_data, tuple):
+    # check arguments
+    if not isinstance(train_data, tuple) and not U.is_huggingface_from_data(train_data):
         err ="""
-            Please pass training data in the form of a tuple of numpy.ndarrays.
-            Training set in the form of Iterator is not currently supported
-            by get_textmodel
+            Please pass training data in the form of a tuple of numpy.ndarrays
+            or data returned from a ktrain texts_from* function.
             """
         raise Exception(err)
 
-    if name in  [BIGRU, BERT] and not isinstance(preproc, tpp.TextPreprocessor):
-        raise ValueError('A valid TextPreprocessor object is required for bert/bigru')
-    elif not isinstance(preproc, tpp.TextPreprocessor):
-        msg = 'The preproc argument will be required in future versions of ktrain.'
+    if not isinstance(preproc, tpp.TextPreprocessor):
+        msg = 'The preproc argument is required.'
         msg += ' The preproc arg should be an instance of TextPreprocessor, which is '
         msg += ' the third return value from texts_from_folder, texts_from_csv, etc.'
-        warnings.warn(msg, FutureWarning)
+        #warnings.warn(msg, FutureWarning)
+        raise ValueError(msg)
     if name == BIGRU and preproc.ngram_count() != 1:
         raise ValueError('Data should be processed with ngram_range=1 for bigru model.')
     is_bert = U.bert_data_tuple(train_data)
     if (is_bert and name != BERT) or (not is_bert and name == BERT):
         raise ValueError("if '%s' is selected model, then preprocess_mode='%s' should be used and vice versa" % (BERT, BERT))
+    is_huggingface = U.is_huggingface(data=train_data)
+    if (is_huggingface and name not in HUGGINGFACE_MODELS) or (not is_huggingface and name in HUGGINGFACE_MODELS):
+        raise ValueError('you are using a Hugging Face transformer model but did not preprocess as such (or vice versa)')
+    if is_huggingface and preproc.name != name:
+        raise ValueError('you preprocessed for %s but want build a %s model' % (preproc.name, name))
     
 
     # set number of classes and multilabel flag
-    x_train = train_data[0]
-    y_train = train_data[1]
-    if isinstance(y_train[0], int):
-        y_train = to_categorical(y_train)
-    num_classes = y_train.shape[1]
+    num_classes = U.nclasses_from_data(train_data)
 
     # determine multilabel
     if multilabel is None:
@@ -106,68 +110,82 @@ def text_classifier(name, train_data, preproc=None, multilabel=None, verbose=1):
 
 
     # determine number of classes, maxlen, and max_features
-    maxlen = U.shape_from_data((x_train, y_train))[1]
     max_features = preproc.max_features if preproc is not None else None
     features = set()
-    if not is_bert:
+    if not is_bert and not is_huggingface:
         U.vprint('compiling word ID features...', verbose=verbose)
+        x_train = train_data[0]
+        y_train = train_data[1]
+        if isinstance(y_train[0], int): raise ValueError('train labels should not be in sparse format')
+
         for x in x_train:
             features.update(x)
         #max_features = len(features)
         if max_features is None: 
             max_features = max(features)+1
             U.vprint('max_features is %s' % (max_features), verbose=verbose)
+    maxlen = U.shape_from_data(train_data)[1]
     U.vprint('maxlen is %s' % (maxlen), verbose=verbose)
 
 
     # return appropriate model
     if name == LOGREG:
-        model =  _build_logreg(x_train, y_train, num_classes, 
+        model =  _build_logreg(num_classes, 
                             maxlen,
                             max_features,
                             features,
                             loss_func=loss_func,
                             activation=activation, verbose=verbose)
-    elif name == BERT:
-        model =  _build_bert(x_train, y_train, num_classes, 
-                            maxlen,
-                            max_features,
-                            features,
-                            loss_func=loss_func,
-                            activation=activation, verbose=verbose,
-                            lang=preproc.lang)
 
-    elif name==NBSVM:
-        model = _build_nbsvm(x_train, y_train, num_classes, 
-                            maxlen,
-                            max_features,
-                            features,
-                            loss_func=loss_func,
-                            activation=activation, verbose=verbose)
     elif name==FASTTEXT:
-        model = _build_fasttext(x_train, y_train, num_classes, 
+        model = _build_fasttext(num_classes, 
                             maxlen,
                             max_features,
                             features,
                             loss_func=loss_func,
                             activation=activation, verbose=verbose)
     elif name==STANDARD_GRU:
-        model = _build_standard_gru(x_train, y_train, num_classes, 
+        model = _build_standard_gru(num_classes, 
                                     maxlen,
                                     max_features,
                                     features,
                                     loss_func=loss_func,
                                     activation=activation, verbose=verbose)
+    elif name==NBSVM:
+        model = _build_nbsvm(num_classes, 
+                            maxlen,
+                            max_features,
+                            features,
+                            loss_func=loss_func,
+                            activation=activation, verbose=verbose,
+                            train_data=train_data)
 
     elif name==BIGRU:
         (tokenizer, tok_dct) = preproc.get_preprocessor()
-        model = _build_bigru(x_train, y_train, num_classes, 
+        model = _build_bigru(num_classes, 
                             maxlen,
                             max_features,
                             features,
                             loss_func=loss_func,
                             activation=activation, verbose=verbose,
                             tokenizer=tokenizer)
+    elif name == BERT:
+        model =  _build_bert(num_classes, 
+                            maxlen,
+                            max_features,
+                            features,
+                            loss_func=loss_func,
+                            activation=activation, verbose=verbose,
+                            preproc=preproc)
+    elif name in HUGGINGFACE_MODELS:
+        model =  _build_transformer(num_classes, 
+                                   maxlen,
+                                   max_features,
+                                   features,
+                                   loss_func=loss_func,
+                                   activation=activation, verbose=verbose,
+                                   preproc=preproc)
+
     else:
         raise ValueError('name for textclassifier is invalid')
     U.vprint('done.', verbose=verbose)
@@ -175,7 +193,7 @@ def text_classifier(name, train_data, preproc=None, multilabel=None, verbose=1):
 
 
 
-def _build_logreg(x_train, y_train, num_classes,
+def _build_logreg(num_classes,
                   maxlen, max_features, features,
                  loss_func='categorical_crossentropy',
                  activation = 'softmax', verbose=1):
@@ -199,11 +217,13 @@ def _build_logreg(x_train, y_train, num_classes,
     return model
 
 
-def _build_bert(x_train, y_train, num_classes,
+def _build_bert(num_classes,
                 maxlen, max_features, features,
                loss_func='categorical_crossentropy',
                activation = 'softmax', verbose=1,
-               lang=None):
+               preproc=None):
+    if preproc is None: raise ValueError('preproc is missing')
+    lang = preproc.lang
     if lang is None: raise ValueError('lang is missing')
     config_path = os.path.join(tpp.get_bert_path(lang=lang), 'bert_config.json')
     checkpoint_path = os.path.join(tpp.get_bert_path(lang=lang), 'bert_model.ckpt')
@@ -224,12 +244,33 @@ def _build_bert(x_train, y_train, num_classes,
     return model
 
 
+def _build_transformer(num_classes,
+                      maxlen, max_features, features,
+                      loss_func='categorical_crossentropy',
+                      activation = 'softmax', verbose=1,
+                      preproc=None):
+    if not isinstance(preproc, tpp.TransformersPreprocessor): 
+        raise ValueError('preproc must be instance of %s' % (str(tpp.TransformersPreprocessor)))
 
-def _build_nbsvm(x_train, y_train, num_classes,
+    model = preproc.model_type.from_pretrained(preproc.model_name, num_labels=num_classes)
+    # Hugging Face models require from_logits=True
+    loss_map =  {'categorical_crossentropy': keras.losses.CategoricalCrossentropy(from_logits=True),
+                 'binary_crossentropy': keras.losses.BinaryCrossentropy(from_logits=True)}
+    model.compile(loss=loss_map[loss_func],
+                  optimizer=keras.optimizers.Adam(learning_rate=3e-5, epsilon=1e-08),
+                  metrics=['accuracy'])
+    return model
+
+
+
+
+def _build_nbsvm(num_classes,
                  maxlen, max_features, features,
                  loss_func='categorical_crossentropy',
-                 activation = 'softmax', verbose=1):
-
+                 activation = 'softmax', verbose=1, train_data=None):
+    if train_data is None: raise ValueError('train_data is required')
+    x_train = train_data[0]
+    y_trai = train_data[1]
     Y = np.array([np.argmax(row) for row in y_train])
     num_columns = max(features) + 1
     num_rows = len(x_train)
@@ -280,7 +321,7 @@ def _build_nbsvm(x_train, y_train, num_classes,
     return model
 
 
-def _build_fasttext(x_train, y_train, num_classes,
+def _build_fasttext(num_classes,
                  maxlen, max_features, features,
                  loss_func='categorical_crossentropy',
                  activation = 'softmax', verbose=1):
@@ -298,7 +339,7 @@ def _build_fasttext(x_train, y_train, num_classes,
     return model
 
 
-def _build_standard_gru(x_train, y_train, num_classes,
+def _build_standard_gru(num_classes,
                  maxlen, max_features, features,
                  loss_func='categorical_crossentropy',
                  activation = 'softmax', verbose=1):
@@ -312,7 +353,7 @@ def _build_standard_gru(x_train, y_train, num_classes,
 
 
 
-def _build_bigru(x_train, y_train, num_classes,
+def _build_bigru(num_classes,
                   maxlen, max_features, features,
                  loss_func='categorical_crossentropy',
                  activation = 'softmax', verbose=1,
@@ -349,10 +390,6 @@ def _build_bigru(x_train, y_train, num_classes,
                   optimizer=U.DEFAULT_OPT,
                   metrics=['accuracy'])
     return model
-
-
-
-
 
 
 
