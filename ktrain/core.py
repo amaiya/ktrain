@@ -37,7 +37,6 @@ class Learner(ABC):
         self._original_weights = weightfile
 
 
-
     def get_weight_decay(self):
         """
         Gets set of weight decays currently used in network.
@@ -405,10 +404,24 @@ class Learner(ABC):
         self.model.save_weights(weightfile)
         #self.model.load_weights(self._original_weights)
 
+
+         # compute steps_per_epoch
+        num_samples = U.nsamples_from_data(self.train_data)
+        bs = self.train_data.batch_size if hasattr(self.train_data, 'batch_size') else self.batch_size
+        if U.is_iter(self.train_data):
+            use_gen = True
+            steps_per_epoch = num_samples // bs
+        else:
+            use_gen = False
+            steps_per_epoch = np.ceil(num_samples/bs)
+
         try:
             # track and plot learning rates
             self.lr_finder = LRFinder(self.model)
-            self.lr_finder.find(self.train_data, start_lr=start_lr, lr_mult=lr_mult, 
+            self.lr_finder.find(self._prepare(self.train_data), 
+                                steps_per_epoch,
+                                use_gen=use_gen,
+                                start_lr=start_lr, lr_mult=lr_mult, 
                                 max_epochs=max_epochs,
                                 workers=self.workers, 
                                 use_multiprocessing=self.use_multiprocessing, 
@@ -588,6 +601,17 @@ class Learner(ABC):
 
         if not callbacks: callbacks=None
         return callbacks
+
+
+    def _prepare(self, data, mode='train'):
+        """
+        Subclasses can override this method if data
+        needs to be specially-prepared prior to invoking fit methods
+        Args:
+          data:  dataset
+          mode: either 'train' or 'valid'
+        """
+        return data
 
 
     @abstractmethod
@@ -895,13 +919,14 @@ class ArrayLearner(Learner):
         # train model
         with warnings.catch_warnings():
             warnings.filterwarnings('ignore', message='.*Check your callbacks.*')
-            hist = self.model.fit(x_train, y_train,
-                                 batch_size=self.batch_size,
-                                 epochs=epochs,
-                                 validation_data=validation, verbose=verbose, 
-                                 shuffle=True,
-                                 class_weight=class_weight,
-                                 callbacks=kcallbacks)
+            hist = self.model.fit(self._prepare(x_train), 
+                                  self._prepare(y_train, mode='valid'),
+                                  batch_size=self.batch_size,
+                                  epochs=epochs,
+                                  validation_data=validation, verbose=verbose, 
+                                  shuffle=True,
+                                  class_weight=class_weight,
+                                  callbacks=kcallbacks)
 
         if sgdr is not None: hist.history['lr'] = sgdr.history['lr']
         self.history = hist
@@ -1003,10 +1028,12 @@ class GenLearner(Learner):
         self.train_data = train_data
         self.val_data = val_data
         self.batch_size = batch_size
-        if self.train_data:
-            self.train_data.batch_size = batch_size
-        if self.val_data:
-            self.val_data.batch_size = batch_size
+        # HF_EXCEPTION
+        if not U.is_huggingface(data=train_data):
+            if self.train_data:
+                self.train_data.batch_size = batch_size
+            if self.val_data:
+                self.val_data.batch_size = batch_size
         return
 
     
@@ -1046,10 +1073,12 @@ class GenLearner(Learner):
         
         # handle callbacks
         num_samples = U.nsamples_from_data(self.train_data)
-        steps_per_epoch = math.ceil(num_samples/self.train_data.batch_size)
+        train_bs = self.train_data.batch_size if hasattr(self.train_data, 'batch_size') else self.batch_size
+        steps_per_epoch = math.ceil(num_samples/train_bs)
         validation_steps = None
         if self.val_data is not None:
-            validation_steps = math.ceil(U.nsamples_from_data(self.val_data)/self.val_data.batch_size)
+            val_bs = self.val_data.batch_size if hasattr(self.val_data, 'batch_size') else self.batch_size
+            validation_steps = math.ceil(U.nsamples_from_data(self.val_data)/val_bs)
 
         epochs = self._check_cycles(n_cycles, cycle_len, cycle_mult)
         self.set_lr(lr)
@@ -1074,17 +1103,23 @@ class GenLearner(Learner):
         # train model
         with warnings.catch_warnings():
             warnings.filterwarnings('ignore', message='.*Check your callbacks.*')
-            hist = self.model.fit_generator(self.train_data,
-                                           steps_per_epoch = steps_per_epoch,
-                                           validation_steps = validation_steps,
-                                           epochs=epochs,
-                                           validation_data=self.val_data,
-                                           workers=self.workers,
-                                           use_multiprocessing=self.use_multiprocessing, 
-                                           verbose=verbose,
-                                           shuffle=True,
-                                           class_weight=class_weight,
-                                           callbacks=kcallbacks)
+            # bug in TF2 causes fit_generator to be very slow
+            # https://github.com/tensorflow/tensorflow/issues/33024
+            if version.parse(tf.__version__) < version.parse('2.0'):
+                fit_fn = self.model.fit_generator
+            else:
+                fit_fn = self.model.fit
+            hist = fit_fn(self._prepare(self.train_data),
+                                        steps_per_epoch = steps_per_epoch,
+                                        validation_steps = validation_steps,
+                                        epochs=epochs,
+                                        validation_data=self._prepare(self.val_data, mode='valid'),
+                                        workers=self.workers,
+                                        use_multiprocessing=self.use_multiprocessing, 
+                                        verbose=verbose,
+                                        shuffle=True,
+                                        class_weight=class_weight,
+                                        callbacks=kcallbacks)
         if sgdr is not None: hist.history['lr'] = sgdr.history['lr']
         self.history = hist
 

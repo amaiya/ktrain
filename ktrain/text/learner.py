@@ -81,8 +81,6 @@ class TransformerTextClassLearner(GenLearner):
                          batch_size=batch_size, 
                          workers=workers, use_multiprocessing=use_multiprocessing,
                          multigpu=multigpu)
-        self._train_data = train_data.shuffle(train_data.y.shape[0]).batch(batch_size).repeat(-1)
-        self.val_data = self.val_data.batch(batch_size)
         return
 
 
@@ -133,3 +131,37 @@ class TransformerTextClassLearner(GenLearner):
             print("id:%s | loss:%s | true:%s | pred:%s)\n" % (idx, round(loss,2), truth, pred))
             print(obs)
         return
+
+
+    def _prepare(self, data, mode='train'):
+        """
+        prepare data as tf.Dataset
+        """
+        # HF_EXCEPTION
+        # convert arrays to TF dataset (iterator) on-the-fly
+        # to work around issues with transformers and tf.Datasets
+        tfdataset = self.features_to_tfdataset(data)
+        if mode == 'train':
+            return tfdataset.shuffle(U.nsamples_from_data(data)).batch(self.batch_size).repeat(-1)
+        else:
+            return tfdataset.batch(self.batch_size)
+
+
+    def features_to_tfdataset(self, data):
+        """
+        convert transformer features to tf.Dataset
+        """
+
+        features_list = data[0]['transformer_features']
+        labels = data[1]
+        if type(features_list) not in [list, np.ndarray] or\
+                type(labels) not in [list, np.ndarray]:
+            raise ValueError('features_list and labels must be numpy arrays')
+        if type(features_list) == list: features_list = np.array(features_list)
+        if type(labels) == list: labels = np.array(labels)
+        tfdataset = tf.data.Dataset.from_tensor_slices((features_list, labels))
+        tfdataset = tfdataset.map(lambda x,y: ({'input_ids': x[0], 
+                                                'attention_mask': x[1], 
+                                                 'token_type_ids': x[2]}, y))
+
+        return tfdataset

@@ -53,7 +53,8 @@ class LRFinder:
             return
 
 
-    def find(self, train_data, start_lr, lr_mult=1.01, max_epochs=None, 
+    def find(self, train_data, steps_per_epoch, use_gen=False,
+             start_lr=1e-7, lr_mult=1.01, max_epochs=None, 
              batch_size=U.DEFAULT_BS, workers=1, use_multiprocessing=False, verbose=1):
         """
         Track loss as learning rate is increased.
@@ -63,18 +64,18 @@ class LRFinder:
         # check arguments and initialize
         if train_data is None:
             raise ValueError('train_data is required')
-        U.data_arg_check(train_data=train_data, train_required=True)
+        #U.data_arg_check(train_data=train_data, train_required=True)
         self.lrs = []
         self.losses = []
 
          # compute steps_per_epoch
-        num_samples = U.nsamples_from_data(train_data)
-        if U.is_iter(train_data):
-            use_gen = True
-            steps_per_epoch = num_samples // train_data.batch_size
-        else:
-            use_gen = False
-            steps_per_epoch = np.ceil(num_samples/batch_size)
+        #num_samples = U.nsamples_from_data(train_data)
+        #if U.is_iter(train_data):
+            #use_gen = True
+            #steps_per_epoch = num_samples // train_data.batch_size
+        #else:
+            #use_gen = False
+            #steps_per_epoch = np.ceil(num_samples/batch_size)
 
         # max_epochs and lr_mult are None, set max_epochs
         # using sample size of 1500 batches

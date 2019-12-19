@@ -67,14 +67,7 @@ def is_huggingface_from_model(model):
 
 
 def is_huggingface_from_data(data):
-    #if not isinstance(data, tf.data.Dataset): 
-    if 'tensorflow.python.data.ops.dataset_ops' not in str(type(data)):
-        return False
-    try:
-        klist = list(tf.data.experimental.get_structure(data)[0].keys())
-    except:
-        return False
-    return 'input_ids' in klist and 'attention_mask' in klist and 'token_type_ids' in klist
+    return type(data) == tuple and type(data[0]) == dict and 'transformer_features' in data[0]
 
 
 
@@ -131,7 +124,11 @@ def is_multilabel(data):
     checks for multilabel from data
     """
     data_arg_check(val_data=data, val_required=True)
-    if is_iter(data):
+    # HF_EXCEPTION
+    # do not treat Hugging Face transformer arrays as normal arrays here
+    # typically Hugging Face transformers are treated as iterators
+    # due to issue with transformers library and tf.Datasets
+    if is_iter(data) and not is_huggingface(data=data): 
         if is_ner(data=data): return False   # NERSequence
         elif is_nodeclass(data=data): return False  # NodeSequenceWrapper
         multilabel = False
@@ -162,10 +159,8 @@ def shape_from_data(data):
     if is_iter(data):
         if is_ner(data=data): return (len(data.x), data[0][0][0].shape[1])  # NERSequence
         elif is_huggingface(data=data):  # HF Transformer
-            hf_size = tf.data.experimental.cardinality(data).numpy()
-            hf_shape1 = tf.data.experimental.get_structure(data)[0]['input_ids'].shape
-            hf_maxlen = hf_shape1[1] if hf_shape1[0] is None else hf_shape1[0]
-            return (hf_size, hf_maxlen)
+            hf_shape = data[0]['transformer_features'].shape
+            return (hf_shape[0], hf_shape[2])
         elif is_nodeclass(data=data):                                 # NodeSequence
             return data[0][0][0].shape[1:]  # returns 1st neighborhood only
         elif hasattr(data, 'image_shape'): return data.image_shape          # DirectoryIterator/DataFrameIterator
@@ -218,12 +213,9 @@ def nsamples_from_data(data):
 
 def nclasses_from_data(data):
     if is_iter(data):
-
         if is_ner(data=data): return len(data.p._label_vocab._id2token)    # NERSequence
         elif is_huggingface(data=data):         # Hugging Face Transformer
-            hf_shape1 = tf.data.experimental.get_structure(data)[1].shape.as_list()
-            hf_nclasses = hf_shape1[1] if hf_shape1[0] is None else hf_shape1[0]
-            return hf_nclasses
+            return data[1].shape[1]
         elif is_nodeclass(data=data):                                # NodeSequenceWrapper
             return data[0][1].shape[1]                                   
         elif hasattr(data, 'classes'):                                     # DirectoryIterator
@@ -244,12 +236,7 @@ def y_from_data(data):
     if is_iter(data):
         if is_ner(data=data): return data.y    # NERSequence
         if is_huggingface(data=data):  # Hugging Face Transformer
-            curr_bs = data.__iter__().get_next()[1].shape.as_list()[0]
-            data = data.unbatch().batch(1)
-            import tensorflow_datasets as tfds
-            res = np.array([np.squeeze(y) for x,y in tfds.as_numpy(data)])
-            data = data.unbatch().batch(curr_bs)
-            return res
+            return data[1]
         elif is_nodeclass(data=data):      # NodeSequenceWrapper
             return data.targets
         elif hasattr(data, 'classes'): # DirectoryIterator
@@ -272,6 +259,10 @@ def is_iter(data, ignore=False):
     iter_classes = ["NumpyArrayIterator", "DirectoryIterator",
                     "DataFrameIterator", "Iterator", "Sequence", 
                     "NERSequence", "NodeSequenceWrapper"]
+    # HF_EXCEPTION:
+    # Hugging Face transformer arrays are transformed on-the-fly to iterators
+    # to address issue with TF2 version of transformer library
+    # see TransformerLearner._prepare method
     return data.__class__.__name__ in iter_classes or is_huggingface(data=data)
 
 

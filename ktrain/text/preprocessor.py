@@ -234,7 +234,8 @@ def hf_convert_examples(texts, y=None, tokenizer=DistilBertTokenizer,
     """
     Loads a data file into a list of ``InputFeatures``
     Args:
-        examples: List of ``InputExamples`` or ``tf.data.Dataset`` containing the examples.
+        texts: texts of documents
+        y:  labels for documents
         tokenizer: Instance of a tokenizer that will tokenize the examples
         max_length: Maximum example length
         pad_on_left: If set to ``True``, the examples will be padded on the left rather than on the right (default)
@@ -251,9 +252,10 @@ def hf_convert_examples(texts, y=None, tokenizer=DistilBertTokenizer,
 
 
 
+    data = []
+    mb = master_bar(range(1))
     features_list = []
     labels = []
-    mb = master_bar(range(1))
     for i in mb:
         for (idx, text) in enumerate(progress_bar(texts, parent=mb)):
 
@@ -264,17 +266,14 @@ def hf_convert_examples(texts, y=None, tokenizer=DistilBertTokenizer,
                                           pad_token_segment_id=pad_token_segment_id,
                                           mask_padding_with_zero=mask_padding_with_zero)
             features_list.append(features)
-            label = y[idx] if y is not None else None
-            labels.append(label)
-    tfdataset = hf_features_to_tfdataset(features_list, labels)
-    #tfdataset.kt_transformer = True
-    #tfdataset.kt_shape = (len(examples), max_length)
-    #tfdataset.kt_y = np.array(y_data)
-
-    return tfdataset
-
-
-
+            labels.append(y[idx] if y is not None else None)
+    #tfdataset = hf_features_to_tfdataset(features_list, labels)
+    #return tfdataset
+    #return (features_list, labels)
+    # HF_EXCEPTION
+    # due to issues in transormers library and TF2 tf.Datasets, arrays are converted
+    # to iterators on-the-fly
+    return ({'transformer_features': np.array(features_list)}, np.array(labels))
 
 
 #------------------------------------------------------------------------------
