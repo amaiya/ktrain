@@ -273,7 +273,7 @@ def hf_convert_examples(texts, y=None, tokenizer=DistilBertTokenizer,
     # HF_EXCEPTION
     # due to issues in transormers library and TF2 tf.Datasets, arrays are converted
     # to iterators on-the-fly
-    return ({'transformer_features': np.array(features_list)}, np.array(labels))
+    return  TransformerSequence(np.array(features_list), np.array(labels))
 
 
 #------------------------------------------------------------------------------
@@ -668,6 +668,9 @@ class TransformersPreprocessor(TextPreprocessor):
         """
         U.vprint('preprocessing %s...' % (mode), verbose=verbose)
         U.vprint('language: %s' % (self.lang), verbose=verbose)
+        if y is not None:
+            if len(y.shape) == 1:
+                y = to_categorical(y)
 
         dataset = hf_convert_examples(texts, y=y, tokenizer=self.tok, max_length=self.maxlen)
         return dataset
@@ -688,13 +691,60 @@ class DistilBertPreprocessor(TransformersPreprocessor):
                 lang='en', ngram_range=1):
 
         name = DISTILBERT
-        model_name = 'distilbert-base-uncased'
         tokenizer_type = transformers.DistilBertTokenizer
         model_type = transformers.TFDistilBertForSequenceClassification
+        if lang == 'en':
+            model_name = 'distilbert-base-uncased'
+        else:
+            model_name = 'distilbert-base-multilingual-cased'
+            raise Exception('non-English languages are not currently supported for '+\
+                            'distilbert due to issues with TF2 version of transformers library. ')
 
         super().__init__(name, model_name, tokenizer_type, model_type,
                          maxlen, max_features, classes=classes, 
                          lang=lang, ngram_range=ngram_range)
+
+
+
+# Transformer Sequence
+class TransformerSequence(Sequence):
+
+    def __init__(self, x, y, batch_size=1):
+        if type(x) not in [list, np.ndarray]: raise ValueError('x must be list or np.ndarray')
+        if type(y) not in [list, np.ndarray]: raise ValueError('y must be list or np.ndarray')
+        if type(x) == list: x = np.array(x)
+        if type(y) == list: y = np.array(y)
+        self.x = x
+        self.y = y
+        self.batch_size = batch_size
+
+
+    def __getitem__(self, idx):
+        batch_x = self.x[idx * self.batch_size: (idx + 1) * self.batch_size]
+        batch_y = self.y[idx * self.batch_size: (idx + 1) * self.batch_size]
+        return (batch_x, batch_y)
+
+
+    def __len__(self):
+        return math.ceil(len(self.x) / self.batch_size)
+
+
+    def to_tfdataset(self, shuffle=True, repeat=True):
+        """
+        convert transformer features to tf.Dataset
+        """
+        tfdataset = tf.data.Dataset.from_tensor_slices((self.x, self.y))
+        tfdataset = tfdataset.map(lambda x,y: ({'input_ids': x[0], 
+                                                'attention_mask': x[1], 
+                                                 'token_type_ids': x[2]}, y))
+        if shuffle:
+            tfdataset = tfdataset.shuffle(self.x.shape[0])
+        tfdataset = tfdataset.batch(self.batch_size)
+        if repeat:
+            tfdataset = tfdataset.repeat(-1)
+        return tfdataset
+
+
 
 
 # preprocessors

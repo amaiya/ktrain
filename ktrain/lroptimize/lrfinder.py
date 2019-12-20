@@ -103,16 +103,23 @@ class LRFinder:
 
         callback = LambdaCallback(on_batch_end=lambda batch, logs: self.on_batch_end(batch, logs))
 
+
         if use_gen:
-            self.model.fit_generator(train_data, steps_per_epoch, 
-                                     epochs=epochs, 
-                                     workers=workers, use_multiprocessing=use_multiprocessing,
-                                     verbose=verbose,
-                                     callbacks=[callback])
+            if version.parse(tf.__version__) < version.parse('2.0'):
+                fit_fn = self.model.fit_generator
+            else:
+                fit_fn = self.model.fit
+            
+            fit_fn(train_data, steps_per_epoch=steps_per_epoch, 
+                   epochs=epochs, 
+                   workers=workers, use_multiprocessing=use_multiprocessing,
+                   verbose=verbose,
+                   callbacks=[callback])
         else:
             self.model.fit(train_data[0], train_data[1],
                             batch_size=batch_size, epochs=epochs, verbose=verbose,
                             callbacks=[callback])
+
 
         # Restore the weights to the state before model fitting
         self.model.load_weights(self._weightfile)

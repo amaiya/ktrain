@@ -831,7 +831,8 @@ class Learner(ABC):
         if U.is_iter(val):
             if hasattr(val, 'reset'): val.reset()
             steps = np.ceil(U.nsamples_from_data(val)/val.batch_size)
-            return self.model.predict_generator(val, steps=steps)
+            return self.model.predict_generator(self._prepare(val, mode='valid'), 
+                                                steps=steps)
         else:
             return self.model.predict(val[0])
 
@@ -1028,12 +1029,10 @@ class GenLearner(Learner):
         self.train_data = train_data
         self.val_data = val_data
         self.batch_size = batch_size
-        # HF_EXCEPTION
-        if not U.is_huggingface(data=train_data):
-            if self.train_data:
-                self.train_data.batch_size = batch_size
-            if self.val_data:
-                self.val_data.batch_size = batch_size
+        if self.train_data:
+            self.train_data.batch_size = batch_size
+        if self.val_data:
+            self.val_data.batch_size = batch_size
         return
 
     

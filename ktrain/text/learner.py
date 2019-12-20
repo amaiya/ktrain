@@ -121,7 +121,8 @@ class TransformerTextClassLearner(GenLearner):
 
             # BERT-style tuple
             join_char = ' '
-            obs = val[0][0][idx]
+            #obs = val[0][0][idx]
+            obs = val.x[idx]
             if preproc is not None: 
                 obs = preproc.undo(obs)
                 if preproc.is_nospace_lang(): join_char = ''
@@ -140,28 +141,11 @@ class TransformerTextClassLearner(GenLearner):
         # HF_EXCEPTION
         # convert arrays to TF dataset (iterator) on-the-fly
         # to work around issues with transformers and tf.Datasets
-        tfdataset = self.features_to_tfdataset(data)
-        if mode == 'train':
-            return tfdataset.shuffle(U.nsamples_from_data(data)).batch(self.batch_size).repeat(-1)
-        else:
-            return tfdataset.batch(self.batch_size)
+        shuffle=True
+        repeat = True
+        if mode != 'train':
+            shuffle = False
+            repeat = False
+        return data.to_tfdataset(shuffle=shuffle, repeat=repeat)
 
 
-    def features_to_tfdataset(self, data):
-        """
-        convert transformer features to tf.Dataset
-        """
-
-        features_list = data[0]['transformer_features']
-        labels = data[1]
-        if type(features_list) not in [list, np.ndarray] or\
-                type(labels) not in [list, np.ndarray]:
-            raise ValueError('features_list and labels must be numpy arrays')
-        if type(features_list) == list: features_list = np.array(features_list)
-        if type(labels) == list: labels = np.array(labels)
-        tfdataset = tf.data.Dataset.from_tensor_slices((features_list, labels))
-        tfdataset = tfdataset.map(lambda x,y: ({'input_ids': x[0], 
-                                                'attention_mask': x[1], 
-                                                 'token_type_ids': x[2]}, y))
-
-        return tfdataset
