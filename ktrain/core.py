@@ -1219,6 +1219,7 @@ def load_predictor(fpath):
     # load the model
     model = _load_model(fpath, preproc=preproc)
 
+
     # preprocessing functions in ImageDataGenerators are not pickable
     # so, we must reconstruct
     if hasattr(preproc, 'datagen') and hasattr(preproc.datagen, 'ktrain_preproc'):
@@ -1301,6 +1302,11 @@ def _load_model(fpath, preproc=None, train_data=None):
               'learner.model.load_weights instead.')
         print('Error was: %s' % (e))
         return
+
+    # see issue https://github.com/amaiya/ktrain/issues/21
+    if hasattr(model, '_make_predict_function'):
+        model._make_predict_function()
+
     return model
 
 

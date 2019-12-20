@@ -16,7 +16,7 @@ Most recent releases are shown at the top. Each release shows:
 - `preproc` argument is required for `text.text_classifier`
 
 ### Fixed:
-- N/A
+- `core._load_model` calls `_make_predict_function` before returning model
 
 
 
