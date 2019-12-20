@@ -17,7 +17,7 @@ if tf.__version__.startswith('1.14'):
         logging.getLogger('tensorflow').setLevel(logging.CRITICAL)
     except: pass
 tf.logging.set_verbosity(tf.logging.ERROR)
-#tf.disable_v2_behavior()
+tf.disable_v2_behavior()
 
 
 
