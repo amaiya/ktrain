@@ -2,11 +2,26 @@ from ..imports import *
 from .. import utils as U
 from ..preprocessor import Preprocessor
 
-InputFeatures = transformers.data.processors.utils.InputFeatures
-InputExample = transformers.data.processors.utils.InputExample
 DistilBertTokenizer = transformers.DistilBertTokenizer
-
 DISTILBERT= 'distilbert'
+
+from transformers import BertConfig, TFBertForSequenceClassification, BertTokenizer
+from transformers import XLNetConfig, TFXLNetForSequenceClassification, XLNetTokenizer
+from transformers import XLMConfig, TFXLMForSequenceClassification, XLMTokenizer
+from transformers import RobertaConfig, TFRobertaForSequenceClassification, RobertaTokenizer
+from transformers import DistilBertConfig, TFDistilBertForSequenceClassification, DistilBertTokenizer
+from transformers import AlbertConfig, TFAlbertForSequenceClassification, AlbertTokenizer
+#from transformers import CamembertConfig, TFCamembertForSequenceClassification, CamembertTokenizer
+
+TRANSFORMER_MODELS = {
+    'bert':       (BertConfig, TFBertForSequenceClassification, BertTokenizer),
+    'xlnet':      (XLNetConfig, TFXLNetForSequenceClassification, XLNetTokenizer),
+    'xlm':        (XLMConfig, TFXLMForSequenceClassification, XLMTokenizer),
+    'roberta':    (RobertaConfig, TFRobertaForSequenceClassification, RobertaTokenizer),
+    'distilbert': (DistilBertConfig, TFDistilBertForSequenceClassification, DistilBertTokenizer),
+    'albert':     (AlbertConfig, TFAlbertForSequenceClassification, AlbertTokenizer),
+    #'camembert':  (CamembertConfig, TFCamembertForSequenceClassification, CamembertTokenizer)
+}
 
 
 NOSPACE_LANGS = ['zh-cn', 'zh-tw', 'ja']
@@ -173,7 +188,7 @@ def hf_features_to_tfdataset(features_list, labels):
 
 
 
-def hf_convert_example(text, tokenizer=DistilBertTokenizer,
+def hf_convert_example(text, tokenizer=None,
                        max_length=512,
                        pad_on_left=False,
                        pad_token=0,
@@ -182,7 +197,7 @@ def hf_convert_example(text, tokenizer=DistilBertTokenizer,
     """
     convert InputExample to InputFeature for Hugging Face transformer
     """
-
+    if tokenizer is None: raise ValueError('tokenizer is required')
 
     inputs = tokenizer.encode_plus(
         text,
@@ -225,7 +240,7 @@ def hf_convert_example(text, tokenizer=DistilBertTokenizer,
 
 
 
-def hf_convert_examples(texts, y=None, tokenizer=DistilBertTokenizer,
+def hf_convert_examples(texts, y=None, tokenizer=None,
                         max_length=512,
                         pad_on_left=False,
                         pad_token=0,
@@ -623,7 +638,7 @@ class TransformersPreprocessor(TextPreprocessor):
     text preprocessing for Hugging Face Transformer models
     """
 
-    def __init__(self, name, model_name, tokenizer_type, model_type,
+    def __init__(self,  model_name,
                 maxlen, max_features, classes=[], 
                 lang='en', ngram_range=1):
 
@@ -631,17 +646,20 @@ class TransformersPreprocessor(TextPreprocessor):
 
         super().__init__(maxlen, classes, lang=lang)
 
-        tokenizer = tokenizer_type.from_pretrained(model_name)
+        self.model_name = model_name
+        self.name = model_name.split('-')[0]
+        if self.name not in TRANSFORMER_MODELS:
+            raise ValueError('uknown model name %s' % (model_name))
+        self.model_type = TRANSFORMER_MODELS[self.name][1]
+        self.tokenizer_type = TRANSFORMER_MODELS[self.name][2]
+
+        tokenizer = self.tokenizer_type.from_pretrained(model_name)
 
         self.tok = tokenizer
         self.tok_dct = None
         self.max_features = max_features # ignored
         self.ngram_range = 1 # ignored
 
-        self.name = name
-        self.model_name = model_name
-        self.tokenizer_type = tokenizer_type
-        self.model_type = model_type
 
 
 
@@ -651,7 +669,8 @@ class TransformersPreprocessor(TextPreprocessor):
 
 
     def preprocess(self, texts):
-        return self.preprocess_test(texts, verbose=0)[0]
+        tseq = self.preprocess_test(texts, verbose=0)
+        return tseq.to_tfdataset(shuffle=False, repeat=False)
 
 
     def undo(self, doc):
@@ -668,11 +687,18 @@ class TransformersPreprocessor(TextPreprocessor):
         """
         U.vprint('preprocessing %s...' % (mode), verbose=verbose)
         U.vprint('language: %s' % (self.lang), verbose=verbose)
+        if y is None and mode == 'train':
+            raise ValueError('y is required for training sets')
+        elif y is None:
+            y = np.array([1] * len(texts))
         if y is not None:
             if len(y.shape) == 1:
                 y = to_categorical(y)
 
-        dataset = hf_convert_examples(texts, y=y, tokenizer=self.tok, max_length=self.maxlen)
+        dataset = hf_convert_examples(texts, y=y, tokenizer=self.tok, max_length=self.maxlen,
+                                      pad_on_left=bool(self.name in ['xlnet']),
+                                      pad_token=self.tok.convert_tokens_to_ids([self.tok.pad_token][0]),
+                                      pad_token_segment_id=4 if self.name in ['xlnet'] else 0)
         return dataset
 
 
@@ -691,8 +717,6 @@ class DistilBertPreprocessor(TransformersPreprocessor):
                 lang='en', ngram_range=1):
 
         name = DISTILBERT
-        tokenizer_type = transformers.DistilBertTokenizer
-        model_type = transformers.TFDistilBertForSequenceClassification
         if lang == 'en':
             model_name = 'distilbert-base-uncased'
         else:
@@ -700,9 +724,59 @@ class DistilBertPreprocessor(TransformersPreprocessor):
             raise Exception('non-English languages are not currently supported for '+\
                             'distilbert due to issues with TF2 version of transformers library. ')
 
-        super().__init__(name, model_name, tokenizer_type, model_type,
+        super().__init__(model_name,
                          maxlen, max_features, classes=classes, 
                          lang=lang, ngram_range=ngram_range)
+
+
+class Transformer(TransformersPreprocessor):
+    """
+    convenience class for text classification Hugging Face transformers 
+    Usage:
+       t = Transformer('distilbert-base-uncased', maxlen=128, classes=['neg', 'pos'], batch_size=16)
+       train_dataset = t.preprocess_train(train_texts, train_labels)
+       model = t.get_classifier()
+       model.fit(train_dataset)
+    """
+
+    def __init__(self, model_name, maxlen=128, classes=[], 
+                 batch_size=32, is_multilabel=False):
+        if classes is None or not classes:
+            raise ValueError('classes argument is required - provide list of class names as strings')
+        super().__init__(model_name,
+                         maxlen, max_features=10000, classes=classes)
+        self.batch_size = batch_size
+        self.is_multilabel = is_multilabel
+
+
+    def preprocess_train(self, texts, y=None, mode='train', verbose=1):
+        """
+        preprocess training set
+        """
+        tseq = super().preprocess_train(texts, y=y, mode=mode, verbose=verbose)
+        tseq.batch_size = self.batch_size
+        shuffle=True if mode=='train' else False
+        repeat=True if mode=='train' else False
+        return tseq.to_tfdataset(shuffle=shuffle, repeat=repeat)
+
+
+    def preprocess_test(self, texts, y=None,  verbose=1):
+        return self.preprocess_train(texts, y=y, mode='test', verbose=verbose)
+
+
+
+    def get_classifier(self):
+        num_labels = len(self.get_classes())
+        model = self.model_type.from_pretrained(self.model_name, num_labels=num_labels)
+        if self.is_multilabel:
+            loss_fn =  keras.losses.BinaryCrossentropy(from_logits=True)
+        else:
+            loss_fn = keras.losses.CategoricalCrossentropy(from_logits=True)
+        model.compile(loss=loss_fn,
+                      optimizer=keras.optimizers.Adam(learning_rate=3e-5, epsilon=1e-08),
+                      metrics=['accuracy'])
+        return model
+
 
 
 
