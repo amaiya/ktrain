@@ -35,7 +35,7 @@ class TestNodeClassification(TestCase):
 
         # test training results
         self.assertAlmostEqual(max(hist.history['lr']), lr)
-        self.assertGreater(max(hist.history['acc']), 0.9)
+        self.assertGreater(max(hist.history['accuracy']), 0.9)
 
 
         # test top losses

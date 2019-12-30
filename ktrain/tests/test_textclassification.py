@@ -34,6 +34,7 @@ class TestTextClassification(TestCase):
 
 
 
+    #@skip('temporarily disabled')
     def test_fasttext(self):
         trn, val, preproc = txt.texts_from_array(x_train=self.trn[0], 
                                                  y_train=self.trn[1],
@@ -43,14 +44,14 @@ class TestTextClassification(TestCase):
                                                  preprocess_mode='standard',
                                                  maxlen=350, 
                                                  max_features=35000)
-        model = txt.text_classifier('fasttext', train_data=trn)
+        model = txt.text_classifier('fasttext', train_data=trn, preproc=preproc)
         learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=32)
         lr = 0.01
         hist = learner.fit(lr, 10, cycle_len=1)
 
         # test training results
         self.assertAlmostEqual(max(hist.history['lr']), lr)
-        self.assertGreater(max(hist.history['val_acc']), 0.8)
+        self.assertGreater(max(hist.history['val_accuracy']), 0.8)
 
 
         # test top losses
@@ -101,7 +102,7 @@ class TestTextClassification(TestCase):
 
         # test training results
         self.assertAlmostEqual(max(hist.history['lr']), lr)
-        self.assertGreater(max(hist.history['val_acc']), 0.92)
+        self.assertGreater(max(hist.history['val_accuracy']), 0.92)
         self.assertAlmostEqual(max(hist.history['momentum']), 0.95)
         self.assertAlmostEqual(min(hist.history['momentum']), 0.85)
 
@@ -135,6 +136,8 @@ class TestTextClassification(TestCase):
         self.assertEqual(np.argmax(p.predict_proba([TEST_DOC])[0]), 3)
         self.assertEqual(type(p.explain(TEST_DOC)), IPython.core.display.HTML)
 
+
+    #@skip('temporarily disabled')
     def test_logreg(self):
         trn, val, preproc = txt.texts_from_array(x_train=self.trn[0], 
                                                  y_train=self.trn[1],
@@ -145,14 +148,14 @@ class TestTextClassification(TestCase):
                                                  maxlen=700, 
                                                  max_features=35000,
                                                  ngram_range=3)
-        model = txt.text_classifier('logreg', train_data=trn)
+        model = txt.text_classifier('logreg', train_data=trn, preproc=preproc)
         learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=32)
         lr = 0.01
         hist = learner.autofit(lr)
 
         # test training results
         self.assertAlmostEqual(max(hist.history['lr']), lr)
-        self.assertGreater(max(hist.history['val_acc']), 0.9)
+        self.assertGreater(max(hist.history['val_accuracy']), 0.9)
         self.assertAlmostEqual(max(hist.history['momentum']), 0.95)
         self.assertAlmostEqual(min(hist.history['momentum']), 0.85)
 
@@ -205,7 +208,7 @@ class TestTextClassification(TestCase):
 
         # test training results
         self.assertAlmostEqual(max(hist.history['lr']), lr)
-        self.assertGreater(max(hist.history['val_acc']), 0.9)
+        self.assertGreater(max(hist.history['val_accuracy']), 0.9)
         self.assertAlmostEqual(max(hist.history['momentum']), 0.95)
         self.assertAlmostEqual(min(hist.history['momentum']), 0.85)
 
@@ -260,7 +263,7 @@ class TestTextClassification(TestCase):
 
         # test training results
         self.assertAlmostEqual(max(hist.history['lr']), lr)
-        self.assertGreater(max(hist.history['acc']), 0.7)
+        self.assertGreater(max(hist.history['accuracy']), 0.7)
 
 
         # test top losses

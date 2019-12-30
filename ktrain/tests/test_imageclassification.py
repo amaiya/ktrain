@@ -38,13 +38,13 @@ class TestImageClassification(TestCase):
         model = vis.image_classifier('pretrained_resnet50', trn, val)
         learner = ktrain.get_learner(model=model, train_data=trn, val_data=val, batch_size=1)
         learner.freeze()
-        hist = learner.autofit(1e-3, monitor='val_acc')
+        hist = learner.autofit(1e-3, monitor='val_accuracy')
 
         # test train
         self.assertAlmostEqual(max(hist.history['lr']), 1e-3)
-        if max(hist.history['acc']) == 0.5:
+        if max(hist.history['accuracy']) == 0.5:
             raise Exception('unlucky initialization: please run test again')
-        self.assertGreater(max(hist.history['acc']), 0.8)
+        self.assertGreater(max(hist.history['accuracy']), 0.8)
 
         # test top_losses
         obs = learner.top_losses(n=1, val_data=val)
@@ -52,7 +52,7 @@ class TestImageClassification(TestCase):
         if obs:
             self.assertIn(obs[0][0], list(range(U.nsamples_from_data(val))))
         else:
-            self.assertEqual(max(hist.history['val_acc']), 1)
+            self.assertEqual(max(hist.history['val_accuracy']), 1)
 
         # test weight decay
         self.assertEqual(len(learner.get_weight_decay()), 54)

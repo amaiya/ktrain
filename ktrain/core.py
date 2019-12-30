@@ -229,7 +229,7 @@ class Learner(ABC):
         """
         a wrapper to model.save
         """
-        self.model.save(fpath)
+        self.model.save(fpath, save_format='h5')
         return
 
 
@@ -731,7 +731,7 @@ class Learner(ABC):
                                         File name will be of the form: 
                                         weights-{epoch:02d}-{val_loss:.2f}.hdf5
             monitor (str):              what metric to monitor for early_stopping
-                                        and reduce_on_plateau (either val_loss or val_acc).
+                                        and reduce_on_plateau (either val_loss or val_accuracy).
                                         Only used if early_stopping or reduce_on_plateau
                                         is enabled.
             class_weight (dict):       Optional dictionary mapping class indices (integers) to a weight (float) 
@@ -739,8 +739,8 @@ class Learner(ABC):
             verbose (bool):  verbose mode
         """
         # check monitor
-        if monitor not in ['val_acc', 'val_loss']:
-            raise ValueError("monitor must be one of {'val_acc', val_loss'}")
+        if monitor not in ['val_accuracy', 'val_loss']:
+            raise ValueError("monitor must be one of {'val_accuracy', val_loss'}")
 
         # setup learning rate policy 
         num_samples = U.nsamples_from_data(self.train_data)
@@ -764,7 +764,7 @@ class Learner(ABC):
                           'Either reduce reduce_on_plateau or set early_stopping ' +\
                           'to be higher.')
 
-        if self.val_data is None and monitor in ['val_loss', 'val_acc'] and\
+        if self.val_data is None and monitor in ['val_loss', 'val_accuracy'] and\
            (reduce_on_plateau is not None or early_stopping is not None):
             raise Exception('cannot monitor %s ' % (monitor)  +\
                             'without validation data - please change monitor')
