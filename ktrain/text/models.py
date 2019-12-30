@@ -270,7 +270,7 @@ def _build_nbsvm(num_classes,
                  activation = 'softmax', verbose=1, train_data=None):
     if train_data is None: raise ValueError('train_data is required')
     x_train = train_data[0]
-    y_trai = train_data[1]
+    y_train = train_data[1]
     Y = np.array([np.argmax(row) for row in y_train])
     num_columns = max(features) + 1
     num_rows = len(x_train)

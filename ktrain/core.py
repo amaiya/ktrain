@@ -187,7 +187,8 @@ class Learner(ABC):
         else:
             L = self.model.loss_functions[0]
         losses = L(tf.convert_to_tensor(y_true), tf.convert_to_tensor(y_pred))
-        losses = tf.Session().run(losses)
+        #losses = tf.Session().run(losses)
+        losses = losses.numpy()
 
 
         class_names = [] if preproc is None else preproc.get_classes()
