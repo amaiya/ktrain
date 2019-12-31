@@ -6,6 +6,19 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.7.3 (2019-12-31)
+
+### New:
+- N/A
+
+### Changed:
+- N/A
+
+### Fixed:
+- Fixed error when using *ktrain* with v0.2.x of `fastprogress`. *ktrain* can now be used with both v0.1.x and v0.2.x of `fastprogress`
+
+
+
 ## 0.7.2 (2019-12-11)
 
 ### New:
