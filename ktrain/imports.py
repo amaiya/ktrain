@@ -170,7 +170,12 @@ import joblib
 from scipy import sparse # utils
 from scipy.sparse import csr_matrix
 import pandas as pd
-from fastprogress import master_bar, progress_bar 
+try:
+    # fastprogress >= v0.2.0
+    from fastprogress.fastprogress import master_bar, progress_bar 
+except:
+    # fastprogress < v0.2.0
+    from fastprogress import master_bar, progress_bar 
 import keras_bert
 from keras_bert import Tokenizer as BERT_Tokenizer
 import requests
