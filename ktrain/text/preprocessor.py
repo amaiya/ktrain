@@ -721,7 +721,7 @@ class DistilBertPreprocessor(TransformersPreprocessor):
             model_name = 'distilbert-base-uncased'
         else:
             model_name = 'distilbert-base-multilingual-cased'
-            raise Exception('non-English languages are not currently supported for '+\
+            raise Exception('currently_unsupported: non-English languages are not currently supported for '+\
                             'distilbert due to issues with TF2 version of transformers library. ')
 
         super().__init__(model_name,
