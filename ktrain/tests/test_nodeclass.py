@@ -8,6 +8,7 @@ from unittest import TestCase, main, skip
 import numpy as np
 import ktrain
 from ktrain import graph as gr
+from ktrain.imports import ACC_NAME, VAL_ACC_NAME
 
 class TestNodeClassification(TestCase):
 
@@ -35,7 +36,7 @@ class TestNodeClassification(TestCase):
 
         # test training results
         self.assertAlmostEqual(max(hist.history['lr']), lr)
-        self.assertGreater(max(hist.history['accuracy']), 0.9)
+        self.assertGreater(max(hist.history[ACC_NAME]), 0.9)
 
 
         # test top losses

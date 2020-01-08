@@ -6,9 +6,12 @@ import testenv
 import IPython
 from unittest import TestCase, main, skip
 import numpy as np
+
 import ktrain
 from ktrain import text as txt
 TEST_DOC = '还好，床很大而且很干净，前台很友好，很满意，下次还来。'
+from ktrain.imports import ACC_NAME, VAL_ACC_NAME
+
 
 class TestTextClassification(TestCase):
 
@@ -26,7 +29,7 @@ class TestTextClassification(TestCase):
 
         # test training results
         self.assertAlmostEqual(max(hist.history['lr']), lr)
-        self.assertGreater(max(hist.history['val_accuracy']), 0.85)
+        self.assertGreater(max(hist.history[VAL_ACC_NAME]), 0.85)
 
 
         # test top losses

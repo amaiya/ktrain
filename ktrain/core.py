@@ -187,8 +187,10 @@ class Learner(ABC):
         else:
             L = self.model.loss_functions[0]
         losses = L(tf.convert_to_tensor(y_true), tf.convert_to_tensor(y_pred))
-        #losses = tf.Session().run(losses)
-        losses = losses.numpy()
+        if DISABLE_V2_BEHAVIOR:
+            losses = tf.Session().run(losses)
+        else:
+            losses = losses.numpy()
 
 
         class_names = [] if preproc is None else preproc.get_classes()
@@ -739,8 +741,8 @@ class Learner(ABC):
             verbose (bool):  verbose mode
         """
         # check monitor
-        if monitor not in ['val_accuracy', 'val_loss']:
-            raise ValueError("monitor must be one of {'val_accuracy', val_loss'}")
+        if monitor not in [VAL_ACC_NAME, 'val_loss']:
+            raise ValueError("monitor must be one of {%s, val_loss'}" % (VAL_ACC_NAME))
 
         # setup learning rate policy 
         num_samples = U.nsamples_from_data(self.train_data)
@@ -764,7 +766,7 @@ class Learner(ABC):
                           'Either reduce reduce_on_plateau or set early_stopping ' +\
                           'to be higher.')
 
-        if self.val_data is None and monitor in ['val_loss', 'val_accuracy'] and\
+        if self.val_data is None and monitor in ['val_loss', VAL_ACC_NAME] and\
            (reduce_on_plateau is not None or early_stopping is not None):
             raise Exception('cannot monitor %s ' % (monitor)  +\
                             'without validation data - please change monitor')
@@ -832,7 +834,7 @@ class Learner(ABC):
         if U.is_iter(val):
             if hasattr(val, 'reset'): val.reset()
             steps = np.ceil(U.nsamples_from_data(val)/val.batch_size)
-            return self.model.predict_generator(self._prepare(val, mode='valid'), 
+            result = self.model.predict_generator(self._prepare(val, mode='valid'), 
                                                 steps=steps)
         else:
             return self.model.predict(val[0])

@@ -46,6 +46,9 @@ class TextPredictor(Predictor):
         #    treat_multilabel = True
         texts = self.preproc.preprocess(texts)
         preds = self.model.predict(texts)
+        if U.is_huggingface(model=self.model):
+            # convert logits to probabilities for Hugging Face models
+            preds = activations.softmax(tf.convert_to_tensor(preds)).numpy()
         result =  preds if return_proba else [self.c[np.argmax(pred)] for pred in preds] 
         if multilabel:
             result =  [list(zip(self.c, r)) for r in result]

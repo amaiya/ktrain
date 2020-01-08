@@ -123,14 +123,8 @@ class TransformerTextClassLearner(GenLearner):
             join_char = ' '
             #obs = val[0][0][idx]
             obs = val.x[idx]
-            if preproc is not None: 
-                obs = preproc.undo(obs)
-                if preproc.is_nospace_lang(): join_char = ''
-            if type(obs) == str:
-                obs = join_char.join(obs.split()[:512])
             print('----------')
             print("id:%s | loss:%s | true:%s | pred:%s)\n" % (idx, round(loss,2), truth, pred))
-            print(obs)
         return
 
 
@@ -147,5 +141,19 @@ class TransformerTextClassLearner(GenLearner):
             shuffle = False
             repeat = False
         return data.to_tfdataset(shuffle=shuffle, repeat=repeat)
+
+
+    def predict(self, val_data=None):
+        """
+        Makes predictions on validation set
+        """
+        if val_data is not None:
+            val = val_data
+        else:
+            val = self.val_data
+        if val is None: raise Exception('val_data must be supplied to get_learner or predict')
+        if hasattr(val, 'reset'): val.reset()
+        preds = self.model.predict(self._prepare(val, mode='valid'))
+        return activations.softmax(tf.convert_to_tensor(preds)).numpy()
 
 

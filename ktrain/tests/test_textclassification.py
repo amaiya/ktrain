@@ -8,6 +8,7 @@ from unittest import TestCase, main, skip
 import numpy as np
 import ktrain
 from ktrain import text as txt
+from ktrain.imports import ACC_NAME, VAL_ACC_NAME
 TEST_DOC = 'god christ jesus mother mary church sunday lord heaven amen'
 
 class TestTextClassification(TestCase):
@@ -51,7 +52,7 @@ class TestTextClassification(TestCase):
 
         # test training results
         self.assertAlmostEqual(max(hist.history['lr']), lr)
-        self.assertGreater(max(hist.history['val_accuracy']), 0.8)
+        self.assertGreater(max(hist.history[VAL_ACC_NAME]), 0.8)
 
 
         # test top losses
@@ -102,7 +103,7 @@ class TestTextClassification(TestCase):
 
         # test training results
         self.assertAlmostEqual(max(hist.history['lr']), lr)
-        self.assertGreater(max(hist.history['val_accuracy']), 0.92)
+        self.assertGreater(max(hist.history[VAL_ACC_NAME]), 0.92)
         self.assertAlmostEqual(max(hist.history['momentum']), 0.95)
         self.assertAlmostEqual(min(hist.history['momentum']), 0.85)
 
@@ -155,7 +156,7 @@ class TestTextClassification(TestCase):
 
         # test training results
         self.assertAlmostEqual(max(hist.history['lr']), lr)
-        self.assertGreater(max(hist.history['val_accuracy']), 0.9)
+        self.assertGreater(max(hist.history[VAL_ACC_NAME]), 0.9)
         self.assertAlmostEqual(max(hist.history['momentum']), 0.95)
         self.assertAlmostEqual(min(hist.history['momentum']), 0.85)
 
@@ -208,7 +209,7 @@ class TestTextClassification(TestCase):
 
         # test training results
         self.assertAlmostEqual(max(hist.history['lr']), lr)
-        self.assertGreater(max(hist.history['val_accuracy']), 0.9)
+        self.assertGreater(max(hist.history[VAL_ACC_NAME]), 0.9)
         self.assertAlmostEqual(max(hist.history['momentum']), 0.95)
         self.assertAlmostEqual(min(hist.history['momentum']), 0.85)
 
@@ -263,7 +264,7 @@ class TestTextClassification(TestCase):
 
         # test training results
         self.assertAlmostEqual(max(hist.history['lr']), lr)
-        self.assertGreater(max(hist.history['accuracy']), 0.7)
+        self.assertGreater(max(hist.history[ACC_NAME]), 0.7)
 
 
         # test top losses

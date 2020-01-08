@@ -49,7 +49,16 @@ def sequence_tagger(name, preproc,
     """
     
 
-
+    if not DISABLE_V2_BEHAVIOR:
+        warnings.warn("Please add os.environ['DISABLE_V2_BEHAVIOR'] = '1' at top of your script or notebook")
+        msg = "\nktrain uses the CRF module from keras_contrib, which is not yet\n" +\
+              "fully compatible with TensorFlow 2. You can still use the BiLSTM-CRF model\n" +\
+              "in ktrain for sequence tagging with TensorFlow 2, but you must add the\n" +\
+              "following to the top of your script or notebook BEFORE you import ktrain:\n\n" +\
+              "import os\n" +\
+              "os.environ['DISABLE_V2_BEHAVIOR'] = '1'\n"
+        print(msg)
+        return
 
     emb_model = None
     if preproc.e == pp.W2V:
