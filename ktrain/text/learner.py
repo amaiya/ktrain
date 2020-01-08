@@ -119,10 +119,8 @@ class TransformerTextClassLearner(GenLearner):
             truth = tup[2]
             pred = tup[3]
 
-            # BERT-style tuple
             join_char = ' '
-            #obs = val[0][0][idx]
-            obs = val.x[idx]
+            #obs = val.x[idx][0]
             print('----------')
             print("id:%s | loss:%s | true:%s | pred:%s)\n" % (idx, round(loss,2), truth, pred))
         return
