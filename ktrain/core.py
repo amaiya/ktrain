@@ -1108,12 +1108,13 @@ class GenLearner(Learner):
             if version.parse(tf.__version__) < version.parse('2.0'):
                 fit_fn = self.model.fit_generator
             else:
-                # TODO: check for multiple inputs and proceed accordingly until
-                # TF bug is fixed
-                if U.is_huggingface(model=self.model, data=self.train_data):
-                    fit_fn = self.model.fit
-                else:
+                # TF bug with using multiple inputs with utils.Sequence and model.fit
+                # TODO: check data and proceed accordingly
+                if U.is_nodeclass(model=self.model, data=self.train_data) or\
+                   U.is_ner(model=self.model, data=self.train_data):
                     fit_fn = self.model.fit_generator
+                else:
+                    fit_fn = self.model.fit
             hist = fit_fn(self._prepare(self.train_data),
                                         steps_per_epoch = steps_per_epoch,
                                         validation_steps = validation_steps,

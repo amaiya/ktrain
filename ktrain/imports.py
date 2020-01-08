@@ -12,11 +12,19 @@ import logging
 
 # TF2-transition
 #import tensorflow.compat.v1 as tf
+#try:
+    #logging.getLogger('tensorflow').setLevel(logging.ERROR)
+#except: pass
+#tf.disable_v2_behavior()
+
+
+# TF2
 import tensorflow as tf
+#tf.compat.v1.disable_eager_execution()
+#tf.compat.v1.experimental.output_all_intermediates(True)
 try:
     logging.getLogger('tensorflow').setLevel(logging.ERROR)
 except: pass
-#tf.disable_v2_behavior()
 
 
 
@@ -28,7 +36,10 @@ if os.environ.get('TF_KERAS', '0') != '0':
     #from tensorflow import keras
 
     # TF2-transition
-    from tensorflow.compat.v1 import keras
+    #from tensorflow.compat.v1 import keras
+
+    # TF2
+    from tensorflow import keras
 
     TF_KERAS = True
     if os.environ.get('TF_EAGER', '0') != '0':
