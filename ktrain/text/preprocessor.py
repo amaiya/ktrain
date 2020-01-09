@@ -743,20 +743,48 @@ class Transformer(TransformersPreprocessor):
     """
 
     def __init__(self, model_name, maxlen=128, classes=[], 
-                 batch_size=32, is_multilabel=False):
+                 batch_size=None, is_multilabel=False,
+                 use_with_learner=True):
+        """
+        Args:
+            model_name (str):  name of Hugging Face pretrained model
+            maxlen (int):  sequence length
+            classes(list):  list of strings of class names (e.g., 'positive', 'negative')
+            use_with_learner(bool):  If False, preprocess_train and preprocess_test
+                                     will return tf.Datasets for direct use with model.fit
+                                     in tf.Keras.
+                                     If True, preprocess_train and preprocess_test will
+                                     return a ktrain TransformerSequence object for use with
+                                     ktrain.get_learner.
+            batch_size (int): batch_size - only required if use_with_learner=False
+            is_multilabel (int):  if True, classifier will be configured for
+                                  multilabel classification.
+
+        """
+        if not use_with_learner and batch_size is None:
+            raise ValueError('batch_size is required when use_with_learner=False')
         if classes is None or not classes:
             raise ValueError('classes argument is required - provide list of class names as strings')
         super().__init__(model_name,
                          maxlen, max_features=10000, classes=classes)
         self.batch_size = batch_size
         self.is_multilabel = is_multilabel
+        self.use_with_learner = use_with_learner
 
 
     def preprocess_train(self, texts, y=None, mode='train', verbose=1):
         """
         preprocess training set
+        Args:
+            texts (list of strings): text of documents
+            y: labels
+            mode (str):  If 'train' and prepare_for_learner=False,
+                         a tf.Dataset will be returned with repeat enabled
+                         for training with fit_generator
+            verbose(bool): verbosity
         """
         tseq = super().preprocess_train(texts, y=y, mode=mode, verbose=verbose)
+        if self.use_with_learner: return tseq
         tseq.batch_size = self.batch_size
         shuffle=True if mode=='train' else False
         repeat=True if mode=='train' else False
@@ -764,6 +792,9 @@ class Transformer(TransformersPreprocessor):
 
 
     def preprocess_test(self, texts, y=None,  verbose=1):
+        """
+        preprocess validation or test datasets
+        """
         return self.preprocess_train(texts, y=y, mode='test', verbose=verbose)
 
 

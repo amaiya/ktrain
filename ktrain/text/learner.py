@@ -1,6 +1,7 @@
 from ..imports import *
 from .. import utils as U
-from ..core import ArrayLearner, GenLearner
+from ..core import ArrayLearner, GenLearner, _load_model
+from .preprocessor import TransformersPreprocessor
 
 
 
@@ -153,5 +154,29 @@ class TransformerTextClassLearner(GenLearner):
         if hasattr(val, 'reset'): val.reset()
         preds = self.model.predict(self._prepare(val, mode='valid'))
         return activations.softmax(tf.convert_to_tensor(preds)).numpy()
+
+
+    def save_model(self, fpath):
+        """
+        save Transformers model
+        """
+        self.model.save_pretrained(fpath)
+        return
+
+
+    def load_model(self, fpath, preproc=None):
+        """
+        load Transformers model
+        """
+        if preproc is None or not isinstance(preproc, TransformersPreprocessor):
+            raise ValueError('preproc is required for Transformer models. ' +\
+                              'Supply a TransformersPreprocessor instance, which is the ' +\
+                              'third return value from texts_from* function')
+
+
+        self.model = _load_model(fpath, preproc=preproc)
+        return
+
+
 
 

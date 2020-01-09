@@ -1,6 +1,6 @@
 from ..imports import *
 from ..predictor import Predictor
-from .preprocessor import TextPreprocessor
+from .preprocessor import TextPreprocessor, TransformersPreprocessor
 from .. import utils as U
 
 class TextPredictor(Predictor):
@@ -66,12 +66,14 @@ class TextPredictor(Predictor):
         return self.predict(texts, return_proba=True)
 
 
-    def explain(self, doc, truncate_len=512):
+    def explain(self, doc, truncate_len=512, all_targets=False):
         """
         Highlights text to explain prediction
         Args:
             doc (str): text of documnet
             truncate_len(int): truncate document to this many words
+            all_targets(bool):  If True, show visualization for
+                                each target.
         """
         try:
             import eli5
@@ -82,6 +84,7 @@ class TextPredictor(Predictor):
             warnings.warn(msg)
             return
 
+        prediction = [self.predict(doc)] if not all_targets else None
 
         if not isinstance(doc, str): raise Exception('text must of type str')
         if self.preproc.is_nospace_lang():
@@ -90,7 +93,7 @@ class TextPredictor(Predictor):
         doc = ' '.join(doc.split()[:truncate_len])
         te = TextExplainer(random_state=42)
         _ = te.fit(doc, self.predict_proba)
-        return te.show_prediction(target_names=self.preproc.get_classes())
+        return te.show_prediction(target_names=self.preproc.get_classes(), targets=prediction)
 
 
     def analyze_valid(self, val_tup, print_report=True, multilabel=None):
@@ -121,3 +124,17 @@ class TextPredictor(Predictor):
             cm_func = confusion_matrix
         cm =  confusion_matrix(y_true,  y_pred)
         return cm
+
+    def save(self, fname):
+        if not isinstance(self.preproc, TransformersPreprocessor):
+            super().save(fname)
+            return
+
+        # save model
+        self.model.save_pretrained(fname)
+
+        # save preprocessor
+        fname_preproc = fname+'.preproc'
+        with open(fname_preproc, 'wb') as f:
+            pickle.dump(self.preproc, f)
+        return

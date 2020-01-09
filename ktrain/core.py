@@ -7,7 +7,7 @@ from . import utils as U
 
 from .vision.preprocessor import ImagePreprocessor
 from .vision.predictor import ImagePredictor
-from .text.preprocessor import TextPreprocessor, BERTPreprocessor
+from .text.preprocessor import TextPreprocessor, BERTPreprocessor, TransformersPreprocessor
 from .text.predictor import TextPredictor
 from .text.ner.predictor import NERPredictor
 from .text.ner.preprocessor import NERPreprocessor
@@ -374,9 +374,12 @@ class Learner(ABC):
     def lr_find(self, start_lr=1e-7, lr_mult=1.01, max_epochs=None,
                 show_plot=False, verbose=1):
         """
-        Plots loss as learning rate is increased.
-        Highest learning rate corresponding to a still
-        falling loss should be chosen.
+        Plots loss as learning rate is increased.  Highest learning rate 
+        corresponding to a still falling loss should be chosen.
+
+        If you find the LR finder is running for more epochs than you'd prefer,
+        you can set max_epochs (e.g., max_epochs=5) to estimate LR with a 
+        smaller sample size.
 
         If lr_mult is supplied and max_epochs is None, LR will increase until loss diverges.
         Reasonable values of lr_mult are between 1.01 and 1.05.
@@ -417,6 +420,13 @@ class Learner(ABC):
         else:
             use_gen = False
             steps_per_epoch = np.ceil(num_samples/bs)
+
+        # check steps_per_epoch
+        if steps_per_epoch <=64 and max_epochs is None:
+            warnings.warn('max_epochs is being set to 5 since steps per epoch is small. ' +\
+                          'If you wish to estimate LR using more epochs, set max_epochs manually.')
+            max_epochs = 5
+
 
         try:
             # track and plot learning rates
@@ -1112,6 +1122,7 @@ class GenLearner(Learner):
             else:
                 # TF bug with using multiple inputs with utils.Sequence and model.fit
                 # TODO: check data and proceed accordingly
+                # potential patch is to have Sequence subclasses return tuple(batch_x), y
                 if U.is_nodeclass(model=self.model, data=self.train_data) or\
                    U.is_ner(model=self.model, data=self.train_data):
                     fit_fn = self.model.fit_generator
@@ -1286,7 +1297,10 @@ def _load_model(fpath, preproc=None, train_data=None):
     if not preproc and not train_data:
         raise ValueError('Either preproc or train_data is required.')
     custom_objects=None
-    if (preproc and (isinstance(preproc, BERTPreprocessor) or \
+    if preproc and isinstance(preproc, TransformersPreprocessor):
+        model = preproc.model_type.from_pretrained(fpath)
+        return model
+    elif (preproc and (isinstance(preproc, BERTPreprocessor) or \
                     type(preproc).__name__ == 'BERTPreprocessor')) or\
        train_data and U.bert_data_tuple(train_data):
         # custom BERT model
