@@ -186,3 +186,34 @@ class TransformerTextClassLearner(GenLearner):
 
 
 
+    def set_weight_decay(self, wd=0.005):
+        """
+        Sets global weight decay layer-by-layer using L2 regularization.
+
+        Args:
+          wd(float): weight decay (see note above)
+        Returns:
+          None
+              
+        """
+
+        for layer in self.model.layers:
+            if hasattr(layer, 'kernel_regularizer') and hasattr(layer, 'kernel'):
+                layer.kernel_regularizer= regularizers.l2(wd)
+                if U.is_tf_keras():
+                    layer.add_loss(lambda:regularizers.l2(wd)(layer.kernel))
+                else:
+                    layer.add_loss(regularizers.l2(wd)(layer.kernel))
+
+            if hasattr(layer, 'bias_regularizer') and hasattr(layer, 'bias'):
+                layer.bias_regularizer= regularizers.l2(wd)
+                if U.is_tf_keras():
+                    layer.add_loss(lambda:regularizers.l2(wd)(layer.bias))
+                else:
+                    layer.add_loss(regularizers.l2(wd)(layer.bias))
+        warnings.warn('currently_unsupported: set_weight_decay currently has no effect on ' +\
+                       'Hugging Face transformer models in ktrain.')
+        #self._recompile(preproc=preproc)
+        return
+        
+
