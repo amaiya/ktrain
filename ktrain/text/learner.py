@@ -160,6 +160,11 @@ class TransformerTextClassLearner(GenLearner):
         """
         save Transformers model
         """
+        if os.path.isfile(fpath):
+            raise ValueError(f'There is an existing file named {fpath}. ' +\
+                              'Please use dfferent value for fpath.')
+        elif not os.path.exists(fpath):
+            os.mkdir(fpath)
         self.model.save_pretrained(fpath)
         return
 
@@ -169,9 +174,10 @@ class TransformerTextClassLearner(GenLearner):
         load Transformers model
         """
         if preproc is None or not isinstance(preproc, TransformersPreprocessor):
-            raise ValueError('preproc is required for Transformer models. ' +\
-                              'Supply a TransformersPreprocessor instance, which is the ' +\
-                              'third return value from texts_from* function')
+            raise ValueError('preproc arg is required to load Transformer models from disk. ' +\
+                              'Supply a TransformersPreprocessor instance. This is ' +\
+                              'either the third return value from texts_from* function or '+\
+                              'the result of calling ktrain.text.Transformer')
 
 
         self.model = _load_model(fpath, preproc=preproc)

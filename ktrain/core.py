@@ -1220,7 +1220,7 @@ def get_predictor(model, preproc):
         raise Exception('preproc of type %s not currently supported' % (type(preproc)))
 
 
-def load_predictor(fpath):
+def load_predictor(fname):
     """
     Loads a previously saved Predictor instance
     """
@@ -1228,7 +1228,7 @@ def load_predictor(fpath):
     # load the preprocessor
     try:
         preproc = None
-        with open(fpath+'.preproc', 'rb') as f:
+        with open(fname +'.preproc', 'rb') as f:
             preproc = pickle.load(f)
     except FileNotFoundError:
         print('load_predictor failed.\n'+\
@@ -1237,7 +1237,7 @@ def load_predictor(fpath):
         return
 
     # load the model
-    model = _load_model(fpath, preproc=preproc)
+    model = _load_model(fname, preproc=preproc)
 
 
     # preprocessing functions in ImageDataGenerators are not pickable
@@ -1293,12 +1293,20 @@ def release_gpu_memory(device=0):
     return
 
 
-def _load_model(fpath, preproc=None, train_data=None):
+def _load_model(fname, preproc=None, train_data=None):
     if not preproc and not train_data:
         raise ValueError('Either preproc or train_data is required.')
     custom_objects=None
     if preproc and isinstance(preproc, TransformersPreprocessor):
-        model = preproc.model_type.from_pretrained(fpath)
+        # note: with transformer models, fname is actually a directory
+        model = preproc.model_type.from_pretrained(fname)
+        if preproc.multilabel:
+            loss_fn =  keras.losses.BinaryCrossentropy(from_logits=True)
+        else:
+            loss_fn = keras.losses.CategoricalCrossentropy(from_logits=True)
+        model.compile(loss=loss_fn,
+                      optimizer=keras.optimizers.Adam(learning_rate=3e-5, epsilon=1e-08),
+                      metrics=['accuracy'])
         return model
     elif (preproc and (isinstance(preproc, BERTPreprocessor) or \
                     type(preproc).__name__ == 'BERTPreprocessor')) or\
@@ -1318,7 +1326,7 @@ def _load_model(fpath, preproc=None, train_data=None):
         from stellargraph.layer import MeanAggregator
         custom_objects={'MeanAggregator': MeanAggregator}
     try:
-        model = load_model(fpath, custom_objects=custom_objects)
+        model = load_model(fname, custom_objects=custom_objects)
     except Exception as e:
         print('Call to keras.models.load_model failed.  '
               'Try using the learner.model.save_weights and '

@@ -125,16 +125,20 @@ class TextPredictor(Predictor):
         cm =  confusion_matrix(y_true,  y_pred)
         return cm
 
-    def save(self, fname):
-        if not isinstance(self.preproc, TransformersPreprocessor):
-            super().save(fname)
-            return
 
-        # save model
-        self.model.save_pretrained(fname)
+    def save(self, fpath):
 
-        # save preprocessor
-        fname_preproc = fname+'.preproc'
-        with open(fname_preproc, 'wb') as f:
-            pickle.dump(self.preproc, f)
+        if isinstance(self.preproc, TransformersPreprocessor):
+            if os.path.isfile(fpath):
+                raise ValueError(f'There is an existing file named {fpath}. ' +\
+                                  'Please use dfferent value for fpath.')
+            elif not os.path.exists(fpath):
+                os.mkdir(fpath)
+            self.model.save_pretrained(fpath)
+            fname_preproc = fpath+'.preproc'
+            with open(fname_preproc, 'wb') as f:
+                pickle.dump(self.preproc, f)
+        else:
+            super().save(fpath)
         return
+

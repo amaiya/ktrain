@@ -349,7 +349,7 @@ class TextPreprocessor(Preprocessor):
     Text preprocessing base class
     """
 
-    def __init__(self, maxlen, classes, lang='en'):
+    def __init__(self, maxlen, classes, lang='en', multilabel=False):
 
         self.c = classes
         self.maxlen = maxlen
@@ -366,6 +366,10 @@ class TextPreprocessor(Preprocessor):
 
     def preprocess(self, texts):
         raise NotImplementedError
+
+
+    def set_multilabel(self, data):
+        self.multilabel = U.is_multilabel(data)
 
 
     def undo(self, doc):
@@ -404,8 +408,8 @@ class StandardTextPreprocessor(TextPreprocessor):
     """
 
     def __init__(self, maxlen, max_features, classes=[], 
-                 lang='en', ngram_range=1):
-        super().__init__(maxlen, classes, lang=lang)
+                 lang='en', ngram_range=1, multilabel=False):
+        super().__init__(maxlen, classes, lang=lang, multilabel=multilabel)
         self.tok = None
         self.tok_dct = {}
         self.max_features = max_features
@@ -433,7 +437,6 @@ class StandardTextPreprocessor(TextPreprocessor):
         """
         preprocess training set
         """
-
 
         U.vprint('language: %s' % (self.lang), verbose=verbose)
 
@@ -464,7 +467,9 @@ class StandardTextPreprocessor(TextPreprocessor):
         U.vprint('y_train shape: ({},{})'.format(y_train.shape[0], y_train.shape[1]), verbose=verbose)
 
         # return
-        return (x_train, y_train)
+        result =  (x_train, y_train)
+        self.set_multilabel(result)
+        return result
 
 
     def preprocess_test(self, test_text, y_test=None, verbose=1):
@@ -577,11 +582,11 @@ class BERTPreprocessor(TextPreprocessor):
     """
 
     def __init__(self, maxlen, max_features, classes=[], 
-                lang='en', ngram_range=1):
+                lang='en', ngram_range=1, multilabel=False):
 
         if maxlen > 512: raise ValueError('BERT only supports maxlen <= 512')
 
-        super().__init__(maxlen, classes, lang=lang)
+        super().__init__(maxlen, classes, lang=lang, multilabel=multilabel)
         vocab_path = os.path.join(get_bert_path(lang=lang), 'vocab.txt')
         token_dict = {}
         with codecs.open(vocab_path, 'r', 'utf8') as reader:
@@ -625,7 +630,9 @@ class BERTPreprocessor(TextPreprocessor):
             if len(y.shape) == 1:
                 y = to_categorical(y)
             #U.vprint('\ty shape: ({},{})'.format(y.shape[0], y.shape[1]), verbose=verbose)
-        return (x, y)
+        result = (x, y)
+        self.set_multilabel(result)
+        return result
 
 
 
@@ -640,11 +647,11 @@ class TransformersPreprocessor(TextPreprocessor):
 
     def __init__(self,  model_name,
                 maxlen, max_features, classes=[], 
-                lang='en', ngram_range=1):
+                lang='en', ngram_range=1, multilabel=False):
 
         if maxlen > 512: raise ValueError('Transformer models only supports maxlen <= 512')
 
-        super().__init__(maxlen, classes, lang=lang)
+        super().__init__(maxlen, classes, lang=lang, multilabel=multilabel)
 
         self.model_name = model_name
         self.name = model_name.split('-')[0]
@@ -702,6 +709,7 @@ class TransformersPreprocessor(TextPreprocessor):
                                       pad_on_left=bool(self.name in ['xlnet']),
                                       pad_token=self.tok.convert_tokens_to_ids([self.tok.pad_token][0]),
                                       pad_token_segment_id=4 if self.name in ['xlnet'] else 0)
+        self.set_multilabel(dataset)
         return dataset
 
 
