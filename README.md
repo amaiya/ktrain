@@ -52,6 +52,7 @@ Please see the following tutorial notebooks for a guide on how to use *ktrain* o
 * Tutorial 7: [Graph Node Classification](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorial-07-graph-node_classification.ipynb) with Graph Neural Networks
 * Tutorial A1: [Additional tricks](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorial-A1-additional-tricks.ipynb), which covers topics such as previewing data augmentation schemes, inspecting intermediate output of Keras models for debugging, setting global weight decay, and use of built-in and custom callbacks.
 * Tutorial A2: [Explaining Predictions and Misclassifications](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorial-A2-explaining-predictions.ipynb)
+* Tutorial A3: [Text Classification with Hugging Face Transformers](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorial-A3-hugging_face_transformers.ipynb)
 
 
 Some blog tutorials about *ktrain* are shown below:
