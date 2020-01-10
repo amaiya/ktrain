@@ -24,7 +24,13 @@ def is_classifier(model):
 
     # get loss name
     loss = model.loss
-    if callable(loss): loss = loss.__name__
+    if callable(loss): 
+        if hasattr(loss, '__name__'):
+            loss = loss.__name__
+        elif hasattr(loss, 'name'):
+            loss = loss.name
+        else:
+            raise Exception('could not get loss name')
 
     # check for classification
     if loss in ['categorical_crossentropy',
@@ -43,6 +49,28 @@ def is_classifier(model):
     return (is_classifier, is_multilabel)
 
 
+def is_huggingface(model=None, data=None):
+    """
+    check for hugging face transformer model
+    from  model and/or data
+    """
+    huggingface = False
+    if model is not None and is_huggingface_from_model(model):
+        huggingface = True
+    elif data is not None and is_huggingface_from_data(data):
+        huggingface = True
+    return huggingface
+
+
+def is_huggingface_from_model(model):
+    return 'transformers.modeling_tf' in str(type(model))
+
+
+def is_huggingface_from_data(data):
+    return type(data).__name__ == 'TransformerSequence'
+
+
+
 def is_ner(model=None, data=None):
     ner = False
     if model is not None and is_ner_from_model(model):
@@ -58,7 +86,14 @@ def is_ner_from_model(model):
     Curently, only checks for a CRF-based sequence tagger
     """
     loss = model.loss
-    if callable(loss): loss = loss.__name__
+    if callable(loss): 
+        if hasattr(loss, '__name__'):
+            loss = loss.__name__
+        elif hasattr(loss, 'name'):
+            loss = loss.name
+        else:
+            raise Exception('could not get loss name')
+
     return loss == 'crf_loss' or 'CRF.loss_function' in str(model.loss)
 
 
@@ -89,7 +124,7 @@ def is_multilabel(data):
     checks for multilabel from data
     """
     data_arg_check(val_data=data, val_required=True)
-    if is_iter(data):
+    if is_iter(data): 
         if is_ner(data=data): return False   # NERSequence
         elif is_nodeclass(data=data): return False  # NodeSequenceWrapper
         multilabel = False
@@ -119,6 +154,8 @@ def shape_from_data(data):
     err_msg = 'could not determine shape from %s' % (type(data))
     if is_iter(data):
         if is_ner(data=data): return (len(data.x), data[0][0][0].shape[1])  # NERSequence
+        elif is_huggingface(data=data):  # HF Transformer
+            return (len(data.x), data[0][0][0].shape[1])
         elif is_nodeclass(data=data):                                 # NodeSequence
             return data[0][0][0].shape[1:]  # returns 1st neighborhood only
         elif hasattr(data, 'image_shape'): return data.image_shape          # DirectoryIterator/DataFrameIterator
@@ -141,7 +178,8 @@ def shape_from_data(data):
 
 def ondisk(data):
     ondisk = is_iter(data) and \
-             (type(data).__name__ not in  ['NumpyArrayIterator', 'NERSequence', 'NodeSequenceWrapper'])
+             (type(data).__name__ not in  ['NumpyArrayIterator', 'NERSequence', 
+                                           'NodeSequenceWrapper', 'TransformerSequence'])
     return ondisk
 
 
@@ -149,6 +187,8 @@ def nsamples_from_data(data):
     err_msg = 'could not determine number of samples from %s' % (type(data))
     if is_iter(data):
         if is_ner(data=data): return len(data.x)      # NERSequence
+        elif is_huggingface(data=data):  # HuggingFace Transformer
+            return len(data.x)
         elif is_nodeclass(data=data):           # NodeSequenceWrapper
             return data.targets.shape[0]
         elif hasattr(data, 'samples'):                # DirectoryIterator/DataFrameIterator
@@ -170,6 +210,8 @@ def nsamples_from_data(data):
 def nclasses_from_data(data):
     if is_iter(data):
         if is_ner(data=data): return len(data.p._label_vocab._id2token)    # NERSequence
+        elif is_huggingface(data=data):         # Hugging Face Transformer
+            return data.y.shape[1]
         elif is_nodeclass(data=data):                                # NodeSequenceWrapper
             return data[0][1].shape[1]                                   
         elif hasattr(data, 'classes'):                                     # DirectoryIterator
@@ -189,6 +231,8 @@ def nclasses_from_data(data):
 def y_from_data(data):
     if is_iter(data):
         if is_ner(data=data): return data.y    # NERSequence
+        if is_huggingface(data=data):  # Hugging Face Transformer
+            return data.y
         elif is_nodeclass(data=data):      # NodeSequenceWrapper
             return data.targets
         elif hasattr(data, 'classes'): # DirectoryIterator
@@ -210,7 +254,7 @@ def is_iter(data, ignore=False):
     if ignore: return True
     iter_classes = ["NumpyArrayIterator", "DirectoryIterator",
                     "DataFrameIterator", "Iterator", "Sequence", 
-                    "NERSequence", "NodeSequenceWrapper"]
+                    "NERSequence", "NodeSequenceWrapper", "TransformerSequence"]
     return data.__class__.__name__ in iter_classes
 
 
@@ -238,6 +282,7 @@ def bert_data_tuple(data):
     """
     checks if data tuple is BERT-style format
     """
+    if is_iter(data): return False
     if type(data[0]) == list and len(data[0]) == 2 and \
        type(data[0][0]) is np.ndarray and type(data[0][1]) is np.ndarray and \
        type(data[1]) is np.ndarray and np.count_nonzero(data[0][1]) == 0:

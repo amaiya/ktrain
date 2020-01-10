@@ -1,46 +1,48 @@
 
-#------------------------
-# Keras imports
-#------------------------
+#--------------------------
+# Tensorflow Keras imports
+#--------------------------
 
 import os
 import logging
+from distutils.util import strtobool
+from packaging import version
+
+# suppress TF warnings
+logging.getLogger('tensorflow').setLevel(logging.ERROR)
 
 # TF1
 #import tensorflow as tf
 #tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
+#from tensorflow import keras
 
-# TF2-transition
-import tensorflow.compat.v1 as tf
-if tf.__version__.startswith('1.14'):
-    try:
-        logging.getLogger('tensorflow').setLevel(logging.CRITICAL)
-    except: pass
-tf.logging.set_verbosity(tf.logging.ERROR)
-tf.disable_v2_behavior()
-
-
-
-TF_KERAS = False
-EAGER_MODE = False
-os.environ['TF_KERAS'] = '1' # force tf.keras as of 0.7.x
-if os.environ.get('TF_KERAS', '0') != '0':
-    # TF1
-    #from tensorflow import keras
-
+DISABLE_V2_BEHAVIOR = strtobool(os.environ.get('DISABLE_V2_BEHAVIOR', '0'))
+if DISABLE_V2_BEHAVIOR:
     # TF2-transition
+    ACC_NAME = 'acc'
+    VAL_ACC_NAME = 'val_acc'
+    import tensorflow.compat.v1 as tf
+    tf.disable_v2_behavior()
     from tensorflow.compat.v1 import keras
-
-    TF_KERAS = True
-    if os.environ.get('TF_EAGER', '0') != '0':
-        try:
-            tf.enable_eager_execution()
-            raise AttributeError()
-        except AttributeError as e:
-            pass
-    EAGER_MODE = tf.executing_eagerly()
+    print('Using DISABLE_V2_BEHAVIOR with TensorFlow')
 else:
-    import keras
+    # TF2
+    ACC_NAME = 'accuracy'
+    VAL_ACC_NAME = 'val_accuracy'
+    import tensorflow as tf
+    from tensorflow import keras
+
+
+if version.parse(tf.__version__) < version.parse('2.0'):
+    raise Exception('As of v0.8.x, ktrain needs TensorFlow 2. Please upgrade TensorFlow.')
+
+os.environ['TF_KERAS'] = '1' # to use keras_bert package below with tf.Keras
+
+
+
+
+
+# output Keras version
 print("using Keras version: %s" % (keras.__version__))
 
 K = keras.backend
@@ -197,9 +199,11 @@ from seqeval.metrics import classification_report as ner_classification_report
 from seqeval.metrics import f1_score as ner_f1_score
 from seqeval.metrics.sequence_labeling import get_entities
 
-# packaging
-from packaging import version
-
+# transformers
+try:
+    logging.getLogger('transformers').setLevel(logging.CRITICAL)
+except: pass
+import transformers
 
 
 try:

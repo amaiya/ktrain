@@ -2,6 +2,27 @@ from ..imports import *
 from .. import utils as U
 from ..preprocessor import Preprocessor
 
+DistilBertTokenizer = transformers.DistilBertTokenizer
+DISTILBERT= 'distilbert'
+
+from transformers import BertConfig, TFBertForSequenceClassification, BertTokenizer
+from transformers import XLNetConfig, TFXLNetForSequenceClassification, XLNetTokenizer
+from transformers import XLMConfig, TFXLMForSequenceClassification, XLMTokenizer
+from transformers import RobertaConfig, TFRobertaForSequenceClassification, RobertaTokenizer
+from transformers import DistilBertConfig, TFDistilBertForSequenceClassification, DistilBertTokenizer
+from transformers import AlbertConfig, TFAlbertForSequenceClassification, AlbertTokenizer
+#from transformers import CamembertConfig, TFCamembertForSequenceClassification, CamembertTokenizer
+
+TRANSFORMER_MODELS = {
+    'bert':       (BertConfig, TFBertForSequenceClassification, BertTokenizer),
+    'xlnet':      (XLNetConfig, TFXLNetForSequenceClassification, XLNetTokenizer),
+    'xlm':        (XLMConfig, TFXLMForSequenceClassification, XLMTokenizer),
+    'roberta':    (RobertaConfig, TFRobertaForSequenceClassification, RobertaTokenizer),
+    'distilbert': (DistilBertConfig, TFDistilBertForSequenceClassification, DistilBertTokenizer),
+    'albert':     (AlbertConfig, TFAlbertForSequenceClassification, AlbertTokenizer),
+    #'camembert':  (CamembertConfig, TFCamembertForSequenceClassification, CamembertTokenizer)
+}
+
 
 NOSPACE_LANGS = ['zh-cn', 'zh-tw', 'ja']
 
@@ -118,6 +139,159 @@ def bert_tokenize(docs, tokenizer, maxlen, verbose=1):
     return [np.array(indices), np.array(zeros)]
 
 #------------------------------------------------------------------------------
+# Transformers UTILITIES
+#------------------------------------------------------------------------------
+
+#def convert_to_tfdataset(csv):
+    #def gen():
+        #for ex in csv:
+            #yield  {'idx': ex[0],
+                     #'sentence': ex[1],
+                     #'label': str(ex[2])}
+    #return tf.data.Dataset.from_generator(gen,
+        #{'idx': tf.int64,
+          #'sentence': tf.string,
+          #'label': tf.int64})
+
+
+#def features_to_tfdataset(features):
+
+#    def gen():
+#        for ex in features:
+#            yield ({'input_ids': ex.input_ids,
+#                     'attention_mask': ex.attention_mask,
+#                     'token_type_ids': ex.token_type_ids},
+#                    ex.label)
+
+#    return tf.data.Dataset.from_generator(gen,
+#        ({'input_ids': tf.int32,
+#          'attention_mask': tf.int32,
+#          'token_type_ids': tf.int32},
+#         tf.int64),
+#        ({'input_ids': tf.TensorShape([None]),
+#          'attention_mask': tf.TensorShape([None]),
+#          'token_type_ids': tf.TensorShape([None])},
+#         tf.TensorShape([None])))
+#         #tf.TensorShape(])))
+
+
+
+def hf_features_to_tfdataset(features_list, labels):
+    features_list = np.array(features_list)
+    labels = np.array(labels) if labels is not None else None
+    tfdataset = tf.data.Dataset.from_tensor_slices((features_list, labels))
+    tfdataset = tfdataset.map(lambda x,y: ({'input_ids': x[0], 
+                                            'attention_mask': x[1], 
+                                             'token_type_ids': x[2]}, y))
+
+    return tfdataset
+
+
+
+def hf_convert_example(text, tokenizer=None,
+                       max_length=512,
+                       pad_on_left=False,
+                       pad_token=0,
+                       pad_token_segment_id=0,
+                       mask_padding_with_zero=True):
+    """
+    convert InputExample to InputFeature for Hugging Face transformer
+    """
+    if tokenizer is None: raise ValueError('tokenizer is required')
+
+    inputs = tokenizer.encode_plus(
+        text,
+        None,
+        add_special_tokens=True,
+        max_length=max_length,
+    )
+    input_ids, token_type_ids = inputs["input_ids"], inputs["token_type_ids"]
+
+    # The mask has 1 for real tokens and 0 for padding tokens. Only real
+    # tokens are attended to.
+    attention_mask = [1 if mask_padding_with_zero else 0] * len(input_ids)
+
+    # Zero-pad up to the sequence length.
+    padding_length = max_length - len(input_ids)
+    if pad_on_left:
+        input_ids = ([pad_token] * padding_length) + input_ids
+        attention_mask = ([0 if mask_padding_with_zero else 1] * padding_length) + attention_mask
+        token_type_ids = ([pad_token_segment_id] * padding_length) + token_type_ids
+    else:
+        input_ids = input_ids + ([pad_token] * padding_length)
+        attention_mask = attention_mask + ([0 if mask_padding_with_zero else 1] * padding_length)
+        token_type_ids = token_type_ids + ([pad_token_segment_id] * padding_length)
+
+    assert len(input_ids) == max_length, "Error with input length {} vs {}".format(len(input_ids), max_length)
+    assert len(attention_mask) == max_length, "Error with input length {} vs {}".format(len(attention_mask), max_length)
+    assert len(token_type_ids) == max_length, "Error with input length {} vs {}".format(len(token_type_ids), max_length)
+
+
+    #if ex_index < 1:
+        #print("*** Example ***")
+        #print("guid: %s" % (example.guid))
+        #print("input_ids: %s" % " ".join([str(x) for x in input_ids]))
+        #print("attention_mask: %s" % " ".join([str(x) for x in attention_mask]))
+        #print("token_type_ids: %s" % " ".join([str(x) for x in token_type_ids]))
+        #print("label: %s (id = %d)" % (example.label, label))
+
+    return [input_ids, attention_mask, token_type_ids]
+
+
+
+
+def hf_convert_examples(texts, y=None, tokenizer=None,
+                        max_length=512,
+                        pad_on_left=False,
+                        pad_token=0,
+                        pad_token_segment_id=0,
+                        mask_padding_with_zero=True):
+    """
+    Loads a data file into a list of ``InputFeatures``
+    Args:
+        texts: texts of documents
+        y:  labels for documents
+        tokenizer: Instance of a tokenizer that will tokenize the examples
+        max_length: Maximum example length
+        pad_on_left: If set to ``True``, the examples will be padded on the left rather than on the right (default)
+        pad_token: Padding token
+        pad_token_segment_id: The segment ID for the padding token (It is usually 0, but can vary such as for XLNet where it is 4)
+        mask_padding_with_zero: If set to ``True``, the attention mask will be filled by ``1`` for actual values
+            and by ``0`` for padded values. If set to ``False``, inverts it (``1`` for padded values, ``0`` for
+            actual values)
+    Returns:
+        If the ``examples`` input is a ``tf.data.Dataset``, will return a ``tf.data.Dataset``
+        containing the task-specific features. If the input is a list of ``InputExamples``, will return
+        a list of task-specific ``InputFeatures`` which can be fed to the model.
+    """
+
+
+
+    data = []
+    mb = master_bar(range(1))
+    features_list = []
+    labels = []
+    for i in mb:
+        for (idx, text) in enumerate(progress_bar(texts, parent=mb)):
+
+            features = hf_convert_example(text, tokenizer=tokenizer,
+                                          max_length=max_length,
+                                          pad_on_left=pad_on_left,
+                                          pad_token=pad_token,
+                                          pad_token_segment_id=pad_token_segment_id,
+                                          mask_padding_with_zero=mask_padding_with_zero)
+            features_list.append(features)
+            labels.append(y[idx] if y is not None else None)
+    #tfdataset = hf_features_to_tfdataset(features_list, labels)
+    #return tfdataset
+    #return (features_list, labels)
+    # HF_EXCEPTION
+    # due to issues in transormers library and TF2 tf.Datasets, arrays are converted
+    # to iterators on-the-fly
+    return  TransformerSequence(np.array(features_list), np.array(labels))
+
+
+#------------------------------------------------------------------------------
 # MISC UTILITIES
 #------------------------------------------------------------------------------
 
@@ -175,7 +349,7 @@ class TextPreprocessor(Preprocessor):
     Text preprocessing base class
     """
 
-    def __init__(self, maxlen, classes, lang='en'):
+    def __init__(self, maxlen, classes, lang='en', multilabel=False):
 
         self.c = classes
         self.maxlen = maxlen
@@ -192,6 +366,10 @@ class TextPreprocessor(Preprocessor):
 
     def preprocess(self, texts):
         raise NotImplementedError
+
+
+    def set_multilabel(self, data):
+        self.multilabel = U.is_multilabel(data)
 
 
     def undo(self, doc):
@@ -230,8 +408,8 @@ class StandardTextPreprocessor(TextPreprocessor):
     """
 
     def __init__(self, maxlen, max_features, classes=[], 
-                 lang='en', ngram_range=1):
-        super().__init__(maxlen, classes, lang=lang)
+                 lang='en', ngram_range=1, multilabel=False):
+        super().__init__(maxlen, classes, lang=lang, multilabel=multilabel)
         self.tok = None
         self.tok_dct = {}
         self.max_features = max_features
@@ -259,7 +437,6 @@ class StandardTextPreprocessor(TextPreprocessor):
         """
         preprocess training set
         """
-
 
         U.vprint('language: %s' % (self.lang), verbose=verbose)
 
@@ -290,7 +467,9 @@ class StandardTextPreprocessor(TextPreprocessor):
         U.vprint('y_train shape: ({},{})'.format(y_train.shape[0], y_train.shape[1]), verbose=verbose)
 
         # return
-        return (x_train, y_train)
+        result =  (x_train, y_train)
+        self.set_multilabel(result)
+        return result
 
 
     def preprocess_test(self, test_text, y_test=None, verbose=1):
@@ -403,11 +582,11 @@ class BERTPreprocessor(TextPreprocessor):
     """
 
     def __init__(self, maxlen, max_features, classes=[], 
-                lang='en', ngram_range=1):
+                lang='en', ngram_range=1, multilabel=False):
 
         if maxlen > 512: raise ValueError('BERT only supports maxlen <= 512')
 
-        super().__init__(maxlen, classes, lang=lang)
+        super().__init__(maxlen, classes, lang=lang, multilabel=multilabel)
         vocab_path = os.path.join(get_bert_path(lang=lang), 'vocab.txt')
         token_dict = {}
         with codecs.open(vocab_path, 'r', 'utf8') as reader:
@@ -417,7 +596,7 @@ class BERTPreprocessor(TextPreprocessor):
         tokenizer = BERT_Tokenizer(token_dict)
         self.tok = tokenizer
         self.tok_dct = dict((v,k) for k,v in token_dict.items())
-        self.max_features = max_features
+        self.max_features = max_features # ignored
         self.ngram_range = 1 # ignored
 
 
@@ -451,7 +630,87 @@ class BERTPreprocessor(TextPreprocessor):
             if len(y.shape) == 1:
                 y = to_categorical(y)
             #U.vprint('\ty shape: ({},{})'.format(y.shape[0], y.shape[1]), verbose=verbose)
-        return (x, y)
+        result = (x, y)
+        self.set_multilabel(result)
+        return result
+
+
+
+    def preprocess_test(self, texts, y=None, mode='test', verbose=1):
+        return self.preprocess_train(texts, y=y, mode=mode, verbose=verbose)
+
+
+class TransformersPreprocessor(TextPreprocessor):
+    """
+    text preprocessing for Hugging Face Transformer models
+    """
+
+    def __init__(self,  model_name,
+                maxlen, max_features, classes=[], 
+                lang='en', ngram_range=1, multilabel=False):
+
+        if maxlen > 512: raise ValueError('Transformer models only supports maxlen <= 512')
+
+        super().__init__(maxlen, classes, lang=lang, multilabel=multilabel)
+
+        self.model_name = model_name
+        self.name = model_name.split('-')[0]
+        if self.name not in TRANSFORMER_MODELS:
+            raise ValueError('uknown model name %s' % (model_name))
+        self.model_type = TRANSFORMER_MODELS[self.name][1]
+        self.tokenizer_type = TRANSFORMER_MODELS[self.name][2]
+
+        tokenizer = self.tokenizer_type.from_pretrained(model_name)
+
+        self.tok = tokenizer
+        self.tok_dct = None
+        self.max_features = max_features # ignored
+        self.ngram_range = 1 # ignored
+
+
+
+
+    def get_preprocessor(self):
+        return (self.tok, self.tok_dct)
+
+
+
+    def preprocess(self, texts):
+        tseq = self.preprocess_test(texts, verbose=0)
+        return tseq.to_tfdataset(shuffle=False, repeat=False)
+
+
+    def undo(self, doc):
+        """
+        undoes preprocessing and returns raw data by:
+        converting a list or array of Word IDs back to words
+        """
+        print(doc)
+        print(type(doc))
+        return self.tok.convert_ids_to_tokens(doc)
+        #raise Exception('currently_unsupported: Transformers.Preprocessor.undo is not yet supported')
+
+
+    def preprocess_train(self, texts, y=None, mode='train', verbose=1):
+        """
+        preprocess training set
+        """
+        U.vprint('preprocessing %s...' % (mode), verbose=verbose)
+        U.vprint('language: %s' % (self.lang), verbose=verbose)
+        if y is None and mode == 'train':
+            raise ValueError('y is required for training sets')
+        elif y is None:
+            y = np.array([1] * len(texts))
+        if y is not None:
+            if len(y.shape) == 1:
+                y = to_categorical(y)
+
+        dataset = hf_convert_examples(texts, y=y, tokenizer=self.tok, max_length=self.maxlen,
+                                      pad_on_left=bool(self.name in ['xlnet']),
+                                      pad_token=self.tok.convert_tokens_to_ids([self.tok.pad_token][0]),
+                                      pad_token_segment_id=4 if self.name in ['xlnet'] else 0)
+        self.set_multilabel(dataset)
+        return dataset
 
 
 
@@ -460,9 +719,152 @@ class BERTPreprocessor(TextPreprocessor):
 
 
 
+class DistilBertPreprocessor(TransformersPreprocessor):
+    """
+    text preprocessing for Hugging Face DistlBert model
+    """
+
+    def __init__(self, maxlen, max_features, classes=[], 
+                lang='en', ngram_range=1):
+
+        name = DISTILBERT
+        if lang == 'en':
+            model_name = 'distilbert-base-uncased'
+        else:
+            model_name = 'distilbert-base-multilingual-cased'
+            raise Exception('currently_unsupported: non-English languages are not currently supported for '+\
+                            'distilbert due to issues with TF2 version of transformers library. ')
+
+        super().__init__(model_name,
+                         maxlen, max_features, classes=classes, 
+                         lang=lang, ngram_range=ngram_range)
+
+
+class Transformer(TransformersPreprocessor):
+    """
+    convenience class for text classification Hugging Face transformers 
+    Usage:
+       t = Transformer('distilbert-base-uncased', maxlen=128, classes=['neg', 'pos'], batch_size=16)
+       train_dataset = t.preprocess_train(train_texts, train_labels)
+       model = t.get_classifier()
+       model.fit(train_dataset)
+    """
+
+    def __init__(self, model_name, maxlen=128, classes=[], 
+                 batch_size=None, is_multilabel=False,
+                 use_with_learner=True):
+        """
+        Args:
+            model_name (str):  name of Hugging Face pretrained model
+            maxlen (int):  sequence length
+            classes(list):  list of strings of class names (e.g., 'positive', 'negative')
+            use_with_learner(bool):  If False, preprocess_train and preprocess_test
+                                     will return tf.Datasets for direct use with model.fit
+                                     in tf.Keras.
+                                     If True, preprocess_train and preprocess_test will
+                                     return a ktrain TransformerSequence object for use with
+                                     ktrain.get_learner.
+            batch_size (int): batch_size - only required if use_with_learner=False
+            is_multilabel (int):  if True, classifier will be configured for
+                                  multilabel classification.
+
+        """
+        if not use_with_learner and batch_size is None:
+            raise ValueError('batch_size is required when use_with_learner=False')
+        if classes is None or not classes:
+            raise ValueError('classes argument is required - provide list of class names as strings')
+        super().__init__(model_name,
+                         maxlen, max_features=10000, classes=classes)
+        self.batch_size = batch_size
+        self.is_multilabel = is_multilabel
+        self.use_with_learner = use_with_learner
+
+
+    def preprocess_train(self, texts, y=None, mode='train', verbose=1):
+        """
+        preprocess training set
+        Args:
+            texts (list of strings): text of documents
+            y: labels
+            mode (str):  If 'train' and prepare_for_learner=False,
+                         a tf.Dataset will be returned with repeat enabled
+                         for training with fit_generator
+            verbose(bool): verbosity
+        """
+        tseq = super().preprocess_train(texts, y=y, mode=mode, verbose=verbose)
+        if self.use_with_learner: return tseq
+        tseq.batch_size = self.batch_size
+        shuffle=True if mode=='train' else False
+        repeat=True if mode=='train' else False
+        return tseq.to_tfdataset(shuffle=shuffle, repeat=repeat)
+
+
+    def preprocess_test(self, texts, y=None,  verbose=1):
+        """
+        preprocess validation or test datasets
+        """
+        return self.preprocess_train(texts, y=y, mode='test', verbose=verbose)
+
+
+
+    def get_classifier(self):
+        num_labels = len(self.get_classes())
+        model = self.model_type.from_pretrained(self.model_name, num_labels=num_labels)
+        if self.is_multilabel:
+            loss_fn =  keras.losses.BinaryCrossentropy(from_logits=True)
+        else:
+            loss_fn = keras.losses.CategoricalCrossentropy(from_logits=True)
+        model.compile(loss=loss_fn,
+                      optimizer=keras.optimizers.Adam(learning_rate=3e-5, epsilon=1e-08),
+                      metrics=['accuracy'])
+        return model
+
+
+
+
+# Transformer Sequence
+class TransformerSequence(Sequence):
+
+    def __init__(self, x, y, batch_size=1):
+        if type(x) not in [list, np.ndarray]: raise ValueError('x must be list or np.ndarray')
+        if type(y) not in [list, np.ndarray]: raise ValueError('y must be list or np.ndarray')
+        if type(x) == list: x = np.array(x)
+        if type(y) == list: y = np.array(y)
+        self.x = x
+        self.y = y
+        self.batch_size = batch_size
+
+
+    def __getitem__(self, idx):
+        batch_x = self.x[idx * self.batch_size: (idx + 1) * self.batch_size]
+        batch_y = self.y[idx * self.batch_size: (idx + 1) * self.batch_size]
+        return (batch_x, batch_y)
+
+
+    def __len__(self):
+        return math.ceil(len(self.x) / self.batch_size)
+
+
+    def to_tfdataset(self, shuffle=True, repeat=True):
+        """
+        convert transformer features to tf.Dataset
+        """
+        tfdataset = tf.data.Dataset.from_tensor_slices((self.x, self.y))
+        tfdataset = tfdataset.map(lambda x,y: ({'input_ids': x[0], 
+                                                'attention_mask': x[1], 
+                                                 'token_type_ids': x[2]}, y))
+        if shuffle:
+            tfdataset = tfdataset.shuffle(self.x.shape[0])
+        tfdataset = tfdataset.batch(self.batch_size)
+        if repeat:
+            tfdataset = tfdataset.repeat(-1)
+        return tfdataset
+
+
 
 
 # preprocessors
 TEXT_PREPROCESSORS = {'standard': StandardTextPreprocessor,
-                      'bert': BERTPreprocessor}
+                      'bert': BERTPreprocessor,
+                      'distilbert': DistilBertPreprocessor}
 

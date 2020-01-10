@@ -21,7 +21,7 @@ class Predictor(ABC):
             from .text.ner import crf_loss
             self.model.compile(loss=crf_loss, optimizer=U.DEFAULT_OPT)
 
-        self.model.save(fname)
+        self.model.save(fname, save_format='h5')
         fname_preproc = fname+'.preproc'
         with open(fname_preproc, 'wb') as f:
             pickle.dump(self.preproc, f)

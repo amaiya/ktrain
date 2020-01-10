@@ -6,9 +6,12 @@ import testenv
 import IPython
 from unittest import TestCase, main, skip
 import numpy as np
+
 import ktrain
 from ktrain import text as txt
 TEST_DOC = '还好，床很大而且很干净，前台很友好，很满意，下次还来。'
+from ktrain.imports import ACC_NAME, VAL_ACC_NAME
+
 
 class TestTextClassification(TestCase):
 
@@ -19,14 +22,14 @@ class TestTextClassification(TestCase):
                       label_columns = ["pos", "neg"],
                       max_features=30000, maxlen=75,
                       preprocess_mode='standard', sep='|')
-        model = txt.text_classifier('fasttext', train_data=trn)
+        model = txt.text_classifier('fasttext', train_data=trn, preproc=preproc)
         learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=32)
         lr = 5e-3
         hist = learner.autofit(lr, 10)
 
         # test training results
         self.assertAlmostEqual(max(hist.history['lr']), lr)
-        self.assertGreater(max(hist.history['val_acc']), 0.85)
+        self.assertGreater(max(hist.history[VAL_ACC_NAME]), 0.85)
 
 
         # test top losses

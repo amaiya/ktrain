@@ -6,6 +6,7 @@ import testenv
 import numpy as np
 from unittest import TestCase, main, skip
 import ktrain
+from ktrain.imports import ACC_NAME, VAL_ACC_NAME
 
 
 Sequential = ktrain.imports.Sequential
@@ -95,7 +96,7 @@ class TestMultilabel(TestCase):
 
     def test_multilabel(self):
         hist  = synthetic_multilabel()
-        final_acc = hist.history['val_acc'][-1]
+        final_acc = hist.history[VAL_ACC_NAME][-1]
         print('final_accuracy:%s' % (final_acc))
         self.assertGreater(final_acc, 0.97)
 

@@ -7,7 +7,7 @@ from . import utils as U
 
 from .vision.preprocessor import ImagePreprocessor
 from .vision.predictor import ImagePredictor
-from .text.preprocessor import TextPreprocessor, BERTPreprocessor
+from .text.preprocessor import TextPreprocessor, BERTPreprocessor, TransformersPreprocessor
 from .text.predictor import TextPredictor
 from .text.ner.predictor import NERPredictor
 from .text.ner.preprocessor import NERPreprocessor
@@ -35,7 +35,6 @@ class Learner(ABC):
         new_file, weightfile = tempfile.mkstemp()
         self.model.save_weights(weightfile)
         self._original_weights = weightfile
-
 
 
     def get_weight_decay(self):
@@ -188,7 +187,10 @@ class Learner(ABC):
         else:
             L = self.model.loss_functions[0]
         losses = L(tf.convert_to_tensor(y_true), tf.convert_to_tensor(y_pred))
-        losses = tf.Session().run(losses)
+        if DISABLE_V2_BEHAVIOR:
+            losses = tf.Session().run(losses)
+        else:
+            losses = losses.numpy()
 
 
         class_names = [] if preproc is None else preproc.get_classes()
@@ -229,7 +231,7 @@ class Learner(ABC):
         """
         a wrapper to model.save
         """
-        self.model.save(fpath)
+        self.model.save(fpath, save_format='h5')
         return
 
 
@@ -251,7 +253,6 @@ class Learner(ABC):
                    argument of load_imagemodel to selectively freeze layers.
                    """
             raise Exception(err_msg)
-
         
         if self.multigpu:
             with tf.device("/cpu:0"):
@@ -372,9 +373,12 @@ class Learner(ABC):
     def lr_find(self, start_lr=1e-7, lr_mult=1.01, max_epochs=None,
                 show_plot=False, verbose=1):
         """
-        Plots loss as learning rate is increased.
-        Highest learning rate corresponding to a still
-        falling loss should be chosen.
+        Plots loss as learning rate is increased.  Highest learning rate 
+        corresponding to a still falling loss should be chosen.
+
+        If you find the LR finder is running for more epochs than you'd prefer,
+        you can set max_epochs (e.g., max_epochs=5) to estimate LR with a 
+        smaller sample size.
 
         If lr_mult is supplied and max_epochs is None, LR will increase until loss diverges.
         Reasonable values of lr_mult are between 1.01 and 1.05.
@@ -405,10 +409,31 @@ class Learner(ABC):
         self.model.save_weights(weightfile)
         #self.model.load_weights(self._original_weights)
 
+
+         # compute steps_per_epoch
+        num_samples = U.nsamples_from_data(self.train_data)
+        bs = self.train_data.batch_size if hasattr(self.train_data, 'batch_size') else self.batch_size
+        if U.is_iter(self.train_data):
+            use_gen = True
+            steps_per_epoch = num_samples // bs
+        else:
+            use_gen = False
+            steps_per_epoch = np.ceil(num_samples/bs)
+
+        # check steps_per_epoch
+        if steps_per_epoch <=64 and max_epochs is None:
+            warnings.warn('max_epochs is being set to 5 since steps per epoch is small. ' +\
+                          'If you wish to estimate LR using more epochs, set max_epochs manually.')
+            max_epochs = 5
+
+
         try:
             # track and plot learning rates
             self.lr_finder = LRFinder(self.model)
-            self.lr_finder.find(self.train_data, start_lr=start_lr, lr_mult=lr_mult, 
+            self.lr_finder.find(self._prepare(self.train_data), 
+                                steps_per_epoch,
+                                use_gen=use_gen,
+                                start_lr=start_lr, lr_mult=lr_mult, 
                                 max_epochs=max_epochs,
                                 workers=self.workers, 
                                 use_multiprocessing=self.use_multiprocessing, 
@@ -590,6 +615,17 @@ class Learner(ABC):
         return callbacks
 
 
+    def _prepare(self, data, mode='train'):
+        """
+        Subclasses can override this method if data
+        needs to be specially-prepared prior to invoking fit methods
+        Args:
+          data:  dataset
+          mode: either 'train' or 'valid'
+        """
+        return data
+
+
     @abstractmethod
     def fit(self, lr, n_cycles, cycle_len=None, cycle_mult=1, batch_size=U.DEFAULT_BS):
         pass
@@ -706,7 +742,7 @@ class Learner(ABC):
                                         File name will be of the form: 
                                         weights-{epoch:02d}-{val_loss:.2f}.hdf5
             monitor (str):              what metric to monitor for early_stopping
-                                        and reduce_on_plateau (either val_loss or val_acc).
+                                        and reduce_on_plateau (either val_loss or val_accuracy).
                                         Only used if early_stopping or reduce_on_plateau
                                         is enabled.
             class_weight (dict):       Optional dictionary mapping class indices (integers) to a weight (float) 
@@ -714,8 +750,8 @@ class Learner(ABC):
             verbose (bool):  verbose mode
         """
         # check monitor
-        if monitor not in ['val_acc', 'val_loss']:
-            raise ValueError("monitor must be one of {'val_acc', val_loss'}")
+        if monitor not in [VAL_ACC_NAME, 'val_loss']:
+            raise ValueError("monitor must be one of {%s, val_loss'}" % (VAL_ACC_NAME))
 
         # setup learning rate policy 
         num_samples = U.nsamples_from_data(self.train_data)
@@ -739,7 +775,7 @@ class Learner(ABC):
                           'Either reduce reduce_on_plateau or set early_stopping ' +\
                           'to be higher.')
 
-        if self.val_data is None and monitor in ['val_loss', 'val_acc'] and\
+        if self.val_data is None and monitor in ['val_loss', VAL_ACC_NAME] and\
            (reduce_on_plateau is not None or early_stopping is not None):
             raise Exception('cannot monitor %s ' % (monitor)  +\
                             'without validation data - please change monitor')
@@ -807,7 +843,8 @@ class Learner(ABC):
         if U.is_iter(val):
             if hasattr(val, 'reset'): val.reset()
             steps = np.ceil(U.nsamples_from_data(val)/val.batch_size)
-            return self.model.predict_generator(val, steps=steps)
+            result = self.model.predict_generator(self._prepare(val, mode='valid'), 
+                                                steps=steps)
         else:
             return self.model.predict(val[0])
 
@@ -895,13 +932,14 @@ class ArrayLearner(Learner):
         # train model
         with warnings.catch_warnings():
             warnings.filterwarnings('ignore', message='.*Check your callbacks.*')
-            hist = self.model.fit(x_train, y_train,
-                                 batch_size=self.batch_size,
-                                 epochs=epochs,
-                                 validation_data=validation, verbose=verbose, 
-                                 shuffle=True,
-                                 class_weight=class_weight,
-                                 callbacks=kcallbacks)
+            hist = self.model.fit(self._prepare(x_train), 
+                                  self._prepare(y_train, mode='valid'),
+                                  batch_size=self.batch_size,
+                                  epochs=epochs,
+                                  validation_data=validation, verbose=verbose, 
+                                  shuffle=True,
+                                  class_weight=class_weight,
+                                  callbacks=kcallbacks)
 
         if sgdr is not None: hist.history['lr'] = sgdr.history['lr']
         self.history = hist
@@ -1046,10 +1084,12 @@ class GenLearner(Learner):
         
         # handle callbacks
         num_samples = U.nsamples_from_data(self.train_data)
-        steps_per_epoch = math.ceil(num_samples/self.train_data.batch_size)
+        train_bs = self.train_data.batch_size if hasattr(self.train_data, 'batch_size') else self.batch_size
+        steps_per_epoch = math.ceil(num_samples/train_bs)
         validation_steps = None
         if self.val_data is not None:
-            validation_steps = math.ceil(U.nsamples_from_data(self.val_data)/self.val_data.batch_size)
+            val_bs = self.val_data.batch_size if hasattr(self.val_data, 'batch_size') else self.batch_size
+            validation_steps = math.ceil(U.nsamples_from_data(self.val_data)/val_bs)
 
         epochs = self._check_cycles(n_cycles, cycle_len, cycle_mult)
         self.set_lr(lr)
@@ -1074,17 +1114,30 @@ class GenLearner(Learner):
         # train model
         with warnings.catch_warnings():
             warnings.filterwarnings('ignore', message='.*Check your callbacks.*')
-            hist = self.model.fit_generator(self.train_data,
-                                           steps_per_epoch = steps_per_epoch,
-                                           validation_steps = validation_steps,
-                                           epochs=epochs,
-                                           validation_data=self.val_data,
-                                           workers=self.workers,
-                                           use_multiprocessing=self.use_multiprocessing, 
-                                           verbose=verbose,
-                                           shuffle=True,
-                                           class_weight=class_weight,
-                                           callbacks=kcallbacks)
+            # bug in TF2 causes fit_generator to be very slow
+            # https://github.com/tensorflow/tensorflow/issues/33024
+            if version.parse(tf.__version__) < version.parse('2.0'):
+                fit_fn = self.model.fit_generator
+            else:
+                # TF bug with using multiple inputs with utils.Sequence and model.fit
+                # TODO: check data and proceed accordingly
+                # potential patch is to have Sequence subclasses return tuple(batch_x), y
+                if U.is_nodeclass(model=self.model, data=self.train_data) or\
+                   U.is_ner(model=self.model, data=self.train_data):
+                    fit_fn = self.model.fit_generator
+                else:
+                    fit_fn = self.model.fit
+            hist = fit_fn(self._prepare(self.train_data),
+                                        steps_per_epoch = steps_per_epoch,
+                                        validation_steps = validation_steps,
+                                        epochs=epochs,
+                                        validation_data=self._prepare(self.val_data, mode='valid'),
+                                        workers=self.workers,
+                                        use_multiprocessing=self.use_multiprocessing, 
+                                        verbose=verbose,
+                                        shuffle=True,
+                                        class_weight=class_weight,
+                                        callbacks=kcallbacks)
         if sgdr is not None: hist.history['lr'] = sgdr.history['lr']
         self.history = hist
 
@@ -1166,7 +1219,7 @@ def get_predictor(model, preproc):
         raise Exception('preproc of type %s not currently supported' % (type(preproc)))
 
 
-def load_predictor(fpath):
+def load_predictor(fname):
     """
     Loads a previously saved Predictor instance
     """
@@ -1174,7 +1227,7 @@ def load_predictor(fpath):
     # load the preprocessor
     try:
         preproc = None
-        with open(fpath+'.preproc', 'rb') as f:
+        with open(fname +'.preproc', 'rb') as f:
             preproc = pickle.load(f)
     except FileNotFoundError:
         print('load_predictor failed.\n'+\
@@ -1183,7 +1236,8 @@ def load_predictor(fpath):
         return
 
     # load the model
-    model = _load_model(fpath, preproc=preproc)
+    model = _load_model(fname, preproc=preproc)
+
 
     # preprocessing functions in ImageDataGenerators are not pickable
     # so, we must reconstruct
@@ -1238,11 +1292,22 @@ def release_gpu_memory(device=0):
     return
 
 
-def _load_model(fpath, preproc=None, train_data=None):
+def _load_model(fname, preproc=None, train_data=None):
     if not preproc and not train_data:
         raise ValueError('Either preproc or train_data is required.')
     custom_objects=None
-    if (preproc and (isinstance(preproc, BERTPreprocessor) or \
+    if preproc and isinstance(preproc, TransformersPreprocessor):
+        # note: with transformer models, fname is actually a directory
+        model = preproc.model_type.from_pretrained(fname)
+        if preproc.multilabel:
+            loss_fn =  keras.losses.BinaryCrossentropy(from_logits=True)
+        else:
+            loss_fn = keras.losses.CategoricalCrossentropy(from_logits=True)
+        model.compile(loss=loss_fn,
+                      optimizer=keras.optimizers.Adam(learning_rate=3e-5, epsilon=1e-08),
+                      metrics=['accuracy'])
+        return model
+    elif (preproc and (isinstance(preproc, BERTPreprocessor) or \
                     type(preproc).__name__ == 'BERTPreprocessor')) or\
        train_data and U.bert_data_tuple(train_data):
         # custom BERT model
@@ -1260,13 +1325,18 @@ def _load_model(fpath, preproc=None, train_data=None):
         from stellargraph.layer import MeanAggregator
         custom_objects={'MeanAggregator': MeanAggregator}
     try:
-        model = load_model(fpath, custom_objects=custom_objects)
+        model = load_model(fname, custom_objects=custom_objects)
     except Exception as e:
         print('Call to keras.models.load_model failed.  '
               'Try using the learner.model.save_weights and '
               'learner.model.load_weights instead.')
         print('Error was: %s' % (e))
         return
+
+    # see issue https://github.com/amaiya/ktrain/issues/21
+    if hasattr(model, '_make_predict_function'):
+        model._make_predict_function()
+
     return model
 
 

@@ -5,9 +5,13 @@ Tests of ktrain image classification flows
 import testenv
 from unittest import TestCase, main, skip
 import numpy as np
+
+
+
 import ktrain
 from ktrain import vision as vis
 import ktrain.utils as U
+from ktrain.imports import ACC_NAME, VAL_ACC_NAME
 
 
 #def classify_from_csv():
@@ -38,13 +42,13 @@ class TestImageClassification(TestCase):
         model = vis.image_classifier('pretrained_resnet50', trn, val)
         learner = ktrain.get_learner(model=model, train_data=trn, val_data=val, batch_size=1)
         learner.freeze()
-        hist = learner.autofit(1e-3, monitor='val_acc')
+        hist = learner.autofit(1e-3, monitor=VAL_ACC_NAME)
 
         # test train
         self.assertAlmostEqual(max(hist.history['lr']), 1e-3)
-        if max(hist.history['acc']) == 0.5:
+        if max(hist.history[ACC_NAME]) == 0.5:
             raise Exception('unlucky initialization: please run test again')
-        self.assertGreater(max(hist.history['acc']), 0.8)
+        self.assertGreater(max(hist.history[ACC_NAME]), 0.8)
 
         # test top_losses
         obs = learner.top_losses(n=1, val_data=val)
@@ -52,7 +56,7 @@ class TestImageClassification(TestCase):
         if obs:
             self.assertIn(obs[0][0], list(range(U.nsamples_from_data(val))))
         else:
-            self.assertEqual(max(hist.history['val_acc']), 1)
+            self.assertEqual(max(hist.history[VAL_ACC_NAME]), 1)
 
         # test weight decay
         self.assertEqual(len(learner.get_weight_decay()), 54)

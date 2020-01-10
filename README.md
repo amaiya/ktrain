@@ -5,10 +5,11 @@
 
 
 ### News and Announcements
+- **2020-01-13:**  
+  - ***ktrain*** **v0.8.x is released and now uses TensorFlow 2**. TensorFlow 1.x is no longer supported.  If you're using Google Colab and `import tensorflow as tf;  print(tf.__version__)` shows v1.15 is installed, you must install TensorFlow 2: `!pip3 install -q tensorflow_gpu==2.0`.
+  - Also available in  **v0.8.x**: *ktrain* now exposes a simplified interface for text classification with [HuggingFace Transformer models](https://github.com/huggingface/transformers).
 - **2019-12-10:**  
   - ***ktrain*** **v0.7.x is released and now uses TensorFlow Keras** (i.e., `tf.keras`) instead of stand-alone Keras.  If you're using custom Keras models with *ktrain*, you must change all `keras` references to `tensorflow.keras`. That is, don't import Keras like this: `from keras.layers import Dense`. Do this instead:  `from tensorflow.keras.layers import Dense`.  If you mix calls to tf.keras with Keras, you will experience problems.  Supported versions of TensorFlow include 1.14 and 2.0.
-- **2019-11-12:**  
-  - *ktrain* v0.6.x is released and includes pre-canned support for [learning from unlabeled or partially labeled text data](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorial-05-learning_from_unlabeled_text_data.ipynb).
 - **Coming Soon**:
   - better support for custom data formats and models
   - ability to train [HuggingFace Transformer models](https://github.com/huggingface/transformers) within *ktrain*
@@ -195,19 +196,17 @@ Using *ktrain* on **Google Colab**?  See [this simple demo of Multiclass Text Cl
 
 Make sure pip is up-to-date with: `pip3 install -U pip`.
 
-1. Ensure Tensorflow 1.14 or TensorFlow 2 [is installed](https://www.tensorflow.org/install/pip?lang=python3) if it is not already
+1. Ensure TensorFlow 2 [is installed](https://www.tensorflow.org/install/pip?lang=python3) if it is not already
 
-> For GPU: `pip3 install "tensorflow_gpu>=1.14,<=2"`
+> For GPU: `pip3 install "tensorflow_gpu>=2.0.0"`
 
-> For CPU: `pip3 install "tensorflow>=1.14,<=2"`
+> For CPU: `pip3 install "tensorflow>=2.0.0"`
 
 
 2. Install *ktrain*: `pip3 install ktrain`
 
 **Some things to note:**
-- The *ktrain* package can be used with either TensorFlow 2.0 or TensorFlow 1.14.  If using TensorFlow 2.0, *ktrain*
-presently runs in 1.x mode using [tf.compat.v1.disable_v2_behavior](https://www.tensorflow.org/api_docs/python/tf/compat/v1/disable_v2_behavior).  In the future, this will be removed and **only** TensorFlow 2 will be supported.
-
+- As of v0.8.x, *ktrain* requires TensorFlow 2.  TensorFlow 1.x (1.14, 1.15) is no longer suppoted. 
 - Since some *ktrain* dependencies have not yet been migrated to `tf.keras` in TensorFlow 2 (or may have other issues), 
   *ktrain* is temporarily using forked versions of some libraries. Specifically, *ktrain* uses forked versions
   `eli5` and `stellargraph`.  If not installed, *ktrain* will complain  when a method or function needing 

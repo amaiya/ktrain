@@ -80,7 +80,7 @@ def graph_node_classifier(name, train_data, layer_sizes=[32,32], verbose=1):
     model = Model(inputs=x_inp, outputs=prediction)
     model.compile(optimizer='adam',
                   loss=loss_func,
-                  metrics=["acc"])
+                  metrics=["accuracy"])
     U.vprint('done', verbose=verbose)
     return model
 
