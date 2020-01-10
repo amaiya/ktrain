@@ -253,6 +253,7 @@ class Learner(ABC):
                    argument of load_imagemodel to selectively freeze layers.
                    """
             raise Exception(err_msg)
+
         
         if self.multigpu:
             with tf.device("/cpu:0"):
