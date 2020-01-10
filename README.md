@@ -209,8 +209,7 @@ Make sure pip is up-to-date with: `pip3 install -U pip`.
 **Some things to note:**
 - As of v0.8.x, *ktrain* requires TensorFlow 2.  TensorFlow 1.x (1.14, 1.15) is no longer suppoted. 
 - Since some *ktrain* dependencies have not yet been migrated to `tf.keras` in TensorFlow 2 (or may have other issues), 
-  *ktrain* is temporarily using forked versions of some libraries. Specifically, *ktrain* uses forked versions
-  `eli5` and `stellargraph`.  If not installed, *ktrain* will complain  when a method or function needing 
+  *ktrain* is temporarily using forked versions of some libraries. Specifically, *ktrain* uses forked versions of the `eli5` and `stellargraph` libraries.  If not installed, *ktrain* will complain  when a method or function needing 
   either of these libraries is invoked.
   To install these forked versions, you can do the following:
 ```
