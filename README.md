@@ -6,8 +6,8 @@
 
 ### News and Announcements
 - **2020-01-13:**  
-  - ***ktrain*** **v0.8.x is released and now uses TensorFlow 2**. TensorFlow 1.x is no longer supported.  If you're using Google Colab and `import tensorflow as tf;  print(tf.__version__)` shows v1.15 is installed, you must install TensorFlow 2: `!pip3 install -q tensorflow_gpu==2.0`.
-  - Also available in  **v0.8.x**: *ktrain* now exposes a simplified interface for text classification with [HuggingFace Transformer models](https://github.com/huggingface/transformers).
+  - ***ktrain*** **v0.8.x is released** and now exposes a simplified interface for text classification with [HuggingFace Transformer   models](https://github.com/huggingface/transformers).  See this tutorial notebook for more details:   [tutorial-A2-hugging_face_transformers.ipynb]((https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-A3-hugging_face_transformers.ipynb) for more details. 
+  - As of v0.8.x, *ktrain* now uses **TensorFlow 2**. TensorFlow 1.x is no longer supported.  If you're using Google Colab and `import tensorflow as tf;  print(tf.__version__)` shows v1.15 is installed, you must install TensorFlow 2: `!pip3 install -q tensorflow_gpu==2.0`.
 - **2019-12-10:**  
   - ***ktrain*** **v0.7.x is released and now uses TensorFlow Keras** (i.e., `tf.keras`) instead of stand-alone Keras.  If you're using custom Keras models with *ktrain*, you must change all `keras` references to `tensorflow.keras`. That is, don't import Keras like this: `from keras.layers import Dense`. Do this instead:  `from tensorflow.keras.layers import Dense`.  If you mix calls to tf.keras with Keras, you will experience problems.  Supported versions of TensorFlow include 1.14 and 2.0.
 - **Coming Soon**:
