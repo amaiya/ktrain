@@ -12,8 +12,6 @@
   - ***ktrain*** **v0.7.x is released and now uses TensorFlow Keras** (i.e., `tf.keras`) instead of stand-alone Keras.  If you're using custom Keras models with *ktrain*, you must change all `keras` references to `tensorflow.keras`. That is, don't import Keras like this: `from keras.layers import Dense`. Do this instead:  `from tensorflow.keras.layers import Dense`.  If you mix calls to tf.keras with Keras, you will experience problems.  Supported versions of TensorFlow include 1.14 and 2.0.
 - **Coming Soon**:
   - better support for custom data formats and models
-  - ability to train [HuggingFace Transformer models](https://github.com/huggingface/transformers) within *ktrain*
-  
 
 
 ----
