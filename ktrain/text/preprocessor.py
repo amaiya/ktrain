@@ -368,8 +368,9 @@ class TextPreprocessor(Preprocessor):
         raise NotImplementedError
 
 
-    def set_multilabel(self, data):
-        self.multilabel = U.is_multilabel(data)
+    def set_multilabel(self, data, mode):
+        if mode == 'train':
+            self.multilabel = U.is_multilabel(data)
 
 
     def undo(self, doc):
@@ -468,7 +469,7 @@ class StandardTextPreprocessor(TextPreprocessor):
 
         # return
         result =  (x_train, y_train)
-        self.set_multilabel(result)
+        self.set_multilabel(result, 'train')
         return result
 
 
@@ -622,6 +623,8 @@ class BERTPreprocessor(TextPreprocessor):
         """
         preprocess training set
         """
+        if mode == 'train' and y is None:
+            raise ValueError('y is required when mode=train')
         U.vprint('preprocessing %s...' % (mode), verbose=verbose)
         U.vprint('language: %s' % (self.lang), verbose=verbose)
 
@@ -631,7 +634,7 @@ class BERTPreprocessor(TextPreprocessor):
                 y = to_categorical(y)
             #U.vprint('\ty shape: ({},{})'.format(y.shape[0], y.shape[1]), verbose=verbose)
         result = (x, y)
-        self.set_multilabel(result)
+        self.set_multilabel(result, mode)
         return result
 
 
@@ -709,7 +712,7 @@ class TransformersPreprocessor(TextPreprocessor):
                                       pad_on_left=bool(self.name in ['xlnet']),
                                       pad_token=self.tok.convert_tokens_to_ids([self.tok.pad_token][0]),
                                       pad_token_segment_id=4 if self.name in ['xlnet'] else 0)
-        self.set_multilabel(dataset)
+        self.set_multilabel(dataset, mode)
         return dataset
 
 
