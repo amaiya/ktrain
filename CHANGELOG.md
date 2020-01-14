@@ -17,6 +17,7 @@ Most recent releases are shown at the top. Each release shows:
 
 ### Fixed:
 - `core._load_model` calls `_make_predict_function` before returning model
+- added warning when non-adam optimizer is used with `cycle_momentum=True`
 
 
 

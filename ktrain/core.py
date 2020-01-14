@@ -242,6 +242,13 @@ class Learner(ABC):
         self.model = _load_model(fpath, train_data=self.train_data)
         return
 
+    def _is_adamlike(self):
+        """
+        checks whether optimizer attached to model is an 
+        "Adam-like" optimizer with beta_1 parameter.
+        """
+        return self.model is not None and hasattr(self.model.optimizer, 'beta_1')
+
 
     def _recompile(self):
         # ISSUE: recompile does not work correctly with multigpu models
@@ -657,6 +664,11 @@ class Learner(ABC):
             callbacks (list): list of Callback instances to employ during training
             verbose (bool):  verbose mode
         """
+        if not self._is_adamlike() and cycle_momentum:
+            warnings.warn('cyclical momentum has been disabled because '+\
+                           'optimizer is not "Adam-like" with beta_1 param')
+            cycle_momentum=False
+
 
         num_samples = U.nsamples_from_data(self.train_data)
         steps_per_epoch = math.ceil(num_samples/self.batch_size)
@@ -749,6 +761,12 @@ class Learner(ABC):
             callbacks (list): list of Callback instances to employ during training
             verbose (bool):  verbose mode
         """
+        # check optimizer
+        if not self._is_adamlike() and cycle_momentum:
+            warnings.warn('cyclical momentum has been disabled because '+\
+                           'optimizer is not "Adam-like" with beta_1 param')
+            cycle_momentum=False
+
         # check monitor
         if monitor not in [VAL_ACC_NAME, 'val_loss']:
             raise ValueError("monitor must be one of {%s, val_loss'}" % (VAL_ACC_NAME))
