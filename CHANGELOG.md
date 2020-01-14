@@ -6,6 +6,21 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.8.0 (2020-01-13)
+
+### New:
+- availability of a new, simplied interface to Hugging Face transformer models
+- added 'distilbert' as an available model in `text.text_classifier` function
+
+### Changed:
+- `preproc` argument is required for `text.text_classifier`
+
+### Fixed:
+- `core._load_model` calls `_make_predict_function` before returning model
+- added warning when non-adam optimizer is used with `cycle_momentum=True`
+
+
+
 ## 0.7.3 (2019-12-31)
 
 ### New:
@@ -16,7 +31,6 @@ Most recent releases are shown at the top. Each release shows:
 
 ### Fixed:
 - Fixed error when using *ktrain* with v0.2.x of `fastprogress`. *ktrain* can now be used with both v0.1.x and v0.2.x of `fastprogress`
-
 
 
 ## 0.7.2 (2019-12-11)

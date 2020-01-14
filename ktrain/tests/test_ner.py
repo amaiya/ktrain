@@ -6,6 +6,10 @@ import testenv
 import IPython
 from unittest import TestCase, main, skip
 import numpy as np
+
+import os
+os.environ['DISABLE_V2_BEHAVIOR'] = '1'
+
 import ktrain
 from ktrain import text as txt
 

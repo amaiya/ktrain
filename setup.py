@@ -22,7 +22,7 @@ setup(
   install_requires=[
           'scikit-learn == 0.21.3',
           'matplotlib >= 3.0.0',
-          'pandas >= 0.24.2',
+          'pandas < 1.0',
           'fastprogress >= 0.1.21',
           'keras_bert',
           'requests',
@@ -34,6 +34,8 @@ setup(
           'bokeh',
           'seqeval',
           'packaging',
+          'tensorflow_datasets',
+          'transformers'
           #'stellargraph>=0.8.2',
           #'eli5 >= 0.10.0',
           #'pillow'

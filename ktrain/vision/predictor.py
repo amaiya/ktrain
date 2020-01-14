@@ -165,7 +165,8 @@ class ImagePredictor(Predictor):
 
 
     def save(self, fname):
-        self.model.save(fname)
+        self.model.save(fname, save_format='h5')
+
         fname_preproc = fname+'.preproc'
         with open(fname_preproc, 'wb') as f:
             datagen = self.preproc.get_preprocessor()
