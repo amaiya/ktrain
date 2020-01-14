@@ -35,7 +35,7 @@ class TestTransformers(TestCase):
 
 
 
-    @skip('temporarily disabled')
+    #@skip('temporarily disabled')
     def test_transformers_api_1(self):
         trn, val, preproc = txt.texts_from_array(x_train=self.trn[0], 
                                                  y_train=self.trn[1],
