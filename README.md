@@ -58,7 +58,7 @@ Some blog tutorials about *ktrain* are shown below:
 
 > [**BERT Text Classification in 3 Lines of Code**](https://towardsdatascience.com/bert-text-classification-in-3-lines-of-code-using-keras-264db7e7a358)  
 
-> [**Explainable AI in Practice**](https://medium.com/@asmaiya/explainable-ai-in-practice-2e5ae2d16dc7)
+> [**Text Classification with Hugging Face Transformers in  TensorFlow 2 (Without Tears)**](https://medium.com/@asmaiya/text-classification-with-hugging-face-transformers-in-tensorflow-2-without-tears-ee50e4f3e7ed)
 
 
 
