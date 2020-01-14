@@ -843,7 +843,7 @@ class Learner(ABC):
         if U.is_iter(val):
             if hasattr(val, 'reset'): val.reset()
             steps = np.ceil(U.nsamples_from_data(val)/val.batch_size)
-            result = self.model.predict_generator(self._prepare(val, mode='valid'), 
+            return self.model.predict_generator(self._prepare(val, mode='valid'), 
                                                 steps=steps)
         else:
             return self.model.predict(val[0])
