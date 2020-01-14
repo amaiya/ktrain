@@ -1249,7 +1249,7 @@ def load_predictor(fname):
             preproc = pickle.load(f)
     except FileNotFoundError:
         print('load_predictor failed.\n'+\
-              'Could not find the saved preprocessor (%s) for this model.' % (fpath+'.preproc') +\
+              'Could not find the saved preprocessor (%s) for this model.' % (fname+'.preproc') +\
                ' Are you sure predictor.save method was called?')
         return
 
