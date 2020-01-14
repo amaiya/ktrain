@@ -12,7 +12,7 @@ setup(
   packages = setuptools.find_packages(),
   version = __version__,
   license='MIT',
-  description = 'ktrain is a lightweight wrapper for Keras to help train neural networks',
+  description = 'ktrain is a lightweight wrapper for TensorFlow Keras to help train neural networks',
   long_description = readme,
   long_description_content_type = 'text/markdown',
   author = 'Arun S. Maiya',
