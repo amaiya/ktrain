@@ -15,7 +15,7 @@ Most recent releases are shown at the top. Each release shows:
 - N/A
 
 ### Fixed:
-- fix to support multilabel text classification
+- fix to support multilabel text classification in `Transformers`
 - `_prepare_dataset` no longer breaks when validation dataset has not been supplied
 
 
