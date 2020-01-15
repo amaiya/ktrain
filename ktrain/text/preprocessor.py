@@ -785,7 +785,13 @@ class Transformer(TransformersPreprocessor):
 
     def preprocess_train(self, texts, y=None, mode='train', verbose=1):
         """
-        preprocess training set
+        Preprocess training set for A Transformer model
+
+        Each label can be in the form of either:
+        1) integer representing the class (index into array returned by get_classes)
+           for binary and multiclass text classification
+        2) multi-hot-encoded vector for multilabel text classification problems
+
         Args:
             texts (list of strings): text of documents
             y: labels
@@ -804,7 +810,17 @@ class Transformer(TransformersPreprocessor):
 
     def preprocess_test(self, texts, y=None,  verbose=1):
         """
-        preprocess validation or test datasets
+        Preprocess the validation or test set for a Transformer model
+
+        Each label can be in the form of either:
+        1) integer representing the class (index into array returned by get_classes)
+           for binary and multiclass text classification
+        2) multi-hot-encoded vector for multilabel text classification problems
+
+        Args:
+            texts (list of strings): text of documents
+            y: labels
+            verbose(bool): verbosity
         """
         return self.preprocess_train(texts, y=y, mode='test', verbose=verbose)
 
