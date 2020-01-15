@@ -370,7 +370,7 @@ class TextPreprocessor(Preprocessor):
 
     def set_multilabel(self, data, mode):
         if mode == 'train':
-            self.multilabel = U.is_multilabel(data)
+            self.is_multilabel = U.is_multilabel(data)
 
 
     def undo(self, doc):
