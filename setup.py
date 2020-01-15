@@ -18,7 +18,7 @@ setup(
   author = 'Arun S. Maiya',
   author_email = 'arun@maiya.net',
   url = 'https://github.com/amaiya/ktrain',
-  keywords = ['keras', 'deep learning', 'machine learning'],
+  keywords = ['tensorflow', 'keras', 'deep learning', 'machine learning'],
   install_requires=[
           'scikit-learn == 0.21.3',
           'matplotlib >= 3.0.0',
@@ -45,7 +45,7 @@ setup(
     #   3 - Alpha
     #   4 - Beta
     #   5 - Production/Stable
-    'Development Status :: 3 - Alpha',
+    'Development Status :: 4 - Beta',
 
     # Indicate who your project is intended for
     'Intended Audience :: Developers',
