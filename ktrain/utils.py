@@ -40,12 +40,15 @@ def is_classifier(model):
 
     # check for multilabel
     if loss == 'binary_crossentropy':
-        last = model.layers[-1]
-        output_shape = last.output_shape
-        mult_output = True if len(output_shape) ==2 and output_shape[1] >  1 else False
-        if ( (hasattr(last, 'activation') and isinstance(last.activation, type(sigmoid))) or\
-           isinstance(last, type(sigmoid)) ) and mult_output:
+        if is_huggingface(model=model):
             is_multilabel = True
+        else:
+            last = model.layers[-1]
+            output_shape = last.output_shape
+            mult_output = True if len(output_shape) ==2 and output_shape[1] >  1 else False
+            if ( (hasattr(last, 'activation') and isinstance(last.activation, type(sigmoid))) or\
+               isinstance(last, type(sigmoid)) ) and mult_output:
+                is_multilabel = True
     return (is_classifier, is_multilabel)
 
 

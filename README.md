@@ -6,7 +6,7 @@
 
 ### News and Announcements
 - **2020-01-14:**  
-  - ***ktrain*** **v0.8.x is released** and now includes a simplified interface for text classification with [HuggingFace Transformers](https://github.com/huggingface/transformers).  See [this tutorial notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/tutorials/tutorial-A3-hugging_face_transformers.ipynb) for more details. 
+  - ***ktrain*** **v0.8.x is released** and now includes a thin and easy-to-use wrapper to [HuggingFace Transformers](https://github.com/huggingface/transformers) for text classification.  See [this tutorial notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/tutorials/tutorial-A3-hugging_face_transformers.ipynb) for more details. 
   - As of v0.8.x, *ktrain* now uses **TensorFlow 2**. TensorFlow 1.x is no longer supported.  If you're using Google Colab and `import tensorflow as tf;  print(tf.__version__)` shows v1.15 is installed, you must install TensorFlow 2: `!pip3 install -q tensorflow_gpu==2.0`.  Remember to import Keras modules like this:  `from tensorflow.keras.layers import Dense`.  (That is, don't do this:  `from keras.layers import Dense`.)
 - **Coming Soon**:
   - better support for custom data formats and models
@@ -22,7 +22,7 @@
 - utilize learning rate schedules such as the [triangular policy](https://arxiv.org/abs/1506.01186), the [1cycle policy](https://arxiv.org/abs/1803.09820), and [SGDR](https://arxiv.org/abs/1608.03983) to effectively minimize loss and improve generalization
 - employ fast and easy-to-use pre-canned models for  `text`, `vision`, and `graph` data:
   - `text` data:
-     - **Text Classification**: [BERT](https://arxiv.org/abs/1810.04805), [NBSVM](https://www.aclweb.org/anthology/P12-2018), [fastText](https://arxiv.org/abs/1607.01759), GRUs with [pretrained word vectors](https://fasttext.cc/docs/en/english-vectors.html), and other models <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/IMDb-BERT.ipynb)]</sup></sub>
+     - **Text Classification**: [BERT](https://arxiv.org/abs/1810.04805), [DistilBERT](https://arxiv.org/abs/1910.01108), [NBSVM](https://www.aclweb.org/anthology/P12-2018), [fastText](https://arxiv.org/abs/1607.01759), and other models <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/IMDb-BERT.ipynb)]</sup></sub>
      - **Sequence Labeling**:  [Bidirectional LSTM-CRF](https://arxiv.org/abs/1603.01360) with optional pretrained word embeddings <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorial-06-sequence-tagging.ipynb)]</sup></sub>
      - **Unsupervised Topic Modeling** with [LDA](http://www.jmlr.org/papers/volume3/blei03a/blei03a.pdf)  <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/20newsgroups-topic_modeling.ipynb)]</sup></sub>
      - **Document Similarity with One-Class Learning**:  given some documents of interest, find and score new documents that are semantically similar to them using [One-Class Text Classification](https://en.wikipedia.org/wiki/One-class_classification) <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/20newsgroups-document_similarity_scorer.ipynb)]</sup></sub>
@@ -58,7 +58,7 @@ Some blog tutorials about *ktrain* are shown below:
 
 > [**BERT Text Classification in 3 Lines of Code**](https://towardsdatascience.com/bert-text-classification-in-3-lines-of-code-using-keras-264db7e7a358)  
 
-> [**Explainable AI in Practice**](https://medium.com/@asmaiya/explainable-ai-in-practice-2e5ae2d16dc7)
+> [**Text Classification with Hugging Face Transformers in  TensorFlow 2 (Without Tears)**](https://medium.com/@asmaiya/text-classification-with-hugging-face-transformers-in-tensorflow-2-without-tears-ee50e4f3e7ed)
 
 
 

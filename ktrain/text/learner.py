@@ -134,6 +134,7 @@ class TransformerTextClassLearner(GenLearner):
         # HF_EXCEPTION
         # convert arrays to TF dataset (iterator) on-the-fly
         # to work around issues with transformers and tf.Datasets
+        if data is None: return None
         shuffle=True
         repeat = True
         if mode != 'train':
