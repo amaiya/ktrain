@@ -354,6 +354,7 @@ class TextPreprocessor(Preprocessor):
         self.c = classes
         self.maxlen = maxlen
         self.lang = lang
+        self.multilabel = multilabel
 
 
     def get_preprocessor(self):
@@ -370,7 +371,7 @@ class TextPreprocessor(Preprocessor):
 
     def set_multilabel(self, data, mode):
         if mode == 'train':
-            self.is_multilabel = U.is_multilabel(data)
+            self.multilabel = U.is_multilabel(data)
 
 
     def undo(self, doc):
@@ -754,7 +755,7 @@ class Transformer(TransformersPreprocessor):
     """
 
     def __init__(self, model_name, maxlen=128, classes=[], 
-                 batch_size=None, is_multilabel=False,
+                 batch_size=None, multilabel=False,
                  use_with_learner=True):
         """
         Args:
@@ -768,7 +769,7 @@ class Transformer(TransformersPreprocessor):
                                      return a ktrain TransformerSequence object for use with
                                      ktrain.get_learner.
             batch_size (int): batch_size - only required if use_with_learner=False
-            is_multilabel (int):  if True, classifier will be configured for
+            multilabel (int):  if True, classifier will be configured for
                                   multilabel classification.
 
         """
@@ -777,9 +778,8 @@ class Transformer(TransformersPreprocessor):
         if classes is None or not classes:
             raise ValueError('classes argument is required - provide list of class names as strings')
         super().__init__(model_name,
-                         maxlen, max_features=10000, classes=classes)
+                         maxlen, max_features=10000, classes=classes, multilabel=multilabel)
         self.batch_size = batch_size
-        self.is_multilabel = is_multilabel
         self.use_with_learner = use_with_learner
 
 
@@ -829,7 +829,7 @@ class Transformer(TransformersPreprocessor):
     def get_classifier(self):
         num_labels = len(self.get_classes())
         model = self.model_type.from_pretrained(self.model_name, num_labels=num_labels)
-        if self.is_multilabel:
+        if self.multilabel:
             loss_fn =  keras.losses.BinaryCrossentropy(from_logits=True)
         else:
             loss_fn = keras.losses.CategoricalCrossentropy(from_logits=True)
