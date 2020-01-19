@@ -24,7 +24,7 @@ class Dataset(Sequence):
        raise NotImplemented
 
    def ondisk(self):
-       raise NotImplemented
+       return False
 
 
 
