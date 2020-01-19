@@ -239,7 +239,7 @@ def nclasses_from_data(data):
 
 def y_from_data(data):
     if is_iter(data):
-        if isinstance(data, Dataset): return np.squeeze(data.y)
+        if isinstance(data, Dataset): return np.squeeze(data.get_y())
         elif is_ner(data=data): return data.y    # NERSequence
         if is_huggingface(data=data):  # Hugging Face Transformer
             return data.y

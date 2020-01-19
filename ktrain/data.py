@@ -23,6 +23,9 @@ class Dataset(Sequence):
    def nclasses(self):
        raise NotImplemented
 
+    def get_y(self):
+        raise NotImplemented
+
    def ondisk(self):
        return False
 
@@ -65,6 +68,9 @@ class ArrayDataset(Dataset):
 
     def nclasses(self):
         return self.y.shape[1]
+
+    def get_y(self):
+        return self.y
 
     def ondisk(self):
         return False
