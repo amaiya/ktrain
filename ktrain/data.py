@@ -2,32 +2,32 @@ from .imports import *
 
 
 class Dataset(Sequence):
-   def __init__(self, batch_size=32):
-       self.batch_size = batch_size
+    def __init__(self, batch_size=32):
+        self.batch_size = batch_size
 
-   def __len__(self):
-       raise NotImplemented
+    def __len__(self):
+        raise NotImplemented
 
-   def __getitem__(self, idx):
-       raise NotImplemented
+    def __getitem__(self, idx):
+        raise NotImplemented
 
-   def on_epoch_end(self):
-       raise NotImplemented
+    def on_epoch_end(self):
+        raise NotImplemented
 
-   def xshape(self):
-       raise NotImplemented
+    def xshape(self):
+        raise NotImplemented
 
-   def nsamples(self):
-       raise NotImplemented
+    def nsamples(self):
+        raise NotImplemented
 
-   def nclasses(self):
-       raise NotImplemented
+    def nclasses(self):
+        raise NotImplemented
 
     def get_y(self):
         raise NotImplemented
 
-   def ondisk(self):
-       return False
+    def ondisk(self):
+        return False
 
 
 
