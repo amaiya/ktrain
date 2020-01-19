@@ -276,7 +276,7 @@ def data_arg_check(train_data=None, val_data=None, train_required=False, val_req
     if train_data is not None and not is_iter(train_data, ndarray_only):
         if bad_data_tuple(train_data):
             err_msg = 'data must be tuple of numpy.ndarrays'
-            if not ndarray_only: err_msg += ' or an instance of Iterator'
+            if not ndarray_only: err_msg += ' or an instance of ktrain.Dataset'
             raise ValueError(err_msg)
     if val_data is not None and not is_iter(val_data, ndarray_only):
         if bad_data_tuple(val_data):
