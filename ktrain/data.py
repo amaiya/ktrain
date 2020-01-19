@@ -32,13 +32,13 @@ class ArrayDataset(Dataset):
     def __init__(self, x, y, batch_size=32):
         if type(x) != np.ndarray or type(y) != np.ndarray:
             raise ValueError('x and y must be numpy arrays')
+        if len(x.shape) != 3:
+            raise valueError('x must have 3 dimensions')
         super().__init__(batch_size=batch_size)
         self.x, self.y = x, y
         self.indices = np.arange(self.x[0].shape[0])
-        if len(x.shape) == 2:
-            self.n_inputs = 1 
-        else:
-            self.n_inputs = x.shape[0]
+        self.n_inputs = x.shape[0]
+
 
     def __len__(self):
         return math.ceil(self.x[0].shape[0] / self.batch_size)
