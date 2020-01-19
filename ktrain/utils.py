@@ -182,6 +182,8 @@ def shape_from_data(data):
 
 
 def ondisk(data):
+    if hasattr(data, 'ondisk'): return data.ondisk()
+
     ondisk = is_iter(data) and \
              (type(data).__name__ not in  ['ArrayDataset', 'NumpyArrayIterator', 'NERSequence',
                                            'NodeSequenceWrapper', 'TransformerSequence'])
