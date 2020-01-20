@@ -2,43 +2,53 @@ from .imports import *
 
 
 class Dataset(Sequence):
-   def __init__(self, batch_size=32):
-       self.batch_size = batch_size
+    def __init__(self, batch_size=32):
+        self.batch_size = batch_size
 
-   def __len__(self):
-       raise NotImplemented
+    # required by keras.utils.Sequence instances
+    def __len__(self):
+        raise NotImplemented
 
-   def __getitem__(self, idx):
-       raise NotImplemented
+    # required by keras.utils.Sequence instances
+    def __getitem__(self, idx):
+        raise NotImplemented
 
-   def on_epoch_end(self):
-       raise NotImplemented
+    # required: used by Learner instances
+    def nsamples(self):
+        raise NotImplemented
 
-   def xshape(self):
-       raise NotImplemented
+    # required: used by Learner instances
+    def get_y(self):
+        raise NotImplemented
 
-   def nsamples(self):
-       raise NotImplemented
+    # optional: to modify dataset between epochs (e.g., shuffle)
+    def on_epoch_end(self):
+        pass
 
-   def nclasses(self):
-       raise NotImplemented
+    # optional
+    def ondisk(self):
+        return False
 
-   def ondisk(self):
-       raise NotImplemented
+    # optional: used only if invoking *_classifier functions
+    def xshape(self):
+        raise NotImplemented
+    
+    # optional: used only if invoking *_classifier functions
+    def nclasses(self):
+        raise NotImplemented
 
 
 
-class ArrayDataset(Dataset):
+class MultiArrayDataset(Dataset):
     def __init__(self, x, y, batch_size=32):
         if type(x) != np.ndarray or type(y) != np.ndarray:
             raise ValueError('x and y must be numpy arrays')
+        if len(x.shape) != 3:
+            raise valueError('x must have 3 dimensions')
         super().__init__(batch_size=batch_size)
         self.x, self.y = x, y
         self.indices = np.arange(self.x[0].shape[0])
-        if len(x.shape) == 2:
-            self.n_inputs = 1 
-        else:
-            self.n_inputs = x.shape[0]
+        self.n_inputs = x.shape[0]
 
     def __len__(self):
         return math.ceil(self.x[0].shape[0] / self.batch_size)
@@ -65,6 +75,9 @@ class ArrayDataset(Dataset):
 
     def nclasses(self):
         return self.y.shape[1]
+
+    def get_y(self):
+        return self.y
 
     def ondisk(self):
         return False
