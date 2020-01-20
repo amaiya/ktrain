@@ -1,4 +1,5 @@
 from .imports import *
+from .data import Dataset
 
 
 #------------------------------------------------------------------------------
@@ -156,7 +157,8 @@ def is_multilabel(data):
 def shape_from_data(data):
     err_msg = 'could not determine shape from %s' % (type(data))
     if is_iter(data):
-        if is_ner(data=data): return (len(data.x), data[0][0][0].shape[1])  # NERSequence
+        if isinstance(data, Dataset): return data.xshape()
+        elif is_ner(data=data): return (len(data.x), data[0][0][0].shape[1])  # NERSequence
         elif is_huggingface(data=data):  # HF Transformer
             return (len(data.x), data[0][0][0].shape[1])
         elif is_nodeclass(data=data):                                 # NodeSequence
@@ -180,8 +182,10 @@ def shape_from_data(data):
 
 
 def ondisk(data):
+    if hasattr(data, 'ondisk'): return data.ondisk()
+
     ondisk = is_iter(data) and \
-             (type(data).__name__ not in  ['NumpyArrayIterator', 'NERSequence', 
+             (type(data).__name__ not in  ['ArrayDataset', 'NumpyArrayIterator', 'NERSequence',
                                            'NodeSequenceWrapper', 'TransformerSequence'])
     return ondisk
 
@@ -189,7 +193,8 @@ def ondisk(data):
 def nsamples_from_data(data):
     err_msg = 'could not determine number of samples from %s' % (type(data))
     if is_iter(data):
-        if is_ner(data=data): return len(data.x)      # NERSequence
+        if isinstance(data, Dataset): return data.nsamples()
+        elif is_ner(data=data): return len(data.x)      # NERSequence
         elif is_huggingface(data=data):  # HuggingFace Transformer
             return len(data.x)
         elif is_nodeclass(data=data):           # NodeSequenceWrapper
@@ -212,7 +217,8 @@ def nsamples_from_data(data):
 
 def nclasses_from_data(data):
     if is_iter(data):
-        if is_ner(data=data): return len(data.p._label_vocab._id2token)    # NERSequence
+        if isinstance(data, Dataset): return data.nsamples()
+        elif is_ner(data=data): return len(data.p._label_vocab._id2token)    # NERSequence
         elif is_huggingface(data=data):         # Hugging Face Transformer
             return data.y.shape[1]
         elif is_nodeclass(data=data):                                # NodeSequenceWrapper
@@ -233,7 +239,8 @@ def nclasses_from_data(data):
 
 def y_from_data(data):
     if is_iter(data):
-        if is_ner(data=data): return data.y    # NERSequence
+        if isinstance(data, Dataset): return data.get_y()
+        elif is_ner(data=data): return data.y    # NERSequence
         if is_huggingface(data=data):  # Hugging Face Transformer
             return data.y
         elif is_nodeclass(data=data):      # NodeSequenceWrapper
@@ -258,7 +265,7 @@ def is_iter(data, ignore=False):
     iter_classes = ["NumpyArrayIterator", "DirectoryIterator",
                     "DataFrameIterator", "Iterator", "Sequence", 
                     "NERSequence", "NodeSequenceWrapper", "TransformerSequence"]
-    return data.__class__.__name__ in iter_classes
+    return data.__class__.__name__ in iter_classes or isinstance(data, Dataset)
 
 
 
@@ -271,7 +278,7 @@ def data_arg_check(train_data=None, val_data=None, train_required=False, val_req
     if train_data is not None and not is_iter(train_data, ndarray_only):
         if bad_data_tuple(train_data):
             err_msg = 'data must be tuple of numpy.ndarrays'
-            if not ndarray_only: err_msg += ' or an instance of Iterator'
+            if not ndarray_only: err_msg += ' or an instance of ktrain.Dataset'
             raise ValueError(err_msg)
     if val_data is not None and not is_iter(val_data, ndarray_only):
         if bad_data_tuple(val_data):
