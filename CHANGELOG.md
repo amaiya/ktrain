@@ -7,7 +7,7 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
-## 0.8.2 (TBD)
+## 0.8.2 (2020-01-19)
 
 ### New:
 - initial base `ktrain.Dataset` class for use as a Sequence wrapper to better support custom datasets/models
