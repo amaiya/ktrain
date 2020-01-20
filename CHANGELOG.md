@@ -10,7 +10,7 @@ Most recent releases are shown at the top. Each release shows:
 ## 0.8.2 (TBD)
 
 ### New:
-- initial base `ktrain.Dataset` classes to support custom datasets
+- initial base `ktrain.Dataset` class for use as a Sequence wrapper to better support custom datasets/models
 
 ### Changed:
 - N/A
