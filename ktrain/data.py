@@ -5,33 +5,41 @@ class Dataset(Sequence):
     def __init__(self, batch_size=32):
         self.batch_size = batch_size
 
+    # required by keras.utils.Sequence instances
     def __len__(self):
         raise NotImplemented
 
+    # required by keras.utils.Sequence instances
     def __getitem__(self, idx):
         raise NotImplemented
 
-    def on_epoch_end(self):
-        raise NotImplemented
-
-    def xshape(self):
-        raise NotImplemented
-
+    # required: used by Learner instances
     def nsamples(self):
         raise NotImplemented
 
-    def nclasses(self):
-        raise NotImplemented
-
+    # required: used by Learner instances
     def get_y(self):
         raise NotImplemented
 
+    # optional: to modify dataset between epochs (e.g., shuffle)
+    def on_epoch_end(self):
+        pass
+
+    # optional
     def ondisk(self):
         return False
 
+    # optional: used only if invoking *_classifier functions
+    def xshape(self):
+        raise NotImplemented
+    
+    # optional: used only if invoking *_classifier functions
+    def nclasses(self):
+        raise NotImplemented
 
 
-class ArrayDataset(Dataset):
+
+class MultiArrayDataset(Dataset):
     def __init__(self, x, y, batch_size=32):
         if type(x) != np.ndarray or type(y) != np.ndarray:
             raise ValueError('x and y must be numpy arrays')
@@ -41,7 +49,6 @@ class ArrayDataset(Dataset):
         self.x, self.y = x, y
         self.indices = np.arange(self.x[0].shape[0])
         self.n_inputs = x.shape[0]
-
 
     def __len__(self):
         return math.ceil(self.x[0].shape[0] / self.batch_size)
