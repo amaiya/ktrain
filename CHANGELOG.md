@@ -7,6 +7,19 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.8.3 (2020-01-22)
+
+### New:
+- N/A
+
+### Changed:
+- `MultiArrayDataset` accepts list of Numpy arrays 
+
+### Fixed:
+- fixed incorrect activation in `TextPredictor` for multi-label Transformer models
+- fixed `top_losses` for regression tasks
+
+
 ## 0.8.2 (2020-01-19)
 
 ### New:

@@ -48,8 +48,13 @@ class TextPredictor(Predictor):
         preds = self.model.predict(texts)
         if U.is_huggingface(model=self.model):
             # convert logits to probabilities for Hugging Face models
-            preds = activations.softmax(tf.convert_to_tensor(preds)).numpy()
-        result =  preds if return_proba else [self.c[np.argmax(pred)] for pred in preds] 
+            if multilabel and self.c:
+                preds = activations.sigmoid(tf.convert_to_tensor(preds)).numpy()
+            elif self.c:
+                preds = activations.softmax(tf.convert_to_tensor(preds)).numpy()
+            else:
+                preds = np.squeeze(preds)
+        result =  preds if return_proba or not self.c else [self.c[np.argmax(pred)] for pred in preds] 
         if multilabel:
             result =  [list(zip(self.c, r)) for r in result]
         if is_str: return result[0]
