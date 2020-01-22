@@ -13,7 +13,7 @@ Most recent releases are shown at the top. Each release shows:
 - N/A
 
 ### Changed:
-- `MultiArrayDataset` accepts lists of Numpy arrays 
+- `MultiArrayDataset` accepts list of Numpy arrays 
 
 ### Fixed:
 - fixed incorrect activation in `TextPredictor` for multi-label Transformer models
