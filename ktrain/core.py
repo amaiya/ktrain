@@ -178,8 +178,13 @@ class Learner(ABC):
         y_true = self.ground_truth(val_data=val)
         y_true = y_true.astype('float32')
 
-        # compute loss
+        # adjust y_true for regression problems
+        if not classification and len(y_true.shape) == 1 and\
+                (len(y_pred.shape) == 2 and y_pred.shape[1] == 1):
+            y_true = np.expand_dims(y_true, -1)
 
+
+        # compute loss
         # this doesn't work in tf.keras 1.14
         #losses = self.model.loss_functions[0](tf.convert_to_tensor(y_true), tf.convert_to_tensor(y_pred))
         if U.is_tf_keras():
@@ -199,10 +204,14 @@ class Learner(ABC):
         else:
             class_fcn = lambda x:class_names[x]
 
-        # don't put regression predictions in a list
-        if not classification and len(y_pred.shape) == 2 and y_pred.shape[1] == 1:
-            y_pred = np.squeeze(y_pred)
-            y_pred = np.around(y_pred, 2)
+        # regression output modifications
+        if not classification:
+            if len(y_pred.shape) == 2 and y_pred.shape[1] == 1:
+                y_pred = np.squeeze(y_pred)
+                y_pred = np.around(y_pred, 2)
+            if len(y_true.shape) == 2 and y_true.shape[1] == 1:
+                y_true = np.squeeze(y_true)
+                y_true = np.around(y_true, 2)
 
         # sort by loss and prune correct classifications, if necessary
         if classification and not multilabel:
