@@ -35,7 +35,8 @@ setup(
           'seqeval',
           'packaging',
           'tensorflow_datasets',
-          'transformers'
+          'transformers',
+          'ipython'
           #'stellargraph>=0.8.2',
           #'eli5 >= 0.10.0',
           #'pillow'
