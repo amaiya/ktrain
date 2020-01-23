@@ -870,8 +870,9 @@ class Learner(ABC):
         if U.is_iter(val):
             if hasattr(val, 'reset'): val.reset()
             steps = np.ceil(U.nsamples_from_data(val)/val.batch_size)
-            return self.model.predict_generator(self._prepare(val, mode='valid'), 
+            result = self.model.predict_generator(self._prepare(val, mode='valid'), 
                                                 steps=steps)
+            return result
         else:
             return self.model.predict(val[0])
 
@@ -1364,13 +1365,19 @@ def _load_model(fname, preproc=None, train_data=None):
     if preproc and isinstance(preproc, TransformersPreprocessor):
         # note: with transformer models, fname is actually a directory
         model = preproc.model_type.from_pretrained(fname)
-        if preproc.multilabel:
-            loss_fn =  keras.losses.BinaryCrossentropy(from_logits=True)
+        if preproc.get_classes():
+            metrics = ['accuracy']
+            if preproc.multilabel:
+                loss_fn =  keras.losses.BinaryCrossentropy(from_logits=True)
+            else:
+                loss_fn = keras.losses.CategoricalCrossentropy(from_logits=True)
         else:
-            loss_fn = keras.losses.CategoricalCrossentropy(from_logits=True)
+                loss_fn = 'mse'
+                metrics = ['mae']
+
         model.compile(loss=loss_fn,
                       optimizer=keras.optimizers.Adam(learning_rate=3e-5, epsilon=1e-08),
-                      metrics=['accuracy'])
+                      metrics=metrics)
         return model
     elif (preproc and (isinstance(preproc, BERTPreprocessor) or \
                     type(preproc).__name__ == 'BERTPreprocessor')) or\

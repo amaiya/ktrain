@@ -18,7 +18,7 @@ __all__ = [
            'get_topic_model',
            'extract_filenames', 
            'load_text_files',
-           'Transformer'
+           'Transformer',
            ]
 
 
@@ -43,3 +43,4 @@ def load_topic_model(fname):
 
 
 
+seqlen_stats = Transformer.seqlen_stats

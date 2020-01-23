@@ -153,8 +153,15 @@ class TransformerTextClassLearner(GenLearner):
             val = self.val_data
         if val is None: raise Exception('val_data must be supplied to get_learner or predict')
         if hasattr(val, 'reset'): val.reset()
+        classification, multilabel = U.is_classifier(self.model)
         preds = self.model.predict(self._prepare(val, mode='valid'))
-        return activations.softmax(tf.convert_to_tensor(preds)).numpy()
+        if classification:
+            if multilabel:
+                return activations.sigmoid(tf.convert_to_tensor(preds)).numpy()
+            else:
+                return activations.softmax(tf.convert_to_tensor(preds)).numpy()
+        else:
+            return preds
 
 
     def save_model(self, fpath):

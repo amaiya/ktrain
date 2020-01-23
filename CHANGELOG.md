@@ -7,6 +7,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.9.0dev0 (TBD)
+
+### New:
+- enhanced `Transformer` API to support text regression
+
+### Changed:
+- `text.TextPreprocessor` prints sequence length statistics
+
+### Fixed:
+N/A
+
+
 ## 0.8.3 (2020-01-22)
 
 ### New:
