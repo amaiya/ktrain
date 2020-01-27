@@ -11,6 +11,7 @@ STANDARD_GRU = 'standard_gru'
 BERT = 'bert'
 DISTILBERT = tpp.DISTILBERT
 HUGGINGFACE_MODELS = [DISTILBERT]
+LINREG = 'linreg'
 TEXT_CLASSIFIERS = {
                     FASTTEXT: "a fastText-like model [http://arxiv.org/pdf/1607.01759.pdf]",
                     LOGREG:  "logistic regression using a trainable Embedding layer",
@@ -21,10 +22,23 @@ TEXT_CLASSIFIERS = {
                     DISTILBERT:  'distilled, smaller, and faster BERT from Hugging Face [https://arxiv.org/abs/1910.01108]',
                     } 
 
+TEXT_REGRESSION_MODELS = {
+                    FASTTEXT: "a fastText-like model [http://arxiv.org/pdf/1607.01759.pdf]",
+                    LINREG:  "linear text ression using a trainable Embedding layer",
+                    BIGRU:  'Bidirectional GRU with pretrained word vectors [https://arxiv.org/abs/1712.09405]',
+                    STANDARD_GRU: 'simple 2-layer GRU with randomly initialized embeddings',
+                    BERT:  'Bidirectional Encoder Representations from Transformers (BERT) [https://arxiv.org/abs/1810.04805]',
+                    DISTILBERT:  'distilled, smaller, and faster BERT from Hugging Face [https://arxiv.org/abs/1910.01108]',
+                    }
+
 
 
 def print_text_classifiers():
     for k,v in TEXT_CLASSIFIERS.items():
+        print("%s: %s" % (k,v))
+
+def print_text_regression_models():
+    for k,v in TEXT_REGRESSION_MODELS.items():
         print("%s: %s" % (k,v))
 
 
@@ -38,9 +52,9 @@ def calc_r(y_i, x, y):
     return np.log(calc_pr(y_i, x, y, True) / calc_pr(y_i, x, y, False))
 
 
-def text_classifier(name, train_data, preproc=None, multilabel=None, verbose=1):
+def _text_model(name, train_data, preproc=None, multilabel=None, classification=True, verbose=1):
     """
-    Build and return the default text classification model.
+    Build and return a text classification or text regression model.
 
     Args:
         name (string): one of:
@@ -50,15 +64,15 @@ def text_classifier(name, train_data, preproc=None, multilabel=None, verbose=1):
                       - 'bigru' for Bidirectional GRU with pretrained word vectors
                       - 'bert' for BERT Text Classification
                       - 'distilbert' for Hugging Face DistilBert model
-
-        train_data (tuple): a tuple of numpy.ndarrays: (x_train, y_train)
-        y_train can either be a list of integers representing classes
-        or one-hot-encoded
+        train_data (tuple): a tuple of numpy.ndarrays: (x_train, y_train) or ktrain.Dataset instance
+                            returned from one of the texts_from_* functions
         preproc: a ktrain.text.TextPreprocessor instance.
                  As of v0.8.0, this is required.
         multilabel (bool):  If True, multilabel model will be returned.
                             If false, binary/multiclass model will be returned.
                             If None, multilabel will be inferred from data.
+        classification(bool): If True, will build a text classificaton model.
+                              Otherwise, a text regression model will be returned.
         verbose (boolean): verbosity of output
     Return:
         model (Model): A Keras Model instance
@@ -86,56 +100,66 @@ def text_classifier(name, train_data, preproc=None, multilabel=None, verbose=1):
     if (is_huggingface and name not in HUGGINGFACE_MODELS) or (not is_huggingface and name in HUGGINGFACE_MODELS):
         raise ValueError('you are using a Hugging Face transformer model but did not preprocess as such (or vice versa)')
     if is_huggingface and preproc.name != name:
-        raise ValueError('you preprocessed for %s but want build a %s model' % (preproc.name, name))
-    
+        raise ValueError('you preprocessed for %s but want to build a %s model' % (preproc.name, name))
+ 
+    if not classification: # regression
+        metrics=['mae']
+        num_classes = 1
+        multilabel = False
+        loss_func = 'mse'
+        activation = None
+        max_features = preproc.max_features
+        features = None
+        maxlen = U.shape_from_data(train_data)[1]
+        U.vprint('maxlen is %s' % (maxlen), verbose=verbose)
+    else:                 # classification
+        metrics = ['accuracy']
+        # set number of classes and multilabel flag
+        num_classes = U.nclasses_from_data(train_data)
 
-    # set number of classes and multilabel flag
-    num_classes = U.nclasses_from_data(train_data)
+        # determine multilabel
+        if multilabel is None:
+            multilabel = U.is_multilabel(train_data)
+        if multilabel and name in [NBSVM, LOGREG]:
+            warnings.warn('switching to fasttext model, as data suggests '
+                          'multilabel classification from data.')
+            name = FASTTEXT
+        U.vprint("Is Multi-Label? %s" % (multilabel), verbose=verbose)
 
-    # determine multilabel
-    if multilabel is None:
-        multilabel = U.is_multilabel(train_data)
-    if multilabel and name in [NBSVM, LOGREG]:
-        warnings.warn('switching to fasttext model, as data suggests '
-                      'multilabel classification from data.')
-        name = FASTTEXT
-    U.vprint("Is Multi-Label? %s" % (multilabel), verbose=verbose)
+        # set loss and activations
+        loss_func = 'categorical_crossentropy'
+        activation = 'softmax'
+        if multilabel:
+            loss_func = 'binary_crossentropy'
+            activation = 'sigmoid'
 
-    # set loss and activations
-    loss_func = 'categorical_crossentropy'
-    activation = 'softmax'
-    if multilabel:
-        loss_func = 'binary_crossentropy'
-        activation = 'sigmoid'
+        # determine number of classes, maxlen, and max_features
+        max_features = preproc.max_features if preproc is not None else None
+        features = set()
+        if not is_bert and not is_huggingface:
+            U.vprint('compiling word ID features...', verbose=verbose)
+            x_train = train_data[0]
+            y_train = train_data[1]
+            if isinstance(y_train[0], int): raise ValueError('train labels should not be in sparse format')
 
-
-    # determine number of classes, maxlen, and max_features
-    max_features = preproc.max_features if preproc is not None else None
-    features = set()
-    if not is_bert and not is_huggingface:
-        U.vprint('compiling word ID features...', verbose=verbose)
-        x_train = train_data[0]
-        y_train = train_data[1]
-        if isinstance(y_train[0], int): raise ValueError('train labels should not be in sparse format')
-
-        for x in x_train:
-            features.update(x)
-        #max_features = len(features)
-        if max_features is None: 
-            max_features = max(features)+1
-            U.vprint('max_features is %s' % (max_features), verbose=verbose)
-    maxlen = U.shape_from_data(train_data)[1]
-    U.vprint('maxlen is %s' % (maxlen), verbose=verbose)
+            for x in x_train:
+                features.update(x)
+            #max_features = len(features)
+            if max_features is None: 
+                max_features = max(features)+1
+                U.vprint('max_features is %s' % (max_features), verbose=verbose)
+        maxlen = U.shape_from_data(train_data)[1]
+        U.vprint('maxlen is %s' % (maxlen), verbose=verbose)
 
 
     # return appropriate model
-    if name == LOGREG:
+    if name in [LOGREG, LINREG]:
         model =  _build_logreg(num_classes, 
                             maxlen,
                             max_features,
                             features,
                             loss_func=loss_func,
-                            activation=activation, verbose=verbose)
+                            activation=activation, metrics=metrics, verbose=verbose)
 
     elif name==FASTTEXT:
         model = _build_fasttext(num_classes, 
@@ -143,21 +167,21 @@ def text_classifier(name, train_data, preproc=None, multilabel=None, verbose=1):
                             max_features,
                             features,
                             loss_func=loss_func,
-                            activation=activation, verbose=verbose)
+                            activation=activation, metrics=metrics, verbose=verbose)
     elif name==STANDARD_GRU:
         model = _build_standard_gru(num_classes, 
                                     maxlen,
                                     max_features,
                                     features,
                                     loss_func=loss_func,
-                                    activation=activation, verbose=verbose)
+                                    activation=activation, metrics=metrics, verbose=verbose)
     elif name==NBSVM:
         model = _build_nbsvm(num_classes, 
                             maxlen,
                             max_features,
                             features,
                             loss_func=loss_func,
-                            activation=activation, verbose=verbose,
+                            activation=activation, metrics=metrics, verbose=verbose,
                             train_data=train_data)
 
     elif name==BIGRU:
@@ -167,7 +191,7 @@ def text_classifier(name, train_data, preproc=None, multilabel=None, verbose=1):
                             max_features,
                             features,
                             loss_func=loss_func,
-                            activation=activation, verbose=verbose,
+                            activation=activation, metrics=metrics, verbose=verbose,
                             tokenizer=tokenizer)
     elif name == BERT:
         model =  _build_bert(num_classes, 
@@ -175,7 +199,7 @@ def text_classifier(name, train_data, preproc=None, multilabel=None, verbose=1):
                             max_features,
                             features,
                             loss_func=loss_func,
-                            activation=activation, verbose=verbose,
+                            activation=activation, metrics=metrics, verbose=verbose,
                             preproc=preproc)
     elif name in HUGGINGFACE_MODELS:
         model =  _build_transformer(num_classes, 
@@ -183,7 +207,7 @@ def text_classifier(name, train_data, preproc=None, multilabel=None, verbose=1):
                                    max_features,
                                    features,
                                    loss_func=loss_func,
-                                   activation=activation, verbose=verbose,
+                                   activation=activation, metrics=metrics, verbose=verbose,
                                    preproc=preproc)
 
     else:
@@ -196,7 +220,7 @@ def text_classifier(name, train_data, preproc=None, multilabel=None, verbose=1):
 def _build_logreg(num_classes,
                   maxlen, max_features, features,
                  loss_func='categorical_crossentropy',
-                 activation = 'softmax', verbose=1):
+                 activation = 'softmax', metrics=['accuracy'], verbose=1):
 
     embedding_matrix = np.ones((max_features, 1))
     embedding_matrix[0] = 0
@@ -209,18 +233,18 @@ def _build_logreg(num_classes,
                   embeddings_initializer='glorot_normal')(inp)
     x = dot([x,r], axes=1)
     x = Flatten()(x)
-    x = Activation(activation)(x)
+    if activation: x = Activation(activation)(x)
     model = Model(inputs=inp, outputs=x)
     model.compile(loss=loss_func,
                   optimizer=U.DEFAULT_OPT,
-                  metrics=['accuracy'])
+                  metrics=metrics)
     return model
 
 
 def _build_bert(num_classes,
                 maxlen, max_features, features,
                loss_func='categorical_crossentropy',
-               activation = 'softmax', verbose=1,
+               activation = 'softmax', metrics=['accuracy'],  verbose=1,
                preproc=None):
     if preproc is None: raise ValueError('preproc is missing')
     lang = preproc.lang
@@ -240,14 +264,14 @@ def _build_bert(num_classes,
     model = Model(inputs, outputs)
     model.compile(loss=loss_func,
                   optimizer=U.DEFAULT_OPT,
-                  metrics=['accuracy'])
+                  metrics=metrics)
     return model
 
 
 def _build_transformer(num_classes,
                       maxlen, max_features, features,
                       loss_func='categorical_crossentropy',
-                      activation = 'softmax', verbose=1,
+                      activation = 'softmax', metrics=['accuracy'],  verbose=1,
                       preproc=None):
     if not isinstance(preproc, tpp.TransformersPreprocessor): 
         raise ValueError('preproc must be instance of %s' % (str(tpp.TransformersPreprocessor)))
@@ -258,7 +282,7 @@ def _build_transformer(num_classes,
                  'binary_crossentropy': keras.losses.BinaryCrossentropy(from_logits=True)}
     model.compile(loss=loss_map[loss_func],
                   optimizer=keras.optimizers.Adam(learning_rate=3e-5, epsilon=1e-08),
-                  metrics=['accuracy'])
+                  metrics=metrics)
     return model
 
 
@@ -267,7 +291,7 @@ def _build_transformer(num_classes,
 def _build_nbsvm(num_classes,
                  maxlen, max_features, features,
                  loss_func='categorical_crossentropy',
-                 activation = 'softmax', verbose=1, train_data=None):
+                 activation = 'softmax', metrics=['accuracy'], verbose=1, train_data=None):
     if train_data is None: raise ValueError('train_data is required')
     x_train = train_data[0]
     y_train = train_data[1]
@@ -317,14 +341,14 @@ def _build_nbsvm(num_classes,
     model = Model(inputs=inp, outputs=x)
     model.compile(loss=loss_func,
                   optimizer=U.DEFAULT_OPT,
-                  metrics=['accuracy'])
+                  metrics=metrics)
     return model
 
 
 def _build_fasttext(num_classes,
                  maxlen, max_features, features,
                  loss_func='categorical_crossentropy',
-                 activation = 'softmax', verbose=1):
+                 activation = 'softmax', metrics=['accuracy'],  verbose=1):
 
     model = Sequential()
     model.add(Embedding(max_features, 64, input_length=maxlen))
@@ -334,7 +358,7 @@ def _build_fasttext(num_classes,
     model.add(Dense(64, activation='relu', kernel_initializer='he_normal'))
     model.add(Dropout(0.5))
     model.add(Dense(num_classes, activation=activation))
-    model.compile(loss=loss_func, optimizer=U.DEFAULT_OPT, metrics=['accuracy'])
+    model.compile(loss=loss_func, optimizer=U.DEFAULT_OPT, metrics=metrics)
 
     return model
 
@@ -342,13 +366,13 @@ def _build_fasttext(num_classes,
 def _build_standard_gru(num_classes,
                  maxlen, max_features, features,
                  loss_func='categorical_crossentropy',
-                 activation = 'softmax', verbose=1):
+                 activation = 'softmax', metrics=['accuracy'], verbose=1):
     model = Sequential()
     model.add(Embedding(max_features, 256, input_length = maxlen))
     model.add(GRU(256, dropout=0.9, return_sequences=True))
     model.add(GRU(256, dropout=0.9))
     model.add(Dense(num_classes, activation=activation))
-    model.compile(loss=loss_func, optimizer=U.DEFAULT_OPT, metrics=['accuracy'])
+    model.compile(loss=loss_func, optimizer=U.DEFAULT_OPT, metrics=metrics)
     return model
 
 
@@ -356,7 +380,7 @@ def _build_standard_gru(num_classes,
 def _build_bigru(num_classes,
                   maxlen, max_features, features,
                  loss_func='categorical_crossentropy',
-                 activation = 'softmax', verbose=1,
+                 activation = 'softmax', metrics=['accuracy'], verbose=1,
                  tokenizer=None):
 
 
@@ -388,8 +412,66 @@ def _build_bigru(num_classes,
     model = Model(inputs=inp, outputs=outp)
     model.compile(loss=loss_func,
                   optimizer=U.DEFAULT_OPT,
-                  metrics=['accuracy'])
+                  metrics=metrics)
     return model
 
 
 
+def text_classifier(name, train_data, preproc=None, multilabel=None, verbose=1):
+    """
+    Build and return a text classification model.
+
+    Args:
+        name (string): one of:
+                      - 'fasttext' for FastText model
+                      - 'nbsvm' for NBSVM model  
+                      - 'logreg' for logistic regression using embedding layers
+                      - 'bigru' for Bidirectional GRU with pretrained word vectors
+                      - 'bert' for BERT Text Classification
+                      - 'distilbert' for Hugging Face DistilBert model
+
+        train_data (tuple): a tuple of numpy.ndarrays: (x_train, y_train) or ktrain.Dataset instance
+                            returned from one of the texts_from_* functions
+        preproc: a ktrain.text.TextPreprocessor instance.
+                 As of v0.8.0, this is required.
+        multilabel (bool):  If True, multilabel model will be returned.
+                            If false, binary/multiclass model will be returned.
+                            If None, multilabel will be inferred from data.
+        verbose (boolean): verbosity of output
+    Return:
+        model (Model): A Keras Model instance
+    """
+    if name not in TEXT_CLASSIFIERS:
+        raise ValueError('invalid name for text classification: %s' % (name)) 
+    if not preproc.get_classes():
+        raise ValueError('preproc.get_classes() is empty, but required for text classification')
+    return _text_model(name, train_data, preproc=preproc,
+                       multilabel=multilabel, classification=True, verbose=verbose)
+
+
+def text_regression_model(name, train_data, preproc=None, verbose=1):
+    """
+    Build and return a text regression model.
+
+    Args:
+        name (string): one of:
+                      - 'fasttext' for FastText model
+                      - 'nbsvm' for NBSVM model  
+                      - 'linreg' for linear regression using embedding layers
+                      - 'bigru' for Bidirectional GRU with pretrained word vectors
+                      - 'bert' for BERT Text Classification
+                      - 'distilbert' for Hugging Face DistilBert model
+
+        train_data (tuple): a tuple of numpy.ndarrays: (x_train, y_train)
+        preproc: a ktrain.text.TextPreprocessor instance.
+                 As of v0.8.0, this is required.
+        verbose (boolean): verbosity of output
+    Return:
+        model (Model): A Keras Model instance
+    """
+    if name not in TEXT_REGRESSION_MODELS:
+        raise ValueError('invalid name for text classification: %s' % (name) )
+    if preproc.get_classes():
+        raise ValueError('preproc.get_classes() is supposed to be empty for text regression tasks')
+    return _text_model(name, train_data, preproc=preproc,
+                      multilabel=False, classification=False,  verbose=verbose)

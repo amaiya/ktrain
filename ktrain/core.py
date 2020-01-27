@@ -386,8 +386,8 @@ class Learner(ABC):
 
 
 
-    def lr_find(self, start_lr=1e-7, lr_mult=1.01, max_epochs=None,
-                show_plot=False, verbose=1):
+    def lr_find(self, start_lr=1e-7, lr_mult=1.01, max_epochs=None, 
+                stop_factor=4, show_plot=False, verbose=1):
         """
         Plots loss as learning rate is increased.  Highest learning rate 
         corresponding to a still falling loss should be chosen.
@@ -409,6 +409,13 @@ class Learner(ABC):
                              Ignored if max_epochs is supplied.
             max_epochs (int):  maximum number of epochs to simulate.
                                lr_mult is ignored if max_epoch is supplied.
+                               Default is None. Set max_epochs to an integer
+                               (e.g., 5) if lr_find is taking too long
+                               and running for more epochs than desired.
+            stop_factor(int): factor used to determine threhsold that loss 
+                              must exceed to stop training simulation.
+                              Increase this if loss is erratic and lr_find
+                              exits too early.
             show_plot (bool):  If True, automatically invoke lr_plot
             verbose (bool): specifies how much output to print
         Returns:
@@ -445,7 +452,7 @@ class Learner(ABC):
 
         try:
             # track and plot learning rates
-            self.lr_finder = LRFinder(self.model)
+            self.lr_finder = LRFinder(self.model, stop_factor=stop_factor)
             self.lr_finder.find(self._prepare(self.train_data), 
                                 steps_per_epoch,
                                 use_gen=use_gen,

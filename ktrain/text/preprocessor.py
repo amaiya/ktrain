@@ -38,24 +38,6 @@ def fname_from_url(url):
     return os.path.split(url)[-1]
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #------------------------------------------------------------------------------
 # Word Vectors
 #------------------------------------------------------------------------------
@@ -432,7 +414,11 @@ class TextPreprocessor(Preprocessor):
         """
         counts = []
         for text in list_of_texts:
-            counts.append(len(text.split()))
+            if isinstance(text, (list, np.ndarray)):
+                lst = text
+            else:
+                lst = text.split()
+            counts.append(len(lst))
         p95 = np.percentile(counts, 95)
         p99 = np.percentile(counts, 99)
         avg = sum(counts)/len(counts)
@@ -448,6 +434,21 @@ class TextPreprocessor(Preprocessor):
             print( "%s sequence lengths:" % mode)
             for k in stat_dict:
                 print("\t%s : %s" % (k, int(round(stat_dict[k]))))
+
+
+    def _transform_y(self, y_data):
+        """
+        preprocess y
+        If shape of y is 1, then task is considered classification if self.c exists
+        or regression if not.
+        """
+        if y_data is None: return y_data
+        # if shape is 1, this is either a classification or regression task 
+        # depending on class_names existing
+        y_data = np.array(y_data) if type(y_data) == list else y_data
+        y_data = to_categorical(y_data) if len(y_data.shape) == 1 and self.get_classes() else y_data
+        return y_data
+
 
 
 
@@ -503,25 +504,19 @@ class StandardTextPreprocessor(TextPreprocessor):
         # convert to word IDs
         x_train = self.tok.texts_to_sequences(train_text)
         U.vprint('{} train sequences'.format(len(x_train)), verbose=verbose)
-        sequence_lengths = list(map(len, x_train))
-        U.vprint('Average train sequence length: {}'.format(np.mean(sequence_lengths, dtype=int)), 
-                verbose=verbose)
-        U.vprint('95th percentile train sequence length: {}'.format(np.percentile(sequence_lengths, 95)), 
-                verbose=verbose)
-        U.vprint('99th percentile train sequence length: {}'.format(np.percentile(sequence_lengths, 99)), 
-                verbose=verbose)
+        self.print_seqlen_stats(x_train, 'train', verbose=verbose)
 
         # add ngrams
         x_train = self._fit_ngrams(x_train, verbose=verbose)
 
         # pad sequences
         x_train = sequence.pad_sequences(x_train, maxlen=self.maxlen)
+        U.vprint('x_train shape: ({},{})'.format(x_train.shape[0], x_train.shape[1]), verbose=verbose)
 
         # transform y
-        if len(y_train.shape) == 1:
-            y_train = to_categorical(y_train)
-        U.vprint('x_train shape: ({},{})'.format(x_train.shape[0], x_train.shape[1]), verbose=verbose)
-        U.vprint('y_train shape: ({},{})'.format(y_train.shape[0], y_train.shape[1]), verbose=verbose)
+        y_train = self._transform_y(y_train)
+        if y_train is not None and verbose:
+            print('y_train shape: %s' % (y_train.shape))
 
         # return
         result =  (x_train, y_train)
@@ -542,13 +537,7 @@ class StandardTextPreprocessor(TextPreprocessor):
         # convert to word IDs
         x_test = self.tok.texts_to_sequences(test_text)
         U.vprint('{} test sequences'.format(len(x_test)), verbose=verbose)
-        sequence_lengths = list(map(len, x_test))
-        U.vprint('Average test sequence length: {}'.format(np.mean(sequence_lengths, 
-                                                                 dtype=int)), verbose=verbose)
-        U.vprint('95th percentile test sequence length: {}'.format(np.percentile(sequence_lengths, 95)), 
-                  verbose=verbose)
-        U.vprint('99th percentile test sequence length: {}'.format(np.percentile(sequence_lengths, 99)), 
-                  verbose=verbose)
+        self.print_seqlen_stats(x_test, 'test', verbose=verbose)
 
         # add n-grams
         x_test = self._add_ngrams(x_test, mode='test', verbose=verbose)
@@ -558,11 +547,11 @@ class StandardTextPreprocessor(TextPreprocessor):
         x_test = sequence.pad_sequences(x_test, maxlen=self.maxlen)
         U.vprint('x_test shape: ({},{})'.format(x_test.shape[0], x_test.shape[1]), verbose=verbose)
 
-        # convert y
-        if y_test is not None:
-            if len(y_test.shape) == 1:
-                y_test = to_categorical(y_test)
-            U.vprint('y_test shape: ({},{})'.format(y_test.shape[0], y_test.shape[1]), verbose=verbose)
+        # transform y
+        y_test = self._transform_y(y_test)
+        if y_test is not None and verbose:
+            print('y_test shape: %s' % (y_test.shape))
+
 
         # return
         return (x_test, y_test)
@@ -615,6 +604,7 @@ class StandardTextPreprocessor(TextPreprocessor):
             new_sequences.append(new_list)
         U.vprint('Average {} sequence length with ngrams: {}'.format(mode,
             np.mean(list(map(len, new_sequences)), dtype=int)), verbose=verbose)    
+        self.print_seqlen_stats(new_sequences, '%s (w/ngrams)' % mode, verbose=verbose)
         return new_sequences
 
 
@@ -690,10 +680,9 @@ class BERTPreprocessor(TextPreprocessor):
         U.vprint('language: %s' % (self.lang), verbose=verbose)
 
         x = bert_tokenize(texts, self.tok, self.maxlen, verbose=verbose)
-        if y is not None:
-            if len(y.shape) == 1:
-                y = to_categorical(y)
-            #U.vprint('\ty shape: ({},{})'.format(y.shape[0], y.shape[1]), verbose=verbose)
+
+        # transform y
+        y = self._transform_y(y)
         result = (x, y)
         self.set_multilabel(result, mode)
         return result
@@ -763,14 +752,12 @@ class TransformersPreprocessor(TextPreprocessor):
         U.vprint('language: %s' % (self.lang), verbose=verbose)
         self.print_seqlen_stats(texts, mode, verbose=verbose)
 
+        # transform y
         if y is None and mode == 'train':
             raise ValueError('y is required for training sets')
         elif y is None:
             y = np.array([1] * len(texts))
-        if y is not None:
-            if len(y.shape) == 1 and self.get_classes():
-                y = to_categorical(y)
-
+        y = self._transform_y(y)
         dataset = hf_convert_examples(texts, y=y, tokenizer=self.tok, max_length=self.maxlen,
                                       pad_on_left=bool(self.name in ['xlnet']),
                                       pad_token=self.tok.convert_tokens_to_ids([self.tok.pad_token][0]),
@@ -891,7 +878,7 @@ class Transformer(TransformersPreprocessor):
     def get_classifier(self):
         if not self.get_classes():
             warnings.warn('no class labels were provided - treating as regression')
-            return self.get_regressor()
+            return self.get_regression_model()
         num_labels = len(self.get_classes())
         model = self.model_type.from_pretrained(self.model_name, num_labels=num_labels)
         if self.multilabel:
@@ -904,7 +891,7 @@ class Transformer(TransformersPreprocessor):
         return model
 
 
-    def get_regressor(self):
+    def get_regression_model(self):
         if self.get_classes():
             warnings.warn('class labels were provided - treating as classification problem')
             return self.get_classifier()
@@ -918,7 +905,7 @@ class Transformer(TransformersPreprocessor):
 
     def get_model(self):
         if not self.get_classes():
-            return self.get_regressor()
+            return self.get_regression_model()
         else:
             return self.get_classifier()
 

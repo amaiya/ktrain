@@ -13,11 +13,11 @@ class Dataset(Sequence):
     def __getitem__(self, idx):
         raise NotImplemented
 
-    # required: used by Learner instances
+    # required: used by ktrain.core.Learner instances
     def nsamples(self):
         raise NotImplemented
 
-    # required: used by Learner instances
+    # required: used by ktrain.core.Learner instances
     def get_y(self):
         raise NotImplemented
 
@@ -27,14 +27,28 @@ class Dataset(Sequence):
 
     # optional
     def ondisk(self):
+        """
+        Is data being read from disk like with DirectoryIterators?
+        """
         return False
 
     # optional: used only if invoking *_classifier functions
     def xshape(self):
+        """
+        shape of X
+        Examples:
+            for images: input_shape
+            for text: (n_example, sequence_length)
+        """
         raise NotImplemented
     
     # optional: used only if invoking *_classifier functions
     def nclasses(self):
+        """
+        Number of classes
+        For classification problems: this is the number of labels
+        Not used for regression problems
+        """
         raise NotImplemented
 
 
