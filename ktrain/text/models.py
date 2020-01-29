@@ -24,7 +24,7 @@ TEXT_CLASSIFIERS = {
 
 TEXT_REGRESSION_MODELS = {
                     FASTTEXT: "a fastText-like model [http://arxiv.org/pdf/1607.01759.pdf]",
-                    LINREG:  "linear text ression using a trainable Embedding layer",
+                    LINREG:  "linear text regression using a trainable Embedding layer",
                     BIGRU:  'Bidirectional GRU with pretrained word vectors [https://arxiv.org/abs/1712.09405]',
                     STANDARD_GRU: 'simple 2-layer GRU with randomly initialized embeddings',
                     BERT:  'Bidirectional Encoder Representations from Transformers (BERT) [https://arxiv.org/abs/1810.04805]',

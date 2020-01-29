@@ -54,7 +54,7 @@ class Dataset(Sequence):
 
 
 class MultiArrayDataset(Dataset):
-    def __init__(self, x, y, batch_size=32):
+    def __init__(self, x, y, batch_size=32, shuffle=True):
         # error checks
         err = False
         if type(x) == np.ndarray and len(x.shape) != 2: err = True
@@ -76,6 +76,7 @@ class MultiArrayDataset(Dataset):
         self.x, self.y = x, y
         self.indices = np.arange(self.x[0].shape[0])
         self.n_inputs = len(x)
+        self.shuffle = shuffle
 
 
     def __len__(self):
@@ -96,7 +97,7 @@ class MultiArrayDataset(Dataset):
         return self.y
 
     def on_epoch_end(self):
-        np.random.shuffle(self.indices)
+        if self.shuffle: np.random.shuffle(self.indices)
 
     def xshape(self):
         return self.x[0].shape
