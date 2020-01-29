@@ -489,6 +489,8 @@ class StandardTextPreprocessor(TextPreprocessor):
         """
         preprocess training set
         """
+        if self.lang is None: self.lang = detect_lang(train_text)
+
 
         U.vprint('language: %s' % (self.lang), verbose=verbose)
 
@@ -676,6 +678,7 @@ class BERTPreprocessor(TextPreprocessor):
         """
         if mode == 'train' and y is None:
             raise ValueError('y is required when mode=train')
+        if self.lang is None and mode=='train': self.lang = detect_lang(texts)
         U.vprint('preprocessing %s...' % (mode), verbose=verbose)
         U.vprint('language: %s' % (self.lang), verbose=verbose)
 
@@ -749,6 +752,7 @@ class TransformersPreprocessor(TextPreprocessor):
         preprocess training set
         """
         U.vprint('preprocessing %s...' % (mode), verbose=verbose)
+        if self.lang is None and mode=='train': self.lang = detect_lang(texts)
         U.vprint('language: %s' % (self.lang), verbose=verbose)
         self.print_seqlen_stats(texts, mode, verbose=verbose)
 
