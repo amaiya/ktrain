@@ -279,7 +279,8 @@ def _build_transformer(num_classes,
     model = preproc.model_type.from_pretrained(preproc.model_name, num_labels=num_classes)
     # Hugging Face models require from_logits=True
     loss_map =  {'categorical_crossentropy': keras.losses.CategoricalCrossentropy(from_logits=True),
-                 'binary_crossentropy': keras.losses.BinaryCrossentropy(from_logits=True)}
+                 'binary_crossentropy': keras.losses.BinaryCrossentropy(from_logits=True), 
+                 'mse': 'mse'}
     model.compile(loss=loss_map[loss_func],
                   optimizer=keras.optimizers.Adam(learning_rate=3e-5, epsilon=1e-08),
                   metrics=metrics)
