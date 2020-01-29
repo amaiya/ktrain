@@ -3,6 +3,7 @@
 This directory contains various example notebooks using *ktrain*.  The directory currently has three folders:
 - `text`:  
   - [text classification](#textclass): examples using various text classification models and datasets
+  - [text regression](#textregression): example for predicting continuous value purely from text
   - [text sequence labeling](#seqlab):  sequence tagging models
   - [topic modeling](#lda):  unsupervised learning from unlabeled text data
   - [document similarity with one-class learning](#docsim): given a sample of interesting documents, find and score new documents that are semantically similar to it using One-Class text classification
@@ -62,6 +63,16 @@ to categorize each text comment into one or more categories of toxic online beha
 Dataset is in the form of a CSV file.
 - [toxic_comments-fasttext.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text):  A fasttext-like model applied in a multi-label setting.
 - [toxic_comments-bigru.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text):  A bidirectional GRU using pretrained Glove vectors. This example shows how to use pretreained word vectors using *ktrain*.
+
+
+### <a name="textregression"></a>Text Regression Datasets
+
+#### [Wine Prices](https://www.floydhub.com/floydhub/datasets/wine-reviews/1/wine_data.csv):  Text Regression
+
+This dataset consists of prices of various wines along with textual descriptions of the wine.
+We will attempt to predict the price of a wine based purely on its text description.
+- [text_regression_example.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text):  Using an Embedding-based implementation of linear regression to predict wine prices from text column.
+
 
 
 ### <a name="seqlab"></a> Sequence Labeling Datasets

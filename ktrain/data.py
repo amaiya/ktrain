@@ -13,11 +13,11 @@ class Dataset(Sequence):
     def __getitem__(self, idx):
         raise NotImplemented
 
-    # required: used by Learner instances
+    # required: used by ktrain.core.Learner instances
     def nsamples(self):
         raise NotImplemented
 
-    # required: used by Learner instances
+    # required: used by ktrain.core.Learner instances
     def get_y(self):
         raise NotImplemented
 
@@ -27,20 +27,34 @@ class Dataset(Sequence):
 
     # optional
     def ondisk(self):
+        """
+        Is data being read from disk like with DirectoryIterators?
+        """
         return False
 
     # optional: used only if invoking *_classifier functions
     def xshape(self):
+        """
+        shape of X
+        Examples:
+            for images: input_shape
+            for text: (n_example, sequence_length)
+        """
         raise NotImplemented
     
     # optional: used only if invoking *_classifier functions
     def nclasses(self):
+        """
+        Number of classes
+        For classification problems: this is the number of labels
+        Not used for regression problems
+        """
         raise NotImplemented
 
 
 
 class MultiArrayDataset(Dataset):
-    def __init__(self, x, y, batch_size=32):
+    def __init__(self, x, y, batch_size=32, shuffle=True):
         # error checks
         err = False
         if type(x) == np.ndarray and len(x.shape) != 2: err = True
@@ -62,6 +76,7 @@ class MultiArrayDataset(Dataset):
         self.x, self.y = x, y
         self.indices = np.arange(self.x[0].shape[0])
         self.n_inputs = len(x)
+        self.shuffle = shuffle
 
 
     def __len__(self):
@@ -82,7 +97,7 @@ class MultiArrayDataset(Dataset):
         return self.y
 
     def on_epoch_end(self):
-        np.random.shuffle(self.indices)
+        if self.shuffle: np.random.shuffle(self.indices)
 
     def xshape(self):
         return self.x[0].shape

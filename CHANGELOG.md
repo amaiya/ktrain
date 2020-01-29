@@ -7,6 +7,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.9.0 (2020-01-31)
+
+### New:
+- support for out-of-the-box text regression in both the `Transformer` API and conventional API (i.e., `text.text_regression_model`).
+
+### Changed:
+- `text.TextPreprocessor` prints sequence length statistics
+
+### Fixed:
+- auto-detect language when using `Transformer` class to prevent printing `en` as default
+
+
 ## 0.8.3 (2020-01-22)
 
 ### New:

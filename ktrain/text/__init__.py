@@ -7,8 +7,8 @@ from .textutils import extract_filenames, load_text_files, filter_by_id
 from .preprocessor import Transformer
 
 __all__ = [
-           'text_classifier', 
-           'print_text_classifiers'
+           'text_classifier', 'text_regression_model',
+           'print_text_classifiers', 'print_text_regression_models',
            'texts_from_folder', 'texts_from_csv',
            'entities_from_gmb',
            'entities_from_conll2003',
@@ -18,7 +18,7 @@ __all__ = [
            'get_topic_model',
            'extract_filenames', 
            'load_text_files',
-           'Transformer'
+           'Transformer',
            ]
 
 
@@ -43,3 +43,4 @@ def load_topic_model(fname):
 
 
 
+seqlen_stats = Transformer.seqlen_stats

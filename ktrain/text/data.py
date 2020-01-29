@@ -133,6 +133,9 @@ def texts_from_csv(train_filepath,
     one-hot-encoded arrays representing classes:
          classification (a single one in each array): [[1,0,0], [0,1,0]]]
          multi-label classification (one more ones in each array): [[1,1,0], [0,1,1]]
+    This treats task as classification problem.  
+    If data is for a text regression task, use texts_from_array.
+
     Args:
         train_filepath(str): file path to training CSV
         text_column(str): name of column containing the text
@@ -195,6 +198,8 @@ def texts_from_df(train_df,
     one-hot-encoded arrays representing classes:
          classification (a single one in each array): [[1,0,0], [0,1,0]]]
          multi-label classification (one more ones in each array): [[1,1,0], [0,1,1]]
+    This treats task as classification problem.  
+    If this is a text regression task, use texts_from_array.
     Args:
         train_df(dataframe): Pandas dataframe
         text_column(str): name of column containing the text
@@ -263,11 +268,21 @@ def texts_from_array(x_train, y_train, x_test=None, y_test=None,
                    verbose=1):
     """
     Loads and preprocesses text data from arrays.
+    texts_from_array can handle data for both text classification
+    and text regression.  If class_names is empty, a regression task is assumed.
     Args:
         x_train(list): list of training texts 
-        y_train(list): list of integers representing classes
+        y_train(list): labels in one of the following forms:
+                       1. list of integers representing classes (class_names is required)
+                       2. list of strings representing classes (class_names is required)
+                       3. a one or multi hot encoded array representing classes (class_names is required)
+                       4. numerical values for text regresssion (class_names should be left empty)
         x_val(list): list of training texts 
-        y_val(list): list of integers representing classes
+        y_val(list): labels in one of the following forms:
+                      1. list of integers representing classes (class_names is required)
+                      2. list of strings representing classes (class_names is required)
+                      3. a one or multi hot encoded array representing classes (class_names is required)
+                      4. numerical values for text regression (class_names should be left empty)
         class_names (list): list of strings representing class labels
                             shape should be (num_examples,1) or (num_examples,)
         max_features(int): max num of words to consider in vocabulary
@@ -286,16 +301,28 @@ def texts_from_array(x_train, y_train, x_test=None, y_test=None,
         verbose (boolean): verbosity
     """
 
-    if not class_names:
-        classes =  list(set(y_train))
-        classes.sort()
-        class_names = ["%s" % (c) for c in classes]
+    if not class_names and verbose:
+        #classes =  list(set(y_train))
+        #classes.sort()
+        #class_names = ["%s" % (c) for c in classes]
+        print('task: text regression (supply class_names argument if this is supposed to be classification task)')
+    else:
+        print('task: text classification')
+
     if x_test is None or y_test is None:
         x_train, x_test, y_train, y_test = train_test_split(x_train, y_train, 
                                                             test_size=val_pct,
                                                             random_state=random_state)
-    y_train = to_categorical(y_train)
-    y_test = to_categorical(y_test)
+
+    # convert string labels to integers, if necessary
+    if isinstance(y_train[0], str):
+        if not isinstance(y_test[0], str): 
+            raise ValueError('y_train contains strings, but y_test does not')
+        from sklearn.preprocessing import LabelEncoder
+        encoder = LabelEncoder()
+        encoder.fit(y_train)
+        y_train = encoder.transform(y_train)
+        y_test = encoder.transform(y_test)
 
 
     # detect language
