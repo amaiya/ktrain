@@ -16,7 +16,7 @@ Most recent releases are shown at the top. Each release shows:
 - `text.TextPreprocessor` prints sequence length statistics
 
 ### Fixed:
-N/A
+- auto-detect language when using `Transformer` class to prevent printing `en` as default
 
 
 ## 0.8.3 (2020-01-22)
