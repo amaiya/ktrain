@@ -518,7 +518,7 @@ class StandardTextPreprocessor(TextPreprocessor):
         # transform y
         y_train = self._transform_y(y_train)
         if y_train is not None and verbose:
-            print('y_train shape: %s' % (y_train.shape))
+            print('y_train shape: %s' % (y_train.shape,))
 
         # return
         result =  (x_train, y_train)
@@ -552,7 +552,7 @@ class StandardTextPreprocessor(TextPreprocessor):
         # transform y
         y_test = self._transform_y(y_test)
         if y_test is not None and verbose:
-            print('y_test shape: %s' % (y_test.shape))
+            print('y_test shape: %s' % (y_test.shape,))
 
 
         # return
