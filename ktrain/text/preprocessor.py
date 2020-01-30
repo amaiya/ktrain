@@ -834,6 +834,7 @@ class Transformer(TransformersPreprocessor):
                          maxlen, max_features=10000, classes=classes, multilabel=multilabel)
         self.batch_size = batch_size
         self.use_with_learner = use_with_learner
+        self.lang = None
 
 
     def preprocess_train(self, texts, y=None, mode='train', verbose=1):
