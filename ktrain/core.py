@@ -386,8 +386,8 @@ class Learner(ABC):
 
 
 
-    def lr_find(self, start_lr=1e-7, lr_mult=1.01, max_epochs=None,
-                show_plot=False, verbose=1):
+    def lr_find(self, start_lr=1e-7, lr_mult=1.01, max_epochs=None, 
+                stop_factor=4, show_plot=False, verbose=1):
         """
         Plots loss as learning rate is increased.  Highest learning rate 
         corresponding to a still falling loss should be chosen.
@@ -409,6 +409,13 @@ class Learner(ABC):
                              Ignored if max_epochs is supplied.
             max_epochs (int):  maximum number of epochs to simulate.
                                lr_mult is ignored if max_epoch is supplied.
+                               Default is None. Set max_epochs to an integer
+                               (e.g., 5) if lr_find is taking too long
+                               and running for more epochs than desired.
+            stop_factor(int): factor used to determine threhsold that loss 
+                              must exceed to stop training simulation.
+                              Increase this if loss is erratic and lr_find
+                              exits too early.
             show_plot (bool):  If True, automatically invoke lr_plot
             verbose (bool): specifies how much output to print
         Returns:
@@ -445,7 +452,7 @@ class Learner(ABC):
 
         try:
             # track and plot learning rates
-            self.lr_finder = LRFinder(self.model)
+            self.lr_finder = LRFinder(self.model, stop_factor=stop_factor)
             self.lr_finder.find(self._prepare(self.train_data), 
                                 steps_per_epoch,
                                 use_gen=use_gen,
@@ -870,8 +877,9 @@ class Learner(ABC):
         if U.is_iter(val):
             if hasattr(val, 'reset'): val.reset()
             steps = np.ceil(U.nsamples_from_data(val)/val.batch_size)
-            return self.model.predict_generator(self._prepare(val, mode='valid'), 
+            result = self.model.predict_generator(self._prepare(val, mode='valid'), 
                                                 steps=steps)
+            return result
         else:
             return self.model.predict(val[0])
 
@@ -1364,13 +1372,19 @@ def _load_model(fname, preproc=None, train_data=None):
     if preproc and isinstance(preproc, TransformersPreprocessor):
         # note: with transformer models, fname is actually a directory
         model = preproc.model_type.from_pretrained(fname)
-        if preproc.multilabel:
-            loss_fn =  keras.losses.BinaryCrossentropy(from_logits=True)
+        if preproc.get_classes():
+            metrics = ['accuracy']
+            if preproc.multilabel:
+                loss_fn =  keras.losses.BinaryCrossentropy(from_logits=True)
+            else:
+                loss_fn = keras.losses.CategoricalCrossentropy(from_logits=True)
         else:
-            loss_fn = keras.losses.CategoricalCrossentropy(from_logits=True)
+                loss_fn = 'mse'
+                metrics = ['mae']
+
         model.compile(loss=loss_fn,
                       optimizer=keras.optimizers.Adam(learning_rate=3e-5, epsilon=1e-08),
-                      metrics=['accuracy'])
+                      metrics=metrics)
         return model
     elif (preproc and (isinstance(preproc, BERTPreprocessor) or \
                     type(preproc).__name__ == 'BERTPreprocessor')) or\

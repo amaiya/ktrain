@@ -54,6 +54,7 @@ class TextPredictor(Predictor):
                 preds = activations.softmax(tf.convert_to_tensor(preds)).numpy()
             else:
                 preds = np.squeeze(preds)
+                if len(preds.shape) == 0: preds = np.expand_dims(preds, -1)
         result =  preds if return_proba or not self.c else [self.c[np.argmax(pred)] for pred in preds] 
         if multilabel:
             result =  [list(zip(self.c, r)) for r in result]
@@ -80,6 +81,9 @@ class TextPredictor(Predictor):
             all_targets(bool):  If True, show visualization for
                                 each target.
         """
+        if not self.c:
+            warnings.warn('currently_unsupported:  explain does not support text regression')
+            return
         try:
             import eli5
             from eli5.lime import TextExplainer
