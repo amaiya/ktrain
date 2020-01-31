@@ -2,6 +2,23 @@ from .imports import *
 
 
 class Dataset(Sequence):
+    """
+    Base class for custom datasets in ktrain.
+
+    Subclasses can either wrap datasets as a keras.utils.Sequence
+    instance or implement a to_tfdataset method. For an example
+    of the former, see the MultiArrayDataset example below. 
+    For the latter, if subclass of Dataset implements a method to to_tfdataset
+    that converts the data to a tf.Dataset, then this will be
+    invoked by Learner instances just prior to training so
+    fit() will train using a tf.Dataset representation of your data.
+
+    The signature of to_tfdataset is as follows:
+
+    def to_tfdataset(self, shuffle=True, repeat=True)
+
+    See ktrain.text.preprocess.TransformerDataset as an example.
+    """
     def __init__(self, batch_size=32):
         self.batch_size = batch_size
 

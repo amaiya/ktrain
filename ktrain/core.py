@@ -646,7 +646,17 @@ class Learner(ABC):
           data:  dataset
           mode: either 'train' or 'valid'
         """
-        return data
+        if data is None: return None
+
+        if hasattr(data, 'to_tfdataset'):
+            shuffle=True
+            repeat = True
+            if mode != 'train':
+                shuffle = False
+                repeat = False
+            return data.to_tfdataset(shuffle=shuffle, repeat=repeat)
+        else:
+            return data
 
 
     @abstractmethod

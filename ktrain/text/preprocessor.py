@@ -1,6 +1,7 @@
 from ..imports import *
 from .. import utils as U
 from ..preprocessor import Preprocessor
+from ..data import Dataset
 
 DistilBertTokenizer = transformers.DistilBertTokenizer
 DISTILBERT= 'distilbert'
@@ -916,8 +917,54 @@ class Transformer(TransformersPreprocessor):
 
 
 
+class TransformerDataset(ktrain.Dataset):
+    """
+    Wrapper for Transformer datasets.
+    Note that, ince to_tfdataset() method is implemented,
+    __get_item__ and __len__ are not implemented.
+    That is, TranformerDataset is converted to tf.Dataset on-the-fly prior to training
+    by Learner instances.
+    """
 
-# Transformer Sequence
+    def __init__(self, x, y, batch_size=1):
+        if type(x) not in [list, np.ndarray]: raise ValueError('x must be list or np.ndarray')
+        if type(y) not in [list, np.ndarray]: raise ValueError('y must be list or np.ndarray')
+        if type(x) == list: x = np.array(x)
+        if type(y) == list: y = np.array(y)
+        self.x = x
+        self.y = y
+        self.batch_size = batch_size
+
+
+    def to_tfdataset(self, shuffle=True, repeat=True):
+        """
+        convert transformer features to tf.Dataset
+        """
+        tfdataset = tf.data.Dataset.from_tensor_slices((self.x, self.y))
+        tfdataset = tfdataset.map(lambda x,y: ({'input_ids': x[0], 
+                                                'attention_mask': x[1], 
+                                                 'token_type_ids': x[2]}, y))
+        if shuffle:
+            tfdataset = tfdataset.shuffle(self.x.shape[0])
+        tfdataset = tfdataset.batch(self.batch_size)
+        if repeat:
+            tfdataset = tfdataset.repeat(-1)
+        return tfdataset
+
+    def get_y(self):
+        return self.y
+
+    def nsamples(self):
+        return len(self.x)
+
+    def nclasses(self):
+        self.y.shape[1]
+
+    def xshape(self):
+        return (len(self.x), self.x[0].shape[1])
+
+
+# Transformer Sequence - obsolete - no longer used
 class TransformerSequence(Sequence):
 
     def __init__(self, x, y, batch_size=1):
