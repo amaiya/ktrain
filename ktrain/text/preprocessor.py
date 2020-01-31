@@ -289,7 +289,8 @@ def hf_convert_examples(texts, y=None, tokenizer=None,
     # HF_EXCEPTION
     # due to issues in transormers library and TF2 tf.Datasets, arrays are converted
     # to iterators on-the-fly
-    return  TransformerSequence(np.array(features_list), np.array(labels))
+    #return  TransformerSequence(np.array(features_list), np.array(labels))
+    return  TransformerDataset(np.array(features_list), np.array(labels))
 
 
 #------------------------------------------------------------------------------
@@ -917,13 +918,9 @@ class Transformer(TransformersPreprocessor):
 
 
 
-class TransformerDataset(ktrain.Dataset):
+class TransformerDataset(Dataset):
     """
     Wrapper for Transformer datasets.
-    Note that, ince to_tfdataset() method is implemented,
-    __get_item__ and __len__ are not implemented.
-    That is, TranformerDataset is converted to tf.Dataset on-the-fly prior to training
-    by Learner instances.
     """
 
     def __init__(self, x, y, batch_size=1):
@@ -934,6 +931,16 @@ class TransformerDataset(ktrain.Dataset):
         self.x = x
         self.y = y
         self.batch_size = batch_size
+
+
+    def __getitem__(self, idx):
+        batch_x = self.x[idx * self.batch_size: (idx + 1) * self.batch_size]
+        batch_y = self.y[idx * self.batch_size: (idx + 1) * self.batch_size]
+        return (batch_x, batch_y)
+
+
+    def __len__(self):
+        return math.ceil(len(self.x) / self.batch_size)
 
 
     def to_tfdataset(self, shuffle=True, repeat=True):
@@ -958,7 +965,7 @@ class TransformerDataset(ktrain.Dataset):
         return len(self.x)
 
     def nclasses(self):
-        self.y.shape[1]
+        return self.y.shape[1]
 
     def xshape(self):
         return (len(self.x), self.x[0].shape[1])

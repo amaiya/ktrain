@@ -71,7 +71,7 @@ def is_huggingface_from_model(model):
 
 
 def is_huggingface_from_data(data):
-    return type(data).__name__ == 'TransformerSequence'
+    return type(data).__name__ in ['TransformerSequence', 'TransformerDataset']
 
 
 
