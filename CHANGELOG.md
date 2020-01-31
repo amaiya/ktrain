@@ -7,6 +7,19 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.9.1 (TBD)
+
+### New:
+- N/A
+
+### Changed:
+- N/A
+- `text.TextPreprocessor` prints sequence length statistics
+
+### Fixed:
+- fixed `utils.nclasses_from_data` for `ktrain.Dataset` instances
+
+
 ## 0.9.0 (2020-01-31)
 
 ### New:
