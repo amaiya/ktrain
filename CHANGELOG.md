@@ -13,7 +13,7 @@ Most recent releases are shown at the top. Each release shows:
 - N/A
 
 ### Changed:
-- `text.TextPreprocessor` prints sequence length statistics
+- N/A
 
 ### Fixed:
 - fixed `utils.nclasses_from_data` for `ktrain.Dataset` instances
