@@ -7,17 +7,17 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
-## 0.9.1 (TBD)
+## 0.9.1 (2020-02-01)
 
 ### New:
 - N/A
 
 ### Changed:
 - N/A
-- `text.TextPreprocessor` prints sequence length statistics
 
 ### Fixed:
 - fixed `utils.nclasses_from_data` for `ktrain.Dataset` instances
+- prevent `detect_lang` failing when Pandas Series is supplied
 
 
 ## 0.9.0 (2020-01-31)
