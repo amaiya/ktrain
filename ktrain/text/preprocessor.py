@@ -326,7 +326,11 @@ def detect_lang(texts, sample_size=32):
     """
     detect language
     """
-    if not isinstance(texts, (list, np.ndarray)): texts = [texts]
+    if isinstance(texts, (pd.Series, pd.DataFrame)):
+        texts = texts.values
+    if isinstance(texts, str): texts = [texts]
+    if not isinstance(texts, (list, np.ndarray)):
+        raise ValueError('texts must be a list or NumPy array of strings')
     lst = []
     for doc in texts[:sample_size]:
         try:
