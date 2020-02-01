@@ -13,7 +13,6 @@ Most recent releases are shown at the top. Each release shows:
 - N/A
 
 ### Changed:
-- N/A
 - `text.TextPreprocessor` prints sequence length statistics
 
 ### Fixed:
