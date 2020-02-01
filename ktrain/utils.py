@@ -217,7 +217,7 @@ def nsamples_from_data(data):
 
 def nclasses_from_data(data):
     if is_iter(data):
-        if isinstance(data, Dataset): return data.nsamples()
+        if isinstance(data, Dataset): return data.nclasses()
         elif is_ner(data=data): return len(data.p._label_vocab._id2token)    # NERSequence
         elif is_huggingface(data=data):         # Hugging Face Transformer
             return data.y.shape[1]
