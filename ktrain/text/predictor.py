@@ -38,7 +38,7 @@ class TextPredictor(Predictor):
         elif not isinstance(texts, np.ndarray) and not isinstance(texts, list):
             raise ValueError('data must be numpy.ndarray or list (of texts)')
         classification, multilabel = U.is_classifier(self.model)
-        if multilabel: return_proba = True
+        #if multilabel: return_proba = True
         #treat_multilabel = False
         #loss = self.model.loss
         #if loss != 'categorical_crossentropy' and not return_proba:
@@ -55,8 +55,8 @@ class TextPredictor(Predictor):
             else:
                 preds = np.squeeze(preds)
                 if len(preds.shape) == 0: preds = np.expand_dims(preds, -1)
-        result =  preds if return_proba or not self.c else [self.c[np.argmax(pred)] for pred in preds] 
-        if multilabel:
+        result =  preds if return_proba or multilabel or not self.c else [self.c[np.argmax(pred)] for pred in preds] 
+        if multilabel and not return_proba:
             result =  [list(zip(self.c, r)) for r in result]
         if is_str: return result[0]
         else:      return result
