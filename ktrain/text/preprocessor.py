@@ -793,6 +793,8 @@ class DistilBertPreprocessor(TransformersPreprocessor):
             model_name = 'distilbert-base-uncased'
         else:
             model_name = 'distilbert-base-multilingual-cased'
+            raise Exception('currently_unsupported: non-English languages are not currently supported for '+\
+                            'distilbert due to issues with TF2 version of transformers library. ')
 
         super().__init__(model_name,
                          maxlen, max_features, classes=classes, 
@@ -946,23 +948,10 @@ class TransformerSequence(Sequence):
         """
         convert transformer features to tf.Dataset
         """
-        def gen():
-            for idx, data in enumerate(self.x):
-                yield ({'input_ids': data[0],
-                         'attention_mask': data[1],
-                         'token_type_ids': data[2]},
-                        self.y[idx])
-
-        tfdataset= tf.data.Dataset.from_generator(gen,
-            ({'input_ids': tf.int32,
-              'attention_mask': tf.int32,
-              'token_type_ids': tf.int32},
-             tf.int64),
-            ({'input_ids': tf.TensorShape([None]),
-              'attention_mask': tf.TensorShape([None]),
-              'token_type_ids': tf.TensorShape([None])},
-             tf.TensorShape([None])))
-
+        tfdataset = tf.data.Dataset.from_tensor_slices((self.x, self.y))
+        tfdataset = tfdataset.map(lambda x,y: ({'input_ids': x[0], 
+                                                'attention_mask': x[1], 
+                                                 'token_type_ids': x[2]}, y))
         if shuffle:
             tfdataset = tfdataset.shuffle(self.x.shape[0])
         tfdataset = tfdataset.batch(self.batch_size)

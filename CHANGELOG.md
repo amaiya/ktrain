@@ -7,17 +7,15 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
-## 0.9.2b0 (TBD)
+## 0.9.2dev0 (TBD)
 
 ### New:
 - N/A
 
 ### Changed:
-- Removed Exception when `distilbert` is selected in `text_classifier` for non-English language after 
-  [Hugging Face fixed the reported bug](https://github.com/huggingface/transformers/issues/2462).
+- N/A
 
 ### Fixed:
-- XLNet models like `xlnet-base-cased` now work after casting input arrays to `int32`
 - modified `TextPredictor.explain` to propogate correct error message from `eli5` for multilabel text classification.
 
 
