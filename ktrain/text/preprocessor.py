@@ -946,6 +946,11 @@ class TransformerSequence(Sequence):
         """
         convert transformer features to tf.Dataset
         """
+        if len(self.y.shape) == 1:
+            yshape = []
+        else:
+            yshape = [None]
+
         def gen():
             for idx, data in enumerate(self.x):
                 yield ({'input_ids': data[0],
@@ -961,7 +966,7 @@ class TransformerSequence(Sequence):
             ({'input_ids': tf.TensorShape([None]),
               'attention_mask': tf.TensorShape([None]),
               'token_type_ids': tf.TensorShape([None])},
-             tf.TensorShape([None])))
+             tf.TensorShape(yshape)))
 
         if shuffle:
             tfdataset = tfdataset.shuffle(self.x.shape[0])
