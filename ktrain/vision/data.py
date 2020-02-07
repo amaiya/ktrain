@@ -614,10 +614,15 @@ def images_from_array(x_train, y_train,
     """
 
     # one-hot-encode if necessary
-    if isinstance(y_train[0], int):
+    if np.issubdtype(type(y_train[0]), np.integer) or\
+        (isinstance(y_train[0], (list, np.ndarray)) and len(y_train[0]) == 1):
         y_train = to_categorical(y_train)
-    if validation_data and isinstance(validation_data[1][0], int):
-        validation_data[1] = to_categorical(validation_data[1])
+    if validation_data:
+        x_test = validation_data[0]
+        y_test = validation_data[1]
+        if np.issubdtype(type(y_test[0]), np.integer) or\
+           (isinstance(y_test[0], (list, np.ndarray)) and len(y_test[0]) == 1):
+            y_test = to_categorical(y_test)
 
 
     (train_datagen, test_datagen) = process_datagen(data_aug, train_array=x_train)
@@ -627,7 +632,7 @@ def images_from_array(x_train, y_train,
     batches_te = None
     preproc = None
     if validation_data:
-        batches_te = test_datagen.flow(validation_data[0], validation_data[1],
+        batches_te = test_datagen.flow(x_test, y_test,
                                        shuffle=False)
         classes = map(str, list(range(len(y_train[0]))))
         preproc = ImagePreprocessor(test_datagen, classes, target_size=None, color_mode=None)
