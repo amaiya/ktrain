@@ -1,6 +1,7 @@
 from ...imports import *
 from ... import utils as U
 from ...preprocessor import Preprocessor
+from ...data import Dataset
 
 OTHER = 'O'
 W2V = 'word2vec'
@@ -137,7 +138,7 @@ class SentenceGetter(object):
 
 
 
-class NERSequence(Sequence):
+class NERSequence(Dataset):
 
     def __init__(self, x, y, batch_size=1, p=None):
         self.x = x
@@ -166,4 +167,32 @@ class NERSequence(Sequence):
             lengths.append(i)
 
         return lengths
+
+    def nsamples(self):
+        return len(self.x)   
+
+
+    def get_y(self):
+        return self.y
+
+
+    def xshape(self):
+        return (len(self.x), self[0][0][0].shape[1]) 
+
+
+    def nclasses(self):
+        return len(self.p._label_vocab._id2token) 
+
+
+
+
+
+
+
+
+
+
+
+
+
 
