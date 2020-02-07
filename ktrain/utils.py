@@ -71,7 +71,7 @@ def is_huggingface_from_model(model):
 
 
 def is_huggingface_from_data(data):
-    return type(data).__name__ in ['TransformerSequence', 'TransformerDataset']
+    return type(data).__name__ in ['TransformerDataset']
 
 
 
@@ -159,8 +159,6 @@ def shape_from_data(data):
     if is_iter(data):
         if isinstance(data, Dataset): return data.xshape()
         elif is_ner(data=data): return (len(data.x), data[0][0][0].shape[1])  # NERSequence
-        elif is_huggingface(data=data):  # HF Transformer
-            return (len(data.x), data[0][0][0].shape[1])
         elif is_nodeclass(data=data):                                 # NodeSequence
             return data[0][0][0].shape[1:]  # returns 1st neighborhood only
         elif hasattr(data, 'image_shape'): return data.image_shape          # DirectoryIterator/DataFrameIterator
@@ -186,7 +184,7 @@ def ondisk(data):
 
     ondisk = is_iter(data) and \
              (type(data).__name__ not in  ['ArrayDataset', 'NumpyArrayIterator', 'NERSequence',
-                                           'NodeSequenceWrapper', 'TransformerSequence'])
+                                           'NodeSequenceWrapper'])
     return ondisk
 
 
@@ -195,8 +193,6 @@ def nsamples_from_data(data):
     if is_iter(data):
         if isinstance(data, Dataset): return data.nsamples()
         elif is_ner(data=data): return len(data.x)      # NERSequence
-        elif is_huggingface(data=data):  # HuggingFace Transformer
-            return len(data.x)
         elif is_nodeclass(data=data):           # NodeSequenceWrapper
             return data.targets.shape[0]
         elif hasattr(data, 'samples'):                # DirectoryIterator/DataFrameIterator
@@ -219,8 +215,6 @@ def nclasses_from_data(data):
     if is_iter(data):
         if isinstance(data, Dataset): return data.nclasses()
         elif is_ner(data=data): return len(data.p._label_vocab._id2token)    # NERSequence
-        elif is_huggingface(data=data):         # Hugging Face Transformer
-            return data.y.shape[1]
         elif is_nodeclass(data=data):                                # NodeSequenceWrapper
             return data[0][1].shape[1]                                   
         elif hasattr(data, 'classes'):                                     # DirectoryIterator
@@ -241,8 +235,6 @@ def y_from_data(data):
     if is_iter(data):
         if isinstance(data, Dataset): return data.get_y()
         elif is_ner(data=data): return data.y    # NERSequence
-        if is_huggingface(data=data):  # Hugging Face Transformer
-            return data.y
         elif is_nodeclass(data=data):      # NodeSequenceWrapper
             return data.targets
         elif hasattr(data, 'classes'): # DirectoryIterator
@@ -264,7 +256,7 @@ def is_iter(data, ignore=False):
     if ignore: return True
     iter_classes = ["NumpyArrayIterator", "DirectoryIterator",
                     "DataFrameIterator", "Iterator", "Sequence", 
-                    "NERSequence", "NodeSequenceWrapper", "TransformerSequence"]
+                    "NERSequence", "NodeSequenceWrapper"]
     return data.__class__.__name__ in iter_classes or isinstance(data, Dataset)
 
 
