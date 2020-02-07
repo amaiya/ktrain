@@ -7,6 +7,19 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.9.3 (TBD)
+
+### New:
+- N/A
+
+### Changed:
+- Transformed data containers for transformeres, NER, and node-classification to be
+  instances of `ktrain.data.Dataset`.
+
+### Fixed:
+- fixed `images_from_array` so that y labels are correctly 1-hot-encoded when necessary
+
+
 ## 0.9.2 (2020-02-04)
 
 ### New:
