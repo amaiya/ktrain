@@ -18,6 +18,7 @@ Most recent releases are shown at the top. Each release shows:
 
 ### Fixed:
 - fixed `images_from_array` so that y labels are correctly 1-hot-encoded when necessary
+- correct tokenization for `bert-base-japanese` Transformer models from PR 57
 
 
 ## 0.9.2 (2020-02-04)
