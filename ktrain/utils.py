@@ -158,8 +158,6 @@ def shape_from_data(data):
     err_msg = 'could not determine shape from %s' % (type(data))
     if is_iter(data):
         if isinstance(data, Dataset): return data.xshape()
-        elif is_nodeclass(data=data):                                 # NodeSequence
-            return data[0][0][0].shape[1:]  # returns 1st neighborhood only
         elif hasattr(data, 'image_shape'): return data.image_shape          # DirectoryIterator/DataFrameIterator
         elif hasattr(data, 'x'):                                            # NumpyIterator
             return data.x.shape[1:]
@@ -182,7 +180,7 @@ def ondisk(data):
     if hasattr(data, 'ondisk'): return data.ondisk()
 
     ondisk = is_iter(data) and \
-             (type(data).__name__ not in  ['ArrayDataset', 'NumpyArrayIterator', 'NodeSequenceWrapper'])
+             (type(data).__name__ not in  ['NumpyArrayIterator'])
     return ondisk
 
 
@@ -190,11 +188,9 @@ def nsamples_from_data(data):
     err_msg = 'could not determine number of samples from %s' % (type(data))
     if is_iter(data):
         if isinstance(data, Dataset): return data.nsamples()
-        elif is_nodeclass(data=data):           # NodeSequenceWrapper
-            return data.targets.shape[0]
-        elif hasattr(data, 'samples'):                # DirectoryIterator/DataFrameIterator
+        elif hasattr(data, 'samples'):  # DirectoryIterator/DataFrameIterator
             return data.samples
-        elif hasattr(data, 'n'):                      # DirectoryIterator/DataFrameIterator/NumpyIterator
+        elif hasattr(data, 'n'):     # DirectoryIterator/DataFrameIterator/NumpyIterator
             return data.n
         else:
             raise Exception(err_msg)
@@ -211,13 +207,11 @@ def nsamples_from_data(data):
 def nclasses_from_data(data):
     if is_iter(data):
         if isinstance(data, Dataset): return data.nclasses()
-        elif is_nodeclass(data=data):                                # NodeSequenceWrapper
-            return data[0][1].shape[1]                                   
-        elif hasattr(data, 'classes'):                                     # DirectoryIterator
+        elif hasattr(data, 'classes'):   # DirectoryIterator
             return len(set(data.classes))
         else:
             try:
-                return data[0][1].shape[1]                                 # DataFrameIterator/NumpyIterator
+                return data[0][1].shape[1]  # DataFrameIterator/NumpyIterator
             except:
                 raise Exception('could not determine number of classes from %s' % (type(data)))
     else:
@@ -230,8 +224,6 @@ def nclasses_from_data(data):
 def y_from_data(data):
     if is_iter(data):
         if isinstance(data, Dataset): return data.get_y()
-        elif is_nodeclass(data=data):      # NodeSequenceWrapper
-            return data.targets
         elif hasattr(data, 'classes'): # DirectoryIterator
             return to_categorical(data.classes)
         elif hasattr(data, 'labels'):  # DataFrameIterator
@@ -250,8 +242,7 @@ def y_from_data(data):
 def is_iter(data, ignore=False):
     if ignore: return True
     iter_classes = ["NumpyArrayIterator", "DirectoryIterator",
-                    "DataFrameIterator", "Iterator", "Sequence", 
-                    "NodeSequenceWrapper"]
+                    "DataFrameIterator", "Iterator", "Sequence"]
     return data.__class__.__name__ in iter_classes or isinstance(data, Dataset)
 
 
