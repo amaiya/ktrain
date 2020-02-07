@@ -13,7 +13,7 @@ Most recent releases are shown at the top. Each release shows:
 - N/A
 
 ### Changed:
-- Transformed data containers for transformeres, NER, and node-classification to be
+- Transformed data containers for transformers, NER, and graph -node classification to be
   instances of `ktrain.data.Dataset`.
 
 ### Fixed:
