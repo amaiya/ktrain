@@ -62,7 +62,8 @@ def conv1_block(input, k=1, dropout=0.0):
 def conv2_block(input, k=1, dropout=0.0):
     init = input
 
-    channel_axis = 1 if K.image_dim_ordering() == "th" else -1
+    #channel_axis = 1 if K.image_dim_ordering() == "th" else -1
+    channel_axis = -1 
 
     x = BatchNormalization(axis=channel_axis, momentum=0.1, epsilon=1e-5, gamma_initializer='uniform')(input)
     x = Activation('relu')(x)
@@ -84,7 +85,8 @@ def conv2_block(input, k=1, dropout=0.0):
 def conv3_block(input, k=1, dropout=0.0):
     init = input
 
-    channel_axis = 1 if K.image_dim_ordering() == "th" else -1
+    #channel_axis = 1 if K.image_dim_ordering() == "th" else -1
+    channel_axis = -1
 
     x = BatchNormalization(axis=channel_axis, momentum=0.1, epsilon=1e-5, gamma_initializer='uniform')(input)
     x = Activation('relu')(x)
