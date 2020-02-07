@@ -721,6 +721,8 @@ class TransformersPreprocessor(TextPreprocessor):
             raise ValueError('uknown model name %s' % (model_name))
         self.model_type = TRANSFORMER_MODELS[self.name][1]
         self.tokenizer_type = TRANSFORMER_MODELS[self.name][2]
+        if "bert-base-japanese" in model_name:
+            self.tokenizer_type = transformers.BertJapaneseTokenizer
 
         tokenizer = self.tokenizer_type.from_pretrained(model_name)
 
@@ -996,4 +998,3 @@ class TransformerDataset(Dataset):
 TEXT_PREPROCESSORS = {'standard': StandardTextPreprocessor,
                       'bert': BERTPreprocessor,
                       'distilbert': DistilBertPreprocessor}
-
