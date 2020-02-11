@@ -1,6 +1,7 @@
 from ..imports import *
 from .. import utils as U
 from ..preprocessor import Preprocessor
+from ..data import Dataset
 
 DistilBertTokenizer = transformers.DistilBertTokenizer
 DISTILBERT= 'distilbert'
@@ -288,7 +289,8 @@ def hf_convert_examples(texts, y=None, tokenizer=None,
     # HF_EXCEPTION
     # due to issues in transormers library and TF2 tf.Datasets, arrays are converted
     # to iterators on-the-fly
-    return  TransformerSequence(np.array(features_list), np.array(labels))
+    #return  TransformerSequence(np.array(features_list), np.array(labels))
+    return  TransformerDataset(np.array(features_list), np.array(labels))
 
 
 #------------------------------------------------------------------------------
@@ -719,6 +721,8 @@ class TransformersPreprocessor(TextPreprocessor):
             raise ValueError('uknown model name %s' % (model_name))
         self.model_type = TRANSFORMER_MODELS[self.name][1]
         self.tokenizer_type = TRANSFORMER_MODELS[self.name][2]
+        if "bert-base-japanese" in model_name:
+            self.tokenizer_type = transformers.BertJapaneseTokenizer
 
         tokenizer = self.tokenizer_type.from_pretrained(model_name)
 
@@ -918,9 +922,10 @@ class Transformer(TransformersPreprocessor):
 
 
 
-
-# Transformer Sequence
-class TransformerSequence(Sequence):
+class TransformerDataset(Dataset):
+    """
+    Wrapper for Transformer datasets.
+    """
 
     def __init__(self, x, y, batch_size=1):
         if type(x) not in [list, np.ndarray]: raise ValueError('x must be list or np.ndarray')
@@ -976,10 +981,20 @@ class TransformerSequence(Sequence):
         return tfdataset
 
 
+    def get_y(self):
+        return self.y
+
+    def nsamples(self):
+        return len(self.x)
+
+    def nclasses(self):
+        return self.y.shape[1]
+
+    def xshape(self):
+        return (len(self.x), self.x[0].shape[1])
 
 
 # preprocessors
 TEXT_PREPROCESSORS = {'standard': StandardTextPreprocessor,
                       'bert': BERTPreprocessor,
                       'distilbert': DistilBertPreprocessor}
-

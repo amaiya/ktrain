@@ -2,6 +2,22 @@ from .imports import *
 
 
 class Dataset(Sequence):
+    """
+    Base class for custom datasets in ktrain.
+
+    If subclass of Dataset implements a method to to_tfdataset
+    that converts the data to a tf.Dataset, then this will be
+    invoked by Learner instances just prior to training so
+    fit() will train using a tf.Dataset representation of your data.
+    Sequence methods such as __get_item__ and __len__
+    must still be implemented.
+
+    The signature of to_tfdataset is as follows:
+
+    def to_tfdataset(self, shuffle=True, repeat=True)
+
+    See ktrain.text.preprocess.TransformerDataset as an example.
+    """
     def __init__(self, batch_size=32):
         self.batch_size = batch_size
 

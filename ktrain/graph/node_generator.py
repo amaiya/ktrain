@@ -1,4 +1,5 @@
 from ..imports import *
+from ..data import Dataset
 
 
 # import stellargraph
@@ -11,7 +12,7 @@ if version.parse(sg.__version__) < version.parse('0.8'):
     raise Exception(SG_ERRMSG)
 
 
-class NodeSequenceWrapper(node_mappers.NodeSequence):
+class NodeSequenceWrapper(node_mappers.NodeSequence, Dataset):
     def __init__(self, node_seq):
         if not isinstance(node_seq, node_mappers.NodeSequence):
             raise ValueError('node_seq must by a stellargraph NodeSequence object')
@@ -65,4 +66,33 @@ class NodeSequenceWrapper(node_mappers.NodeSequence):
             except:
                 raise AttributeError
         return
+
+
+    def nsamples(self):
+        return self.targets.shape[0]
+
+
+    def get_y(self):
+        return self.targets
+
+
+    def xshape(self):
+        return self[0][0][0].shape[1:]  # returns 1st neighborhood only
+
+
+    def nclasses(self):
+        return self[0][1].shape[1]                                   
+
+
+
+
+
+
+
+
+
+
+
+
+
 

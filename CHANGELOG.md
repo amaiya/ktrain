@@ -7,6 +7,20 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.9.3 (2020-02-11)
+
+### New:
+- N/A
+
+### Changed:
+- Transformed data containers for transformers, NER, and graph -node classification to be
+  instances of `ktrain.data.Dataset`.
+
+### Fixed:
+- fixed `images_from_array` so that y labels are correctly 1-hot-encoded when necessary
+- correct tokenization for `bert-base-japanese` Transformer models from PR 57
+
+
 ## 0.9.2 (2020-02-04)
 
 ### New:
