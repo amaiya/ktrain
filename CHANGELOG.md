@@ -7,7 +7,7 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
-## 0.9.3 (TBD)
+## 0.9.3 (2020-02-11)
 
 ### New:
 - N/A
