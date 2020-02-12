@@ -22,7 +22,7 @@ setup(
   install_requires=[
           'scikit-learn == 0.21.3',
           'matplotlib >= 3.0.0',
-          'pandas < 1.0',
+          'pandas >= 1.0.1',
           'fastprogress >= 0.1.21',
           'keras_bert',
           'requests',
