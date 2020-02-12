@@ -7,18 +7,6 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
-## 0.9.4 (TBD)
-
-### New:
-- N/A
-
-### Changed:
-- changed pandas dependency to `>=1.0.1` due to bug in pandas 1.0
-
-### Fixed:
-- N/A
-
-
 ## 0.9.3 (2020-02-11)
 
 ### New:
