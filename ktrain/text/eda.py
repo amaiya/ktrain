@@ -10,7 +10,8 @@ class TopicModel():
     def __init__(self,texts=None, n_topics=None, n_features=10000, 
                  min_df=5, max_df=0.5,  stop_words='english',
                  lda_max_iter=5, lda_mode='online', 
-                 token_pattern=None, verbose=1):
+                 token_pattern=None, verbose=1,
+                 alpha=None, beta=0.01):
         """
         Fits a topic model to documents in <texts>.
         Example:
@@ -41,6 +42,9 @@ class TopicModel():
             estimated = max(1, int(math.floor(math.sqrt(len(texts) / 2))))
             n_topics = min(400, estimated)
             print('n_topics automatically set to %s' % (n_topics))
+
+        self.alpha = alpha if alpha is None else 5. / n_topics
+        self.beta = beta
 
         # train model
         if texts is not None:
@@ -126,12 +130,11 @@ class TopicModel():
         x_train = vectorizer.fit_transform(texts)
 
         # fit model
-        alpha = 5./n_topics
-        beta = 0.01
+
         if self.verbose: print('fitting model...')
         model = LatentDirichletAllocation(n_components=n_topics, max_iter=lda_max_iter,
                                           learning_method=lda_mode, learning_offset=50.,
-                                          doc_topic_prior=alpha, topic_word_prior=beta,
+                                          doc_topic_prior=self.alpha, topic_word_prior=self.beta,
                                           verbose=self.verbose, random_state=0)
         model.fit(x_train)
 
