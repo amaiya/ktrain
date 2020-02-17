@@ -8,7 +8,6 @@ MAX_FEATURES = 20000
 MAXLEN = 400
 
 
-
 def texts_from_folder(datadir, classes=None, 
                       max_features=MAX_FEATURES, maxlen=MAXLEN,
                       ngram_range=1,
@@ -57,6 +56,9 @@ def texts_from_folder(datadir, classes=None,
         verbose (bool):         verbosity
         
     """
+    # check is the given path is a valid filepath
+    if(not os.path.isdir(datadir)):
+        raise Exception("Given datadir is not a valid directory path")
 
     # check train_test_names
     if len(train_test_names) < 1 or len(train_test_names) > 2:
@@ -160,6 +162,12 @@ def texts_from_csv(train_filepath,
                                 If None, train/test split will be random
         verbose (boolean): verbosity
     """
+
+    # check is the given path is a valid filepath
+    if(not os.path.isfile(train_filepath)):
+        raise Exception("Given train_filepath is not a valid file path")
+
+
     if encoding is None:
         with open(train_filepath, 'rb') as f:
             encoding = chardet.detect(f.read())['encoding']
@@ -222,6 +230,13 @@ def texts_from_df(train_df,
                                 If None, train/test split will be random
         verbose (boolean): verbosity
     """
+
+    #checks if the dtpye of input data is appropriate
+
+    if(type(train_df) is not pd.DataFrame()):
+        dtype_df =  type(train_df)
+        raise Exception(f"Data type of train_df is {dtype}, make sure it is pandas DataFrame")
+
 
     # read in train and test data
     train = train_df
@@ -300,6 +315,18 @@ def texts_from_array(x_train, y_train, x_test=None, y_test=None,
                                 If None, train/test split will be random.
         verbose (boolean): verbosity
     """
+
+    #checks if the dtpye of input data is appropriate
+    if(not (type(x_train)==list )):
+        try:
+            x_train = list(x_train)
+            y_train = list(y_train)
+            if(x_test):
+                x_test=list(x_test)
+                y_test = list(y_test)
+        except:
+            dtype = str(type(x_train))
+            raise Exception(f"Data type of the input data is {dtype}, make sure it is list")
 
     if not class_names and verbose:
         #classes =  list(set(y_train))

@@ -185,6 +185,13 @@ def datagen_needs_fit(datagen):
 def sample_image_folder(train_directory, 
                          target_size,
                          color_mode='rgb', flat_dir=False):
+    
+    # check is the given path is a valid filepath
+    if(not os.path.isdir(train_directory)):
+        raise Exception("Given datadir is not a valid directory path")
+
+
+
 
     # adjust train_directory
     classes = None
@@ -218,6 +225,11 @@ def sample_image_folder(train_directory,
 
 def detect_color_mode(train_directory, 
                      target_size=(32,32)):
+
+    # check is the given path is a valid filepath
+    if(not os.path.isdir(train_directory)):
+        raise Exception("Given datadir is not a valid directory path")
+
     try:
         fname = glob.glob(os.path.join(train_directory, '**/*'))[0]
         img = Image.open(fname).resize(target_size)
@@ -261,6 +273,12 @@ def preprocess_csv(csv_in, csv_out, x_col='filename', y_col=None,
     Return:
         list :  the list of clases (and csv_out will be new CSV file)
     """
+
+    # check is the given path is a valid filepath
+    if(not os.path.isfile(csv_in)):
+        raise Exception("Given csv_in  is not a valid file path")
+
+
     if not y_col and not suffix:
         raise ValueError('one or both of y_col and suffix should be supplied')
     df = pd.read_csv(csv_in, sep=sep)
@@ -338,6 +356,10 @@ def images_from_folder(datadir, target_size=(224,224),
     batches: a tuple of two Iterators - one for train and one for test
 
     """
+
+    # check is the given path is a valid filepath
+    if(not os.path.isdir(datadir)):
+        raise Exception("Given datadir is not a valid directory path")
 
     # train/test names
     train_str = train_test_names[0]
@@ -417,6 +439,10 @@ def images_from_csv(train_filepath,
     batches: a tuple of two Iterators - one for train and one for test
 
     """
+
+    # check is the given path is a valid filepath
+    if(not os.path.isfile(train_filepath)):
+        raise Exception("Given train_filepath is not a valid file path")
 
     # get train and test data generators
     if directory:
@@ -507,6 +533,9 @@ def images_from_fname( img_folder,
     batches: a tuple of two Iterators - one for train and one for test
 
     """
+    # check is the given path is a valid filepath
+    if(not os.path.isdir(img_folder)):
+        raise Exception("Given img_folder is not a valid directory path")
 
     # get train and test data generators
     (train_datagen, test_datagen) = process_datagen(data_aug, 
@@ -612,6 +641,14 @@ def images_from_array(x_train, y_train,
     batches: a tuple of two image.Iterator - one for train and one for test
 
     """
+
+    if(not (type(x_train)==type(np.array([])) )):
+        try:
+            x_train = np.array(x_train)
+            y_train = np.array(y_train)
+        except:
+            dtype = str(type(x_train))
+            raise Exception(f"Data type of the input data is {dtype}, make sure it is a numpy array")
 
     # one-hot-encode if necessary
     if np.issubdtype(type(y_train[0]), np.integer) or\
