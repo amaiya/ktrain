@@ -13,7 +13,7 @@ class TopicModel():
                  lda_max_iter=5, lda_mode='online',
                  token_pattern=None, verbose=1,
                  hyperparam_kwargs=None
-):
+    ):
         """
         Fits a topic model to documents in <texts>.
         Example:
@@ -109,6 +109,7 @@ class TopicModel():
         beta = hyperparam_kwargs.get('beta', 0.01)
         nmf_alpha = hyperparam_kwargs.get('nmf_alpha', 0)
         l1_ratio = hyperparam_kwargs.get('beta', 0)
+        ngram_range = hyperparam_kwargs.get('ngram_range', (1,1))
 
         # adjust defaults based on language detected
         if texts is not None:
@@ -129,8 +130,8 @@ class TopicModel():
         if token_pattern is None: token_pattern = TU.DEFAULT_TOKEN_PATTERN
         #if token_pattern is None: token_pattern = r'(?u)\b\w\w+\b'
         vectorizer = CountVectorizer(max_df=max_df, min_df=min_df,
-                                     max_features=n_features, stop_words=stop_words,
-                                     token_pattern=token_pattern)
+                                 max_features=n_features, stop_words=stop_words,
+                                 token_pattern=token_pattern, ngram_range=ngram_range)
         
 
         x_train = vectorizer.fit_transform(texts)
@@ -442,7 +443,7 @@ class TopicModel():
         return
 
 
-    def train_recommender(self):
+    def train_recommender(self, n_neighbors=20, metric='minkowski', p=2):
         """
         Trains a recommender that, given a single document, will return
         documents in the corpus that are semantically similar to it.
@@ -453,7 +454,7 @@ class TopicModel():
             None
         """
         from sklearn.neighbors import NearestNeighbors
-        rec = NearestNeighbors(n_neighbors=20)
+        rec = NearestNeighbors(n_neighbors=n_neighbors, metric=metric, p=p)
         probs = self.get_doctopics()
         rec.fit(probs)
         self.recommender = rec
@@ -461,7 +462,7 @@ class TopicModel():
 
 
 
-    def recommend(self, text=None, doc_topic=None, n=5):
+    def recommend(self, text=None, doc_topic=None, n=5, n_neighbors=100):
         """
         Given an example document, recommends documents similar to it
         from the set of documents supplied to build().
@@ -476,8 +477,6 @@ class TopicModel():
                             (text, doc_id, topic_probability, topic_id)
 
         """
-        n_neighbors = 100 
-
         # error-checks
         if text is not None and doc_topic is not None:
             raise ValueError('text is mutually-exclusive with doc_topic')
@@ -501,7 +500,7 @@ class TopicModel():
 
 
 
-    def train_scorer(self, topic_ids=[], doc_ids=[]):
+    def train_scorer(self, topic_ids=[], doc_ids=[], n_neighbors=20):
         """
         Trains a scorer that can score documents based on similarity to a
         seed set of documents represented by topic_ids and doc_ids.
@@ -517,7 +516,7 @@ class TopicModel():
             None
         """
         from sklearn.neighbors import LocalOutlierFactor
-        clf = LocalOutlierFactor(n_neighbors=20, novelty=True, contamination=0.1)
+        clf = LocalOutlierFactor(n_neighbors=n_neighbors, novelty=True, contamination=0.1)
         probs = self.get_doctopics(topic_ids=topic_ids, doc_ids=doc_ids)
         clf.fit(probs)
         self.scorer = clf
