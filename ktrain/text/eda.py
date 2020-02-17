@@ -9,9 +9,11 @@ class TopicModel():
 
     def __init__(self,texts=None, n_topics=None, n_features=10000, 
                  min_df=5, max_df=0.5,  stop_words='english',
-                 lda_max_iter=5, lda_mode='online', 
+                 model_type='lda',
+                 lda_max_iter=5, lda_mode='online',
                  token_pattern=None, verbose=1,
-                 alpha=None, beta=0.01):
+                 hyperparam_kwargs=None
+):
         """
         Fits a topic model to documents in <texts>.
         Example:
@@ -43,17 +45,15 @@ class TopicModel():
             n_topics = min(400, estimated)
             print('n_topics automatically set to %s' % (n_topics))
 
-        self.alpha = alpha if alpha is None else 5. / n_topics
-        self.beta = beta
-
         # train model
         if texts is not None:
-            (model, vectorizer) = self.train(texts, 
+            (model, vectorizer) = self.train(texts, model_type=model_type,
                                              n_topics=n_topics, n_features=n_features,
                                              min_df = min_df, max_df = max_df, 
                                              stop_words=stop_words,
                                              lda_max_iter=lda_max_iter, lda_mode=lda_mode,
-                                             token_pattern=token_pattern)
+                                             token_pattern=token_pattern,
+                                             hyperparam_kwargs=hyperparam_kwargs)
         else:
             vectorizer = None
             model = None
@@ -77,10 +77,10 @@ class TopicModel():
         return
 
 
-    def train(self,texts, n_topics=None, n_features=10000, 
+    def train(self,texts, model_type='lda', n_topics=None, n_features=10000,
               min_df=5, max_df=0.5,  stop_words='english',
               lda_max_iter=5, lda_mode='online',
-              token_pattern=None):
+              token_pattern=None, hyperparam_kwargs=None):
         """
         Fits a topic model to documents in <texts>.
         Example:
@@ -103,6 +103,12 @@ class TopicModel():
         Returns:
             tuple: (model, vectorizer)
         """
+        if hyperparam_kwargs is None:
+            hyperparam_kwargs = {}
+        alpha = hyperparam_kwargs.get('alpha', 5.0 / n_topics)
+        beta = hyperparam_kwargs.get('beta', 0.01)
+        nmf_alpha = hyperparam_kwargs.get('nmf_alpha', 0)
+        l1_ratio = hyperparam_kwargs.get('beta', 0)
 
         # adjust defaults based on language detected
         if texts is not None:
@@ -132,10 +138,20 @@ class TopicModel():
         # fit model
 
         if self.verbose: print('fitting model...')
-        model = LatentDirichletAllocation(n_components=n_topics, max_iter=lda_max_iter,
-                                          learning_method=lda_mode, learning_offset=50.,
-                                          doc_topic_prior=self.alpha, topic_word_prior=self.beta,
-                                          verbose=self.verbose, random_state=0)
+        if model_type == 'lda':
+            model = LatentDirichletAllocation(n_components=n_topics, max_iter=lda_max_iter,
+                                              learning_method=lda_mode, learning_offset=50.,
+                                              doc_topic_prior=alpha,
+                                              topic_word_prior=beta,
+                                              verbose=self.verbose, random_state=0)
+        elif model_type == 'nmf':
+            model = NMF(
+                n_components=n_topics,
+                max_iter=lda_max_iter,
+                verbose=self.verbose,
+                alpha=nmf_alpha,
+                l1_ratio=l1_ratio,
+                random_state=0)
         model.fit(x_train)
 
         # save model and vectorizer and hyperparameter settings
