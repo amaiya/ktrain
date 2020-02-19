@@ -1,6 +1,6 @@
 from .models import *
 from .data import *
-from .ner.data import entities_from_gmb, entities_from_conll2003, entities_from_txt
+from .ner.data import entities_from_gmb, entities_from_conll2003, entities_from_txt, entities_from_df, entities_from_array
 from .ner.models import sequence_tagger, print_sequence_taggers
 from .eda import get_topic_model
 from .textutils import extract_filenames, load_text_files, filter_by_id
@@ -13,6 +13,8 @@ __all__ = [
            'entities_from_gmb',
            'entities_from_conll2003',
            'entities_from_txt',
+           'entities_from_array',
+           'entities_from_df',
            'sequence_tagger',
            'print_sequence_taggers',
            'get_topic_model',

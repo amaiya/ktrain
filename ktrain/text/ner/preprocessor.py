@@ -37,13 +37,16 @@ class NERPreprocessor(Preprocessor):
         return self.e
 
 
-    def preprocess(self, sentences):
+    def preprocess(self, sentences, tokenize_fn=None):
         if type(sentences) != list:
             raise ValueError('Param sentences must be a list of strings')
         X = []
         y = []
         for s in sentences:
-            tokens = tokenize(s)
+            if tokenize_fn is not None:
+                tokens = tokenize_fn(s)
+            else:
+                tokens = tokenize(s)
             X.append(tokens)
             y.append([OTHER] * len(tokens))
         nerseq = NERSequence(X, y, p=self.p)
