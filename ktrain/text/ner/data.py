@@ -12,12 +12,14 @@ WORD_COL = 'Word'
 TAG_COL = 'Tag'
 SENT_COL = 'SentenceID'
 
+
+
 def entities_from_gmb(train_filepath, 
+                      val_filepath=None,
+                      embeddings=None,
                       word_column=WORD_COL,
                       tag_column=TAG_COL,
                       sentence_column=SENT_COL,
-                      val_filepath=None,
-                       maxlen=MAXLEN, 
                        encoding='latin1',
                        val_pct=0.1, verbose=1):
     """
@@ -28,6 +30,7 @@ def entities_from_gmb(train_filepath,
 
     return entities_from_txt(train_filepath=train_filepath,
                              val_filepath=val_filepath,
+                             embeddings=None,
                              word_column=word_column,
                              tag_column=tag_column,
                              sentence_column=sentence_column,
@@ -39,6 +42,7 @@ def entities_from_gmb(train_filepath,
         
 def entities_from_conll2003(train_filepath, 
                             val_filepath=None,
+                            embeddings=None,
                             encoding='latin1',
                             val_pct=0.1, verbose=1):
     """
@@ -137,11 +141,45 @@ def entities_from_txt(train_filepath,
         word_column, tag_column, sentence_column = WORD_COL, TAG_COL, SENT_COL
 
     # create dataframe
-    df = data_to_df(train_filepath, encoding=encoding)
+    train_df = data_to_df(train_filepath, encoding=encoding)
 
 
+    val_df = None if val_filepath is None else data_to_df(val_filepath, encoding=encoding)
+    return entities_from_df(train_df,
+                            val_df=val_df,
+                            word_column=word_column,
+                            tag_column=tag_column,
+                            sentence_column=sentence_column,
+                            embeddings=embeddings,
+                            val_pct=val_pct, verbose=verbose)
+
+
+
+def entities_from_df(train_df,
+                     val_df=None,
+                     word_column=WORD_COL,
+                     tag_column=TAG_COL,
+                     sentence_column=SENT_COL,
+                     embeddings=None,
+                     val_pct=0.1, verbose=1):
+    """
+    Load entities from pandas DataFrame
+    Args:
+      train_df(pd.DataFrame): training data
+      val_df(pdf.DataFrame): validation data
+      word_column(str): name of column containing the text
+      tag_column(str): name of column containing lael
+      sentence_column(str): name of column containing Sentence IDs
+      embeddings(str): Currently, either None or 'word2vec' is supported
+                       If 'word2vec' is specified, pretrained word vectors
+                       are automatically downloaded to <home>/ktran_data
+                       and used as weights in the Embedding layer.
+                         If None, random embeddings used.
+     verbose (boolean): verbosity
+
+    """
     # process dataframe and instantiate NERPreprocessor
-    x, y  = pp.process_df(df, 
+    x, y  = pp.process_df(train_df, 
                           word_column=word_column,
                           tag_column=tag_column,
                           sentence_column=sentence_column,
@@ -149,10 +187,9 @@ def entities_from_txt(train_filepath,
 
 
     # get validation set
-    if val_filepath is None:
+    if val_df is None:
         x_train, x_valid, y_train, y_valid = train_test_split(x, y, test_size=val_pct)
     else:
-        val_df = data_to_df(val_filepath, encoding=encoding)
         x_train, y_train = x, y
         (x_valid, y_valid)  = pp.process_df(val_df,
                                             word_column=word_column,
@@ -169,6 +206,54 @@ def entities_from_txt(train_filepath,
 
     return ( trn, val, preproc)
 
+
+
+def entities_from_array(x_train, y_train,
+                        x_test=None, y_test=None,
+                        embeddings=None,
+                        verbose=1):
+    """
+    Load entities from arrays
+    Args:
+      x_train(list): list of list of entity tokens for training
+                     Example: x_train = [['Hello', 'world'], ['Hello', 'Cher'], ['I', 'love', 'Chicago']]
+      y_train(list): list of list of tokens representing entity labels
+                     Example:  y_train = [['O', 'O'], ['O', 'B-PER'], ['O', 'O', 'B-LOC']]
+      x_test(list): list of list of entity tokens for validation 
+                     Example: x_train = [['Hello', 'world'], ['Hello', 'Cher'], ['I', 'love', 'Chicago']]
+      y_test(list): list of list of tokens representing entity labels
+                     Example:  y_train = [['O', 'O'], ['O', 'B-PER'], ['O', 'O', 'B-LOC']]
+      embeddings(str): Currently, either None or 'word2vec' is supported
+                       If 'word2vec' is specified, pretrained word vectors
+                       are automatically downloaded to <home>/ktran_data
+                       and used as weights in the Embedding layer.
+                         If None, random embeddings used.
+     verbose (boolean): verbosity
+
+    """
+    train_df = array_to_df(x_train, y_train)
+    val_df = None
+    if x_test is not None and y_test is not None:
+        val_df = array_to_df(x_test, y_test)
+
+    return entities_from_df(train_df, val_df=val_df, embeddings=embeddings, verbose=verbose)
+
+
+
+
+
+
+def array_to_df(x_list, y_list):
+    ids = []
+    words = []
+    tags = []
+    current_index = 0
+    for idx, lst in enumerate(x_list):
+        length = len(lst)
+        words.extend(lst)
+        tags.extend(y_list[idx])
+        ids.extend( list(range(current_index, length)) )
+        current_index += length
 
 
 

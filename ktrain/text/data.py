@@ -277,8 +277,8 @@ def texts_from_array(x_train, y_train, x_test=None, y_test=None,
                        2. list of strings representing classes (class_names is required)
                        3. a one or multi hot encoded array representing classes (class_names is required)
                        4. numerical values for text regresssion (class_names should be left empty)
-        x_val(list): list of training texts 
-        y_val(list): labels in one of the following forms:
+        x_test(list): list of training texts 
+        y_test(list): labels in one of the following forms:
                       1. list of integers representing classes (class_names is required)
                       2. list of strings representing classes (class_names is required)
                       3. a one or multi hot encoded array representing classes (class_names is required)
