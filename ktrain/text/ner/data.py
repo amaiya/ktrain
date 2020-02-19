@@ -235,7 +235,11 @@ def entities_from_array(x_train, y_train,
     val_df = None
     if x_test is not None and y_test is not None:
         val_df = array_to_df(x_test, y_test)
-
+    if verbose:
+        print('training data sample:')
+        print(train_df.head())
+        print('validation data sample:')
+        print(val_df.head())
     return entities_from_df(train_df, val_df=val_df, embeddings=embeddings, verbose=verbose)
 
 
@@ -247,13 +251,13 @@ def array_to_df(x_list, y_list):
     ids = []
     words = []
     tags = []
-    current_index = 0
     for idx, lst in enumerate(x_list):
         length = len(lst)
         words.extend(lst)
         tags.extend(y_list[idx])
-        ids.extend( list(range(current_index, length)) )
-        current_index += length
+        ids.extend([idx] * length)
+    return pd.DataFrame(zip(ids, words, tags), columns=[SENT_COL, WORD_COL, TAG_COL])
+
 
 
 
