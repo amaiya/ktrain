@@ -47,9 +47,9 @@ class NERPreprocessor(Preprocessor):
         X = []
         y = []
         for s in sentences:
-            if is_chinese(lang):
+            if is_chinese(lang) or lang=='ko': # workaround for langdetect bug on short chinese texts
                 tokenize_chinese = lambda text:[c for c in text]
-                tokens = tokenize_fn(s)
+                tokens = tokenize_chinese(s)
             else:
                 tokens = tokenize(s)
             X.append(tokens)
