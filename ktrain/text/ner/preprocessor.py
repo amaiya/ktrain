@@ -2,6 +2,7 @@ from ...imports import *
 from ... import utils as U
 from ...preprocessor import Preprocessor
 from ...data import Dataset
+from ..preprocessor import detect_lang, is_chinese
 
 OTHER = 'O'
 W2V = 'word2vec'
@@ -37,13 +38,17 @@ class NERPreprocessor(Preprocessor):
         return self.e
 
 
-    def preprocess(self, sentences, tokenize_fn=None):
+    def preprocess(self, sentences):
         if type(sentences) != list:
             raise ValueError('Param sentences must be a list of strings')
+
+        # language detection
+        lang = detect_lang(sentences)
         X = []
         y = []
         for s in sentences:
-            if tokenize_fn is not None:
+            if is_chinese(lang):
+                tokenize_chinese = lambda text:[c for c in text]
                 tokens = tokenize_fn(s)
             else:
                 tokens = tokenize(s)
