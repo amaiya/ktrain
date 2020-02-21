@@ -36,7 +36,8 @@ setup(
           'packaging',
           'tensorflow_datasets',
           'transformers',
-          'ipython'
+          'ipython',
+          'syntok'
           #'stellargraph>=0.8.2',
           #'eli5 >= 0.10.0',
           #'pillow'

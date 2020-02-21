@@ -5,6 +5,7 @@ from .ner.models import sequence_tagger, print_sequence_taggers
 from .eda import get_topic_model
 from .textutils import extract_filenames, load_text_files, filter_by_id
 from .preprocessor import Transformer
+from . import shallownlp
 
 __all__ = [
            'text_classifier', 'text_regression_model',
@@ -21,6 +22,7 @@ __all__ = [
            'extract_filenames', 
            'load_text_files',
            'Transformer',
+           'shallownlp'
            ]
 
 
