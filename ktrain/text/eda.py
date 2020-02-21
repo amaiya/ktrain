@@ -108,7 +108,7 @@ class TopicModel():
         alpha = hyperparam_kwargs.get('alpha', 5.0 / n_topics)
         beta = hyperparam_kwargs.get('beta', 0.01)
         nmf_alpha = hyperparam_kwargs.get('nmf_alpha', 0)
-        l1_ratio = hyperparam_kwargs.get('beta', 0)
+        l1_ratio = hyperparam_kwargs.get('l1_ratio', 0)
         ngram_range = hyperparam_kwargs.get('ngram_range', (1,1))
 
         # adjust defaults based on language detected
@@ -153,6 +153,8 @@ class TopicModel():
                 alpha=nmf_alpha,
                 l1_ratio=l1_ratio,
                 random_state=0)
+        else:
+            raise ValueError("unknown model type:", str(model_type))
         model.fit(x_train)
 
         # save model and vectorizer and hyperparameter settings
