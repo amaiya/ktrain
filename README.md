@@ -76,7 +76,7 @@ Tasks such as text classification and image classification can be accomplished e
 only a few lines of code.
 
 #### Example: Text Classification of [IMDb Movie Reviews](https://ai.stanford.edu/~amaas/data/sentiment/) Using [BERT](https://arxiv.org/pdf/1810.04805.pdf)
-```
+```python
 import ktrain
 from ktrain import text as txt
 
@@ -105,7 +105,7 @@ learner.fit_onecycle(2e-5, 3)
 
 
 #### Example: Classifying Images of [Dogs and Cats](https://www.kaggle.com/c/dogs-vs-cats) Using a Pretrained [ResNet50](https://arxiv.org/abs/1512.03385) model
-```
+```python
 import ktrain
 from ktrain import vision as vis
 
@@ -132,7 +132,7 @@ learner.autofit(1e-4, checkpoint_folder='/tmp/saved_weights')
 ```
 
 #### Example: Sequence Labeling for [Named Entity Recognition](https://www.kaggle.com/abhinavwalia95/entity-annotated-corpus/version/2) using a randomly initialized [Bidirectional LSTM CRF](https://arxiv.org/abs/1603.01360) model
-```
+```python
 import ktrain
 from ktrain import text as txt
 
@@ -156,7 +156,7 @@ learner.fit(1e-3, 1)
 
 
 #### Example: Node Classification on [Cora Citation Graph](https://linqs-data.soe.ucsc.edu/public/lbc/cora.tgz) using a [GraphSAGE](https://arxiv.org/abs/1706.02216) model
-```
+```python
 import ktrain
 from ktrain import graph as gr
 
