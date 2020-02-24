@@ -29,10 +29,10 @@ class NER:
             print(msg)
             return
 
-        old_do = os.environ.get('CUDA_DEVICE_ORDER', None)
-        old_vd = os.environ.get('CUDA_VISIBLE_DEVICES', None)
-        os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-        os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+        #old_do = os.environ.get('CUDA_DEVICE_ORDER', None)
+        #old_vd = os.environ.get('CUDA_VISIBLE_DEVICES', None)
+        #os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+        #os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
         if isinstance(texts, str): texts = [texts]
         if self.lang == 'zh':
@@ -60,14 +60,14 @@ class NER:
             results.append(result)
         if len(result) == 1: result = result[0]
 
-        if old_do is not None:
-            os.environ["CUDA_DEVICE_ORDER"] = old_do
-        else:
-            del os.environ['CUDA_DEVICE_ORDER']
-        if old_vd is not None:
-            os.environ['CUDA_VISIBLE_DEVICES'] = old_vd
-        else:
-            del os.environ['CUDA_VISIBLE_DEVICES']
+        #if old_do is not None:
+            #os.environ["CUDA_DEVICE_ORDER"] = old_do
+        #else:
+            #del os.environ['CUDA_DEVICE_ORDER']
+        #if old_vd is not None:
+            #os.environ['CUDA_VISIBLE_DEVICES'] = old_vd
+        #else:
+            #del os.environ['CUDA_VISIBLE_DEVICES']
         return result
 
     def merge_entities(self, annotated_sentence):
