@@ -9,8 +9,11 @@ class TopicModel():
 
     def __init__(self,texts=None, n_topics=None, n_features=10000, 
                  min_df=5, max_df=0.5,  stop_words='english',
-                 lda_max_iter=5, lda_mode='online', 
-                 token_pattern=None, verbose=1):
+                 model_type='lda',
+                 lda_max_iter=5, lda_mode='online',
+                 token_pattern=None, verbose=1,
+                 hyperparam_kwargs=None
+    ):
         """
         Fits a topic model to documents in <texts>.
         Example:
@@ -44,12 +47,13 @@ class TopicModel():
 
         # train model
         if texts is not None:
-            (model, vectorizer) = self.train(texts, 
+            (model, vectorizer) = self.train(texts, model_type=model_type,
                                              n_topics=n_topics, n_features=n_features,
                                              min_df = min_df, max_df = max_df, 
                                              stop_words=stop_words,
                                              lda_max_iter=lda_max_iter, lda_mode=lda_mode,
-                                             token_pattern=token_pattern)
+                                             token_pattern=token_pattern,
+                                             hyperparam_kwargs=hyperparam_kwargs)
         else:
             vectorizer = None
             model = None
@@ -73,10 +77,10 @@ class TopicModel():
         return
 
 
-    def train(self,texts, n_topics=None, n_features=10000, 
+    def train(self,texts, model_type='lda', n_topics=None, n_features=10000,
               min_df=5, max_df=0.5,  stop_words='english',
               lda_max_iter=5, lda_mode='online',
-              token_pattern=None):
+              token_pattern=None, hyperparam_kwargs=None):
         """
         Fits a topic model to documents in <texts>.
         Example:
@@ -99,6 +103,13 @@ class TopicModel():
         Returns:
             tuple: (model, vectorizer)
         """
+        if hyperparam_kwargs is None:
+            hyperparam_kwargs = {}
+        alpha = hyperparam_kwargs.get('alpha', 5.0 / n_topics)
+        beta = hyperparam_kwargs.get('beta', 0.01)
+        nmf_alpha = hyperparam_kwargs.get('nmf_alpha', 0)
+        l1_ratio = hyperparam_kwargs.get('l1_ratio', 0)
+        ngram_range = hyperparam_kwargs.get('ngram_range', (1,1))
 
         # adjust defaults based on language detected
         if texts is not None:
@@ -119,20 +130,31 @@ class TopicModel():
         if token_pattern is None: token_pattern = TU.DEFAULT_TOKEN_PATTERN
         #if token_pattern is None: token_pattern = r'(?u)\b\w\w+\b'
         vectorizer = CountVectorizer(max_df=max_df, min_df=min_df,
-                                     max_features=n_features, stop_words=stop_words,
-                                     token_pattern=token_pattern)
+                                 max_features=n_features, stop_words=stop_words,
+                                 token_pattern=token_pattern, ngram_range=ngram_range)
         
 
         x_train = vectorizer.fit_transform(texts)
 
         # fit model
-        alpha = 5./n_topics
-        beta = 0.01
+
         if self.verbose: print('fitting model...')
-        model = LatentDirichletAllocation(n_components=n_topics, max_iter=lda_max_iter,
-                                          learning_method=lda_mode, learning_offset=50.,
-                                          doc_topic_prior=alpha, topic_word_prior=beta,
-                                          verbose=self.verbose, random_state=0)
+        if model_type == 'lda':
+            model = LatentDirichletAllocation(n_components=n_topics, max_iter=lda_max_iter,
+                                              learning_method=lda_mode, learning_offset=50.,
+                                              doc_topic_prior=alpha,
+                                              topic_word_prior=beta,
+                                              verbose=self.verbose, random_state=0)
+        elif model_type == 'nmf':
+            model = NMF(
+                n_components=n_topics,
+                max_iter=lda_max_iter,
+                verbose=self.verbose,
+                alpha=nmf_alpha,
+                l1_ratio=l1_ratio,
+                random_state=0)
+        else:
+            raise ValueError("unknown model type:", str(model_type))
         model.fit(x_train)
 
         # save model and vectorizer and hyperparameter settings
@@ -423,7 +445,7 @@ class TopicModel():
         return
 
 
-    def train_recommender(self):
+    def train_recommender(self, n_neighbors=20, metric='minkowski', p=2):
         """
         Trains a recommender that, given a single document, will return
         documents in the corpus that are semantically similar to it.
@@ -434,7 +456,7 @@ class TopicModel():
             None
         """
         from sklearn.neighbors import NearestNeighbors
-        rec = NearestNeighbors(n_neighbors=20)
+        rec = NearestNeighbors(n_neighbors=n_neighbors, metric=metric, p=p)
         probs = self.get_doctopics()
         rec.fit(probs)
         self.recommender = rec
@@ -442,7 +464,7 @@ class TopicModel():
 
 
 
-    def recommend(self, text=None, doc_topic=None, n=5):
+    def recommend(self, text=None, doc_topic=None, n=5, n_neighbors=100):
         """
         Given an example document, recommends documents similar to it
         from the set of documents supplied to build().
@@ -457,8 +479,6 @@ class TopicModel():
                             (text, doc_id, topic_probability, topic_id)
 
         """
-        n_neighbors = 100 
-
         # error-checks
         if text is not None and doc_topic is not None:
             raise ValueError('text is mutually-exclusive with doc_topic')
@@ -482,7 +502,7 @@ class TopicModel():
 
 
 
-    def train_scorer(self, topic_ids=[], doc_ids=[]):
+    def train_scorer(self, topic_ids=[], doc_ids=[], n_neighbors=20):
         """
         Trains a scorer that can score documents based on similarity to a
         seed set of documents represented by topic_ids and doc_ids.
@@ -498,7 +518,7 @@ class TopicModel():
             None
         """
         from sklearn.neighbors import LocalOutlierFactor
-        clf = LocalOutlierFactor(n_neighbors=20, novelty=True, contamination=0.1)
+        clf = LocalOutlierFactor(n_neighbors=n_neighbors, novelty=True, contamination=0.1)
         probs = self.get_doctopics(topic_ids=topic_ids, doc_ids=doc_ids)
         clf.fit(probs)
         self.scorer = clf
