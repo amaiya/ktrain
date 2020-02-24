@@ -8,6 +8,7 @@ This directory contains various example notebooks using *ktrain*.  The directory
   - [topic modeling](#lda):  unsupervised learning from unlabeled text data
   - [document similarity with one-class learning](#docsim): given a sample of interesting documents, find and score new documents that are semantically similar to it using One-Class text classification
   - [document recommender system](#docrec):  given text from a sample document, recommend documents that are semantically similar to it from a larger corpus 
+  - [Shallow NLP](#shallownlp):  a small collection of miscellaneous text utilities amenable to being used on machines with only a CPU available (no GPU required)
 - `vision`:  
   - [image classification](#imageclass):  models for image datasetsimage classification examples using various models and datasets
 - `graphs`: 
@@ -16,7 +17,7 @@ This directory contains various example notebooks using *ktrain*.  The directory
 
 ## Text Data
 
-### <a name="textclass"></a>Text Classification Datasets
+### <a name="textclass"></a>Text Classification
 
 #### [IMDb](https://ai.stanford.edu/~amaas/data/sentiment/):  Binary Classification
 
@@ -65,7 +66,7 @@ Dataset is in the form of a CSV file.
 - [toxic_comments-bigru.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text):  A bidirectional GRU using pretrained Glove vectors. This example shows how to use pretreained word vectors using *ktrain*.
 
 
-### <a name="textregression"></a>Text Regression Datasets
+### <a name="textregression"></a>Text Regression 
 
 #### [Wine Prices](https://www.floydhub.com/floydhub/datasets/wine-reviews/1/wine_data.csv):  Text Regression
 
@@ -75,7 +76,7 @@ We will attempt to predict the price of a wine based purely on its text descript
 
 
 
-### <a name="seqlab"></a> Sequence Labeling Datasets
+### <a name="seqlab"></a> Sequence Labeling 
 #### [CoNLL2003 NER Task](https://github.com/amaiya/ktrain/tree/master/ktrain/tests/conll2003):  Named Entity Recognition
 The objective of the CoNLL2003 task is to classify sequences of words as belonging to one of several categories of concepts such as Persons or Locations. See the [original paper](https://www.aclweb.org/anthology/W03-0419) for more information on the format.
 
@@ -100,9 +101,22 @@ The objective of the CoNLL2003 task is to classify sequences of words as belongi
 - [20newsgroups-recommendation_engine.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text):  given text from a sample document, recommend documents that are semantically similar to it from a larger corpus
 
 
+### <a name="shallownlp"></a> Shallow NLP
+
+#### [shallownlp-tutorial.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text)
+- Shallow NLP is a submodule in *ktrain* that provides a small collection of miscellaneous text utiilities to analyze text on machines with no GPU and minimal computational resources.  Includes:
+    - *text classification*: a non-neural version of NBSVM that can be trained in a single line of code
+	- *named-entity-recognition (NER)*:  out-of-the box, pretrained NER for English and Chinese that just works with no training
+	- *multilingual text searches*:  searching text in multiple languages
+
+
+#### [20 News Groups](http://qwone.com/~jason/20Newsgroups/): recommend posts from 20newsgroups
+- [20newsgroups-recommendation_engine.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text):  given text from a sample document, recommend documents that are semantically similar to it from a larger corpu
+
+
 ## Vision Data
 
-### <a name="imageclass"></a> Image Classification Datasets
+### <a name="imageclass"></a> Image Classification 
 
 #### [Dogs vs. Cats](https://www.kaggle.com/c/dogs-vs-cats):  Binary Classification
 - [dogs_vs_cats-ResNet50.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/vision):  ResNet50 pretrained on ImageNet.  

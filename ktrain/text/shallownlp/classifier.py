@@ -116,6 +116,7 @@ class Classifier:
         self.model = Pipeline([ ('vect', CountVectorizer(ngram_range=(1,3), binary=True, token_pattern=token_pattern)),
                               ('clf', clf) ])
         self.model.fit(x_train, y_train)
+        return self
 
 
     def predict(self, x_test):

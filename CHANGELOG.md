@@ -7,6 +7,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.9.5 (TBD)
+
+### New:
+- added `shallownlp` module
+
+### Changed:
+- N/A
+
+### Fixed:
+- N/A
+
+
 ## 0.9.4 (2020-02-13)
 
 ### New:

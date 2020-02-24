@@ -133,6 +133,9 @@ def texts_from_csv(train_filepath,
     one-hot-encoded arrays representing classes:
          classification (a single one in each array): [[1,0,0], [0,1,0]]]
          multi-label classification (one more ones in each array): [[1,1,0], [0,1,1]]
+    There should be a column for each entry in the 1-hot or multi-hot encoded label,
+    which should be supplied as list to label_columns argument.
+
     This treats task as classification problem.  
     If data is for a text regression task, use texts_from_array.
 
@@ -198,6 +201,9 @@ def texts_from_df(train_df,
     one-hot-encoded arrays representing classes:
          classification (a single one in each array): [[1,0,0], [0,1,0]]]
          multi-label classification (one more ones in each array): [[1,1,0], [0,1,1]]
+    There should be a column for each entry in the 1-hot or multi-hot encoded label,
+    which should be supplied as list to label_columns argument.
+
     This treats task as classification problem.  
     If this is a text regression task, use texts_from_array.
     Args:
