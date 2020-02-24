@@ -10,6 +10,7 @@ Most recent releases are shown at the top. Each release shows:
 ## 0.9.5 (TBD)
 
 ### New:
+- `text.eda` module now supports NMF in addition to LDA
 - added `shallownlp` module
 
 ### Changed:

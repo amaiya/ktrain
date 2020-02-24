@@ -100,6 +100,14 @@ class TopicModel():
             lda_mode (str):  one of {'online', 'batch'}. Ignored of model_type !='lda'
             token_pattern(str): regex pattern to use to tokenize documents. 
                                 If None, a default tokenizer will be used
+            hyperparam_kwargs(dict): hyperparameters for LDA/NMF
+                                     Keys in this dict can be any of the following:
+                                         alpha: alpha for LDA  default: 5./n_topics
+                                         beta: beta for LDA.  default:0.01
+                                         nmf_alpha: alpha for NMF.  default:0
+                                         l1_ratio: l1_ratio for NMF. default: 0
+                                         ngram_range:  whether to consider bigrams, trigrams. default: (1,1) 
+                                    
         Returns:
             tuple: (model, vectorizer)
         """
