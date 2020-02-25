@@ -8,8 +8,13 @@ import logging
 from distutils.util import strtobool
 from packaging import version
 
-# suppress TF warnings
+# suppress warnings
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 logging.getLogger('tensorflow').setLevel(logging.ERROR)
+warnings.simplefilter(action='ignore', category=FutureWarning)
+
+
+
 
 # TF1
 #import tensorflow as tf
@@ -32,6 +37,8 @@ else:
     import tensorflow as tf
     from tensorflow import keras
 
+# suppress autograph warnings
+tf.autograph.set_verbosity(1)
 
 if version.parse(tf.__version__) < version.parse('2.0'):
     raise Exception('As of v0.8.x, ktrain needs TensorFlow 2. Please upgrade TensorFlow.')
