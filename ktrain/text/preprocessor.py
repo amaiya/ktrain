@@ -2,6 +2,7 @@ from ..imports import *
 from .. import utils as U
 from ..preprocessor import Preprocessor
 from ..data import Dataset
+from . import textutils as TU
 
 DistilBertTokenizer = transformers.DistilBertTokenizer
 DISTILBERT= 'distilbert'
@@ -26,9 +27,6 @@ TRANSFORMER_MODELS = {
 
 
 NOSPACE_LANGS = ['zh-cn', 'zh-tw', 'ja']
-
-def is_chinese(lang):
-    return lang is not None and lang.startswith('zh-')
 
 
 def is_nospace_lang(lang):
@@ -294,60 +292,6 @@ def hf_convert_examples(texts, y=None, tokenizer=None,
 
 
 #------------------------------------------------------------------------------
-# MISC UTILITIES
-#------------------------------------------------------------------------------
-
-def decode_by_line(texts, encoding='utf-8', verbose=1):
-    """
-    Decode text line by line and skip over errors.
-    """
-    new_texts = []
-    skips=0
-    num_lines = 0
-    for doc in texts:
-        text = ""
-        for line in doc.splitlines():
-            num_lines +=1
-            try:
-                line = line.decode(encoding)
-            except:
-                skips +=1
-                continue
-            text += line
-        new_texts.append(text)
-    pct = round((skips*1./num_lines) * 100, 1)
-    if verbose: 
-        print('skipped %s lines (%s%%) due to character decoding errors' % (skips, pct))
-        if pct > 10:
-            print('If this is too many, try a different encoding')
-    return new_texts
-
-
-
-def detect_lang(texts, sample_size=32):
-    """
-    detect language
-    """
-    if isinstance(texts, (pd.Series, pd.DataFrame)):
-        texts = texts.values
-    if isinstance(texts, str): texts = [texts]
-    if not isinstance(texts, (list, np.ndarray)):
-        raise ValueError('texts must be a list or NumPy array of strings')
-    lst = []
-    for doc in texts[:sample_size]:
-        try:
-            lst.append(langdetect.detect(doc))
-        except:
-            continue
-    if len(lst) == 0: 
-        raise Exception('could not detect language in random sample of %s docs.'  % (sample_size))
-    return max(set(lst), key=lst.count)
-
-
-
-
-
-#------------------------------------------------------------------------------
 
 
 class TextPreprocessor(Preprocessor):
@@ -389,23 +333,18 @@ class TextPreprocessor(Preprocessor):
 
 
     def is_chinese(self):
-        return is_chinese(self.lang)
+        return TU.is_chinese(self.lang)
 
 
     def is_nospace_lang(self):
-        return is_nospace_lang(self.lang)
+        return TU.is_nospace_lang(self.lang)
 
 
     def process_chinese(self, texts, lang=None):
         #if lang is None: lang = langdetect.detect(texts[0])
-        if lang is None: lang = detect_lang(texts)
-        if not is_nospace_lang(lang): return texts
-        split_texts = []
-        for doc in texts:
-            seg_list = jieba.cut(doc, cut_all=False)
-            seg_list = list(seg_list)
-            split_texts.append(seg_list)
-        return [" ".join(tokens) for tokens in split_texts] 
+        if lang is None: lang = TU.detect_lang(texts)
+        if not TU.is_nospace_lang(lang): return texts
+        return TU.split_chinese(texts)
 
 
     @classmethod
@@ -495,7 +434,7 @@ class StandardTextPreprocessor(TextPreprocessor):
         """
         preprocess training set
         """
-        if self.lang is None: self.lang = detect_lang(train_text)
+        if self.lang is None: self.lang = TU.detect_lang(train_text)
 
 
         U.vprint('language: %s' % (self.lang), verbose=verbose)
@@ -684,7 +623,7 @@ class BERTPreprocessor(TextPreprocessor):
         """
         if mode == 'train' and y is None:
             raise ValueError('y is required when mode=train')
-        if self.lang is None and mode=='train': self.lang = detect_lang(texts)
+        if self.lang is None and mode=='train': self.lang = TU.detect_lang(texts)
         U.vprint('preprocessing %s...' % (mode), verbose=verbose)
         U.vprint('language: %s' % (self.lang), verbose=verbose)
 
@@ -760,7 +699,7 @@ class TransformersPreprocessor(TextPreprocessor):
         preprocess training set
         """
         U.vprint('preprocessing %s...' % (mode), verbose=verbose)
-        if self.lang is None and mode=='train': self.lang = detect_lang(texts)
+        if self.lang is None and mode=='train': self.lang = TU.detect_lang(texts)
         U.vprint('language: %s' % (self.lang), verbose=verbose)
         self.print_seqlen_stats(texts, mode, verbose=verbose)
 

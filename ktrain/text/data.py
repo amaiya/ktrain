@@ -1,6 +1,7 @@
 from ..imports import *
 from .. import utils as U
 from  . import preprocessor as tpp
+from . import textutils as TU
 
 
 
@@ -80,10 +81,7 @@ def texts_from_folder(datadir, classes=None,
 
     # decode based on supplied encoding
     if encoding is None:
-        # detect encoding from first training example
-        lst = [chardet.detect(doc)['encoding'] for doc in x_train[:32]]
-        encoding = max(set(lst), key=lst.count)
-        encoding = standardize_to_utf8(encoding)
+        encoding = TU.detect_encoding(x_train)
         U.vprint('detected encoding: %s' % (encoding), verbose=verbose)
     
     try:
@@ -93,12 +91,12 @@ def texts_from_folder(datadir, classes=None,
         U.vprint('Decoding with %s failed 1st attempt - using %s with skips' % (encoding, 
                                                                                 encoding),
                                                                                 verbose=verbose)
-        x_train = tpp.decode_by_line(x_train, encoding=encoding, verbose=verbose)
-        x_test = tpp.decode_by_line(x_test, encoding=encoding, verbose=verbose)
+        x_train = TU.decode_by_line(x_train, encoding=encoding, verbose=verbose)
+        x_test = TU.decode_by_line(x_test, encoding=encoding, verbose=verbose)
 
 
     # detect language
-    if lang is None: lang = tpp.detect_lang(x_train)
+    if lang is None: lang = TU.detect_lang(x_train)
     check_unsupported_lang(lang, preprocess_mode)
 
 
@@ -165,8 +163,9 @@ def texts_from_csv(train_filepath,
     """
     if encoding is None:
         with open(train_filepath, 'rb') as f:
-            encoding = chardet.detect(f.read())['encoding']
-            encoding = standardize_to_utf8(encoding)
+            #encoding = chardet.detect(f.read())['encoding']
+            #encoding = 'utf-8' if encoding.lower() in ['ascii', 'utf8', 'utf-8'] else encoding
+            encoding = TU.detect_encoding(f.read())
             U.vprint('detected encoding: %s (if wrong, set manually)' % (encoding), verbose=verbose)
 
     train_df = pd.read_csv(train_filepath, encoding=encoding,sep=sep)
@@ -248,7 +247,7 @@ def texts_from_df(train_df,
     y_test = np.squeeze(y_test)
 
     # detect language
-    if lang is None: lang = tpp.detect_lang(x_train)
+    if lang is None: lang = TU.detect_lang(x_train)
     check_unsupported_lang(lang, preprocess_mode)
 
 
@@ -332,7 +331,7 @@ def texts_from_array(x_train, y_train, x_test=None, y_test=None,
 
 
     # detect language
-    if lang is None: lang = tpp.detect_lang(x_train)
+    if lang is None: lang = TU.detect_lang(x_train)
     check_unsupported_lang(lang, preprocess_mode)
 
     # return preprocessed the texts
@@ -348,22 +347,11 @@ def texts_from_array(x_train, y_train, x_test=None, y_test=None,
 
 
 
-def standardize_to_utf8(encoding):
-    """
-    standardize to utf-8 if necessary.
-    NOTE: mainly used to use utf-8 if ASCII is detected, as
-    BERT performance suffers otherwise.
-    """
-    encoding = 'utf-8' if encoding.lower() in ['ascii', 'utf8', 'utf-8'] else encoding
-    return encoding
-
-
-
 def check_unsupported_lang(lang, preprocess_mode):
     """
-    check for unsupported language (e.g., nospace langs no supported by Jieba)
+    check for unsupported language (e.g., nospace langs not supported by Jieba)
     """
-    unsupported = preprocess_mode=='standard' and tpp.is_nospace_lang(lang) and not tpp.is_chinese(lang)
+    unsupported = preprocess_mode=='standard' and TU.is_nospace_lang(lang) and not TU.is_chinese(lang)
     if unsupported:
         raise ValueError('language %s is currently only supported by the BERT model. ' % (lang) +
                          'Please select preprocess_mode="bert"')

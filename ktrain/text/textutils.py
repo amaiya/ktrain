@@ -191,6 +191,8 @@ def detect_lang(texts, sample_size=32):
     """
     detect language
     """
+    if isinstance(texts, (pd.Series, pd.DataFrame)):
+        texts = texts.values
     if isinstance(texts, str): texts = [texts]
     if not isinstance(texts, (list, np.ndarray)):
         raise ValueError('texts must be a list or NumPy array of strings')
@@ -200,9 +202,10 @@ def detect_lang(texts, sample_size=32):
             lst.append(langdetect.detect(doc))
         except:
             continue
-    if len(lst) == 0:
+    if len(lst) == 0: 
         raise Exception('could not detect language in random sample of %s docs.'  % (sample_size))
     return max(set(lst), key=lst.count)
+
 
 
 def is_chinese(lang, strict=True):
@@ -229,10 +232,18 @@ def split_chinese(texts):
     return [" ".join(tokens) for tokens in split_texts]
 
 
+NOSPACE_LANGS = ['zh-cn', 'zh-tw', 'ja']
+
+
+def is_nospace_lang(lang):
+    return lang in NOSPACE_LANGS
+
+
 def decode_by_line(texts, encoding='utf-8', verbose=1):
     """
     Decode text line by line and skip over errors.
     """
+
     if isinstance(texts, str): texts = [texts]
     new_texts = []
     skips=0
@@ -257,9 +268,10 @@ def decode_by_line(texts, encoding='utf-8', verbose=1):
 
 
 def detect_encoding(texts, sample_size=32):
-    if isinstance(texts, str): texts = [texts]
+    if not isinstance(texts, list): texts = [texts] # check for instance of list as bytes are supplied as input
     lst = [chardet.detect(doc)['encoding'] for doc in texts[:sample_size]]
     encoding = max(set(lst), key=lst.count)
+    # standardize to utf-8 to prevent BERT problems
     encoding = 'utf-8' if encoding.lower() in ['ascii', 'utf8', 'utf-8'] else encoding
     return encoding
 

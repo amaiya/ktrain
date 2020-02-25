@@ -4,6 +4,7 @@
 #--------------------------
 
 import os
+import warnings
 import logging
 from distutils.util import strtobool
 from packaging import version
@@ -12,6 +13,8 @@ from packaging import version
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 logging.getLogger('tensorflow').setLevel(logging.ERROR)
 warnings.simplefilter(action='ignore', category=FutureWarning)
+# elevate warnings to errors for debugging dependencies
+#warnings.simplefilter('error', FutureWarning)
 
 
 
@@ -147,9 +150,9 @@ import string
 import random
 import json
 import mimetypes
-import warnings
-# elevate warnings to errors for debugging dependencies
-#warnings.simplefilter('error', FutureWarning)
+
+
+
 
 
 

@@ -14,7 +14,8 @@ Most recent releases are shown at the top. Each release shows:
 - added `shallownlp` module
 
 ### Changed:
-- N/A
+- reorganized language-handling to `text.textutils`
+- more suppression of warnings due to spurious warnings from TF2 causing confusion in output
 
 ### Fixed:
 - N/A

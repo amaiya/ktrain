@@ -2,7 +2,7 @@ from ...imports import *
 from ... import utils as U
 from ...preprocessor import Preprocessor
 from ...data import Dataset
-from ..preprocessor import detect_lang, is_chinese
+from .. import textutils as TU
 
 OTHER = 'O'
 W2V = 'word2vec'
@@ -43,11 +43,11 @@ class NERPreprocessor(Preprocessor):
             raise ValueError('Param sentences must be a list of strings')
 
         # language detection
-        lang = detect_lang(sentences)
+        lang = TU.detect_lang(sentences)
         X = []
         y = []
         for s in sentences:
-            if is_chinese(lang) or lang=='ko': # workaround for langdetect bug on short chinese texts
+            if TU.is_chinese(lang, strict=False): # strict=False: workaround for langdetect bug on short chinese texts
                 tokenize_chinese = lambda text:[c for c in text]
                 tokens = tokenize_chinese(s)
             else:
