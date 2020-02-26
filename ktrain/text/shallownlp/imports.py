@@ -13,7 +13,7 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.preprocessing import LabelEncoder
 from sklearn.datasets import load_files
-from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import LogisticRegression, SGDClassifier
 from joblib import dump, load
 import pandas as pd
 import syntok.segmenter as segmenter

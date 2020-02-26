@@ -13,6 +13,55 @@ class Classifier:
         """
         self.model = None
 
+
+    def create_model(self, ctype, texts, hp_dict={}, ngram_range=(1,3)):
+        """
+        create a model
+        Args:
+          ctype(str): one of {'nbsvm', 'logreg', 'sgdclassifier'}
+          texts(list): list of texts
+          hp_dict(dict): dictionary of hyperparameters to use for the ctype selected
+
+        """
+        lang = U.detect_lang(texts)
+        if U.is_chinese(lang):
+            token_pattern = r'(?u)\b\w+\b'
+        else:
+            token_pattern = r'\w+|[%s]' % string.punctuation
+        if ctype == 'nbsvm':
+            clf = NBSVM(C=hp_dict.get('C', 0.01), 
+                        alpha=hp_dict.get('alpha', 0.75), 
+                        beta=hp_dict.get('beta', 0.25), 
+                        fit_intercept=hp_dict.get('fit_intercept', False))
+        elif ctype=='logreg':
+            clf = LogisticRegression(C=hp_dict.get('C', 0.1), 
+                                     dual=hp_dict.get('dual', True),
+                                     penalty=hp_dict.get('penalty', 'l2'),
+                                     tol=hp_dict.get('tol', 1e-4),
+                                     intercept_scaling=hp_dict.get('intercept_scaling', 1),
+                                     solver=hp_dict.get('solver', 'liblinear'),
+                                     max_iter=hp_dict.get('max_iter', 100),
+                                     multi_class=hp_dict.get('multi_class', 'auto'),
+                                     warm_start=hp_dict.get('warm_start', False),
+                                     n_jobs=hp_dict.get('n_jobs', None),
+                                     l1_ratio=hp_dict.get('l1_ratio', None),
+                                     random_state=hp_dict.get('random_state', 42)
+                                     )
+        elif ctype == 'sgdclassifier':
+            clf = SGDClassifier(loss=hp_dict.get('loss', 'hinge'), 
+                                penalty=hp_dict.get('penalty', 'l2'), 
+                                alpha=hp_dict.get('alpha', 1e-3), 
+                                random_state=hp_dict.get('random_state', 42), 
+                                max_iter=hp_dict.get('max_iter', 5), 
+                                tol=hp_dict.get('tol', None))
+        else:
+            raise ValueError('Unknown ctype: %s' % (ctype))
+
+        self.model = Pipeline([ ('vect', CountVectorizer(ngram_range=ngram_range, binary=True, token_pattern=token_pattern)),
+                              ('clf', clf) ])
+        return
+
+
     @classmethod
     def texts_from_folder(cls, folder_path, 
                           subfolders=None, 
@@ -94,45 +143,49 @@ class Classifier:
         return (texts, labels, le.classes_)
 
 
-    def fit(self, x_train, y_train, ctype='nbsvm'):
+    def fit(self, x_train, y_train, ctype='logreg'):
         """
         train a classifier
         Args:
           x_train(list or np.ndarray):  training texts
           y_train(np.ndarray):  training labels
-          ctype(str):  Either 'logreg' or 'nbsvm'
+          ctype(str):  One of {'logreg', 'nbsvm', 'sgdclassifier'}.  default:nbsvm
         """
-
         lang = U.detect_lang(x_train)
         if U.is_chinese(lang):
-            token_pattern = r'(?u)\b\w+\b'
             x_train = U.split_chinese(x_train)
-        else:
-            token_pattern = r'\w+|[%s]' % string.punctuation
-        if ctype == 'nbsvm':
-            clf = NBSVM(C=0.01, alpha=0.75, beta=0.25, fit_intercept=False)
-        else:
-            clf = LogisticRegression(C=0.1, dual=True)
-        self.model = Pipeline([ ('vect', CountVectorizer(ngram_range=(1,3), binary=True, token_pattern=token_pattern)),
-                              ('clf', clf) ])
+        if self.model is None:
+            self.create_model(ctype, x_train)
         self.model.fit(x_train, y_train)
         return self
 
 
-    def predict(self, x_test):
+
+    def predict(self, x_test, return_proba=False):
         """
         make predictions on text data
         Args:
           x_test(list or np.ndarray or str): array of texts on which to make predictions or a string representing text
         """
-
+        if return_proba and not hasattr(self.model['clf'], 'predict_proba'): 
+            raise ValueError('%s does not support predict_proba' % (type(self.model['clf']).__name__))
         if isinstance(x_test, str): x_test = [x_test]
         lang = U.detect_lang(x_test)
         if U.is_chinese(lang): x_test = U.split_chinese(x_test)
         if self.model is None: raise ValueError('model is None - call fit or load to set the model')
-        predicted = self.model.predict(x_test)
+        if return_proba:
+            predicted = self.model.predict_proba(x_test)
+        else:
+            predicted = self.model.predict(x_test)
         if len(predicted) == 1: predicted = predicted[0]
         return predicted
+
+
+    def predict_proba(self, x_test):
+        """
+        predict_proba
+        """
+        return self.predict(x_test, return_proba=True)
 
 
     def evaluate(self, x_test, y_test):
@@ -159,7 +212,26 @@ class Classifier:
         """
         self.model = load(filename)
 
-
+    def grid_search(self, params, x_train, y_train, n_jobs=-1):
+        """
+        Performs grid search to find optimal set of hyperparameters
+        Args:
+          params (dict):  A dictionary defining the space of the search.
+                          Example for finding optimal value of alpha in NBSVM:
+                        parameters = {
+                                      #'clf__C': (1e0, 1e-1, 1e-2),
+                                      'clf__alpha': (0.1, 0.2, 0.4, 0.5, 0.75, 0.9, 1.0),
+                                      #'clf__fit_intercept': (True, False),
+                                      #'clf__beta' : (0.1, 0.25, 0.5, 0.9) 
+                                      }
+          n_jobs(int): number of jobs to run in parallel.  default:-1 (use all processors)
+        """
+        gs_clf = GridSearchCV(self.model, params, n_jobs=n_jobs)
+        gs_clf = gs_clf.fit(x_train, y_train)
+	#gs_clf.best_score_                                  
+        for param_name in sorted(params.keys()):
+            print("%s: %r" % (param_name, gs_clf.best_params_[param_name]))
+        return
 
 
 
@@ -220,18 +292,3 @@ class NBSVM(BaseEstimator, LinearClassifierMixin, SparseCoefMixin):
 
         return coef_, intercept_
 
-
-
-# hyperparam search for NBSVM
-# # hyperparameter tuning
-# parameters = {
-# #               'clf__C': (1e0, 1e-1, 1e-2),
-#               'clf__alpha': (0.1, 0.2, 0.4, 0.5, 0.75, 0.9, 1.0),
-# #               'clf__fit_intercept': (True, False),
-# #                'clf__beta' : (0.1, 0.25, 0.5, 0.9)
-
-
-# }
-# gs_clf = GridSearchCV(text_clf, parameters, n_jobs=-1)
-# #gs_clf = gs_clf.fit(X_train[:5000], y_train[:5000])
-# gs_clf = gs_clf.fit(X_train, y_train)
