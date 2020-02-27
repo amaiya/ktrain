@@ -724,6 +724,43 @@ class TransformersPreprocessor(TextPreprocessor):
         return self.preprocess_train(texts, y=y, mode=mode, verbose=verbose)
 
 
+    def get_classifier(self, fpath=None):
+        if not self.get_classes():
+            warnings.warn('no class labels were provided - treating as regression')
+            return self.get_regression_model()
+        num_labels = len(self.get_classes())
+        mname = fpath if fpath is not None else self.model_name
+        model = self.model_type.from_pretrained(mname, num_labels=num_labels)
+        if self.multilabel:
+            loss_fn =  keras.losses.BinaryCrossentropy(from_logits=True)
+        else:
+            loss_fn = keras.losses.CategoricalCrossentropy(from_logits=True)
+        model.compile(loss=loss_fn,
+                      optimizer=keras.optimizers.Adam(learning_rate=3e-5, epsilon=1e-08),
+                      metrics=['accuracy'])
+        return model
+
+
+    def get_regression_model(self, fpath=None):
+        if self.get_classes():
+            warnings.warn('class labels were provided - treating as classification problem')
+            return self.get_classifier()
+        mname = fpath if fpath is not None else self.model_name
+        model = self.model_type.from_pretrained(mname, num_labels=1)
+        loss_fn = 'mse'
+        model.compile(loss=loss_fn,
+                      optimizer=keras.optimizers.Adam(learning_rate=3e-5, epsilon=1e-08),
+                      metrics=['mae'])
+        return model
+
+
+    def get_model(self, fpath=None):
+        if not self.get_classes():
+            return self.get_regression_model(fpath=fpath)
+        else:
+            return self.get_classifier(fpath=fpath)
+
+
 
 class DistilBertPreprocessor(TransformersPreprocessor):
     """
@@ -827,39 +864,39 @@ class Transformer(TransformersPreprocessor):
 
 
 
-    def get_classifier(self):
-        if not self.get_classes():
-            warnings.warn('no class labels were provided - treating as regression')
-            return self.get_regression_model()
-        num_labels = len(self.get_classes())
-        model = self.model_type.from_pretrained(self.model_name, num_labels=num_labels)
-        if self.multilabel:
-            loss_fn =  keras.losses.BinaryCrossentropy(from_logits=True)
-        else:
-            loss_fn = keras.losses.CategoricalCrossentropy(from_logits=True)
-        model.compile(loss=loss_fn,
-                      optimizer=keras.optimizers.Adam(learning_rate=3e-5, epsilon=1e-08),
-                      metrics=['accuracy'])
-        return model
 
 
-    def get_regression_model(self):
-        if self.get_classes():
-            warnings.warn('class labels were provided - treating as classification problem')
-            return self.get_classifier()
-        model = self.model_type.from_pretrained(self.model_name, num_labels=1)
-        loss_fn = 'mse'
-        model.compile(loss=loss_fn,
-                      optimizer=keras.optimizers.Adam(learning_rate=3e-5, epsilon=1e-08),
-                      metrics=['mae'])
-        return model
 
 
-    def get_model(self):
-        if not self.get_classes():
-            return self.get_regression_model()
-        else:
-            return self.get_classifier()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
