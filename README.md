@@ -6,7 +6,7 @@
 
 ### News and Announcements
 - **2020-02-28:**  
-  - ***ktrain*** **v0.10.x is released** and now includes [out-of-the-box NER in English and Chinese](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/shallownlp-examples.ipynb) with no training required. 
+  - ***ktrain*** **v0.10.x is released** and now includes [ready-to-use NER for English and Chinese](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/shallownlp-examples.ipynb) with no training required. 
 - **2020-01-31:**  
   - ***ktrain*** **v0.9.x is released** and now includes out-of-the-box support for text regression in addition to support for custom data formats. See [this tutorial notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/tutorials/tutorial-A4-customdata-text_regression_with_extra_regressors.ipynb) for more information on both these topics.
   <!--- ***ktrain*** **v0.8.x is released** and now includes a thin and easy-to-use wrapper to [HuggingFace Transformers](https://github.com/huggingface/transformers) for text classification.  See [this tutorial notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-A3-hugging_face_transformers.ipynb) for more details. -->
@@ -34,7 +34,7 @@
   - `graph` data:
     - **graph node classification** with graph neural networks (e.g., [GraphSAGE](https://cs.stanford.edu/people/jure/pubs/graphsage-nips17.pdf)) <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/graphs/pubmed-GraphSAGE.ipynb)]</sup></sub>
 - perform multilingual text classification (e.g., [Chinese Sentiment Analysis with BERT](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/ChineseHotelReviews-BERT.ipynb), [Arabic Sentiment Analysis with NBSVM](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/ArabicHotelReviews-nbsvm.ipynb))
-- [Out-of-the-Box NER](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/shallownlp-examples.ipynb) for English and Chinese (no training required)
+- [Ready-to-Use NER](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/shallownlp-examples.ipynb) for English and Chinese (no training required)
 - load and preprocess text and image data from a variety of formats 
 - inspect data points that were misclassified and [provide explanations](https://eli5.readthedocs.io/en/latest/) to help improve your model
 - leverage a simple prediction API for saving and deploying both models and data-preprocessing steps to make predictions on new raw data
