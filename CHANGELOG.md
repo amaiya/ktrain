@@ -7,11 +7,11 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
-## 0.9.5 (TBD)
+## 0.10.0 (TBD)
 
 ### New:
+- added `shallownlp` module with out-of-the-box NER for English and Chinese
 - `text.eda` module now supports NMF in addition to LDA
-- added `shallownlp` module
 
 ### Changed:
 - `texts_from_csv` and `texts_from_df` now accept a single column of labels in string format and will 
