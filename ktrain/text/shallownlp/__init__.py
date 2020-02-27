@@ -5,8 +5,14 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 logging.getLogger("tensorflow").setLevel(logging.CRITICAL)
 logging.getLogger("tensorflow_hub").setLevel(logging.CRITICAL)
 warnings.simplefilter(action='ignore', category=FutureWarning)
-import tensorflow as tf
-tf.autograph.set_verbosity(1)
+
+try:
+    import tensorflow as tf
+    TF_INSTALLED = True
+except ImportError:
+    TF_INSTALLED = False
+if TF_INSTALLED:
+    tf.autograph.set_verbosity(1)
 
 
 

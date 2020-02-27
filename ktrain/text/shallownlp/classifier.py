@@ -148,6 +148,7 @@ class Classifier:
                 encoding = U.detect_encoding([f.read()])
                 if encoding != 'utf-8':
                     print('detected encoding: %s (if wrong, set manually)' % (encoding))
+        import pandas as pd
         df = pd.read_csv(csv_filepath, encoding=encoding, sep=sep)
         texts = df[text_column].fillna('fillna').values
         labels = df[label_column].values

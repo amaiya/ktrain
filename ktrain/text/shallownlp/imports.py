@@ -15,8 +15,13 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.datasets import load_files
 from sklearn.linear_model import LogisticRegression, SGDClassifier
 from joblib import dump, load
-import pandas as pd
 import syntok.segmenter as segmenter
+
+# ktrain imported locally in ner.py
+#import ktrain 
+
+# pandas imported locally in classifier.py
+#import pandas as pd
 
 try:
     import langdetect
