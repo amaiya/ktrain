@@ -127,15 +127,22 @@ def texts_from_csv(train_filepath,
                    sep=',', random_state=None,       
                    verbose=1):
     """
-    Loads text data from CSV file. Class labels are assumed to be
-    one-hot-encoded arrays representing classes:
-         classification (a single one in each array): [[1,0,0], [0,1,0]]]
-         multi-label classification (one more ones in each array): [[1,1,0], [0,1,1]]
-    There should be a column for each entry in the 1-hot or multi-hot encoded label,
-    which should be supplied as list to label_columns argument.
+    Loads text data from CSV or TSV file. Class labels are assumed to be
+    one of the following formats:
+        1. one-hot-encoded or multi-hot-encoded arrays representing classes:
+              Example with label_columns=['positive', 'negative'] and text_column='text':
+                text|positive|negative
+                I like this movie.|1|0
+                I hated this movie.|0|1
+            Classification will have a single one in each row: [[1,0,0], [0,1,0]]]
+            Multi-label classification will have one more ones in each row: [[1,1,0], [0,1,1]]
+        2. labels are in a single column of string or integer values representing classs labels
+               Example with label_columns=['label'] and text_column='text':
+                 text|label
+                 I like this movie.|positive
+                 I hated this movie.|negative
 
-    This treats task as classification problem.  
-    If data is for a text regression task, use texts_from_array.
+    This treats task as classification problem. If this is a text regression task, use texts_from_array.
 
     Args:
         train_filepath(str): file path to training CSV
@@ -183,9 +190,6 @@ def texts_from_csv(train_filepath,
                          verbose=verbose)
 
 
-
-
-
 def texts_from_df(train_df, 
                    text_column,
                    label_columns = [],
@@ -197,14 +201,22 @@ def texts_from_df(train_df,
                    verbose=1):
     """
     Loads text data from Pandas dataframe file. Class labels are assumed to be
-    one-hot-encoded arrays representing classes:
-         classification (a single one in each array): [[1,0,0], [0,1,0]]]
-         multi-label classification (one more ones in each array): [[1,1,0], [0,1,1]]
-    There should be a column for each entry in the 1-hot or multi-hot encoded label,
-    which should be supplied as list to label_columns argument.
+    one of the following formats:
+        1. one-hot-encoded or multi-hot-encoded arrays representing classes:
+              Example with label_columns=['positive', 'negative'] and text_column='text':
+                text|positive|negative
+                I like this movie.|1|0
+                I hated this movie.|0|1
+            Classification will have a single one in each row: [[1,0,0], [0,1,0]]]
+            Multi-label classification will have one more ones in each row: [[1,1,0], [0,1,1]]
+        2. labels are in a single column of string or integer values representing classs labels
+               Example with label_columns=['label'] and text_column='text':
+                 text|label
+                 I like this movie.|positive
+                 I hated this movie.|negative
 
-    This treats task as classification problem.  
-    If this is a text regression task, use texts_from_array.
+    This treats task as classification problem. If this is a text regression task, use texts_from_array.
+
     Args:
         train_df(dataframe): Pandas dataframe
         text_column(str): name of column containing the text
@@ -245,6 +257,18 @@ def texts_from_df(train_df,
                                                             random_state=random_state)
     y_train = np.squeeze(y_train)
     y_test = np.squeeze(y_test)
+    if isinstance(label_columns, str) or (isinstance(label_columns, list) and len(label_columns) == 1):
+        classes = list(set(y_train))
+        need_transform = True if isinstance(classes[0], str) else False
+        classes.sort()
+        classes = [str(c) for c in classes]
+        if need_transform:
+            encoder = LabelEncoder()
+            encoder.fit(y_train)
+            y_train = encoder.transform(y_train)
+            y_test = encoder.transform(y_test)
+    else:
+        classes = label_columns
 
     # detect language
     if lang is None: lang = TU.detect_lang(x_train)
@@ -256,7 +280,7 @@ def texts_from_df(train_df,
     if None: raise ValueError('unsupported preprocess_mode')
     preproc = preproc_type(maxlen,
                            max_features,
-                           classes = label_columns,
+                           classes = classes,
                            lang=lang, ngram_range=ngram_range)
     trn = preproc.preprocess_train(x_train, y_train, verbose=verbose)
     val = preproc.preprocess_test(x_test,  y_test, verbose=verbose)
@@ -323,7 +347,6 @@ def texts_from_array(x_train, y_train, x_test=None, y_test=None,
     if isinstance(y_train[0], str):
         if not isinstance(y_test[0], str): 
             raise ValueError('y_train contains strings, but y_test does not')
-        from sklearn.preprocessing import LabelEncoder
         encoder = LabelEncoder()
         encoder.fit(y_train)
         y_train = encoder.transform(y_train)

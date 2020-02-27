@@ -175,6 +175,8 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.decomposition import NMF, LatentDirichletAllocation
 from sklearn.manifold import TSNE
+from sklearn.preprocessing import LabelEncoder
+
 
 
 #from sklearn.externals import joblib

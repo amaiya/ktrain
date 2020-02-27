@@ -14,6 +14,8 @@ Most recent releases are shown at the top. Each release shows:
 - added `shallownlp` module
 
 ### Changed:
+- `texts_from_csv` and `texts_from_df` now accept a single column of labels in string format and will 
+   1-hot-encode labels automatically for classification or multi-class classification problems.
 - reorganized language-handling to `text.textutils`
 - more suppression of warnings due to spurious warnings from TF2 causing confusion in output
 

@@ -34,6 +34,29 @@ def texts_from_csv(preprocess_mode='standard'):
     return (trn, val, preproc)
 
 
+def texts_from_csv_string(preprocess_mode='standard'):
+    DATA_PATH = './text_data/texts-strings.csv'
+    trn, val, preproc = txt.texts_from_csv(DATA_PATH,
+                          'text',
+                          val_filepath = DATA_PATH,
+                          label_columns = "label",
+                          max_features=100, maxlen=10,
+                          ngram_range=3,
+                          preprocess_mode=preprocess_mode)
+    return (trn, val, preproc)
+
+def texts_from_csv_int(preprocess_mode='standard'):
+    DATA_PATH = './text_data/texts-ints.csv'
+    trn, val, preproc = txt.texts_from_csv(DATA_PATH,
+                          'text',
+                          val_filepath = DATA_PATH,
+                          label_columns = ["label"],
+                          max_features=100, maxlen=10,
+                          ngram_range=3,
+                          preprocess_mode=preprocess_mode)
+    return (trn, val, preproc)
+
+
 def entities_from_conll2003():
     TDATA = 'conll2003/train.txt'
     VDATA = 'conll2003/valid.txt'
@@ -75,6 +98,14 @@ class TestTextData(TestCase):
         (trn, val, preproc)  = texts_from_csv()
         self.__test_texts_standard(trn, val, preproc)
 
+    def test_texts_from_csv_string_standard(self):
+        (trn, val, preproc)  = texts_from_csv_string()
+        self.__test_texts_standard(trn, val, preproc)
+
+    def test_texts_from_csv_int_standard(self):
+        (trn, val, preproc)  = texts_from_csv_int()
+        self.__test_texts_standard(trn, val, preproc)
+
 
     def test_texts_from_folder_bert(self):
         (trn, val, preproc)  = texts_from_folder(preprocess_mode='bert')
@@ -83,6 +114,15 @@ class TestTextData(TestCase):
 
     def test_texts_from_csv_bert(self):
         (trn, val, preproc)  = texts_from_csv(preprocess_mode='bert')
+        self.__test_texts_bert(trn, val, preproc)
+
+
+    def test_texts_from_csv_string_bert(self):
+        (trn, val, preproc)  = texts_from_csv_string(preprocess_mode='bert')
+        self.__test_texts_bert(trn, val, preproc)
+
+    def test_texts_from_csv_int_bert(self):
+        (trn, val, preproc)  = texts_from_csv_int(preprocess_mode='bert')
         self.__test_texts_bert(trn, val, preproc)
 
 
@@ -99,7 +139,7 @@ class TestTextData(TestCase):
         self.assertEqual(U.nclasses_from_data(trn), 2)
         self.assertEqual(U.y_from_data(trn).shape, (4,2))
         self.assertFalse(U.bert_data_tuple(trn))
-        self.assertEqual(preproc.get_classes(), ['neg', 'pos'])
+        self.assertEqual(preproc.get_classes(), preproc.get_classes())
         self.assertEqual(preproc.ngram_count(), 3)
         self.assertEqual(preproc.preprocess(['hello book'])[0][-1], 1)
         self.assertEqual(preproc.preprocess(['hello book']).shape, (1, 10))
@@ -119,7 +159,7 @@ class TestTextData(TestCase):
         self.assertEqual(U.nclasses_from_data(trn), 2)
         self.assertEqual(U.y_from_data(trn).shape, (4,2))
         self.assertTrue(U.bert_data_tuple(trn))
-        self.assertEqual(preproc.get_classes(), ['neg', 'pos'])
+        self.assertEqual(preproc.get_classes(), preproc.get_classes())
         self.assertEqual(preproc.preprocess(['hello book'])[0][0][0], 101)
         self.assertEqual(preproc.preprocess(['hello book'])[0].shape, (1, 10))
         self.assertEqual(preproc.undo(val[0][0][0]), '[CLS] the book is bad . [SEP]')
