@@ -45,15 +45,29 @@ class Classifier:
                                      warm_start=hp_dict.get('warm_start', False),
                                      n_jobs=hp_dict.get('n_jobs', None),
                                      l1_ratio=hp_dict.get('l1_ratio', None),
-                                     random_state=hp_dict.get('random_state', 42)
+                                     random_state=hp_dict.get('random_state', 42),
+                                     class_weight=hp_dict.get('class_weight', None)
                                      )
         elif ctype == 'sgdclassifier':
             clf = SGDClassifier(loss=hp_dict.get('loss', 'hinge'), 
                                 penalty=hp_dict.get('penalty', 'l2'), 
                                 alpha=hp_dict.get('alpha', 1e-3), 
                                 random_state=hp_dict.get('random_state', 42), 
-                                max_iter=hp_dict.get('max_iter', 5), 
-                                tol=hp_dict.get('tol', None))
+                                max_iter=hp_dict.get('max_iter', 5),  # scikit-learn default is 1000
+                                tol=hp_dict.get('tol', None),
+                                l1_ratio=hp_dict.get('l1_ratio', 0.15),
+                                fit_intercept=hp_dict.get('fit_intercept', True),
+                                episilon=hp_dict.get('epsilon', 0.1),
+                                n_jobs=hp_dict.get('n_jobs', None),
+                                learning_rate=hp_dict.get('learning_rate', 'optimal'),
+                                eta0=hp_dict.get('eta0', 0.0),
+                                power_t=hp_dict.get('power_t', 0.5),
+                                early_stopping=hp_dict.get('early_stopping', False),
+                                validation_fraction=hp_dict.get('validation_fraction', 0.1),
+                                n_iter_no_change=hp_dict.get('n_iter_no_change', 5),
+                                warm_start=hp_dict.get('warm_start', False),
+                                average=hp_dict.get('average', False),
+                                class_weight=hp_dict.get('class_weight', None))
         else:
             raise ValueError('Unknown ctype: %s' % (ctype))
 

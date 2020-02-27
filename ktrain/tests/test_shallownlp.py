@@ -2,15 +2,15 @@
 """
 Tests of ktrain text classification flows
 """
+import testenv
 from unittest import TestCase, main, skip
 import numpy as np
-import sys
-sys.path.insert(0,'../..')
+
 import os
 os.environ['DISABLE_V2_BEHAVIOR'] = '1'
-import shallownlp as snlp
+from ktrain.text import shallownlp as snlp
 
-class TestShalloNLP(TestCase):
+class TestShallowNLP(TestCase):
 
 
 
@@ -41,7 +41,7 @@ class TestShalloNLP(TestCase):
 
     #@skip('temporarily disabled')
     def test_classifier_chinese(self):
-        fpath = '../../..//tests/text_data/chinese_hotel_reviews.csv'
+        fpath = './text_data/chinese_hotel_reviews.csv'
         (x_train,  y_train, label_names) = snlp.Classifier.texts_from_csv(fpath, text_column='content', label_column='pos', sep='|')
         print('label names: %s' % (label_names))
         clf = snlp.Classifier()
@@ -81,6 +81,7 @@ class TestShalloNLP(TestCase):
 
 
 
+    #@skip('temporarily disabled')
     def test_search(self):
         document1 ="""
         Hello there,
