@@ -80,6 +80,13 @@ class TestShallowNLP(TestCase):
         self.assertEqual(len(snlp.sent_tokenize('这是关于史密斯博士的第一句话。第二句话是关于琼斯先生的。')), 2)
 
 
+        ner = snlp.NER('ru')
+        text = """Владимир Владимирович Путин - российский политик, который является президентом России с 2012 года."""
+        result = ner.predict(text)
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0][1], 'PER')
+        self.assertEqual(result[1][1], 'LOC')
+
 
     #@skip('temporarily disabled')
     def test_search(self):
