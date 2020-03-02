@@ -11,7 +11,7 @@ Most recent releases are shown at the top. Each release shows:
 
 ### New:
 - `Transformer` API in *ktrain*  now supports using community-uploaded transformer models
-- added `shallownlp` module with out-of-the-box NER for English and Chinese
+- added `shallownlp` module with out-of-the-box NER for English, Russian, and Chinese
 - `text.eda` module now supports NMF in addition to LDA
 
 ### Changed:
