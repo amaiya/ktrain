@@ -11,7 +11,7 @@ setup(
   name = 'ktrain',
   packages = setuptools.find_packages(),
   version = __version__,
-  license='MIT',
+  license='Apache License 2.0',
   description = 'ktrain is a lightweight wrapper for TensorFlow Keras to help train neural networks',
   long_description = readme,
   long_description_content_type = 'text/markdown',
