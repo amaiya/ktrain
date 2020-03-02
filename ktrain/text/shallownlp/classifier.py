@@ -14,13 +14,18 @@ class Classifier:
         self.model = None
 
 
-    def create_model(self, ctype, texts, hp_dict={}, ngram_range=(1,3)):
+    def create_model(self, ctype, texts, hp_dict={}, ngram_range=(1,3), binary=True):
         """
         create a model
         Args:
           ctype(str): one of {'nbsvm', 'logreg', 'sgdclassifier'}
           texts(list): list of texts
-          hp_dict(dict): dictionary of hyperparameters to use for the ctype selected
+          hp_dict(dict): dictionary of hyperparameters to use for the ctype selected.
+                         hp_dict can also be used to supply arguments to CountVectorizer
+          ngram_range(tuple): default ngram_range.
+                              overridden if 'ngram_range' in hp_dict
+          binary(bool): default value for binary argument to CountVectorizer.
+                        overridden if 'binary' key in hp_dict
 
         """
         lang = U.detect_lang(texts)
@@ -71,7 +76,17 @@ class Classifier:
         else:
             raise ValueError('Unknown ctype: %s' % (ctype))
 
-        self.model = Pipeline([ ('vect', CountVectorizer(ngram_range=ngram_range, binary=True, token_pattern=token_pattern)),
+        self.model = Pipeline([ ('vect', CountVectorizer(ngram_range=hp_dict.get('ngram_range', ngram_range), 
+                                                         binary=hp_dict.get('binary', binary), 
+                                                         token_pattern=token_pattern,
+                                                         max_features=hp_dict.get('max_features', None),
+                                                         max_df=hp_dict.get('max_df', 1.0),
+                                                         min_df=hp_dict.get('min_df', 1),
+                                                         stop_words=hp_dict.get('stop_words', None),
+                                                         lower_case=hp_dict.get('lower_case', True),
+                                                         strip_accents=hp_dict.get('strip_accents', None),
+                                                         encoding=hp_dict.get('encoding', 'utf-8')
+                                                         )),
                               ('clf', clf) ])
         return
 
