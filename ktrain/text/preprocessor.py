@@ -314,6 +314,9 @@ class TextPreprocessor(Preprocessor):
 
 
     def migrate_classes(self, class_names, classes):
+        class_names = class_names.tolist() if isinstance(class_names, np.ndarray) else class_names
+        classes = classes.tolist() if isinstance(classes, np.ndarray) else classes
+
         if not class_names and classes:
             class_names = classes
             warnings.warn('The class_names argument is replacing the classes argument. Please update your code.')
