@@ -1,0 +1,5 @@
+"text","label"
+"The book is bad.",neg
+"This book is bad.",neg
+"The book is good.",pos
+"This book is good.",pos

@@ -8,10 +8,10 @@ class NER:
         Only English and Chinese are currenty supported.
 
         Args:
-          lang(str): Either 'en' for English or 'zh' for Chinese
+          lang(str): Currently, one of {'en', 'zh', 'ru'}: en=English , zh=Chinese, or ru=Russian
         """
-        if lang not in ['en', 'zh']:
-            raise ValueError('Choose either en for English or zh for Chinese')
+        if lang not in ['en', 'zh', 'ru']:
+            raise ValueError("Unsupported langauge:  choose either 'en' for English, 'zh' for Chinese, or 'ru' for Chinese")
         self.lang = lang
 
 
@@ -38,6 +38,9 @@ class NER:
         if self.lang == 'zh':
             dirpath = os.path.dirname(os.path.abspath(__file__))
             fpath = os.path.join(dirpath, 'ner_models/ner_chinese')
+        elif self.lang == 'ru':
+            dirpath = os.path.dirname(os.path.abspath(__file__))
+            fpath = os.path.join(dirpath, 'ner_models/ner_russian')
         elif self.lang=='en':
             dirpath = os.path.dirname(os.path.abspath(__file__))
             fpath = os.path.join(dirpath, 'ner_models/ner_english')

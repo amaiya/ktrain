@@ -83,7 +83,7 @@ class Classifier:
                                                          max_df=hp_dict.get('max_df', 1.0),
                                                          min_df=hp_dict.get('min_df', 1),
                                                          stop_words=hp_dict.get('stop_words', None),
-                                                         lower_case=hp_dict.get('lower_case', True),
+                                                         lowercase=hp_dict.get('lowercase', True),
                                                          strip_accents=hp_dict.get('strip_accents', None),
                                                          encoding=hp_dict.get('encoding', 'utf-8')
                                                          )),
