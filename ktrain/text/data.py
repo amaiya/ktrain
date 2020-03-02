@@ -34,12 +34,15 @@ def texts_from_folder(datadir, classes=None,
     │       ├── class2       # folder containing documents of class 2
     │       └── classN       # folder containing documents of class N
 
+    Each subfolder should contain documents in plain text format.
     If train and test contain additional subfolders that do not represent
     classes, they can be ignored by explicitly listing the subfolders of
     interest using the classes argument.
     Args:
         datadir (str): path to folder
-        classes (list): list of classes (subfolders to consider)
+        classes (list): list of classes (subfolders to consider).
+                        This is simply supplied as the categories argument
+                        to sklearn's load_files function.
         max_features (int):  maximum number of unigrams to consider
         maxlen (int):  maximum length of tokens in document
         ngram_range (int):  If > 1, will include 2=bigrams, 3=trigrams and bigrams
@@ -106,7 +109,7 @@ def texts_from_folder(datadir, classes=None,
     if None: raise ValueError('unsupported preprocess_mode')
     preproc = preproc_type(maxlen,
                            max_features,
-                           classes = train_b.target_names,
+                           class_names = train_b.target_names,
                            lang=lang, ngram_range=ngram_range)
     trn = preproc.preprocess_train(x_train, y_train, verbose=verbose)
     val = preproc.preprocess_test(x_test,  y_test, verbose=verbose)
@@ -258,17 +261,18 @@ def texts_from_df(train_df,
     y_train = np.squeeze(y_train)
     y_test = np.squeeze(y_test)
     if isinstance(label_columns, str) or (isinstance(label_columns, list) and len(label_columns) == 1):
-        classes = list(set(y_train))
-        need_transform = True if isinstance(classes[0], str) else False
-        classes.sort()
-        classes = [str(c) for c in classes]
+        class_names = list(set(y_train))
+        need_transform = True if isinstance(class_names[0], str) else False
+        class_names.sort()
+        class_names = [str(c) for c in class_names]
         if need_transform:
             encoder = LabelEncoder()
             encoder.fit(y_train)
             y_train = encoder.transform(y_train)
             y_test = encoder.transform(y_test)
+            class_names = encoder.classes_
     else:
-        classes = label_columns
+        class_names = label_columns
 
     # detect language
     if lang is None: lang = TU.detect_lang(x_train)
@@ -280,7 +284,7 @@ def texts_from_df(train_df,
     if None: raise ValueError('unsupported preprocess_mode')
     preproc = preproc_type(maxlen,
                            max_features,
-                           classes = classes,
+                           class_names = class_names,
                            lang=lang, ngram_range=ngram_range)
     trn = preproc.preprocess_train(x_train, y_train, verbose=verbose)
     val = preproc.preprocess_test(x_test,  y_test, verbose=verbose)
@@ -302,16 +306,12 @@ def texts_from_array(x_train, y_train, x_test=None, y_test=None,
     Args:
         x_train(list): list of training texts 
         y_train(list): labels in one of the following forms:
-                       1. list of integers representing classes (class_names is required)
-                       2. list of strings representing classes (class_names is required)
-                       3. a one or multi hot encoded array representing classes (class_names is required)
-                       4. numerical values for text regresssion (class_names should be left empty)
         x_test(list): list of training texts 
         y_test(list): labels in one of the following forms:
-                      1. list of integers representing classes (class_names is required)
-                      2. list of strings representing classes (class_names is required)
-                      3. a one or multi hot encoded array representing classes (class_names is required)
-                      4. numerical values for text regression (class_names should be left empty)
+                       1. list of integers representing classes (class_names is required)
+                       2. list of strings representing classes (class_names is not needed and ignored.)
+                       3. a one or multi hot encoded array representing classes (class_names is required)
+                       4. numerical values for text regresssion (class_names should be left empty)
         class_names (list): list of strings representing class labels
                             shape should be (num_examples,1) or (num_examples,)
         max_features(int): max num of words to consider in vocabulary
@@ -343,14 +343,14 @@ def texts_from_array(x_train, y_train, x_test=None, y_test=None,
                                                             test_size=val_pct,
                                                             random_state=random_state)
 
-    # convert string labels to integers, if necessary
-    if isinstance(y_train[0], str):
-        if not isinstance(y_test[0], str): 
-            raise ValueError('y_train contains strings, but y_test does not')
-        encoder = LabelEncoder()
-        encoder.fit(y_train)
-        y_train = encoder.transform(y_train)
-        y_test = encoder.transform(y_test)
+    # removed as TextPreprocessor now handles this.
+    #if isinstance(y_train[0], str):
+        #if not isinstance(y_test[0], str): 
+            #raise ValueError('y_train contains strings, but y_test does not')
+        #encoder = LabelEncoder()
+        #encoder.fit(y_train)
+        #y_train = encoder.transform(y_train)
+        #y_test = encoder.transform(y_test)
 
 
     # detect language
@@ -362,7 +362,7 @@ def texts_from_array(x_train, y_train, x_test=None, y_test=None,
     if None: raise ValueError('unsupported preprocess_mode')
     preproc = preproc_type(maxlen,
                            max_features,
-                           classes = class_names,
+                           class_names = class_names,
                            lang=lang, ngram_range=ngram_range)
     trn = preproc.preprocess_train(x_train, y_train, verbose=verbose)
     val = preproc.preprocess_test(x_test,  y_test, verbose=verbose)
