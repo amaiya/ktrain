@@ -15,6 +15,7 @@ from transformers import DistilBertConfig, TFDistilBertForSequenceClassification
 from transformers import AlbertConfig, TFAlbertForSequenceClassification, AlbertTokenizer
 from transformers import CamembertConfig, TFCamembertForSequenceClassification, CamembertTokenizer
 from transformers import XLMRobertaConfig, TFXLMRobertaForSequenceClassification, XLMRobertaTokenizer
+from transformers import AutoConfig, TFAutoModelForSequenceClassification, AutoTokenizer
 
 TRANSFORMER_MODELS = {
     'bert':       (BertConfig, TFBertForSequenceClassification, BertTokenizer),
@@ -307,6 +308,7 @@ class TextPreprocessor(Preprocessor):
         self.maxlen = maxlen
         self.lang = lang
         self.multilabel = multilabel
+        self.preprocess_train_called = False
 
     
     def get_preprocessor(self):
@@ -470,6 +472,7 @@ class StandardTextPreprocessor(TextPreprocessor):
         # return
         result =  (x_train, y_train)
         self.set_multilabel(result, 'train')
+        self.preprocess_train_called = True
         return result
 
 
@@ -635,6 +638,7 @@ class BERTPreprocessor(TextPreprocessor):
         y = self._transform_y(y)
         result = (x, y)
         self.set_multilabel(result, mode)
+        self.preprocess_train_called = True
         return result
 
 
@@ -659,9 +663,15 @@ class TransformersPreprocessor(TextPreprocessor):
         self.model_name = model_name
         self.name = model_name.split('-')[0]
         if self.name not in TRANSFORMER_MODELS:
-            raise ValueError('uknown model name %s' % (model_name))
-        self.model_type = TRANSFORMER_MODELS[self.name][1]
-        self.tokenizer_type = TRANSFORMER_MODELS[self.name][2]
+            #raise ValueError('unsupported model name %s' % (model_name))
+            self.config = AutoConfig.from_pretrained(model_name)
+            self.model_type = TFAutoModelForSequenceClassification
+            self.tokenizer_type = AutoTokenizer
+        else:
+            self.config = None # use default config
+            self.model_type = TRANSFORMER_MODELS[self.name][1]
+            self.tokenizer_type = TRANSFORMER_MODELS[self.name][2]
+
         if "bert-base-japanese" in model_name:
             self.tokenizer_type = transformers.BertJapaneseTokenizer
 
@@ -716,6 +726,7 @@ class TransformersPreprocessor(TextPreprocessor):
                                       pad_token=self.tok.convert_tokens_to_ids([self.tok.pad_token][0]),
                                       pad_token_segment_id=4 if self.name in ['xlnet'] else 0)
         self.set_multilabel(dataset, mode)
+        self.preprocess_train_called = True
         return dataset
 
 
@@ -724,13 +735,34 @@ class TransformersPreprocessor(TextPreprocessor):
         return self.preprocess_train(texts, y=y, mode=mode, verbose=verbose)
 
 
+    def _load_pretrained(self, mname, num_labels):
+        """
+        load pretrained model
+        """
+        if self.config is not None:
+            self.config.num_labels = num_labels
+            try:
+                model = self.model_type.from_pretrained(mname, config=self.config)
+            except:
+                try:
+                    model = self.model_type.from_pretrained(mname, config=self.config, from_pt=True)
+                except:
+                    raise ValueError('could not load pretrained model %s using both from_pt=False and from_pt=True' % (mname))
+        else:
+            model = self.model_type.from_pretrained(mname, num_labels=num_labels)
+        return model
+
+
+
     def get_classifier(self, fpath=None):
+        if not self.preprocess_train_called:
+            raise Exception('preprocess_train must be called first')
         if not self.get_classes():
             warnings.warn('no class labels were provided - treating as regression')
             return self.get_regression_model()
         num_labels = len(self.get_classes())
         mname = fpath if fpath is not None else self.model_name
-        model = self.model_type.from_pretrained(mname, num_labels=num_labels)
+        model = self._load_pretrained(mname, num_labels)
         if self.multilabel:
             loss_fn =  keras.losses.BinaryCrossentropy(from_logits=True)
         else:
@@ -742,11 +774,14 @@ class TransformersPreprocessor(TextPreprocessor):
 
 
     def get_regression_model(self, fpath=None):
+        if not self.preprocess_train_called:
+            raise Exception('preprocess_train must be called first')
         if self.get_classes():
             warnings.warn('class labels were provided - treating as classification problem')
             return self.get_classifier()
+        num_labels = 1
         mname = fpath if fpath is not None else self.model_name
-        model = self.model_type.from_pretrained(mname, num_labels=1)
+        model = self._load_pretrained(mname, num_labels)
         loss_fn = 'mse'
         model.compile(loss=loss_fn,
                       optimizer=keras.optimizers.Adam(learning_rate=3e-5, epsilon=1e-08),
@@ -755,6 +790,8 @@ class TransformersPreprocessor(TextPreprocessor):
 
 
     def get_model(self, fpath=None):
+        if not self.preprocess_train_called:
+            raise Exception('preprocess_train must be called first')
         if not self.get_classes():
             return self.get_regression_model(fpath=fpath)
         else:
