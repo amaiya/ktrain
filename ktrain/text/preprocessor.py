@@ -419,8 +419,8 @@ class TextPreprocessor(Preprocessor):
         # check for errors and warnings
         if not isinstance(y_data, str) and len(y_data.shape) ==1 and not self.get_classes():
             warnings.warn('Task is being treated as TEXT REGRESSION because ' +\
-                          'classes argument was not suppliedr. ' + \
-                          'If this is incorrect, supply classes argument.')
+                          'class_names argument was not suppliedr. ' + \
+                          'If this is incorrect, supply class_names argument.')
         elif len(y_data.shape) > 1 and not self.get_classes():
             raise ValueError('y-values are 1-hot or multi-hot encoded but self.get_classes() is empty. ' +\
                              'The classes argument should have been supplied.')
