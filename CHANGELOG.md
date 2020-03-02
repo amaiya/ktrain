@@ -19,6 +19,7 @@ Most recent releases are shown at the top. Each release shows:
    1-hot-encode labels automatically for classification or multi-class classification problems.
 - reorganized language-handling to `text.textutils`
 - more suppression of warnings due to spurious warnings from TF2 causing confusion in output
+- `classes` argument to `Transformer` constructor has been changed to `class_names` for consistency with `texts_from_array`
 
 ### Fixed:
 - N/A
