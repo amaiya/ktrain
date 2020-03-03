@@ -23,11 +23,14 @@ class NER:
             warnings.warn("Please add os.environ['DISABLE_V2_BEHAVIOR'] = '1' at top of your script or notebook")
             msg = "\nNER in ktrain uses the CRF module from keras_contrib, which is not yet\n" +\
                     "fully compatible with TensorFlow 2. To use NER, you must add the following to the top of your\n" +\
-                    "script or notebook BEFORE you import ktrain:\n\n" +\
+                    "script or notebook BEFORE you import ktrain (after restarting runtime):\n\n" +\
                   "import os\n" +\
                   "os.environ['DISABLE_V2_BEHAVIOR'] = '1'\n"
             print(msg)
             return
+        else:
+            import tensorflow.compat.v1 as tf
+            tf.disable_v2_behavior()
 
         #old_do = os.environ.get('CUDA_DEVICE_ORDER', None)
         #old_vd = os.environ.get('CUDA_VISIBLE_DEVICES', None)
