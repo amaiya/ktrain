@@ -7,7 +7,7 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
-## 0.10.0 (2020-03-02)
+## 0.10.0 (2020-03-03)
 
 ### New:
 - `Transformer` API in *ktrain*  now supports using community-uploaded transformer models
