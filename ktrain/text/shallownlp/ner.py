@@ -57,6 +57,7 @@ class NER:
         predictor = ktrain.load_predictor(fpath)
         results = []
         for text in texts:
+            text = text.strip()
             result = predictor.predict(text)
             if merge_tokens:
                 result = self.merge_entities(result)
@@ -81,25 +82,31 @@ class NER:
         current_token = ""
         current_tag = ""
         entities = []
+
         for tup in annotated_sentence:
             token = tup[0]
             entity = tup[1]
             tag = entity.split('-')[1] if '-' in entity else None
+            prefix = entity.split('-')[0] if '-' in entity else None
             # not within entity
             if tag is None and not current_token:
                 continue
+            # beginning of entity
+            elif tag and prefix=='B':
+                if current_token: # consecutive entities
+                    entities.append((current_token, current_tag))
+                    current_token = ""
+                    current_tag = None
+                current_token = token
+                current_tag = tag
             # end of entity
             elif tag is None and current_token:
-                entities.append((current_token, current_tag))      
+                entities.append((current_token, current_tag))
                 current_token = ""
                 current_tag = None
                 continue
-            # beginning of entity
-            elif tag and not current_token:
-                current_token = token
-                current_tag = tag
             # within entity
-            elif tag and current_token:
+            elif tag and current_token:  #  prefix I
                 current_token = current_token + sep + token
                 current_tag = tag
         return entities  
