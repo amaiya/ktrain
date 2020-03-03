@@ -304,7 +304,7 @@ class TextPreprocessor(Preprocessor):
 
     def __init__(self, maxlen, class_names, lang='en', multilabel=False):
 
-        self.c = class_names
+        self.set_classes(class_names) # converts to list of necessary
         self.maxlen = maxlen
         self.lang = lang
         self.multilabel = multilabel
