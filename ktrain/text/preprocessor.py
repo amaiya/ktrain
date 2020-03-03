@@ -314,6 +314,8 @@ class TextPreprocessor(Preprocessor):
 
 
     def migrate_classes(self, class_names, classes):
+        # NOTE: this method transforms to np.ndarray to list.
+        # If removed and "if class_names" is issued prior to set_classes(), an error will occur.
         class_names = class_names.tolist() if isinstance(class_names, np.ndarray) else class_names
         classes = classes.tolist() if isinstance(classes, np.ndarray) else classes
 
