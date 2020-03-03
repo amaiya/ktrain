@@ -2,6 +2,7 @@ from ..imports import *
 from .. import utils as U
 from ..preprocessor import Preprocessor
 from ..data import Dataset
+from . import textutils as TU
 
 DistilBertTokenizer = transformers.DistilBertTokenizer
 DISTILBERT= 'distilbert'
@@ -12,7 +13,9 @@ from transformers import XLMConfig, TFXLMForSequenceClassification, XLMTokenizer
 from transformers import RobertaConfig, TFRobertaForSequenceClassification, RobertaTokenizer
 from transformers import DistilBertConfig, TFDistilBertForSequenceClassification, DistilBertTokenizer
 from transformers import AlbertConfig, TFAlbertForSequenceClassification, AlbertTokenizer
-#from transformers import CamembertConfig, TFCamembertForSequenceClassification, CamembertTokenizer
+from transformers import CamembertConfig, TFCamembertForSequenceClassification, CamembertTokenizer
+from transformers import XLMRobertaConfig, TFXLMRobertaForSequenceClassification, XLMRobertaTokenizer
+from transformers import AutoConfig, TFAutoModelForSequenceClassification, AutoTokenizer
 
 TRANSFORMER_MODELS = {
     'bert':       (BertConfig, TFBertForSequenceClassification, BertTokenizer),
@@ -21,14 +24,12 @@ TRANSFORMER_MODELS = {
     'roberta':    (RobertaConfig, TFRobertaForSequenceClassification, RobertaTokenizer),
     'distilbert': (DistilBertConfig, TFDistilBertForSequenceClassification, DistilBertTokenizer),
     'albert':     (AlbertConfig, TFAlbertForSequenceClassification, AlbertTokenizer),
-    #'camembert':  (CamembertConfig, TFCamembertForSequenceClassification, CamembertTokenizer)
+    'camembert':  (CamembertConfig, TFCamembertForSequenceClassification, CamembertTokenizer),
+    'xlm_roberta':  (XLMRobertaConfig, TFXLMRobertaForSequenceClassification, XLMRobertaTokenizer)
 }
 
 
 NOSPACE_LANGS = ['zh-cn', 'zh-tw', 'ja']
-
-def is_chinese(lang):
-    return lang is not None and lang.startswith('zh-')
 
 
 def is_nospace_lang(lang):
@@ -294,60 +295,6 @@ def hf_convert_examples(texts, y=None, tokenizer=None,
 
 
 #------------------------------------------------------------------------------
-# MISC UTILITIES
-#------------------------------------------------------------------------------
-
-def decode_by_line(texts, encoding='utf-8', verbose=1):
-    """
-    Decode text line by line and skip over errors.
-    """
-    new_texts = []
-    skips=0
-    num_lines = 0
-    for doc in texts:
-        text = ""
-        for line in doc.splitlines():
-            num_lines +=1
-            try:
-                line = line.decode(encoding)
-            except:
-                skips +=1
-                continue
-            text += line
-        new_texts.append(text)
-    pct = round((skips*1./num_lines) * 100, 1)
-    if verbose: 
-        print('skipped %s lines (%s%%) due to character decoding errors' % (skips, pct))
-        if pct > 10:
-            print('If this is too many, try a different encoding')
-    return new_texts
-
-
-
-def detect_lang(texts, sample_size=32):
-    """
-    detect language
-    """
-    if isinstance(texts, (pd.Series, pd.DataFrame)):
-        texts = texts.values
-    if isinstance(texts, str): texts = [texts]
-    if not isinstance(texts, (list, np.ndarray)):
-        raise ValueError('texts must be a list or NumPy array of strings')
-    lst = []
-    for doc in texts[:sample_size]:
-        try:
-            lst.append(langdetect.detect(doc))
-        except:
-            continue
-    if len(lst) == 0: 
-        raise Exception('could not detect language in random sample of %s docs.'  % (sample_size))
-    return max(set(lst), key=lst.count)
-
-
-
-
-
-#------------------------------------------------------------------------------
 
 
 class TextPreprocessor(Preprocessor):
@@ -355,20 +302,45 @@ class TextPreprocessor(Preprocessor):
     Text preprocessing base class
     """
 
-    def __init__(self, maxlen, classes, lang='en', multilabel=False):
+    def __init__(self, maxlen, class_names, lang='en', multilabel=False):
 
-        self.c = classes
+        self.set_classes(class_names) # converts to list of necessary
         self.maxlen = maxlen
         self.lang = lang
         self.multilabel = multilabel
+        self.preprocess_train_called = False
+        self.label_encoder = None # only set if y is in string format
+        self.c = self.c.tolist() if isinstance(self.c, np.ndarray) else self.c
 
-    
+
+    def migrate_classes(self, class_names, classes):
+        # NOTE: this method transforms to np.ndarray to list.
+        # If removed and "if class_names" is issued prior to set_classes(), an error will occur.
+        class_names = class_names.tolist() if isinstance(class_names, np.ndarray) else class_names
+        classes = classes.tolist() if isinstance(classes, np.ndarray) else classes
+
+        if not class_names and classes:
+            class_names = classes
+            warnings.warn('The class_names argument is replacing the classes argument. Please update your code.')
+        return class_names
+
+
+
+    def check_trained(self):
+        if not self.preprocess_train_called:
+            raise Exception('preprocess_train must be called')
+
+
     def get_preprocessor(self):
         raise NotImplementedError
 
 
     def get_classes(self):
         return self.c
+
+
+    def set_classes(self, class_names):
+        self.c = class_names.tolist() if isinstance(class_names, np.ndarray) else class_names
 
 
     def preprocess(self, texts):
@@ -389,23 +361,18 @@ class TextPreprocessor(Preprocessor):
 
 
     def is_chinese(self):
-        return is_chinese(self.lang)
+        return TU.is_chinese(self.lang)
 
 
     def is_nospace_lang(self):
-        return is_nospace_lang(self.lang)
+        return TU.is_nospace_lang(self.lang)
 
 
     def process_chinese(self, texts, lang=None):
         #if lang is None: lang = langdetect.detect(texts[0])
-        if lang is None: lang = detect_lang(texts)
-        if not is_nospace_lang(lang): return texts
-        split_texts = []
-        for doc in texts:
-            seg_list = jieba.cut(doc, cut_all=False)
-            seg_list = list(seg_list)
-            split_texts.append(seg_list)
-        return [" ".join(tokens) for tokens in split_texts] 
+        if lang is None: lang = TU.detect_lang(texts)
+        if not TU.is_nospace_lang(lang): return texts
+        return TU.split_chinese(texts)
 
 
     @classmethod
@@ -449,9 +416,28 @@ class TextPreprocessor(Preprocessor):
         or regression if not.
         """
         if y_data is None: return y_data
+        y_data = np.array(y_data) if type(y_data) == list else y_data
+
+        # check for errors and warnings
+        if not isinstance(y_data, str) and len(y_data.shape) ==1 and not self.get_classes():
+            warnings.warn('Task is being treated as TEXT REGRESSION because ' +\
+                          'class_names argument was not supplied. ' + \
+                          'If this is incorrect, supply class_names argument.')
+        elif len(y_data.shape) > 1 and not self.get_classes():
+            raise ValueError('y-values are 1-hot or multi-hot encoded but self.get_classes() is empty. ' +\
+                             'The classes argument should have been supplied.')
+
+        # convert string labels to integers, if necessary
+        if isinstance(y_data[0], str):
+            if self.label_encoder is None:
+                self.label_encoder = LabelEncoder()
+                self.label_encoder.fit(y_data)
+                self.set_classes(self.label_encoder.classes_)
+            y_data = self.label_encoder.transform(y_data)
+
+
         # if shape is 1, this is either a classification or regression task 
         # depending on class_names existing
-        y_data = np.array(y_data) if type(y_data) == list else y_data
         y_data = to_categorical(y_data) if len(y_data.shape) == 1 and self.get_classes() else y_data
         return y_data
 
@@ -465,9 +451,10 @@ class StandardTextPreprocessor(TextPreprocessor):
     Standard text preprocessing
     """
 
-    def __init__(self, maxlen, max_features, classes=[], 
+    def __init__(self, maxlen, max_features, class_names=[], classes=[], 
                  lang='en', ngram_range=1, multilabel=False):
-        super().__init__(maxlen, classes, lang=lang, multilabel=multilabel)
+        class_names = self.migrate_classes(class_names, classes)
+        super().__init__(maxlen, class_names, lang=lang, multilabel=multilabel)
         self.tok = None
         self.tok_dct = {}
         self.max_features = max_features
@@ -495,7 +482,7 @@ class StandardTextPreprocessor(TextPreprocessor):
         """
         preprocess training set
         """
-        if self.lang is None: self.lang = detect_lang(train_text)
+        if self.lang is None: self.lang = TU.detect_lang(train_text)
 
 
         U.vprint('language: %s' % (self.lang), verbose=verbose)
@@ -529,6 +516,7 @@ class StandardTextPreprocessor(TextPreprocessor):
         # return
         result =  (x_train, y_train)
         self.set_multilabel(result, 'train')
+        self.preprocess_train_called = True
         return result
 
 
@@ -536,6 +524,7 @@ class StandardTextPreprocessor(TextPreprocessor):
         """
         preprocess validation or test dataset
         """
+        self.check_trained()
         if self.tok is None or self.lang is None:
             raise Exception('Unfitted tokenizer or missing language. Did you run preprocess_train first?')
 
@@ -641,12 +630,14 @@ class BERTPreprocessor(TextPreprocessor):
     text preprocessing for BERT model
     """
 
-    def __init__(self, maxlen, max_features, classes=[], 
+    def __init__(self, maxlen, max_features, class_names=[], classes=[], 
                 lang='en', ngram_range=1, multilabel=False):
+        class_names = self.migrate_classes(class_names, classes)
+
 
         if maxlen > 512: raise ValueError('BERT only supports maxlen <= 512')
 
-        super().__init__(maxlen, classes, lang=lang, multilabel=multilabel)
+        super().__init__(maxlen, class_names, lang=lang, multilabel=multilabel)
         vocab_path = os.path.join(get_bert_path(lang=lang), 'vocab.txt')
         token_dict = {}
         with codecs.open(vocab_path, 'r', 'utf8') as reader:
@@ -684,7 +675,7 @@ class BERTPreprocessor(TextPreprocessor):
         """
         if mode == 'train' and y is None:
             raise ValueError('y is required when mode=train')
-        if self.lang is None and mode=='train': self.lang = detect_lang(texts)
+        if self.lang is None and mode=='train': self.lang = TU.detect_lang(texts)
         U.vprint('preprocessing %s...' % (mode), verbose=verbose)
         U.vprint('language: %s' % (self.lang), verbose=verbose)
 
@@ -694,11 +685,13 @@ class BERTPreprocessor(TextPreprocessor):
         y = self._transform_y(y)
         result = (x, y)
         self.set_multilabel(result, mode)
+        if mode == 'train': self.preprocess_train_called = True
         return result
 
 
 
     def preprocess_test(self, texts, y=None, mode='test', verbose=1):
+        self.check_trained()
         return self.preprocess_train(texts, y=y, mode=mode, verbose=verbose)
 
 
@@ -708,19 +701,26 @@ class TransformersPreprocessor(TextPreprocessor):
     """
 
     def __init__(self,  model_name,
-                maxlen, max_features, classes=[], 
+                maxlen, max_features, class_names=[], classes=[], 
                 lang='en', ngram_range=1, multilabel=False):
+        class_names = self.migrate_classes(class_names, classes)
 
         if maxlen > 512: raise ValueError('Transformer models only supports maxlen <= 512')
 
-        super().__init__(maxlen, classes, lang=lang, multilabel=multilabel)
+        super().__init__(maxlen, class_names, lang=lang, multilabel=multilabel)
 
         self.model_name = model_name
         self.name = model_name.split('-')[0]
         if self.name not in TRANSFORMER_MODELS:
-            raise ValueError('uknown model name %s' % (model_name))
-        self.model_type = TRANSFORMER_MODELS[self.name][1]
-        self.tokenizer_type = TRANSFORMER_MODELS[self.name][2]
+            #raise ValueError('unsupported model name %s' % (model_name))
+            self.config = AutoConfig.from_pretrained(model_name)
+            self.model_type = TFAutoModelForSequenceClassification
+            self.tokenizer_type = AutoTokenizer
+        else:
+            self.config = None # use default config
+            self.model_type = TRANSFORMER_MODELS[self.name][1]
+            self.tokenizer_type = TRANSFORMER_MODELS[self.name][2]
+
         if "bert-base-japanese" in model_name:
             self.tokenizer_type = transformers.BertJapaneseTokenizer
 
@@ -759,8 +759,9 @@ class TransformersPreprocessor(TextPreprocessor):
         """
         preprocess training set
         """
+
         U.vprint('preprocessing %s...' % (mode), verbose=verbose)
-        if self.lang is None and mode=='train': self.lang = detect_lang(texts)
+        if self.lang is None and mode=='train': self.lang = TU.detect_lang(texts)
         U.vprint('language: %s' % (self.lang), verbose=verbose)
         self.print_seqlen_stats(texts, mode, verbose=verbose)
 
@@ -775,12 +776,74 @@ class TransformersPreprocessor(TextPreprocessor):
                                       pad_token=self.tok.convert_tokens_to_ids([self.tok.pad_token][0]),
                                       pad_token_segment_id=4 if self.name in ['xlnet'] else 0)
         self.set_multilabel(dataset, mode)
+        if mode == 'train':  self.preprocess_train_called = True
         return dataset
 
 
 
     def preprocess_test(self, texts, y=None, mode='test', verbose=1):
+        self.check_trained()
         return self.preprocess_train(texts, y=y, mode=mode, verbose=verbose)
+
+
+    def _load_pretrained(self, mname, num_labels):
+        """
+        load pretrained model
+        """
+        if self.config is not None:
+            self.config.num_labels = num_labels
+            try:
+                model = self.model_type.from_pretrained(mname, config=self.config)
+            except:
+                try:
+                    model = self.model_type.from_pretrained(mname, config=self.config, from_pt=True)
+                except:
+                    raise ValueError('could not load pretrained model %s using both from_pt=False and from_pt=True' % (mname))
+        else:
+            model = self.model_type.from_pretrained(mname, num_labels=num_labels)
+        return model
+
+
+
+    def get_classifier(self, fpath=None):
+        self.check_trained()
+        if not self.get_classes():
+            warnings.warn('no class labels were provided - treating as regression')
+            return self.get_regression_model()
+        num_labels = len(self.get_classes())
+        mname = fpath if fpath is not None else self.model_name
+        model = self._load_pretrained(mname, num_labels)
+        if self.multilabel:
+            loss_fn =  keras.losses.BinaryCrossentropy(from_logits=True)
+        else:
+            loss_fn = keras.losses.CategoricalCrossentropy(from_logits=True)
+        model.compile(loss=loss_fn,
+                      optimizer=keras.optimizers.Adam(learning_rate=3e-5, epsilon=1e-08),
+                      metrics=['accuracy'])
+        return model
+
+
+    def get_regression_model(self, fpath=None):
+        self.check_trained()
+        if self.get_classes():
+            warnings.warn('class labels were provided - treating as classification problem')
+            return self.get_classifier()
+        num_labels = 1
+        mname = fpath if fpath is not None else self.model_name
+        model = self._load_pretrained(mname, num_labels)
+        loss_fn = 'mse'
+        model.compile(loss=loss_fn,
+                      optimizer=keras.optimizers.Adam(learning_rate=3e-5, epsilon=1e-08),
+                      metrics=['mae'])
+        return model
+
+
+    def get_model(self, fpath=None):
+        self.check_trained()
+        if not self.get_classes():
+            return self.get_regression_model(fpath=fpath)
+        else:
+            return self.get_classifier(fpath=fpath)
 
 
 
@@ -789,9 +852,9 @@ class DistilBertPreprocessor(TransformersPreprocessor):
     text preprocessing for Hugging Face DistlBert model
     """
 
-    def __init__(self, maxlen, max_features, classes=[], 
+    def __init__(self, maxlen, max_features, class_names=[], classes=[], 
                 lang='en', ngram_range=1):
-
+        class_names = self.migrate_classes(class_names, classes)
         name = DISTILBERT
         if lang == 'en':
             model_name = 'distilbert-base-uncased'
@@ -799,7 +862,7 @@ class DistilBertPreprocessor(TransformersPreprocessor):
             model_name = 'distilbert-base-multilingual-cased'
 
         super().__init__(model_name,
-                         maxlen, max_features, classes=classes, 
+                         maxlen, max_features, class_names=class_names, 
                          lang=lang, ngram_range=ngram_range)
 
 
@@ -813,31 +876,42 @@ class Transformer(TransformersPreprocessor):
        model.fit(train_dataset)
     """
 
-    def __init__(self, model_name, maxlen=128, classes=[], 
+    def __init__(self, model_name, maxlen=128, class_names=[], classes=[],
                  batch_size=None, multilabel=False,
                  use_with_learner=True):
         """
         Args:
             model_name (str):  name of Hugging Face pretrained model
             maxlen (int):  sequence length
-            classes(list):  list of strings of class names (e.g., 'positive', 'negative')
+            class_names(list):  list of strings of class names (e.g., 'positive', 'negative').
+                                The index position of string is the class ID.
+                                Not required for:
+                                  - regression problems
+                                  - binary/multi classification problems where
+                                    labels in y_train/y_test are in string format.
+                                    In this case, classes will be populated automatically.
+                                    get_classes() can be called to view discovered class labels.
+                                The class_names argument replaces the old classes argument.
+            classes(list):  alias for class_names.  Included for backwards-compatiblity.
+
             use_with_learner(bool):  If False, preprocess_train and preprocess_test
                                      will return tf.Datasets for direct use with model.fit
                                      in tf.Keras.
                                      If True, preprocess_train and preprocess_test will
-                                     return a ktrain TransformerSequence object for use with
+                                     return a ktrain TransformerDataset object for use with
                                      ktrain.get_learner.
             batch_size (int): batch_size - only required if use_with_learner=False
             multilabel (int):  if True, classifier will be configured for
                                   multilabel classification.
 
         """
+        class_names = self.migrate_classes(class_names, classes)
         if not use_with_learner and batch_size is None:
             raise ValueError('batch_size is required when use_with_learner=False')
-        if multilabel and (classes is None or not classes):
+        if multilabel and (class_names is None or not class_names):
             raise ValueError('classes argument is required when multilabel=True')
         super().__init__(model_name,
-                         maxlen, max_features=10000, classes=classes, multilabel=multilabel)
+                         maxlen, max_features=10000, class_names=class_names, multilabel=multilabel)
         self.batch_size = batch_size
         self.use_with_learner = use_with_learner
         self.lang = None
@@ -847,10 +921,17 @@ class Transformer(TransformersPreprocessor):
         """
         Preprocess training set for A Transformer model
 
-        Each label can be in the form of either:
-        1) integer representing the class (index into array returned by get_classes)
-           for binary and multiclass text classification
-        2) multi-hot-encoded vector for multilabel text classification problems
+        Y values can be in one of the following forms:
+        1) integers representing the class (index into array returned by get_classes)
+           for binary and multiclass text classification.
+           If labels are integers, class_names argument to Transformer constructor is required.
+        2) strings representing the class (e.g., 'negative', 'positive').
+           If labels are strings, class_names argument to Transformer constructor is ignored,
+           as class labels will be extracted from y.
+        3) multi-hot-encoded vector for multilabel text classification problems
+           If labels are multi-hot-encoded, class_names argument to Transformer constructor is requird.
+        4) Numerical values for regression problems.
+           <class_names> argument to Transformer constructor should NOT be supplied
 
         Args:
             texts (list of strings): text of documents
@@ -859,6 +940,8 @@ class Transformer(TransformersPreprocessor):
                          a tf.Dataset will be returned with repeat enabled
                          for training with fit_generator
             verbose(bool): verbosity
+        Returns:
+          TransformerDataset if self.use_with_learner = True else tf.Dataset
         """
         tseq = super().preprocess_train(texts, y=y, mode=mode, verbose=verbose)
         if self.use_with_learner: return tseq
@@ -871,54 +954,28 @@ class Transformer(TransformersPreprocessor):
     def preprocess_test(self, texts, y=None,  verbose=1):
         """
         Preprocess the validation or test set for a Transformer model
-
-        Each label can be in the form of either:
-        1) integer representing the class (index into array returned by get_classes)
-           for binary and multiclass text classification
-        2) multi-hot-encoded vector for multilabel text classification problems
+        Y values can be in one of the following forms:
+        1) integers representing the class (index into array returned by get_classes)
+           for binary and multiclass text classification.
+           If labels are integers, class_names argument to Transformer constructor is required.
+        2) strings representing the class (e.g., 'negative', 'positive').
+           If labels are strings, class_names argument to Transformer constructor is ignored,
+           as class labels will be extracted from y.
+        3) multi-hot-encoded vector for multilabel text classification problems
+           If labels are multi-hot-encoded, class_names argument to Transformer constructor is requird.
+        4) Numerical values for regression problems.
+           <class_names> argument to Transformer constructor should NOT be supplied
 
         Args:
             texts (list of strings): text of documents
             y: labels
             verbose(bool): verbosity
+        Returns:
+            TransformerDataset if self.use_with_learner = True else tf.Dataset
         """
+        self.check_trained()
         return self.preprocess_train(texts, y=y, mode='test', verbose=verbose)
 
-
-
-    def get_classifier(self):
-        if not self.get_classes():
-            warnings.warn('no class labels were provided - treating as regression')
-            return self.get_regression_model()
-        num_labels = len(self.get_classes())
-        model = self.model_type.from_pretrained(self.model_name, num_labels=num_labels)
-        if self.multilabel:
-            loss_fn =  keras.losses.BinaryCrossentropy(from_logits=True)
-        else:
-            loss_fn = keras.losses.CategoricalCrossentropy(from_logits=True)
-        model.compile(loss=loss_fn,
-                      optimizer=keras.optimizers.Adam(learning_rate=3e-5, epsilon=1e-08),
-                      metrics=['accuracy'])
-        return model
-
-
-    def get_regression_model(self):
-        if self.get_classes():
-            warnings.warn('class labels were provided - treating as classification problem')
-            return self.get_classifier()
-        model = self.model_type.from_pretrained(self.model_name, num_labels=1)
-        loss_fn = 'mse'
-        model.compile(loss=loss_fn,
-                      optimizer=keras.optimizers.Adam(learning_rate=3e-5, epsilon=1e-08),
-                      metrics=['mae'])
-        return model
-
-
-    def get_model(self):
-        if not self.get_classes():
-            return self.get_regression_model()
-        else:
-            return self.get_classifier()
 
 
 

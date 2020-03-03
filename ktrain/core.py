@@ -1381,20 +1381,7 @@ def _load_model(fname, preproc=None, train_data=None):
     custom_objects=None
     if preproc and isinstance(preproc, TransformersPreprocessor):
         # note: with transformer models, fname is actually a directory
-        model = preproc.model_type.from_pretrained(fname)
-        if preproc.get_classes():
-            metrics = ['accuracy']
-            if preproc.multilabel:
-                loss_fn =  keras.losses.BinaryCrossentropy(from_logits=True)
-            else:
-                loss_fn = keras.losses.CategoricalCrossentropy(from_logits=True)
-        else:
-                loss_fn = 'mse'
-                metrics = ['mae']
-
-        model.compile(loss=loss_fn,
-                      optimizer=keras.optimizers.Adam(learning_rate=3e-5, epsilon=1e-08),
-                      metrics=metrics)
+        model = preproc.get_model(fpath=fname)
         return model
     elif (preproc and (isinstance(preproc, BERTPreprocessor) or \
                     type(preproc).__name__ == 'BERTPreprocessor')) or\

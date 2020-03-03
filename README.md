@@ -5,12 +5,22 @@
 
 
 ### News and Announcements
+- **2020-03-02:**  
+  - ***ktrain*** **v0.10.x is released** and now includes [ready-to-use NER for English, Chinese, and Russian](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/shallownlp-examples.ipynb) with no training required. 
+  - **Also in v0.10.x:**  Ability to train [community-uploaded Hugging Face transformer models](https://huggingface.co/models) like [SciBERT](https://arxiv.org/abs/1903.10676) and  [BioBERT](https://arxiv.org/abs/1901.08746):
+```python
+import ktrain
+from ktrain import text
+MODEL_NAME = 'monologg/scibert_scivocab_uncased'
+t = text.Transformer(MODEL_NAME, maxlen=500, class_names=label_list)
+trn = t.preprocess_train(x_train, y_train)
+val = t.preprocess_test(x_test, y_test)
+model = t.get_classifier()
+learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=6)
+learner.fit_onecycle(3e-5, 1)
+```
 - **2020-01-31:**  
   - ***ktrain*** **v0.9.x is released** and now includes out-of-the-box support for text regression in addition to support for custom data formats. See [this tutorial notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/tutorials/tutorial-A4-customdata-text_regression_with_extra_regressors.ipynb) for more information on both these topics.
-- **2020-01-14:**  
-  - ***ktrain*** **v0.8.x is released** and now includes a thin and easy-to-use wrapper to [HuggingFace Transformers](https://github.com/huggingface/transformers) for text classification.  See [this tutorial notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-A3-hugging_face_transformers.ipynb) for more details. 
-  - As of v0.8.x, *ktrain* now uses **TensorFlow 2**. TensorFlow 1.x is no longer supported.  If you're using Google Colab and `import tensorflow as tf;  print(tf.__version__)` shows v1.15 is installed, you must install TensorFlow 2: `!pip3 install -q tensorflow_gpu>=2.0`.  Remember to import Keras modules like this:  `from tensorflow.keras.layers import Dense`.  (That is, don't do this:  `from keras.layers import Dense`.)
-
 
 ----
 
@@ -33,6 +43,7 @@
   - `graph` data:
     - **graph node classification** with graph neural networks (e.g., [GraphSAGE](https://cs.stanford.edu/people/jure/pubs/graphsage-nips17.pdf)) <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/graphs/pubmed-GraphSAGE.ipynb)]</sup></sub>
 - perform multilingual text classification (e.g., [Chinese Sentiment Analysis with BERT](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/ChineseHotelReviews-BERT.ipynb), [Arabic Sentiment Analysis with NBSVM](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/ArabicHotelReviews-nbsvm.ipynb))
+- [Ready-to-Use NER for English, Chinese, and Russian](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/shallownlp-examples.ipynb) (no training required)
 - load and preprocess text and image data from a variety of formats 
 - inspect data points that were misclassified and [provide explanations](https://eli5.readthedocs.io/en/latest/) to help improve your model
 - leverage a simple prediction API for saving and deploying both models and data-preprocessing steps to make predictions on new raw data
@@ -76,7 +87,7 @@ Tasks such as text classification and image classification can be accomplished e
 only a few lines of code.
 
 #### Example: Text Classification of [IMDb Movie Reviews](https://ai.stanford.edu/~amaas/data/sentiment/) Using [BERT](https://arxiv.org/pdf/1810.04805.pdf)
-```
+```python
 import ktrain
 from ktrain import text as txt
 
@@ -105,7 +116,7 @@ learner.fit_onecycle(2e-5, 3)
 
 
 #### Example: Classifying Images of [Dogs and Cats](https://www.kaggle.com/c/dogs-vs-cats) Using a Pretrained [ResNet50](https://arxiv.org/abs/1512.03385) model
-```
+```python
 import ktrain
 from ktrain import vision as vis
 
@@ -132,7 +143,7 @@ learner.autofit(1e-4, checkpoint_folder='/tmp/saved_weights')
 ```
 
 #### Example: Sequence Labeling for [Named Entity Recognition](https://www.kaggle.com/abhinavwalia95/entity-annotated-corpus/version/2) using a randomly initialized [Bidirectional LSTM CRF](https://arxiv.org/abs/1603.01360) model
-```
+```python
 import ktrain
 from ktrain import text as txt
 
@@ -156,7 +167,7 @@ learner.fit(1e-3, 1)
 
 
 #### Example: Node Classification on [Cora Citation Graph](https://linqs-data.soe.ucsc.edu/public/lbc/cora.tgz) using a [GraphSAGE](https://arxiv.org/abs/1706.02216) model
-```
+```python
 import ktrain
 from ktrain import graph as gr
 

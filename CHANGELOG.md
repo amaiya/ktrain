@@ -7,6 +7,24 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.10.0 (2020-03-03)
+
+### New:
+- `Transformer` API in *ktrain*  now supports using community-uploaded transformer models
+- added `shallownlp` module with out-of-the-box NER for English, Russian, and Chinese
+- `text.eda` module now supports NMF in addition to LDA
+
+### Changed:
+- `texts_from_csv` and `texts_from_df` now accept a single column of labels in string format and will 
+   1-hot-encode labels automatically for classification or multi-class classification problems.
+- reorganized language-handling to `text.textutils`
+- more suppression of warnings due to spurious warnings from TF2 causing confusion in output
+- `classes` argument to `Transformer` constructor has been changed to `class_names` for consistency with `texts_from_array`
+
+### Fixed:
+- N/A
+
+
 ## 0.9.4 (2020-02-13)
 
 ### New:

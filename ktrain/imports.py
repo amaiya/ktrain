@@ -4,12 +4,20 @@
 #--------------------------
 
 import os
+import warnings
 import logging
 from distutils.util import strtobool
 from packaging import version
 
-# suppress TF warnings
+# suppress warnings
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 logging.getLogger('tensorflow').setLevel(logging.ERROR)
+warnings.simplefilter(action='ignore', category=FutureWarning)
+# elevate warnings to errors for debugging dependencies
+#warnings.simplefilter('error', FutureWarning)
+
+
+
 
 # TF1
 #import tensorflow as tf
@@ -32,6 +40,8 @@ else:
     import tensorflow as tf
     from tensorflow import keras
 
+# suppress autograph warnings
+tf.autograph.set_verbosity(1)
 
 if version.parse(tf.__version__) < version.parse('2.0'):
     raise Exception('As of v0.8.x, ktrain needs TensorFlow 2. Please upgrade TensorFlow.')
@@ -140,9 +150,9 @@ import string
 import random
 import json
 import mimetypes
-import warnings
-# elevate warnings to errors for debugging dependencies
-#warnings.simplefilter('error', FutureWarning)
+
+
+
 
 
 
@@ -165,6 +175,8 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.decomposition import NMF, LatentDirichletAllocation
 from sklearn.manifold import TSNE
+from sklearn.preprocessing import LabelEncoder
+
 
 
 #from sklearn.externals import joblib

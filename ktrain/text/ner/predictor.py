@@ -38,5 +38,3 @@ class NERPredictor(Predictor):
         y_pred = self.preproc.p.inverse_transform(y_pred, lengths)
         y_pred = y_pred[0]
         return list(zip(nerseq.x[0], y_pred))
-
-

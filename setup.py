@@ -10,8 +10,9 @@ exec(open('ktrain/version.py').read())
 setup(
   name = 'ktrain',
   packages = setuptools.find_packages(),
+  package_data={'ktrain': ['text/shallownlp/ner_models/*']},
   version = __version__,
-  license='MIT',
+  license='Apache License 2.0',
   description = 'ktrain is a lightweight wrapper for TensorFlow Keras to help train neural networks',
   long_description = readme,
   long_description_content_type = 'text/markdown',
@@ -36,7 +37,8 @@ setup(
           'packaging',
           'tensorflow_datasets',
           'transformers',
-          'ipython'
+          'ipython',
+          'syntok'
           #'stellargraph>=0.8.2',
           #'eli5 >= 0.10.0',
           #'pillow'
@@ -53,7 +55,7 @@ setup(
     'Topic :: Scientific/Engineering :: Artificial Intelligence',
 
     # Pick your license as you wish
-    'License :: OSI Approved :: MIT License',
+    'License :: OSI Approved :: Apache Software License',
 
     # Specify the Python versions you support here. In particular, ensure
     # that you indicate whether you support Python 2, Python 3 or both.
