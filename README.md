@@ -5,8 +5,20 @@
 
 
 ### News and Announcements
-- **2020-02-28:**  
+- **2020-03-02:**  
   - ***ktrain*** **v0.10.x is released** and now includes [ready-to-use NER for English, Chinese, and Russian](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/shallownlp-examples.ipynb) with no training required. 
+  - **Also in v0.10.x:**  Ability to train [community-uploaded Hugging Face transformer models](https://huggingface.co/models) like [SciBERT](https://arxiv.org/abs/1903.10676) and  [BioBERT](https://arxiv.org/abs/1901.08746):
+  ```python
+import ktrain
+from ktrain import text
+MODEL_NAME = 'monologg/scibert_scivocab_uncased'
+t = text.Transformer(MODEL_NAME, maxlen=500, class_names=label_list)
+trn = t.preprocess_train(x_train, y_train)
+val = t.preprocess_test(x_test, y_test)
+model = t.get_classifier()
+learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=6)
+learner.fit_onecycle(3e-5, 1)
+  ```
 - **2020-01-31:**  
   - ***ktrain*** **v0.9.x is released** and now includes out-of-the-box support for text regression in addition to support for custom data formats. See [this tutorial notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/tutorials/tutorial-A4-customdata-text_regression_with_extra_regressors.ipynb) for more information on both these topics.
   <!--- ***ktrain*** **v0.8.x is released** and now includes a thin and easy-to-use wrapper to [HuggingFace Transformers](https://github.com/huggingface/transformers) for text classification.  See [this tutorial notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-A3-hugging_face_transformers.ipynb) for more details. -->
