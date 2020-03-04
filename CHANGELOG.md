@@ -7,6 +7,23 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.10.1 (2020-03-04)
+
+### New:
+- N/A
+
+### Changed:
+- `shallownlp.Classifier.texts_from_folder` changed to `shallownlp.Classifier.load_texts_from_folder`
+- `shallownlp.Classifier.texts_from_csv` changed to `shallownlp.Classifier.load_texts_from_csv`
+- In `text.preprocessor`, added warning that `class_names` is being ignored when `class_names` were supplied
+  and `y_train` and `y_test` contain string labels
+
+### Fixed:
+- N/A
+
+
+
+
 ## 0.10.0 (2020-03-03)
 
 ### New:

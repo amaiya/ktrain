@@ -203,7 +203,7 @@ def detect_lang(texts, sample_size=32):
         except:
             continue
     if len(lst) == 0: 
-        raise Exception('could not detect language in random sample of %s docs.'  % (sample_size))
+        raise Exception('could not detect language in random sample of %s docs. Are you sure you provided a list of strings?'  % (sample_size))
     return max(set(lst), key=lst.count)
 
 
