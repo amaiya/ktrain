@@ -432,6 +432,7 @@ class TextPreprocessor(Preprocessor):
             if self.label_encoder is None:
                 self.label_encoder = LabelEncoder()
                 self.label_encoder.fit(y_data)
+                #if self.get_classes(): warnings.warn('class_names argument is being overridden by string labels from data')
                 self.set_classes(self.label_encoder.classes_)
             y_data = self.label_encoder.transform(y_data)
 
