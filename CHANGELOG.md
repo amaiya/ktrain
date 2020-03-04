@@ -7,6 +7,21 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.10.1 (TBD)
+
+### New:
+- N/A
+
+### Changed:
+- `shallownlp.Classifier.texts_from_folder` changed to `shallownlp.Classifier.load_texts_from_folder`
+- `shallownlp.Classifier.texts_from_csv` changed to `shallownlp.Classifier.load_texts_from_csv`
+
+### Fixed:
+- N/A
+
+
+
+
 ## 0.10.0 (2020-03-03)
 
 ### New:

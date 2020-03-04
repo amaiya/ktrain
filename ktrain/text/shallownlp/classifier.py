@@ -92,10 +92,10 @@ class Classifier:
 
 
     @classmethod
-    def texts_from_folder(cls, folder_path, 
-                          subfolders=None, 
-                          shuffle=True,
-                          encoding=None):
+    def load_texts_from_folder(cls, folder_path, 
+                              subfolders=None, 
+                              shuffle=True,
+                              encoding=None):
         """
         load text files from folder
 
@@ -137,8 +137,8 @@ class Classifier:
 
 
     @classmethod
-    def texts_from_csv(cls, csv_filepath, text_column='text', label_column='label',
-                       sep=',', encoding=None):
+    def load_texts_from_csv(cls, csv_filepath, text_column='text', label_column='label',
+                            sep=',', encoding=None):
         """
         load text files from csv file
         CSV should have at least two columns.

@@ -42,7 +42,7 @@ class TestShallowNLP(TestCase):
     #@skip('temporarily disabled')
     def test_classifier_chinese(self):
         fpath = './text_data/chinese_hotel_reviews.csv'
-        (x_train,  y_train, label_names) = snlp.Classifier.texts_from_csv(fpath, text_column='content', label_column='pos', sep='|')
+        (x_train,  y_train, label_names) = snlp.Classifier.load_texts_from_csv(fpath, text_column='content', label_column='pos', sep='|')
         print('label names: %s' % (label_names))
         clf = snlp.Classifier()
         clf.fit(x_train, y_train, ctype='nbsvm')
