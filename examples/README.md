@@ -106,7 +106,7 @@ The objective of the CoNLL2003 task is to classify sequences of words as belongi
 #### [shallownlp-examples.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text)
 - Shallow NLP is a submodule in *ktrain* that provides a small collection of miscellaneous text utiilities to analyze text on machines with no GPU and minimal computational resources.  Includes:
     - *text classification*: a non-neural version of NBSVM that can be trained in a single line of code
-	- *named-entity-recognition (NER)*:  out-of-the box, pretrained NER for English and Chinese that just works with no training
+	- *named-entity-recognition (NER)*:  out-of-the box, ready-to-use NER for English, Russian, and Chinese that just works with no training
 	- *multilingual text searches*:  searching text in multiple languages
 
 
