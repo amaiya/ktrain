@@ -1,5 +1,5 @@
 ### [Overview](#overview) | [Tutorials](#tutorials) | [Examples](#examples) |  [Installation](#installation)
-[![Downloads](https://pepy.tech/badge/ktrain)](https://pepy.tech/project/ktrain) [![Downloads](https://pepy.tech/badge/ktrain/month)](https://pepy.tech/project/ktrain/month) [![Downloads](https://pepy.tech/badge/ktrain/week)](https://pepy.tech/project/ktrain/week)
+[![PyPI Status](https://badge.fury.io/py/pytorch-lightning.svg)](https://badge.fury.io/py/pytorch-lightning) [![license](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/amaiya/ktrain/blob/master/LICENSE) [![Downloads](https://pepy.tech/badge/ktrain)](https://pepy.tech/project/ktrain) [![Downloads](https://pepy.tech/badge/ktrain/month)](https://pepy.tech/project/ktrain/month)
 
 
 # ktrain
