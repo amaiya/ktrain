@@ -1,4 +1,6 @@
 ### [Overview](#overview) | [Tutorials](#tutorials) | [Examples](#examples) |  [Installation](#installation)
+[![Downloads](https://pepy.tech/badge/ktrain)](https://pepy.tech/project/ktrain) [![Downloads](https://pepy.tech/badge/ktrain/month)](https://pepy.tech/project/ktrain/month) [![Downloads](https://pepy.tech/badge/ktrain/week)](https://pepy.tech/project/ktrain/week)
+
 
 # ktrain
 
