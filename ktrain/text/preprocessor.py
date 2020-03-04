@@ -419,7 +419,7 @@ class TextPreprocessor(Preprocessor):
         y_data = np.array(y_data) if type(y_data) == list else y_data
 
         # check for errors and warnings
-        if not isinstance(y_data, str) and len(y_data.shape) ==1 and not self.get_classes():
+        if not isinstance(y_data[0], str) and len(y_data.shape) ==1 and not self.get_classes():
             warnings.warn('Task is being treated as TEXT REGRESSION because ' +\
                           'class_names argument was not supplied. ' + \
                           'If this is incorrect, supply class_names argument.')
@@ -432,7 +432,7 @@ class TextPreprocessor(Preprocessor):
             if self.label_encoder is None:
                 self.label_encoder = LabelEncoder()
                 self.label_encoder.fit(y_data)
-                #if self.get_classes(): warnings.warn('class_names argument is being overridden by string labels from data')
+                if self.get_classes(): warnings.warn('class_names argument was ignored, as they were extracted from string labels in dataset')
                 self.set_classes(self.label_encoder.classes_)
             y_data = self.label_encoder.transform(y_data)
 
