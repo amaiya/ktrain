@@ -122,6 +122,10 @@ class Learner(ABC):
         y_true = np.argmax(y_true, axis=1)
         if print_report:
             if class_names:
+                try:
+                    class_names = [str(s) for s in class_names]
+                except:
+                    pass
                 report = classification_report(y_true, y_pred, target_names=class_names)
             else:
                 report = classification_report(y_true, y_pred)

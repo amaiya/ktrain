@@ -7,6 +7,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.10.2 (TBD)
+
+### New:
+- N/A
+
+### Changed:
+- N/A
+
+### Fixed:
+- convert `class_names` to strings in `core.validate` to prevent error from scikit-learn
+
+
 ## 0.10.1 (2020-03-04)
 
 ### New:
