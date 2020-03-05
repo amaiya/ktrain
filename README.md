@@ -198,6 +198,42 @@ learner.autofit(0.01, checkpoint_folder='/tmp/saved_weights')
 ```
 
 
+#### Example: Text Classification with [Hugging Face Transformers](https://github.com/huggingface/transformers) on [20 Newsgroups Dataset](https://scikit-learn.org/stable/tutorial/text_analytics/working_with_text_data.html) Using [DistilBERT](https://arxiv.org/abs/1910.01108)
+```python
+# load text data
+categories = ['alt.atheism', 'soc.religion.christian','comp.graphics', 'sci.med']
+from sklearn.datasets import fetch_20newsgroups
+train_b = fetch_20newsgroups(subset='train', categories=categories, shuffle=True)
+test_b = fetch_20newsgroups(subset='test',categories=categories, shuffle=True)
+(x_train, y_train) = (train_b.data, train_b.target)
+(x_test, y_test) = (test_b.data, test_b.target)
+
+# build, train, and validate model (Transformer is wrapper around transformers library)
+import ktrain
+from ktrain import text
+MODEL_NAME = 'distilbert-base-uncased'
+t = text.Transformer(MODEL_NAME, maxlen=500, class_names=train_b.target_names)
+trn = t.preprocess_train(x_train, y_train)
+val = t.preprocess_test(x_test, y_test)
+model = t.get_classifier()
+learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=6)
+learner.fit_onecycle(5e-5, 4)
+learner.validate(class_names=t.get_classes()) # class_names must be string values
+
+# Output from learner.validate()
+#                        precision    recall  f1-score   support
+#
+#           alt.atheism       0.92      0.93      0.93       319
+#         comp.graphics       0.97      0.97      0.97       389
+#               sci.med       0.97      0.95      0.96       396
+#soc.religion.christian       0.96      0.96      0.96       398
+#
+#              accuracy                           0.96      1502
+#             macro avg       0.95      0.96      0.95      1502
+#          weighted avg       0.96      0.96      0.96      1502
+```
+
+
 Using *ktrain* on **Google Colab**?  See [this simple demo of Multiclass Text Classification with BERT](https://colab.research.google.com/drive/1AH3fkKiEqBpVpO5ua00scp7zcHs5IDLK).
 
 **Additional examples can be found [here](https://github.com/amaiya/ktrain/tree/master/examples).**
