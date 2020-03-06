@@ -139,6 +139,7 @@ def process_datagen(data_aug, train_array=None, train_directory=None,
         test_datagen = get_test_datagen(data_aug=data_aug)
     else:
         train_datagen = get_test_datagen()
+        test_datagen = get_test_datagen()
 
     # compute statistics for normalization
     fit_datagens(train_datagen, test_datagen, 
