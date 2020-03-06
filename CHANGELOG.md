@@ -13,11 +13,12 @@ Most recent releases are shown at the top. Each release shows:
 - N/A
 
 ### Changed:
-- N/A
+- `images_from_csv` accepts single column of string labels
 
 ### Fixed:
 - convert `class_names` to strings in `core.validate` to prevent error from scikit-learn
 - fixed error arising when no data augmentation scheme is provided to the `images_from*` functions
+
 
 
 ## 0.10.1 (2020-03-04)
