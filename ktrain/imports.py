@@ -13,6 +13,8 @@ from packaging import version
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 logging.getLogger('tensorflow').setLevel(logging.ERROR)
 warnings.simplefilter(action='ignore', category=FutureWarning)
+
+
 # elevate warnings to errors for debugging dependencies
 #warnings.simplefilter('error', FutureWarning)
 
