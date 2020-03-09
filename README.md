@@ -283,7 +283,7 @@ The following software/libraries should be installed:
 -->
 
 
-This code was tested on Ubuntu 18.04 LTS using TensorFlow 2.0 (Keras version 2.2.4-tf).
+This code was tested on Ubuntu 18.04 LTS using TensorFlow 2.1.0
 
 ----
 **Creator:  [Arun S. Maiya](http://arun.maiya.net)**

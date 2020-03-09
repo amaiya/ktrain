@@ -9,15 +9,14 @@ import logging
 from distutils.util import strtobool
 from packaging import version
 
-# suppress warnings
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
-logging.getLogger('tensorflow').setLevel(logging.ERROR)
-warnings.simplefilter(action='ignore', category=FutureWarning)
-
-
-# elevate warnings to errors for debugging dependencies
-#warnings.simplefilter('error', FutureWarning)
-
+SUPPRESS_TF_WARNINGS = strtobool(os.environ.get('SUPPRESS_TF_WARNINGS', '1'))
+if SUPPRESS_TF_WARNINGS:
+    # suppress warnings
+    os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+    logging.getLogger('tensorflow').setLevel(logging.ERROR)
+    warnings.simplefilter(action='ignore', category=FutureWarning)
+    # elevate warnings to errors for debugging dependencies
+    #warnings.simplefilter('error', FutureWarning)
 
 
 
@@ -43,7 +42,8 @@ else:
     from tensorflow import keras
 
 # suppress autograph warnings
-tf.autograph.set_verbosity(1)
+if SUPPRESS_TF_WARNINGS:
+    tf.autograph.set_verbosity(1)
 
 if version.parse(tf.__version__) < version.parse('2.0'):
     raise Exception('As of v0.8.x, ktrain needs TensorFlow 2. Please upgrade TensorFlow.')
@@ -55,7 +55,7 @@ os.environ['TF_KERAS'] = '1' # to use keras_bert package below with tf.Keras
 
 
 # output Keras version
-print("using Keras version: %s" % (keras.__version__))
+#print("using Keras version: %s" % (keras.__version__))
 
 K = keras.backend
 Layer = keras.layers.Layer
