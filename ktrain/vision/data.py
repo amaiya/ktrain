@@ -530,8 +530,9 @@ def images_from_csv(train_filepath,
 
 
 
-def images_from_fname( img_folder,
+def images_from_fname( train_folder,
                       pattern=r'([^/]+)_\d+.jpg$',
+                      val_folder=None,
                      target_size=(224,224),
                      color_mode='rgb',
                      data_aug=None,
@@ -542,17 +543,18 @@ def images_from_fname( img_folder,
     Returns image generator (Iterator instance).
 	
     Args:
+    train_folder (str): directory containing images
     pat (str):  regular expression to extract class from file name of each image
                 Example: r'([^/]+)_\d+.jpg$' to match 'english_setter' in 'english_setter_140.jpg'
                 By default, it will extract classes from file names of the form:
                    <class_name>_<numbers>.jpg
-    img_folder (str): directory containing images
+    val_folder (str): directory containing validation images. default:None
     target_size (tuple):  image dimensions 
     color_mode (string):  color mode
     data_aug(ImageDataGenerator):  a keras.preprocessing.image.ImageDataGenerator
                                   for data augmentation
     val_pct(float):  proportion of training data to be used for validation
-                     only used if val_filepath is None
+                     only used if val_folder is None
     random_state(int): random seed for train/test split
     verbose(bool):   verbosity
 
@@ -563,57 +565,30 @@ def images_from_fname( img_folder,
 
     # get train and test data generators
     (train_datagen, test_datagen) = process_datagen(data_aug, 
-                                                    train_directory=img_folder,
+                                                    train_directory=train_folder,
                                                     target_size=target_size,
                                                     color_mode=color_mode,
                                                     flat_dir=True)
 
-    # setup dataframe
-    fnames = []
-    for ext in ('*.gif', '*.png', '*.jpg'):
-        fnames.extend(glob.glob(os.path.join(img_folder, ext)))
+    # train df
+    train_df, class_names = _img_fnames_to_df(train_folder, pattern, verbose=verbose)
 
-    # extract class names
-    image_names = []
-    labels = []
-    p = re.compile(r'([^/]+)_\d+.jpg$')
-    for fname in fnames:
-        r = p.search(fname)
-        if r:
-            image_names.append(os.path.basename(fname))
-            labels.append(r.group(1))
-        else:
-            warnings.warn('Could not extract class for %s -  skipping this file'% (fname))
-
-    # convert labels to integers
-    class_names = list(set(labels))
-    class_names.sort()
-    c2i = {k:v for v,k in enumerate(class_names)}
-    labels = [c2i[label] for label in labels]
-    labels = to_categorical(labels)
-
-    U.vprint('Found %s classes: %s' % (len(class_names), class_names), verbose=verbose)
-    U.vprint('y shape: (%s,%s)' % (labels.shape[0], labels.shape[1]), verbose=verbose)
-    dct = {'image_name': image_names}
-    for i in range(labels.shape[1]):
-        dct[class_names[i]] = labels[:,i]
-
-    # convert to dataframes
-    df = pd.DataFrame(dct)
-    #df = df.astype({"a": int, "b": complex})
-    #df.to_csv('/tmp/pets.csv')
-    if val_pct:
+    # val df
+    if val_folder is not None:
+        val_df, _ = _img_fnames_to_df(val_folder, pattern, verbose=verbose)
+    elif val_pct:
         prop = 1-val_pct
         if random_state is not None: np.random.seed(42)
         msk = np.random.rand(len(df)) < prop
         train_df = df[msk]
         val_df = df[~msk]
+        val_folder = train_folder
     else:
         val_df = None
 
     batches_tr = train_datagen.flow_from_dataframe(
                                       train_df,
-                                      directory=img_folder,
+                                      directory=train_folder,
                                       x_col = 'image_name',
                                       y_col=class_names,
                                       target_size=target_size,
@@ -625,7 +600,7 @@ def images_from_fname( img_folder,
     if val_df is not None:
         batches_te = test_datagen.flow_from_dataframe(
                                           val_df,
-                                          directory=img_folder,
+                                          directory=val_folder,
                                           x_col = 'image_name',
                                           y_col=class_names,
                                           target_size=target_size,
@@ -642,6 +617,41 @@ def images_from_fname( img_folder,
                                 target_size=target_size, 
                                 color_mode=color_mode)
     return (batches_tr, batches_te, preproc)
+
+
+
+def _img_fnames_to_df(img_folder, pattern, verbose=1):
+    # get fnames
+    fnames = []
+    for ext in ('*.gif', '*.png', '*.jpg'):
+        fnames.extend(glob.glob(os.path.join(img_folder, ext)))
+
+    # process filenames and labels
+    image_names = []
+    labels = []
+    p = re.compile(pattern)
+    for fname in fnames:
+        r = p.search(fname)
+        if r:
+            image_names.append(os.path.basename(fname))
+            labels.append(r.group(1))
+        else:
+            warnings.warn('Could not extract class for %s -  skipping this file'% (fname))
+    class_names = list(set(labels))
+    class_names.sort()
+    c2i = {k:v for v,k in enumerate(class_names)}
+    labels = [c2i[label] for label in labels]
+    labels = to_categorical(labels)
+    #class_names = [str(c) in class_names]
+    U.vprint('Found %s classes: %s' % (len(class_names), class_names), verbose=verbose)
+    U.vprint('y shape: (%s,%s)' % (labels.shape[0], labels.shape[1]), verbose=verbose)
+    dct = {'image_name': image_names}
+    for i in range(labels.shape[1]):
+        dct[class_names[i]] = labels[:,i]
+
+    # convert to dataframes
+    df = pd.DataFrame(dct)
+    return (df, class_names)
 
 
 
