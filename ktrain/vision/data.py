@@ -3,6 +3,35 @@ from .. import utils as U
 from .preprocessor import ImagePreprocessor
 
 
+def show_image(img_path):
+    """
+    Given file path to image, show it in Jupyter notebook
+    """
+    if not os.path.isfile(img_path):
+        raise ValueError('%s is not valid file' % (img_path))
+    img = plt.imread(img_path)
+    out = plt.imshow(img)
+    return out
+
+
+def show_random_images(img_folder, n=4, rows=1):
+    """
+    display random images from a img_folder
+    """
+    fnames = []
+    for ext in ('*.gif', '*.png', '*.jpg'):
+        fnames.extend(glob.glob(os.path.join(img_folder, ext)))
+    ims = []
+    for i in range(n):
+        img_path = random.choice(fnames)
+        img = image.load_img(img_path)
+        x = image.img_to_array(img)
+        x = x/255.
+        ims.append(x)
+    U.plots(ims, rows=rows)
+    return
+
+
 def preview_data_aug(img_path, data_aug, rows=1, n=4):
     """
     Preview data augmentation (ImageDatagenerator)
@@ -33,7 +62,7 @@ def preview_data_aug(img_path, data_aug, rows=1, n=4):
     return
 
 
-def preview_data_aug_colformat(img_path, data_aug, n=4):
+def preview_data_aug_OLD(img_path, data_aug, n=4):
     """
     Preview data augmentation (ImageDatagenerator)
     on a supplied image.
@@ -62,12 +91,6 @@ def preview_data_aug_colformat(img_path, data_aug, n=4):
     return
 
 
-def show_image(img_path):
-    if not os.path.isfile(img_path):
-        raise ValueError('%s is not valid file' % (img_path))
-    img = plt.imread(img_path)
-    out = plt.imshow(img)
-    return out
 
 def get_data_aug(
                  rotation_range=40,

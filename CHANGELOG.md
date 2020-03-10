@@ -10,7 +10,7 @@ Most recent releases are shown at the top. Each release shows:
 ## 0.10.2 (TBD)
 
 ### New:
-- N/A
+- `show_random_images`: show random images from folder in Jupyter notebook
 
 ### Changed:
 - added `SUPPRESS_TF_WARNINGS` environment variable (default:'1', which is True)
