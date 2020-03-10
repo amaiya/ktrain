@@ -38,6 +38,7 @@ class ImagePredictor(Predictor):
 
         try:
             import eli5
+            from eli5.lime import TextExplainer
         except:
             msg = 'ktrain requires a forked version of eli5 to support tf.keras. '+\
                   'Install with: pip3 install git+https://github.com/amaiya/eli5@tfkeras_0_10_1'
@@ -51,16 +52,6 @@ class ImagePredictor(Predictor):
                            "the forked version:  " +\
                            "pip3 install git+https://github.com/amaiya/eli5@tfkeras_0_10_1")
             return
-
-        if not DISABLE_V2_BEHAVIOR:
-            warnings.warn("Please add os.environ['DISABLE_V2_BEHAVIOR'] = '1' at top of your script or notebook.")
-            msg = "\nFor image classification, the explain method currently requires disabling V2 behavior in TensorFlow 2.\n" +\
-                    "Please add the following to the top of your script or notebook BEFORE you import ktrain and restart Colab runtime or Jupyter kernel:\n\n" +\
-                  "import os\n" +\
-                  "os.environ['DISABLE_V2_BEHAVIOR'] = '1'\n"
-            print(msg)
-            return
-
 
         img = image.load_img(img_fpath, 
                              target_size=self.preproc.target_size, 

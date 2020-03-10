@@ -14,13 +14,10 @@ Most recent releases are shown at the top. Each release shows:
 
 ### Changed:
 - added `SUPPRESS_TF_WARNINGS` environment variable (default:'1', which is True)
-- ensure `DISABLE_V2_BEHAVIOR=True` when `ImagePredictor.explain` is invoked
 
 ### Fixed:
 - convert `class_names` to strings in `core.validate` to prevent error from scikit-learn
 - fixed error arising when no data augmentation scheme is provided to the `images_from*` functions
-- fixed bug in `images_from_fname` to ensure supplied `pattern` is used
-- added `val_folder` argument to `images_from_fname`
 
 
 ## 0.10.1 (2020-03-04)
