@@ -76,6 +76,23 @@ class NER:
         #else:
             #del os.environ['CUDA_VISIBLE_DEVICES']
         return result
+    
+    #Gets the entities and masks the entities if they are in the list
+    #Expect mask element in [[entitytoken, (optional) replacementtoken]]
+    #Example: [["PER", "XXX"]] or [["PER"], ["ORG", "YYY"]]
+    def predict_and_mask(self, texts, merge_tokens=True, mask_list=[]):
+        entities = self.predict(texts)
+        result = texts
+        if mask_list is not []:
+            for mask in mask_list:
+                for entity in entities:
+                    if mask[0] == entity[1]:
+                        try:
+                            result = result.replace(entity[0], mask[1])
+                        except:
+                            result = result.replace(entity[0], "XXX")
+        return result
+        
 
     def merge_entities(self, annotated_sentence):
         if self.lang == 'zh':
