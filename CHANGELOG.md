@@ -21,6 +21,7 @@ Most recent releases are shown at the top. Each release shows:
 - fixed error arising when no data augmentation scheme is provided to the `images_from*` functions
 - fixed bug in `images_from_fname` to ensure supplied `pattern` is used
 - added `val_folder` argument to `images_from_fname`
+- raise Exception when `preproc` is not found in `load_predictor`
 
 
 ## 0.10.1 (2020-03-04)
