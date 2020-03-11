@@ -3,12 +3,12 @@ import os, logging, warnings
 #os.environ['DISABLE_V2_BEHAVIOR'] = '1'
 
 
-# warnings controlled by ktrain.imports.SHOW_ALL_WARNINGS
+# warnings controlled by ktrain.imports.SHOW_ALL_WARNINGS also
 
-#os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
-#logging.getLogger("tensorflow").setLevel(logging.CRITICAL)
-#logging.getLogger("tensorflow_hub").setLevel(logging.CRITICAL)
-#warnings.simplefilter(action='ignore', category=FutureWarning)
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+logging.getLogger("tensorflow").setLevel(logging.CRITICAL)
+logging.getLogger("tensorflow_hub").setLevel(logging.CRITICAL)
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
 try:
     import tensorflow as tf
