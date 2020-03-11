@@ -22,6 +22,7 @@ Most recent releases are shown at the top. Each release shows:
 - fixed bug in `images_from_fname` to ensure supplied `pattern` is used
 - added `val_folder` argument to `images_from_fname`
 - raise Exception when `preproc` is not found in `load_predictor`
+- check for existence of `preproc` in `text_classifier` and `text_regression_model`
 
 
 ## 0.10.1 (2020-03-04)
