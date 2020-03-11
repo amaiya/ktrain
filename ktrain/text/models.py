@@ -453,7 +453,7 @@ def text_classifier(name, train_data, preproc=None, multilabel=None, verbose=1):
     """
     if name not in TEXT_CLASSIFIERS:
         raise ValueError('invalid name for text classification: %s' % (name)) 
-    if not preproc.get_classes():
+    if preproc is not None and not preproc.get_classes():
         raise ValueError('preproc.get_classes() is empty, but required for text classification')
     return _text_model(name, train_data, preproc=preproc,
                        multilabel=multilabel, classification=True, verbose=verbose)
@@ -481,7 +481,7 @@ def text_regression_model(name, train_data, preproc=None, verbose=1):
     """
     if name not in TEXT_REGRESSION_MODELS:
         raise ValueError('invalid name for text classification: %s' % (name) )
-    if preproc.get_classes():
+    if preproc is not None and preproc.get_classes():
         raise ValueError('preproc.get_classes() is supposed to be empty for text regression tasks')
     return _text_model(name, train_data, preproc=preproc,
                       multilabel=False, classification=False,  verbose=verbose)
