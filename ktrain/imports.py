@@ -48,8 +48,9 @@ else:
     from tensorflow import keras
 
 # suppress autograph warnings
-if SUPPRESS_TF_WARNINGS:
-    tf.autograph.set_verbosity(1)
+tf.autograph.set_verbosity(1)
+#if SUPPRESS_TF_WARNINGS:
+    #tf.autograph.set_verbosity(1)
 
 if version.parse(tf.__version__) < version.parse('2.0'):
     raise Exception('As of v0.8.x, ktrain needs TensorFlow 2. Please upgrade TensorFlow.')
