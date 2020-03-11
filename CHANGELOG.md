@@ -13,7 +13,6 @@ Most recent releases are shown at the top. Each release shows:
 - `show_random_images`: show random images from folder in Jupyter notebook
 
 ### Changed:
-- added `SUPPRESS_TF_WARNINGS` environment variable (default:'1', which is True)
 - ensure `DISABLE_V2_BEHAVIOR=True` when `ImagePredictor.explain` is invoked
 
 ### Fixed:
