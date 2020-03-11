@@ -11,11 +11,13 @@ from packaging import version
 
 
 # suppress warnings
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
-logging.getLogger('tensorflow').setLevel(logging.ERROR)
-warnings.simplefilter(action='ignore', category=FutureWarning)
-# elevate warnings to errors for debugging dependencies
-#warnings.simplefilter('error', FutureWarning)
+SUPRESS_TF_WARNINGS = strtobool(os.environ.get('SUPRESS_TF_WARNINGS', '1'))
+if SUPRESS_TF_WARNINGS:
+    os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+    logging.getLogger('tensorflow').setLevel(logging.ERROR)
+    warnings.simplefilter(action='ignore', category=FutureWarning)
+    # elevate warnings to errors for debugging dependencies
+    #warnings.simplefilter('error', FutureWarning)
 
 
 
