@@ -7,25 +7,25 @@ from . import textutils as TU
 DistilBertTokenizer = transformers.DistilBertTokenizer
 DISTILBERT= 'distilbert'
 
-from transformers import BertConfig, TFBertForSequenceClassification, BertTokenizer
-from transformers import XLNetConfig, TFXLNetForSequenceClassification, XLNetTokenizer
-from transformers import XLMConfig, TFXLMForSequenceClassification, XLMTokenizer
-from transformers import RobertaConfig, TFRobertaForSequenceClassification, RobertaTokenizer
-from transformers import DistilBertConfig, TFDistilBertForSequenceClassification, DistilBertTokenizer
-from transformers import AlbertConfig, TFAlbertForSequenceClassification, AlbertTokenizer
-from transformers import CamembertConfig, TFCamembertForSequenceClassification, CamembertTokenizer
-from transformers import XLMRobertaConfig, TFXLMRobertaForSequenceClassification, XLMRobertaTokenizer
-from transformers import AutoConfig, TFAutoModelForSequenceClassification, AutoTokenizer
+from transformers import BertConfig, TFBertForSequenceClassification, BertTokenizer, TFBertModel
+from transformers import XLNetConfig, TFXLNetForSequenceClassification, XLNetTokenizer, TFXLNetModel 
+from transformers import XLMConfig, TFXLMForSequenceClassification, XLMTokenizer, TFXLMModel
+from transformers import RobertaConfig, TFRobertaForSequenceClassification, RobertaTokenizer, TFRobertaModel
+from transformers import DistilBertConfig, TFDistilBertForSequenceClassification, DistilBertTokenizer, TFDistilBertModel
+from transformers import AlbertConfig, TFAlbertForSequenceClassification, AlbertTokenizer, TFAlbertModel
+from transformers import CamembertConfig, TFCamembertForSequenceClassification, CamembertTokenizer, TFCamembertModel
+from transformers import XLMRobertaConfig, TFXLMRobertaForSequenceClassification, XLMRobertaTokenizer, TFXLMRobertaModel
+from transformers import AutoConfig, TFAutoModelForSequenceClassification, AutoTokenizer, TFAutoModel
 
 TRANSFORMER_MODELS = {
-    'bert':       (BertConfig, TFBertForSequenceClassification, BertTokenizer),
-    'xlnet':      (XLNetConfig, TFXLNetForSequenceClassification, XLNetTokenizer),
-    'xlm':        (XLMConfig, TFXLMForSequenceClassification, XLMTokenizer),
-    'roberta':    (RobertaConfig, TFRobertaForSequenceClassification, RobertaTokenizer),
-    'distilbert': (DistilBertConfig, TFDistilBertForSequenceClassification, DistilBertTokenizer),
-    'albert':     (AlbertConfig, TFAlbertForSequenceClassification, AlbertTokenizer),
-    'camembert':  (CamembertConfig, TFCamembertForSequenceClassification, CamembertTokenizer),
-    'xlm_roberta':  (XLMRobertaConfig, TFXLMRobertaForSequenceClassification, XLMRobertaTokenizer)
+    'bert':       (BertConfig, TFBertForSequenceClassification, BertTokenizer, TFBertModel),
+    'xlnet':      (XLNetConfig, TFXLNetForSequenceClassification, XLNetTokenizer, TFXLNetModel),
+    'xlm':        (XLMConfig, TFXLMForSequenceClassification, XLMTokenizer, TFXLMModel),
+    'roberta':    (RobertaConfig, TFRobertaForSequenceClassification, RobertaTokenizer, TFRobertaModel),
+    'distilbert': (DistilBertConfig, TFDistilBertForSequenceClassification, DistilBertTokenizer, TFDistilBertModel),
+    'albert':     (AlbertConfig, TFAlbertForSequenceClassification, AlbertTokenizer, TFAlbertModel),
+    'camembert':  (CamembertConfig, TFCamembertForSequenceClassification, CamembertTokenizer, TFCamembertModel),
+    'xlm_roberta':  (XLMRobertaConfig, TFXLMRobertaForSequenceClassification, XLMRobertaTokenizer, TFXLMRobertaModel)
 }
 
 
@@ -977,6 +977,94 @@ class Transformer(TransformersPreprocessor):
         self.check_trained()
         return self.preprocess_train(texts, y=y, mode='test', verbose=verbose)
 
+
+class TransformerEmbedding():
+    def __init__(self, model_name):
+        """
+        Args:
+            model_name (str):  name of Hugging Face pretrained model.
+                               Choose from here: https://huggingface.co/transformers/pretrained_models.html
+                               
+        """
+        self.model_name = model_name
+        self.name = model_name.split('-')[0]
+        if self.name not in TRANSFORMER_MODELS:
+            self.config = AutoConfig.from_pretrained(model_name)
+            self.model_type = TFAutoModel
+            self.tokenizer_type = AutoTokenizer
+        else:
+            self.config = None # use default config
+            self.model_type = TRANSFORMER_MODELS[self.name][3]
+            self.tokenizer_type = TRANSFORMER_MODELS[self.name][2]
+        if "bert-base-japanese" in model_name:
+            self.tokenizer_type = transformers.BertJapaneseTokenizer
+
+        self.tokenizer = self.tokenizer_type.from_pretrained(model_name)
+        self.model = self._load_pretrained(model_name)
+
+
+    def _load_pretrained(self, model_name):
+        """
+        load pretrained model
+        """
+        if self.config is not None:
+            try:
+                model = self.model_type.from_pretrained(model_name, config=self.config)
+            except:
+                try:
+                    model = self.model_type.from_pretrained(model_name, config=self.config, from_pt=True)
+                except:
+                    raise ValueError('could not load pretrained model %s using both from_pt=False and from_pt=True' % (model_name))
+        else:
+            model = self.model_type.from_pretrained(model_name)
+        return model
+
+
+
+    def embed(self, text, cls_only=True, return_all=False):
+        """
+        get embedding for word, phrase, or sentence
+        Args:
+          text(str): word, phrase, or sentence
+          cls_only(bool):  If True, a size-1 vector representing the text will be returned
+                           IF False, a vector for each token from the tokenized <text>
+                           will be returned.
+                          Default:True
+          return_all(bool):  If True, embeddding includes CLS and SEP tokens.
+                             If False, these are ommitted from final result.
+                             Cannot be True if cls_only=True.
+        Returns:
+            np.ndarray
+        """
+        if return_all and cls_only:
+            raise ValueError('return_all and cls_only cannot both be True')
+
+        input_ids = tf.constant(self.tokenizer.encode(text))[None, :]  # Batch size 1
+        outputs = self.model(input_ids)
+        last_hidden_states = outputs[0] 
+        embedding = np.squeeze(last_hidden_states.numpy())
+        if cls_only:
+            return embedding[0]
+        elif return_all:
+            return embedding
+        else:
+            return embedding[1:-1]
+
+
+    def tokenize(self, text, return_all=False):
+        """
+        get embedding for word, phrase, or sentence
+        Args:
+          text(str): word, phrase, or sentence
+          return_all(bool):  If True, CLS and SEP tokens are prepended and appended, respectively.
+        Returns:
+          list
+        """
+        tokens = self.tokenizer(text)
+        if return_all:
+            return [self.tokenizer.cls_token] +  tokens + [self.tokenizer.sep_token]
+        else:
+            return tokens
 
 
 

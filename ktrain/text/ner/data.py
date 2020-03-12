@@ -30,7 +30,7 @@ def entities_from_gmb(train_filepath,
 
     return entities_from_txt(train_filepath=train_filepath,
                              val_filepath=val_filepath,
-                             embeddings=None,
+                             embeddings=embeddings,
                              word_column=word_column,
                              tag_column=tag_column,
                              sentence_column=sentence_column,
@@ -50,6 +50,7 @@ def entities_from_conll2003(train_filepath,
     """
     return entities_from_txt(train_filepath=train_filepath,
                              val_filepath=val_filepath,
+                             embeddings=embeddings,
                              data_format='conll2003',
                              encoding=encoding,
                              val_pct=val_pct, verbose=verbose)
@@ -115,11 +116,18 @@ def entities_from_txt(train_filepath,
     Args:
         train_filepath(str): file path to training CSV
         val_filepath (str): file path to validation dataset
-        embeddings(str): Currently, either None or 'word2vec' is supported
-                         If 'word2vec' is specified, pretrained word vectors
-                         are automatically downloaded to <home>/ktran_data
-                         and used as weights in the Embedding layer.
-                         If None, random embeddings used.
+        embeddings(str): Currently, must be one of the following:
+                         - None: randomly-initialized embedding is used
+                         - word2vec: pretrained English word vectors
+                                     are automatically downloaded to <home>/ktrain_data
+                                     and used as weights in the Embedding layer.
+                         - a transformer model from https://huggingface.co/transformers/pretrained_models.html
+                         Examples:
+                            embeddings=None
+                            embeddings='word2vec'
+                            embeddings='bert-base-uncased'  # English BERT
+                            embeddings='bert-base-chinese'  # Chinese BERT
+                            embeddings='bert-multilingual-cased'  # Multilingual BERT
         word_column(str): name of column containing the text
         tag_column(str): name of column containing lael
         sentence_column(str): name of column containing Sentence IDs
@@ -170,11 +178,18 @@ def entities_from_df(train_df,
       word_column(str): name of column containing the text
       tag_column(str): name of column containing lael
       sentence_column(str): name of column containing Sentence IDs
-      embeddings(str): Currently, either None or 'word2vec' is supported
-                       If 'word2vec' is specified, pretrained word vectors
-                       are automatically downloaded to <home>/ktran_data
-                       and used as weights in the Embedding layer.
-                         If None, random embeddings used.
+      embeddings(str): Currently, must be one of the following:
+                         - None: randomly-initialized embedding is used
+                         - word2vec: pretrained English word vectors
+                                     are automatically downloaded to <home>/ktrain_data
+                                     and used as weights in the Embedding layer.
+                         - a transformer model from https://huggingface.co/transformers/pretrained_models.html
+                         Examples:
+                            embeddings=None
+                            embeddings='word2vec'
+                            embeddings='bert-base-uncased'  # English BERT
+                            embeddings='bert-base-chinese'  # Chinese BERT
+                            embeddings='bert-multilingual-cased'  # Multilingual BERT
      verbose (boolean): verbosity
 
     """
@@ -223,11 +238,18 @@ def entities_from_array(x_train, y_train,
                      Example: x_train = [['Hello', 'world'], ['Hello', 'Cher'], ['I', 'love', 'Chicago']]
       y_test(list): list of list of tokens representing entity labels
                      Example:  y_train = [['O', 'O'], ['O', 'B-PER'], ['O', 'O', 'B-LOC']]
-      embeddings(str): Currently, either None or 'word2vec' is supported
-                       If 'word2vec' is specified, pretrained word vectors
-                       are automatically downloaded to <home>/ktran_data
-                       and used as weights in the Embedding layer.
-                         If None, random embeddings used.
+      embeddings(str): Currently, must be one of the following:
+                         - None: randomly-initialized embedding is used
+                         - word2vec: pretrained English word vectors
+                                     are automatically downloaded to <home>/ktrain_data
+                                     and used as weights in the Embedding layer.
+                         - a transformer model from https://huggingface.co/transformers/pretrained_models.html
+                         Examples:
+                            embeddings=None
+                            embeddings='word2vec'
+                            embeddings='bert-base-uncased'  # English BERT
+                            embeddings='bert-base-chinese'  # Chinese BERT
+                            embeddings='bert-multilingual-cased'  # Multilingual BERT
      verbose (boolean): verbosity
 
     """

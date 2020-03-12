@@ -3,6 +3,8 @@ from ... import utils as U
 from ...preprocessor import Preprocessor
 from ...data import Dataset
 from .. import textutils as TU
+from .. import preprocessor as tpp
+from .anago.utils import filter_embeddings
 
 OTHER = 'O'
 W2V = 'word2vec'
@@ -18,14 +20,15 @@ class NERPreprocessor(Preprocessor):
     NER preprocessing base class
     """
 
-    def __init__(self, p, embeddings=None):
+    def __init__(self, p, embeddings=None, transformer_model_name=None):
         self.p = p
         self.c = p._label_vocab._id2token
         self.e = embeddings
-        if embeddings is not None and embeddings not in SUPPORTED_EMBEDDINGS:
-            raise ValueError('%s is not a supported word embedding type' % (embeddings))
-
-
+        if self.e is not None and self.e not in SUPPORTED_EMBEDDINGS:
+            try:
+                _ = tpp.TransformerEmbedding(self.e)
+            except:
+                raise ValueError('Could not create a %s embedding model - embedding must be either %s or valid transformer model' % ( self.e, W2V))
 
     def get_preprocessor(self):
         return self.p
@@ -36,6 +39,53 @@ class NERPreprocessor(Preprocessor):
 
     def get_embedding_name(self):
         return self.e
+
+
+    def filter_embedding(embeddings, vocab, dim):
+        """Loads word vectors in numpy array.
+
+        Args:
+            embeddings (dict or TransformerEmbedding): a dictionary of numpy array or Transformer Embedding instance
+            vocab (dict): word_index lookup table.
+
+        Returns:
+            numpy array: an array of word embeddings.
+        """
+        if not isinstance(embeddings, dict) and not instance(embeddings, TransformerEmbedding):
+            return
+        _embeddings = np.zeros([len(vocab), dim])
+        if isinstance(embeddings, dict):
+            for word in vocab:
+                if word in embeddings:
+                    word_idx = vocab[word]
+                    _embeddings[word_idx] = embeddings[word]
+        else: # TransformerEmbedding
+            for word in vocab:
+                word_idx = vocab[word]
+                _embeddings[word_idx] = embeddings.embed(word)
+        return _embeddings
+
+
+
+    def get_embed_model(self, verbose=1):
+        if self.e is None: raise ValueError('supply embeddings argument')
+        embed_model = None
+        use_embedding = False
+        if self.e == W2V:
+            if verbose: print('pretrained %s word embeddings will be used' % (preproc.e))
+            word_embedding_dim = 300
+            embs = tpp.load_wv(verbose=verbose)
+            use_embedding = True
+        else:
+           if verbose: print('attempting to load transformer embedding model %s' % (self.e))
+           embs = tpp.TransformerEmbedding(self.e)
+           word_embedding_dim = embs.embed('ktrain').shape[0]
+           use_embedding = True
+
+        if use_embedding:
+            emb_model = self.filter_embeddings(embs, self.p._word_vocab.vocab, word_embedding_dim)
+        return (emb_model, word_embedding_dim)
+
 
 
     def preprocess(self, sentences):
