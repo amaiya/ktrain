@@ -2,7 +2,7 @@
 from ...imports import *
 from ... import utils as U
 from . import preprocessor as pp
-from .anago.models import BiLSTMCRF
+from .anago.models import BiLSTMCRF, BiLSTM
 
 BILSTM_CRF = 'bilstm-crf'
 SEQUENCE_TAGGERS = {
@@ -47,38 +47,53 @@ def sequence_tagger(name, preproc,
     """
     
 
-    if not DISABLE_V2_BEHAVIOR:
-        warnings.warn("Please add os.environ['DISABLE_V2_BEHAVIOR'] = '1' at top of your script or notebook")
-        msg = "\nktrain uses the CRF module from keras_contrib, which is not yet\n" +\
-              "fully compatible with TensorFlow 2. You can still use the BiLSTM-CRF model\n" +\
-              "in ktrain for sequence tagging with TensorFlow 2, but you must add the\n" +\
-              "following to the top of your script or notebook BEFORE you import ktrain:\n\n" +\
-              "import os\n" +\
-              "os.environ['DISABLE_V2_BEHAVIOR'] = '1'\n"
-        print(msg)
-        return
+    #if not DISABLE_V2_BEHAVIOR:
+    #    warnings.warn("Please add os.environ['DISABLE_V2_BEHAVIOR'] = '1' at top of your script or notebook")
+    #    msg = "\nktrain uses the CRF module from keras_contrib, which is not yet\n" +\
+    #          "fully compatible with TensorFlow 2. You can still use the BiLSTM-CRF model\n" +\
+    #          "in ktrain for sequence tagging with TensorFlow 2, but you must add the\n" +\
+    #          "following to the top of your script or notebook BEFORE you import ktrain:\n\n" +\
+    #          "import os\n" +\
+    #          "os.environ['DISABLE_V2_BEHAVIOR'] = '1'\n"
+    #    print(msg)
+    #    return
 
     # setup embedding
     if preproc.e is not None:
         emb_model, word_embedding_dim = preproc.get_embed_model(verbose=verbose)
     else:
         emb_model = None
+    use_crf = False if preproc.using_transformer_embedding() else True
 
     if name == BILSTM_CRF:
-        model = BiLSTMCRF(char_embedding_dim=char_embedding_dim,
-                          word_embedding_dim=word_embedding_dim,
-                          char_lstm_size=char_lstm_size,
-                          word_lstm_size=word_lstm_size,
-                          fc_dim=fc_dim,
-                          char_vocab_size=preproc.p.char_vocab_size,
-                          word_vocab_size=preproc.p.word_vocab_size,
-                          num_labels=preproc.p.label_size,
-                          dropout=dropout,
-                          use_char=preproc.p._use_char,
-                          use_crf=True,
-                          embeddings=emb_model)
+        if use_crf:
+            model = BiLSTMCRF(char_embedding_dim=char_embedding_dim,
+                              word_embedding_dim=word_embedding_dim,
+                              char_lstm_size=char_lstm_size,
+                              word_lstm_size=word_lstm_size,
+                              fc_dim=fc_dim,
+                              char_vocab_size=preproc.p.char_vocab_size,
+                              word_vocab_size=preproc.p.word_vocab_size,
+                              num_labels=preproc.p.label_size,
+                              dropout=dropout,
+                              use_char=preproc.p._use_char,
+                              use_crf=use_crf,
+                              embeddings=emb_model)
+        else:
+            warnings.warn('falling back to BiLSTM')
+            model = BiLSTM(char_embedding_dim=char_embedding_dim,
+                           word_embedding_dim=word_embedding_dim,
+                           char_lstm_size=char_lstm_size,
+                           word_lstm_size=word_lstm_size,
+                           fc_dim=fc_dim,
+                           char_vocab_size=preproc.p.char_vocab_size,
+                           word_vocab_size=preproc.p.word_vocab_size,
+                           num_labels=preproc.p.label_size,
+                           dropout=dropout,
+                           use_char=preproc.p._use_char,
+                           embeddings=emb_model)
+
         model, loss = model.build()
-        #loss = crf_loss
         model.compile(loss=loss, optimizer=U.DEFAULT_OPT)
         return model
     else:

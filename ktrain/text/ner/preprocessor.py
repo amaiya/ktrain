@@ -40,8 +40,11 @@ class NERPreprocessor(Preprocessor):
     def get_embedding_name(self):
         return self.e
 
+    def using_transformer_embedding(self):
+        return self.e != W2V
 
-    def filter_embedding(embeddings, vocab, dim):
+
+    def filter_embeddings(self, embeddings, vocab, dim):
         """Loads word vectors in numpy array.
 
         Args:
@@ -51,18 +54,13 @@ class NERPreprocessor(Preprocessor):
         Returns:
             numpy array: an array of word embeddings.
         """
-        if not isinstance(embeddings, dict) and not instance(embeddings, TransformerEmbedding):
+        if not isinstance(embeddings, dict):
             return
         _embeddings = np.zeros([len(vocab), dim])
-        if isinstance(embeddings, dict):
-            for word in vocab:
-                if word in embeddings:
-                    word_idx = vocab[word]
-                    _embeddings[word_idx] = embeddings[word]
-        else: # TransformerEmbedding
-            for word in vocab:
+        for word in vocab:
+            if word in embeddings:
                 word_idx = vocab[word]
-                _embeddings[word_idx] = embeddings.embed(word)
+                _embeddings[word_idx] = embeddings[word]
         return _embeddings
 
 
@@ -70,20 +68,14 @@ class NERPreprocessor(Preprocessor):
     def get_embed_model(self, verbose=1):
         if self.e is None: raise ValueError('supply embeddings argument')
         embed_model = None
-        use_embedding = False
+        word_embedding_dim = None
         if self.e == W2V:
-            if verbose: print('pretrained %s word embeddings will be used' % (preproc.e))
+            if verbose: print('pretrained %s word embeddings will be used' % (self.e))
             word_embedding_dim = 300
             embs = tpp.load_wv(verbose=verbose)
-            use_embedding = True
-        else:
-           if verbose: print('attempting to load transformer embedding model %s' % (self.e))
-           embs = tpp.TransformerEmbedding(self.e)
-           word_embedding_dim = embs.embed('ktrain').shape[0]
-           use_embedding = True
-
-        if use_embedding:
             emb_model = self.filter_embeddings(embs, self.p._word_vocab.vocab, word_embedding_dim)
+        else:
+            raise ValueError('pre-trained word embeddings for %s is not supported' % (self.e))
         return (emb_model, word_embedding_dim)
 
 
