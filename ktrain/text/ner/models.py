@@ -79,7 +79,8 @@ def sequence_tagger(name, preproc,
                   "in ktrain for sequence tagging with TensorFlow 2, but you must add the\n" +\
                   "following to the top of your script or notebook BEFORE you import ktrain:\n\n" +\
                   "import os\n" +\
-                  "os.environ['DISABLE_V2_BEHAVIOR'] = '1'\n"
+                  "os.environ['DISABLE_V2_BEHAVIOR'] = '1'\n\n" +\
+                  "For this run, a vanilla BiLSTM model (with no CRF layer) will be used."
             print(msg)
         model = BiLSTMCRF(char_embedding_dim=char_embedding_dim,
                           word_embedding_dim=word_embedding_dim,
