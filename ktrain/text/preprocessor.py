@@ -74,12 +74,37 @@ def get_wv_path():
 
 def get_coefs(word, *arr): return word, np.asarray(arr, dtype='float32')
 
+
+
+#def load_wv(wv_path=None, verbose=1):
+    #if verbose: print('Loading pretrained word vectors...this may take a few moments...')
+    #if wv_path is None: wv_path = get_wv_path()
+    #embeddings_index = dict(get_coefs(*o.rstrip().rsplit(' ')) for o in open(wv_path, encoding='utf-8'))
+    #if verbose: print('Done.')
+    #return embeddings_index
+
+
+def file_len(fname):
+    with open(fname) as f:
+        for i, l in enumerate(f):
+            pass
+    return i + 1
+
+
 def load_wv(wv_path=None, verbose=1):
     if verbose: print('Loading pretrained word vectors...this may take a few moments...')
     if wv_path is None: wv_path = get_wv_path()
-    embeddings_index = dict(get_coefs(*o.rstrip().rsplit(' ')) for o in open(wv_path, encoding='utf-8'))
-    if verbose: print('Done.')
-    return embeddings_index
+    length = file_len(wv_path)
+    tups = []
+    mb = master_bar(range(1))
+    for i in mb:
+        f = open(wv_path, encoding='utf-8')
+        for o in progress_bar(range(length), parent=mb):
+            o = f.readline()
+            tups.append(get_coefs(*o.rstrip().rsplit(' ')))
+        f.close()
+        if verbose: mb.write('done.')
+    return dict(tups)
 
 
 
