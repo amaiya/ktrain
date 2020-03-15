@@ -4,7 +4,7 @@ from ... import utils as U
 from . import preprocessor as pp
 from .preprocessor import NERPreprocessor
 
-from .anago.preprocessing import IndexTransformer
+from .anago.preprocessing import IndexTransformer, ELMoTransformer
 
 
 MAXLEN = 128
@@ -16,7 +16,8 @@ SENT_COL = 'SentenceID'
 
 def entities_from_gmb(train_filepath, 
                       val_filepath=None,
-                      embeddings=None,
+                      wv_path_or_url=None,
+                      use_elmo=False,
                       word_column=WORD_COL,
                       tag_column=TAG_COL,
                       sentence_column=SENT_COL,
@@ -30,7 +31,8 @@ def entities_from_gmb(train_filepath,
 
     return entities_from_txt(train_filepath=train_filepath,
                              val_filepath=val_filepath,
-                             embeddings=embeddings,
+                             wv_path_or_url=wv_path_or_url,
+                             use_elmo=use_elmo,
                              word_column=word_column,
                              tag_column=tag_column,
                              sentence_column=sentence_column,
@@ -42,7 +44,8 @@ def entities_from_gmb(train_filepath,
         
 def entities_from_conll2003(train_filepath, 
                             val_filepath=None,
-                            embeddings=None,
+                            wv_path_or_url=None,
+                            use_elmo=False,
                             encoding='latin1',
                             val_pct=0.1, verbose=1):
     """
@@ -50,7 +53,8 @@ def entities_from_conll2003(train_filepath,
     """
     return entities_from_txt(train_filepath=train_filepath,
                              val_filepath=val_filepath,
-                             embeddings=embeddings,
+                             wv_path_or_url=wv_path_or_url,
+                             use_elmo=use_elmo,
                              data_format='conll2003',
                              encoding=encoding,
                              val_pct=val_pct, verbose=verbose)
@@ -60,7 +64,8 @@ def entities_from_conll2003(train_filepath,
 
 def entities_from_txt(train_filepath, 
                       val_filepath=None,
-                      embeddings=None,
+                      wv_path_or_url=None,
+                      use_elmo=False,
                       word_column=WORD_COL,
                       tag_column=TAG_COL,
                       sentence_column=SENT_COL,
@@ -116,18 +121,29 @@ def entities_from_txt(train_filepath,
     Args:
         train_filepath(str): file path to training CSV
         val_filepath (str): file path to validation dataset
-        embeddings(str): Currently, must be one of the following:
-                         - None: randomly-initialized embedding is used
-                         - word2vec: pretrained English word vectors
-                                     are automatically downloaded to <home>/ktrain_data
-                                     and used as weights in the Embedding layer.
-                         - a transformer model from https://huggingface.co/transformers/pretrained_models.html
-                         Examples:
-                            embeddings=None
-                            embeddings='word2vec'
-                            embeddings='bert-base-uncased'  # English BERT
-                            embeddings='bert-base-chinese'  # Chinese BERT
-                            embeddings='bert-multilingual-cased'  # Multilingual BERT
+        wv_path_or_url(str): either a URL or file path toa fasttext word vector file (.vec or .vec.zip or .vec.gz)
+
+                             Example valid values for wv_path_or_url:
+                               Randomly-initaialized word embeddings:
+                                 set wv_path_or_url=None
+                               English pretrained word vectors:
+                                 https://dl.fbaipublicfiles.com/fasttext/vectors-english/crawl-300d-2M.vec.zip
+                               Chinese pretrained word vectors:
+                                 https://dl.fbaipublicfiles.com/fasttext/vectors-crawl/cc.zh.300.vec.gz
+                               Russian pretrained word vectors:
+                                 https://dl.fbaipublicfiles.com/fasttext/vectors-crawl/cc.ru.300.vec.gz
+                               Dutch pretrained word vectors:
+                                 https://dl.fbaipublicfiles.com/fasttext/vectors-crawl/cc.nl.300.vec.gz
+
+
+                             See these two Web pages for a full list of URLs to word vector files for 
+                             different languages:
+                                1.  https://fasttext.cc/docs/en/english-vectors.html (for English)
+                                2.  https://fasttext.cc/docs/en/crawl-vectors.html (for non-English langages)
+
+                            Default:None (randomly-initialized word embeddings are used)
+
+        use_elmo(bool):    If True, Elmo embeddings will be used in addition to word/character embeddings
         word_column(str): name of column containing the text
         tag_column(str): name of column containing lael
         sentence_column(str): name of column containing Sentence IDs
@@ -158,7 +174,8 @@ def entities_from_txt(train_filepath,
                             word_column=word_column,
                             tag_column=tag_column,
                             sentence_column=sentence_column,
-                            embeddings=embeddings,
+                            wv_path_or_url=wv_path_or_url,
+                            use_elmo=use_elmo,
                             val_pct=val_pct, verbose=verbose)
 
 
@@ -168,7 +185,8 @@ def entities_from_df(train_df,
                      word_column=WORD_COL,
                      tag_column=TAG_COL,
                      sentence_column=SENT_COL,
-                     embeddings=None,
+                     wv_path_or_url=None,
+                     use_elmo=False,
                      val_pct=0.1, verbose=1):
     """
     Load entities from pandas DataFrame
@@ -178,18 +196,31 @@ def entities_from_df(train_df,
       word_column(str): name of column containing the text
       tag_column(str): name of column containing lael
       sentence_column(str): name of column containing Sentence IDs
-      embeddings(str): Currently, must be one of the following:
-                         - None: randomly-initialized embedding is used
-                         - word2vec: pretrained English word vectors
-                                     are automatically downloaded to <home>/ktrain_data
-                                     and used as weights in the Embedding layer.
-                         - a transformer model from https://huggingface.co/transformers/pretrained_models.html
-                         Examples:
-                            embeddings=None
-                            embeddings='word2vec'
-                            embeddings='bert-base-uncased'  # English BERT
-                            embeddings='bert-base-chinese'  # Chinese BERT
-                            embeddings='bert-multilingual-cased'  # Multilingual BERT
+
+        wv_path_or_url(str): either a URL or file path toa fasttext word vector file (.vec or .vec.zip or .vec.gz)
+
+                             Example valid values for wv_path_or_url:
+                               Randomly-initialized word vectors:
+                                 set wv_path_or_url=None
+                               English pretrained word vectors:
+                                 https://dl.fbaipublicfiles.com/fasttext/vectors-english/crawl-300d-2M.vec.zip
+                               Chinese pretrained word vectors:
+                                 https://dl.fbaipublicfiles.com/fasttext/vectors-crawl/cc.zh.300.vec.gz
+                               Russian pretrained word vectors:
+                                 https://dl.fbaipublicfiles.com/fasttext/vectors-crawl/cc.ru.300.vec.gz
+                               Dutch pretrained word vectors:
+                                 https://dl.fbaipublicfiles.com/fasttext/vectors-crawl/cc.nl.300.vec.gz
+
+
+                             See these two Web pages for a full list of URLs to word vector files for 
+                             different languages:
+                                1.  https://fasttext.cc/docs/en/english-vectors.html (for English)
+                                2.  https://fasttext.cc/docs/en/crawl-vectors.html (for non-English langages)
+
+
+                            Default:None (randomly-initialized word embeddings are used)
+
+     use_elmo(bool):    If True, Elmo embeddings will be used in addition to word/character embeddings
      verbose (boolean): verbosity
 
     """
@@ -213,8 +244,11 @@ def entities_from_df(train_df,
                                             verbose=0)
 
     # preprocess and convert to generator
-    p = IndexTransformer(use_char=True)
-    preproc = NERPreprocessor(p, embeddings=embeddings)
+    if use_elmo:
+        p = ELMoTransformer(use_char=True)
+    else:
+        p = IndexTransformer(use_char=True)
+    preproc = NERPreprocessor(p, wv_path_or_url=wv_path_or_url, use_elmo=use_elmo)
     preproc.fit(x_train, y_train)
     trn = pp.NERSequence(x_train, y_train, batch_size=U.DEFAULT_BS, p=p)
     val = pp.NERSequence(x_valid, y_valid, batch_size=U.DEFAULT_BS, p=p)
@@ -225,7 +259,8 @@ def entities_from_df(train_df,
 
 def entities_from_array(x_train, y_train,
                         x_test=None, y_test=None,
-                        embeddings=None,
+                        wv_path_or_url=None,
+                        use_elmo=False,
                         verbose=1):
     """
     Load entities from arrays
@@ -238,18 +273,29 @@ def entities_from_array(x_train, y_train,
                      Example: x_train = [['Hello', 'world'], ['Hello', 'Cher'], ['I', 'love', 'Chicago']]
       y_test(list): list of list of tokens representing entity labels
                      Example:  y_train = [['O', 'O'], ['O', 'B-PER'], ['O', 'O', 'B-LOC']]
-      embeddings(str): Currently, must be one of the following:
-                         - None: randomly-initialized embedding is used
-                         - word2vec: pretrained English word vectors
-                                     are automatically downloaded to <home>/ktrain_data
-                                     and used as weights in the Embedding layer.
-                         - a transformer model from https://huggingface.co/transformers/pretrained_models.html
-                         Examples:
-                            embeddings=None
-                            embeddings='word2vec'
-                            embeddings='bert-base-uncased'  # English BERT
-                            embeddings='bert-base-chinese'  # Chinese BERT
-                            embeddings='bert-multilingual-cased'  # Multilingual BERT
+        wv_path_or_url(str): either a URL or file path toa fasttext word vector file (.vec or .vec.zip or .vec.gz)
+
+                             Example valid values for wv_path_or_url:
+                               Randomly-initialized word embeeddings:
+                                 set wv_path_or_url=None
+                               English pretrained word vectors:
+                                 https://dl.fbaipublicfiles.com/fasttext/vectors-english/crawl-300d-2M.vec.zip
+                               Chinese pretrained word vectors:
+                                 https://dl.fbaipublicfiles.com/fasttext/vectors-crawl/cc.zh.300.vec.gz
+                               Russian pretrained word vectors:
+                                 https://dl.fbaipublicfiles.com/fasttext/vectors-crawl/cc.ru.300.vec.gz
+                               Dutch pretrained word vectors:
+                                 https://dl.fbaipublicfiles.com/fasttext/vectors-crawl/cc.nl.300.vec.gz
+
+
+                             See these two Web pages for a full list of URLs to word vector files for 
+                             different languages:
+                                1.  https://fasttext.cc/docs/en/english-vectors.html (for English)
+                                2.  https://fasttext.cc/docs/en/crawl-vectors.html (for non-English langages)
+
+                            Default:None (randomly-initialized word embeddings are used)
+
+     use_elmo(bool):    If True, Elmo embeddings will be used in addition to word/character embeddings
      verbose (boolean): verbosity
 
     """
@@ -262,7 +308,8 @@ def entities_from_array(x_train, y_train,
         print(train_df.head())
         print('validation data sample:')
         print(val_df.head())
-    return entities_from_df(train_df, val_df=val_df, embeddings=embeddings, verbose=verbose)
+    return entities_from_df(train_df, val_df=val_df, 
+                            wv_path_or_url=wv_path_or_url, use_elmo=use_elmo, verbose=verbose)
 
 
 

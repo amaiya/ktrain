@@ -47,14 +47,21 @@ WV_URL = 'https://dl.fbaipublicfiles.com/fasttext/vectors-english/crawl-300d-2M.
 #WV_URL = 'http://nlp.stanford.edu/data/glove.6B.zip
 
 
-def get_wv_path():
+def get_wv_path(wv_path_or_url=WV_URL):
+    if os.path.isfile(wv_path_or_url): return wv_path_or_url
+    fasttext_url = 'https://dl.fbaipublicfiles.com/fasttext'
+    if not wv_path_or_url.startswith(fasttext_url):
+        raise ValueError('selected word vector file must be from %s'% (fasttext_url))
+    if not wv_path_or_url.endswith('.vec.zip') and not wv_path_or_url.endswith('vec.gz'):
+        raise ValueError('If wv_path_or_url is URL, must be .vec.zip filea from Facebook fasttext site.')
+
     ktrain_data = U.get_ktrain_data()
-    zip_fpath = os.path.join(ktrain_data, fname_from_url(WV_URL))
-    wv_path =  os.path.join(ktrain_data, os.path.splitext(fname_from_url(WV_URL))[0])
+    zip_fpath = os.path.join(ktrain_data, fname_from_url(wv_path_or_url))
+    wv_path =  os.path.join(ktrain_data, os.path.splitext(fname_from_url(wv_path_or_url))[0])
     if not os.path.isfile(wv_path):
         # download zip
-        print('downloading pretrained word vectors (~1.5G) ...')
-        U.download(WV_URL, zip_fpath)
+        print('downloading pretrained word vectors (~1.5G) to %s ...' % (ktrain_data))
+        U.download(wv_path_or_url, zip_fpath)
 
         # unzip
         print('\nextracting pretrained word vectors...')
@@ -91,9 +98,9 @@ def file_len(fname):
     return i + 1
 
 
-def load_wv(wv_path=None, verbose=1):
+def load_wv(wv_path_or_url=None, verbose=1):
     if verbose: print('Loading pretrained word vectors...this may take a few moments...')
-    if wv_path is None: wv_path = get_wv_path()
+    wv_path = get_wv_path(wv_path_or_url)
     length = file_len(wv_path)
     tups = []
     mb = master_bar(range(1))

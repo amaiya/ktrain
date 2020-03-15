@@ -47,7 +47,8 @@ class BiLSTMCRF(object):
                  embeddings=None,
                  use_char=True,
                  use_crf=True,
-                 mask_zero=True):
+                 mask_zero=True,
+                 use_elmo=False):
         """Build a Bi-LSTM CRF model.
 
         Args:
@@ -64,6 +65,8 @@ class BiLSTMCRF(object):
             use_char (boolean): add char feature.
             use_crf (boolean): use crf as last layer.
             mask_zero(boolean): mask zero
+            use_elmo(boolean): If True, model will be configured to accept Elmo embeddings
+                               as an additional input to word and character embeddings
         """
         super(BiLSTMCRF).__init__()
         self._char_embedding_dim = char_embedding_dim
@@ -79,7 +82,8 @@ class BiLSTMCRF(object):
         self._embeddings = embeddings
         self._num_labels = num_labels
         self.mask_zero = mask_zero
-        # NOTE: provide option for mask_zeor=False because TF2 with V2 behavior throws error otherwise
+        self._use_elmo = use_elmo
+        # NOTE: provide option for mask_zero=False because TF2 with V2 behavior throws error otherwise
         # REFERENCE:
         #   https://github.com/tensorflow/tensorflow/issues/33069
         #   https://github.com/tensorflow/tensorflow/issues/33148
@@ -89,6 +93,7 @@ class BiLSTMCRF(object):
         # build word embedding
         word_ids = Input(batch_shape=(None, None), dtype='int32', name='word_input')
         inputs = [word_ids]
+        embedding_list = []
         if self._embeddings is None:
             word_embeddings = Embedding(input_dim=self._word_vocab_size,
                                         output_dim=self._word_embedding_dim,
@@ -100,6 +105,7 @@ class BiLSTMCRF(object):
                                         mask_zero=self.mask_zero,
                                         weights=[self._embeddings],
                                         name='word_embedding')(word_ids)
+        embedding_list.append(word_embeddings)
 
         # build character based word embedding
         if self._use_char:
@@ -110,7 +116,11 @@ class BiLSTMCRF(object):
                                         mask_zero=self.mask_zero,
                                         name='char_embedding')(char_ids)
             char_embeddings = TimeDistributed(Bidirectional(LSTM(self._char_lstm_size)))(char_embeddings)
-            word_embeddings = Concatenate()([word_embeddings, char_embeddings])
+            embedding_list.append(char_embeddings)
+        if self._use_elmo:
+            elmo_embeddings = Input(shape=(None, 1024), dtype='float32')
+            embedding_list.append(elmo_embeddings)
+        word_embeddings = Concatenate()(embedding_list) if len(embedding_list) > 1 else embedding_list[0]
 
         word_embeddings = Dropout(self._dropout)(word_embeddings)
         z = Bidirectional(LSTM(units=self._word_lstm_size, return_sequences=True))(word_embeddings)

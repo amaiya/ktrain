@@ -20,15 +20,11 @@ class NERPreprocessor(Preprocessor):
     NER preprocessing base class
     """
 
-    def __init__(self, p, embeddings=None, transformer_model_name=None):
+    def __init__(self, p, wv_path_or_url=None, use_elmo=False):
         self.p = p
         self.c = p._label_vocab._id2token
-        self.e = embeddings
-        if self.e is not None and self.e not in SUPPORTED_EMBEDDINGS:
-            try:
-                _ = tpp.TransformerEmbedding(self.e)
-            except:
-                raise ValueError('Could not create a %s embedding model - embedding must be either %s or valid transformer model' % ( self.e, W2V))
+        self.wv_path_or_url = wv_path_or_url
+        self.use_elmo = use_elmo
 
     def get_preprocessor(self):
         return self.p
@@ -36,12 +32,6 @@ class NERPreprocessor(Preprocessor):
 
     def get_classes(self):
         return self.c
-
-    def get_embedding_name(self):
-        return self.e
-
-    def using_transformer_embedding(self):
-        return self.e != W2V
 
 
     def filter_embeddings(self, embeddings, vocab, dim):
@@ -66,16 +56,13 @@ class NERPreprocessor(Preprocessor):
 
 
     def get_embed_model(self, verbose=1):
-        if self.e is None: raise ValueError('supply embeddings argument')
-        embed_model = None
-        word_embedding_dim = None
-        if self.e == W2V:
-            if verbose: print('pretrained %s word embeddings will be used' % (self.e))
-            word_embedding_dim = 300
-            embs = tpp.load_wv(verbose=verbose)
-            emb_model = self.filter_embeddings(embs, self.p._word_vocab.vocab, word_embedding_dim)
-        else:
-            raise ValueError('pre-trained word embeddings for %s is not supported' % (self.e))
+        if self.wv_path_or_url is None: 
+            raise ValueError('wordvector_path_or_url is empty: supply a file path or '+\
+                             'URL to fasttext word vector file')
+        if verbose: print('pretrained word embeddings will be loaded from:\n\t%s' % (self.wv_path_or_url))
+        word_embedding_dim = 300 # all fasttext word vectors are of dim=300
+        embs = tpp.load_wv(self.wv_path_or_url, verbose=verbose)
+        emb_model = self.filter_embeddings(embs, self.p._word_vocab.vocab, word_embedding_dim)
         return (emb_model, word_embedding_dim)
 
 

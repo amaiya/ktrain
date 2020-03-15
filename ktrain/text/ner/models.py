@@ -64,7 +64,7 @@ def sequence_tagger(name, preproc,
        #return
 
     # setup embedding
-    if preproc.e is not None:
+    if preproc.wv_path_or_url is not None:
         emb_model, word_embedding_dim = preproc.get_embed_model(verbose=verbose)
     else:
         emb_model = None
@@ -94,7 +94,8 @@ def sequence_tagger(name, preproc,
                           use_char=preproc.p._use_char,
                           use_crf=use_crf,
                           embeddings=emb_model,
-                          mask_zero=mask_zero)
+                          mask_zero=mask_zero,
+                          use_elmo=preproc.use_elmo)
     else:
         use_crf = False
         model = BiLSTMCRF(char_embedding_dim=char_embedding_dim,
@@ -109,7 +110,8 @@ def sequence_tagger(name, preproc,
                           use_char=preproc.p._use_char,
                           use_crf=use_crf,
                           embeddings=emb_model,
-                          mask_zero=mask_zero)
+                          mask_zero=mask_zero,
+                          use_elmo=preproc.use_elmo)
 
     model, loss = model.build()
     model.compile(loss=loss, optimizer=U.DEFAULT_OPT)
