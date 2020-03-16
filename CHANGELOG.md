@@ -7,9 +7,14 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
-## 0.10.2 (TBD)
+## 0.11.0 (TBD)
 
 ### New:
+- sequence-taging (e.g., NER) now supports ELMo embeddings with `use_elmo=True` argument to data-loading
+  functions like `entities_from_array`  and `entities_from_txt`A
+- pretrained word embeddings (i.e., fasttext word2vec embeddings) can be specified by providing the URL to
+  a `.vec.gz` file from [here](https://fasttext.cc/docs/en/crawl-vectors.html). The URL (or path) is
+  supplied as `wv_path_or_url` argument to data-loading functions like `entities_from_array` and `entities_from_txt`
 - `show_random_images`: show random images from folder in Jupyter notebook
 
 ### Changed:
