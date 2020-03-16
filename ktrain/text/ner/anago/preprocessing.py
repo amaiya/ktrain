@@ -6,6 +6,13 @@ Preprocessors.
 from ....imports import *
 from .utils import Vocabulary
 
+try:
+    from allennlp.modules.elmo import Elmo, batch_to_ids
+    ALLENNLP_INSTALLED = True
+except:
+    ALLENNLP_INSTALLED = False
+
+
 options_file = 'https://s3-us-west-2.amazonaws.com/allennlp/models/elmo/2x4096_512_2048cnn_2xhighway/elmo_2x4096_512_2048cnn_2xhighway_options.json'
 weight_file = 'https://s3-us-west-2.amazonaws.com/allennlp/models/elmo/2x4096_512_2048cnn_2xhighway/elmo_2x4096_512_2048cnn_2xhighway_weights.hdf5'
 
@@ -193,9 +200,7 @@ class ELMoTransformer(IndexTransformer):
                  use_char=True, initial_vocab=None):
         super(ELMoTransformer, self).__init__(lower, num_norm, use_char, initial_vocab)
 
-        try:
-            from allennlp.modules.elmo import Elmo, batch_to_ids
-        except:
+        if not ALLENNLP_INSTALLED:        
             raise Exception(ALLENNLP_ERRMSG)
 
         self._elmo = Elmo(options_file, weight_file, 2, dropout=0)
@@ -217,10 +222,8 @@ class ELMoTransformer(IndexTransformer):
         char_ids = [[self._char_vocab.doc2id(w) for w in doc] for doc in X]
         char_ids = pad_nested_sequences(char_ids)
 
-        try: 
-            from allennlp.modules.elmo import Elmo, batch_to_ids
-        except:
-            raise Exception(ALLENNLP_ERRMSGG)
+        if not ALLENNLP_INSTALLED:        
+            raise Exception(ALLENNLP_ERRMSG)
 
         character_ids = batch_to_ids(X)
         elmo_embeddings = self._elmo(character_ids)['elmo_representations'][1]

@@ -48,7 +48,12 @@ WV_URL = 'https://dl.fbaipublicfiles.com/fasttext/vectors-english/crawl-300d-2M.
 
 
 def get_wv_path(wv_path_or_url=WV_URL):
-    if os.path.isfile(wv_path_or_url): return wv_path_or_url
+    # process if file path given
+    if os.path.isfile(wv_path_or_url) and wv_path_or_url.endswith('vec'): return wv_path_or_url
+    elif os.path.isfile(wv_path_or_url):
+        raise ValueError("wv_path_or_url must either be URL .vec.zip or .vec.gz file or file path to .vec file")
+
+    # process if URL is given
     fasttext_url = 'https://dl.fbaipublicfiles.com/fasttext'
     if not wv_path_or_url.startswith(fasttext_url):
         raise ValueError('selected word vector file must be from %s'% (fasttext_url))
@@ -65,8 +70,13 @@ def get_wv_path(wv_path_or_url=WV_URL):
 
         # unzip
         print('\nextracting pretrained word vectors...')
-        with zipfile.ZipFile(zip_fpath, 'r') as zip_ref:
-            zip_ref.extractall(ktrain_data)
+        if wv_path_or_url.endswith('.vec.zip'):
+            with zipfile.ZipFile(zip_fpath, 'r') as zip_ref:
+                zip_ref.extractall(ktrain_data)
+        else: # .vec.gz
+            with gzip.open(zip_fpath, 'rb') as f_in:
+                with open(wv_path, 'wb') as f_out:
+                    shutil.copyfileobj(f_in, f_out)
         print('done.\n')
 
         # cleanup
@@ -99,8 +109,8 @@ def file_len(fname):
 
 
 def load_wv(wv_path_or_url=None, verbose=1):
-    if verbose: print('Loading pretrained word vectors...this may take a few moments...')
     wv_path = get_wv_path(wv_path_or_url)
+    if verbose: print('loading pretrained word vectors...this may take a few moments...')
     length = file_len(wv_path)
     tups = []
     mb = master_bar(range(1))

@@ -150,6 +150,8 @@ import glob
 import codecs
 import urllib.request
 import zipfile
+import gzip
+import shutil
 import string
 import random
 import json
