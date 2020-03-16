@@ -18,6 +18,12 @@ class NER:
     def predict(self, texts, merge_tokens=True):
         """
         Extract named entities from supplied text
+
+        Args:
+          texts (list of str or str): list of texts to annotate
+          merge_tokens(bool):  If True, tokens will be merged together by the entity
+                               to which they are associated:
+                               ('Paul', 'B-PER'), ('Newman', 'I-PER') becomes ('Paul Newman', 'PER')
         """
         if os.environ.get('DISABLE_V2_BEHAVIOR', None) != '1':
             warnings.warn("Please add os.environ['DISABLE_V2_BEHAVIOR'] = '1' at top of your script or notebook")
@@ -63,7 +69,7 @@ class NER:
             text = text.strip()
             result = predictor.predict(text)
             if merge_tokens:
-                result = self.merge_entities(result)
+                result = self.merge_tokens(result)
             results.append(result)
         if len(result) == 1: result = result[0]
 
@@ -77,7 +83,7 @@ class NER:
             #del os.environ['CUDA_VISIBLE_DEVICES']
         return result
 
-    def merge_entities(self, annotated_sentence):
+    def merge_tokens(self, annotated_sentence):
         if self.lang == 'zh':
             sep = ''
         else:

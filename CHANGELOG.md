@@ -20,6 +20,7 @@ Most recent releases are shown at the top. Each release shows:
 ### Changed:
 - ensure `DISABLE_V2_BEHAVIOR=True` when `ImagePredictor.explain` is invoked
 - added `SUPPRESS_TF_WARNINGS` environment variable.  Default is '1'. If set to '0', TF warnings will be displayed.
+- `merge_entities` method of `ktrain.text.shallownlp.ner.NER` changed to `merge_tokens`
 
 ### Fixed:
 - convert `class_names` to strings in `core.validate` to prevent error from scikit-learn
