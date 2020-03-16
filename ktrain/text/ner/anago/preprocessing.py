@@ -212,7 +212,7 @@ class ELMoTransformer(IndexTransformer):
             y: label id matrix.
         """
         word_ids = [self._word_vocab.doc2id(doc) for doc in X]
-        word_ids = pad_sequences(word_ids, padding='post')
+        word_ids = sequence.pad_sequences(word_ids, padding='post')
 
         char_ids = [[self._char_vocab.doc2id(w) for w in doc] for doc in X]
         char_ids = pad_nested_sequences(char_ids)
@@ -230,7 +230,7 @@ class ELMoTransformer(IndexTransformer):
 
         if y is not None:
             y = [self._label_vocab.doc2id(doc) for doc in y]
-            y = pad_sequences(y, padding='post')
+            y = sequence.pad_sequences(y, padding='post')
             y = to_categorical(y, self.label_size).astype(int)
             # In 2018/06/01, to_categorical is a bit strange.
             # >>> to_categorical([[1,3]], num_classes=4).shape

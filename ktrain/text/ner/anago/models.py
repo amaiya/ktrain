@@ -119,6 +119,7 @@ class BiLSTMCRF(object):
             embedding_list.append(char_embeddings)
         if self._use_elmo:
             elmo_embeddings = Input(shape=(None, 1024), dtype='float32')
+            inputs.append(elmo_embeddings)
             embedding_list.append(elmo_embeddings)
         word_embeddings = Concatenate()(embedding_list) if len(embedding_list) > 1 else embedding_list[0]
 
