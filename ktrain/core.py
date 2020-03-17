@@ -1176,6 +1176,8 @@ class GenLearner(Learner):
                     fit_fn = self.model.fit_generator
                 else:
                     fit_fn = self.model.fit
+                # fixed in 2.1.0
+                #fit_fn = self.model.fit
             hist = fit_fn(self._prepare(self.train_data),
                                         steps_per_epoch = steps_per_epoch,
                                         validation_steps = validation_steps,
