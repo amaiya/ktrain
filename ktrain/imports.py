@@ -150,6 +150,8 @@ import glob
 import codecs
 import urllib.request
 import zipfile
+import gzip
+import shutil
 import string
 import random
 import json
@@ -231,6 +233,9 @@ except:
 SG_ERRMSG = 'ktrain currently uses a forked version of stellargraph v0.8.2. '+\
             'Please install with: '+\
             'pip3 install git+https://github.com/amaiya/stellargraph@no_tf_dep_082'
+
+ALLENNLP_ERRMSG  = 'To use ELMo embedings, please install allenlp:\n' +\
+                   'pip3 install allennlp'
 
 
 

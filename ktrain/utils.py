@@ -363,6 +363,7 @@ def download(url, filename):
         else:
             downloaded = 0
             total = int(total)
+            #print(total)
             for data in response.iter_content(chunk_size=max(int(total/1000), 1024*1024)):
                 downloaded += len(data)
                 f.write(data)
