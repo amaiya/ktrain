@@ -108,7 +108,7 @@ def file_len(fname):
     return i + 1
 
 
-def load_wv(wv_path_or_url=None, verbose=1):
+def load_wv(wv_path_or_url=WV_URL, verbose=1):
     wv_path = get_wv_path(wv_path_or_url)
     if verbose: print('loading pretrained word vectors...this may take a few moments...')
     length = file_len(wv_path)
