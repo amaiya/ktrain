@@ -231,7 +231,6 @@ def entities_from_df(train_df,
                           sentence_column=sentence_column,
                           verbose=verbose)
 
-
     # get validation set
     if val_df is None:
         x_train, x_valid, y_train, y_valid = train_test_split(x, y, test_size=val_pct)
@@ -299,7 +298,8 @@ def entities_from_array(x_train, y_train,
      verbose (boolean): verbosity
 
     """
-    train_df = array_to_df(x_train, y_train)
+    # TODO: converting to df to use entities_from_df - needs to be refactored
+    train_df = array_to_df(x_train, y_train) 
     val_df = None
     if x_test is not None and y_test is not None:
         val_df = array_to_df(x_test, y_test)

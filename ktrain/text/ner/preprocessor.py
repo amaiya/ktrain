@@ -86,6 +86,21 @@ class NERPreprocessor(Preprocessor):
         nerseq = NERSequence(X, y, p=self.p)
         return nerseq
 
+    def preprocess_test(self, x_test, y_test, verbose=1):
+        """
+        Args:
+          x_test(list of lists of str): lists of token lists
+          x_test (list of lists of str):  lists of tag lists
+          verbose(bool): verbosity
+        Returns:
+          NERSequence:  can be used as argument to NERLearner.validate() to evaluate test sets
+        """
+        # array > df > array in order to print statistics more easily
+        from .data import array_to_df
+        test_df = array_to_df(x_test, y_test) 
+        (x_list, y_list)  = process_df(test_df, verbose=verbose) 
+        return NERSequence(x_list, y_list, batch_size=U.DEFAULT_BS, p=self.p)
+
 
     def undo(self, nerseq):
         """

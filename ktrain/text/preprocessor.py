@@ -65,7 +65,7 @@ def get_wv_path(wv_path_or_url=WV_URL):
     wv_path =  os.path.join(ktrain_data, os.path.splitext(fname_from_url(wv_path_or_url))[0])
     if not os.path.isfile(wv_path):
         # download zip
-        print('downloading pretrained word vectors (~1.5G) to %s ...' % (ktrain_data))
+        print('downloading pretrained word vectors to %s ...' % (ktrain_data))
         U.download(wv_path_or_url, zip_fpath)
 
         # unzip

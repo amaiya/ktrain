@@ -2,7 +2,7 @@ from .imports import *
 
 
 class NER:
-    def __init__(self, lang='en'):
+    def __init__(self, lang='en', predictor_path=None):
         """
         pretrained NER.
         Only English and Chinese are currenty supported.
@@ -10,21 +10,12 @@ class NER:
         Args:
           lang(str): Currently, one of {'en', 'zh', 'ru'}: en=English , zh=Chinese, or ru=Russian
         """
-        if lang not in ['en', 'zh', 'ru']:
-            raise ValueError("Unsupported langauge:  choose either 'en' for English, 'zh' for Chinese, or 'ru' for Chinese")
+        if lang is None:
+            raise ValueError('lang is required (e.g., "en" for English, "zh" for Chinese, "ru" for Russian, etc.')
+        if predictor_path is None and lang not in ['en', 'zh', 'ru']:
+            raise ValueError("Unsupported language: if predictor_path is None,  then lang must be " +\
+                             "'en' for English, 'zh' for Chinese, or 'ru' for Chinese")
         self.lang = lang
-
-
-    def predict(self, texts, merge_tokens=True):
-        """
-        Extract named entities from supplied text
-
-        Args:
-          texts (list of str or str): list of texts to annotate
-          merge_tokens(bool):  If True, tokens will be merged together by the entity
-                               to which they are associated:
-                               ('Paul', 'B-PER'), ('Newman', 'I-PER') becomes ('Paul Newman', 'PER')
-        """
         if os.environ.get('DISABLE_V2_BEHAVIOR', None) != '1':
             warnings.warn("Please add os.environ['DISABLE_V2_BEHAVIOR'] = '1' at top of your script or notebook")
             msg = "\nNER in ktrain uses the CRF module from keras_contrib, which is not yet\n" +\
@@ -38,23 +29,23 @@ class NER:
             import tensorflow.compat.v1 as tf
             tf.disable_v2_behavior()
 
-        #old_do = os.environ.get('CUDA_DEVICE_ORDER', None)
-        #old_vd = os.environ.get('CUDA_VISIBLE_DEVICES', None)
-        #os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-        #os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
-
-        if isinstance(texts, str): texts = [texts]
-        if self.lang == 'zh':
+        if predictor_path is None and self.lang == 'zh':
             dirpath = os.path.dirname(os.path.abspath(__file__))
             fpath = os.path.join(dirpath, 'ner_models/ner_chinese')
-        elif self.lang == 'ru':
+        elif predictor_path is None and self.lang == 'ru':
             dirpath = os.path.dirname(os.path.abspath(__file__))
             fpath = os.path.join(dirpath, 'ner_models/ner_russian')
-        elif self.lang=='en':
+        elif predictor_path is None and self.lang=='en':
             dirpath = os.path.dirname(os.path.abspath(__file__))
             fpath = os.path.join(dirpath, 'ner_models/ner_english')
+        elif predictor_path is None:
+            raise ValueError("Unsupported language: if predictor_path is None,  then lang must be " +\
+                             "'en' for English, 'zh' for Chinese, or 'ru' for Chinese")
         else:
-            raise ValueError('lang %s is not supported by NER'  % (self.lang))
+            if not os.path.isfile(predictor_path) or not os.path.isfile(predictor_path +'.preproc'):
+                raise ValueError('could not find a valid predictor model '+\
+                                 '%s or valid Preprocessor %s at specified path' % (predictor_path, predictor_path+'.preproc'))
+            fpath = predictor_path
         try:
            import io
            from contextlib import redirect_stdout
@@ -63,28 +54,33 @@ class NER:
                import ktrain
         except:
            raise ValueError('ktrain could not be imported. Install with: pip3 install ktrain')
-        predictor = ktrain.load_predictor(fpath)
+        self.predictor = ktrain.load_predictor(fpath)
+
+
+    def predict(self, texts, merge_tokens=True):
+        """
+        Extract named entities from supplied text
+
+        Args:
+          texts (list of str or str): list of texts to annotate
+          merge_tokens(bool):  If True, tokens will be merged together by the entity
+                               to which they are associated:
+                               ('Paul', 'B-PER'), ('Newman', 'I-PER') becomes ('Paul Newman', 'PER')
+        """
+        if isinstance(texts, str): texts = [texts]
         results = []
         for text in texts:
             text = text.strip()
-            result = predictor.predict(text)
+            result = self.predictor.predict(text)
             if merge_tokens:
                 result = self.merge_tokens(result)
             results.append(result)
         if len(result) == 1: result = result[0]
-
-        #if old_do is not None:
-            #os.environ["CUDA_DEVICE_ORDER"] = old_do
-        #else:
-            #del os.environ['CUDA_DEVICE_ORDER']
-        #if old_vd is not None:
-            #os.environ['CUDA_VISIBLE_DEVICES'] = old_vd
-        #else:
-            #del os.environ['CUDA_VISIBLE_DEVICES']
         return result
 
+
     def merge_tokens(self, annotated_sentence):
-        if self.lang == 'zh':
+        if self.lang.startswith('zh'):
             sep = ''
         else:
             sep = ' '
