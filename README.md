@@ -8,7 +8,7 @@
 
 ### News and Announcements
 - **2020-03-18:**  
-  - ***ktrain*** **v0.11.x is released** and includes various fixes and enhancements to sequence-tagging including abiilty to easily use non-English pretrained word embeddings covering 157 languages
+  - ***ktrain*** **v0.11.x is released** and includes various fixes and enhancements to sequence-tagging including abilty to easily use non-English pretrained word embeddings covering 157 languages
 - **2020-03-03:**  
   - ***ktrain*** **v0.10.x is released** and now includes [ready-to-use NER for English, Chinese, and Russian](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/shallownlp-examples.ipynb) with no training required. 
   - **Also in v0.10.x:**  Ability to train [community-uploaded Hugging Face transformer models](https://huggingface.co/models) like [SciBERT](https://arxiv.org/abs/1903.10676) and  [BioBERT](https://arxiv.org/abs/1901.08746):
