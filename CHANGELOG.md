@@ -7,7 +7,7 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
-## 0.10.2 (2020-03-20)
+## 0.11.0 (2020-03-18)
 
 ### New:
 - sequence-taging (e.g., NER) now supports ELMo embeddings with `use_elmo=True` argument to data-loading
@@ -33,6 +33,7 @@ Most recent releases are shown at the top. Each release shows:
 - added `val_folder` argument to `images_from_fname`
 - raise Exception when `preproc` is not found in `load_predictor`
 - check for existence of `preproc` in `text_classifier` and `text_regression_model`
+- fixed `text.eda` so that `detect_lang` is called correctly after being moved to `textutils`
 
 
 ## 0.10.1 (2020-03-04)

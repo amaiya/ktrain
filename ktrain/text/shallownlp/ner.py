@@ -97,7 +97,8 @@ class NER:
             if tag is None and not current_token:
                 continue
             # beginning of entity
-            elif tag and prefix=='B':
+            #elif tag and prefix=='B':
+            elif tag and (prefix=='B' or prefix=='I' and not current_token):
                 if current_token: # consecutive entities
                     entities.append((current_token, current_tag))
                     current_token = ""
