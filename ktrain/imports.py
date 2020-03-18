@@ -9,13 +9,15 @@ import logging
 from distutils.util import strtobool
 from packaging import version
 
-# suppress warnings
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
-logging.getLogger('tensorflow').setLevel(logging.ERROR)
-warnings.simplefilter(action='ignore', category=FutureWarning)
-# elevate warnings to errors for debugging dependencies
-#warnings.simplefilter('error', FutureWarning)
 
+# suppress warnings
+SUPPRESS_TF_WARNINGS = strtobool(os.environ.get('SUPPRESS_TF_WARNINGS', '1'))
+if SUPPRESS_TF_WARNINGS:
+    os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+    logging.getLogger('tensorflow').setLevel(logging.ERROR)
+    warnings.simplefilter(action='ignore', category=FutureWarning)
+    # elevate warnings to errors for debugging dependencies
+    #warnings.simplefilter('error', FutureWarning)
 
 
 
@@ -42,6 +44,8 @@ else:
 
 # suppress autograph warnings
 tf.autograph.set_verbosity(1)
+#if SUPPRESS_TF_WARNINGS:
+    #tf.autograph.set_verbosity(1)
 
 if version.parse(tf.__version__) < version.parse('2.0'):
     raise Exception('As of v0.8.x, ktrain needs TensorFlow 2. Please upgrade TensorFlow.')
@@ -53,7 +57,7 @@ os.environ['TF_KERAS'] = '1' # to use keras_bert package below with tf.Keras
 
 
 # output Keras version
-print("using Keras version: %s" % (keras.__version__))
+#print("using Keras version: %s" % (keras.__version__))
 
 K = keras.backend
 Layer = keras.layers.Layer
@@ -146,6 +150,8 @@ import glob
 import codecs
 import urllib.request
 import zipfile
+import gzip
+import shutil
 import string
 import random
 import json
@@ -227,6 +233,9 @@ except:
 SG_ERRMSG = 'ktrain currently uses a forked version of stellargraph v0.8.2. '+\
             'Please install with: '+\
             'pip3 install git+https://github.com/amaiya/stellargraph@no_tf_dep_082'
+
+ALLENNLP_ERRMSG  = 'To use ELMo embedings, please install allenlp:\n' +\
+                   'pip3 install allennlp'
 
 
 

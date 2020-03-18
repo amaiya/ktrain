@@ -3,6 +3,8 @@ from ... import utils as U
 from ...preprocessor import Preprocessor
 from ...data import Dataset
 from .. import textutils as TU
+from .. import preprocessor as tpp
+from .anago.utils import filter_embeddings
 
 OTHER = 'O'
 W2V = 'word2vec'
@@ -18,14 +20,11 @@ class NERPreprocessor(Preprocessor):
     NER preprocessing base class
     """
 
-    def __init__(self, p, embeddings=None):
+    def __init__(self, p, wv_path_or_url=None, use_elmo=False):
         self.p = p
         self.c = p._label_vocab._id2token
-        self.e = embeddings
-        if embeddings is not None and embeddings not in SUPPORTED_EMBEDDINGS:
-            raise ValueError('%s is not a supported word embedding type' % (embeddings))
-
-
+        self.wv_path_or_url = wv_path_or_url
+        self.use_elmo = use_elmo
 
     def get_preprocessor(self):
         return self.p
@@ -34,8 +33,38 @@ class NERPreprocessor(Preprocessor):
     def get_classes(self):
         return self.c
 
-    def get_embedding_name(self):
-        return self.e
+
+    def filter_embeddings(self, embeddings, vocab, dim):
+        """Loads word vectors in numpy array.
+
+        Args:
+            embeddings (dict or TransformerEmbedding): a dictionary of numpy array or Transformer Embedding instance
+            vocab (dict): word_index lookup table.
+
+        Returns:
+            numpy array: an array of word embeddings.
+        """
+        if not isinstance(embeddings, dict):
+            return
+        _embeddings = np.zeros([len(vocab), dim])
+        for word in vocab:
+            if word in embeddings:
+                word_idx = vocab[word]
+                _embeddings[word_idx] = embeddings[word]
+        return _embeddings
+
+
+
+    def get_embed_model(self, verbose=1):
+        if self.wv_path_or_url is None: 
+            raise ValueError('wordvector_path_or_url is empty: supply a file path or '+\
+                             'URL to fasttext word vector file')
+        if verbose: print('pretrained word embeddings will be loaded from:\n\t%s' % (self.wv_path_or_url))
+        word_embedding_dim = 300 # all fasttext word vectors are of dim=300
+        embs = tpp.load_wv(self.wv_path_or_url, verbose=verbose)
+        emb_model = self.filter_embeddings(embs, self.p._word_vocab.vocab, word_embedding_dim)
+        return (emb_model, word_embedding_dim)
+
 
 
     def preprocess(self, sentences):
@@ -56,6 +85,21 @@ class NERPreprocessor(Preprocessor):
             y.append([OTHER] * len(tokens))
         nerseq = NERSequence(X, y, p=self.p)
         return nerseq
+
+    def preprocess_test(self, x_test, y_test, verbose=1):
+        """
+        Args:
+          x_test(list of lists of str): lists of token lists
+          x_test (list of lists of str):  lists of tag lists
+          verbose(bool): verbosity
+        Returns:
+          NERSequence:  can be used as argument to NERLearner.validate() to evaluate test sets
+        """
+        # array > df > array in order to print statistics more easily
+        from .data import array_to_df
+        test_df = array_to_df(x_test, y_test) 
+        (x_list, y_list)  = process_df(test_df, verbose=verbose) 
+        return NERSequence(x_list, y_list, batch_size=U.DEFAULT_BS, p=self.p)
 
 
     def undo(self, nerseq):

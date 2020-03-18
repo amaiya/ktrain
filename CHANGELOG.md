@@ -7,6 +7,35 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.11.0 (2020-03-18)
+
+### New:
+- sequence-taging (e.g., NER) now supports ELMo embeddings with `use_elmo=True` argument to data-loading
+  functions like `entities_from_array`  and `entities_from_txt`A
+- pretrained word embeddings (i.e., fasttext word2vec embeddings) can be specified by providing the URL to
+  a `.vec.gz` file from [here](https://fasttext.cc/docs/en/crawl-vectors.html). The URL (or path) is
+  supplied as `wv_path_or_url` argument to data-loading functions like `entities_from_array` and `entities_from_txt`
+- `show_random_images`: show random images from folder in Jupyter notebook
+- `NERPreprocessor` now includes a `preprocess_test` method for easier evaluation of test sets in datasets
+   that contain a training, validation, and test set
+
+### Changed:
+- ensure `DISABLE_V2_BEHAVIOR=True` when `ImagePredictor.explain` is invoked
+- added `SUPPRESS_TF_WARNINGS` environment variable.  Default is '1'. If set to '0', TF warnings will be displayed.
+- `merge_entities` method of `ktrain.text.shallownlp.ner.NER` changed to `merge_tokens` 
+- moved `load_predictor` to constructor in `krain.text.shallownlp.ner.NER`
+- `ktrain.text.shallownlp.ner.NER` now supports `predictor_path` argument
+
+### Fixed:
+- convert `class_names` to strings in `core.validate` to prevent error from scikit-learn
+- fixed error arising when no data augmentation scheme is provided to the `images_from*` functions
+- fixed bug in `images_from_fname` to ensure supplied `pattern` is used
+- added `val_folder` argument to `images_from_fname`
+- raise Exception when `preproc` is not found in `load_predictor`
+- check for existence of `preproc` in `text_classifier` and `text_regression_model`
+- fixed `text.eda` so that `detect_lang` is called correctly after being moved to `textutils`
+
+
 ## 0.10.1 (2020-03-04)
 
 ### New:

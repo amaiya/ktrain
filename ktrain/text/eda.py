@@ -121,7 +121,7 @@ class TopicModel():
 
         # adjust defaults based on language detected
         if texts is not None:
-            lang = pp.detect_lang(texts)
+            lang = TU.detect_lang(texts)
             if lang != 'en':
                 stopwords = None if stop_words=='english' else stop_words
                 token_pattern = r'(?u)\b\w+\b' if token_pattern is None else token_pattern

@@ -3,6 +3,35 @@ from .. import utils as U
 from .preprocessor import ImagePreprocessor
 
 
+def show_image(img_path):
+    """
+    Given file path to image, show it in Jupyter notebook
+    """
+    if not os.path.isfile(img_path):
+        raise ValueError('%s is not valid file' % (img_path))
+    img = plt.imread(img_path)
+    out = plt.imshow(img)
+    return out
+
+
+def show_random_images(img_folder, n=4, rows=1):
+    """
+    display random images from a img_folder
+    """
+    fnames = []
+    for ext in ('*.gif', '*.png', '*.jpg'):
+        fnames.extend(glob.glob(os.path.join(img_folder, ext)))
+    ims = []
+    for i in range(n):
+        img_path = random.choice(fnames)
+        img = image.load_img(img_path)
+        x = image.img_to_array(img)
+        x = x/255.
+        ims.append(x)
+    U.plots(ims, rows=rows)
+    return
+
+
 def preview_data_aug(img_path, data_aug, rows=1, n=4):
     """
     Preview data augmentation (ImageDatagenerator)
@@ -33,7 +62,7 @@ def preview_data_aug(img_path, data_aug, rows=1, n=4):
     return
 
 
-def preview_data_aug_colformat(img_path, data_aug, n=4):
+def preview_data_aug_OLD(img_path, data_aug, n=4):
     """
     Preview data augmentation (ImageDatagenerator)
     on a supplied image.
@@ -62,12 +91,6 @@ def preview_data_aug_colformat(img_path, data_aug, n=4):
     return
 
 
-def show_image(img_path):
-    if not os.path.isfile(img_path):
-        raise ValueError('%s is not valid file' % (img_path))
-    img = plt.imread(img_path)
-    out = plt.imshow(img)
-    return out
 
 def get_data_aug(
                  rotation_range=40,
@@ -139,6 +162,7 @@ def process_datagen(data_aug, train_array=None, train_directory=None,
         test_datagen = get_test_datagen(data_aug=data_aug)
     else:
         train_datagen = get_test_datagen()
+        test_datagen = get_test_datagen()
 
     # compute statistics for normalization
     fit_datagens(train_datagen, test_datagen, 
@@ -158,7 +182,6 @@ def fit_datagens(train_datagen, test_datagen,
     """
     computes stats of images for normalization
     """
-
     if not datagen_needs_fit(train_datagen): return
     if bool(train_array is not None) == bool(train_directory):
         raise ValueError('only one of train_array or train_directory is required.')
@@ -384,8 +407,9 @@ def images_from_folder(datadir, target_size=(224,224),
 
 def images_from_csv(train_filepath, 
                    image_column,
-                   directory=None,
                    label_columns=[],
+                   directory=None,
+                   suffix='',
                    val_filepath=None,
                    target_size=(224,224),
                     color_mode='rgb',
@@ -401,8 +425,31 @@ def images_from_csv(train_filepath,
     Args:
     train_filepath (string): path to training dataset in CSV format with header row
     image_column (string): name of column containing the filenames of images
+                           If values in image_column do not have a file extension,
+                           the extension should be supplied with suffix argument.
+                           If values in image_column are not full file paths,
+                           then the path to directory containing images should be supplied
+                           as directory argument.
+
+    label_columns(list or str): list or str representing the columns that store labels
+                                Labels can be in any one of the following formats:
+                                1. a single column string string labels
+
+                                   image_fname,label
+                                   -----------------
+                                   image01,cat
+                                   image02,dog
+
+                                2. multiple columns for one-hot-encoded labels
+                                   image_fname,cat,dog
+                                   image01,1,0
+                                   image02,0,1
+
     directory (string): path to directory containing images
                         not required if image_column contains full filepaths
+    suffix(str): will be appended to each entry in image_column
+                 Used when the filenames in image_column do not contain file extensions.
+                 The extension in suffx should include ".".
     val_filepath (string): path to validation dataset in CSV format
     suffix(string): suffix to add to file names in image_column 
     target_size (tuple):  image dimensions 
@@ -445,7 +492,36 @@ def images_from_csv(train_filepath,
         train_df = df
         val_df = pd.read_csv(val_filepath)
 
+    # class names
     label_columns.sort()
+
+    # fix file extensions, if necessary
+    if suffix:
+        train_df[image_column] = train_df[image_column].apply(lambda x : x+suffix)
+        val_df[image_column] = val_df[image_column].apply(lambda x : x+suffix)
+
+
+    # 1-hot-encode string labels
+    if isinstance(label_columns, str) or \
+       (isinstance(label_columns, (list, np.ndarray)) and len(label_columns) == 1):
+        label_col_name = label_columns if isinstance(label_columns, str) else label_columns[0]
+        if not isinstance(df[label_col_name].values[0], str):
+            raise ValueError('If a single label column is provided, labels must be in the form of a string.')
+        le = LabelEncoder()
+        train_labels = train_df[label_col_name].values
+        le.fit(train_labels)
+        y_train = to_categorical(le.transform(train_labels))
+        y_val = to_categorical(le.transform(val_df[label_col_name].values))
+        y_train_pd = [y_train[:,i] for i in range(y_train.shape[1])]
+        y_val_pd = [y_val[:,i] for i in range(y_val.shape[1])]
+        label_columns = list(le.classes_)
+        train_df = pd.DataFrame(zip(train_df[image_column].values, *y_train_pd), columns=[image_column]+label_columns)
+        val_df = pd.DataFrame(zip(val_df[image_column].values, *y_val_pd), columns=[image_column]+label_columns)
+
+
+
+
+
     batches_tr = train_datagen.flow_from_dataframe(
                                       train_df,
                                       directory=directory,
@@ -477,8 +553,9 @@ def images_from_csv(train_filepath,
 
 
 
-def images_from_fname( img_folder,
+def images_from_fname( train_folder,
                       pattern=r'([^/]+)_\d+.jpg$',
+                      val_folder=None,
                      target_size=(224,224),
                      color_mode='rgb',
                      data_aug=None,
@@ -489,17 +566,18 @@ def images_from_fname( img_folder,
     Returns image generator (Iterator instance).
 	
     Args:
+    train_folder (str): directory containing images
     pat (str):  regular expression to extract class from file name of each image
                 Example: r'([^/]+)_\d+.jpg$' to match 'english_setter' in 'english_setter_140.jpg'
                 By default, it will extract classes from file names of the form:
                    <class_name>_<numbers>.jpg
-    img_folder (str): directory containing images
+    val_folder (str): directory containing validation images. default:None
     target_size (tuple):  image dimensions 
     color_mode (string):  color mode
     data_aug(ImageDataGenerator):  a keras.preprocessing.image.ImageDataGenerator
                                   for data augmentation
     val_pct(float):  proportion of training data to be used for validation
-                     only used if val_filepath is None
+                     only used if val_folder is None
     random_state(int): random seed for train/test split
     verbose(bool):   verbosity
 
@@ -510,57 +588,30 @@ def images_from_fname( img_folder,
 
     # get train and test data generators
     (train_datagen, test_datagen) = process_datagen(data_aug, 
-                                                    train_directory=img_folder,
+                                                    train_directory=train_folder,
                                                     target_size=target_size,
                                                     color_mode=color_mode,
                                                     flat_dir=True)
 
-    # setup dataframe
-    fnames = []
-    for ext in ('*.gif', '*.png', '*.jpg'):
-        fnames.extend(glob.glob(os.path.join(img_folder, ext)))
+    # train df
+    train_df, class_names = _img_fnames_to_df(train_folder, pattern, verbose=verbose)
 
-    # extract class names
-    image_names = []
-    labels = []
-    p = re.compile(r'([^/]+)_\d+.jpg$')
-    for fname in fnames:
-        r = p.search(fname)
-        if r:
-            image_names.append(os.path.basename(fname))
-            labels.append(r.group(1))
-        else:
-            warnings.warn('Could not extract class for %s -  skipping this file'% (fname))
-
-    # convert labels to integers
-    class_names = list(set(labels))
-    class_names.sort()
-    c2i = {k:v for v,k in enumerate(class_names)}
-    labels = [c2i[label] for label in labels]
-    labels = to_categorical(labels)
-
-    U.vprint('Found %s classes: %s' % (len(class_names), class_names), verbose=verbose)
-    U.vprint('y shape: (%s,%s)' % (labels.shape[0], labels.shape[1]), verbose=verbose)
-    dct = {'image_name': image_names}
-    for i in range(labels.shape[1]):
-        dct[class_names[i]] = labels[:,i]
-
-    # convert to dataframes
-    df = pd.DataFrame(dct)
-    #df = df.astype({"a": int, "b": complex})
-    #df.to_csv('/tmp/pets.csv')
-    if val_pct:
+    # val df
+    if val_folder is not None:
+        val_df, _ = _img_fnames_to_df(val_folder, pattern, verbose=verbose)
+    elif val_pct:
         prop = 1-val_pct
         if random_state is not None: np.random.seed(42)
         msk = np.random.rand(len(df)) < prop
         train_df = df[msk]
         val_df = df[~msk]
+        val_folder = train_folder
     else:
         val_df = None
 
     batches_tr = train_datagen.flow_from_dataframe(
                                       train_df,
-                                      directory=img_folder,
+                                      directory=train_folder,
                                       x_col = 'image_name',
                                       y_col=class_names,
                                       target_size=target_size,
@@ -572,7 +623,7 @@ def images_from_fname( img_folder,
     if val_df is not None:
         batches_te = test_datagen.flow_from_dataframe(
                                           val_df,
-                                          directory=img_folder,
+                                          directory=val_folder,
                                           x_col = 'image_name',
                                           y_col=class_names,
                                           target_size=target_size,
@@ -592,6 +643,41 @@ def images_from_fname( img_folder,
 
 
 
+def _img_fnames_to_df(img_folder, pattern, verbose=1):
+    # get fnames
+    fnames = []
+    for ext in ('*.gif', '*.png', '*.jpg'):
+        fnames.extend(glob.glob(os.path.join(img_folder, ext)))
+
+    # process filenames and labels
+    image_names = []
+    labels = []
+    p = re.compile(pattern)
+    for fname in fnames:
+        r = p.search(fname)
+        if r:
+            image_names.append(os.path.basename(fname))
+            labels.append(r.group(1))
+        else:
+            warnings.warn('Could not extract class for %s -  skipping this file'% (fname))
+    class_names = list(set(labels))
+    class_names.sort()
+    c2i = {k:v for v,k in enumerate(class_names)}
+    labels = [c2i[label] for label in labels]
+    labels = to_categorical(labels)
+    #class_names = [str(c) in class_names]
+    U.vprint('Found %s classes: %s' % (len(class_names), class_names), verbose=verbose)
+    U.vprint('y shape: (%s,%s)' % (labels.shape[0], labels.shape[1]), verbose=verbose)
+    dct = {'image_name': image_names}
+    for i in range(labels.shape[1]):
+        dct[class_names[i]] = labels[:,i]
+
+    # convert to dataframes
+    df = pd.DataFrame(dct)
+    return (df, class_names)
+
+
+
 def images_from_array(x_train, y_train, 
                       validation_data=None,
                       data_aug=None):
@@ -606,6 +692,7 @@ def images_from_array(x_train, y_train,
     Args:
     x_train(numpy.ndarray):  training gdata
     y_train(numpy.ndarray):  labels
+                             Must be 1-hot encoded already.
     validation_data (tuple): tuple of numpy.ndarrays for validation data
     data_aug(ImageDataGenerator):  a keras.preprocessing.image.ImageDataGenerator
     Returns:

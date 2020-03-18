@@ -122,6 +122,10 @@ class Learner(ABC):
         y_true = np.argmax(y_true, axis=1)
         if print_report:
             if class_names:
+                try:
+                    class_names = [str(s) for s in class_names]
+                except:
+                    pass
                 report = classification_report(y_true, y_pred, target_names=class_names)
             else:
                 report = classification_report(y_true, y_pred)
@@ -1172,6 +1176,8 @@ class GenLearner(Learner):
                     fit_fn = self.model.fit_generator
                 else:
                     fit_fn = self.model.fit
+                # fixed in 2.1.0
+                #fit_fn = self.model.fit
             hist = fit_fn(self._prepare(self.train_data),
                                         steps_per_epoch = steps_per_epoch,
                                         validation_steps = validation_steps,
@@ -1308,15 +1314,9 @@ def load_predictor(fname):
     """
 
     # load the preprocessor
-    try:
-        preproc = None
-        with open(fname +'.preproc', 'rb') as f:
-            preproc = pickle.load(f)
-    except FileNotFoundError:
-        print('load_predictor failed.\n'+\
-              'Could not find the saved preprocessor (%s) for this model.' % (fname+'.preproc') +\
-               ' Are you sure predictor.save method was called?')
-        return
+    preproc = None
+    with open(fname +'.preproc', 'rb') as f:
+        preproc = pickle.load(f)
 
     # load the model
     model = _load_model(fname, preproc=preproc)

@@ -7,25 +7,25 @@ from . import textutils as TU
 DistilBertTokenizer = transformers.DistilBertTokenizer
 DISTILBERT= 'distilbert'
 
-from transformers import BertConfig, TFBertForSequenceClassification, BertTokenizer
-from transformers import XLNetConfig, TFXLNetForSequenceClassification, XLNetTokenizer
-from transformers import XLMConfig, TFXLMForSequenceClassification, XLMTokenizer
-from transformers import RobertaConfig, TFRobertaForSequenceClassification, RobertaTokenizer
-from transformers import DistilBertConfig, TFDistilBertForSequenceClassification, DistilBertTokenizer
-from transformers import AlbertConfig, TFAlbertForSequenceClassification, AlbertTokenizer
-from transformers import CamembertConfig, TFCamembertForSequenceClassification, CamembertTokenizer
-from transformers import XLMRobertaConfig, TFXLMRobertaForSequenceClassification, XLMRobertaTokenizer
-from transformers import AutoConfig, TFAutoModelForSequenceClassification, AutoTokenizer
+from transformers import BertConfig, TFBertForSequenceClassification, BertTokenizer, TFBertModel
+from transformers import XLNetConfig, TFXLNetForSequenceClassification, XLNetTokenizer, TFXLNetModel 
+from transformers import XLMConfig, TFXLMForSequenceClassification, XLMTokenizer, TFXLMModel
+from transformers import RobertaConfig, TFRobertaForSequenceClassification, RobertaTokenizer, TFRobertaModel
+from transformers import DistilBertConfig, TFDistilBertForSequenceClassification, DistilBertTokenizer, TFDistilBertModel
+from transformers import AlbertConfig, TFAlbertForSequenceClassification, AlbertTokenizer, TFAlbertModel
+from transformers import CamembertConfig, TFCamembertForSequenceClassification, CamembertTokenizer, TFCamembertModel
+from transformers import XLMRobertaConfig, TFXLMRobertaForSequenceClassification, XLMRobertaTokenizer, TFXLMRobertaModel
+from transformers import AutoConfig, TFAutoModelForSequenceClassification, AutoTokenizer, TFAutoModel
 
 TRANSFORMER_MODELS = {
-    'bert':       (BertConfig, TFBertForSequenceClassification, BertTokenizer),
-    'xlnet':      (XLNetConfig, TFXLNetForSequenceClassification, XLNetTokenizer),
-    'xlm':        (XLMConfig, TFXLMForSequenceClassification, XLMTokenizer),
-    'roberta':    (RobertaConfig, TFRobertaForSequenceClassification, RobertaTokenizer),
-    'distilbert': (DistilBertConfig, TFDistilBertForSequenceClassification, DistilBertTokenizer),
-    'albert':     (AlbertConfig, TFAlbertForSequenceClassification, AlbertTokenizer),
-    'camembert':  (CamembertConfig, TFCamembertForSequenceClassification, CamembertTokenizer),
-    'xlm_roberta':  (XLMRobertaConfig, TFXLMRobertaForSequenceClassification, XLMRobertaTokenizer)
+    'bert':       (BertConfig, TFBertForSequenceClassification, BertTokenizer, TFBertModel),
+    'xlnet':      (XLNetConfig, TFXLNetForSequenceClassification, XLNetTokenizer, TFXLNetModel),
+    'xlm':        (XLMConfig, TFXLMForSequenceClassification, XLMTokenizer, TFXLMModel),
+    'roberta':    (RobertaConfig, TFRobertaForSequenceClassification, RobertaTokenizer, TFRobertaModel),
+    'distilbert': (DistilBertConfig, TFDistilBertForSequenceClassification, DistilBertTokenizer, TFDistilBertModel),
+    'albert':     (AlbertConfig, TFAlbertForSequenceClassification, AlbertTokenizer, TFAlbertModel),
+    'camembert':  (CamembertConfig, TFCamembertForSequenceClassification, CamembertTokenizer, TFCamembertModel),
+    'xlm_roberta':  (XLMRobertaConfig, TFXLMRobertaForSequenceClassification, XLMRobertaTokenizer, TFXLMRobertaModel)
 }
 
 
@@ -47,19 +47,36 @@ WV_URL = 'https://dl.fbaipublicfiles.com/fasttext/vectors-english/crawl-300d-2M.
 #WV_URL = 'http://nlp.stanford.edu/data/glove.6B.zip
 
 
-def get_wv_path():
+def get_wv_path(wv_path_or_url=WV_URL):
+    # process if file path given
+    if os.path.isfile(wv_path_or_url) and wv_path_or_url.endswith('vec'): return wv_path_or_url
+    elif os.path.isfile(wv_path_or_url):
+        raise ValueError("wv_path_or_url must either be URL .vec.zip or .vec.gz file or file path to .vec file")
+
+    # process if URL is given
+    fasttext_url = 'https://dl.fbaipublicfiles.com/fasttext'
+    if not wv_path_or_url.startswith(fasttext_url):
+        raise ValueError('selected word vector file must be from %s'% (fasttext_url))
+    if not wv_path_or_url.endswith('.vec.zip') and not wv_path_or_url.endswith('vec.gz'):
+        raise ValueError('If wv_path_or_url is URL, must be .vec.zip filea from Facebook fasttext site.')
+
     ktrain_data = U.get_ktrain_data()
-    zip_fpath = os.path.join(ktrain_data, fname_from_url(WV_URL))
-    wv_path =  os.path.join(ktrain_data, os.path.splitext(fname_from_url(WV_URL))[0])
+    zip_fpath = os.path.join(ktrain_data, fname_from_url(wv_path_or_url))
+    wv_path =  os.path.join(ktrain_data, os.path.splitext(fname_from_url(wv_path_or_url))[0])
     if not os.path.isfile(wv_path):
         # download zip
-        print('downloading pretrained word vectors (~1.5G) ...')
-        U.download(WV_URL, zip_fpath)
+        print('downloading pretrained word vectors to %s ...' % (ktrain_data))
+        U.download(wv_path_or_url, zip_fpath)
 
         # unzip
         print('\nextracting pretrained word vectors...')
-        with zipfile.ZipFile(zip_fpath, 'r') as zip_ref:
-            zip_ref.extractall(ktrain_data)
+        if wv_path_or_url.endswith('.vec.zip'):
+            with zipfile.ZipFile(zip_fpath, 'r') as zip_ref:
+                zip_ref.extractall(ktrain_data)
+        else: # .vec.gz
+            with gzip.open(zip_fpath, 'rb') as f_in:
+                with open(wv_path, 'wb') as f_out:
+                    shutil.copyfileobj(f_in, f_out)
         print('done.\n')
 
         # cleanup
@@ -74,12 +91,37 @@ def get_wv_path():
 
 def get_coefs(word, *arr): return word, np.asarray(arr, dtype='float32')
 
-def load_wv(wv_path=None, verbose=1):
-    if verbose: print('Loading pretrained word vectors...this may take a few moments...')
-    if wv_path is None: wv_path = get_wv_path()
-    embeddings_index = dict(get_coefs(*o.rstrip().rsplit(' ')) for o in open(wv_path, encoding='utf-8'))
-    if verbose: print('Done.')
-    return embeddings_index
+
+
+#def load_wv(wv_path=None, verbose=1):
+    #if verbose: print('Loading pretrained word vectors...this may take a few moments...')
+    #if wv_path is None: wv_path = get_wv_path()
+    #embeddings_index = dict(get_coefs(*o.rstrip().rsplit(' ')) for o in open(wv_path, encoding='utf-8'))
+    #if verbose: print('Done.')
+    #return embeddings_index
+
+
+def file_len(fname):
+    with open(fname) as f:
+        for i, l in enumerate(f):
+            pass
+    return i + 1
+
+
+def load_wv(wv_path_or_url=WV_URL, verbose=1):
+    wv_path = get_wv_path(wv_path_or_url)
+    if verbose: print('loading pretrained word vectors...this may take a few moments...')
+    length = file_len(wv_path)
+    tups = []
+    mb = master_bar(range(1))
+    for i in mb:
+        f = open(wv_path, encoding='utf-8')
+        for o in progress_bar(range(length), parent=mb):
+            o = f.readline()
+            tups.append(get_coefs(*o.rstrip().rsplit(' ')))
+        f.close()
+        if verbose: mb.write('done.')
+    return dict(tups)
 
 
 
@@ -977,6 +1019,94 @@ class Transformer(TransformersPreprocessor):
         self.check_trained()
         return self.preprocess_train(texts, y=y, mode='test', verbose=verbose)
 
+
+class TransformerEmbedding():
+    def __init__(self, model_name):
+        """
+        Args:
+            model_name (str):  name of Hugging Face pretrained model.
+                               Choose from here: https://huggingface.co/transformers/pretrained_models.html
+                               
+        """
+        self.model_name = model_name
+        self.name = model_name.split('-')[0]
+        if self.name not in TRANSFORMER_MODELS:
+            self.config = AutoConfig.from_pretrained(model_name)
+            self.model_type = TFAutoModel
+            self.tokenizer_type = AutoTokenizer
+        else:
+            self.config = None # use default config
+            self.model_type = TRANSFORMER_MODELS[self.name][3]
+            self.tokenizer_type = TRANSFORMER_MODELS[self.name][2]
+        if "bert-base-japanese" in model_name:
+            self.tokenizer_type = transformers.BertJapaneseTokenizer
+
+        self.tokenizer = self.tokenizer_type.from_pretrained(model_name)
+        self.model = self._load_pretrained(model_name)
+
+
+    def _load_pretrained(self, model_name):
+        """
+        load pretrained model
+        """
+        if self.config is not None:
+            try:
+                model = self.model_type.from_pretrained(model_name, config=self.config)
+            except:
+                try:
+                    model = self.model_type.from_pretrained(model_name, config=self.config, from_pt=True)
+                except:
+                    raise ValueError('could not load pretrained model %s using both from_pt=False and from_pt=True' % (model_name))
+        else:
+            model = self.model_type.from_pretrained(model_name)
+        return model
+
+
+
+    def embed(self, text, cls_only=True, return_all=False):
+        """
+        get embedding for word, phrase, or sentence
+        Args:
+          text(str): word, phrase, or sentence
+          cls_only(bool):  If True, a size-1 vector representing the text will be returned
+                           IF False, a vector for each token from the tokenized <text>
+                           will be returned.
+                          Default:True
+          return_all(bool):  If True, embeddding includes CLS and SEP tokens.
+                             If False, these are ommitted from final result.
+                             Cannot be True if cls_only=True.
+        Returns:
+            np.ndarray
+        """
+        if return_all and cls_only:
+            raise ValueError('return_all and cls_only cannot both be True')
+
+        input_ids = tf.constant(self.tokenizer.encode(text))[None, :]  # Batch size 1
+        outputs = self.model(input_ids)
+        last_hidden_states = outputs[0] 
+        embedding = np.squeeze(last_hidden_states.numpy())
+        if cls_only:
+            return embedding[0]
+        elif return_all:
+            return embedding
+        else:
+            return embedding[1:-1]
+
+
+    def tokenize(self, text, return_all=False):
+        """
+        get embedding for word, phrase, or sentence
+        Args:
+          text(str): word, phrase, or sentence
+          return_all(bool):  If True, CLS and SEP tokens are prepended and appended, respectively.
+        Returns:
+          list
+        """
+        tokens = self.tokenizer(text)
+        if return_all:
+            return [self.tokenizer.cls_token] +  tokens + [self.tokenizer.sep_token]
+        else:
+            return tokens
 
 
 

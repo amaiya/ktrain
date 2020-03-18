@@ -48,7 +48,7 @@ class TestTextClassification(TestCase):
         learner.load_model('/tmp/test_model')
 
         # test validate
-        cm = learner.validate()
+        cm = learner.validate(class_names=preproc.get_classes())
         print(cm)
         for i, row in enumerate(cm):
             self.assertEqual(np.argmax(row), i)

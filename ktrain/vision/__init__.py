@@ -7,6 +7,9 @@ __all__ = [
            'images_from_folder', 'images_from_csv', 'images_from_array',
            'get_data_aug',
            'preprocess_csv',
-           'ImagePredictor'
+           'ImagePredictor',
+           'show_image',
+           'show_random_images',
+           'preview_data_aug'
            ]
 
