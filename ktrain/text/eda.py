@@ -448,7 +448,7 @@ class TopicModel():
         p.circle('x', 'y', size=point_size, source=source, fill_color= 'fill_color')
         bp.show(p)
         if filepath is not None:
-            bp.output_file('/tmp/t.html')
+            bp.output_file(filepath)
             bp.save(p)
         return
 

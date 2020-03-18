@@ -7,6 +7,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.11.2 (2020-03-18)
+
+### New:
+- N/A
+
+### Changed:
+- N/A
+
+### Fixed:
+- `ktrain.text.eda.visualize_documents` now properly processes filepath argument
+
+
 ## 0.11.1 (2020-03-18)
 
 ### New:
