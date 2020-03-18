@@ -102,7 +102,7 @@ def get_coefs(word, *arr): return word, np.asarray(arr, dtype='float32')
 
 
 def file_len(fname):
-    with open(fname) as f:
+    with open(fname, encoding='utf-8') as f:
         for i, l in enumerate(f):
             pass
     return i + 1
