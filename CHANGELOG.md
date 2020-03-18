@@ -7,6 +7,19 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.11.1 (2020-03-18)
+
+### New:
+- `entities_from_txt`, `entities_from_gmb`, and `entities_from_conll2003` functions now discover
+   the encoding of the file automatically when `encoding=None` (which is the default now)
+
+### Changed:
+- N/A
+
+### Fixed:
+- N/A
+
+
 ## 0.11.0 (2020-03-18)
 
 ### New:

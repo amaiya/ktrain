@@ -1,6 +1,7 @@
 
 from ...imports import *
 from ... import utils as U
+from .. import textutils as TU
 from . import preprocessor as pp
 from .preprocessor import NERPreprocessor
 
@@ -21,7 +22,7 @@ def entities_from_gmb(train_filepath,
                       word_column=WORD_COL,
                       tag_column=TAG_COL,
                       sentence_column=SENT_COL,
-                       encoding='latin1',
+                       encoding=None,
                        val_pct=0.1, verbose=1):
     """
     Loads sequence-labeled data from text file in the  Groningen
@@ -46,7 +47,7 @@ def entities_from_conll2003(train_filepath,
                             val_filepath=None,
                             wv_path_or_url=None,
                             use_elmo=False,
-                            encoding='latin1',
+                            encoding=None,
                             val_pct=0.1, verbose=1):
     """
     Loads sequence-labeled data from a file in CoNLL2003 format.
@@ -70,7 +71,7 @@ def entities_from_txt(train_filepath,
                       tag_column=TAG_COL,
                       sentence_column=SENT_COL,
                       data_format='conll2003',
-                      encoding='latin1',
+                      encoding=None,
                       val_pct=0.1, verbose=1):
     """
     Loads sequence-labeled data from comma or tab-delmited text file.
@@ -150,7 +151,7 @@ def entities_from_txt(train_filepath,
         data_format(str): one of colnll2003 or gmb
                           word_column, tag_column, and sentence_column
                           ignored if 'conll2003'
-        encoding(str): the encoding to use
+        encoding(str): the encoding to use.  If None, encoding is discovered automatically
         val_pct(float): Proportion of training to use for validation.
         verbose (boolean): verbosity
     """
@@ -163,6 +164,12 @@ def entities_from_txt(train_filepath,
     else:
         data_to_df = conll2003_to_df
         word_column, tag_column, sentence_column = WORD_COL, TAG_COL, SENT_COL
+
+    # detect encoding
+    if encoding is None:
+        with open(train_filepath, 'rb') as f:
+            encoding = TU.detect_encoding(f.read())
+            U.vprint('detected encoding: %s (if wrong, set manually)' % (encoding), verbose=verbose)
 
     # create dataframe
     train_df = data_to_df(train_filepath, encoding=encoding)
