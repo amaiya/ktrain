@@ -1063,50 +1063,60 @@ class TransformerEmbedding():
 
 
 
-    def embed(self, text, cls_only=True, return_all=False):
+    def embed(self, text, cls_only=True):
         """
         get embedding for word, phrase, or sentence
         Args:
           text(str): word, phrase, or sentence
-          cls_only(bool):  If True, a size-1 vector representing the text will be returned
+          cls_only(bool):  If True, a size-1 vector representing the text will be returned as
+                           the sentence embedding.
                            IF False, a vector for each token from the tokenized <text>
                            will be returned.
                           Default:True
-          return_all(bool):  If True, embeddding includes CLS and SEP tokens.
-                             If False, these are ommitted from final result.
-                             Cannot be True if cls_only=True.
         Returns:
-            np.ndarray
+            np.ndarray  or lsit of np.ndarray
         """
-        if return_all and cls_only:
-            raise ValueError('return_all and cls_only cannot both be True')
-
-        input_ids = tf.constant(self.tokenizer.encode(text))[None, :]  # Batch size 1
+        token_ids = self.tokenizer.encode(text)
+        input_ids = tf.constant(token_ids)[None, :]  # Batch size 1
         outputs = self.model(input_ids)
         last_hidden_states = outputs[0] 
         embedding = np.squeeze(last_hidden_states.numpy())
         if cls_only:
             return embedding[0]
-        elif return_all:
-            return embedding
         else:
-            return embedding[1:-1]
+            special_tokens = list(self.tokenizer.special_tokens_map.values())
+            tokens = self.tokenizer.convert_ids_to_tokens(token_ids)
+            result = [embedding[idx] for idx, token in enumerate(tokens) \
+                                               if not token.startswith("##") and token not in special_tokens]
+            
+            return result
+
+    def embed_from_list(self, token_list, cls_only=True):
+        """
+        get embedding for sentence represented by a list of tokens
+        Args:
+          token_list(list): list of strings representing a sentence
+          cls_only(bool):  If True, a size-1 vector representing the text will be returned as
+                           the sentence embedding.
+                           IF False, a vector for each token from the tokenized <text>
+                           will be returned.
+                          Default:True
+        Returns:
+            np.ndarray  or lsit of np.ndarray
+        """
+        return(self.embed(" ".join(token_list), cls_only=cls_only))
 
 
-    def tokenize(self, text, return_all=False):
+
+    def tokenize(self, text):
         """
         get embedding for word, phrase, or sentence
         Args:
           text(str): word, phrase, or sentence
-          return_all(bool):  If True, CLS and SEP tokens are prepended and appended, respectively.
         Returns:
           list
         """
-        tokens = self.tokenizer(text)
-        if return_all:
-            return [self.tokenizer.cls_token] +  tokens + [self.tokenizer.sep_token]
-        else:
-            return tokens
+        return self.tokenizer.tokenize(text)
 
 
 
