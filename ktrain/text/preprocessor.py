@@ -15,7 +15,7 @@ from transformers import DistilBertConfig, TFDistilBertForSequenceClassification
 from transformers import AlbertConfig, TFAlbertForSequenceClassification, AlbertTokenizer, TFAlbertModel
 from transformers import CamembertConfig, TFCamembertForSequenceClassification, CamembertTokenizer, TFCamembertModel
 from transformers import XLMRobertaConfig, TFXLMRobertaForSequenceClassification, XLMRobertaTokenizer, TFXLMRobertaModel
-from transformers import AutoConfig, TFAutoModelForSequenceClassification, AutoTokenizer, TFAutoModel
+from transformers import AutoConfig, TFAutoModelForSequenceClassification, AutoTokenizer, TFAutoModel, BertTokenizer
 
 TRANSFORMER_MODELS = {
     'bert':       (BertConfig, TFBertForSequenceClassification, BertTokenizer, TFBertModel),
@@ -766,8 +766,13 @@ class TransformersPreprocessor(TextPreprocessor):
 
         if "bert-base-japanese" in model_name:
             self.tokenizer_type = transformers.BertJapaneseTokenizer
-
-        tokenizer = self.tokenizer_type.from_pretrained(model_name)
+        
+        try:
+            tokenizer = self.tokenizer_type.from_pretrained(model_name)
+        except OSError:
+            print("Loading error by using AutoTokenizer , changing to BertTokenizer")
+            self.tokenizer_type = BertTokenizer
+            tokenizer = self.tokenizer_type.from_pretrained(model_name)
 
         self.tok = tokenizer
         self.tok_dct = None
