@@ -7,6 +7,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.12.0 (TBD)
+
+### New:
+- N/A
+
+### Changed
+- use `mask_zero=True` again for NER
+
+### Fixed:
+- N/A
+
+
 ## 0.11.3 (2020-03-18)
 
 ### New:
