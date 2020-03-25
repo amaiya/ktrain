@@ -792,8 +792,6 @@ class TransformersPreprocessor(TextPreprocessor):
         undoes preprocessing and returns raw data by:
         converting a list or array of Word IDs back to words
         """
-        print(doc)
-        print(type(doc))
         return self.tok.convert_ids_to_tokens(doc)
         #raise Exception('currently_unsupported: Transformers.Preprocessor.undo is not yet supported')
 

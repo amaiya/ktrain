@@ -68,7 +68,8 @@ def sequence_tagger(name, preproc,
         emb_model, word_embedding_dim = preproc.get_embed_model(verbose=verbose)
     else:
         emb_model = None
-    mask_zero = False if not DISABLE_V2_BEHAVIOR else True  # https://github.com/tensorflow/tensorflow/issues/33148
+    #mask_zero = False if not DISABLE_V2_BEHAVIOR else True  # https://github.com/tensorflow/tensorflow/issues/33148
+    mask_zero = True
     if name == BILSTM_CRF:
         use_crf = True
         if not DISABLE_V2_BEHAVIOR:
