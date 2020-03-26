@@ -14,7 +14,7 @@ Most recent releases are shown at the top. Each release shows:
 
 ### Changed
 - use `mask_zero=True` again for NER
-- enforce `disable_v2_behavior` for bilstm as well due to CUDA error when `use_char=True` (possible TF2 bug) 
+- enforce `disable_v2_behavior` for bilstm as well due to `CUDA_STATUS_BAD_PARAM` error when `use_char=True` (possible TF2 bug) 
 
 ### Fixed:
 - properly set threshold in `text.eda` (PR #99)
