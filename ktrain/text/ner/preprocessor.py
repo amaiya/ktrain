@@ -55,15 +55,15 @@ class NERPreprocessor(Preprocessor):
 
 
 
-    def get_embed_model(self, verbose=1):
-        if self.wv_path_or_url is None: 
+    def get_wv_model(self, wv_path_or_url, verbose=1):
+        if wv_path_or_url is None: 
             raise ValueError('wordvector_path_or_url is empty: supply a file path or '+\
                              'URL to fasttext word vector file')
-        if verbose: print('pretrained word embeddings will be loaded from:\n\t%s' % (self.wv_path_or_url))
+        if verbose: print('pretrained word embeddings will be loaded from:\n\t%s' % (wv_path_or_url))
         word_embedding_dim = 300 # all fasttext word vectors are of dim=300
-        embs = tpp.load_wv(self.wv_path_or_url, verbose=verbose)
-        emb_model = self.filter_embeddings(embs, self.p._word_vocab.vocab, word_embedding_dim)
-        return (emb_model, word_embedding_dim)
+        embs = tpp.load_wv(wv_path_or_url, verbose=verbose)
+        wv_model = self.filter_embeddings(embs, self.p._word_vocab.vocab, word_embedding_dim)
+        return (wv_model, word_embedding_dim)
 
 
 

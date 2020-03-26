@@ -83,7 +83,9 @@ class BiLSTMCRF(object):
         self._num_labels = num_labels
         self.mask_zero = mask_zero
         self._use_elmo = use_elmo
+
         # NOTE: provide option for mask_zero=False because TF2 with V2 behavior throws error otherwise
+        #       mask_zero is strongly recommended
         # REFERENCE:
         #   https://github.com/tensorflow/tensorflow/issues/33069
         #   https://github.com/tensorflow/tensorflow/issues/33148
@@ -117,12 +119,16 @@ class BiLSTMCRF(object):
                                         name='char_embedding')(char_ids)
             char_embeddings = TimeDistributed(Bidirectional(LSTM(self._char_lstm_size)))(char_embeddings)
             embedding_list.append(char_embeddings)
+
+        # add elmo embedding
         if self._use_elmo:
             elmo_embeddings = Input(shape=(None, 1024), dtype='float32')
             inputs.append(elmo_embeddings)
             embedding_list.append(elmo_embeddings)
         word_embeddings = Concatenate()(embedding_list) if len(embedding_list) > 1 else embedding_list[0]
 
+
+        # build model
         word_embeddings = Dropout(self._dropout)(word_embeddings)
         z = Bidirectional(LSTM(units=self._word_lstm_size, return_sequences=True))(word_embeddings)
         z = Dense(self._fc_dim, activation='tanh')(z)

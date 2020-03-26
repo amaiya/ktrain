@@ -33,7 +33,8 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
     """
 
     def __init__(self, lower=True, num_norm=True,
-                 use_char=True, initial_vocab=None):
+                 use_char=True, initial_vocab=None,
+                 use_elmo=False):
         """Create a preprocessor object.
 
         Args:
@@ -41,6 +42,7 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
             use_char: boolean. Whether to use char feature.
             num_norm: boolean. Whether to normalize text.
             initial_vocab: Iterable. Initial vocabulary for expanding word_vocab.
+            use_elmo: If True, will generate contextual English Elmo embeddings
         """
         self._num_norm = num_norm
         self._use_char = use_char
@@ -51,6 +53,30 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
         if initial_vocab:
             self._word_vocab.add_documents([initial_vocab])
             self._char_vocab.add_documents(initial_vocab)
+
+        self._use_elmo = use_elmo
+
+    #def _retokenize_for_transformer(self, X, Y):
+        #ids2tok = self.te.tokenizer.convert_ids_to_tokens
+        #encode = self.te.tokenizer.encode
+        #new_X = []
+        #new_Y = []
+        #for i, x in enumerate(X):
+            #new_x = []
+            #new_y =[]
+            #for j,s in enumerate(x):
+                #hf_s = ids2tok(encode(s, add_special_tokens=False))
+                #hf_s = ' '.join(hf_s).replace(' ##', '').split()
+                #new_x.extend(hf_s)
+                #if Y is not None:
+                    #tag = Y[i][j]
+                    #if tag.startswith('B-'): tag = 'I-'+tag[2:]
+                    #new_y.extend([tag]*len(hf_s))
+            #new_X.append(new_x)
+            #new_Y.append(new_y)
+        #new_Y = None if Y is None else new_Y
+        #return new_X, new_Y
+
 
     def fit(self, X, y):
         """Learn vocabulary from training set.
@@ -73,6 +99,7 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
 
         return self
 
+
     def transform(self, X, y=None):
         """Transform documents to document ids.
 
@@ -87,15 +114,26 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
             features: document id matrix.
             y: label id matrix.
         """
+        features = []
+
         word_ids = [self._word_vocab.doc2id(doc) for doc in X]
         word_ids = sequence.pad_sequences(word_ids, padding='post')
+        features.append(word_ids)
 
         if self._use_char:
             char_ids = [[self._char_vocab.doc2id(w) for w in doc] for doc in X]
             char_ids = pad_nested_sequences(char_ids)
-            features = [word_ids, char_ids]
-        else:
-            features = word_ids
+            features_append(char_ids)
+
+        if self._use_elmo:
+            if not ALLENNLP_INSTALLED:        
+                raise Exception(ALLENNLP_ERRMSG)
+
+            character_ids = batch_to_ids(X)
+            elmo_embeddings = self._elmo(character_ids)['elmo_representations'][1]
+            elmo_embeddings = elmo_embeddings.detach().numpy()
+            features.append(elmo_embeddings)
+
 
         if y is not None:
             y = [self._label_vocab.doc2id(doc) for doc in y]
@@ -111,6 +149,7 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
             return features, y
         else:
             return features
+
 
     def fit_transform(self, X, y=None, **params):
         """Learn vocabulary and return document id matrix.
