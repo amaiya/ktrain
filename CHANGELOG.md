@@ -7,16 +7,17 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
-## 0.12.0 (TBD)
+## 0.11.4 (TBD)
 
 ### New:
 - N/A
 
 ### Changed
 - use `mask_zero=True` again for NER
+- enforce `disable_v2_behavior` for bilstm as well due to CUDA error when `use_char=True` (possible TF2 bug) 
 
 ### Fixed:
-- N/A
+- properly set threshold in `text.eda` (PR #99)
 
 
 ## 0.11.3 (2020-03-18)
