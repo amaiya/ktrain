@@ -117,8 +117,13 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
                 new_x.extend(hf_s)
                 if Y is not None:
                     tag = Y[i][j]
-                    if tag.startswith('B-'): tag = 'I-'+tag[2:]
-                    new_y.extend([tag]*len(hf_s))
+                    new_y.extend([tag])
+                    if len(hf_s) > 1:
+                        new_tag = tag
+                        if tag.startswith('B-'): new_tag = 'I-'+tag[2:]
+                        new_y.extend([new_tag]*(len(hf_s)-1) )
+                    #if tag.startswith('B-'): tag = 'I-'+tag[2:]
+
             new_X.append(new_x)
             new_Y.append(new_y)
         new_Y = None if Y is None else new_Y
