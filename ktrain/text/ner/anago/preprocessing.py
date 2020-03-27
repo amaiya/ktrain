@@ -55,7 +55,13 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
             self._char_vocab.add_documents(initial_vocab)
 
         self._use_elmo = use_elmo
+        self._elmo = None
+        self._initElmo()
 
+    def _initElmo(self):
+        if self._use_elmo and self._elmo is None:
+            self._elmo = Elmo(options_file, weight_file, 2, dropout=0)
+            
     #def _retokenize_for_transformer(self, X, Y):
         #ids2tok = self.te.tokenizer.convert_ids_to_tokens
         #encode = self.te.tokenizer.encode
@@ -114,6 +120,7 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
             features: document id matrix.
             y: label id matrix.
         """
+        self._initElmo()
         features = []
 
         word_ids = [self._word_vocab.doc2id(doc) for doc in X]

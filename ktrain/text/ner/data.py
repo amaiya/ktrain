@@ -17,7 +17,7 @@ SENT_COL = 'SentenceID'
 
 def entities_from_gmb(train_filepath, 
                       val_filepath=None,
-                      use_char=True,
+                      use_char=False,
                       word_column=WORD_COL,
                       tag_column=TAG_COL,
                       sentence_column=SENT_COL,
@@ -197,7 +197,7 @@ def entities_from_df(train_df,
                                             verbose=0)
 
     # preprocess and convert to generator
-    p = IndexTransformer(use_char=True)
+    p = IndexTransformer(use_char=use_char)
     preproc = NERPreprocessor(p)
     preproc.fit(x_train, y_train)
     trn = pp.NERSequence(x_train, y_train, batch_size=U.DEFAULT_BS, p=p)

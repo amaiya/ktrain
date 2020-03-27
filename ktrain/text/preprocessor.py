@@ -1041,6 +1041,10 @@ class TransformerEmbedding():
 
         self.tokenizer = self.tokenizer_type.from_pretrained(model_name)
         self.model = self._load_pretrained(model_name)
+        self.embsize = self.embed('ktrain', word_level=False).shape[1] # (batch_size, embsize)
+        if type(model).__name__ not in ['BertModel', 'DistilBertModel', 'AlbertModel']:
+            raise ValueError('TransformerEmbedding class currently only supports BERT-style models: ' +\
+                             'Bert, DistilBert, and Albert and variants like BioBERT and SciBERT')
 
 
     def _load_pretrained(self, model_name):
@@ -1048,6 +1052,7 @@ class TransformerEmbedding():
         load pretrained model
         """
         if self.config is not None:
+            self.config.output_hidden_states = True
             try:
                 model = self.model_type.from_pretrained(model_name, config=self.config)
             except:
@@ -1056,66 +1061,70 @@ class TransformerEmbedding():
                 except:
                     raise ValueError('could not load pretrained model %s using both from_pt=False and from_pt=True' % (model_name))
         else:
-            model = self.model_type.from_pretrained(model_name)
+            model = self.model_type.from_pretrained(model_name, output_hidden_states=True)
         return model
 
 
 
-    def embed(self, text, cls_only=True):
+    def embed(self, texts, word_level=False):
         """
         get embedding for word, phrase, or sentence
         Args:
-          text(str): word, phrase, or sentence
-          cls_only(bool):  If True, a size-1 vector representing the text will be returned as
-                           the sentence embedding.
-                           IF False, a vector for each token from the tokenized <text>
-                           will be returned.
-                          Default:True
+          text(str|list): word, phrase, or sentence or list of them representing a batch
+          word_level(bool): If True, returns embedding for each token in supplied texts.
+                            If False, returns embedding for each text in texts
         Returns:
-            np.ndarray  or lsit of np.ndarray
+            np.ndarray : embeddings
         """
-        token_ids = self.tokenizer.encode(text)
-        input_ids = tf.constant(token_ids)[None, :]  # Batch size 1
-        outputs = self.model(input_ids)
-        last_hidden_states = outputs[0] 
-        embedding = np.squeeze(last_hidden_states.numpy())
-        if cls_only:
-            return embedding[0]
-        else:
-            special_tokens = list(self.tokenizer.special_tokens_map.values())
-            tokens = self.tokenizer.convert_ids_to_tokens(token_ids)
-            result = [embedding[idx] for idx, token in enumerate(tokens) \
-                                               if not token.startswith("##") and token not in special_tokens]
-            
-            return result
+        if isinstance(texts, str): texts = [texts]
+        if not isinstance(texts[0], str): texts = [" ".join(text) for text in texts]
 
-    def embed_from_list(self, token_list, cls_only=True):
-        """
-        get embedding for sentence represented by a list of tokens
-        Args:
-          token_list(list): list of strings representing a sentence
-          cls_only(bool):  If True, a size-1 vector representing the text will be returned as
-                           the sentence embedding.
-                           IF False, a vector for each token from the tokenized <text>
-                           will be returned.
-                          Default:True
-        Returns:
-            np.ndarray  or lsit of np.ndarray
-        """
-        return(self.embed(" ".join(token_list), cls_only=cls_only))
+        sentences = []
+        for text in texts:
+            sentences.append(self.tokenizer.tokenize(text))
+        maxlen = len(max([tokens for tokens in sentences], key=len,)) + 2
+        all_input_ids = []
+        all_input_masks = []
+        for text in texts:
+            tokens = self.tokenizer.tokenize(text)
+            if len(tokens) > maxlen - 2:
+                tokens = tokens[0 : (maxlen - 2)]
+            tokens = [self.tokenizer.cls_token] + tokens + [self.tokenizer.sep_token]
+            input_ids = self.tokenizer.convert_tokens_to_ids(tokens)
+            input_mask = [1] * len(input_ids)
+            while len(input_ids) < maxlen:
+                input_ids.append(0)
+                input_mask.append(0)
+            all_input_ids.append(input_ids)
+            all_input_masks.append(input_mask)
 
+        all_input_ids = np.array(all_input_ids)
+        all_input_masks = np.array(all_input_masks)
+        outputs = self.model(all_input_ids, attention_mask=all_input_masks)
+        hidden_states = outputs[-1]
+        last_hidden = hidden_states[-1].numpy()
 
+        if not word_level: # sentence-level embedding
+            return np.mean(last_hidden, axis=1)
 
-    def tokenize(self, text):
-        """
-        get embedding for word, phrase, or sentence
-        Args:
-          text(str): word, phrase, or sentence
-        Returns:
-          list
-        """
-        return self.tokenizer.tokenize(text)
+        # filter-out extra subword tokens and special tokens 
+        # (using first subword of each token as embedding representations)
+        filtered_embeddings = []
+        for batch_idx, tokens in enumerate(sentences):
+            embedding = []
+            for token_idx, token in enumerate(tokens):
+                if token in [self.tokenizer.cls_token, self.tokenizer.sep_token] or token.startswith('##'): continue
+                embedding.append(last_hidden[batch_idx][token_idx])
+            filtered_embeddings.append(embedding)
 
+        # pad embeddings with zeros
+        max_length = max([len(e) for e in filtered_embeddings])
+        embeddings = []
+        for e in filtered_embeddings:
+            for i in range(max_length-len(e)):
+                e.append(np.zeros((self.embsize,)))
+            embeddings.append(np.array(e))
+        return np.array(embeddings)
 
 
 class TransformerDataset(Dataset):

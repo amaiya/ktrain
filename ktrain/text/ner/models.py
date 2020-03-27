@@ -8,13 +8,16 @@ BILSTM_CRF = 'bilstm-crf'
 BILSTM = 'bilstm'
 BILSTM_ELMO = 'bilstm-elmo'
 BILSTM_CRF_ELMO = 'bilstm-crf-elmo'
+BILSTM_TRANSFORMER = 'bilstm-bert'
 SEQUENCE_TAGGERS = {
                      BILSTM_CRF: 'Bidirectional LSTM-CRF  (https://arxiv.org/abs/1603.01360)',
                      BILSTM: 'Bidirectional LSTM (no CRF layer)  (https://arxiv.org/abs/1603.01360)',
                      BILSTM_CRF: 'Bidirectional LSTM-CRF w/ Elmo embeddings (English only)',
-                     BILSTM_ELMO: 'Bidirectional LSTM w/ Elmo embeddings (English only)'
+                     BILSTM_ELMO: 'Bidirectional LSTM w/ Elmo embeddings (English only)',
+                     BILSTM_TRANSFORMER: 'Bidirectional LSTM w/ BERT embeddings'
                      }
 V1_ONLY_MODELS = [BILSTM_CRF, BILSTM_CRF_ELMO]
+TRANSFORMER_MODELS = [BILSTM_TRANSFORMER]
 
 def print_sequence_taggers():
     for k,v in SEQUENCE_TAGGERS.items():
@@ -23,6 +26,7 @@ def print_sequence_taggers():
 
 def sequence_tagger(name, preproc, 
                     wv_path_or_url=None,
+                    bert_model = 'bert-base-multilingual-cased',
                     word_embedding_dim=100,
                     char_embedding_dim=25,
                     word_lstm_size=100,
@@ -60,11 +64,21 @@ def sequence_tagger(name, preproc,
 
                             Default:None (randomly-initialized word embeddings are used)
 
-        embeddings(str): Currently, either None or 'cbow' is supported
-                         If 'cbow' is specified, pretrained word vectors
-                         are automatically downloaded to <home>/ktran_data
-                         and used as weights in the Embedding layer.
-                         If None, random embeddings used.
+        bert_model_name(str):  the name of the BERT model.  default: 'bert-base-multilingual-cased'
+                               This parameter is only used if bilstm-bert is selected for name parameter.
+                               The value of this parameter is a name of BERT model from here:
+                                        https://huggingface.co/transformers/pretrained_models.html
+                               or a community-uploaded BERT model from here:
+                                        https://huggingface.co/models
+                               Example values:
+                                 bert-base-multilingual-cased:  Multilingual BERT (157 languages) - this is the default
+                                 bert-base-cased:  English BERT
+                                 bert-base-chinese: Chinese BERT
+                                 distilbert-base-german-cased: German DistilBert
+                                 albert-base-v2: English ALBERT model
+                                 monologg/biobert_v1.1_pubmed: community uploaded BioBERT (pretrained on PubMed)
+
+         
         word_embedding_dim (int): word embedding dimensions.
         char_embedding_dim (int): character embedding dimensions.
         word_lstm_size (int): character LSTM feature extractor output dimensions.
@@ -79,6 +93,10 @@ def sequence_tagger(name, preproc,
     
     if name not in SEQUENCE_TAGGERS:
         raise ValueError('invalid name: %s' % (name))
+
+    # check BERT
+    if name in TRANSFORMER_MODELS and not bert_model:
+        raise ValueError('bert_model is required for bilstm-bert models')
 
     # check CRF
     if not DISABLE_V2_BEHAVIOR and name in V1_ONLY_MODELS:
@@ -124,6 +142,10 @@ def sequence_tagger(name, preproc,
         use_elmo = True
     else:
         raise ValueError('Unsupported model name')
+    preproc.p._use_elmo = use_elmo
+    if name in BERT_MODELS:
+        preproc.p._transformer_model = bert_model
+    # CONTINUE
     model = BiLSTMCRF(char_embedding_dim=char_embedding_dim,
                       word_embedding_dim=word_embedding_dim,
                       char_lstm_size=char_lstm_size,
