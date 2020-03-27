@@ -4,7 +4,9 @@ Preprocessors.
 """
 
 from ....imports import *
+from .... import utils as U
 from .utils import Vocabulary
+
 
 try:
     from allennlp.modules.elmo import Elmo, batch_to_ids
@@ -16,7 +18,6 @@ except:
 options_file = 'https://s3-us-west-2.amazonaws.com/allennlp/models/elmo/2x4096_512_2048cnn_2xhighway/elmo_2x4096_512_2048cnn_2xhighway_options.json'
 weight_file = 'https://s3-us-west-2.amazonaws.com/allennlp/models/elmo/2x4096_512_2048cnn_2xhighway/elmo_2x4096_512_2048cnn_2xhighway_weights.hdf5'
 
-DEFAULT_TRANSFORMER_LAYERS = [-1]
 
 
 def normalize_number(text):
@@ -75,7 +76,7 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
         if self.elmo is None:
             self.elmo = Elmo(options_file, weight_file, 2, dropout=0)
 
-    def activate_transformer(self, model_name, layers=DEFAULT_TRANSFORMER_LAYERS):
+    def activate_transformer(self, model_name, layers=U.DEFAULT_TRANSFORMER_LAYERS):
         from ...preprocessor import TransformerEmbedding
         if not hasattr(self, 'te'): self.te = None
         if self.te is None or self.te_model != model_name:  

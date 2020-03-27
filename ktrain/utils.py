@@ -9,6 +9,7 @@ DEFAULT_BS = 32
 DEFAULT_ES = 5 
 DEFAULT_ROP = 2 
 DEFAULT_OPT = 'adam'
+DEFAULT_TRANSFORMER_LAYERS = [-2] # second-to-last hidden state
 
 
 

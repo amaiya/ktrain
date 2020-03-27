@@ -1070,7 +1070,7 @@ class TransformerEmbedding():
 
 
 
-    def embed(self, texts, word_level=False, layers=[-1]):
+    def embed(self, texts, word_level=True, layers=U.DEFAULT_TRANSFORMER_LAYERS):
         """
         get embedding for word, phrase, or sentence
         Args:
