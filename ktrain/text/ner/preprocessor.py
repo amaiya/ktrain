@@ -20,11 +20,9 @@ class NERPreprocessor(Preprocessor):
     NER preprocessing base class
     """
 
-    def __init__(self, p, wv_path_or_url=None, use_elmo=False):
+    def __init__(self, p):
         self.p = p
         self.c = p._label_vocab._id2token
-        self.wv_path_or_url = wv_path_or_url
-        self.use_elmo = use_elmo
 
     def get_preprocessor(self):
         return self.p
