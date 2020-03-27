@@ -10,11 +10,11 @@ BILSTM_ELMO = 'bilstm-elmo'
 BILSTM_CRF_ELMO = 'bilstm-crf-elmo'
 BILSTM_TRANSFORMER = 'bilstm-bert'
 SEQUENCE_TAGGERS = {
+                     BILSTM: 'Bidirectional LSTM (https://arxiv.org/abs/1603.01360)',
+                     BILSTM_TRANSFORMER: 'Bidirectional LSTM w/ BERT embeddings',
                      BILSTM_CRF: 'Bidirectional LSTM-CRF  (https://arxiv.org/abs/1603.01360)',
-                     BILSTM: 'Bidirectional LSTM (no CRF layer)  (https://arxiv.org/abs/1603.01360)',
-                     BILSTM_CRF_ELMO: 'Bidirectional LSTM-CRF w/ Elmo embeddings (English only)',
-                     BILSTM_ELMO: 'Bidirectional LSTM w/ Elmo embeddings (English only)',
-                     BILSTM_TRANSFORMER: 'Bidirectional LSTM w/ BERT embeddings'
+                     BILSTM_ELMO: 'Bidirectional LSTM w/ Elmo embeddings [English only]',
+                     BILSTM_CRF_ELMO: 'Bidirectional LSTM-CRF w/ Elmo embeddings [English only]',
                      }
 V1_ONLY_MODELS = [BILSTM_CRF, BILSTM_CRF_ELMO]
 TRANSFORMER_MODELS = [BILSTM_TRANSFORMER]
