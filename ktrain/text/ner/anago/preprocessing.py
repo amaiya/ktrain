@@ -59,6 +59,16 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
         self.elmo = None  # elmo embedding model
         self.te = None    # transformer embedding model
         self.te_layers = DEFAULT_TRANSFORMER_LAYERS
+        self.te_model = None
+        self._blacklist = ['te']
+
+
+    def __getstate__(self):
+        return {k: v for k, v in self.__dict__.items() if k not in self._blacklist}
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        self.activate_transformer(self.te_model, layers=self.te_layers)
 
 
     def activate_elmo(self):
@@ -67,7 +77,9 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
 
     def activate_transformer(self, model_name, layers=DEFAULT_TRANSFORMER_LAYERS):
         from ...preprocessor import TransformerEmbedding
-        if self.te is None:  
+        if not hasattr(self, 'te'): self.te = None
+        if self.te is None or self.te_model != model_name:  
+            self.te_model = model_name
             self.te = TransformerEmbedding(model_name)
         self.te_layers = layers
 
@@ -149,6 +161,7 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
             features: document id matrix.
             y: label id matrix.
         """
+        self.activate_transformer(self.te_model, layers=self.te_layers)
         features = []
 
         word_ids = [self._word_vocab.doc2id(doc) for doc in X]
