@@ -1041,7 +1041,10 @@ class TransformerEmbedding():
 
         self.tokenizer = self.tokenizer_type.from_pretrained(model_name)
         self.model = self._load_pretrained(model_name)
-        self.embsize = self.embed('ktrain', word_level=False).shape[1] # (batch_size, embsize)
+        try:
+            self.embsize = self.embed('ktrain', word_level=False).shape[1] # (batch_size, embsize)
+        except:
+            warnings.warn('could not determine Embedding size')
         if type(self.model).__name__ not in ['TFBertModel', 'TFDistilBertModel', 'TFAlbertModel']:
             raise ValueError('TransformerEmbedding class currently only supports BERT-style models: ' +\
                              'Bert, DistilBert, and Albert and variants like BioBERT and SciBERT\n\n' +\
@@ -1067,13 +1070,15 @@ class TransformerEmbedding():
 
 
 
-    def embed(self, texts, word_level=False):
+    def embed(self, texts, word_level=False, layers=[-1]):
         """
         get embedding for word, phrase, or sentence
         Args:
           text(str|list): word, phrase, or sentence or list of them representing a batch
           word_level(bool): If True, returns embedding for each token in supplied texts.
                             If False, returns embedding for each text in texts
+          layers(list):  hidden layer indices to use for embedding.
+                         default: last hidden state
         Returns:
             np.ndarray : embeddings
         """
@@ -1102,11 +1107,26 @@ class TransformerEmbedding():
         all_input_ids = np.array(all_input_ids)
         all_input_masks = np.array(all_input_masks)
         outputs = self.model(all_input_ids, attention_mask=all_input_masks)
-        hidden_states = outputs[-1]
-        last_hidden = hidden_states[-1].numpy()
+        hidden_states = outputs[-1] # output_hidden_states=True
+
+        # compile raw embeddings
+        if len(layers) == 1:
+            #raw_embeddings = hidden_states[-1].numpy()
+            raw_embeddings = hidden_states[layers[0]].numpy()
+        else:
+            raw_embeddings = []
+            for batch_id in range(hidden_states[0].shape[0]):
+                token_embeddings = []
+                for token_id in range(hidden_states[0].shape[1]):
+                    all_layers = []
+                    for layer_id in layers:
+                        all_layers.append(hidden_states[layer_id][batch_id][token_id].numpy())
+                    token_embeddings.append(np.concatenate(all_layers) )  
+                raw_embeddings.append(token_embeddings)
+            raw_embeddings = np.array(raw_embeddings)
 
         if not word_level: # sentence-level embedding
-            return np.mean(last_hidden, axis=1)
+            return np.mean(raw_embeddings, axis=1)
 
         # filter-out extra subword tokens and special tokens 
         # (using first subword of each token as embedding representations)
@@ -1115,7 +1135,7 @@ class TransformerEmbedding():
             embedding = []
             for token_idx, token in enumerate(tokens):
                 if token in [self.tokenizer.cls_token, self.tokenizer.sep_token] or token.startswith('##'): continue
-                embedding.append(last_hidden[batch_idx][token_idx])
+                embedding.append(raw_embeddings[batch_idx][token_idx])
             filtered_embeddings.append(embedding)
 
         # pad embeddings with zeros

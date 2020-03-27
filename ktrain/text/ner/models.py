@@ -28,6 +28,7 @@ def print_sequence_taggers():
 def sequence_tagger(name, preproc, 
                     wv_path_or_url=None,
                     bert_model = 'bert-base-multilingual-cased',
+                    bert_layers_to_use = [-1], # last hidden layer
                     word_embedding_dim=100,
                     char_embedding_dim=25,
                     word_lstm_size=100,
@@ -79,7 +80,8 @@ def sequence_tagger(name, preproc,
                                  albert-base-v2: English ALBERT model
                                  monologg/biobert_v1.1_pubmed: community uploaded BioBERT (pretrained on PubMed)
 
-         
+        bert_layers_to_use(list): indices of hidden layers to use.  default:[-1] # last layer
+                                  To use the last 4 layers: use [-1, -2, -3, -4]
         word_embedding_dim (int): word embedding dimensions.
         char_embedding_dim (int): character embedding dimensions.
         word_lstm_size (int): character LSTM feature extractor output dimensions.
@@ -126,7 +128,7 @@ def sequence_tagger(name, preproc,
 
     if verbose:
         emb_names = []
-        if name in TRANSFORMER_MODELS: emb_names.append('BERT embeddings w/ ' + bert_model)
+        if name in TRANSFORMER_MODELS: emb_names.append('BERT embeddings with ' + bert_model)
         if name in ELMO_MODELS: emb_names.append('Elmo embeddings for English')
         if wv_path_or_url is not None: emb_names.append('fasttext embeddings (%s)' % (os.path.basename(wv_path_or_url)))
         print('Word embeddings will be generated using the following methods:\n')
@@ -152,7 +154,7 @@ def sequence_tagger(name, preproc,
         preproc.p.activate_elmo()
     elif name == BILSTM_TRANSFORMER:
         use_crf = False
-        preproc.p.activate_transformer(bert_model)
+        preproc.p.activate_transformer(bert_model, layers=bert_layers_to_use)
     else:
         raise ValueError('Unsupported model name')
     model = BiLSTMCRF(char_embedding_dim=char_embedding_dim,

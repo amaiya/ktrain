@@ -16,6 +16,8 @@ except:
 options_file = 'https://s3-us-west-2.amazonaws.com/allennlp/models/elmo/2x4096_512_2048cnn_2xhighway/elmo_2x4096_512_2048cnn_2xhighway_options.json'
 weight_file = 'https://s3-us-west-2.amazonaws.com/allennlp/models/elmo/2x4096_512_2048cnn_2xhighway/elmo_2x4096_512_2048cnn_2xhighway_weights.hdf5'
 
+DEFAULT_TRANSFORMER_LAYERS = [-1]
+
 
 def normalize_number(text):
     return re.sub(r'[0-9０１２３４５６７８９]', r'0', text)
@@ -56,16 +58,18 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
 
         self.elmo = None  # elmo embedding model
         self.te = None    # transformer embedding model
+        self.te_layers = DEFAULT_TRANSFORMER_LAYERS
 
 
     def activate_elmo(self):
         if self.elmo is None:
             self.elmo = Elmo(options_file, weight_file, 2, dropout=0)
 
-    def activate_transformer(self, model_name):
+    def activate_transformer(self, model_name, layers=DEFAULT_TRANSFORMER_LAYERS):
         from ...preprocessor import TransformerEmbedding
         if self.te is None:  
             self.te = TransformerEmbedding(model_name)
+        self.te_layers = layers
 
     def get_transformer_dim(self):
         if not self.transformer_is_activated(): 
@@ -166,7 +170,7 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
             features.append(elmo_embeddings)
 
         if self.te is not None:
-            transformer_embeddings = self.te.embed(X, word_level=True)
+            transformer_embeddings = self.te.embed(X, word_level=True, layers=self.te_layers)
             features.append(transformer_embeddings)
 
 
