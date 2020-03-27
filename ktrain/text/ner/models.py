@@ -12,12 +12,13 @@ BILSTM_TRANSFORMER = 'bilstm-bert'
 SEQUENCE_TAGGERS = {
                      BILSTM_CRF: 'Bidirectional LSTM-CRF  (https://arxiv.org/abs/1603.01360)',
                      BILSTM: 'Bidirectional LSTM (no CRF layer)  (https://arxiv.org/abs/1603.01360)',
-                     BILSTM_CRF: 'Bidirectional LSTM-CRF w/ Elmo embeddings (English only)',
+                     BILSTM_CRF_ELMO: 'Bidirectional LSTM-CRF w/ Elmo embeddings (English only)',
                      BILSTM_ELMO: 'Bidirectional LSTM w/ Elmo embeddings (English only)',
                      BILSTM_TRANSFORMER: 'Bidirectional LSTM w/ BERT embeddings'
                      }
 V1_ONLY_MODELS = [BILSTM_CRF, BILSTM_CRF_ELMO]
 TRANSFORMER_MODELS = [BILSTM_TRANSFORMER]
+ELMO_MODELS = [BILSTM_ELMO, BILSTM_CRF_ELMO]
 
 def print_sequence_taggers():
     for k,v in SEQUENCE_TAGGERS.items():
@@ -97,6 +98,8 @@ def sequence_tagger(name, preproc,
     # check BERT
     if name in TRANSFORMER_MODELS and not bert_model:
         raise ValueError('bert_model is required for bilstm-bert models')
+    if name in TRANSFORMER_MODELS and DISABLE_V2_BEHAVIOR:
+        raise ValueError('BERT and other transformer models cannot be used with DISABLE_v2_BEHAVIOR')
 
     # check CRF
     if not DISABLE_V2_BEHAVIOR and name in V1_ONLY_MODELS:
@@ -130,22 +133,19 @@ def sequence_tagger(name, preproc,
     mask_zero = True
     if name == BILSTM_CRF:
         use_crf = False if not DISABLE_V2_BEHAVIOR else True # fallback to bilstm 
-        use_elmo = False
     elif name == BILSTM_CRF_ELMO:
         use_crf = False if not DISABLE_V2_BEHAVIOR else True # fallback to bilstm
-        use_elmo = True 
+        preproc.p.activate_elmo()
     elif name == BILSTM:
         use_crf = False
-        use_elmo = False
     elif name == BILSTM_ELMO:
         use_crf = False
-        use_elmo = True
+        preproc.p.activate_elmo()
+    elif name == BILSTM_TRANSFORMER:
+        use_crf = False
+        preproc.p.activate_transformer(bert_model)
     else:
         raise ValueError('Unsupported model name')
-    preproc.p._use_elmo = use_elmo
-    if name in BERT_MODELS:
-        preproc.p._transformer_model = bert_model
-    # CONTINUE
     model = BiLSTMCRF(char_embedding_dim=char_embedding_dim,
                       word_embedding_dim=word_embedding_dim,
                       char_lstm_size=char_lstm_size,
@@ -159,7 +159,8 @@ def sequence_tagger(name, preproc,
                       mask_zero=mask_zero,
                       use_char=preproc.p._use_char,
                       embeddings=wv_model,
-                      use_elmo=use_elmo)
+                      use_elmo=preproc.p.elmo_is_activated(),
+                      use_transformer_with_dim=preproc.p.get_transformer_dim())
     model, loss = model.build()
     model.compile(loss=loss, optimizer=U.DEFAULT_OPT)
     return model

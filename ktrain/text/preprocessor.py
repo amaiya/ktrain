@@ -1042,9 +1042,10 @@ class TransformerEmbedding():
         self.tokenizer = self.tokenizer_type.from_pretrained(model_name)
         self.model = self._load_pretrained(model_name)
         self.embsize = self.embed('ktrain', word_level=False).shape[1] # (batch_size, embsize)
-        if type(model).__name__ not in ['BertModel', 'DistilBertModel', 'AlbertModel']:
+        if type(self.model).__name__ not in ['TFBertModel', 'TFDistilBertModel', 'TFAlbertModel']:
             raise ValueError('TransformerEmbedding class currently only supports BERT-style models: ' +\
-                             'Bert, DistilBert, and Albert and variants like BioBERT and SciBERT')
+                             'Bert, DistilBert, and Albert and variants like BioBERT and SciBERT\n\n' +\
+                             'model received: %s (%s))' % (type(self.model).__name__, model_name))
 
 
     def _load_pretrained(self, model_name):

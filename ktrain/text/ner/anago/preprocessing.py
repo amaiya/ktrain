@@ -54,34 +54,59 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
             self._word_vocab.add_documents([initial_vocab])
             self._char_vocab.add_documents(initial_vocab)
 
-        self._use_elmo = use_elmo
-        self._elmo = None
-        self._initElmo()
+        self.elmo = None  # elmo embedding model
+        self.te = None    # transformer embedding model
 
-    def _initElmo(self):
-        if self._use_elmo and self._elmo is None:
-            self._elmo = Elmo(options_file, weight_file, 2, dropout=0)
+
+    def activate_elmo(self):
+        if self.elmo is None:
+            self.elmo = Elmo(options_file, weight_file, 2, dropout=0)
+
+    def activate_transformer(self, model_name):
+        from ...preprocessor import TransformerEmbedding
+        if self.te is None:  
+            self.te = TransformerEmbedding(model_name)
+
+    def get_transformer_dim(self):
+        if not self.transformer_is_activated(): 
+            return None
+        else:
+            return self.te.embsize
+
+
+    def elmo_is_activated(self):
+        return self.elmo is not None
+
+
+    def transformer_is_activated(self):
+        return self.te is not None
+
             
-    #def _retokenize_for_transformer(self, X, Y):
-        #ids2tok = self.te.tokenizer.convert_ids_to_tokens
-        #encode = self.te.tokenizer.encode
-        #new_X = []
-        #new_Y = []
-        #for i, x in enumerate(X):
-            #new_x = []
-            #new_y =[]
-            #for j,s in enumerate(x):
-                #hf_s = ids2tok(encode(s, add_special_tokens=False))
-                #hf_s = ' '.join(hf_s).replace(' ##', '').split()
-                #new_x.extend(hf_s)
-                #if Y is not None:
-                    #tag = Y[i][j]
-                    #if tag.startswith('B-'): tag = 'I-'+tag[2:]
-                    #new_y.extend([tag]*len(hf_s))
-            #new_X.append(new_x)
-            #new_Y.append(new_y)
-        #new_Y = None if Y is None else new_Y
-        #return new_X, new_Y
+    def fix_tokenization(self, X, Y):
+        """
+        Should be called prior training
+        """
+        if not self.transformer_is_activated():
+            return X, Y
+        ids2tok = self.te.tokenizer.convert_ids_to_tokens
+        encode = self.te.tokenizer.encode
+        new_X = []
+        new_Y = []
+        for i, x in enumerate(X):
+            new_x = []
+            new_y =[]
+            for j,s in enumerate(x):
+                hf_s = ids2tok(encode(s, add_special_tokens=False))
+                hf_s = ' '.join(hf_s).replace(' ##', '').split()
+                new_x.extend(hf_s)
+                if Y is not None:
+                    tag = Y[i][j]
+                    if tag.startswith('B-'): tag = 'I-'+tag[2:]
+                    new_y.extend([tag]*len(hf_s))
+            new_X.append(new_x)
+            new_Y.append(new_y)
+        new_Y = None if Y is None else new_Y
+        return new_X, new_Y
 
 
     def fit(self, X, y):
@@ -120,7 +145,6 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
             features: document id matrix.
             y: label id matrix.
         """
-        self._initElmo()
         features = []
 
         word_ids = [self._word_vocab.doc2id(doc) for doc in X]
@@ -132,14 +156,18 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
             char_ids = pad_nested_sequences(char_ids)
             features_append(char_ids)
 
-        if self._use_elmo:
+        if self.elmo is not None:
             if not ALLENNLP_INSTALLED:        
                 raise Exception(ALLENNLP_ERRMSG)
 
             character_ids = batch_to_ids(X)
-            elmo_embeddings = self._elmo(character_ids)['elmo_representations'][1]
+            elmo_embeddings = self.elmo(character_ids)['elmo_representations'][1]
             elmo_embeddings = elmo_embeddings.detach().numpy()
             features.append(elmo_embeddings)
+
+        if self.te is not None:
+            transformer_embeddings = self.te.embed(X, word_level=True)
+            features.append(transformer_embeddings)
 
 
         if y is not None:

@@ -160,3 +160,15 @@ class NERLearner(GenLearner):
             results.extend(y_pred)
         return results
 
+
+    def _prepare(self, data, mode='train'):
+        """
+        prepare NERSequence for training
+        """
+        print('ner _prepare')
+        if data is None: return None
+        if hasattr(data, 'p'):
+            data.x, data.y = data.p.fix_tokenization(data.x, data.y)
+
+        return data
+
