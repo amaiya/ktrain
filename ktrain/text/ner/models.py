@@ -118,9 +118,9 @@ def sequence_tagger(name, preproc,
     if not DISABLE_V2_BEHAVIOR and preproc.p._use_char:
         warnings.warn('Disabling character embeddings:  use_char=True changed to use_char=False')
         msg = '\nIMPORTANT NOTE:  Due to an open TensorFlow 2 issue (#33148), character-level embeddings fail \n' +\
-                'when mask_zero=True in model\n' +\
+                'when mask_zero=True in model.\n' +\
                 'Since mask_zero=True is important for NER, we are setting use_char to False for this run.\n '  +\
-                'See this for more information on this issue: https://github.com/tensorflow/tensorflow/issues/33148\n'
+                'See the TensorFlow issue thread for more information: https://github.com/tensorflow/tensorflow/issues/33148\n'
         print(msg)
         preproc.p._use_char = False
 
