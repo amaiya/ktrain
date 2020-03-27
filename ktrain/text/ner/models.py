@@ -124,6 +124,15 @@ def sequence_tagger(name, preproc,
         print(msg)
         preproc.p._use_char = False
 
+    if verbose:
+        emb_names = []
+        if name in TRANSFORMER_MODELS: emb_names.append('BERT embeddings w/ ' + bert_model)
+        if name in ELMO_MODELS: emb_names.append('Elmo embeddings for English')
+        if wv_path_or_url is not None: emb_names.append('fasttext embeddings (%s)' % (os.path.basename(wv_path_or_url)))
+        print('Word embeddings will be generated using the following methods:\n')
+        for emb_name in emb_names:
+            print('\t%s' % (emb_name))
+        print('\n')
 
     # setup embedding
     if wv_path_or_url is not None:

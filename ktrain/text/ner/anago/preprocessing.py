@@ -154,7 +154,7 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
         if self._use_char:
             char_ids = [[self._char_vocab.doc2id(w) for w in doc] for doc in X]
             char_ids = pad_nested_sequences(char_ids)
-            features_append(char_ids)
+            features.append(char_ids)
 
         if self.elmo is not None:
             if not ALLENNLP_INSTALLED:        
