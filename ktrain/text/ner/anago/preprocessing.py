@@ -59,7 +59,7 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
 
         self.elmo = None  # elmo embedding model
         self.te = None    # transformer embedding model
-        self.te_layers = DEFAULT_TRANSFORMER_LAYERS
+        self.te_layers = U.DEFAULT_TRANSFORMER_LAYERS
         self.te_model = None
         self._blacklist = ['te']
 
