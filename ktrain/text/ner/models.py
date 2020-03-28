@@ -135,6 +135,7 @@ def sequence_tagger(name, preproc,
         for emb_name in emb_names:
             print('\t%s' % (emb_name))
         print('\n')
+        if preproc.p._use_char: print('character embeddings will be used in model')
 
     # setup embedding
     if wv_path_or_url is not None:

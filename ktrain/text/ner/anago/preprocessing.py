@@ -99,7 +99,7 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
         return self.te is not None
 
             
-    def fix_tokenization(self, X, Y):
+    def fix_tokenization(self, X, Y, maxlen=512, num_special=2):
         """
         Should be called prior training
         """
@@ -112,9 +112,14 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
         for i, x in enumerate(X):
             new_x = []
             new_y =[]
+            seq_len = 0
             for j,s in enumerate(x):
-                hf_s = ids2tok(encode(s, add_special_tokens=False))
-                hf_s = ' '.join(hf_s).replace(' ##', '').split()
+                subtokens = ids2tok(encode(s, add_special_tokens=False))
+                token_len = len(subtokens)
+                if seq_len + token_len > (maxlen - num_special):
+                    break
+                seq_len += token_len
+                hf_s = ' '.join(subtokens).replace(' ##', '').split()
                 new_x.extend(hf_s)
                 if Y is not None:
                     tag = Y[i][j]
@@ -167,7 +172,8 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
             features: document id matrix.
             y: label id matrix.
         """
-        self.activate_transformer(self.te_model, layers=self.te_layers)
+        # re-instantiate TransformerEmbedding if necessary since it is excluded from pickling
+        if self.te_model is not None: self.activate_transformer(self.te_model, layers=self.te_layers)
         features = []
 
         word_ids = [self._word_vocab.doc2id(doc) for doc in X]
