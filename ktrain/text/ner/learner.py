@@ -166,10 +166,10 @@ class NERLearner(GenLearner):
         """
         prepare NERSequence for training
         """
-        print('ner _prepare')
         if data is None: return None
-        if hasattr(data, 'p'):
-            data.x, data.y = data.p.fix_tokenization(data.x, data.y)
-
+        if not data.prepare_called:
+            print('preparing %s data ...' % (mode), end='')
+            data.prepare()
+            print('done.')
         return data
 

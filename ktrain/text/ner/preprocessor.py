@@ -195,6 +195,14 @@ class NERSequence(Dataset):
         self.y = y
         self.batch_size = batch_size
         self.p = p
+        self.prepare_called = False
+
+    def prepare(self):
+        if self.p is not None and not self.prepare_called:
+            self.x, self.y = self.p.fix_tokenization(self.x, self.y)
+        self.prepare_called = True
+        return
+
 
     def __getitem__(self, idx):
         batch_x = self.x[idx * self.batch_size: (idx + 1) * self.batch_size]

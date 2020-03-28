@@ -63,7 +63,6 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
         self.te_model = None
         self._blacklist = ['te']
 
-
     def __getstate__(self):
         return {k: v for k, v in self.__dict__.items() if k not in self._blacklist}
 
@@ -99,7 +98,7 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
         return self.te is not None
 
             
-    def fix_tokenization(self, X, Y, maxlen=512, num_special=2):
+    def fix_tokenization(self, X, Y, maxlen=U.DEFAULT_TRANSFORMER_MAXLEN, num_special=U.DEFAULT_TRANSFORMER_NUM_SPECIAL):
         """
         Should be called prior training
         """
@@ -296,55 +295,3 @@ def pad_nested_sequences(sequences, dtype='int32'):
 
     return x
 
-
-class ELMoTransformer(IndexTransformer):
-
-    def __init__(self, lower=True, num_norm=True,
-                 use_char=True, initial_vocab=None):
-        super(ELMoTransformer, self).__init__(lower, num_norm, use_char, initial_vocab)
-
-        if not ALLENNLP_INSTALLED:        
-            raise Exception(ALLENNLP_ERRMSG)
-
-        self._elmo = Elmo(options_file, weight_file, 2, dropout=0)
-
-    def transform(self, X, y=None):
-        """Transform documents to document ids.
-        Uses the vocabulary learned by fit.
-        Args:
-            X : iterable
-            an iterable which yields either str, unicode or file objects.
-            y : iterabl, label strings.
-        Returns:
-            features: document id matrix.
-            y: label id matrix.
-        """
-        word_ids = [self._word_vocab.doc2id(doc) for doc in X]
-        word_ids = sequence.pad_sequences(word_ids, padding='post')
-
-        char_ids = [[self._char_vocab.doc2id(w) for w in doc] for doc in X]
-        char_ids = pad_nested_sequences(char_ids)
-
-        if not ALLENNLP_INSTALLED:        
-            raise Exception(ALLENNLP_ERRMSG)
-
-        character_ids = batch_to_ids(X)
-        elmo_embeddings = self._elmo(character_ids)['elmo_representations'][1]
-        elmo_embeddings = elmo_embeddings.detach().numpy()
-
-        features = [word_ids, char_ids, elmo_embeddings]
-
-        if y is not None:
-            y = [self._label_vocab.doc2id(doc) for doc in y]
-            y = sequence.pad_sequences(y, padding='post')
-            y = to_categorical(y, self.label_size).astype(int)
-            # In 2018/06/01, to_categorical is a bit strange.
-            # >>> to_categorical([[1,3]], num_classes=4).shape
-            # (1, 2, 4)
-            # >>> to_categorical([[1]], num_classes=4).shape
-            # (1, 4)
-            # So, I expand dimensions when len(y.shape) == 2.
-            y = y if len(y.shape) == 3 else np.expand_dims(y, axis=0)
-            return features, y
-        else:
-            return features
