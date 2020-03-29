@@ -8,9 +8,9 @@
 
 ### News and Announcements
 - **2020-03-18:**  
-  - ***ktrain*** **v0.11.x is released** and includes various fixes and enhancements to sequence-tagging including abilty to easily use non-English pretrained word embeddings covering 157 languages (e.g., [Dutch NER](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/CoNLL2002_Dutch-BiLSTM.ipynb))
+  - ***ktrain*** **v0.11.x is released** and includes various fixes and enhancements to sequence-tagging including abilty to easily use non-English pretrained word embeddings covering 157 languages (e.g., [Dutch NER](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/CoNLL2002_Dutch-BiLSTM.ipynb))
 - **2020-03-03:**  
-  - ***ktrain*** **v0.10.x is released** and now includes [ready-to-use NER for English, Chinese, and Russian](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/shallownlp-examples.ipynb) with no training required. 
+  - ***ktrain*** **v0.10.x is released** and now includes [ready-to-use NER for English, Chinese, and Russian](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/shallownlp-examples.ipynb) with no training required. 
   - **Also in v0.10.x:**  Ability to train [community-uploaded Hugging Face transformer models](https://huggingface.co/models) like [SciBERT](https://arxiv.org/abs/1903.10676) and  [BioBERT](https://arxiv.org/abs/1901.08746):
 ```python
 import ktrain
@@ -24,7 +24,7 @@ learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=6)
 learner.fit_onecycle(3e-5, 1)
 ```
 - **2020-01-31:**  
-  - ***ktrain*** **v0.9.x is released** and now includes out-of-the-box support for text regression in addition to support for custom data formats. See [this tutorial notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/tutorials/tutorial-A4-customdata-text_regression_with_extra_regressors.ipynb) for more information on both these topics.
+  - ***ktrain*** **v0.9.x is released** and now includes out-of-the-box support for text regression in addition to support for custom data formats. See [this tutorial notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-A4-customdata-text_regression_with_extra_regressors.ipynb) for more information on both these topics.
 
 ----
 
@@ -37,7 +37,7 @@ learner.fit_onecycle(3e-5, 1)
 - employ fast and easy-to-use pre-canned models for  `text`, `vision`, and `graph` data:
   - `text` data:
      - **Text Classification**: [BERT](https://arxiv.org/abs/1810.04805), [DistilBERT](https://arxiv.org/abs/1910.01108), [NBSVM](https://www.aclweb.org/anthology/P12-2018), [fastText](https://arxiv.org/abs/1607.01759), and other models <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/IMDb-BERT.ipynb)]</sup></sub>
-     - **Text Regression**: [BERT](https://arxiv.org/abs/1810.04805), [DistilBERT](https://arxiv.org/abs/1910.01108), Embedding-based linear text regression, [fastText](https://arxiv.org/abs/1607.01759), and other models <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/text_regression_example.ipynb)]</sup></sub>
+     - **Text Regression**: [BERT](https://arxiv.org/abs/1810.04805), [DistilBERT](https://arxiv.org/abs/1910.01108), Embedding-based linear text regression, [fastText](https://arxiv.org/abs/1607.01759), and other models <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/text_regression_example.ipynb)]</sup></sub>
      - **Sequence Labeling**:  [Bidirectional LSTM-CRF](https://arxiv.org/abs/1603.01360) with optional pretrained word embeddings <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-06-sequence-tagging.ipynb)]</sup></sub>
      - **Unsupervised Topic Modeling** with [LDA](http://www.jmlr.org/papers/volume3/blei03a/blei03a.pdf)  <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/20newsgroups-topic_modeling.ipynb)]</sup></sub>
      - **Document Similarity with One-Class Learning**:  given some documents of interest, find and score new documents that are semantically similar to them using [One-Class Text Classification](https://en.wikipedia.org/wiki/One-class_classification) <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/20newsgroups-document_similarity_scorer.ipynb)]</sup></sub>
@@ -47,8 +47,8 @@ learner.fit_onecycle(3e-5, 1)
   - `graph` data:
     - **graph node classification** with graph neural networks (e.g., [GraphSAGE](https://cs.stanford.edu/people/jure/pubs/graphsage-nips17.pdf)) <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/graphs/pubmed-GraphSAGE.ipynb)]</sup></sub>
 - perform multilingual text classification (e.g., [Chinese Sentiment Analysis with BERT](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/ChineseHotelReviews-BERT.ipynb), [Arabic Sentiment Analysis with NBSVM](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/ArabicHotelReviews-nbsvm.ipynb))
-- [Ready-to-Use NER for English, Chinese, and Russian](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/shallownlp-examples.ipynb) (no training required)
-- Easily train NER models for any language (e.g., [Dutch NER](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/CoNLL2002_Dutch-BiLSTM.ipynb) )
+- [Ready-to-Use NER for English, Chinese, and Russian](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/shallownlp-examples.ipynb) (no training required)
+- Easily train NER models for any language (e.g., [Dutch NER](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/CoNLL2002_Dutch-BiLSTM.ipynb) )
 - load and preprocess text and image data from a variety of formats 
 - inspect data points that were misclassified and [provide explanations](https://eli5.readthedocs.io/en/latest/) to help improve your model
 - leverage a simple prediction API for saving and deploying both models and data-preprocessing steps to make predictions on new raw data
@@ -66,7 +66,7 @@ Please see the following tutorial notebooks for a guide on how to use *ktrain* o
 * Tutorial A1: [Additional tricks](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-A1-additional-tricks.ipynb), which covers topics such as previewing data augmentation schemes, inspecting intermediate output of Keras models for debugging, setting global weight decay, and use of built-in and custom callbacks.
 * Tutorial A2: [Explaining Predictions and Misclassifications](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-A2-explaining-predictions.ipynb)
 * Tutorial A3: [Text Classification with Hugging Face Transformers](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-A3-hugging_face_transformers.ipynb)
-* Tutorial A4: [Using Custom Data Formats and Models: Text Regression with Extra Regressors](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/tutorials/tutorial-A4-customdata-text_regression_with_extra_regressors.ipynb)
+* Tutorial A4: [Using Custom Data Formats and Models: Text Regression with Extra Regressors](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-A4-customdata-text_regression_with_extra_regressors.ipynb)
 
 
 Some blog tutorials about *ktrain* are shown below:
