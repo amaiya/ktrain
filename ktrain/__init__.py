@@ -16,8 +16,8 @@ __all__ = ['get_learner', 'get_predictor', 'load_predictor', 'release_gpu_memory
 
 
 def get_learner(model, train_data=None, val_data=None, 
-                batch_size=U.DEFAULT_BS, workers=1, use_multiprocessing=False,
-                multigpu=False):
+                batch_size=U.DEFAULT_BS, eval_batch_size=U.DEFAULT_BS,
+                workers=1, use_multiprocessing=False, multigpu=False):
     """
     Returns a Learner instance that can be used to tune and train Keras models.
 
@@ -31,7 +31,11 @@ def get_learner(model, train_data=None, val_data=None,
                                       y_test are numpy.ndarrays or 
                                    2) Iterator
                                    Note: Should be same type as train_data.
-    batch_size (int):              Batch size to use in training
+    batch_size (int):              Batch size to use in training. default:32
+    eval_batch_size(int):  batch size used by learner.predict
+                           only applies to validaton data during training if
+                           val_data is instance of utils.Sequence.
+                           default:32
     workers (int): number of cpu processes used to load data.
                    only applicable if train_data is is a generator.
     use_multiprocessing(bool):  whether or not to use multiprocessing for workers

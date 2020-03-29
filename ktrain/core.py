@@ -895,7 +895,7 @@ class Learner(ABC):
                                                 steps=steps)
             return result
         else:
-            return self.model.predict(val[0])
+            return self.model.predict(val[0], batch_size=self.eval_batch_size)
 
     
 
@@ -916,11 +916,13 @@ class ArrayLearner(Learner):
 
 
     def __init__(self, model, train_data=None, val_data=None, 
-                 batch_size=U.DEFAULT_BS, workers=1, use_multiprocessing=False, multigpu=False):
+                 batch_size=U.DEFAULT_BS, eval_batch_size=U.DEFAULT_BS, 
+                 workers=1, use_multiprocessing=False, multigpu=False):
         super().__init__(model, workers=workers, use_multiprocessing=use_multiprocessing, multigpu=multigpu)
         self.train_data = train_data
         self.val_data = val_data
         self.batch_size = batch_size
+        self.eval_batch_size = eval_batch_size
         return
 
     
@@ -1085,15 +1087,17 @@ class GenLearner(Learner):
 
 
     def __init__(self, model, train_data=None, val_data=None, 
-                 batch_size=U.DEFAULT_BS, workers=1, use_multiprocessing=False, multigpu=False):
+                 batch_size=U.DEFAULT_BS, eval_batch_size=U.DEFAULT_BS,
+                 workers=1, use_multiprocessing=False, multigpu=False):
         super().__init__(model, workers=workers, use_multiprocessing=use_multiprocessing, multigpu=multigpu)
         self.train_data = train_data
         self.val_data = val_data
         self.batch_size = batch_size
+        self.eval_batch_size = eval_batch_size
         if self.train_data:
             self.train_data.batch_size = batch_size
         if self.val_data:
-            self.val_data.batch_size = batch_size
+            self.val_data.batch_size = eval_batch_size
         return
 
     
@@ -1269,7 +1273,7 @@ class GenLearner(Learner):
 # Predictor functions
 #------------------------------------------------------------------------------
 
-def get_predictor(model, preproc):
+def get_predictor(model, preproc, batch_size=U.DEFAULT_BS):
     """
     Returns a Predictor instance that can be used to make predictions on
     unlabeled examples.  Can be saved to disk and reloaded as part of a 
@@ -1288,6 +1292,7 @@ def get_predictor(model, preproc):
                                  ktrain.text.texts_from_folder
                                  ktrain.text.texts_from_csv
                                  ktrain.text.ner.entities_from_csv
+        batch_size(int):    batch size to use.  default:32
     """
 
     # check arguments
@@ -1296,21 +1301,24 @@ def get_predictor(model, preproc):
     if not isinstance(preproc, (ImagePreprocessor,TextPreprocessor, NERPreprocessor, NodePreprocessor)):
         raise ValueError('preproc must be instance of ktrain.preprocessor.Preprocessor')
     if isinstance(preproc, ImagePreprocessor):
-        return ImagePredictor(model, preproc)
+        return ImagePredictor(model, preproc, batch_size=batch_size)
     elif isinstance(preproc, TextPreprocessor):
     #elif type(preproc).__name__ == 'TextPreprocessor':
-        return TextPredictor(model, preproc)
+        return TextPredictor(model, preproc, batch_size=batch_size)
     elif isinstance(preproc, NERPreprocessor):
-        return NERPredictor(model, preproc)
+        return NERPredictor(model, preproc, batch_size=batch_size)
     elif isinstance(preproc, NodePreprocessor):
-        return NodePredictor(model, preproc)
+        return NodePredictor(model, preproc, batch_size=batch_size)
     else:
         raise Exception('preproc of type %s not currently supported' % (type(preproc)))
 
 
-def load_predictor(fname):
+def load_predictor(fname, batch_size=U.DEFAULT_BS):
     """
     Loads a previously saved Predictor instance
+    Args
+      fname(str): predictor path name (value supplied to predictor.save)
+      batch_size(int): batch size to use for predictions. default:32
     """
 
     # load the preprocessor
@@ -1341,13 +1349,13 @@ def load_predictor(fname):
     if not isinstance(preproc, (ImagePreprocessor, TextPreprocessor, NERPreprocessor, NodePreprocessor)):
         raise ValueError('preproc must be instance of ktrain.preprocessor.Preprocessor')
     if isinstance(preproc, ImagePreprocessor):
-        return ImagePredictor(model, preproc)
+        return ImagePredictor(model, preproc, batch_size=batch_size)
     elif isinstance(preproc, TextPreprocessor):
-        return TextPredictor(model, preproc)
+        return TextPredictor(model, preproc, batch_size=batch_size)
     elif isinstance(preproc, NERPreprocessor):
-        return NERPredictor(model, preproc)
+        return NERPredictor(model, preproc, batch_size=batch_size)
     elif isinstance(preproc, NodePreprocessor):
-        return NodePredictor(model, preproc)
+        return NodePredictor(model, preproc, batch_size=batch_size)
     else:
         raise Exception('preprocessor not currently supported')
 

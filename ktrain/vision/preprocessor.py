@@ -22,7 +22,7 @@ class ImagePreprocessor(Preprocessor):
     def get_classes(self):
         return self.c
 
-    def preprocess(self, data):
+    def preprocess(self, data, batch_size=U.DEFAULT_BS):
         """
         Receives raw data and returns 
         tuple containing the generator and steps
@@ -31,7 +31,7 @@ class ImagePreprocessor(Preprocessor):
         # input is an array of pixel values
         if isinstance(data, np.ndarray):
             generator = self.datagen.flow(data, shuffle=False)
-            batch_size = generator.batch_size
+            generator.batch_size = batch_size
             nsamples = len(data)
             steps = math.ceil(nsamples/batch_size)
             return (generator, steps)
@@ -52,7 +52,7 @@ class ImagePreprocessor(Preprocessor):
                                                        shuffle=False,
                                                        interpolation='bicubic',
                                                        color_mode = self.color_mode)
-            batch_size = generator.batch_size
+            generator.batch_size = batch_size
             nsamples = generator.samples
             steps = math.ceil(nsamples/batch_size)
             return (generator, steps)
@@ -66,7 +66,7 @@ class ImagePreprocessor(Preprocessor):
             x = image.img_to_array(img)
             x = np.expand_dims(x, axis=0)
             generator =  self.datagen.flow(np.array(x), shuffle=False)
-            batch_size = generator.batch_size
+            generator.batch_size = batch_size
             nsamples = 1
             steps = math.ceil(nsamples/batch_size)
             return (generator, steps)

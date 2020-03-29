@@ -255,8 +255,7 @@ def y_from_data(data):
 
 def is_iter(data, ignore=False):
     if ignore: return True
-    iter_classes = ["NumpyArrayIterator", "DirectoryIterator",
-                    "DataFrameIterator", "Iterator", "Sequence"]
+    iter_classes = ["NumpyArrayIterator", "DirectoryIterator", "DataFrameIterator"]
     return data.__class__.__name__ in iter_classes or isinstance(data, Dataset)
 
 

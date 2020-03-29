@@ -13,9 +13,10 @@ class BERTTextClassLearner(ArrayLearner):
 
 
     def __init__(self, model, train_data=None, val_data=None, 
-                 batch_size=U.DEFAULT_BS, workers=1, use_multiprocessing=False, multigpu=False):
+                 batch_size=U.DEFAULT_BS, eval_batch_size=U.DEFAULT_BS,
+                 workers=1, use_multiprocessing=False, multigpu=False):
         super().__init__(model, train_data=train_data, val_data=val_data,
-                         batch_size=batch_size, 
+                         batch_size=batch_size, eval_batch_size=eval_batch_size,
                          workers=workers, use_multiprocessing=use_multiprocessing,
                          multigpu=multigpu)
         return
@@ -77,9 +78,10 @@ class TransformerTextClassLearner(GenLearner):
 
 
     def __init__(self, model, train_data=None, val_data=None, 
-                 batch_size=U.DEFAULT_BS, workers=1, use_multiprocessing=False, multigpu=False):
+                 batch_size=U.DEFAULT_BS, eval_batch_size=U.DEFAULT_BS,
+                 workers=1, use_multiprocessing=False, multigpu=False):
         super().__init__(model, train_data=train_data, val_data=val_data,
-                         batch_size=batch_size, 
+                         batch_size=batch_size, eval_batch_size=eval_batch_size,
                          workers=workers, use_multiprocessing=use_multiprocessing,
                          multigpu=multigpu)
         return

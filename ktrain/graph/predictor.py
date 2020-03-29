@@ -8,7 +8,7 @@ class NodePredictor(Predictor):
     predicts graph node's classes
     """
 
-    def __init__(self, model, preproc):
+    def __init__(self, model, preproc, batch_size=U.DEFAULT_BS):
 
         if not isinstance(model, Model):
             raise ValueError('model must be of instance Model')
@@ -17,6 +17,7 @@ class NodePredictor(Predictor):
         self.model = model
         self.preproc = preproc
         self.c = self.preproc.get_classes()
+        self.batch_size = batch_size
 
 
     def get_classes(self):
@@ -33,6 +34,7 @@ class NodePredictor(Predictor):
         If return_proba is True, returns probabilities of each class.
         """
         gen = self.preproc.preprocess_valid(node_ids)
+        gen.batch_size = self.batch_size
         preds = self.model.predict_generator(gen)
         result =  preds if return_proba else [self.c[np.argmax(pred)] for pred in preds]
         return result
@@ -45,6 +47,7 @@ class NodePredictor(Predictor):
         """
 
         gen = self.preproc.preprocess(df, G)
+        gen.batch_size = self.batch_size
         preds = self.model.predict_generator(gen)
         result =  preds if return_proba else [self.c[np.argmax(pred)] for pred in preds]
         return result

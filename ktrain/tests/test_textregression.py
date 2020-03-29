@@ -133,11 +133,11 @@ class TestTextRegression(TestCase):
         learner.load_model(tmp_folder, preproc=preproc)
 
         # test predictor
-        p = ktrain.get_predictor(learner.model, preproc)
+        p = ktrain.get_predictor(learner.model, preproc, batch_size=64)
         self.assertGreater(p.predict([TEST_DOC])[0], 1)
         tmp_folder = ktrain.imports.tempfile.mkdtemp()
         p.save(tmp_folder)
-        p = ktrain.load_predictor(tmp_folder)
+        p = ktrain.load_predictor(tmp_folder, batch_size=64)
         self.assertGreater(p.predict([TEST_DOC])[0], 1)
         self.assertIsNone(p.explain(TEST_DOC))
 

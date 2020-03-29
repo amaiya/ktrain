@@ -8,7 +8,7 @@ class NERPredictor(Predictor):
     predicts  classes for string-representation of sentence
     """
 
-    def __init__(self, model, preproc):
+    def __init__(self, model, preproc, batch_size=U.DEFAULT_BS):
 
         if not isinstance(model, Model):
             raise ValueError('model must be of instance Model')
@@ -18,6 +18,7 @@ class NERPredictor(Predictor):
         self.model = model
         self.preproc = preproc
         self.c = self.preproc.get_classes()
+        self.batch_size = batch_size 
 
 
     def get_classes(self):
@@ -32,6 +33,7 @@ class NERPredictor(Predictor):
         if not isinstance(sentence, str):
             raise ValueError('Param sentence must be a string-representation of a sentence')
         nerseq = self.preproc.preprocess([sentence])
+        nerseq.batch_size = self.batch_size 
         x_true, _ = nerseq[0]
         lengths = nerseq.get_lengths(0)
         y_pred = self.model.predict_on_batch(x_true)
