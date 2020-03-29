@@ -8,7 +8,7 @@ from unittest import TestCase, main, skip
 import numpy as np
 
 import os
-os.environ['DISABLE_V2_BEHAVIOR'] = '0'
+os.environ['DISABLE_V2_BEHAVIOR'] = '1'
 
 import ktrain
 from ktrain import text as txt
@@ -17,7 +17,7 @@ class TestNERClassification(TestCase):
 
     def setUp(self):
         TDATA = 'conll2003/train.txt'
-        (trn, val, preproc) = txt.entities_from_txt(TDATA)
+        (trn, val, preproc) = txt.entities_from_txt(TDATA, use_char=True)
         self.trn = trn
         self.val = val
         self.preproc = preproc
@@ -26,14 +26,15 @@ class TestNERClassification(TestCase):
 
 
     def test_ner(self):
-        model = txt.sequence_tagger('bilstm-bert', self.preproc, bert_model='bert-base-cased')
+        wv_url = 'https://dl.fbaipublicfiles.com/fasttext/vectors-crawl/cc.en.300.vec.gz'
+        model = txt.sequence_tagger('bilstm-crf', self.preproc, wv_path_or_url=wv_url)
         learner = ktrain.get_learner(model, train_data=self.trn, val_data=self.val, batch_size=128)
         lr = 0.01
         hist = learner.fit(lr, 1)
 
         # test training results
         #self.assertAlmostEqual(max(hist.history['lr']), lr)
-        self.assertGreater(learner.validate(), 0.79)
+        self.assertGreater(learner.validate(), 0.65)
 
 
         # test top losses

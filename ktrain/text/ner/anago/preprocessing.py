@@ -68,7 +68,9 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
 
     def __setstate__(self, state):
         self.__dict__.update(state)
-        self.activate_transformer(self.te_model, layers=self.te_layers)
+        if self.te_model is not None: self.activate_transformer(self.te_model, layers=self.te_layers)
+        else:
+            self.te = None
 
 
     def activate_elmo(self):
