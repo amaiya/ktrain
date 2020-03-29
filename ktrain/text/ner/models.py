@@ -116,33 +116,35 @@ def sequence_tagger(name, preproc,
         print(msg)
         name = BILSTM if name == BILSTM_CRF else BILSTM_ELMO
 
-    # check use_char=True
+    # check for use_char=True
     if not DISABLE_V2_BEHAVIOR and preproc.p._use_char:
-        warnings.warn('Disabling character embeddings:  use_char=True changed to use_char=False')
-        msg = '\nIMPORTANT NOTE:  Due to an open TensorFlow 2 issue (#33148), character-level embeddings fail \n' +\
-                'when mask_zero=True in model.\n' +\
-                'Since mask_zero=True is important for NER, we are setting use_char to False for this run.\n '  +\
-                'See the TensorFlow issue thread for more information: https://github.com/tensorflow/tensorflow/issues/33148\n'
-        print(msg)
-        preproc.p._use_char = False
+        # turn off masking due to open TF2 issue ##33148: https://github.com/tensorflow/tensorflow/issues/33148
+        warnings.warn('Setting use_char=False:  character embeddings cannot be used in TF2 due to open TensorFlow 2 bug (#33148).\n' +\
+                       'Add os.environ["DISABLE_V2_BEHAVIOR"] = "1" to the top of script if you really want to use it.')
+        preproc.p._use_char=False
 
     if verbose:
         emb_names = []
+        if wv_path_or_url is not None: 
+            emb_names.append('word embeddings initialized with fasttext word vectors (%s)' % (os.path.basename(wv_path_or_url)))
+        else:
+            emb_names.append('word embeddings initialized randomly')
         if name in TRANSFORMER_MODELS: emb_names.append('BERT embeddings with ' + bert_model)
         if name in ELMO_MODELS: emb_names.append('Elmo embeddings for English')
-        if wv_path_or_url is not None: emb_names.append('fasttext embeddings (%s)' % (os.path.basename(wv_path_or_url)))
-        print('Word embeddings will be generated using the following methods:\n')
+        if preproc.p._use_char:  emb_names.append('character embeddings')
+        if len(emb_names) > 1:
+            print('Embedding schemes employed (combined with concatenation):')
+        else:
+            print('embedding schemes employed:')
         for emb_name in emb_names:
             print('\t%s' % (emb_name))
-        print('\n')
-        if preproc.p._use_char: print('character embeddings will be used in model')
+        print()
 
     # setup embedding
     if wv_path_or_url is not None:
         wv_model, word_embedding_dim = preproc.get_wv_model(wv_path_or_url, verbose=verbose)
     else:
         wv_model = None
-    mask_zero = True
     if name == BILSTM_CRF:
         use_crf = False if not DISABLE_V2_BEHAVIOR else True # fallback to bilstm 
     elif name == BILSTM_CRF_ELMO:
@@ -168,7 +170,6 @@ def sequence_tagger(name, preproc,
                       num_labels=preproc.p.label_size,
                       dropout=dropout,
                       use_crf=use_crf,
-                      mask_zero=mask_zero,
                       use_char=preproc.p._use_char,
                       embeddings=wv_model,
                       use_elmo=preproc.p.elmo_is_activated(),
