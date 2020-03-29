@@ -26,7 +26,7 @@ setup(
           'matplotlib >= 3.0.0',
           'pandas >= 1.0.1',
           'fastprogress >= 0.1.21',
-          'keras_bert',
+          'keras_bert>=0.81.0',
           'requests',
           'joblib',
           'langdetect',
