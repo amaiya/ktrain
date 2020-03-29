@@ -10,6 +10,7 @@ import ktrain
 from ktrain import text as txt
 from ktrain.imports import ACC_NAME, VAL_ACC_NAME
 TEST_DOC = 'god christ jesus mother mary church sunday lord heaven amen'
+EVAL_BS = 64
 
 class TestTextClassification(TestCase):
 
@@ -46,7 +47,7 @@ class TestTextClassification(TestCase):
                                                  maxlen=350, 
                                                  max_features=35000)
         model = txt.text_classifier('fasttext', train_data=trn, preproc=preproc)
-        learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=32)
+        learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=32, eval_batch_size=EVAL_BS)
         lr = 0.01
         hist = learner.fit(lr, 10, cycle_len=1)
 
@@ -77,10 +78,10 @@ class TestTextClassification(TestCase):
             self.assertEqual(np.argmax(row), i)
 
         # test predictor
-        p = ktrain.get_predictor(learner.model, preproc)
+        p = ktrain.get_predictor(learner.model, preproc, batch_size=EVAL_BS)
         self.assertEqual(p.predict([TEST_DOC])[0], 'soc.religion.christian')
         p.save('/tmp/test_predictor')
-        p = ktrain.load_predictor('/tmp/test_predictor')
+        p = ktrain.load_predictor('/tmp/test_predictor', batch_size=EVAL_BS)
         self.assertEqual(p.predict(TEST_DOC), 'soc.religion.christian')
         self.assertEqual(np.argmax(p.predict_proba([TEST_DOC])[0]), 3)
         self.assertEqual(type(p.explain(TEST_DOC)), IPython.core.display.HTML)
@@ -97,7 +98,7 @@ class TestTextClassification(TestCase):
                                                  max_features=35000,
                                                  ngram_range=3)
         model = txt.text_classifier('nbsvm', train_data=trn, preproc=preproc)
-        learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=32)
+        learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=32, eval_batch_size=EVAL_BS)
         lr = 0.01
         hist = learner.fit_onecycle(lr, 10)
 
@@ -129,10 +130,10 @@ class TestTextClassification(TestCase):
             self.assertEqual(np.argmax(row), i)
 
         # test predictor
-        p = ktrain.get_predictor(learner.model, preproc)
+        p = ktrain.get_predictor(learner.model, preproc, batch_size=EVAL_BS)
         self.assertEqual(p.predict([TEST_DOC])[0], 'soc.religion.christian')
         p.save('/tmp/test_predictor')
-        p = ktrain.load_predictor('/tmp/test_predictor')
+        p = ktrain.load_predictor('/tmp/test_predictor', batch_size=EVAL_BS)
         self.assertEqual(p.predict(TEST_DOC), 'soc.religion.christian')
         self.assertEqual(np.argmax(p.predict_proba([TEST_DOC])[0]), 3)
         self.assertEqual(type(p.explain(TEST_DOC)), IPython.core.display.HTML)
@@ -150,7 +151,7 @@ class TestTextClassification(TestCase):
                                                  max_features=35000,
                                                  ngram_range=3)
         model = txt.text_classifier('logreg', train_data=trn, preproc=preproc)
-        learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=32)
+        learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=32, eval_batch_size=EVAL_BS)
         lr = 0.01
         hist = learner.autofit(lr)
 
@@ -182,10 +183,10 @@ class TestTextClassification(TestCase):
             self.assertEqual(np.argmax(row), i)
 
         # test predictor
-        p = ktrain.get_predictor(learner.model, preproc)
+        p = ktrain.get_predictor(learner.model, preproc, batch_size=EVAL_BS)
         self.assertEqual(p.predict([TEST_DOC])[0], 'soc.religion.christian')
         p.save('/tmp/test_predictor')
-        p = ktrain.load_predictor('/tmp/test_predictor')
+        p = ktrain.load_predictor('/tmp/test_predictor', batch_size=EVAL_BS)
         self.assertEqual(p.predict(TEST_DOC), 'soc.religion.christian')
         self.assertEqual(np.argmax(p.predict_proba([TEST_DOC])[0]), 3)
         self.assertEqual(type(p.explain(TEST_DOC)), IPython.core.display.HTML)
@@ -203,7 +204,7 @@ class TestTextClassification(TestCase):
                                                  max_features=35000,
                                                  ngram_range=1)
         model = txt.text_classifier('bigru', train_data=trn, preproc=preproc)
-        learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=32)
+        learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=32, eval_batch_size=EVAL_BS)
         lr = 0.01
         hist = learner.autofit(lr, 1)
 
@@ -237,10 +238,10 @@ class TestTextClassification(TestCase):
             self.assertEqual(np.argmax(row), i)
 
         # test predictor
-        p = ktrain.get_predictor(learner.model, preproc)
+        p = ktrain.get_predictor(learner.model, preproc, batch_size=EVAL_BS)
         self.assertEqual(p.predict([TEST_DOC])[0], 'soc.religion.christian')
         p.save('/tmp/test_predictor')
-        p = ktrain.load_predictor('/tmp/test_predictor')
+        p = ktrain.load_predictor('/tmp/test_predictor', batch_size=EVAL_BS)
         self.assertEqual(p.predict([TEST_DOC])[0], 'soc.religion.christian')
         self.assertEqual(p.predict(TEST_DOC), 'soc.religion.christian')
         self.assertEqual(np.argmax(p.predict_proba([TEST_DOC])[0]), 3)
@@ -258,7 +259,7 @@ class TestTextClassification(TestCase):
                                                  maxlen=350, 
                                                  max_features=35000)
         model = txt.text_classifier('bert', train_data=trn, preproc=preproc)
-        learner = ktrain.get_learner(model, train_data=trn, batch_size=6)
+        learner = ktrain.get_learner(model, train_data=trn, batch_size=6, eval_batch_size=EVAL_BS)
         lr = 2e-5
         hist = learner.fit_onecycle(lr, 1)
 
@@ -289,10 +290,10 @@ class TestTextClassification(TestCase):
             self.assertEqual(np.argmax(row), i)
 
         # test predictor
-        p = ktrain.get_predictor(learner.model, preproc)
+        p = ktrain.get_predictor(learner.model, preproc, batch_size=EVAL_BS)
         self.assertEqual(p.predict([TEST_DOC])[0], 'soc.religion.christian')
         p.save('/tmp/test_predictor')
-        p = ktrain.load_predictor('/tmp/test_predictor')
+        p = ktrain.load_predictor('/tmp/test_predictor', batch_size=EVAL_BS)
         self.assertEqual(p.predict(TEST_DOC), 'soc.religion.christian')
         self.assertEqual(np.argmax(p.predict_proba([TEST_DOC])[0]), 3)
         self.assertEqual(type(p.explain(TEST_DOC)), IPython.core.display.HTML)

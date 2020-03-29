@@ -10,7 +10,7 @@ class ImagePredictor(Predictor):
     predicts image classes
     """
 
-    def __init__(self, model, preproc):
+    def __init__(self, model, preproc, batch_size=U.DEFAULT_BS):
 
         if not isinstance(model, Model):
             raise ValueError('model must be of instance Model')
@@ -20,6 +20,7 @@ class ImagePredictor(Predictor):
         self.preproc = preproc
         self.datagen = self.preproc.get_preprocessor()
         self.c = self.preproc.get_classes()
+        self.batch_size = batch_size
 
 
     def get_classes(self):
@@ -79,7 +80,7 @@ class ImagePredictor(Predictor):
         """
         if not isinstance(data, np.ndarray):
             raise ValueError('data must be numpy.ndarray')
-        (generator, steps) = self.preproc.preprocess(data)
+        (generator, steps) = self.preproc.preprocess(data, batch_size=self.batch_size)
         return self.predict_generator(generator, steps=steps, return_proba=return_proba)
 
 
@@ -89,7 +90,7 @@ class ImagePredictor(Predictor):
         If return_proba is True, returns probabilities of each class.
         """
         if not os.path.isfile(img_path): raise ValueError('img_path must be valid file')
-        (generator, steps) = self.preproc.preprocess(img_path)
+        (generator, steps) = self.preproc.preprocess(img_path, batch_size=self.batch_size)
         return self.predict_generator(generator, steps=steps, return_proba=return_proba)
 
 
@@ -100,7 +101,7 @@ class ImagePredictor(Predictor):
         
         """
         if not os.path.isdir(folder): raise ValueError('folder must be valid directory')
-        (generator, steps) = self.preproc.preprocess(folder)
+        (generator, steps) = self.preproc.preprocess(folder, batch_size=self.batch_size)
         result = self.predict_generator(generator, steps=steps, return_proba=return_proba)
         if len(result) != len(generator.filenames): 
             raise Exception('number of results does not equal number of filenames')
