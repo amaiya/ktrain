@@ -1401,7 +1401,10 @@ def _load_model(fname, preproc=None, train_data=None):
         from stellargraph.layer import MeanAggregator
         custom_objects={'MeanAggregator': MeanAggregator}
     try:
-        model = load_model(fname, custom_objects=custom_objects)
+        try:
+            model = load_model(fname, custom_objects=custom_objects)
+        except:
+            model = load_model(fname) # for bilstm models without CRF layer on TF2
     except Exception as e:
         print('Call to keras.models.load_model failed.  '
               'Try using the learner.model.save_weights and '

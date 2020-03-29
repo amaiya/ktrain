@@ -136,9 +136,10 @@ class NERLearner(GenLearner):
         """
         a wrapper to model.save
         """
-        from .anago.layers import crf_loss
-        self.model.compile(loss=crf_loss, optimizer=U.DEFAULT_OPT)
-        self.model.save(fpath)
+        if U.is_crf(self.model):
+            from .anago.layers import crf_loss
+            self.model.compile(loss=crf_loss, optimizer=U.DEFAULT_OPT)
+        self.model.save(fpath, save_format='h5')
         return
 
 
@@ -159,4 +160,16 @@ class NERLearner(GenLearner):
             y_pred = val.p.inverse_transform(y_pred, lengths)
             results.extend(y_pred)
         return results
+
+
+    def _prepare(self, data, mode='train'):
+        """
+        prepare NERSequence for training
+        """
+        if data is None: return None
+        if not data.prepare_called:
+            print('preparing %s data ...' % (mode), end='')
+            data.prepare()
+            print('done.')
+        return data
 

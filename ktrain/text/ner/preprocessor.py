@@ -20,11 +20,9 @@ class NERPreprocessor(Preprocessor):
     NER preprocessing base class
     """
 
-    def __init__(self, p, wv_path_or_url=None, use_elmo=False):
+    def __init__(self, p):
         self.p = p
         self.c = p._label_vocab._id2token
-        self.wv_path_or_url = wv_path_or_url
-        self.use_elmo = use_elmo
 
     def get_preprocessor(self):
         return self.p
@@ -55,15 +53,15 @@ class NERPreprocessor(Preprocessor):
 
 
 
-    def get_embed_model(self, verbose=1):
-        if self.wv_path_or_url is None: 
+    def get_wv_model(self, wv_path_or_url, verbose=1):
+        if wv_path_or_url is None: 
             raise ValueError('wordvector_path_or_url is empty: supply a file path or '+\
                              'URL to fasttext word vector file')
-        if verbose: print('pretrained word embeddings will be loaded from:\n\t%s' % (self.wv_path_or_url))
+        if verbose: print('pretrained word embeddings will be loaded from:\n\t%s' % (wv_path_or_url))
         word_embedding_dim = 300 # all fasttext word vectors are of dim=300
-        embs = tpp.load_wv(self.wv_path_or_url, verbose=verbose)
-        emb_model = self.filter_embeddings(embs, self.p._word_vocab.vocab, word_embedding_dim)
-        return (emb_model, word_embedding_dim)
+        embs = tpp.load_wv(wv_path_or_url, verbose=verbose)
+        wv_model = self.filter_embeddings(embs, self.p._word_vocab.vocab, word_embedding_dim)
+        return (wv_model, word_embedding_dim)
 
 
 
@@ -197,6 +195,14 @@ class NERSequence(Dataset):
         self.y = y
         self.batch_size = batch_size
         self.p = p
+        self.prepare_called = False
+
+    def prepare(self):
+        if self.p is not None and not self.prepare_called:
+            self.x, self.y = self.p.fix_tokenization(self.x, self.y)
+        self.prepare_called = True
+        return
+
 
     def __getitem__(self, idx):
         batch_x = self.x[idx * self.batch_size: (idx + 1) * self.batch_size]

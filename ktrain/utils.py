@@ -9,6 +9,9 @@ DEFAULT_BS = 32
 DEFAULT_ES = 5 
 DEFAULT_ROP = 2 
 DEFAULT_OPT = 'adam'
+DEFAULT_TRANSFORMER_LAYERS = [-2] # second-to-last hidden state
+DEFAULT_TRANSFORMER_MAXLEN = 512
+DEFAULT_TRANSFORMER_NUM_SPECIAL = 2
 
 
 
@@ -77,39 +80,50 @@ def is_huggingface_from_data(data):
 
 def is_ner(model=None, data=None):
     ner = False
-    if model is not None and is_ner_from_model(model):
+    if data is None:
+        warnings.warn('is_ner only detects CRF-based NER models when data is None')
+    if model is not None and is_crf(model):
         ner = True
     elif data is not None and is_ner_from_data(data):
         ner = True
     return ner 
 
 
-def is_ner_from_model(model):
+def is_crf(model):
     """
-    checks for sequence tagger.
-    Curently, only checks for a CRF-based sequence tagger
+    checks for CRF sequence tagger.
     """
-    loss = model.loss
-    if callable(loss): 
-        if hasattr(loss, '__name__'):
-            loss = loss.__name__
-        elif hasattr(loss, 'name'):
-            loss = loss.name
-        else:
-            raise Exception('could not get loss name')
+    #loss = model.loss
+    #if callable(loss): 
+        #if hasattr(loss, '__name__'):
+            #loss = loss.__name__
+        #elif hasattr(loss, 'name'):
+            #loss = loss.name
+        #else:
+            #raise Exception('could not get loss name')
+    #return loss == 'crf_loss' or 'CRF.loss_function' in str(model.loss)
+    return type(model.layers[-1]).__name__ == 'CRF'
 
-    return loss == 'crf_loss' or 'CRF.loss_function' in str(model.loss)
+
+#def is_ner_from_model(model):
+    #"""
+    #checks for sequence tagger.
+    #Curently, only checks for a CRF-based sequence tagger
+    #"""
+    #loss = model.loss
+    #if callable(loss): 
+        #if hasattr(loss, '__name__'):
+            #loss = loss.__name__
+        #elif hasattr(loss, 'name'):
+            #loss = loss.name
+        #else:
+            #raise Exception('could not get loss name')
+
+    #return loss == 'crf_loss' or 'CRF.loss_function' in str(model.loss)
 
 
 def is_ner_from_data(data):
     return type(data).__name__ == 'NERSequence'
-
-
-def is_crf(model):
-    """
-    This is currently simpley an alias for is_ner_from_model
-    """
-    return is_ner_from_model(model)
 
 
 def is_nodeclass(model=None, data=None):
