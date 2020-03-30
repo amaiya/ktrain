@@ -8,12 +8,12 @@
 
 ### News and Announcements
 - **2020-03-31:**  
-  - ***ktrain*** **v0.12.x is released** and now includes BERT embeddings (BERT, DistilBert, and Albert) that can be used for downstream tasks like building sequence-taggers (i.e., NER) 
-      for any language (English, Chinese, Russian, Dutch, etc.).  For examples of using BERT embeddings with NER, see this [example for English NER](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/CoNLL2003-BiLSTM.ipynb) or the [Dutch NER notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/CoNLL2002_Dutch-BiLSTM.ipynb).  
-	  BERT embeddings also supports domain-specific [community-uploaded Hugging Face models](https://huggingface.co/models) such as [BioBERT](https://arxiv.org/abs/1901.08746) for the biomedical domain.
+  - ***ktrain*** **v0.12.x is released** and now includes BERT embeddings (i.e., BERT, DistilBert, and Albert) that can be used for downstream tasks like building sequence-taggers (i.e., NER) 
+      for any language such as English, Chinese, Russian, Arabic, Dutch, etc.  For examples of using BERT embeddings with NER, see this [example for English NER](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/CoNLL2003-BiLSTM.ipynb) or the [Dutch NER notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/CoNLL2002_Dutch-BiLSTM.ipynb).  
+	  *ktrain* also supports NER with domain-specific [community-uploaded Hugging Face models](https://huggingface.co/models) such as [BioBERT](https://arxiv.org/abs/1901.08746) for the biomedical domain:
 	  ```python
 	  x_train= [['IL-2', 'responsiveness', 'requires', 'three', 'distinct', 'elements', 'within', 'the', 'enhancer', '.'], ...]
-	  y_train=[['B-protein', 'O', 'O', 'O', 'O', 'B-DNA', 'O', 'O', 'B-DNA'], ...]
+	  y_train=[['B-protein', 'O', 'O', 'O', 'O', 'B-DNA', 'O', 'O', 'B-DNA', 'O'], ...]
 	  (trn, val, preproc) = txt.entities_from_array(x_train, y_train)
       model = txt.sequence_tagger('bilstm-bert', preproc, bert_model='monologg/biobert_v1.1_pubmed')
       learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=128, eval_batch_size=256)
