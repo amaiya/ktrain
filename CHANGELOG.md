@@ -15,6 +15,9 @@ Most recent releases are shown at the top. Each release shows:
 ### Changed
 - `wv_path_or_url` parameter moved from `entities_from*` to `sequence_taggers`
 - Added `use_char` parameter and ensure it is not used unless `DISABLE_V2_BEHAVIOR` is enabled:
+- `batch_size` argument added to `get_predictor` and `load_predictor`
+- `eval_batch_size` argument added to `get_learner`
+
 
 ### Fixed:
 - properly set threshold in `text.eda` (PR #99)
