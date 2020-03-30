@@ -86,7 +86,7 @@ The objective of the CoNLL2003 task is to classify sequences of words as belongi
 
 #### [CoNLL2002 NER Task (Dutch)](https://www.clips.uantwerpen.be/conll2002/ner/):  Named Entity Recognition for Dutch
 
-- [CoNLL2002_Dutch-BiLSTM.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text):  A simple and fast Bidirectional LSTM model with pretrained fasttext word embeddings for Dutch.
+- [CoNLL2002_Dutch-BiLSTM.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text):  A Bidirectional LSTM model that uses pretrained BERT embeddings along with pretrained fasttext word embeddings - both for Dutch.
 
 
 ### <a name="lda"></a> Topic Modeling
