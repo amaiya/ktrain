@@ -81,6 +81,7 @@ We will attempt to predict the price of a wine based purely on its text descript
 The objective of the CoNLL2003 task is to classify sequences of words as belonging to one of several categories of concepts such as Persons or Locations. See the [original paper](https://www.aclweb.org/anthology/W03-0419) for more information on the format.
 
 - [CoNLL2003-BiLSTM_CRF.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text):  A simple and fast Bidirectional LSTM-CRF model with randomly initialized word embeddings.
+- [CoNLL2003-BiLSTM.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text):  A Bidirectional LSTM model with pretrained BERT embeddings
 
 
 #### [CoNLL2002 NER Task (Dutch)](https://www.clips.uantwerpen.be/conll2002/ner/):  Named Entity Recognition for Dutch
