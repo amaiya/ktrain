@@ -37,7 +37,7 @@ setup(
           'seqeval',
           'packaging',
           'tensorflow_datasets',
-          'transformers',
+          'transformers>=2.7.0',
           'ipython',
           'syntok'
           #'stellargraph>=0.8.2',
