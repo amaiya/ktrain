@@ -13,6 +13,8 @@
 	  *ktrain* also supports NER with domain-specific embeddings from [community-uploaded Hugging Face models](https://huggingface.co/models) such as [BioBERT](https://arxiv.org/abs/1901.08746) for the biomedical domain:
 ```python
 # NER with BioBERT embeddings
+import ktrain
+from ktrain import txt
 x_train= [['IL-2', 'responsiveness', 'requires', 'three', 'distinct', 'elements', 'within', 'the', 'enhancer', '.'], ...]
 y_train=[['B-protein', 'O', 'O', 'O', 'O', 'B-DNA', 'O', 'O', 'B-DNA', 'O'], ...]
 (trn, val, preproc) = txt.entities_from_array(x_train, y_train)
