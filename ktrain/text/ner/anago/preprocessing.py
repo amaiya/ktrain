@@ -58,10 +58,11 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
             self._char_vocab.add_documents(initial_vocab)
 
         self.elmo = None  # elmo embedding model
+        self.use_elmo = False
         self.te = None    # transformer embedding model
         self.te_layers = U.DEFAULT_TRANSFORMER_LAYERS
         self.te_model = None
-        self._blacklist = ['te']
+        self._blacklist = ['te', 'elmo']
 
     def __getstate__(self):
         return {k: v for k, v in self.__dict__.items() if k not in self._blacklist}
@@ -71,11 +72,17 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
         if self.te_model is not None: self.activate_transformer(self.te_model, layers=self.te_layers)
         else:
             self.te = None
+        if self.use_elmo:  
+            self.activate_elmo()
+        else:
+            self.elmo = None
 
 
     def activate_elmo(self):
+        if not hasattr(self, 'elmo'): self.elmo=None
         if self.elmo is None:
             self.elmo = Elmo(options_file, weight_file, 2, dropout=0)
+        self.use_elmo = True
 
     def activate_transformer(self, model_name, layers=U.DEFAULT_TRANSFORMER_LAYERS):
         from ...preprocessor import TransformerEmbedding
@@ -173,8 +180,11 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
             features: document id matrix.
             y: label id matrix.
         """
-        # re-instantiate TransformerEmbedding if necessary since it is excluded from pickling
+        # re-instantiate TransformerEmbedding/Elmo if necessary since it is excluded from pickling
         if self.te_model is not None: self.activate_transformer(self.te_model, layers=self.te_layers)
+        if self.use_elmo: self.activate_elmo()
+
+
         features = []
 
         word_ids = [self._word_vocab.doc2id(doc) for doc in X]
