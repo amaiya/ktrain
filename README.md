@@ -12,6 +12,7 @@
       for any language such as English, Chinese, Russian, Arabic, Dutch, etc.  See [this English NER example](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/CoNLL2003-BiLSTM.ipynb) or the [Dutch NER notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/CoNLL2002_Dutch-BiLSTM.ipynb) for examples on how to use this feature.
 	  *ktrain* also supports NER with domain-specific embeddings from [community-uploaded Hugging Face models](https://huggingface.co/models) such as [BioBERT](https://arxiv.org/abs/1901.08746) for the biomedical domain:
 	  ```python
+          # NER with BioBERT embeddings
 	  x_train= [['IL-2', 'responsiveness', 'requires', 'three', 'distinct', 'elements', 'within', 'the', 'enhancer', '.'], ...]
 	  y_train=[['B-protein', 'O', 'O', 'O', 'O', 'B-DNA', 'O', 'O', 'B-DNA', 'O'], ...]
 	  (trn, val, preproc) = txt.entities_from_array(x_train, y_train)
@@ -25,9 +26,10 @@
   - ***ktrain*** **v0.10.x is released** and now includes [ready-to-use NER for English, Chinese, and Russian](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/shallownlp-examples.ipynb) with no training required. 
   - **Also in v0.10.x:**  Ability to train [community-uploaded Hugging Face transformer models](https://huggingface.co/models) like [SciBERT](https://arxiv.org/abs/1903.10676) and  [BioBERT](https://arxiv.org/abs/1901.08746):
 ```python
+# text classification with SciBERT
 import ktrain
 from ktrain import text
-MODEL_NAME = 'monologg/scibert_scivocab_uncased'
+MODEL_NAME = 'allenai/scibert_scivocab_uncased'
 t = text.Transformer(MODEL_NAME, maxlen=500, class_names=label_list)
 trn = t.preprocess_train(x_train, y_train)
 val = t.preprocess_test(x_test, y_test)
