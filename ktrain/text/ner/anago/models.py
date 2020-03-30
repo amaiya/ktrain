@@ -47,8 +47,9 @@ class BiLSTMCRF(object):
                  embeddings=None,
                  use_char=True,
                  use_crf=True,
-                 mask_zero=True,
-                 use_elmo=False):
+                 char_mask_zero=True,
+                 use_elmo=False,
+                 use_transformer_with_dim=None):
         """Build a Bi-LSTM CRF model.
 
         Args:
@@ -64,9 +65,11 @@ class BiLSTMCRF(object):
             embeddings (numpy array): word embedding matrix.
             use_char (boolean): add char feature.
             use_crf (boolean): use crf as last layer.
-            mask_zero(boolean): mask zero
+            char_mask_zero(boolean): mask zero for character embedding (see TF2 isse #33148 and #33069)
             use_elmo(boolean): If True, model will be configured to accept Elmo embeddings
                                as an additional input to word and character embeddings
+            use_transformer_with_dim(int): If not None, model will be configured to accept
+                                           transformer embeddings of given dimension
         """
         super(BiLSTMCRF).__init__()
         self._char_embedding_dim = char_embedding_dim
@@ -81,12 +84,10 @@ class BiLSTMCRF(object):
         self._use_crf = use_crf
         self._embeddings = embeddings
         self._num_labels = num_labels
-        self.mask_zero = mask_zero
+        self._char_mask_zero = char_mask_zero
         self._use_elmo = use_elmo
-        # NOTE: provide option for mask_zero=False because TF2 with V2 behavior throws error otherwise
-        # REFERENCE:
-        #   https://github.com/tensorflow/tensorflow/issues/33069
-        #   https://github.com/tensorflow/tensorflow/issues/33148
+        self._use_transformer_with_dim = use_transformer_with_dim
+
 
     def build(self):
 
@@ -97,12 +98,12 @@ class BiLSTMCRF(object):
         if self._embeddings is None:
             word_embeddings = Embedding(input_dim=self._word_vocab_size,
                                         output_dim=self._word_embedding_dim,
-                                        mask_zero=self.mask_zero,
+                                        mask_zero=True,
                                         name='word_embedding')(word_ids)
         else:
             word_embeddings = Embedding(input_dim=self._embeddings.shape[0],
                                         output_dim=self._embeddings.shape[1],
-                                        mask_zero=self.mask_zero,
+                                        mask_zero=True,
                                         weights=[self._embeddings],
                                         name='word_embedding')(word_ids)
         embedding_list.append(word_embeddings)
@@ -113,16 +114,29 @@ class BiLSTMCRF(object):
             inputs.append(char_ids)
             char_embeddings = Embedding(input_dim=self._char_vocab_size,
                                         output_dim=self._char_embedding_dim,
-                                        mask_zero=self.mask_zero,
+                                        mask_zero=self._char_mask_zero,
                                         name='char_embedding')(char_ids)
             char_embeddings = TimeDistributed(Bidirectional(LSTM(self._char_lstm_size)))(char_embeddings)
             embedding_list.append(char_embeddings)
+
+        # add elmo embedding
         if self._use_elmo:
             elmo_embeddings = Input(shape=(None, 1024), dtype='float32')
             inputs.append(elmo_embeddings)
             embedding_list.append(elmo_embeddings)
+
+        # add transformer embedding
+        if self._use_transformer_with_dim is not None:
+            transformer_embeddings = Input(shape=(None, self._use_transformer_with_dim), dtype='float32')
+            inputs.append(transformer_embeddings)
+            embedding_list.append(transformer_embeddings)
+
+
+        # concatenate embeddings
         word_embeddings = Concatenate()(embedding_list) if len(embedding_list) > 1 else embedding_list[0]
 
+
+        # build model
         word_embeddings = Dropout(self._dropout)(word_embeddings)
         z = Bidirectional(LSTM(units=self._word_lstm_size, return_sequences=True))(word_embeddings)
         z = Dense(self._fc_dim, activation='tanh')(z)

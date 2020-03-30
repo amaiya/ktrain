@@ -10,6 +10,7 @@ import ktrain
 from ktrain import text as txt
 from ktrain.imports import ACC_NAME, VAL_ACC_NAME
 TEST_DOC = 'god christ jesus mother mary church sunday lord heaven amen'
+EVAL_BS = 64
 
 class TestTransformers(TestCase):
 
@@ -46,7 +47,7 @@ class TestTransformers(TestCase):
                                                  maxlen=500, 
                                                  max_features=35000)
         model = txt.text_classifier('distilbert', train_data=trn, preproc=preproc)
-        learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=6)
+        learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=6, eval_batch_size=EVAL_BS)
         lr = 5e-5
         hist = learner.fit_onecycle(lr, 1)
 
@@ -78,11 +79,11 @@ class TestTransformers(TestCase):
             self.assertEqual(np.argmax(row), i)
 
         # test predictor
-        p = ktrain.get_predictor(learner.model, preproc)
+        p = ktrain.get_predictor(learner.model, preproc, batch_size=EVAL_BS)
         self.assertEqual(p.predict([TEST_DOC])[0], 'soc.religion.christian')
         tmp_folder = ktrain.imports.tempfile.mkdtemp()
         p.save(tmp_folder)
-        p = ktrain.load_predictor(tmp_folder)
+        p = ktrain.load_predictor(tmp_folder, batch_size=EVAL_BS)
         self.assertEqual(p.predict(TEST_DOC), 'soc.religion.christian')
         self.assertEqual(np.argmax(p.predict_proba([TEST_DOC])[0]), 3)
         self.assertEqual(type(p.explain(TEST_DOC)), IPython.core.display.HTML)
@@ -95,7 +96,7 @@ class TestTransformers(TestCase):
         trn = preproc.preprocess_train(self.trn[0], self.trn[1])
         val = preproc.preprocess_test(self.val[0], self.val[1])
         model = preproc.get_classifier()
-        learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=6)
+        learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=6, eval_batch_size=EVAL_BS)
         lr = 5e-5
         hist = learner.fit_onecycle(lr, 1)
 
@@ -127,11 +128,11 @@ class TestTransformers(TestCase):
             self.assertEqual(np.argmax(row), i)
 
         # test predictor
-        p = ktrain.get_predictor(learner.model, preproc)
+        p = ktrain.get_predictor(learner.model, preproc, batch_size=EVAL_BS)
         self.assertEqual(p.predict([TEST_DOC])[0], 'soc.religion.christian')
         tmp_folder = ktrain.imports.tempfile.mkdtemp()
         p.save(tmp_folder)
-        p = ktrain.load_predictor(tmp_folder)
+        p = ktrain.load_predictor(tmp_folder, batch_size=EVAL_BS)
         self.assertEqual(p.predict(TEST_DOC), 'soc.religion.christian')
         self.assertEqual(np.argmax(p.predict_proba([TEST_DOC])[0]), 3)
         self.assertEqual(type(p.explain(TEST_DOC)), IPython.core.display.HTML)

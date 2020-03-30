@@ -8,7 +8,7 @@ class TextPredictor(Predictor):
     predicts text classes
     """
 
-    def __init__(self, model, preproc):
+    def __init__(self, model, preproc, batch_size=U.DEFAULT_BS):
 
         if not isinstance(model, Model):
             raise ValueError('model must be of instance Model')
@@ -18,6 +18,7 @@ class TextPredictor(Predictor):
         self.model = model
         self.preproc = preproc
         self.c = self.preproc.get_classes()
+        self.batch_size = batch_size
 
 
     def get_classes(self):
@@ -38,14 +39,18 @@ class TextPredictor(Predictor):
         elif not isinstance(texts, np.ndarray) and not isinstance(texts, list):
             raise ValueError('data must be numpy.ndarray or list (of texts)')
         classification, multilabel = U.is_classifier(self.model)
-        #if multilabel: return_proba = True
-        #treat_multilabel = False
-        #loss = self.model.loss
-        #if loss != 'categorical_crossentropy' and not return_proba:
-        #    return_proba=True
-        #    treat_multilabel = True
-        texts = self.preproc.preprocess(texts)
-        preds = self.model.predict(texts)
+
+        # get predictions
+        if U.is_huggingface(model=self.model):
+            tseq = self.preproc.preprocess_test(texts, verbose=0)
+            tseq.batch_size = self.batch_size
+            texts = tseq.to_tfdataset(shuffle=False, repeat=False)
+            preds = self.model.predict(texts)
+        else:
+            texts = self.preproc.preprocess(texts)
+            preds = self.model.predict(texts, batch_size=self.batch_size)
+
+        # process predictions
         if U.is_huggingface(model=self.model):
             # convert logits to probabilities for Hugging Face models
             if multilabel and self.c:

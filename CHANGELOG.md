@@ -7,6 +7,24 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.12.0 (2020-03-31)
+
+### New:
+- BERT and Elmo embeddings for NER and other downstream tasks
+
+### Changed
+- `wv_path_or_url` parameter moved from `entities_from*` to `sequence_taggers`
+- Added `use_char` parameter and ensure it is not used unless `DISABLE_V2_BEHAVIOR` is enabled:
+- `batch_size` argument added to `get_predictor` and `load_predictor`
+- `eval_batch_size` argument added to `get_learner`
+- added `val_pct` argument to `entities_from_array`
+
+
+### Fixed:
+- properly set threshold in `text.eda` (PR #99)
+- fixed error when no validation data is supplied to `entities_from_array`
+
+
 ## 0.11.3 (2020-03-18)
 
 ### New:

@@ -247,6 +247,7 @@ def hf_convert_example(text, tokenizer=None,
         text,
         None,
         add_special_tokens=True,
+        return_token_type_ids=True,
         max_length=max_length,
     )
     input_ids, token_type_ids = inputs["input_ids"], inputs["token_type_ids"]
@@ -754,6 +755,10 @@ class TransformersPreprocessor(TextPreprocessor):
 
         self.model_name = model_name
         self.name = model_name.split('-')[0]
+        if model_name.startswith('xlm-roberta'): 
+            self.name = 'xlm_roberta'
+        else:
+            self.name = model_name.split('-')[0]
         if self.name not in TRANSFORMER_MODELS:
             #raise ValueError('unsupported model name %s' % (model_name))
             self.config = AutoConfig.from_pretrained(model_name)
@@ -792,8 +797,6 @@ class TransformersPreprocessor(TextPreprocessor):
         undoes preprocessing and returns raw data by:
         converting a list or array of Word IDs back to words
         """
-        print(doc)
-        print(type(doc))
         return self.tok.convert_ids_to_tokens(doc)
         #raise Exception('currently_unsupported: Transformers.Preprocessor.undo is not yet supported')
 
@@ -1029,7 +1032,11 @@ class TransformerEmbedding():
                                
         """
         self.model_name = model_name
-        self.name = model_name.split('-')[0]
+        if model_name.startswith('xlm-roberta'):
+            self.name = 'xlm_roberta'
+        else:
+            self.name = model_name.split('-')[0]
+
         if self.name not in TRANSFORMER_MODELS:
             self.config = AutoConfig.from_pretrained(model_name)
             self.model_type = TFAutoModel
@@ -1043,6 +1050,14 @@ class TransformerEmbedding():
 
         self.tokenizer = self.tokenizer_type.from_pretrained(model_name)
         self.model = self._load_pretrained(model_name)
+        try:
+            self.embsize = self.embed('ktrain', word_level=False).shape[1] # (batch_size, embsize)
+        except:
+            warnings.warn('could not determine Embedding size')
+        if type(self.model).__name__ not in ['TFBertModel', 'TFDistilBertModel', 'TFAlbertModel']:
+            raise ValueError('TransformerEmbedding class currently only supports BERT-style models: ' +\
+                             'Bert, DistilBert, and Albert and variants like BioBERT and SciBERT\n\n' +\
+                             'model received: %s (%s))' % (type(self.model).__name__, model_name))
 
 
     def _load_pretrained(self, model_name):
@@ -1050,6 +1065,7 @@ class TransformerEmbedding():
         load pretrained model
         """
         if self.config is not None:
+            self.config.output_hidden_states = True
             try:
                 model = self.model_type.from_pretrained(model_name, config=self.config)
             except:
@@ -1058,56 +1074,87 @@ class TransformerEmbedding():
                 except:
                     raise ValueError('could not load pretrained model %s using both from_pt=False and from_pt=True' % (model_name))
         else:
-            model = self.model_type.from_pretrained(model_name)
+            model = self.model_type.from_pretrained(model_name, output_hidden_states=True)
         return model
 
 
 
-    def embed(self, text, cls_only=True, return_all=False):
+    def embed(self, texts, word_level=True, layers=U.DEFAULT_TRANSFORMER_LAYERS):
         """
         get embedding for word, phrase, or sentence
         Args:
-          text(str): word, phrase, or sentence
-          cls_only(bool):  If True, a size-1 vector representing the text will be returned
-                           IF False, a vector for each token from the tokenized <text>
-                           will be returned.
-                          Default:True
-          return_all(bool):  If True, embeddding includes CLS and SEP tokens.
-                             If False, these are ommitted from final result.
-                             Cannot be True if cls_only=True.
+          text(str|list): word, phrase, or sentence or list of them representing a batch
+          word_level(bool): If True, returns embedding for each token in supplied texts.
+                            If False, returns embedding for each text in texts
+          layers(list):  hidden layer indices to use for embedding.
+                         default: last hidden state
         Returns:
-            np.ndarray
+            np.ndarray : embeddings
         """
-        if return_all and cls_only:
-            raise ValueError('return_all and cls_only cannot both be True')
+        if isinstance(texts, str): texts = [texts]
+        if not isinstance(texts[0], str): texts = [" ".join(text) for text in texts]
 
-        input_ids = tf.constant(self.tokenizer.encode(text))[None, :]  # Batch size 1
-        outputs = self.model(input_ids)
-        last_hidden_states = outputs[0] 
-        embedding = np.squeeze(last_hidden_states.numpy())
-        if cls_only:
-            return embedding[0]
-        elif return_all:
-            return embedding
+        sentences = []
+        for text in texts:
+            sentences.append(self.tokenizer.tokenize(text))
+        maxlen = len(max([tokens for tokens in sentences], key=len,)) + 2
+        all_input_ids = []
+        all_input_masks = []
+        for text in texts:
+            tokens = self.tokenizer.tokenize(text)
+            if len(tokens) > maxlen - 2:
+                tokens = tokens[0 : (maxlen - 2)]
+            tokens = [self.tokenizer.cls_token] + tokens + [self.tokenizer.sep_token]
+            input_ids = self.tokenizer.convert_tokens_to_ids(tokens)
+            input_mask = [1] * len(input_ids)
+            while len(input_ids) < maxlen:
+                input_ids.append(0)
+                input_mask.append(0)
+            all_input_ids.append(input_ids)
+            all_input_masks.append(input_mask)
+
+        all_input_ids = np.array(all_input_ids)
+        all_input_masks = np.array(all_input_masks)
+        outputs = self.model(all_input_ids, attention_mask=all_input_masks)
+        hidden_states = outputs[-1] # output_hidden_states=True
+
+        # compile raw embeddings
+        if len(layers) == 1:
+            #raw_embeddings = hidden_states[-1].numpy()
+            raw_embeddings = hidden_states[layers[0]].numpy()
         else:
-            return embedding[1:-1]
+            raw_embeddings = []
+            for batch_id in range(hidden_states[0].shape[0]):
+                token_embeddings = []
+                for token_id in range(hidden_states[0].shape[1]):
+                    all_layers = []
+                    for layer_id in layers:
+                        all_layers.append(hidden_states[layer_id][batch_id][token_id].numpy())
+                    token_embeddings.append(np.concatenate(all_layers) )  
+                raw_embeddings.append(token_embeddings)
+            raw_embeddings = np.array(raw_embeddings)
 
+        if not word_level: # sentence-level embedding
+            return np.mean(raw_embeddings, axis=1)
 
-    def tokenize(self, text, return_all=False):
-        """
-        get embedding for word, phrase, or sentence
-        Args:
-          text(str): word, phrase, or sentence
-          return_all(bool):  If True, CLS and SEP tokens are prepended and appended, respectively.
-        Returns:
-          list
-        """
-        tokens = self.tokenizer(text)
-        if return_all:
-            return [self.tokenizer.cls_token] +  tokens + [self.tokenizer.sep_token]
-        else:
-            return tokens
+        # filter-out extra subword tokens and special tokens 
+        # (using first subword of each token as embedding representations)
+        filtered_embeddings = []
+        for batch_idx, tokens in enumerate(sentences):
+            embedding = []
+            for token_idx, token in enumerate(tokens):
+                if token in [self.tokenizer.cls_token, self.tokenizer.sep_token] or token.startswith('##'): continue
+                embedding.append(raw_embeddings[batch_idx][token_idx])
+            filtered_embeddings.append(embedding)
 
+        # pad embeddings with zeros
+        max_length = max([len(e) for e in filtered_embeddings])
+        embeddings = []
+        for e in filtered_embeddings:
+            for i in range(max_length-len(e)):
+                e.append(np.zeros((self.embsize,)))
+            embeddings.append(np.array(e))
+        return np.array(embeddings)
 
 
 class TransformerDataset(Dataset):

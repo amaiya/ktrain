@@ -10,10 +10,11 @@ class NERLearner(GenLearner):
 
 
     def __init__(self, model, train_data=None, val_data=None, 
-                 batch_size=U.DEFAULT_BS, workers=1, use_multiprocessing=False,
+                 batch_size=U.DEFAULT_BS, eval_batch_size=U.DEFAULT_BS,
+                 workers=1, use_multiprocessing=False,
                  multigpu=False):
         super().__init__(model, train_data=train_data, val_data=val_data, 
-                         batch_size=batch_size, 
+                         batch_size=batch_size, eval_batch_size=eval_batch_size,
                          workers=workers, use_multiprocessing=use_multiprocessing, 
                          multigpu=multigpu)
         return
@@ -136,9 +137,10 @@ class NERLearner(GenLearner):
         """
         a wrapper to model.save
         """
-        from .anago.layers import crf_loss
-        self.model.compile(loss=crf_loss, optimizer=U.DEFAULT_OPT)
-        self.model.save(fpath)
+        if U.is_crf(self.model):
+            from .anago.layers import crf_loss
+            self.model.compile(loss=crf_loss, optimizer=U.DEFAULT_OPT)
+        self.model.save(fpath, save_format='h5')
         return
 
 
@@ -159,4 +161,16 @@ class NERLearner(GenLearner):
             y_pred = val.p.inverse_transform(y_pred, lengths)
             results.extend(y_pred)
         return results
+
+
+    def _prepare(self, data, mode='train'):
+        """
+        prepare NERSequence for training
+        """
+        if data is None: return None
+        if not data.prepare_called:
+            print('preparing %s data ...' % (mode), end='')
+            data.prepare()
+            print('done.')
+        return data
 
