@@ -755,6 +755,10 @@ class TransformersPreprocessor(TextPreprocessor):
 
         self.model_name = model_name
         self.name = model_name.split('-')[0]
+        if model_name.startswith('xlm-roberta'): 
+            self.name = 'xlm_roberta'
+        else:
+            self.name = model_name.split('-')[0]
         if self.name not in TRANSFORMER_MODELS:
             #raise ValueError('unsupported model name %s' % (model_name))
             self.config = AutoConfig.from_pretrained(model_name)
@@ -1028,7 +1032,11 @@ class TransformerEmbedding():
                                
         """
         self.model_name = model_name
-        self.name = model_name.split('-')[0]
+        if model_name.startswith('xlm-roberta'):
+            self.name = 'xlm_roberta'
+        else:
+            self.name = model_name.split('-')[0]
+
         if self.name not in TRANSFORMER_MODELS:
             self.config = AutoConfig.from_pretrained(model_name)
             self.model_type = TFAutoModel
