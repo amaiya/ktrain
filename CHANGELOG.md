@@ -7,14 +7,14 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
-## 0.11.4 (TBD)
+## 0.12.0 (2020-03-31)
 
 ### New:
-- N/A
+- BERT and Elmo embeddings for NER and other downstream tasks
 
 ### Changed
-- use `mask_zero=True` again for NER
-- enforce `disable_v2_behavior` for bilstm as well due to `CUDA_STATUS_BAD_PARAM` error when `use_char=True` (possible TF2 bug) 
+- `wv_path_or_url` parameter moved from `entities_from*` to `sequence_taggers`
+- Added `use_char` parameter and ensure it is not used unless `DISABLE_V2_BEHAVIOR` is enabled:
 
 ### Fixed:
 - properly set threshold in `text.eda` (PR #99)
