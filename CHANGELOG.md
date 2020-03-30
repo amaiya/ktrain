@@ -17,10 +17,12 @@ Most recent releases are shown at the top. Each release shows:
 - Added `use_char` parameter and ensure it is not used unless `DISABLE_V2_BEHAVIOR` is enabled:
 - `batch_size` argument added to `get_predictor` and `load_predictor`
 - `eval_batch_size` argument added to `get_learner`
+- added `val_pct` argument to `entities_from_array`
 
 
 ### Fixed:
 - properly set threshold in `text.eda` (PR #99)
+- fixed error when no validation data is supplied to `entities_from_array`
 
 
 ## 0.11.3 (2020-03-18)

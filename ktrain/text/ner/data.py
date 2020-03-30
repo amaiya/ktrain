@@ -210,6 +210,7 @@ def entities_from_df(train_df,
 def entities_from_array(x_train, y_train,
                         x_test=None, y_test=None,
                         use_char=False,
+                        val_pct=0.1,
                         verbose=1):
     """
     Load entities from arrays
@@ -223,6 +224,7 @@ def entities_from_array(x_train, y_train,
       y_test(list): list of list of tokens representing entity labels
                      Example:  y_train = [['O', 'O'], ['O', 'B-PER'], ['O', 'O', 'B-LOC']]
      use_char(bool):    If True, data will be preprocessed to use character embeddings  in addition to word embeddings
+     val_pct(float):  percentage of training to use for validation if no validation data is supplied
      verbose (boolean): verbosity
 
     """
@@ -234,9 +236,10 @@ def entities_from_array(x_train, y_train,
     if verbose:
         print('training data sample:')
         print(train_df.head())
-        print('validation data sample:')
-        print(val_df.head())
-    return entities_from_df(train_df, val_df=val_df, 
+        if val_df is not None:
+            print('validation data sample:')
+            print(val_df.head())
+    return entities_from_df(train_df, val_df=val_df, val_pct=val_pct, 
                             use_char=use_char, verbose=verbose)
 
 
