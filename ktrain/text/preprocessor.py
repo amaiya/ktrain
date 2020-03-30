@@ -247,6 +247,7 @@ def hf_convert_example(text, tokenizer=None,
         text,
         None,
         add_special_tokens=True,
+        return_token_type_ids=True,
         max_length=max_length,
     )
     input_ids, token_type_ids = inputs["input_ids"], inputs["token_type_ids"]
