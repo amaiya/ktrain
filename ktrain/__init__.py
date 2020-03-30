@@ -109,4 +109,5 @@ def get_learner(model, train_data=None, val_data=None,
         else: # vanilla text classifiers use standard ArrayLearners
             learner = ArrayLearner
     return learner(model, train_data=train_data, val_data=val_data, 
-                   batch_size=batch_size, workers=workers, use_multiprocessing=use_multiprocessing, multigpu=multigpu)
+                   batch_size=batch_size, eval_batch_size=eval_batch_size, 
+                   workers=workers, use_multiprocessing=use_multiprocessing, multigpu=multigpu)
