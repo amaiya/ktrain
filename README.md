@@ -170,7 +170,8 @@ from ktrain import text as txt
                                             sentence_column='Sentence #',
                                             word_column='Word',
                                             tag_column='Tag', 
-                                            data_format='gmb')
+                                            data_format='gmb',
+                                            use_char=True) # enable character embeddings
 
 # load model
 model = txt.sequence_tagger('bilstm-crf', preproc)
