@@ -9,7 +9,7 @@
 ### News and Announcements
 - **2020-03-31:**  
   - ***ktrain*** **v0.12.x is released** and now includes BERT embeddings (i.e., BERT, DistilBert, and Albert) that can be used for downstream tasks like building sequence-taggers (i.e., NER) 
-      for any language such as English, Chinese, Russian, Arabic, Dutch, etc.  See [this English NER example](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/CoNLL2003-BiLSTM.ipynb) or the [Dutch NER notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/CoNLL2002_Dutch-BiLSTM.ipynb) for examples on how to use this feature.
+      for any language such as English, Chinese, Russian, Arabic, Dutch, etc.  See [this English NER example](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/CoNLL2003-BiLSTM.ipynb) or the [Dutch NER notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/CoNLL2002_Dutch-BiLSTM.ipynb) for examples on how to use this feature.
 	  *ktrain* also supports NER with domain-specific embeddings from [community-uploaded Hugging Face models](https://huggingface.co/models) such as [BioBERT](https://arxiv.org/abs/1901.08746) for the biomedical domain:
 ```python
 # NER with BioBERT embeddings
@@ -170,7 +170,8 @@ from ktrain import text as txt
                                             sentence_column='Sentence #',
                                             word_column='Word',
                                             tag_column='Tag', 
-                                            data_format='gmb')
+                                            data_format='gmb',
+                                            use_char=True) # enable character embeddings
 
 # load model
 model = txt.sequence_tagger('bilstm-crf', preproc)
