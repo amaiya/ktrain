@@ -7,6 +7,20 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.12.2 (2020-04-01)
+
+### New:
+- N/A
+
+### Changed
+- Require at least TensorFlow 2.1.0 is installed in `setup.py` due to TF 2.0.0 bug with `lr_find`
+- Added lower bounds to scikit-learn and networkx versions
+
+
+### Fixed:
+- N/A
+
+
 ## 0.12.1 (2020-04-01)
 
 ### New:

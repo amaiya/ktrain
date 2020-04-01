@@ -22,7 +22,8 @@ setup(
   url = 'https://github.com/amaiya/ktrain',
   keywords = ['tensorflow', 'keras', 'deep learning', 'machine learning'],
   install_requires=[
-          'scikit-learn == 0.21.3',
+          'tensorflow>=2.1.0',
+          'scikit-learn >= 0.21.3',
           'matplotlib >= 3.0.0',
           'pandas >= 1.0.1',
           'fastprogress >= 0.1.21',
@@ -32,7 +33,7 @@ setup(
           'langdetect',
           'jieba',
           'cchardet',
-          'networkx==2.3',
+          'networkx>=2.3',
           'bokeh',
           'seqeval',
           'packaging',
