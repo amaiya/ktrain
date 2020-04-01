@@ -79,6 +79,9 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
 
 
     def activate_elmo(self):
+        if not ALLENNLP_INSTALLED:
+            raise Exception(ALLENNLP_ERRMSG)
+
         if not hasattr(self, 'elmo'): self.elmo=None
         if self.elmo is None:
             self.elmo = Elmo(options_file, weight_file, 2, dropout=0)
