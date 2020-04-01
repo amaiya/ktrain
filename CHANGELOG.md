@@ -7,6 +7,19 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.12.1 (2020-04-01)
+
+### New:
+- N/A
+
+### Changed
+- N/A
+
+
+### Fixed:
+- check and ensure AllenNLP is installed when Elmo embeddings are selected for NER
+
+
 ## 0.12.0 (2020-03-31)
 
 ### New:
