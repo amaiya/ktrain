@@ -668,7 +668,8 @@ class Learner(ABC):
         pass
 
 
-    def fit_onecycle(self, lr, epochs, checkpoint_folder=None, cycle_momentum=True,
+    def fit_onecycle(self, lr, epochs, checkpoint_folder=None, 
+                     cycle_momentum=True, max_momentum=0.95, min_momentum=0.85,
                      verbose=1, class_weight=None, callbacks=[]):
         """
         Train model using a version of Leslie Smith's 1cycle policy.
@@ -689,7 +690,8 @@ class Learner(ABC):
                                       optimzer will be cycled between 0.95 and 0.85 as described in 
                                       https://arxiv.org/abs/1803.09820.
                                       Only takes effect if Adam, Nadam, or Adamax optimizer is used.
-
+            max_momentum(float): Maximum momentum to use if cycle_momentum=True
+            min_momentum(float): minimum momentum to use if cycle_momentum=True
             class_weight (dict):       Optional dictionary mapping class indices (integers) to a weight (float) 
             callbacks (list): list of Callback instances to employ during training
             verbose (bool):  verbose mode
@@ -708,8 +710,8 @@ class Learner(ABC):
         else:
             kcallbacks = callbacks[:] 
         if cycle_momentum:
-            max_momentum = 0.95
-            min_momentum = 0.85
+            max_momentum = max_momentum
+            min_momentum = min_momentum
         else:
             max_momentum = None
             min_momentum = None
@@ -738,15 +740,15 @@ class Learner(ABC):
 
 
 
-    def autofit(self, lr, epochs=None,  
+    def autofit(self, lr, epochs=None, 
                 early_stopping=None, reduce_on_plateau=None, reduce_factor=2, 
-                cycle_momentum=True,
+                cycle_momentum=True, max_momentum=0.95, min_momentum=0.85,
                 monitor='val_loss', checkpoint_folder=None, verbose=1, 
                 class_weight=None, callbacks=[]):
         """
         Automatically train model using a default learning rate schedule shown to work well
-        in practice.  This method currently employs a triangular learning 
-        rate policy (https://arxiv.org/abs/1506.01186).
+        in practice.  By default, this method currently employs a triangular learning 
+        rate policy (https://arxiv.org/abs/1506.01186).  
         During each epoch, this learning rate policy varies the learning rate from lr/10 to lr
         and then back to a low learning rate that is near-zero. 
         If epochs is None, then early_stopping and reduce_on_plateau are atomatically
@@ -779,6 +781,8 @@ class Learner(ABC):
                                       optimzer will be cycled between 0.95 and 0.85 as described in 
                                       https://arxiv.org/abs/1803.09820.
                                       Only takes effect if Adam, Nadam, or Adamax optimizer is used.
+            max_momentum(float):  maximum momentum to use when cycle_momentum=True
+            min_momentum(float): minimum momentum to use when cycle_momentum=True
             checkpoint_folder (string): Folder path in which to save the model weights 
                                         for each epoch.
                                         File name will be of the form: 
@@ -835,11 +839,12 @@ class Learner(ABC):
         else:
             kcallbacks = callbacks[:] 
         if cycle_momentum:
-            max_momentum = 0.95
-            min_momentum = 0.85
+            max_momentum = max_momentum
+            min_momentum = min_momentum
         else:
             max_momentum = None
             min_momentum = None
+
         clr = CyclicLR(base_lr=lr/10, max_lr=lr,
                        step_size=step_size, verbose=verbose,
                        monitor=monitor,
