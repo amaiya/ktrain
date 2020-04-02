@@ -16,7 +16,7 @@ TEXT_CLASSIFIERS = {
                     FASTTEXT: "a fastText-like model [http://arxiv.org/pdf/1607.01759.pdf]",
                     LOGREG:  "logistic regression using a trainable Embedding layer",
                     NBSVM:  "NBSVM model [http://www.aclweb.org/anthology/P12-2018]",
-                    BIGRU:  'Bidirectional GRU with pretrained word vectors [https://arxiv.org/abs/1712.09405]',
+                    BIGRU:  'Bidirectional GRU with pretrained English word vectors [https://arxiv.org/abs/1712.09405]',
                     STANDARD_GRU: 'simple 2-layer GRU with randomly initialized embeddings',
                     BERT:  'Bidirectional Encoder Representations from Transformers (BERT) [https://arxiv.org/abs/1810.04805]',
                     DISTILBERT:  'distilled, smaller, and faster BERT from Hugging Face [https://arxiv.org/abs/1910.01108]',
@@ -25,7 +25,7 @@ TEXT_CLASSIFIERS = {
 TEXT_REGRESSION_MODELS = {
                     FASTTEXT: "a fastText-like model [http://arxiv.org/pdf/1607.01759.pdf]",
                     LINREG:  "linear text regression using a trainable Embedding layer",
-                    BIGRU:  'Bidirectional GRU with pretrained word vectors [https://arxiv.org/abs/1712.09405]',
+                    BIGRU:  'Bidirectional GRU with pretrained English word vectors [https://arxiv.org/abs/1712.09405]',
                     STANDARD_GRU: 'simple 2-layer GRU with randomly initialized embeddings',
                     BERT:  'Bidirectional Encoder Representations from Transformers (BERT) [https://arxiv.org/abs/1810.04805]',
                     DISTILBERT:  'distilled, smaller, and faster BERT from Hugging Face [https://arxiv.org/abs/1910.01108]',
