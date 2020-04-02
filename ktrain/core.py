@@ -740,7 +740,7 @@ class Learner(ABC):
 
 
 
-    def autofit(self, lr, epochs=None,  flat=False,
+    def autofit(self, lr, epochs=None, 
                 early_stopping=None, reduce_on_plateau=None, reduce_factor=2, 
                 cycle_momentum=True, max_momentum=0.95, min_momentum=0.85,
                 monitor='val_loss', checkpoint_folder=None, verbose=1, 
@@ -748,8 +748,7 @@ class Learner(ABC):
         """
         Automatically train model using a default learning rate schedule shown to work well
         in practice.  By default, this method currently employs a triangular learning 
-        rate policy (https://arxiv.org/abs/1506.01186).  If flat=True, it performs the learning rate
-        is decayed in steps (step-based decay).
+        rate policy (https://arxiv.org/abs/1506.01186).  
         During each epoch, this learning rate policy varies the learning rate from lr/10 to lr
         and then back to a low learning rate that is near-zero. 
         If epochs is None, then early_stopping and reduce_on_plateau are atomatically
@@ -763,11 +762,6 @@ class Learner(ABC):
                        for dramatic loss drop.
             epochs (int): Number of epochs.  If None, training will continue until
                           validation loss no longer improves after 5 epochs.
-            flat(bool): If False, a triangular learning rate schedule will be used each epoch with the
-                        peak of the triangle decreasing when reduce_on_plateu is triggered.
-                        If True, a step decay learning rate schedule is used.  That is, the learning rate within each epoch will be flat 
-                        and decrease at the beginning of the epoch if reduce_on_plateau is triggered.
-                 
             early_stopping (int):     If not None, training will automatically stop after this many 
                                       epochs of no improvement in validation loss.
                                       Upon completion, model will be loaded with weights from epoch
@@ -850,9 +844,8 @@ class Learner(ABC):
         else:
             max_momentum = None
             min_momentum = None
-        base_lr = lr if flat else lr/10
 
-        clr = CyclicLR(base_lr=base_lr, max_lr=lr,
+        clr = CyclicLR(base_lr=lr/10, max_lr=lr,
                        step_size=step_size, verbose=verbose,
                        monitor=monitor,
                        reduce_on_plateau=reduce_on_plateau,
@@ -868,7 +861,7 @@ class Learner(ABC):
 
         # start training
         U.vprint('\n', verbose=verbose)
-        policy = 'step decay learning rate' if flat else 'triangular learning rate'
+        policy = 'triangular learning rate'
         U.vprint('begin training using %s policy with max lr of %s...' % (policy, lr), 
                 verbose=verbose)
         hist = self.fit(lr, epochs, early_stopping=early_stopping,
