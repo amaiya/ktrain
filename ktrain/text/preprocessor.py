@@ -120,7 +120,7 @@ def load_wv(wv_path_or_url=WV_URL, verbose=1):
             o = f.readline()
             tups.append(get_coefs(*o.rstrip().rsplit(' ')))
         f.close()
-        if verbose: mb.write('done.')
+        #if verbose: mb.write('done.')
     return dict(tups)
 
 

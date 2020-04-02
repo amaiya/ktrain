@@ -16,7 +16,7 @@ TEXT_CLASSIFIERS = {
                     FASTTEXT: "a fastText-like model [http://arxiv.org/pdf/1607.01759.pdf]",
                     LOGREG:  "logistic regression using a trainable Embedding layer",
                     NBSVM:  "NBSVM model [http://www.aclweb.org/anthology/P12-2018]",
-                    BIGRU:  'Bidirectional GRU with pretrained English word vectors [https://arxiv.org/abs/1712.09405]',
+                    BIGRU:  'Bidirectional GRU with pretrained fasttext word vectors [https://fasttext.cc/docs/en/crawl-vectors.html]',
                     STANDARD_GRU: 'simple 2-layer GRU with randomly initialized embeddings',
                     BERT:  'Bidirectional Encoder Representations from Transformers (BERT) [https://arxiv.org/abs/1810.04805]',
                     DISTILBERT:  'distilled, smaller, and faster BERT from Hugging Face [https://arxiv.org/abs/1910.01108]',
@@ -192,7 +192,8 @@ def _text_model(name, train_data, preproc=None, multilabel=None, classification=
                             features,
                             loss_func=loss_func,
                             activation=activation, metrics=metrics, verbose=verbose,
-                            tokenizer=tokenizer)
+                            tokenizer=tokenizer,
+                            preproc=preproc)
     elif name == BERT:
         model =  _build_bert(num_classes, 
                             maxlen,
@@ -391,16 +392,24 @@ def _build_bigru(num_classes,
                   maxlen, max_features, features,
                  loss_func='categorical_crossentropy',
                  activation = 'softmax', metrics=['accuracy'], verbose=1,
-                 tokenizer=None):
+                 tokenizer=None, preproc=None):
 
 
     if tokenizer is None: raise ValueError('bigru requires valid Tokenizer object')
+    if preproc is None: raise ValueError('bigru requires valid preproc')
+    if not hasattr(preproc, 'lang') or preproc.lang is None: 
+        lang = 'en'
+    else:
+        lang = preproc.lang
+    wv_url = "https://dl.fbaipublicfiles.com/fasttext/vectors-crawl/cc.%s.300.vec.gz" % (lang)
+    if verbose: print('word vectors will be loaded from: %s' % (wv_url))
+
 
 
     # setup pre-trained word embeddings
     embed_size = 300
     U.vprint('processing pretrained word vectors...', verbose=verbose)
-    embeddings_index = tpp.load_wv(verbose=verbose)
+    embeddings_index = tpp.load_wv(wv_path_or_url=wv_url, verbose=verbose)
     word_index = tokenizer.word_index 
     #nb_words = min(max_features, len(word_index))
     nb_words = max_features

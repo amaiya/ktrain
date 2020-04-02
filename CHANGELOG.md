@@ -7,6 +7,19 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.12.4 (TBD)
+
+### New:
+- `bigru` method now selects pretrained word vectors based on detected language
+
+### Changed
+- instead of throwing error, default to English if `detect_lang` could not detect language from batch of texts
+
+
+### Fixed:
+- N/A
+
+
 ## 0.12.3 (2020-04-02)
 
 ### New:
