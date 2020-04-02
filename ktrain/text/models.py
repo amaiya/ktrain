@@ -401,7 +401,7 @@ def _build_bigru(num_classes,
         lang = 'en'
     else:
         lang = preproc.lang
-    wv_url = "https://dl.fbaipublicfiles.com/fasttext/vectors-crawl/cc.%s.300.vec.gz" % (lang)
+    wv_url = "https://dl.fbaipublicfiles.com/fasttext/vectors-crawl/cc.%s.300.vec.gz" % (lang.split('-')[0])
     if verbose: print('word vectors will be loaded from: %s' % (wv_url))
 
 
