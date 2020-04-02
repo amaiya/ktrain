@@ -7,6 +7,21 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.12.3 (TBD)
+
+### New:
+- Added `max_momentum` and `min_momentum` parameters to `autofit` and `fit_onecycle` to control cyclical momentum
+- Added `flat` parameter to `autofit`.  When True, a step decay learning rate schedule is used instead of the default
+  triangular learning rate schedule
+
+### Changed
+- N/A
+
+
+### Fixed:
+- N/A
+
+
 ## 0.12.2 (2020-04-01)
 
 ### New:
