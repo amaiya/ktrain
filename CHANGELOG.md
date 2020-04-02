@@ -7,13 +7,13 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
-## 0.12.3 (TBD)
+## 0.12.3 (2020-04-02)
 
 ### New:
 - Added `max_momentum` and `min_momentum` parameters to `autofit` and `fit_onecycle` to control cyclical momentum
 
 ### Changed
-- N/A
+- Prevent loading errors of previously saved NERPreprocessor objects
 
 
 ### Fixed:
