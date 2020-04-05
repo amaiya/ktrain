@@ -14,6 +14,7 @@ Most recent releases are shown at the top. Each release shows:
 
 ### Changed
 - instead of throwing error, default to English if `detect_lang` could not detect language from batch of texts
+- `layers` argument moved to `TransformerEmbedding` constructor
 
 
 ### Fixed:

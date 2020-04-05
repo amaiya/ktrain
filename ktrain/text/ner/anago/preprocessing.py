@@ -71,6 +71,8 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
         self.__dict__.update(state)
         if not hasattr(self, 'te_model'): self.te_model = None
         if not hasattr(self, 'use_elmo'): self.use_elmo = False
+        if not hasattr(self, 'te_layers'): self.te_layers = U.DEFAULT_TRANSFORMER_LAYERS
+
         if self.te_model is not None: self.activate_transformer(self.te_model, layers=self.te_layers)
         else:
             self.te = None
@@ -94,7 +96,7 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
         if not hasattr(self, 'te'): self.te = None
         if self.te is None or self.te_model != model_name:  
             self.te_model = model_name
-            self.te = TransformerEmbedding(model_name)
+            self.te = TransformerEmbedding(model_name, layers=layers)
         self.te_layers = layers
 
     def get_transformer_dim(self):
@@ -211,7 +213,7 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
             features.append(elmo_embeddings)
 
         if self.te is not None:
-            transformer_embeddings = self.te.embed(X, word_level=True, layers=self.te_layers)
+            transformer_embeddings = self.te.embed(X, word_level=True)
             features.append(transformer_embeddings)
 
 

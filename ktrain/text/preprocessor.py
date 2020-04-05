@@ -1024,13 +1024,16 @@ class Transformer(TransformersPreprocessor):
 
 
 class TransformerEmbedding():
-    def __init__(self, model_name):
+    def __init__(self, model_name, layers=U.DEFAULT_TRANSFORMER_LAYERS):
         """
         Args:
             model_name (str):  name of Hugging Face pretrained model.
                                Choose from here: https://huggingface.co/transformers/pretrained_models.html
+            layers(list): list of indexes indicating which hidden layers to use when
+                          constructing the embedding (e.g., last=[-1])
                                
         """
+        self.layers = layers
         self.model_name = model_name
         if model_name.startswith('xlm-roberta'):
             self.name = 'xlm_roberta'
@@ -1079,15 +1082,13 @@ class TransformerEmbedding():
 
 
 
-    def embed(self, texts, word_level=True, layers=U.DEFAULT_TRANSFORMER_LAYERS):
+    def embed(self, texts, word_level=True):
         """
         get embedding for word, phrase, or sentence
         Args:
           text(str|list): word, phrase, or sentence or list of them representing a batch
           word_level(bool): If True, returns embedding for each token in supplied texts.
                             If False, returns embedding for each text in texts
-          layers(list):  hidden layer indices to use for embedding.
-                         default: last hidden state
         Returns:
             np.ndarray : embeddings
         """
@@ -1119,16 +1120,16 @@ class TransformerEmbedding():
         hidden_states = outputs[-1] # output_hidden_states=True
 
         # compile raw embeddings
-        if len(layers) == 1:
+        if len(self.layers) == 1:
             #raw_embeddings = hidden_states[-1].numpy()
-            raw_embeddings = hidden_states[layers[0]].numpy()
+            raw_embeddings = hidden_states[self.layers[0]].numpy()
         else:
             raw_embeddings = []
             for batch_id in range(hidden_states[0].shape[0]):
                 token_embeddings = []
                 for token_id in range(hidden_states[0].shape[1]):
                     all_layers = []
-                    for layer_id in layers:
+                    for layer_id in self.layers:
                         all_layers.append(hidden_states[layer_id][batch_id][token_id].numpy())
                     token_embeddings.append(np.concatenate(all_layers) )  
                 raw_embeddings.append(token_embeddings)
