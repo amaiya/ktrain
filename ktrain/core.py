@@ -3,6 +3,7 @@ from .imports import *
 from .lroptimize.sgdr import *
 from .lroptimize.triangular import *
 from .lroptimize.lrfinder import *
+from .lroptimize.optimization import AdamWeightDecay
 from . import utils as U
 
 from .vision.preprocessor import ImagePreprocessor
@@ -1387,11 +1388,14 @@ def _load_model(fname, preproc=None, train_data=None):
         train_data and U.is_nodeclass(data=train_data):
         from stellargraph.layer import MeanAggregator
         custom_objects={'MeanAggregator': MeanAggregator}
+    custom_objects = {} if custom_objects is None else custom_objects
+    custom_objects['AdamWeightDecay'] = AdamWeightDecay
     try:
         try:
             model = load_model(fname, custom_objects=custom_objects)
         except:
-            model = load_model(fname) # for bilstm models without CRF layer on TF2
+            # for bilstm models without CRF layer on TF2 where CRF is not supported 
+            model = load_model(fname, custom_objects={'AdamWeightDecay':AdamWeightDecay})
     except Exception as e:
         print('Call to keras.models.load_model failed.  '
               'Try using the learner.model.save_weights and '

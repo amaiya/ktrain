@@ -864,7 +864,7 @@ class TransformersPreprocessor(TextPreprocessor):
         else:
             loss_fn = keras.losses.CategoricalCrossentropy(from_logits=True)
         model.compile(loss=loss_fn,
-                      optimizer=U.get_default_optimizer(lr=3e-5),
+                      optimizer=U.DEFAULT_OPT,
                       metrics=['accuracy'])
         return model
 
@@ -879,7 +879,7 @@ class TransformersPreprocessor(TextPreprocessor):
         model = self._load_pretrained(mname, num_labels)
         loss_fn = 'mse'
         model.compile(loss=loss_fn,
-                      optimizer=U.get_default_optimizer(lr=3e-5),
+                      optimizer=U.DEFAULT_OPT,
                       metrics=['mae'])
         return model
 
