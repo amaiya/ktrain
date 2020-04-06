@@ -16,7 +16,8 @@ Most recent releases are shown at the top. Each release shows:
 - instead of throwing error, default to English if `detect_lang` could not detect language from batch of texts
 - `layers` argument moved to `TransformerEmbedding` constructor
 - enforce specific version of TensorFlow due to undocumented breaking changes in newer TF versions
-- `AdamWeightDecay` is now default optimizer for 'out-of-the-box' models
+- `AdamWeightDecay` optimizer is now used to support global weight decay. Used when user
+   excplictly sets a weight decay
 
 
 ### Fixed:
