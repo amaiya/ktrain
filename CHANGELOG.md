@@ -7,7 +7,7 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
-## 0.12.4 (TBD)
+## 0.13.0 (TBD)
 
 ### New:
 - `bigru` method now selects pretrained word vectors based on detected language
@@ -15,10 +15,12 @@ Most recent releases are shown at the top. Each release shows:
 ### Changed
 - instead of throwing error, default to English if `detect_lang` could not detect language from batch of texts
 - `layers` argument moved to `TransformerEmbedding` constructor
+- enforce specific version of TensorFlow due to undocumented breaking changes in newer TF versions
+- `AdamWeightDecay` is now default optimizer for 'out-of-the-box' models
 
 
 ### Fixed:
-- N/A
+- force re-instantiation of `TransformerEmbedding` object with `sequence_tagger` function is re-invoked
 
 
 ## 0.12.3 (2020-04-02)

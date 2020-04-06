@@ -91,10 +91,11 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
             self.elmo = Elmo(options_file, weight_file, 2, dropout=0)
         self.use_elmo = True
 
-    def activate_transformer(self, model_name, layers=U.DEFAULT_TRANSFORMER_LAYERS):
+    def activate_transformer(self, model_name, layers=U.DEFAULT_TRANSFORMER_LAYERS, 
+                              force=False):
         from ...preprocessor import TransformerEmbedding
         if not hasattr(self, 'te'): self.te = None
-        if self.te is None or self.te_model != model_name:  
+        if self.te is None or self.te_model != model_name or force:
             self.te_model = model_name
             self.te = TransformerEmbedding(model_name, layers=layers)
         self.te_layers = layers
