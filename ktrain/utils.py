@@ -15,8 +15,10 @@ def get_default_optimizer(lr=0.001, wd=DEFAULT_WD):
                          epsilon=1e-6,
                          exclude_from_weight_decay=['layer_norm', 'bias'])
     return opt
-#DEFAULT_OPT = get_default_optimizer()
-DEFAULT_OPT = 'adam' # use Adam as default unless a weight decay is explicitly set by user
+# Use vanilla Adam as default unless weight decay is explicitly set by user
+# in which case AdamWeightDecay is default optimizer.
+# See core.Learner.set_weight_decay for more information
+DEFAULT_OPT = 'adam' 
 DEFAULT_BS = 32
 DEFAULT_ES = 5 
 DEFAULT_ROP = 2 
