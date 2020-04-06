@@ -5,14 +5,31 @@ from .data import Dataset
 #------------------------------------------------------------------------------
 # KTRAIN DEFAULTS
 #------------------------------------------------------------------------------
+DEFAULT_WD = 0.01
+def get_default_optimizer(lr=0.001, wd=DEFAULT_WD):
+    from .lroptimize.optimization import AdamWeightDecay
+    opt = AdamWeightDecay(learning_rate=lr, 
+                         weight_decay_rate=wd, 
+                         beta_1=0.9,
+                         beta_2=0.999,
+                         epsilon=1e-6,
+                         exclude_from_weight_decay=['layer_norm', 'bias'])
+    return opt
+DEFAULT_OPT = get_default_optimizer()
 DEFAULT_BS = 32
 DEFAULT_ES = 5 
 DEFAULT_ROP = 2 
-DEFAULT_OPT = 'adam'
+#DEFAULT_OPT = 'adam'
+#from .lroptimize.optimization import AdamWeightDecay
+#DEFAULT_OPT = AdamWeightDecay(learning_rate=0.001, 
+                              #weight_decay_rate=0.01, 
+                              #beta_1=0.9,
+                              #beta_2=0.999,
+                              #epsilon=1e-6,
+                              #exclude_from_weight_decay=['layer_norm', 'bias'])
 DEFAULT_TRANSFORMER_LAYERS = [-2] # second-to-last hidden state
 DEFAULT_TRANSFORMER_MAXLEN = 512
 DEFAULT_TRANSFORMER_NUM_SPECIAL = 2
-
 
 
 #------------------------------------------------------------------------------

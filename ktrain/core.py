@@ -39,56 +39,24 @@ class Learner(ABC):
 
     def get_weight_decay(self):
         """
-        Gets set of weight decays currently used in network.
-        use print_layers(show_wd=True) to view weight decays per layer.
+        Get current weight decay rate
         """
-        wds = []
-        for layer in self.model.layers:
-            if hasattr(layer, 'kernel_regularizer') and hasattr(layer, 'kernel'):
-                reg = layer.kernel_regularizer
-                if hasattr(reg, 'l2'):
-                    wd = reg.l2
-                elif hasattr(reg, 'l1'):
-                    wd = reg.l1
-                else:
-                    wd = None
-                wds.append(wd)
-        return wds
+        if type(self.model.optimizer).__name__ == 'AdamWeightDecay':
+            return self.model.optimizer.weight_decay_rate
+        else:
+            return None
 
 
-    def set_weight_decay(self, wd=0.005):
+    def set_weight_decay(self, wd=U.DEFAULT_WD):
         """
-        Sets global weight decay layer-by-layer using L2 regularization.
-
-        NOTE: Weight decay can be implemented in the form of
-              L2 regularization, which is the case with Keras.
-              Thus, he weight decay value must be divided by
-              2 to obtain similar behavior.
-              The default weight decay here is 0.01/2 = 0.005.
-              See here for more information: 
-              https://bbabenko.github.io/weight-decay/
+        Sets global weight decay via AdamWeightDecay optimizer
         Args:
-          wd(float): weight decay (see note above)
+          wd(float): weight decay
         Returns:
           None
               
         """
-        # NOTE: zero argument lambda required when TF_EAGER=1
-        for layer in self.model.layers:
-            if hasattr(layer, 'kernel_regularizer') and hasattr(layer, 'kernel'):
-                layer.kernel_regularizer= regularizers.l2(wd)
-                if U.is_tf_keras():
-                    layer.add_loss(lambda:regularizers.l2(wd)(layer.kernel))
-                else:
-                    layer.add_loss(regularizers.l2(wd)(layer.kernel))
-
-            if hasattr(layer, 'bias_regularizer') and hasattr(layer, 'bias'):
-                layer.bias_regularizer= regularizers.l2(wd)
-                if U.is_tf_keras():
-                    layer.add_loss(lambda:regularizers.l2(wd)(layer.bias))
-                else:
-                    layer.add_loss(regularizers.l2(wd)(layer.bias))
-        self._recompile()
+        self._recompile(wd=wd)
         return
         
 
@@ -263,7 +231,7 @@ class Learner(ABC):
         return self.model is not None and hasattr(self.model.optimizer, 'beta_1')
 
 
-    def _recompile(self):
+    def _recompile(self, wd=None):
         # ISSUE: recompile does not work correctly with multigpu models
         if self.multigpu:
             err_msg = """
@@ -274,17 +242,23 @@ class Learner(ABC):
                    """
             raise Exception(err_msg)
         
-        if self.multigpu:
-            with tf.device("/cpu:0"):
-                metrics = [m.name for m in self.model.metrics] if U.is_tf_keras() else self.model.metrics
-                self.model.compile(optimizer=self.model.optimizer,
-                                   loss=self.model.loss,
-                                   metrics=metrics)
+        #if self.multigpu:
+            #with tf.device("/cpu:0"):
+                #metrics = [m.name for m in self.model.metrics] if U.is_tf_keras() else self.model.metrics
+                #self.model.compile(optimizer=self.model.optimizer,
+                                   #loss=self.model.loss,
+                                   #metrics=metrics)
+        metrics = [m.name for m in self.model.metrics] if U.is_tf_keras() else self.model.metrics
+        if wd is not None and type(self.model.optimizer).__name__ != 'AdamWeightDecay':
+            warnings.warn('recompiling model to use AdamWeightDecay as opimizer with weight decay of %s' % (wd) )
+            optimizer = U.get_default_optimizer(wd=wd)
+        elif wd is not None:
+            optimizer = U.get_default_optimizer(wd=wd)
         else:
-            metrics = [m.name for m in self.model.metrics] if U.is_tf_keras() else self.model.metrics
-            self.model.compile(optimizer=self.model.optimizer,
-                               loss=self.model.loss,
-                               metrics=metrics)
+            optimizer = self.model.optimizer
+        self.model.compile(optimizer=optimizer,
+                           loss=self.model.loss,
+                           metrics=metrics)
 
         return
 

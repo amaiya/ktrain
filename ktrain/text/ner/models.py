@@ -157,7 +157,7 @@ def sequence_tagger(name, preproc,
         preproc.p.activate_elmo()
     elif name == BILSTM_TRANSFORMER:
         use_crf = False
-        preproc.p.activate_transformer(bert_model, layers=bert_layers_to_use)
+        preproc.p.activate_transformer(bert_model, layers=bert_layers_to_use, force=True)
     else:
         raise ValueError('Unsupported model name')
     model = BiLSTMCRF(char_embedding_dim=char_embedding_dim,
