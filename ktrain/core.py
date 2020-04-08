@@ -1278,7 +1278,7 @@ def get_predictor(model, preproc, batch_size=U.DEFAULT_BS):
     # check arguments
     if not isinstance(model, Model):
         raise ValueError('model must be of instance Model')
-    if not isinstance(preproc, (ImagePreprocessor,TextPreprocessor, NERPreprocessor, NodePreprocessor)):
+    if not isinstance(preproc, (ImagePreprocessor,TextPreprocessor, NERPreprocessor, NodePreprocessor, LinkPreprocessor)):
         raise ValueError('preproc must be instance of ktrain.preprocessor.Preprocessor')
     if isinstance(preproc, ImagePreprocessor):
         return ImagePredictor(model, preproc, batch_size=batch_size)
@@ -1289,6 +1289,8 @@ def get_predictor(model, preproc, batch_size=U.DEFAULT_BS):
         return NERPredictor(model, preproc, batch_size=batch_size)
     elif isinstance(preproc, NodePreprocessor):
         return NodePredictor(model, preproc, batch_size=batch_size)
+    elif isinstance(preproc, LinkPreprocessor):
+        return LinkPredictor(model, preproc, batch_size=batch_size)
     else:
         raise Exception('preproc of type %s not currently supported' % (type(preproc)))
 
@@ -1326,7 +1328,7 @@ def load_predictor(fname, batch_size=U.DEFAULT_BS):
     # return the appropriate predictor
     if not isinstance(model, Model):
         raise ValueError('model must be of instance Model')
-    if not isinstance(preproc, (ImagePreprocessor, TextPreprocessor, NERPreprocessor, NodePreprocessor)):
+    if not isinstance(preproc, (ImagePreprocessor, TextPreprocessor, NERPreprocessor, NodePreprocessor, LinkPreprocessor)):
         raise ValueError('preproc must be instance of ktrain.preprocessor.Preprocessor')
     if isinstance(preproc, ImagePreprocessor):
         return ImagePredictor(model, preproc, batch_size=batch_size)

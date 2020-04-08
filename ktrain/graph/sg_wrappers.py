@@ -60,6 +60,8 @@ class NodeSequenceWrapper(node_mappers.NodeSequence, Dataset):
             # stellargraph did not implement reset for its generators
             # return a zero-argument lambda that returns None
             return lambda:None 
+        elif name == 'graph':
+            return self.generator.graph
         else:
             try:
                 return self.__dict__[name] 
@@ -134,6 +136,8 @@ class LinkSequenceWrapper(link_mappers.LinkSequence, Dataset):
             # stellargraph did not implement reset for its generators
             # return a zero-argument lambda that returns None
             return lambda:None 
+        elif name == 'graph':
+            return self.generator.graph
         else:
             try:
                 return self.__dict__[name] 

@@ -185,8 +185,9 @@ class LinkPreprocessor(Preprocessor):
     Link preprocessing base class
     """
 
-    def __init__(self,  sample_sizes=[10, 20]):
+    def __init__(self, G,  sample_sizes=[10, 20]):
         self.sample_sizes = sample_sizes
+        self.G = G # original graph under consideration with all original links
 
 
         # class names
@@ -203,7 +204,7 @@ class LinkPreprocessor(Preprocessor):
 
     def preprocess(self, G, edge_ids):
         edge_labels = [1] * len(edge_ids)
-        return self.preproess_valid(G, edge_ids, edge_labels)
+        return self.preprocess_valid(G, edge_ids, edge_labels)
 
 
     def preprocess_train(self, G, edge_ids, edge_labels, mode='train'):

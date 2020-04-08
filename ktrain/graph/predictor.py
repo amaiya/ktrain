@@ -82,6 +82,8 @@ class LinkPredictor(Predictor):
         gen = self.preproc.preprocess(G, edge_ids)
         gen.batch_size = self.batch_size
         preds = self.model.predict_generator(gen)
+        preds = np.squeeze(preds)
+        preds = [[1-pred, pred] for pred in preds] 
         result =  preds if return_proba else [self.c[np.argmax(pred)] for pred in preds]
         return result
 

@@ -224,8 +224,9 @@ def graph_links_from_csv(nodes_filepath,
     # read graph structure
     #----------------------------------------------------------------
     nx_sep = None if sep in [' ', '\t'] else sep
-    g_nx = nx.read_edgelist(path=links_filepath, delimiter=nx_sep)
-    print(nx.info(g_nx))
+    G = nx.read_edgelist(path=links_filepath, delimiter=nx_sep)
+    print(nx.info(G))
+
 
 
 
@@ -237,7 +238,7 @@ def graph_links_from_csv(nodes_filepath,
     feature_names = ["w_{}".format(ii) for ii in range(num_features)]
     node_data = pd.read_csv(nodes_filepath, header=None, names=feature_names, sep=sep)
     node_data.index = node_data.index.map(str)
-    df = node_data[node_data.index.isin(list(g_nx.nodes()))]
+    df = node_data[node_data.index.isin(list(G.nodes()))]
     for col in feature_names:
         if not isinstance(node_data[col].values[0], str): continue
         df = pd.concat([df, df[col].astype('str').str.get_dummies().add_prefix(col+'_')], axis=1, sort=False)
@@ -246,18 +247,18 @@ def graph_links_from_csv(nodes_filepath,
     node_data = df
     node_features = node_data[feature_names].values
     for nid, f in zip(node_data.index, node_features):
-        g_nx.node[nid][sg.globalvar.TYPE_ATTR_NAME] = "node"  
-        g_nx.node[nid]["feature"] = f
+        G.node[nid][sg.globalvar.TYPE_ATTR_NAME] = "node"  
+        G.node[nid]["feature"] = f
 
 
     #----------------------------------------------------------------
     # train/validation sets
     #----------------------------------------------------------------
-    edge_splitter_test = EdgeSplitter(g_nx)
+    edge_splitter_test = EdgeSplitter(G)
     G_test, edge_ids_test, edge_labels_test = edge_splitter_test.train_test_split(p=val_pct, method="global", keep_connected=True)
     edge_splitter_train = EdgeSplitter(G_test)
     G_train, edge_ids_train, edge_labels_train = edge_splitter_train.train_test_split(p=train_pct, method="global", keep_connected=True)
-    epp = LinkPreprocessor(sample_sizes=sample_sizes)
+    epp = LinkPreprocessor(G, sample_sizes=sample_sizes)
     trn = epp.preprocess_train(G_train, edge_ids_train, edge_labels_train)
     val = epp.preprocess_valid(G_test, edge_ids_test, edge_labels_test)
     
