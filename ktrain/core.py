@@ -12,8 +12,8 @@ from .text.preprocessor import TextPreprocessor, BERTPreprocessor, TransformersP
 from .text.predictor import TextPredictor
 from .text.ner.predictor import NERPredictor
 from .text.ner.preprocessor import NERPreprocessor
-from .graph.predictor import NodePredictor
-from .graph.preprocessor import NodePreprocessor
+from .graph.predictor import NodePredictor, LinkPredictor
+from .graph.preprocessor import NodePreprocessor, LinkPreprocessor
 
 
 class Learner(ABC):
@@ -1336,6 +1336,8 @@ def load_predictor(fname, batch_size=U.DEFAULT_BS):
         return NERPredictor(model, preproc, batch_size=batch_size)
     elif isinstance(preproc, NodePreprocessor):
         return NodePredictor(model, preproc, batch_size=batch_size)
+    elif isinstance(preproc, LinkPreprocessor):
+        return LinkPredictor(model, preproc, batch_size=batch_size)
     else:
         raise Exception('preprocessor not currently supported')
 
@@ -1386,6 +1388,11 @@ def _load_model(fname, preproc=None, train_data=None):
     elif (preproc and (isinstance(preproc, NodePreprocessor) or \
                     type(preproc).__name__ == 'NodePreprocessor')) or \
         train_data and U.is_nodeclass(data=train_data):
+        from stellargraph.layer import MeanAggregator
+        custom_objects={'MeanAggregator': MeanAggregator}
+    elif (preproc and (isinstance(preproc, LinkPreprocessor) or \
+                    type(preproc).__name__ == 'LinkPreprocessor')) or \
+        train_data and U.is_linkpred(data=train_data):
         from stellargraph.layer import MeanAggregator
         custom_objects={'MeanAggregator': MeanAggregator}
     custom_objects = {} if custom_objects is None else custom_objects
