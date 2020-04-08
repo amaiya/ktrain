@@ -50,9 +50,9 @@ def texts_from_folder(datadir, classes=None,
                                  name for train and validation sets
                                  if test name is missing, <val_pct> of training
                                  will be used for validation
-        preprocess_mode (str):  Either 'standard' (normal tokenization) or 'bert'
+        preprocess_mode (str):  Either 'standard' (normal tokenization) or one of {'bert', 'distilbert'}
                                 tokenization and preprocessing for use with 
-                                BERT text classification model.
+                                BERT/DistilBert text classification model.
         encoding (str):        character encoding to use. Auto-detected if None
         lang (str):            language.  Auto-detected if None.
         val_pct(float):        Onlyl used if train_test_names  has 1 and not 2 names
@@ -161,9 +161,9 @@ def texts_from_csv(train_filepath,
                                limited by max_features
         val_pct(float): Proportion of training to use for validation.
                         Has no effect if val_filepath is supplied.
-        preprocess_mode (str):  Either 'standard' (normal tokenization) or 'bert'
+        preprocess_mode (str):  Either 'standard' (normal tokenization) or one of {'bert', 'distilbert'}
                                 tokenization and preprocessing for use with 
-                                BERT text classification model.
+                                BERT/DistilBert text classification model.
         encoding (str):        character encoding to use. Auto-detected if None
         lang (str):            language.  Auto-detected if None.
         sep(str):              delimiter for CSV (comma is default)
@@ -234,9 +234,9 @@ def texts_from_df(train_df,
                                limited by max_features
         val_pct(float): Proportion of training to use for validation.
                         Has no effect if val_filepath is supplied.
-        preprocess_mode (str):  Either 'standard' (normal tokenization) or 'bert'
+        preprocess_mode (str):  Either 'standard' (normal tokenization) or one of {'bert', 'distilbert'}
                                 tokenization and preprocessing for use with 
-                                BERT text classification model.
+                                BERT/DistilBert text classification model.
         lang (str):            language.  Auto-detected if None.
         random_state(int):      If integer is supplied, train/test split is reproducible.
                                 If None, train/test split will be random
