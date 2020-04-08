@@ -182,3 +182,56 @@ def graph_nodes_from_csv(nodes_filepath,
     else:
         return (NodeSequenceWrapper(trn), NodeSequenceWrapper(val), preproc)
 
+
+
+def graph_edges_from_csv(nodes_filepath, 
+                         links_filepath,
+                         sample_size=10,
+                         train_pct=0.1, sep=',', 
+                         holdout_pct=None, 
+                         holdout_for_inductive=False,
+                         missing_label_value=None,
+                         random_state=None,
+                         verbose=1):
+    """
+    Loads graph data from CSV files. 
+    Returns generators for nodes in graph for use with GraphSAGE model.
+    Args:
+        nodes_filepath(str): file path to training CSV containing node attributes
+        links_filepath(str): file path to training CSV describing links among nodes
+        sample_size(int): Number of nodes to sample at each neighborhood level
+        train_pct(float): Proportion of nodes to use for training.
+                          Default is 0.1.
+        sep (str):  delimiter for CSVs. Default is comma.
+        random_state (int):  random seed for train/test split
+        verbose (boolean): verbosity
+    Return:
+        tuple of EdgeSequenceWrapper objects for train and validation sets and EdgePreprocessor
+    """
+
+
+    #----------------------------------------------------------------
+    # read graph structure
+    #----------------------------------------------------------------
+    nx_sep = None if sep in [' ', '\t'] else sep
+    g_nx = nx.read_edgelist(path=links_filepath, delimiter=nx_sep)
+    print(nx.info(g_nx))
+
+
+
+    #----------------------------------------------------------------
+    # read node attributes and split into train/validation
+    #----------------------------------------------------------------
+    node_attr = pd.read_csv(nodes_filepath, sep=sep, header=None)
+    num_features = len(node_attr.columns.values) - 2 # subract ID and target
+    feature_names = ["w_{}".format(ii) for ii in range(num_features)]
+    column_names =  feature_names + ["target"]
+    node_data = pd.read_csv(nodes_filepath, header=None, names=column_names, sep=sep)
+    node_data.index = node_data.index.map(str)
+    node_data = node_data[node_data.index.isin(list(g_nx.nodes()))]
+    return node_data
+
+
+
+
+
