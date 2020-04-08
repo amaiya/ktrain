@@ -151,6 +151,12 @@ def is_nodeclass(model=None, data=None):
         result = True
     return result
 
+def is_linkpred(model=None, data=None):
+    result = False
+    if data is not None and type(data).__name__ == 'LinkSequenceWrapper':
+        result = True
+    return result
+
 
 def is_imageclass_from_data(data):
     return type(data).__name__ in ['DirectoryIterator', 'DataFrameIterator', 'NumpyArrayIterator']

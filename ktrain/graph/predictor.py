@@ -1,6 +1,6 @@
 from ..imports import *
 from ..predictor import Predictor
-from .preprocessor import NodePreprocessor
+from .preprocessor import NodePreprocessor, LinkPreprocessor
 from .. import utils as U
 
 class NodePredictor(Predictor):
@@ -13,7 +13,7 @@ class NodePredictor(Predictor):
         if not isinstance(model, Model):
             raise ValueError('model must be of instance Model')
         if not isinstance(preproc, NodePreprocessor):
-            raise ValueError('preproc must be a TextPreprocessor object')
+            raise ValueError('preproc must be a NodePreprocessor object')
         self.model = model
         self.preproc = preproc
         self.c = self.preproc.get_classes()
@@ -51,3 +51,39 @@ class NodePredictor(Predictor):
         preds = self.model.predict_generator(gen)
         result =  preds if return_proba else [self.c[np.argmax(pred)] for pred in preds]
         return result
+
+
+class LinkPredictor(Predictor):
+    """
+    predicts graph node's classes
+    """
+
+    def __init__(self, model, preproc, batch_size=U.DEFAULT_BS):
+
+        if not isinstance(model, Model):
+            raise ValueError('model must be of instance Model')
+        if not isinstance(preproc, LinkPreprocessor):
+            raise ValueError('preproc must be a LinkPreprocessor object')
+        self.model = model
+        self.preproc = preproc
+        self.c = self.preproc.get_classes()
+        self.batch_size = batch_size
+
+
+    def get_classes(self):
+        return self.c
+
+
+    def predict(self, G, edge_ids, return_proba=False):
+        """
+        Performs link prediction
+        If return_proba is True, returns probabilities of each class.
+        """
+        gen = self.preproc.preprocess(G, edge_ids)
+        gen.batch_size = self.batch_size
+        preds = self.model.predict_generator(gen)
+        preds = np.squeeze(preds)
+        preds = [[1-pred, pred] for pred in preds] 
+        result =  preds if return_proba else [self.c[np.argmax(pred)] for pred in preds]
+        return result
+
