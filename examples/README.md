@@ -13,6 +13,7 @@ This directory contains various example notebooks using *ktrain*.  The directory
   - [image classification](#imageclass):  models for image datasetsimage classification examples using various models and datasets
 - `graphs`: 
   - [node classification](#-graph-node-classification-datasets): node classification in graphs or networks
+  - [link prediction](#-graph-link-prediction-datasets): link prediction in graphs or networks
 
 
 ## Text Data
@@ -165,4 +166,16 @@ In the Cora citation graph, each node represents a paper pertaining to one of se
 Dataset of Twitter users and their attributes.  A small portion of the user accounts are annotated as `hateful` or `normal`.  The goal is to predict hateful accounts based on user features and graph structure.
 
 - [hateful_twitter_users-GraphSAGE.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/graphs): GraphSAGE model to predict hateful Twitter users using transductive inference.
+
+
+### <a name="#linkpred"></a> Graph Link Prediction Datasets
+
+
+#### [Cora Citation Graph](https://linqs-data.soe.ucsc.edu/public/lbc/cora.tgz):  Node Classification
+
+In the Cora citation graph, each node represents a paper. Links represent citations between papers.  The attributes or features assigned to each node is in the form of a multi-hot-encoded vector of words in each paper.
+
+- [cora_link_prediction-GraphSAGE.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/graphs): GraphSAGE model to predict missing links in the citation network.
+
+
 

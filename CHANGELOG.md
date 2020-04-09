@@ -7,9 +7,10 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
-## 0.13.0 (TBD)
+## 0.13.0 (2020-04-08)
 
 ### New:
+-  support for link prediction with graph neural networks
 - `bigru` method now selects pretrained word vectors based on detected language
 
 ### Changed
