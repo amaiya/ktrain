@@ -10,7 +10,7 @@
 - **2020-04-09:**  
   - ***ktrain*** **v0.13.x is released** and includes support for:
     -  **link prediction** using graph neural networks.  See [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/graphs/cora_link_prediction-GraphSAGE.ipynb) on citation prediction. 
-    - **text summarization** with pretrained BART. See [example summarization notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/vision/dogs_vs_cats-ResNet50.ipynb)). <sub><sup>(Summarization feature was added in v0.13.1, but not v0.13.0.)</sup></sub>
+    - **text summarization** with pretrained BART. See [example summarization notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/vision/dogs_vs_cats-ResNet50.ipynb). <sub><sup>(Summarization feature was added in v0.13.1, but not v0.13.0.)</sup></sub>
 - **2020-03-31:**  
   - ***ktrain*** **v0.12.x is released** and now includes BERT embeddings (i.e., BERT, DistilBert, and Albert) that can be used for downstream tasks like building sequence-taggers (i.e., NER) 
       for any language such as English, Chinese, Russian, Arabic, Dutch, etc.  See [this English NER example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/CoNLL2003-BiLSTM.ipynb) or the [Dutch NER notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/CoNLL2002_Dutch-BiLSTM.ipynb) for examples on how to use this feature.
