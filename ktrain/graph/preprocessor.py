@@ -5,7 +5,7 @@ from ..preprocessor import Preprocessor
 
 class NodePreprocessor(Preprocessor):
     """
-    Text preprocessing base class
+    Node preprocessing base class
     """
 
     def __init__(self, G_nx, df, sample_size=10, missing_label_value=None):
@@ -90,7 +90,7 @@ class NodePreprocessor(Preprocessor):
         self.G_sg = G_sg
         generator = GraphSAGENodeGenerator(G_sg, U.DEFAULT_BS, [self.sampsize, self.sampsize])
         train_gen = generator.flow(df_tr.index, train_targets, shuffle=True)
-        from .node_generator import NodeSequenceWrapper
+        from .sg_wrappers import NodeSequenceWrapper
         return NodeSequenceWrapper(train_gen)
 
 
@@ -126,7 +126,7 @@ class NodePreprocessor(Preprocessor):
             self.G_sg = sg.StellarGraph(self.G, node_features=self.df[self.feature_names])
         generator = GraphSAGENodeGenerator(self.G_sg, U.DEFAULT_BS, [self.sampsize,self.sampsize])
         val_gen = generator.flow(df_val.index, val_targets, shuffle=False)
-        from .node_generator import NodeSequenceWrapper
+        from .sg_wrappers import NodeSequenceWrapper
         return NodeSequenceWrapper(val_gen)
 
 
@@ -174,9 +174,73 @@ class NodePreprocessor(Preprocessor):
         G_sg = sg.StellarGraph(G_agg, node_features=df_agg[self.feature_names])
         generator = GraphSAGENodeGenerator(G_sg, U.DEFAULT_BS, [self.sampsize,self.sampsize])
         test_gen = generator.flow(df_te.index, test_targets, shuffle=False)
-        from .node_generator import NodeSequenceWrapper
+        from .sg_wrappers import NodeSequenceWrapper
         return NodeSequenceWrapper(test_gen)
 
 
+
+
+class LinkPreprocessor(Preprocessor):
+    """
+    Link preprocessing base class
+    """
+
+    def __init__(self, G,  sample_sizes=[10, 20]):
+        self.sample_sizes = sample_sizes
+        self.G = G # original graph under consideration with all original links
+
+
+        # class names
+        self.c = ['negative', 'positive']
+
+
+    def get_preprocessor(self):
+        return self
+
+
+    def get_classes(self):
+        return self.c
+
+
+    def preprocess(self, G, edge_ids):
+        edge_labels = [1] * len(edge_ids)
+        return self.preprocess_valid(G, edge_ids, edge_labels)
+
+
+    def preprocess_train(self, G, edge_ids, edge_labels, mode='train'):
+        """
+        preprocess training set
+        Args:
+          G (networkx graph): networkx graph
+          edge_ids(list): list of tuples representing edge ids
+          edge_labels(list): edge labels (1 or 0 to indicated whether it is a true edge in original graph or not)
+        """
+        # import stellargraph
+        try:
+            import stellargraph as sg
+            from stellargraph.mapper import GraphSAGELinkGenerator
+        except:
+            raise Exception(SG_ERRMSG)
+        if version.parse(sg.__version__) < version.parse('0.8'):
+            raise Exception(SG_ERRMSG)
+
+        #edge_labels = to_categorical(edge_labels)
+        G_sg = sg.StellarGraph(G, node_features="feature")
+        #print(G_sg.info())
+        shuffle = True if mode == 'train' else False
+        link_seq = GraphSAGELinkGenerator(G_sg, U.DEFAULT_BS, self.sample_sizes).flow(edge_ids, edge_labels, shuffle=shuffle)
+        from .sg_wrappers import LinkSequenceWrapper
+        return LinkSequenceWrapper(link_seq)
+
+
+    def preprocess_valid(self, G, edge_ids, edge_labels):
+        """
+        preprocess training set
+        Args:
+          G (networkx graph): networkx graph
+          edge_ids(list): list of tuples representing edge ids
+          edge_labels(list): edge labels (1 or 0 to indicated whether it is a true edge in original graph or not)
+        """
+        return self.preprocess_train(G, edge_ids, edge_labels, mode='valid')
 
 

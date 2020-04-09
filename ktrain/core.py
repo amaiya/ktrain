@@ -3,6 +3,7 @@ from .imports import *
 from .lroptimize.sgdr import *
 from .lroptimize.triangular import *
 from .lroptimize.lrfinder import *
+from .lroptimize.optimization import AdamWeightDecay
 from . import utils as U
 
 from .vision.preprocessor import ImagePreprocessor
@@ -11,8 +12,8 @@ from .text.preprocessor import TextPreprocessor, BERTPreprocessor, TransformersP
 from .text.predictor import TextPredictor
 from .text.ner.predictor import NERPredictor
 from .text.ner.preprocessor import NERPreprocessor
-from .graph.predictor import NodePredictor
-from .graph.preprocessor import NodePreprocessor
+from .graph.predictor import NodePredictor, LinkPredictor
+from .graph.preprocessor import NodePreprocessor, LinkPreprocessor
 
 
 class Learner(ABC):
@@ -39,56 +40,24 @@ class Learner(ABC):
 
     def get_weight_decay(self):
         """
-        Gets set of weight decays currently used in network.
-        use print_layers(show_wd=True) to view weight decays per layer.
+        Get current weight decay rate
         """
-        wds = []
-        for layer in self.model.layers:
-            if hasattr(layer, 'kernel_regularizer') and hasattr(layer, 'kernel'):
-                reg = layer.kernel_regularizer
-                if hasattr(reg, 'l2'):
-                    wd = reg.l2
-                elif hasattr(reg, 'l1'):
-                    wd = reg.l1
-                else:
-                    wd = None
-                wds.append(wd)
-        return wds
+        if type(self.model.optimizer).__name__ == 'AdamWeightDecay':
+            return self.model.optimizer.weight_decay_rate
+        else:
+            return None
 
 
-    def set_weight_decay(self, wd=0.005):
+    def set_weight_decay(self, wd=U.DEFAULT_WD):
         """
-        Sets global weight decay layer-by-layer using L2 regularization.
-
-        NOTE: Weight decay can be implemented in the form of
-              L2 regularization, which is the case with Keras.
-              Thus, he weight decay value must be divided by
-              2 to obtain similar behavior.
-              The default weight decay here is 0.01/2 = 0.005.
-              See here for more information: 
-              https://bbabenko.github.io/weight-decay/
+        Sets global weight decay via AdamWeightDecay optimizer
         Args:
-          wd(float): weight decay (see note above)
+          wd(float): weight decay
         Returns:
           None
               
         """
-        # NOTE: zero argument lambda required when TF_EAGER=1
-        for layer in self.model.layers:
-            if hasattr(layer, 'kernel_regularizer') and hasattr(layer, 'kernel'):
-                layer.kernel_regularizer= regularizers.l2(wd)
-                if U.is_tf_keras():
-                    layer.add_loss(lambda:regularizers.l2(wd)(layer.kernel))
-                else:
-                    layer.add_loss(regularizers.l2(wd)(layer.kernel))
-
-            if hasattr(layer, 'bias_regularizer') and hasattr(layer, 'bias'):
-                layer.bias_regularizer= regularizers.l2(wd)
-                if U.is_tf_keras():
-                    layer.add_loss(lambda:regularizers.l2(wd)(layer.bias))
-                else:
-                    layer.add_loss(regularizers.l2(wd)(layer.bias))
-        self._recompile()
+        self._recompile(wd=wd)
         return
         
 
@@ -118,8 +87,14 @@ class Learner(ABC):
             return
         y_pred = self.predict(val_data=val)
         y_true = self.ground_truth(val_data=val)
-        y_pred = np.argmax(y_pred, axis=1)
-        y_true = np.argmax(y_true, axis=1)
+        y_pred = np.squeeze(y_pred)
+        y_true = np.squeeze(y_true)
+        if len(y_pred.shape) == 1:
+            y_pred = np.where(y_pred > 0.5, 1, 0)
+            y_true = np.where(y_true > 0.5, 1, 0)
+        else:
+            y_pred = np.argmax(y_pred, axis=1)
+            y_true = np.argmax(y_true, axis=1)
         if print_report:
             if class_names:
                 try:
@@ -219,8 +194,14 @@ class Learner(ABC):
 
         # sort by loss and prune correct classifications, if necessary
         if classification and not multilabel:
-            y_p = np.argmax(y_pred, axis=1)
-            y_t = np.argmax(y_true, axis=1)
+            y_pred = np.squeeze(y_pred)
+            y_true = np.squeeze(y_true)
+            if len(y_pred.shape) == 1:
+                y_p = np.where(y_pred > 0.5, 1, 0)
+                y_t = np.where(y_true>0.5, 1, 0)
+            else:
+                y_p = np.argmax(y_pred, axis=1)
+                y_t = np.argmax(y_true, axis=1)
             tups = [(i,x, class_fcn(y_t[i]), class_fcn(y_p[i])) for i, x in enumerate(losses) 
                      if y_p[i] != y_t[i]]
         else:
@@ -263,7 +244,7 @@ class Learner(ABC):
         return self.model is not None and hasattr(self.model.optimizer, 'beta_1')
 
 
-    def _recompile(self):
+    def _recompile(self, wd=None):
         # ISSUE: recompile does not work correctly with multigpu models
         if self.multigpu:
             err_msg = """
@@ -274,17 +255,23 @@ class Learner(ABC):
                    """
             raise Exception(err_msg)
         
-        if self.multigpu:
-            with tf.device("/cpu:0"):
-                metrics = [m.name for m in self.model.metrics] if U.is_tf_keras() else self.model.metrics
-                self.model.compile(optimizer=self.model.optimizer,
-                                   loss=self.model.loss,
-                                   metrics=metrics)
+        #if self.multigpu:
+            #with tf.device("/cpu:0"):
+                #metrics = [m.name for m in self.model.metrics] if U.is_tf_keras() else self.model.metrics
+                #self.model.compile(optimizer=self.model.optimizer,
+                                   #loss=self.model.loss,
+                                   #metrics=metrics)
+        metrics = [m.name for m in self.model.metrics] if U.is_tf_keras() else self.model.metrics
+        if wd is not None and type(self.model.optimizer).__name__ != 'AdamWeightDecay':
+            warnings.warn('recompiling model to use AdamWeightDecay as opimizer with weight decay of %s' % (wd) )
+            optimizer = U.get_default_optimizer(wd=wd)
+        elif wd is not None:
+            optimizer = U.get_default_optimizer(wd=wd)
         else:
-            metrics = [m.name for m in self.model.metrics] if U.is_tf_keras() else self.model.metrics
-            self.model.compile(optimizer=self.model.optimizer,
-                               loss=self.model.loss,
-                               metrics=metrics)
+            optimizer = self.model.optimizer
+        self.model.compile(optimizer=optimizer,
+                           loss=self.model.loss,
+                           metrics=metrics)
 
         return
 
@@ -1303,7 +1290,7 @@ def get_predictor(model, preproc, batch_size=U.DEFAULT_BS):
     # check arguments
     if not isinstance(model, Model):
         raise ValueError('model must be of instance Model')
-    if not isinstance(preproc, (ImagePreprocessor,TextPreprocessor, NERPreprocessor, NodePreprocessor)):
+    if not isinstance(preproc, (ImagePreprocessor,TextPreprocessor, NERPreprocessor, NodePreprocessor, LinkPreprocessor)):
         raise ValueError('preproc must be instance of ktrain.preprocessor.Preprocessor')
     if isinstance(preproc, ImagePreprocessor):
         return ImagePredictor(model, preproc, batch_size=batch_size)
@@ -1314,6 +1301,8 @@ def get_predictor(model, preproc, batch_size=U.DEFAULT_BS):
         return NERPredictor(model, preproc, batch_size=batch_size)
     elif isinstance(preproc, NodePreprocessor):
         return NodePredictor(model, preproc, batch_size=batch_size)
+    elif isinstance(preproc, LinkPreprocessor):
+        return LinkPredictor(model, preproc, batch_size=batch_size)
     else:
         raise Exception('preproc of type %s not currently supported' % (type(preproc)))
 
@@ -1351,7 +1340,7 @@ def load_predictor(fname, batch_size=U.DEFAULT_BS):
     # return the appropriate predictor
     if not isinstance(model, Model):
         raise ValueError('model must be of instance Model')
-    if not isinstance(preproc, (ImagePreprocessor, TextPreprocessor, NERPreprocessor, NodePreprocessor)):
+    if not isinstance(preproc, (ImagePreprocessor, TextPreprocessor, NERPreprocessor, NodePreprocessor, LinkPreprocessor)):
         raise ValueError('preproc must be instance of ktrain.preprocessor.Preprocessor')
     if isinstance(preproc, ImagePreprocessor):
         return ImagePredictor(model, preproc, batch_size=batch_size)
@@ -1361,6 +1350,8 @@ def load_predictor(fname, batch_size=U.DEFAULT_BS):
         return NERPredictor(model, preproc, batch_size=batch_size)
     elif isinstance(preproc, NodePreprocessor):
         return NodePredictor(model, preproc, batch_size=batch_size)
+    elif isinstance(preproc, LinkPreprocessor):
+        return LinkPredictor(model, preproc, batch_size=batch_size)
     else:
         raise Exception('preprocessor not currently supported')
 
@@ -1413,11 +1404,19 @@ def _load_model(fname, preproc=None, train_data=None):
         train_data and U.is_nodeclass(data=train_data):
         from stellargraph.layer import MeanAggregator
         custom_objects={'MeanAggregator': MeanAggregator}
+    elif (preproc and (isinstance(preproc, LinkPreprocessor) or \
+                    type(preproc).__name__ == 'LinkPreprocessor')) or \
+        train_data and U.is_linkpred(data=train_data):
+        from stellargraph.layer import MeanAggregator
+        custom_objects={'MeanAggregator': MeanAggregator}
+    custom_objects = {} if custom_objects is None else custom_objects
+    custom_objects['AdamWeightDecay'] = AdamWeightDecay
     try:
         try:
             model = load_model(fname, custom_objects=custom_objects)
         except:
-            model = load_model(fname) # for bilstm models without CRF layer on TF2
+            # for bilstm models without CRF layer on TF2 where CRF is not supported 
+            model = load_model(fname, custom_objects={'AdamWeightDecay':AdamWeightDecay})
     except Exception as e:
         print('Call to keras.models.load_model failed.  '
               'Try using the learner.model.save_weights and '

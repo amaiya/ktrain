@@ -62,10 +62,9 @@ class TestTransformers(TestCase):
         learner.view_top_losses(preproc=preproc, n=1, val_data=None)
 
         # test weight decay
-        self.assertEqual(len(learner.get_weight_decay()), 2)
-        self.assertEqual(learner.get_weight_decay()[0], None)
-        learner.set_weight_decay(1e-4)
-        self.assertAlmostEqual(learner.get_weight_decay()[0], 1e-4)
+        self.assertEqual(learner.get_weight_decay(), None)
+        learner.set_weight_decay(1e-2)
+        self.assertAlmostEqual(learner.get_weight_decay(), 1e-2)
 
         # test load and save model
         tmp_folder = ktrain.imports.tempfile.mkdtemp()
@@ -111,10 +110,9 @@ class TestTransformers(TestCase):
         learner.view_top_losses(preproc=preproc, n=1, val_data=None)
 
         # test weight decay
-        self.assertEqual(len(learner.get_weight_decay()), 2)
-        self.assertEqual(learner.get_weight_decay()[0], None)
-        learner.set_weight_decay(1e-4)
-        self.assertAlmostEqual(learner.get_weight_decay()[0], 1e-4)
+        self.assertEqual(learner.get_weight_decay(), None)
+        learner.set_weight_decay(1e-2)
+        self.assertAlmostEqual(learner.get_weight_decay(), 1e-2)
 
         # test load and save model
         tmp_folder = ktrain.imports.tempfile.mkdtemp()

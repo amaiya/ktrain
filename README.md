@@ -7,6 +7,8 @@
 
 
 ### News and Announcements
+- **2020-04-08:**  
+  - ***ktrain*** **v0.13.x is released** and includes support for **link prediction** using graph neural networks.  See [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/graphs/cora_link_prediction-GraphSAGE.ipynb) on citation prediction.
 - **2020-03-31:**  
   - ***ktrain*** **v0.12.x is released** and now includes BERT embeddings (i.e., BERT, DistilBert, and Albert) that can be used for downstream tasks like building sequence-taggers (i.e., NER) 
       for any language such as English, Chinese, Russian, Arabic, Dutch, etc.  See [this English NER example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/CoNLL2003-BiLSTM.ipynb) or the [Dutch NER notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/CoNLL2002_Dutch-BiLSTM.ipynb) for examples on how to use this feature.
@@ -24,21 +26,6 @@ learner.fit(0.01, 1, cycle_len=5)
 ```
 - **2020-03-18:**  
   - ***ktrain*** **v0.11.x is released** and includes various fixes and enhancements to sequence-tagging including abilty to easily use non-English pretrained word embeddings covering 157 languages (e.g., [Dutch NER](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/CoNLL2002_Dutch-BiLSTM.ipynb))
-- **2020-03-03:**  
-  - ***ktrain*** **v0.10.x is released** and now includes [ready-to-use NER for English, Chinese, and Russian](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/shallownlp-examples.ipynb) with no training required. 
-  - **Also in v0.10.x:**  Ability to train [community-uploaded Hugging Face transformer models](https://huggingface.co/models) like [SciBERT](https://arxiv.org/abs/1903.10676) and  [BioBERT](https://arxiv.org/abs/1901.08746):
-```python
-# text classification with SciBERT
-import ktrain
-from ktrain import text
-MODEL_NAME = 'allenai/scibert_scivocab_uncased'
-t = text.Transformer(MODEL_NAME, maxlen=500, class_names=label_list)
-trn = t.preprocess_train(x_train, y_train)
-val = t.preprocess_test(x_test, y_test)
-model = t.get_classifier()
-learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=6)
-learner.fit_onecycle(3e-5, 1)
-```
 ----
 
 ### Overview
@@ -52,16 +39,17 @@ learner.fit_onecycle(3e-5, 1)
      - **Text Classification**: [BERT](https://arxiv.org/abs/1810.04805), [DistilBERT](https://arxiv.org/abs/1910.01108), [NBSVM](https://www.aclweb.org/anthology/P12-2018), [fastText](https://arxiv.org/abs/1607.01759), and other models <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/IMDb-BERT.ipynb)]</sup></sub>
      - **Text Regression**: [BERT](https://arxiv.org/abs/1810.04805), [DistilBERT](https://arxiv.org/abs/1910.01108), Embedding-based linear text regression, [fastText](https://arxiv.org/abs/1607.01759), and other models <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/text_regression_example.ipynb)]</sup></sub>
      - **Sequence Labeling (NER)**:  Bidirectional LSTM with optional [CRF layer](https://arxiv.org/abs/1603.01360) and various embedding schemes such as pretrained [BERT](https://huggingface.co/transformers/pretrained_models.html) and [fasttext](https://fasttext.cc/docs/en/crawl-vectors.html) word embeddings and character embeddings <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/CoNLL2002_Dutch-BiLSTM.ipynb)]</sup></sub>
+     - **Ready-to-Use NER models for English, Chinese, and Russian** with no training required <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/shallownlp-examples.ipynb)]</sup></sub>
      - **Unsupervised Topic Modeling** with [LDA](http://www.jmlr.org/papers/volume3/blei03a/blei03a.pdf)  <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/20newsgroups-topic_modeling.ipynb)]</sup></sub>
      - **Document Similarity with One-Class Learning**:  given some documents of interest, find and score new documents that are semantically similar to them using [One-Class Text Classification](https://en.wikipedia.org/wiki/One-class_classification) <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/20newsgroups-document_similarity_scorer.ipynb)]</sup></sub>
      - **Document Recommendation Engine**:  given text from a sample document, recommend documents that are semantically-related to it from a larger corpus  <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/20newsgroups-recommendation_engine.ipynb)]</sup></sub>
   - `vision` data:
     - **image classification** (e.g., [ResNet](https://arxiv.org/abs/1512.03385), [Wide ResNet](https://arxiv.org/abs/1605.07146), [Inception](https://www.cs.unc.edu/~wliu/papers/GoogLeNet.pdf)) <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/vision/dogs_vs_cats-ResNet50.ipynb)]</sup></sub>
   - `graph` data:
-    - **graph node classification** with graph neural networks (e.g., [GraphSAGE](https://cs.stanford.edu/people/jure/pubs/graphsage-nips17.pdf)) <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/graphs/pubmed-GraphSAGE.ipynb)]</sup></sub>
-- perform multilingual text classification (e.g., [Chinese Sentiment Analysis with BERT](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/ChineseHotelReviews-BERT.ipynb), [Arabic Sentiment Analysis with NBSVM](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/ArabicHotelReviews-nbsvm.ipynb))
-- Easily train NER models for any language (e.g., [Dutch NER](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/CoNLL2002_Dutch-BiLSTM.ipynb) )
-- [Ready-to-Use NER for English, Chinese, and Russian](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/shallownlp-examples.ipynb) (no training required)
+    - **node classification** with graph neural networks ([GraphSAGE](https://cs.stanford.edu/people/jure/pubs/graphsage-nips17.pdf)) <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/graphs/pubmed_node_classification-GraphSAGE.ipynb)]</sup></sub>
+    - **link prediction** with graph neural networks ([GraphSAGE](https://cs.stanford.edu/people/jure/pubs/graphsage-nips17.pdf)) <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/graphs/cora_link_prediction-GraphSAGE.ipynb)]</sup></sub>
+- build text classifiers for any language (e.g., [Chinese Sentiment Analysis with BERT](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/ChineseHotelReviews-BERT.ipynb), [Arabic Sentiment Analysis with NBSVM](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/ArabicHotelReviews-nbsvm.ipynb))
+- easily train NER models for any language (e.g., [Dutch NER](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/CoNLL2002_Dutch-BiLSTM.ipynb) )
 - load and preprocess text and image data from a variety of formats 
 - inspect data points that were misclassified and [provide explanations](https://eli5.readthedocs.io/en/latest/) to help improve your model
 - leverage a simple prediction API for saving and deploying both models and data-preprocessing steps to make predictions on new raw data

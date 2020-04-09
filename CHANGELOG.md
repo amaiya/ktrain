@@ -7,6 +7,24 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.13.0 (2020-04-08)
+
+### New:
+-  support for link prediction with graph neural networks
+- `bigru` method now selects pretrained word vectors based on detected language
+
+### Changed
+- instead of throwing error, default to English if `detect_lang` could not detect language from batch of texts
+- `layers` argument moved to `TransformerEmbedding` constructor
+- enforce specific version of TensorFlow due to undocumented breaking changes in newer TF versions
+- `AdamWeightDecay` optimizer is now used to support global weight decay. Used when user
+   excplictly sets a weight decay
+
+
+### Fixed:
+- force re-instantiation of `TransformerEmbedding` object with `sequence_tagger` function is re-invoked
+
+
 ## 0.12.3 (2020-04-02)
 
 ### New:
