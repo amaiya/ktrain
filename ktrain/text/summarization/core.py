@@ -3,18 +3,27 @@ from ... import utils as U
 
 class TransformerSummarizer():
     """
-    NER preprocessing base class
+    interface to Transformer-based text summarization
     """
 
-    def __init__(self):
+    def __init__(self, model_name='bart-large-cnn'):
+        """
+        interface to BART-based text summarization using transformers library
+
+        Args:
+          model_name(str): name of BART model
+        """
+        if model_name.split('-')[0] != 'bart': 
+            raise ValueError('TransformerSummarizer currently only accepts BART models')
         try:
             import torch
         except ImportError:
             raise Exception('TransformerSummarizer requires PyTorch to be installed.')
         from transformers import BartTokenizer, BartForConditionalGeneration
         self.torch_device = 'cuda' if torch.cuda.is_available() else 'cpu'
-        self.tokenizer = BartTokenizer.from_pretrained('bart-large-cnn')
-        self.model = BartForConditionalGeneration.from_pretrained('bart-large-cnn').to(self.torch_device)
+        self.tokenizer = BartTokenizer.from_pretrained(model_name)
+        self.model = BartForConditionalGeneration.from_pretrained(model_name).to(self.torch_device)
+
 
     def summarize(self, doc):
         """

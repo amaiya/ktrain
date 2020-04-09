@@ -7,6 +7,19 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.13.2 (2020-04-09)
+
+### New:
+- N/A
+
+### Changed
+- `TransformerSummarizer` accepts BART `model_name` as parameter
+
+
+### Fixed:
+- N/A
+
+
 
 ## 0.13.1 including 0.13.0 (2020-04-09)
 
