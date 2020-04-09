@@ -249,11 +249,12 @@ Using *ktrain* on **Google Colab**?  See [this simple demo of Multiclass Text Cl
 
 Make sure pip is up-to-date with: `pip3 install -U pip`.
 
-1. Ensure TensorFlow 2 [is installed](https://www.tensorflow.org/install/pip?lang=python3) if it is not already
+1. Ensure TensorFlow 2.1.0 [is installed](https://www.tensorflow.org/install/pip?lang=python3) if it is not already. 
+   (While *ktrain* will probably work with other versions of TensorFlow 2.x, v2.1.0 is the current recommended and tested version.)
 
-> For GPU: `pip3 install "tensorflow_gpu>=2.1.0"`
+> For GPU: `pip3 install "tensorflow_gpu==2.1.0"`
 
-> For CPU: `pip3 install "tensorflow>=2.1.0"`
+> For CPU: `pip3 install "tensorflow==2.1.0"`
 
 
 2. Install *ktrain*: `pip3 install ktrain`
