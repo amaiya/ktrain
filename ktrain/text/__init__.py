@@ -5,6 +5,7 @@ from .ner.models import sequence_tagger, print_sequence_taggers
 from .eda import get_topic_model
 from .textutils import extract_filenames, load_text_files, filter_by_id
 from .preprocessor import Transformer, TransformerEmbedding
+from .summarization import TransformerSummarizer
 from . import shallownlp
 
 __all__ = [
@@ -23,7 +24,8 @@ __all__ = [
            'load_text_files',
            'Transformer',
            'TranformerEmbedding',
-           'shallownlp'
+           'shallownlp',
+           'TransformerSummarizer'
            ]
 
 

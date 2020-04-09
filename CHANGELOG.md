@@ -7,10 +7,12 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
-## 0.13.0 (2020-04-08)
+
+## 0.13.1 including 0.13.0 (2020-04-09)
 
 ### New:
--  support for link prediction with graph neural networks
+- support for link prediction with graph neural networks
+- text summarization with pretrained BART (included in 0.13.1 but not in 0.13.0)
 - `bigru` method now selects pretrained word vectors based on detected language
 
 ### Changed

@@ -9,6 +9,7 @@ This directory contains various example notebooks using *ktrain*.  The directory
   - [document similarity with one-class learning](#docsim): given a sample of interesting documents, find and score new documents that are semantically similar to it using One-Class text classification
   - [document recommender system](#docrec):  given text from a sample document, recommend documents that are semantically similar to it from a larger corpus 
   - [Shallow NLP](#shallownlp):  a small collection of miscellaneous text utilities amenable to being used on machines with only a CPU available (no GPU required)
+  - [Text Summarization](#bart):  an example of text summarization using a pretrained BART model
 - `vision`:  
   - [image classification](#imageclass):  models for image datasetsimage classification examples using various models and datasets
 - `graphs`: 
@@ -118,7 +119,9 @@ The objective of the CoNLL2003 task is to classify sequences of words as belongi
 
 
 #### [20 News Groups](http://qwone.com/~jason/20Newsgroups/): recommend posts from 20newsgroups
-- [20newsgroups-recommendation_engine.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text):  given text from a sample document, recommend documents that are semantically similar to it from a larger corpu
+- [20newsgroups-recommendation_engine.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text):  given text from a sample document, recommend documents that are semantically similar to it from a larger corpus
+
+### <a name="bart"></a>Text Summarization with pretrained BART: [text_summarization_with_bart.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text)
 
 
 ## Vision Data
