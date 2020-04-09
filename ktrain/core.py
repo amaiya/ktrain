@@ -87,8 +87,14 @@ class Learner(ABC):
             return
         y_pred = self.predict(val_data=val)
         y_true = self.ground_truth(val_data=val)
-        y_pred = np.argmax(y_pred, axis=1)
-        y_true = np.argmax(y_true, axis=1)
+        y_pred = np.squeeze(y_pred)
+        y_true = np.squeeze(y_true)
+        if len(y_pred.shape) == 1:
+            y_pred = np.where(y_pred > 0.5, 1, 0)
+            y_true = np.where(y_true > 0.5, 1, 0)
+        else:
+            y_pred = np.argmax(y_pred, axis=1)
+            y_true = np.argmax(y_true, axis=1)
         if print_report:
             if class_names:
                 try:
@@ -188,8 +194,14 @@ class Learner(ABC):
 
         # sort by loss and prune correct classifications, if necessary
         if classification and not multilabel:
-            y_p = np.argmax(y_pred, axis=1)
-            y_t = np.argmax(y_true, axis=1)
+            y_pred = np.squeeze(y_pred)
+            y_true = np.squeeze(y_true)
+            if len(y_pred.shape) == 1:
+                y_p = np.where(y_pred > 0.5, 1, 0)
+                y_t = np.where(y_true>0.5, 1, 0)
+            else:
+                y_p = np.argmax(y_pred, axis=1)
+                y_t = np.argmax(y_true, axis=1)
             tups = [(i,x, class_fcn(y_t[i]), class_fcn(y_p[i])) for i, x in enumerate(losses) 
                      if y_p[i] != y_t[i]]
         else:

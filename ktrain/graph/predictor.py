@@ -83,7 +83,8 @@ class LinkPredictor(Predictor):
         gen.batch_size = self.batch_size
         preds = self.model.predict_generator(gen)
         preds = np.squeeze(preds)
-        preds = [[1-pred, pred] for pred in preds] 
-        result =  preds if return_proba else [self.c[np.argmax(pred)] for pred in preds]
+        if return_proba:
+            return [[1-pred, pred] for pred in preds] 
+        result =  np.where(preds > 0.5, self.c[1], self.c[0])
         return result
 
