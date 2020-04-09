@@ -153,13 +153,13 @@ Image labels are in the form of a CSV containing paths to images.
 
 In the PubMed graph, each node represents a paper pertaining to one of three topics:  *Diabetes Mellitus - Experimental*, *Diabetes Mellitus - Type 1*, and *Diabetes Mellitus - Type 2*.  Links represent citations between papers.  The attributes or features assigned to each node are in the form of a vector of words in each paper and their corresponding TF-IDF scores.
 
-- [pubmed-GraphSAGE.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/graphs): GraphSAGE model for transductive and inductive inference.
+- [pubmed_node_classification-GraphSAGE.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/graphs): GraphSAGE model for transductive and inductive inference.
 
 #### [Cora Citation Graph](https://linqs-data.soe.ucsc.edu/public/lbc/cora.tgz):  Node Classification
 
 In the Cora citation graph, each node represents a paper pertaining to one of several topic categories.  Links represent citations between papers.  The attributes or features assigned to each node is in the form of a multi-hot-encoded vector of words in each paper.
 
-- [cora-GraphSAGE.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/graphs): GraphSAGE model for transductive inference on validation and test set of nodes in graph.
+- [cora_node_classification-GraphSAGE.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/graphs): GraphSAGE model for transductive inference on validation and test set of nodes in graph.
 
 
 #### [Hateful Twitter Users](https://www.kaggle.com/manoelribeiro/hateful-users-on-twitter):  Node Classification
