@@ -12,6 +12,7 @@
     - **link prediction** using graph neural networks.  See [example link prediction notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/graphs/cora_link_prediction-GraphSAGE.ipynb) on citation prediction. 
     - **text summarization** with pretrained BART. See [example summarization notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/text_summarization_with_bart.ipynb). <sub><sup>(Summarization included in v0.13.1, but not v0.13.0.)</sup></sub>
 ```python
+# text summarization with BART
 from ktrain import text
 ts = text.TransformerSummarizer()
 ts.summarize(some_long_document)
