@@ -1,7 +1,5 @@
 from ...imports import *
 from ... import utils as U
-from transformers import BartTokenizer, BartForConditionalGeneration
-from IPython.display import display, Markdown
 
 class TransformerSummarizer():
     """
@@ -13,6 +11,7 @@ class TransformerSummarizer():
             import torch
         except ImportError:
             raise Exception('TransformerSummarizer requires PyTorch to be installed.')
+        from transformers import BartTokenizer, BartForConditionalGeneration
         self.torch_device = 'cuda' if torch.cuda.is_available() else 'cpu'
         self.tokenizer = BartTokenizer.from_pretrained('bart-large-cnn')
         self.model = BartForConditionalGeneration.from_pretrained('bart-large-cnn').to(self.torch_device)
