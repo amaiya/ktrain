@@ -13,6 +13,8 @@ class TransformerSummarizer():
         Args:
           model_name(str): name of BART model
         """
+        if model_name.split('-')[0] != 'bart': 
+            raise ValueError('TransformerSummarizer currently only accepts BART models')
         try:
             import torch
         except ImportError:
