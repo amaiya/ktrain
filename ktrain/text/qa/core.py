@@ -147,7 +147,7 @@ class SimpleQA(QA):
           docs(list): list of strings representing documents
           use_start_as_title(int):  number of words to use as title of document
         """
-        index.open_dir(index_dir)
+        ix = index.open_dir(index_dir)
         writer = ix.writer()
         mb = master_bar(range(1))
         for i in mb:
