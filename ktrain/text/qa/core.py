@@ -268,19 +268,48 @@ class SimpleQA(QA):
         for idx,c in enumerate(confidences):
             answers[idx]['confidence'] = exp_scores[idx]/total
 
+        if rerank_top_n is None:
+            return answers
+
         # re-rank
+        top_confidences = [a['confidence'] for idx, a in enumerate(answers) if idx < rerank_top_n]
         v1 = self.te.embed(question, word_level=False)
         for idx, answer in enumerate(answers):
-            if idx > 5: 
+            if idx >= rerank_top_n: 
                 answer['similarity_score'] = 0.0
                 continue
             v2 = self.te.embed(answer['full_answer'], word_level=False)
             score = v1 @ v2.T / (np.linalg.norm(v1)*np.linalg.norm(v2))
             answer['similarity_score'] = float(np.squeeze(score))
+            answer['confidence'] = top_confidences[idx]
         answers = sorted(answers, key = lambda k:(k['similarity_score'], k['confidence']), reverse=True)
+        for idx, confidence in enumerate(top_confidences):
+            answers[idx]['confidence'] = confidence
 
 
         return answers
+
+
+    def answers2df(self, answers):
+        dfdata = []
+        for a in answers:
+            answer_text = a['answer']
+            snippet_html = '<div>' +a['sentence_beginning'] + " <font color='red'>"+a['answer']+"</font> "+a['sentence_end']+'</div>'
+            confidence = a['confidence']
+            doc_key = a['path']
+            dfdata.append([answer_text, snippet_html, confidence, doc_key])
+        df = pd.DataFrame(dfdata, columns = ['Candidate Answer', 'Context',  'Confidence', 'Document Reference'])
+        return df
+
+
+    def display_answers(self, answers):
+        df = self.answers2df(answers)
+        from IPython.core.display import display, HTML
+        display(HTML(df.to_html(render_links=True, escape=False)))
+
+
+
+
 
 
 
