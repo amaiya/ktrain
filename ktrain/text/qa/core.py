@@ -25,7 +25,7 @@ class QA(ABC):
         self.model = TFBertForQuestionAnswering.from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad')
         self.tokenizer = BertTokenizer.from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad')
         self.maxlen = 512
-        self.te = tpp.TransformerEmbedding('bert-base-uncased')
+        self.te = tpp.TransformerEmbedding('bert-base-uncased', layers=[-2])
 
 
     @abstractmethod
@@ -113,7 +113,7 @@ class SimpleQA(QA):
         """
         SimpleQA constructor
         Args:
-          index_dir(str):  path to index directory created by SimpleQA.create_index
+          index_dir(str):  path to index directory created by SimpleQA.initialze_index
 
         """
 
@@ -121,7 +121,7 @@ class SimpleQA(QA):
         try:
             ix = index.open_dir(self.index_dir)
         except:
-            raise ValueError('index_dir has not yet been created - please call SimpleQA.create_index("%s")' % (self.index_dir))
+            raise ValueError('index_dir has not yet been created - please call SimpleQA.initialize_index("%s")' % (self.index_dir))
         super().__init__()
 
 
@@ -130,8 +130,8 @@ class SimpleQA(QA):
 
 
     @classmethod
-    def create_index(cls, index_dir):
-        schema = Schema(path=ID(stored=True), content=TEXT, rawtext=TEXT(stored=True))
+    def initialize_index(cls, index_dir):
+        schema = Schema(reference=ID(stored=True), content=TEXT, rawtext=TEXT(stored=True))
         if not os.path.exists(index_dir):
             os.makedirs(index_dir)
         else:
@@ -142,7 +142,7 @@ class SimpleQA(QA):
     @classmethod
     def index_from_list(cls, docs, index_dir, use_start_as_title=64, commit_every=1024):
         """
-        index from list
+        index documents from list
         Args:
           docs(list): list of strings representing documents
           use_start_as_title(int):  number of words to use as title of document
@@ -153,9 +153,9 @@ class SimpleQA(QA):
         for i in mb:
             for idx, doc in enumerate(progress_bar(docs, parent=mb)):
                 title = " ".join(doc.split()[:use_start_as_title])
-                path = "%s" % (idx)
+                reference = "%s" % (idx)
                 content = doc 
-                writer.add_document(path=path, content=content, rawtext=content)
+                writer.add_document(reference=reference, content=content, rawtext=content)
                 idx +=1
                 if idx % commit_every == 0:
                     writer.commit()
@@ -171,7 +171,7 @@ class SimpleQA(QA):
           query(str): search query
           limit(int):  number of top search results to return
         Returns:
-          list of dicts with keys: path, rawtext
+          list of dicts with keys: reference, rawtext
         """
         ix = self._open_ix()
         with ix.searcher() as searcher:
@@ -226,20 +226,21 @@ class SimpleQA(QA):
         Returns:
           list
         """
+        conf_thresh = 0.015
         # locate candidate document contexts
         doc_results = self.search(question, limit=n_docs_considered)
         paragraphs = []
-        paths = []
+        refs = []
         for doc_result in doc_results:
             rawtext = doc_result.get('rawtext', '')
-            path = doc_result.get('path', '')
+            reference = doc_result.get('reference', '')
             if len(self.tokenizer.tokenize(rawtext)) < self.maxlen:
                 paragraphs.append(rawtext)
-                paths.append(path)
+                refs.append(reference)
                 continue
             plist = TU.paragraph_tokenize(rawtext, join_sentences=True)
             paragraphs.extend(plist)
-            paths.extend([path]*len(plist))
+            refs.extend([reference]*len(plist))
 
         # locate candidate answers
         answers = []
@@ -249,7 +250,7 @@ class SimpleQA(QA):
                 answer = self.predict_squad(paragraph, question)
                 if not answer['answer'] or answer['confidence'] <0: continue
                 answer['confidence'] = answer['confidence'].numpy()
-                answer['path'] = paths[idx]
+                answer['reference'] = refs[idx]
                 answer = self._expand_answer(answer)
                 answers.append(answer)
         answers = sorted(answers, key = lambda k:k['confidence'], reverse=True)
@@ -272,10 +273,11 @@ class SimpleQA(QA):
             return answers
 
         # re-rank
-        top_confidences = [a['confidence'] for idx, a in enumerate(answers) if idx < rerank_top_n]
+        top_confidences = [a['confidence'] for idx, a in enumerate(answers) if a['confidence']> conf_thresh]
         v1 = self.te.embed(question, word_level=False)
         for idx, answer in enumerate(answers):
-            if idx >= rerank_top_n: 
+            #if idx >= rerank_top_n: 
+            if answer['confidence'] <= conf_thresh:
                 answer['similarity_score'] = 0.0
                 continue
             v2 = self.te.embed(answer['full_answer'], word_level=False)
@@ -296,7 +298,7 @@ class SimpleQA(QA):
             answer_text = a['answer']
             snippet_html = '<div>' +a['sentence_beginning'] + " <font color='red'>"+a['answer']+"</font> "+a['sentence_end']+'</div>'
             confidence = a['confidence']
-            doc_key = a['path']
+            doc_key = a['reference']
             dfdata.append([answer_text, snippet_html, confidence, doc_key])
         df = pd.DataFrame(dfdata, columns = ['Candidate Answer', 'Context',  'Confidence', 'Document Reference'])
         return df
