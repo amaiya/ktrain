@@ -40,7 +40,8 @@ setup(
           'tensorflow_datasets',
           'transformers>=2.7.0',
           'ipython',
-          'syntok'
+          'syntok',
+          'whoosh'
           #'stellargraph>=0.8.2',
           #'eli5 >= 0.10.0',
           #'allennlp', # required for Elmo embeddings since TF2 TF_HUB does not work

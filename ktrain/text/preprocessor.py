@@ -1137,6 +1137,7 @@ class TransformerEmbedding():
 
         if not word_level: # sentence-level embedding
             return np.mean(raw_embeddings, axis=1)
+            #return np.squeeze(raw_embeddings[:,0:1,:], axis=1)
 
         # filter-out extra subword tokens and special tokens 
         # (using first subword of each token as embedding representations)

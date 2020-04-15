@@ -7,6 +7,8 @@
 
 
 ### News and Announcements
+- **2020-04-15:**  
+  - ***ktrain*** **v0.14.x is released** and now includes support for **open-domain question-answering**.  See the [example QA notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/question_answering_with_bert.ipynb).
 - **2020-04-09:**  
   - ***ktrain*** **v0.13.x is released** and includes support for:
     - **link prediction** using graph neural networks - [see example link prediction notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/graphs/cora_link_prediction-GraphSAGE.ipynb) on citation prediction
@@ -33,8 +35,6 @@ model = txt.sequence_tagger('bilstm-bert', preproc, bert_model='monologg/biobert
 learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=128)
 learner.fit(0.01, 1, cycle_len=5)
 ```
-- **2020-03-18:**  
-  - ***ktrain*** **v0.11.x is released** and includes various fixes and enhancements to sequence-tagging including abilty to easily use non-English pretrained word embeddings covering 157 languages (e.g., [Dutch NER](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/CoNLL2002_Dutch-BiLSTM.ipynb))
 ----
 
 ### Overview
@@ -50,7 +50,8 @@ learner.fit(0.01, 1, cycle_len=5)
      - **Unsupervised Topic Modeling** with [LDA](http://www.jmlr.org/papers/volume3/blei03a/blei03a.pdf)  <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/20newsgroups-topic_modeling.ipynb)]</sup></sub>
      - **Document Similarity with One-Class Learning**:  given some documents of interest, find and score new documents that are semantically similar to them using [One-Class Text Classification](https://en.wikipedia.org/wiki/One-class_classification) <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/20newsgroups-document_similarity_scorer.ipynb)]</sup></sub>
      - **Document Recommendation Engine**:  given text from a sample document, recommend documents that are thematically-related to it from a larger corpus  <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/20newsgroups-recommendation_engine.ipynb)]</sup></sub>
-     - **Text Summarization**:  text summarization with a pretrained BART model - no training required <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/text_summarization_with_bart.ipynb)]</sup></sub>
+     - **Text Summarization**:  summarize long documents with a pretrained BART model - no training required <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/text_summarization_with_bart.ipynb)]</sup></sub>
+     - **Open-Domain Question-Answering**:  ask a large text corpus questions and receive exact answers <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/question_answering_with_bert.ipynb)]</sup></sub>
   - `vision` data:
     - **image classification** (e.g., [ResNet](https://arxiv.org/abs/1512.03385), [Wide ResNet](https://arxiv.org/abs/1605.07146), [Inception](https://www.cs.unc.edu/~wliu/papers/GoogLeNet.pdf)) <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/vision/dogs_vs_cats-ResNet50.ipynb)]</sup></sub>
   - `graph` data:

@@ -7,6 +7,7 @@ from .textutils import extract_filenames, load_text_files, filter_by_id
 from .preprocessor import Transformer, TransformerEmbedding
 from .summarization import TransformerSummarizer
 from . import shallownlp
+from .qa import SimpleQA
 
 __all__ = [
            'text_classifier', 'text_regression_model',
@@ -25,7 +26,8 @@ __all__ = [
            'Transformer',
            'TranformerEmbedding',
            'shallownlp',
-           'TransformerSummarizer'
+           'TransformerSummarizer',
+           'SimpleQA'
            ]
 
 

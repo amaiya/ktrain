@@ -310,3 +310,21 @@ def sent_tokenize(text):
                 sents.append(" ".join([t.value for t in sentence]))
     return sents
 
+
+
+def paragraph_tokenize(text, join_sentences=False):
+    """
+    segment text into sentences
+    """
+    lang = detect_lang(text)
+    if is_chinese(lang):
+        raise ValueError('paragraph_tokenize does not currently support Chinese.')
+    paragraphs = []
+    sents = []
+    for paragraph in segmenter.process(text):
+        sents = []
+        for sentence in paragraph:
+            sents.append(" ".join([t.value for t in sentence]))
+        if join_sentences: sents = ' '.join(sents)
+        paragraphs.append(sents)
+    return paragraphs

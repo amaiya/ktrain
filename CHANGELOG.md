@@ -7,6 +7,20 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.14.0 (2020-04-15)
+
+### New:
+- support for building Question-Answering systems
+- `textutils` now contains `paragraph_tokenize` function
+
+### Changed
+- N/A
+
+### Fixed:
+- resolved import issue with `textutils.sent_tokenize'
+
+
+
 ## 0.13.2 (2020-04-09)
 
 ### New:
