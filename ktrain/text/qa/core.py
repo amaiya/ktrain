@@ -145,19 +145,19 @@ class SimpleQA(QA):
         return ix
 
     @classmethod
-    def index_from_list(cls, docs, index_dir, use_start_as_title=64, commit_every=1024):
+    def index_from_list(cls, docs, index_dir, commit_every=1024):
         """
         index documents from list
         Args:
           docs(list): list of strings representing documents
-          use_start_as_title(int):  number of words to use as title of document
+          commit_every(int): commet after adding this many documents
         """
+        if not isinstance(docs, (np.ndarray, list)): raise ValueError('docs must be a list of strings')
         ix = index.open_dir(index_dir)
         writer = ix.writer()
         mb = master_bar(range(1))
         for i in mb:
             for idx, doc in enumerate(progress_bar(docs, parent=mb)):
-                title = " ".join(doc.split()[:use_start_as_title])
                 reference = "%s" % (idx)
                 content = doc 
                 writer.add_document(reference=reference, content=content, rawtext=content)
@@ -166,6 +166,34 @@ class SimpleQA(QA):
                     writer.commit()
                     writer = ix.writer()
             writer.commit()
+        return
+
+
+    @classmethod
+    def index_from_folder(cls, folder_path, index_dir,  commit_every=1024, verbose=1, encoding='utf-8'):
+        """
+        index all plain text documents within a folder
+        Args:
+          folder_path(str): path to folder containing plain text documents
+          commit_every(int): commet after adding this many documents
+        """
+        if not os.path.isdir(folder_path): raise ValueError('folder_path is not a valid folder')
+        if folder_path[-1] != os.sep: folder_path += os.sep
+        ix = index.open_dir(index_dir)
+        writer = ix.writer()
+        for idx, fpath in enumerate(TU.extract_filenames(folder_path)):
+            if not TU.is_txt(fpath): continue
+            reference = "%s" % (fpath.join(fpath.split(folder_path)[1:]))
+            with open(fpath, 'r', encoding=encoding) as f:
+                doc = f.read()
+            content = doc
+            writer.add_document(reference=reference, content=content, rawtext=content)
+            idx +=1
+            if idx % commit_every == 0:
+                writer.commit()
+                writer = ix.writer()
+                if verbose: print("%s docs indexed" % (idx))
+        writer.commit()
         return
 
 
