@@ -7,6 +7,19 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.14.0 (TBD)
+
+### New:
+- support for building Question-Answering systems
+
+### Changed
+- N/A
+
+### Fixed:
+- N/A
+
+
+
 ## 0.13.2 (2020-04-09)
 
 ### New:
