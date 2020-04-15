@@ -35,8 +35,6 @@ model = txt.sequence_tagger('bilstm-bert', preproc, bert_model='monologg/biobert
 learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=128)
 learner.fit(0.01, 1, cycle_len=5)
 ```
-- **2020-03-18:**  
-  - ***ktrain*** **v0.11.x is released** and includes various fixes and enhancements to sequence-tagging including abilty to easily use non-English pretrained word embeddings covering 157 languages (e.g., [Dutch NER](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/CoNLL2002_Dutch-BiLSTM.ipynb))
 ----
 
 ### Overview
