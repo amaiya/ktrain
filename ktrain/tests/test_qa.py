@@ -22,7 +22,7 @@ class TestQA(TestCase):
         docs = newsgroups_train.data +  newsgroups_test.data
 
         tmp_folder = '/tmp/qa_test'
-        text.SimpleQA.create_index(tmp_folder)
+        text.SimpleQA.initialize_index(tmp_folder)
         text.SimpleQA.index_from_list(docs, tmp_folder, commit_every=len(docs))
         qa = text.SimpleQA(tmp_folder)
 

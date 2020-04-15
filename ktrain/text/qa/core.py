@@ -20,12 +20,13 @@ class QA(ABC):
     Base class for QA
     """
 
-    def __init__(self):
-        self.model_name = 'bert-large-uncased-whole-word-masking-finetuned-squad'
-        self.model = TFBertForQuestionAnswering.from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad')
-        self.tokenizer = BertTokenizer.from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad')
+    def __init__(self, bert_squad_model='bert-large-uncased-whole-word-masking-finetuned-squad',
+                 bert_emb_model='bert-base-uncased'):
+        self.model_name = bert_squad_model
+        self.model = TFBertForQuestionAnswering.from_pretrained(self.model_name)
+        self.tokenizer = BertTokenizer.from_pretrained(self.model_name)
         self.maxlen = 512
-        self.te = tpp.TransformerEmbedding('bert-base-uncased', layers=[-2])
+        self.te = tpp.TransformerEmbedding(bert_emb_model, layers=[-2])
 
 
     @abstractmethod
@@ -109,11 +110,15 @@ class SimpleQA(QA):
     """
     SimpleQA: Question-Answering on a list of texts
     """
-    def __init__(self, index_dir):
+    def __init__(self, index_dir, 
+                 bert_squad_model='bert-large-uncased-whole-word-masking-finetuned-squad',
+                 bert_emb_model='bert-base-uncased'):
         """
         SimpleQA constructor
         Args:
           index_dir(str):  path to index directory created by SimpleQA.initialze_index
+          bert_squad_model(str): name of BERT SQUAD model to use
+          bert_emb_model(str): BERT model to use to generate embeddings for semantic similarity
 
         """
 
@@ -122,7 +127,7 @@ class SimpleQA(QA):
             ix = index.open_dir(self.index_dir)
         except:
             raise ValueError('index_dir has not yet been created - please call SimpleQA.initialize_index("%s")' % (self.index_dir))
-        super().__init__()
+        super().__init__(bert_squad_model=bert_squad_model, bert_emb_model=bert_emb_model)
 
 
     def _open_ix(self):
@@ -184,7 +189,7 @@ class SimpleQA(QA):
 
     def _expand_answer(self, answer):
         """
-        expand answer
+        expand answer to include more of the context
         """
         full_abs = answer['context']
         bert_ans = answer['answer']
@@ -269,11 +274,11 @@ class SimpleQA(QA):
         for idx,c in enumerate(confidences):
             answers[idx]['confidence'] = exp_scores[idx]/total
 
-        if rerank_top_n is None:
+        if rerank_threshold is None:
             return answers
 
         # re-rank
-        top_confidences = [a['confidence'] for idx, a in enumerate(answers) if a['confidence']> rerank_thresholdold]
+        top_confidences = [a['confidence'] for idx, a in enumerate(answers) if a['confidence']> rerank_threshold]
         v1 = self.te.embed(question, word_level=False)
         for idx, answer in enumerate(answers):
             #if idx >= rerank_top_n: 
@@ -309,30 +314,4 @@ class SimpleQA(QA):
         from IPython.core.display import display, HTML
         display(HTML(df.to_html(render_links=True, escape=False)))
 
-
-
-
-
-
-
-
-#SimpleQA.create_index('/tmp/index_dir')
-#qa = SimpleQA('/tmp/index_dir')
-
-
-
-
-
-#schema = Schema(title=TEXT(stored=True), path=ID(stored=True), content=TEXT)
-#ix = create_in("/tmp/indexdir", schema)
-#writer = ix.writer()
-#writer.add_document(title=u"First document", path=u"/a",
-                    #content=u"This is the first document we've added!")
-#writer.add_document(title=u"Second document", path=u"/b",
-                    #content=u"The second one is even more interesting!")
-#writer.commit()
-#with ix.searcher() as searcher:
-    #query = QueryParser("content", ix.schema).parse("first")
-    #results = searcher.search(query)
-    #print(results[0])
 
