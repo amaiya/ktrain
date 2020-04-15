@@ -208,7 +208,7 @@ class SimpleQA(QA):
 
 
 
-    def ask(self, question, n_docs_considered=10, n_answers=50, rerank_top_n=5):
+    def ask(self, question, n_docs_considered=10, n_answers=50, rerank_threshold=0.015):
         """
         submit question to obtain candidate answers
 
@@ -219,14 +219,14 @@ class SimpleQA(QA):
                                   default:10
           n_answers(int): maximum number of candidate answers to return
                           default:50
-          rerank_top_n(int): rerank top N answers based on semantic similarity
-                             between question and answer.
-                             This can help bump the correct answer closer to the top.
-                             default:5
+          rerank_threshold(int): rerank top answers with confidence >= rerank_threshold
+                                 based on semantic similarity between question and answer.
+                                 This can help bump the correct answer closer to the top.
+                                 default:0.015.
+                                 If None, no re-ranking is performed.
         Returns:
           list
         """
-        conf_thresh = 0.015
         # locate candidate document contexts
         doc_results = self.search(question, limit=n_docs_considered)
         paragraphs = []
@@ -273,11 +273,11 @@ class SimpleQA(QA):
             return answers
 
         # re-rank
-        top_confidences = [a['confidence'] for idx, a in enumerate(answers) if a['confidence']> conf_thresh]
+        top_confidences = [a['confidence'] for idx, a in enumerate(answers) if a['confidence']> rerank_thresholdold]
         v1 = self.te.embed(question, word_level=False)
         for idx, answer in enumerate(answers):
             #if idx >= rerank_top_n: 
-            if answer['confidence'] <= conf_thresh:
+            if answer['confidence'] <= rerank_threshold:
                 answer['similarity_score'] = 0.0
                 continue
             v2 = self.te.embed(answer['full_answer'], word_level=False)
