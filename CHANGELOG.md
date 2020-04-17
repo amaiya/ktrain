@@ -7,6 +7,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.14.1 (2020-04-17)
+
+### New:
+- N/A
+
+### Changed
+- N/A
+
+### Fixed:
+- ensure `text.eda.TopicModel.visualize_documents` works with `bokeh` v2.0.x
+
+
 ## 0.14.0 (2020-04-15)
 
 ### New:

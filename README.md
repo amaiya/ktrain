@@ -8,7 +8,7 @@
 
 ### News and Announcements
 - **2020-04-15:**  
-  - ***ktrain*** **v0.14.x is released** and now includes support for **open-domain question-answering**.  See the [example QA notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/question_answering_with_bert.ipynb).
+  - ***ktrain*** **v0.14.x is released** and now includes support for **open-domain question-answering**.  See the [example QA notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/question_answering_with_bert.ipynb)
 - **2020-04-09:**  
   - ***ktrain*** **v0.13.x is released** and includes support for:
     - **link prediction** using graph neural networks - [see example link prediction notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/graphs/cora_link_prediction-GraphSAGE.ipynb) on citation prediction

@@ -438,7 +438,7 @@ class TopicModel():
         source = bp.ColumnDataSource(data=dct)
         hover = HoverTool( tooltips=tool_tups)
         p = bp.figure(plot_width=width, plot_height=height, 
-                      tools=[hover, 'previewsave', 'pan', 'wheel_zoom', 'box_zoom', 'reset'],
+                      tools=[hover, 'save', 'pan', 'wheel_zoom', 'box_zoom', 'reset'],
                       #tools="pan,wheel_zoom,box_zoom,reset,hover,previewsave",
                       title=title)
         #plot_lda = bp.figure(plot_width=1400, plot_height=1100,
