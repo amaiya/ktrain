@@ -173,6 +173,7 @@ import mimetypes
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.colors import rgb2hex
+plt.ion() # interactive mode
 import sklearn
 from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.datasets import load_files

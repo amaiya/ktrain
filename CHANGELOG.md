@@ -7,6 +7,19 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.14.2 (2020-04-21)
+
+### New:
+- N/A
+
+### Changed
+- added `suggest` option to `core.Learner.lr_plot`
+
+### Fixed:
+- set interactive mode for matplotlib so plots show automatically from Python console and PyCharm
+- run prepare for NER sequence predictor to avoid matrix mismatch
+
+
 ## 0.14.1 (2020-04-17)
 
 ### New:
