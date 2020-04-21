@@ -39,7 +39,7 @@ learner.fit(0.01, 1, cycle_len=5)
 
 ### Overview
 
-*ktrain* is a lightweight wrapper for the deep learning library [TensorFlow Keras](https://www.tensorflow.org/guide/keras/overview) (and other libraries) to help build, train, and deploy neural networks and other machine learning models.  With only a few lines of code, ktrain allows you to easily and quickly:
+*ktrain* is a lightweight wrapper for the deep learning library [TensorFlow Keras](https://www.tensorflow.org/guide/keras/overview) (and other libraries) to help build, train, and deploy neural networks and other machine learning models.  It is designed to make deep learning and AI more accessible and easier to apply for both newcomers and experienced practitioners. With only a few lines of code, ktrain allows you to easily and quickly:
 
 - employ fast, accurate, and easy-to-use pre-canned models for  `text`, `vision`, and `graph` data:
   - `text` data:
