@@ -33,7 +33,9 @@ class NERPredictor(Predictor):
         if not isinstance(sentence, str):
             raise ValueError('Param sentence must be a string-representation of a sentence')
         nerseq = self.preproc.preprocess([sentence])
-        nerseq.batch_size = self.batch_size 
+        if not nerseq.prepare_called:
+            nerseq.prepare()
+        nerseq.batch_size = self.batch_size
         x_true, _ = nerseq[0]
         lengths = nerseq.get_lengths(0)
         y_pred = self.model.predict_on_batch(x_true)
