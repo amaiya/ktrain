@@ -132,21 +132,38 @@ class LRFinder:
         return 
 
 
-    def plot_loss(self, n_skip_beginning=10, n_skip_end=1):
+    def plot_loss(self, n_skip_beginning=10, n_skip_end=1, suggest=False):
         """
         Plots the loss.
-        Parameters:
-            n_skip_beginning - number of batches to skip on the left.
-            n_skip_end - number of batches to skip on the right.
-            highlight - will highlight numerical estimate
-                        of best lr if True
+        Args:
+            n_skip_beginning(int): number of batches to skip on the left.
+            n_skip_end(int):  number of batches to skip on the right.
+            suggest(bool): will highlight numerical estimate
+                           of best lr if True - methods adapted from fastai
         """
         fig, ax = plt.subplots()
         plt.ylabel("loss")
         plt.xlabel("learning rate (log scale)")
         ax.plot(self.lrs[n_skip_beginning:-n_skip_end], self.losses[n_skip_beginning:-n_skip_end])
         plt.xscale('log')
+
+        if suggest:
+            # this code was adapted from fastai: https://github.com/fastai/fastai
+            try: 
+                ml = np.argmin(self.losses)
+                mg = (np.gradient(np.array(self.losses[10:ml]))).argmin()
+            except:
+                print("Failed to compute the gradients, there might not be enough points.\n" +\
+                       "Plot displayed without suggestion.")
+                return
+            else:
+                print('Two possible suggestions for LR from plot:')
+                print(f"\tMin numerical gradient: {self.lrs[mg]:.2E}")
+                ax.plot(self.lrs[mg],self.losses[mg], markersize=10,marker='o',color='red')
+                print(f"\tMin loss divided by 10: {self.lrs[ml]/10:.2E}")
         return
+
+
 
         
     def plot_loss_change(self, sma=1, n_skip_beginning=10, n_skip_end=5, y_lim=(-0.01, 0.01)):

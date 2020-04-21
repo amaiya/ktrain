@@ -465,6 +465,7 @@ class Learner(ABC):
         U.vprint('\n', verbose=verbose)
         U.vprint('done.', verbose=verbose)
         if show_plot:
+            U.vprint('Visually inspect the loss plot to help identify the maximal learning rate', verbose=verbose)
             self.lr_plot()
         else:
             U.vprint('Please invoke the Learner.lr_plot() method to visually inspect '
@@ -473,15 +474,21 @@ class Learner(ABC):
         return 
 
 
-    def lr_plot(self, n_skip_beginning=10, n_skip_end=5):
+    def lr_plot(self, n_skip_beginning=10, n_skip_end=5, suggest=False):
         """
         Plots the loss vs. learning rate to help identify
         The maximal learning rate associated with a falling loss.
         The nskip_beginning and n_skip_end arguments can be used
         to "zoom in" on the plot.
+        Args:
+            n_skip_beginning(int): number of batches to skip on the left.
+            n_skip_end(int):  number of batches to skip on the right.
+            suggest(bool): will highlight numerical estimate
+                           of best lr if True - methods adapted from fastai
+          
         """
         self.lr_finder.plot_loss(n_skip_beginning=n_skip_beginning,
-                                 n_skip_end=n_skip_end)
+                                 n_skip_end=n_skip_end, suggest=suggest)
         return
 
 
