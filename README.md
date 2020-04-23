@@ -1,4 +1,4 @@
-### [Overview](#overview) | [Tutorials](#tutorials) | [Examples](#examples) |  [Installation](#installation)
+### [Overview](#overview) | [Tutorials](#tutorials) | [Examples](#examples) |  [Installation](#installation) | [How to Cite](#-how-to-cite)
 [![PyPI Status](https://badge.fury.io/py/ktrain.svg)](https://badge.fury.io/py/ktrain) [![ktrain python compatibility](https://img.shields.io/pypi/pyversions/ktrain.svg)](https://pypi.python.org/pypi/ktrain) [![license](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/amaiya/ktrain/blob/master/LICENSE) [![Downloads](https://pepy.tech/badge/ktrain)](https://pepy.tech/project/ktrain) [![Downloads](https://pepy.tech/badge/ktrain/month)](https://pepy.tech/project/ktrain/month)
 
 
@@ -284,6 +284,19 @@ pip3 install git+https://github.com/amaiya/stellargraph@no_tf_dep_082
 ```
 
 
+### How to Cite
+
+Please cite the following paper when using **ktrain**:
+```
+@misc{maiya2020ktrain,
+    title={ktrain: A Low-Code Library for Augmented Machine Learning},
+    author={Arun S. Maiya},
+    year={2020},
+    eprint={2004.10703},
+    archivePrefix={arXiv},
+    primaryClass={cs.LG}
+}
+```
 
 
 <!--
