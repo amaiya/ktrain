@@ -283,6 +283,8 @@ pip3 install git+https://github.com/amaiya/eli5@tfkeras_0_10_1
 pip3 install git+https://github.com/amaiya/stellargraph@no_tf_dep_082
 ```
 
+This code was tested on Ubuntu 18.04 LTS using TensorFlow 2.1.0
+
 
 ### How to Cite
 
@@ -315,7 +317,6 @@ The following software/libraries should be installed:
 -->
 
 
-This code was tested on Ubuntu 18.04 LTS using TensorFlow 2.1.0
 
 ----
 **Creator:  [Arun S. Maiya](http://arun.maiya.net)**
