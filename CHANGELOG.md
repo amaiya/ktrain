@@ -13,7 +13,7 @@ Most recent releases are shown at the top. Each release shows:
 - N/A
 
 ### Changed
-- N/A
+- added `textutils` to `text` namespace and added note about `sent_tokenize` to sequence-tagging tutorial
 
 ### Fixed:
 - cast dependent variable to `tf.float32` instead of `tf.int64` for text regression problems using `transformers` library

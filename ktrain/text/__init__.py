@@ -8,6 +8,7 @@ from .preprocessor import Transformer, TransformerEmbedding
 from .summarization import TransformerSummarizer
 from . import shallownlp
 from .qa import SimpleQA
+from . import textutils
 
 __all__ = [
            'text_classifier', 'text_regression_model',
@@ -21,13 +22,13 @@ __all__ = [
            'sequence_tagger',
            'print_sequence_taggers',
            'get_topic_model',
-           'extract_filenames', 
-           'load_text_files',
            'Transformer',
            'TranformerEmbedding',
            'shallownlp',
            'TransformerSummarizer',
-           'SimpleQA'
+           'SimpleQA',
+           'extract_filenames', 
+           'load_text_files',
            ]
 
 
