@@ -1190,8 +1190,10 @@ class TransformerDataset(Dataset):
         """
         if len(self.y.shape) == 1:
             yshape = []
+            ytype = tf.float32
         else:
             yshape = [None]
+            ytype = tf.int64
 
         def gen():
             for idx, data in enumerate(self.x):
@@ -1204,7 +1206,7 @@ class TransformerDataset(Dataset):
             ({'input_ids': tf.int32,
               'attention_mask': tf.int32,
               'token_type_ids': tf.int32},
-             tf.int64),
+             ytype),
             ({'input_ids': tf.TensorShape([None]),
               'attention_mask': tf.TensorShape([None]),
               'token_type_ids': tf.TensorShape([None])},

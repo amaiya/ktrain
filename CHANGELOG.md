@@ -7,6 +7,19 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.14.3 (TBD)
+
+### New:
+- N/A
+
+### Changed
+- N/A
+
+### Fixed:
+- cast dependent variable to `tf.float32` instead of `tf.int64` for text regression problems using `transformers` library
+
+
+
 ## 0.14.2 (2020-04-21)
 
 ### New:
