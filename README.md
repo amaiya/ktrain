@@ -291,7 +291,7 @@ This code was tested on Ubuntu 18.04 LTS using TensorFlow 2.1.0
 
 ### How to Cite
 
-Please cite the following paper when using **ktrain**:
+Please cite the [following paper](https://arxiv.org/abs/2004.10703) when using **ktrain**:
 ```
 @misc{maiya2020ktrain,
     title={ktrain: A Low-Code Library for Augmented Machine Learning},
