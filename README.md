@@ -1,4 +1,4 @@
-### [Overview](#overview) | [Tutorials](#tutorials) | [Examples](#examples) |  [Installation](#installation)
+### [Overview](#overview) | [Tutorials](#tutorials) | [Examples](#examples) |  [Installation](#installation) | [How to Cite](#how-to-cite)
 [![PyPI Status](https://badge.fury.io/py/ktrain.svg)](https://badge.fury.io/py/ktrain) [![ktrain python compatibility](https://img.shields.io/pypi/pyversions/ktrain.svg)](https://pypi.python.org/pypi/ktrain) [![license](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/amaiya/ktrain/blob/master/LICENSE) [![Downloads](https://pepy.tech/badge/ktrain)](https://pepy.tech/project/ktrain) [![Downloads](https://pepy.tech/badge/ktrain/month)](https://pepy.tech/project/ktrain/month)
 
 
@@ -53,7 +53,7 @@ learner.fit(0.01, 1, cycle_len=5)
      - **Text Summarization**:  summarize long documents with a pretrained BART model - no training required <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/text_summarization_with_bart.ipynb)]</sup></sub>
      - **Open-Domain Question-Answering**:  ask a large text corpus questions and receive exact answers <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/question_answering_with_bert.ipynb)]</sup></sub>
   - `vision` data:
-    - **image classification** (e.g., [ResNet](https://arxiv.org/abs/1512.03385), [Wide ResNet](https://arxiv.org/abs/1605.07146), [Inception](https://www.cs.unc.edu/~wliu/papers/GoogLeNet.pdf)) <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/vision/dogs_vs_cats-ResNet50.ipynb)]</sup></sub>
+    - **image classification** (e.g., [ResNet](https://arxiv.org/abs/1512.03385), [Wide ResNet](https://arxiv.org/abs/1605.07146), [Inception](https://www.cs.unc.edu/~wliu/papers/GoogLeNet.pdf)) <sub><sup>[[example notebook](https://colab.research.google.com/drive/1WipQJUPL7zqyvLT10yekxf_HNMXDDtyR)]</sup></sub>
   - `graph` data:
     - **node classification** with graph neural networks ([GraphSAGE](https://cs.stanford.edu/people/jure/pubs/graphsage-nips17.pdf)) <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/graphs/pubmed_node_classification-GraphSAGE.ipynb)]</sup></sub>
     - **link prediction** with graph neural networks ([GraphSAGE](https://cs.stanford.edu/people/jure/pubs/graphsage-nips17.pdf)) <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/graphs/cora_link_prediction-GraphSAGE.ipynb)]</sup></sub>
@@ -252,7 +252,10 @@ learner.validate(class_names=t.get_classes()) # class_names must be string value
 ```
 
 
-Using *ktrain* on **Google Colab**?  See [this simple demo of Multiclass Text Classification with BERT](https://colab.research.google.com/drive/1AH3fkKiEqBpVpO5ua00scp7zcHs5IDLK).
+Using *ktrain* on **Google Colab**?  See these Colab examples:
+-  [a simple demo of Multiclass Text Classification with BERT](https://colab.research.google.com/drive/1AH3fkKiEqBpVpO5ua00scp7zcHs5IDLK).
+-  [a simple demo of Multiclass Text Classification with Hugging Face Transformers](https://colab.research.google.com/drive/1YxcceZxsNlvK35pRURgbwvkgejXwFxUt).
+-  [image classification with Cats vs. Dogs](https://colab.research.google.com/drive/1WipQJUPL7zqyvLT10yekxf_HNMXDDtyR)
 
 **Additional examples can be found [here](https://github.com/amaiya/ktrain/tree/master/examples).**
 
@@ -283,7 +286,22 @@ pip3 install git+https://github.com/amaiya/eli5@tfkeras_0_10_1
 pip3 install git+https://github.com/amaiya/stellargraph@no_tf_dep_082
 ```
 
+This code was tested on Ubuntu 18.04 LTS using TensorFlow 2.1.0
 
+
+### How to Cite
+
+Please cite the following paper when using **ktrain**:
+```
+@misc{maiya2020ktrain,
+    title={ktrain: A Low-Code Library for Augmented Machine Learning},
+    author={Arun S. Maiya},
+    year={2020},
+    eprint={2004.10703},
+    archivePrefix={arXiv},
+    primaryClass={cs.LG}
+}
+```
 
 
 <!--
@@ -302,7 +320,6 @@ The following software/libraries should be installed:
 -->
 
 
-This code was tested on Ubuntu 18.04 LTS using TensorFlow 2.1.0
 
 ----
 **Creator:  [Arun S. Maiya](http://arun.maiya.net)**
