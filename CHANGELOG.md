@@ -7,6 +7,19 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+
+## 0.14.4 (2020-04-30)
+
+### New:
+- N/A
+
+### Changed
+- added `merge_tokens` and `return_proba` options to `NERPredictor.predict`
+
+### Fixed:
+- N/A
+
+
 ## 0.14.3 (2020-04-27)
 
 ### New:

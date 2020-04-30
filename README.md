@@ -253,8 +253,8 @@ learner.validate(class_names=t.get_classes()) # class_names must be string value
 
 
 Using *ktrain* on **Google Colab**?  See these Colab examples:
--  [a simple demo of Multiclass Text Classification with BERT](https://colab.research.google.com/drive/1AH3fkKiEqBpVpO5ua00scp7zcHs5IDLK).
--  [a simple demo of Multiclass Text Classification with Hugging Face Transformers](https://colab.research.google.com/drive/1YxcceZxsNlvK35pRURgbwvkgejXwFxUt).
+-  [a simple demo of Multiclass Text Classification with BERT](https://colab.research.google.com/drive/1AH3fkKiEqBpVpO5ua00scp7zcHs5IDLK)
+-  [a simple demo of Multiclass Text Classification with Hugging Face Transformers](https://colab.research.google.com/drive/1YxcceZxsNlvK35pRURgbwvkgejXwFxUt)
 -  [image classification with Cats vs. Dogs](https://colab.research.google.com/drive/1WipQJUPL7zqyvLT10yekxf_HNMXDDtyR)
 
 **Additional examples can be found [here](https://github.com/amaiya/ktrain/tree/master/examples).**
@@ -263,20 +263,14 @@ Using *ktrain* on **Google Colab**?  See these Colab examples:
 
 ### Installation
 
-Make sure pip is up-to-date with: `pip3 install -U pip`.
+*ktrain* currently uses [TensorFlow 2.1.0](https://www.tensorflow.org/install/pip?lang=python3), which will be installed automatically when installing *ktrain*. 
+While *ktrain* will probably work with other versions of TensorFlow 2.x, v2.1.0 is the current recommended and tested version.
 
-1. Ensure TensorFlow 2.1.0 [is installed](https://www.tensorflow.org/install/pip?lang=python3) if it is not already. 
-   (While *ktrain* will probably work with other versions of TensorFlow 2.x, v2.1.0 is the current recommended and tested version.)
-
-> For GPU: `pip3 install "tensorflow_gpu==2.1.0"`
-
-> For CPU: `pip3 install "tensorflow==2.1.0"`
-
+1.  Make sure pip is up-to-date with: `pip3 install -U pip`
 
 2. Install *ktrain*: `pip3 install ktrain`
 
 **Some things to note:**
-- As of v0.8.x, *ktrain* requires TensorFlow 2.  TensorFlow 1.x (1.14, 1.15) is no longer suppoted. 
 - Since some *ktrain* dependencies have not yet been migrated to `tf.keras` in TensorFlow 2 (or may have other issues), 
   *ktrain* is temporarily using forked versions of some libraries. Specifically, *ktrain* uses forked versions of the `eli5` and `stellargraph` libraries.  If not installed, *ktrain* will complain  when a method or function needing 
   either of these libraries is invoked.
