@@ -65,12 +65,12 @@ class NERPreprocessor(Preprocessor):
 
 
 
-    def preprocess(self, sentences):
+    def preprocess(self, sentences, lang=None):
         if type(sentences) != list:
             raise ValueError('Param sentences must be a list of strings')
 
         # language detection
-        lang = TU.detect_lang(sentences)
+        if lang is None: lang = TU.detect_lang(sentences)
         X = []
         y = []
         for s in sentences:

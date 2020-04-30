@@ -71,49 +71,50 @@ class NER:
         results = []
         for text in texts:
             text = text.strip()
-            result = self.predictor.predict(text)
-            if merge_tokens:
-                result = self.merge_tokens(result)
+            result = self.predictor.predict(text, merge_tokens=merge_tokens)
+            #if merge_tokens:
+                #result = self.merge_tokens(result)
             results.append(result)
         if len(result) == 1: result = result[0]
         return result
 
 
-    def merge_tokens(self, annotated_sentence):
-        if self.lang.startswith('zh'):
-            sep = ''
-        else:
-            sep = ' '
-        current_token = ""
-        current_tag = ""
-        entities = []
+    # 2020-04-30: moved to text.ner.predictor
+    #def merge_tokens(self, annotated_sentence):
+    #    if self.lang.startswith('zh'):
+    #        sep = ''
+    #    else:
+    #        sep = ' '
+    #    current_token = ""
+    #    current_tag = ""
+    #    entities = []
 
-        for tup in annotated_sentence:
-            token = tup[0]
-            entity = tup[1]
-            tag = entity.split('-')[1] if '-' in entity else None
-            prefix = entity.split('-')[0] if '-' in entity else None
-            # not within entity
-            if tag is None and not current_token:
-                continue
-            # beginning of entity
-            #elif tag and prefix=='B':
-            elif tag and (prefix=='B' or prefix=='I' and not current_token):
-                if current_token: # consecutive entities
-                    entities.append((current_token, current_tag))
-                    current_token = ""
-                    current_tag = None
-                current_token = token
-                current_tag = tag
-            # end of entity
-            elif tag is None and current_token:
-                entities.append((current_token, current_tag))
-                current_token = ""
-                current_tag = None
-                continue
-            # within entity
-            elif tag and current_token:  #  prefix I
-                current_token = current_token + sep + token
-                current_tag = tag
-        return entities  
+    #    for tup in annotated_sentence:
+    #        token = tup[0]
+    #        entity = tup[1]
+    #        tag = entity.split('-')[1] if '-' in entity else None
+    #        prefix = entity.split('-')[0] if '-' in entity else None
+    #        # not within entity
+    #        if tag is None and not current_token:
+    #            continue
+    #        # beginning of entity
+    #        #elif tag and prefix=='B':
+    #        elif tag and (prefix=='B' or prefix=='I' and not current_token):
+    #            if current_token: # consecutive entities
+    #                entities.append((current_token, current_tag))
+    #                current_token = ""
+    #                current_tag = None
+    #            current_token = token
+    #            current_tag = tag
+    #        # end of entity
+    #        elif tag is None and current_token:
+    #            entities.append((current_token, current_tag))
+    #            current_token = ""
+    #            current_tag = None
+    #            continue
+    #        # within entity
+    #        elif tag and current_token:  #  prefix I
+    #            current_token = current_token + sep + token
+    #            current_tag = tag
+    #    return entities  
 
