@@ -7,6 +7,16 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.14.5 (2020-05-03)
+
+### New:
+- N/A
+
+### Changed
+- N/A
+
+### Fixed:
+- fixed issue with MobileNet model due to typo and added MobileNet example notebook
 
 ## 0.14.4 (2020-04-30)
 
