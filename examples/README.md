@@ -133,6 +133,9 @@ The objective of the CoNLL2003 task is to classify sequences of words as belongi
 #### [Dogs vs. Cats](https://www.kaggle.com/c/dogs-vs-cats):  Binary Classification
 - [dogs_vs_cats-ResNet50.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/vision):  ResNet50 pretrained on ImageNet.  
 
+#### [Dogs vs. Cats](https://www.kaggle.com/c/dogs-vs-cats):  Binary Classification
+- [dogs_vs_cats-MobileNet.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/vision):  MobileNet pretrained on ImageNet on filtered version of Dogs vs. Cats dataset
+
 #### [MNIST](http://yann.lecun.com/exdb/mnist/):  Multiclass Classification
 - [mnist-WRN22.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/vision):  A randomly-initialized Wide Residual Network applied to MNIST
 
