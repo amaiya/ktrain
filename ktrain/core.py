@@ -38,7 +38,7 @@ class Learner(ABC):
             self.model.save_weights(weightfile)
             self._original_weights = weightfile
         except:
-            warnins.warn('Could not save original model weights')
+            warnings.warn('Could not save original model weights')
             self._original_weights = None
 
 
