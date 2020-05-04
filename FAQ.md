@@ -57,7 +57,7 @@ learner.load_model('/tmp/my_model', preproc=t)
 learner.validate(val_data=val, class_names=t.get_classes())
 ```
 
-[Back to Top](#frequently-asked-questions-about-ktrain)
+[[Back to Top](#frequently-asked-questions-about-ktrain)]
 
 ### How do I obtain the word or sentence embeddings after fine-tuning a Transformer-based text classifier?
 Here is a self-contained example of generating word embeddings from a fine-tuned `Transformer` model:
@@ -97,21 +97,21 @@ in various ways (e.g., average vectors).
 
 See also [this post](https://github.com/huggingface/transformers/issues/1950) on the `transformers` GitHub repo.
 
-[Back to Top](#frequently-asked-questions-about-ktrain)
+[[Back to Top](#frequently-asked-questions-about-ktrain)]
 
 ### How do I train a model using mixed precision?
 
 See [this post](https://github.com/amaiya/ktrain/issues/126#issuecomment-616545655).
 
 
-[Back to Top](#frequently-asked-questions-about-ktrain)
+[[Back to Top](#frequently-asked-questions-about-ktrain)]
 
 
 ### How do I deploy a model using Flask?
 
 See [this post](https://github.com/amaiya/ktrain/issues/37#issuecomment-568085054).
 
-[Back to Top](#frequently-asked-questions-about-ktrain)
+[[Back to Top](#frequently-asked-questions-about-ktrain)]
 
 ### How do I use custom metrics with *ktrain*?
 You can use custom callbacks:
@@ -139,14 +139,14 @@ learner = ktrain.get_learner(model, train_data=train_data, val_data = val_data)
 learner.autofit(0.005, 2, callbacks=[RocAuc])
 ```
 
-[Back to Top](#frequently-asked-questions-about-ktrain)
+[[Back to Top](#frequently-asked-questions-about-ktrain)]
 
 ### How do I get the predicted class "probabilities" of a model?
 
 All `predict` methods in `Predictor` instances accept a `return_proba` argument.  Set it to true to obtain the class probabilities.
 
 
-[Back to Top](#frequently-asked-questions-about-ktrain)
+[[Back to Top](#frequently-asked-questions-about-ktrain)]
 
 
 ### How do I retrieve or visualize training history?
@@ -166,12 +166,12 @@ To visualize the learning rate schedule, you can do this:
 learner.plot('lr')
 ```
 
-[Back to Top](#frequently-asked-questions-about-ktrain)
+[[Back to Top](#frequently-asked-questions-about-ktrain)]
 
 ### I have a model that accepts multiple inputs (e.g., both text and other numerical or categorical variables).  How do train it with *ktrain*?
 
 See [this tutorial](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-A4-customdata-text_regression_with_extra_regressors.ipynb).
 
 
-[Back to Top](#frequently-asked-questions-about-ktrain)
+[[Back to Top](#frequently-asked-questions-about-ktrain)]
 
