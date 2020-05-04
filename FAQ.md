@@ -1,5 +1,7 @@
 # Frequently Asked Questions About `ktrain`
 
+- [I am a newcomer and am having trouble figuring out how to even to even get started. Where do I begin?]()
+
 - [How do I obtain the word or sentence embeddings after fine-tuning a Transformer-based text classifier?](#how-do-i-obtain-the-word-or-sentence-embeddings-after-fine-tuning-a-transformer-based-text-classifier)
 
 - [How do I train using multiple GPUs?](#how-do-i-train-using-multiple-gpus)
@@ -17,6 +19,39 @@
 - [I have a model that accepts multiple inputs (e.g., both text and other numerical or categorical variables).  How do train it with *ktrain*?](#i-have-a-model-that-accepts-multiple-inputs-eg-both-text-and-other-numerical-or-categorical-variables--how-do-train-it-with-ktrain)
 
 
+### I am a newcomer and am having trouble figuring out how to even get started. Where do I begin?
+
+Machine learning models (e.g., neural networks) are trained on example inputs and outputs to learn mappings between them.  Once trained, given a new input, a correct output can be predicted.
+For example, if you train a neural network on documents (i.e., inputs) and document categories or topics (i.e, outputs), the neural network will learn to predict the categories of new documents.  
+Training neural network models can be computationally intensive due to the number of mathematical operations it takes to learn the mappings.  GPUs (or Graphical Processing Units) are devices
+that allow you train neural networks faster by performing many mathematical operations at the same time. 
+
+*ktrain* is a Python library that allows you train a neural network and make predictions using a minimal number of "commands" or lines of code. 
+It is built on top of a library by Google called TensorFlow. Only limited Python knowledge is required to use it.  
+
+
+The three biggest challenges for newcomers are gaining access to a computer with a GPU, installing and setting up the TensorFlow library to use the GPU, and setting up Jupyter notebook.
+(Jupyter notebook are programming environemnts that allow you to interactively type code and see and save results of that code in an interacive fashion.)  
+Fortunately, Google did a nice thing and made notebook environments with GPU access freely available "in the cloud" to anyone with a Gmail account.
+
+Here is how you can quickly get started using *ktrain*:
+
+1. Go to the [Google Colab](https://colab.research.google.com/notebooks/intro.ipynb) and sign in using your Gmail account.
+2. Go to this [example notebook on image classification](https://colab.research.google.com/drive/1WipQJUPL7zqyvLT10yekxf_HNMXDDtyR). This notebook shows you how to build a neural network that recoginizes cats vs. dogs in photos.
+3. Save the notebook to your Google Drive: `File --> Save a copy in Drive`
+4. Make sure the notebook is setup to use a GPU: `Runtime --> Change runtime type` and select `GPU` in the menu.
+5. Click on each cell in the notebook and execute it by pressing `SHIFT` and `ENTER` at the same time.
+
+
+- For more information on `ktrain`, see [the tutorials](https://github.com/amaiya/ktrain#tutorials).
+
+- For more information on Python, see [here](https://learnpythonthehardway.org/).
+
+- For more information on neural networks, see [this page](https://victorzhou.com/blog/intro-to-neural-networks/).
+
+- For more information on Google Colab, see [this video](https://www.youtube.com/watch?v=inN8seMm7UI).
+
+- For more information on Jupyter notebooks, see [this video](https://www.youtube.com/watch?v=HW29067qVWk).
 
 
 ### How do I obtain the word or sentence embeddings after fine-tuning a Transformer-based text classifier?
