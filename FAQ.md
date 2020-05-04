@@ -22,7 +22,7 @@
 ### I am a newcomer and am having trouble figuring out how to even get started. Where do I begin?
 
 Machine learning models (e.g., neural networks) are trained on example inputs and outputs to learn mappings between them.  Once trained, given a new input, a correct output can be predicted.
-For example, if you train a neural network on documents (i.e., inputs) and document categories or topics (i.e, outputs), the neural network will learn to predict the categories of new documents.  
+For example, if you train a neural network on documents as inputs and document categories (e.g., subject areas) as outputs, the neural network will learn to predict the categories of new documents.  
 
 
 Training neural network models can be computationally intensive due to the number of mathematical operations it takes to learn the mappings.  GPUs (or Graphical Processing Units) are devices
@@ -54,6 +54,8 @@ Here is how you can quickly get started using *ktrain*:
 - For more information on Google Colab, see [this video](https://www.youtube.com/watch?v=inN8seMm7UI).
 
 - For more information on Jupyter notebooks, see [this video](https://www.youtube.com/watch?v=HW29067qVWk).
+
+*ktrain* is inspired by some other libraries like `fastai` and `ludwig`. For a deeper dive into neural networks, the fastai MOOC is recommended.
 
 
 ### How do I obtain the word or sentence embeddings after fine-tuning a Transformer-based text classifier?
