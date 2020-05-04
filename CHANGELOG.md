@@ -7,13 +7,13 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
-## 0.14.6 (TBD)
+## 0.14.6 (2020-05-04)
 
 ### New:
 - N/A
 
 ### Changed
-- issue warning if Learner cannot save original weights (e.g., TPU models)
+- issue warning if Learner cannot save original weights
 
 ### Fixed:
 - N/A
