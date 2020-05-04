@@ -210,7 +210,7 @@ learner.plot('lr')
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
 
-### I have a model that accepts multiple inputs (e.g., both text and other numerical or categorical variables).  How do train it with *ktrain*?
+### I have a model that accepts multiple inputs (e.g., both text and other numerical or categorical variables).  How do I train it with *ktrain*?
 
 See [this tutorial](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-A4-customdata-text_regression_with_extra_regressors.ipynb).
 
