@@ -1,4 +1,4 @@
-# Frequently Asked Questions About `ktrain`
+# Frequently Asked Questions About *ktrain*
 
 - [I am a newcomer and am having trouble figuring out how to even get started. Where do I begin?](#i-am-a-newcomer-and-am-having-trouble-figuring-out-how-to-even-get-started-where-do-i-begin)
 
