@@ -217,3 +217,13 @@ See [this tutorial](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/maste
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
 
+
+### Can I use `tf.data.Dataset` instances with *ktrain*?
+
+Yes, but you'll need to wrap your dataset in a `ktrain.Dataset` instance (which is simply a [utils.Sequence](https://www.tensorflow.org/api_docs/python/tf/keras/utils/Sequence), so
+that *ktrain* can more easily inspect your data.
+
+See [this tutorial](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-A4-customdata-text_regression_with_extra_regressors.ipynb) for more information.
+
+
+[[Back to Top](#frequently-asked-questions-about-ktrain)]
