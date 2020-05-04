@@ -33,13 +33,14 @@ class Learner(ABC):
         self.history = None
 
         # save original weights of model
-        try:
-            new_file, weightfile = tempfile.mkstemp()
-            self.model.save_weights(weightfile)
-            self._original_weights = weightfile
-        except:
-            warnins.warn('Could not save original model weights')
-            self._original_weights = None
+        #try:
+            #new_file, weightfile = tempfile.mkstemp()
+            #self.model.save_weights(weightfile)
+            #self._original_weights = weightfile
+        #except:
+            #warnins.warn('Could not save original model weights')
+            #self._original_weights = None
+        self._original_weights = None
 
 
     def get_weight_decay(self):
