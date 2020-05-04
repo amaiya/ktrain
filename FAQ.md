@@ -17,7 +17,7 @@
 - [How do I retrieve or visualize training history?](#how-do-i-retrieve-or-visualize-training-history)
 
 - [I have a model that accepts multiple inputs (e.g., both text and other numerical or categorical variables).  How do train it with *ktrain*?](#i-have-a-model-that-accepts-multiple-inputs-eg-both-text-and-other-numerical-or-categorical-variables--how-do-train-it-with-ktrain)
-
+- [Can I use `tf.data.Dataset` instances with *ktrain*?](#can-i-use-tfdatadataset-instances-with-ktrain)
 
 ### I am a newcomer and am having trouble figuring out how to even get started. Where do I begin?
 
