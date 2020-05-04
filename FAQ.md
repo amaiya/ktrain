@@ -29,20 +29,20 @@ Training neural network models can be computationally intensive due to the numbe
 that allow you train neural networks faster by performing many mathematical operations at the same time. 
 
 *ktrain* is a Python library that allows you train a neural network and make predictions using a minimal number of "commands" or lines of code. 
-It is built on top of a library by Google called TensorFlow. Only limited Python knowledge is required to use it.  
+It is built on top of a library by Google called TensorFlow. Only very basic and minimal Python knowledge is required to use it.  
 
 
-The three biggest challenges for newcomers are gaining access to a computer with a GPU, installing and setting up the TensorFlow library to use the GPU, and setting up Jupyter notebook.
-(Jupyter notebook are programming environemnts that allow you to interactively type code and see and save results of that code in an interacive fashion.)  
+A challenge for newcomers is setting up the programming environment.  This includes 1) gaining access to a computer with a GPU, 2) installing and setting up the TensorFlow library to use the GPU, and 3) setting up Jupyter notebook.
+(A Jupyter notebook is a programming environemnt that allows you to type code and see and save results of that code in an interacive fashion.)  
 Fortunately, Google did a nice thing and made notebook environments with GPU access freely available "in the cloud" to anyone with a Gmail account.
 
 Here is how you can quickly get started using *ktrain*:
 
 1. Go to the [Google Colab](https://colab.research.google.com/notebooks/intro.ipynb) and sign in using your Gmail account.
-2. Go to this [example notebook on image classification](https://colab.research.google.com/drive/1WipQJUPL7zqyvLT10yekxf_HNMXDDtyR). This notebook shows you how to build a neural network that recoginizes cats vs. dogs in photos.
+2. Go to this [example notebook on image classification](https://colab.research.google.com/drive/1WipQJUPL7zqyvLT10yekxf_HNMXDDtyR). 
 3. Save the notebook to your Google Drive: `File --> Save a copy in Drive`
 4. Make sure the notebook is setup to use a GPU: `Runtime --> Change runtime type` and select `GPU` in the menu.
-5. Click on each cell in the notebook and execute it by pressing `SHIFT` and `ENTER` at the same time.
+5. Click on each cell in the notebook and execute it by pressing `SHIFT` and `ENTER` at the same time. The notebook shows you how to build a neural network that recoginizes cats vs. dogs in photos.
 
 
 - For more information on `ktrain`, see [the tutorials](https://github.com/amaiya/ktrain#tutorials).
