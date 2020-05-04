@@ -23,6 +23,8 @@
 
 Machine learning models (e.g., neural networks) are trained on example inputs and outputs to learn mappings between them.  Once trained, given a new input, a correct output can be predicted.
 For example, if you train a neural network on documents (i.e., inputs) and document categories or topics (i.e, outputs), the neural network will learn to predict the categories of new documents.  
+
+
 Training neural network models can be computationally intensive due to the number of mathematical operations it takes to learn the mappings.  GPUs (or Graphical Processing Units) are devices
 that allow you train neural networks faster by performing many mathematical operations at the same time. 
 
