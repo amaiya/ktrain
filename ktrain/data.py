@@ -1,7 +1,7 @@
 from .imports import *
 
 
-class Dataset(Sequence):
+class Dataset:
     """
     Base class for custom datasets in ktrain.
 
@@ -14,20 +14,13 @@ class Dataset(Sequence):
 
     The signature of to_tfdataset is as follows:
 
-    def to_tfdataset(self, shuffle=True, repeat=True)
+    def to_tfdataset(self, train=True)
 
     See ktrain.text.preprocess.TransformerDataset as an example.
     """
     def __init__(self, batch_size=32):
         self.batch_size = batch_size
 
-    # required by keras.utils.Sequence instances
-    def __len__(self):
-        raise NotImplemented
-
-    # required by keras.utils.Sequence instances
-    def __getitem__(self, idx):
-        raise NotImplemented
 
     # required: used by ktrain.core.Learner instances
     def nsamples(self):
@@ -68,8 +61,67 @@ class Dataset(Sequence):
         raise NotImplemented
 
 
+class TFDataset(Dataset):
+    """
+    Wrapper for tf.data.Datasets
+    """
+    def __init__(self, tfdataset, batch_size=32):
+        """
+        Args:
+          tfdataset(tf.data.Dataset):  a tf.Dataset instance
+          batch_size(int): batch size set for the supplied tfdataset
+          n(int): number of examples in dataset
+          y(np.ndarray): y values for each example - should be in the format expected by your moddel
+        """
+        self.tfdataset = tfdataset
+        self.batch_size = batch_size
+        self.n = nsamples
+        self.y = y
 
-class MultiArrayDataset(Dataset):
+    def nsamples(self):
+        return self.n
+
+    def get_y(self):
+        return self.y
+
+    def to_tfdataset(training=True):
+        return self.tfdataset
+
+
+class SequenceDataset(Dataset, Sequence):
+    """
+    Base class for custom datasets in ktrain.
+
+    If subclass of Dataset implements a method to to_tfdataset
+    that converts the data to a tf.Dataset, then this will be
+    invoked by Learner instances just prior to training so
+    fit() will train using a tf.Dataset representation of your data.
+    Sequence methods such as __get_item__ and __len__
+    must still be implemented.
+
+    The signature of to_tfdataset is as follows:
+
+    def to_tfdataset(self, training=True)
+
+    See ktrain.text.preprocess.TransformerDataset as an example.
+    """
+    def __init__(self, batch_size=32):
+        self.batch_size = batch_size
+
+    # required by keras.utils.Sequence instances
+    def __len__(self):
+        raise NotImplemented
+
+    # required by keras.utils.Sequence instances
+    def __getitem__(self, idx):
+        raise NotImplemented
+
+        return False
+
+
+
+
+class MultiArrayDataset(SequenceDataset):
     def __init__(self, x, y, batch_size=32, shuffle=True):
         # error checks
         err = False

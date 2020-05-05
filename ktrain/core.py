@@ -640,23 +640,18 @@ class Learner(ABC):
         return callbacks
 
 
-    def _prepare(self, data, mode='train'):
+    def _prepare(self, data, train=True):
         """
         Subclasses can override this method if data
         needs to be specially-prepared prior to invoking fit methods
         Args:
           data:  dataset
-          mode: either 'train' or 'valid'
+          train(bool):  If True, prepare for training. Otherwise, prepare for evaluation.
         """
         if data is None: return None
 
         if hasattr(data, 'to_tfdataset'):
-            shuffle=True
-            repeat = True
-            if mode != 'train':
-                shuffle = False
-                repeat = False
-            return data.to_tfdataset(shuffle=shuffle, repeat=repeat)
+            return data.to_tfdataset(train=train)
         else:
             return data
 
@@ -894,7 +889,7 @@ class Learner(ABC):
         if U.is_iter(val):
             if hasattr(val, 'reset'): val.reset()
             steps = np.ceil(U.nsamples_from_data(val)/val.batch_size)
-            result = self.model.predict_generator(self._prepare(val, mode='valid'), 
+            result = self.model.predict_generator(self._prepare(val, train=False), 
                                                 steps=steps)
             return result
         else:
@@ -987,7 +982,7 @@ class ArrayLearner(Learner):
         with warnings.catch_warnings():
             warnings.filterwarnings('ignore', message='.*Check your callbacks.*')
             hist = self.model.fit(self._prepare(x_train), 
-                                  self._prepare(y_train, mode='valid'),
+                                  self._prepare(y_train, train=False),
                                   batch_size=self.batch_size,
                                   epochs=epochs,
                                   validation_data=validation, verbose=verbose, 
@@ -1189,7 +1184,7 @@ class GenLearner(Learner):
                                         steps_per_epoch = steps_per_epoch,
                                         validation_steps = validation_steps,
                                         epochs=epochs,
-                                        validation_data=self._prepare(self.val_data, mode='valid'),
+                                        validation_data=self._prepare(self.val_data, train=False),
                                         workers=self.workers,
                                         use_multiprocessing=self.use_multiprocessing, 
                                         verbose=verbose,

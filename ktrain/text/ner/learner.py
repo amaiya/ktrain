@@ -163,7 +163,7 @@ class NERLearner(GenLearner):
         return results
 
 
-    def _prepare(self, data, mode='train'):
+    def _prepare(self, data, train=True):
         """
         prepare NERSequence for training
         """
