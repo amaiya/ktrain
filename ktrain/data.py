@@ -18,9 +18,6 @@ class Dataset:
 
     See ktrain.text.preprocess.TransformerDataset as an example.
     """
-    def __init__(self, batch_size=32):
-        self.batch_size = batch_size
-
 
     # required: used by ktrain.core.Learner instances
     def nsamples(self):
@@ -65,7 +62,7 @@ class TFDataset(Dataset):
     """
     Wrapper for tf.data.Datasets
     """
-    def __init__(self, tfdataset, batch_size=32):
+    def __init__(self, tfdataset, batch_size, n, y):
         """
         Args:
           tfdataset(tf.data.Dataset):  a tf.Dataset instance
@@ -74,9 +71,19 @@ class TFDataset(Dataset):
           y(np.ndarray): y values for each example - should be in the format expected by your moddel
         """
         self.tfdataset = tfdataset
-        self.batch_size = batch_size
-        self.n = nsamples
+        self.bs = batch_size
+        self.n = n
         self.y = y
+
+    @property
+    def batch_size(self, value):
+        return self.bs
+
+    @batch_size.setter
+    def batch_size(self, value):
+        warnings.warn('batch_size parameter is ignored, as pre-configured batch_size of tf.data.Dataset is used')
+        self.bs = value
+
 
     def nsamples(self):
         return self.n
