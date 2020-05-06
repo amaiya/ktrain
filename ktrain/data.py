@@ -62,16 +62,17 @@ class TFDataset(Dataset):
     """
     Wrapper for tf.data.Datasets
     """
-    def __init__(self, tfdataset, batch_size, n, y):
+    def __init__(self, tfdataset, n, y):
         """
         Args:
           tfdataset(tf.data.Dataset):  a tf.Dataset instance
-          batch_size(int): batch size set for the supplied tfdataset
-          n(int): number of examples in dataset
-          y(np.ndarray): y values for each example - should be in the format expected by your moddel
+          n(int): number of examples in dataset (cardinality, which can't reliably be extracted from tf.data.Datasets)
+          y(np.ndarray): y values for each example - should be in the format expected by your moddel (e.g., 1-hot-encoded)
         """
+        if not isinstance(tfdataset, tf.data.Dataset):
+            raise ValueError('tfdataset must be a fully-configured tf.data.Dataset with batch_size, etc. set appropriately')
         self.tfdataset = tfdataset
-        self.bs = batch_size
+        self.bs = next(tfdataset.as_numpy_iterator())[0].shape[0] # extract batch_size from tfdataset
         self.n = n
         self.y = y
 
@@ -81,8 +82,8 @@ class TFDataset(Dataset):
 
     @batch_size.setter
     def batch_size(self, value):
-        warnings.warn('batch_size parameter is ignored, as pre-configured batch_size of tf.data.Dataset is used')
-        self.bs = value
+        if value != self.bs:
+            warnings.warn('batch_size parameter is ignored, as pre-configured batch_size of tf.data.Dataset is used')
 
 
     def nsamples(self):
