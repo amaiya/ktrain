@@ -171,7 +171,7 @@ def is_multilabel(data):
         if is_ner(data=data): return False   # NERSequence
         elif is_nodeclass(data=data): return False  # NodeSequenceWrapper
         multilabel = False
-        Y = U.y_from_data(data)
+        Y = y_from_data(data)
         for idx, y in enumerate(Y):
             if idx >= 16: break
             #y = v[1]
