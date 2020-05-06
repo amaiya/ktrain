@@ -20,6 +20,7 @@ Most recent releases are shown at the top. Each release shows:
 - fixed issue with `return_proba=True` including class labels for multilabel image classification
 - resolved issue with class labels not being set correctly in `images_from_array`
 - lock to `cchardet==2.1.5` due to [this issue](https://stackoverflow.com/questions/60784527/ktrain-importerror-dll-load-failed-the-specified-module-could-not-be-found)
+- fixed `y_from_data` from NumpyArrayIterators in image classification
 
 
 ## 0.14.5 (2020-05-03)
