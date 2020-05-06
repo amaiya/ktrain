@@ -789,7 +789,7 @@ class TransformersPreprocessor(TextPreprocessor):
 
     def preprocess(self, texts):
         tseq = self.preprocess_test(texts, verbose=0)
-        return tseq.to_tfdataset(shuffle=False, repeat=False)
+        return tseq.to_tfdataset(train=False)
 
 
     def undo(self, doc):
@@ -992,9 +992,8 @@ class Transformer(TransformersPreprocessor):
         tseq = super().preprocess_train(texts, y=y, mode=mode, verbose=verbose)
         if self.use_with_learner: return tseq
         tseq.batch_size = self.batch_size
-        shuffle=True if mode=='train' else False
-        repeat=True if mode=='train' else False
-        return tseq.to_tfdataset(shuffle=shuffle, repeat=repeat)
+        train = (mode == 'train')
+        return tseq.to_tfdataset(train=train)
 
 
     def preprocess_test(self, texts, y=None,  verbose=1):
@@ -1184,10 +1183,17 @@ class TransformerDataset(Dataset):
         return math.ceil(len(self.x) / self.batch_size)
 
 
-    def to_tfdataset(self, shuffle=True, repeat=True):
+    def to_tfdataset(self, train=True):
         """
         convert transformer features to tf.Dataset
         """
+        if train:
+            shuffle=True
+            repeat = True
+        else:
+            shuffle=False
+            repeat=False
+
         if len(self.y.shape) == 1:
             yshape = []
             ytype = tf.float32
