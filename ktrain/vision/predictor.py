@@ -116,9 +116,8 @@ class ImagePredictor(Predictor):
         #    return_proba=True
         #    treat_multilabel = True
         classification, multilabel = U.is_classifier(self.model)
-        if multilabel: return_proba=True
         preds =  self.model.predict_generator(generator, steps=steps)
-        result =  preds if return_proba else [self.c[np.argmax(pred)] for pred in preds]
+        result =  preds if return_proba or multilabel else [self.c[np.argmax(pred)] for pred in preds]
         if multilabel and not return_proba:
             return [list(zip(self.c, r)) for r in result]
         else:
