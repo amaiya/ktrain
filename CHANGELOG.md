@@ -7,13 +7,14 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
-## 0.14.6 (2020-05-04)
+## 0.14.6 (2020-05-06)
 
 ### New:
-- If no validation data is supplied to `images_from_array`, training data is split to ge
+- If no validation data is supplied to `images_from_array`, training data is split to generate validation data
 
 ### Changed
 - issue warning if Learner cannot save original weights
+- `images_from_array` accepts labels in the form of integer class IDs
 
 ### Fixed:
 - fix pandas `SettingwithCopyWarning` from `images_from_csv`
