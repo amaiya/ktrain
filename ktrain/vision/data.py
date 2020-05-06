@@ -679,25 +679,27 @@ def _img_fnames_to_df(img_folder, pattern, verbose=1):
 
 def images_from_array(x_train, y_train,
                       validation_data=None,
+                      val_pct=0.1,
+                      random_state=None,
                       data_aug=None,
                       classes=None):
 
     """
     Returns image generator (Iterator instance) from training
     and validation data in the form of NumPy arrays
-    Assumes output will be 2D one-hot-encoded labels for categorization.
-    Note: This function preprocesses the input in preparation
-          for a ResNet50 model.
 
     Args:
-    x_train(numpy.ndarray):  training gdata
-    y_train(numpy.ndarray):  labels
-                             Must be 1-hot encoded already.
-    validation_data (tuple): tuple of numpy.ndarrays for validation data
-    data_aug(ImageDataGenerator):  a keras.preprocessing.image.ImageDataGenerator
+      x_train(numpy.ndarray):  training gdata
+      y_train(numpy.ndarray):  labels must either be:
+                               1. one-hot (or multi-hot) encoded arrays
+                               2. integer values representing the label
+      validation_data (tuple): tuple of numpy.ndarrays for validation data.
+                               labels should be in one of the formats listed above.
+      val_pct(float): percentage of training data to use for validaton if validation_data is None
+      random_state(int): random state to use for splitting data
+      data_aug(ImageDataGenerator):  a keras.preprocessing.image.ImageDataGenerator
     Returns:
-    batches: a tuple of two image.Iterator - one for train and one for test
-
+      batches: a tuple of two image.Iterator - one for train and one for test and ImagePreprocessor instance
     """
 
     # one-hot-encode if necessary
@@ -710,22 +712,34 @@ def images_from_array(x_train, y_train,
         if np.issubdtype(type(y_test[0]), np.integer) or\
            (isinstance(y_test[0], (list, np.ndarray)) and len(y_test[0]) == 1):
             y_test = to_categorical(y_test)
+    elif val_pct is not None and val_pct >0:
+        x_train, x_test, y_train, y_test = train_test_split(x_train, y_train,
+                                                            test_size=val_pct,
+                                                            random_state=random_state)
+    else:
+        x_test = None
+        y_test = None
 
+    # set class labels
+    if classes == None:
+        classes = list(map(str, range(len(y_train[0]))))
+    else:
+        assert len(classes) == len(y_train[0]), \
+            "Number of classes has to match length of the one-hot encoding"
 
+    # train and test data generators
     (train_datagen, test_datagen) = process_datagen(data_aug, train_array=x_train)
 
+    # Image preprocessor
+    preproc = ImagePreprocessor(test_datagen, classes, target_size=None, color_mode=None)
+
+    # training data
     batches_tr = train_datagen.flow(x_train, y_train, shuffle=True)
 
+    # validation data
     batches_te = None
-    preproc = None
-    if validation_data:
+    if x_test is not None and y_test is not None:
         batches_te = test_datagen.flow(x_test, y_test,
                                        shuffle=False)
-        if classes == None:
-            classes = list(map(str, range(len(y_train[0]))))
-        else:
-            assert len(classes) == len(y_train[0]), \
-                "Number of classes has to match length of the one-hot encoding"
-        preproc = ImagePreprocessor(test_datagen, classes, target_size=None, color_mode=None)
     return (batches_tr, batches_te, preproc)
 

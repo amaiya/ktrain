@@ -157,7 +157,7 @@ class TestImageClassification(TestCase):
         self.assertEqual(r, ['cat'])
 
 
-    @skip('temporarily disabled')
+    #@skip('temporarily disabled')
     def test_array(self):
 
         from tensorflow.keras.datasets import mnist

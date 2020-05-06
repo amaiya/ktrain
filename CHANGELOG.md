@@ -10,7 +10,7 @@ Most recent releases are shown at the top. Each release shows:
 ## 0.14.6 (2020-05-04)
 
 ### New:
-- N/A
+- If no validation data is supplied to `images_from_array`, training data is split to ge
 
 ### Changed
 - issue warning if Learner cannot save original weights
