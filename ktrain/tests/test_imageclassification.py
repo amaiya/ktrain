@@ -157,6 +157,84 @@ class TestImageClassification(TestCase):
         self.assertEqual(r, ['cat'])
 
 
+    #@skip('temporarily disabled')
+    def test_array(self):
+
+        from tensorflow.keras.datasets import mnist
+        from tensorflow.keras.utils import to_categorical
+        import numpy as np
+        (x_train, y_train), (x_test, y_test) = mnist.load_data()
+        x_train = x_train.astype('float32')
+        x_test = x_test.astype('float32')
+        x_train /= 255
+        x_test /= 255
+        x_train = np.expand_dims(x_train, axis=3)
+        x_test = np.expand_dims(x_test, axis=3)
+        y_train = to_categorical(y_train)
+        y_test = to_categorical(y_test)
+
+
+        classes = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine']
+        data_aug = vis.get_data_aug(  rotation_range=15,
+                                      zoom_range=0.1,
+                                      width_shift_range=0.1,
+                                      height_shift_range=0.1,
+                                      featurewise_center=False, 
+                                       featurewise_std_normalization=False,)
+
+        (trn, val, preproc) = vis.images_from_array(x_train, y_train, 
+                                                    validation_data=(x_test, y_test),
+                                                    data_aug=data_aug,
+                                                    classes=classes)
+
+        model = vis.image_classifier('default_cnn', trn, val)
+        learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=128)
+        hist = learner.fit_onecycle(1e-3, 1)
+
+
+
+
+
+        # test train
+        self.assertAlmostEqual(max(hist.history['lr']), 1e-3)
+        self.assertGreater(max(hist.history[VAL_ACC_NAME]), 0.97)
+
+        # test top_losses
+        obs = learner.top_losses(n=1, val_data=val)
+        print(obs)
+        if obs:
+            self.assertIn(obs[0][0], list(range(U.nsamples_from_data(val))))
+        else:
+            self.assertEqual(max(hist.history[VAL_ACC_NAME]), 1)
+
+        # test weight decay
+        self.assertEqual(learner.get_weight_decay(), None)
+        learner.set_weight_decay(1e-2)
+        self.assertAlmostEqual(learner.get_weight_decay(), 1e-2)
+
+        # test load and save model
+        learner.save_model('/tmp/test_model')
+        learner.load_model('/tmp/test_model')
+
+        # test validate
+        cm = learner.validate(val_data=val)
+        print(cm)
+        for i, row in enumerate(cm):
+            self.assertEqual(np.argmax(row), i)
+
+        p = ktrain.get_predictor(learner.model, preproc)
+        r = p.predict(x_test[0:1])
+        print(r)
+        self.assertEqual(r[0], 'seven')
+        r = p.predict(x_test[0:1], return_proba=True)
+        self.assertEqual(np.argmax(r[0]), 7)
+
+        p.save('/tmp/test_predictor')
+        p = ktrain.load_predictor('/tmp/test_predictor')
+        r = p.predict(x_test[0:1])
+        self.assertEqual(r[0], 'seven')
+
+
 
 if __name__ == "__main__":
     main()

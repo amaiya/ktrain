@@ -63,8 +63,8 @@ class ImagePredictor(Predictor):
             return
 
 
-        img = image.load_img(img_fpath, 
-                             target_size=self.preproc.target_size, 
+        img = image.load_img(img_fpath,
+                             target_size=self.preproc.target_size,
                              color_mode=self.preproc.color_mode)
         x = image.img_to_array(img)
         x = np.expand_dims(x, axis=0)
@@ -98,12 +98,12 @@ class ImagePredictor(Predictor):
         """
         Predicts the classes of all images in a folder.
         If return_proba is True, returns probabilities of each class.
-        
+
         """
         if not os.path.isdir(folder): raise ValueError('folder must be valid directory')
         (generator, steps) = self.preproc.preprocess(folder, batch_size=self.batch_size)
         result = self.predict_generator(generator, steps=steps, return_proba=return_proba)
-        if len(result) != len(generator.filenames): 
+        if len(result) != len(generator.filenames):
             raise Exception('number of results does not equal number of filenames')
         return list(zip(generator.filenames, result))
 
@@ -116,10 +116,9 @@ class ImagePredictor(Predictor):
         #    return_proba=True
         #    treat_multilabel = True
         classification, multilabel = U.is_classifier(self.model)
-        if multilabel: return_proba=True
         preds =  self.model.predict_generator(generator, steps=steps)
-        result =  preds if return_proba else [self.c[np.argmax(pred)] for pred in preds] 
-        if multilabel:
+        result =  preds if return_proba or multilabel else [self.c[np.argmax(pred)] for pred in preds]
+        if multilabel and not return_proba:
             return [list(zip(self.c, r)) for r in result]
         else:
             return result
@@ -150,7 +149,7 @@ class ImagePredictor(Predictor):
 
 
         Optionally prints a classification report.
-        Currently, this method is only supported for binary and multiclass 
+        Currently, this method is only supported for binary and multiclass
         problems, not multilabel classification problems.
 
         """
@@ -185,4 +184,4 @@ class ImagePredictor(Predictor):
             pickle.dump(self.preproc, f)
             datagen.preprocessing_function = pfunc
         return
-        
+

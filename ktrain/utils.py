@@ -268,7 +268,8 @@ def y_from_data(data):
         elif hasattr(data, 'labels'):  # DataFrameIterator
             return data.labels
         elif hasattr(data, 'y'): # NumpyArrayIterator
-            return to_categorical(data.y)
+            #return to_categorical(data.y)
+            return data.y
         else:
             raise Exception('could not determine number of classes from %s' % (type(data)))
     else:

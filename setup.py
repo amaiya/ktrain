@@ -32,7 +32,8 @@ setup(
           'joblib',
           'langdetect',
           'jieba',
-          'cchardet',
+          # fix cchardet to 2.1.5 due to this issue: https://github.com/PyYoshi/cChardet/issues/61
+          'cchardet==2.1.5', 
           'networkx>=2.3',
           'bokeh',
           'seqeval',
