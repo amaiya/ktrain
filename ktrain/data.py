@@ -76,7 +76,7 @@ class TFDataset(Dataset):
         self.y = y
 
     @property
-    def batch_size(self, value):
+    def batch_size(self):
         return self.bs
 
     @batch_size.setter
@@ -91,7 +91,7 @@ class TFDataset(Dataset):
     def get_y(self):
         return self.y
 
-    def to_tfdataset(training=True):
+    def to_tfdataset(self, train=True):
         return self.tfdataset
 
 
