@@ -7,16 +7,21 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
-## 0.14.6 (2020-05-04)
+## 0.14.6 (2020-05-06)
 
 ### New:
-- N/A
+- If no validation data is supplied to `images_from_array`, training data is split to generate validation data
 
 ### Changed
 - issue warning if Learner cannot save original weights
+- `images_from_array` accepts labels in the form of integer class IDs
 
 ### Fixed:
-- N/A
+- fix pandas `SettingwithCopyWarning` from `images_from_csv`
+- fixed issue with `return_proba=True` including class labels for multilabel image classification
+- resolved issue with class labels not being set correctly in `images_from_array`
+- lock to `cchardet==2.1.5` due to [this issue](https://stackoverflow.com/questions/60784527/ktrain-importerror-dll-load-failed-the-specified-module-could-not-be-found)
+- fixed `y_from_data` from NumpyArrayIterators in image classification
 
 
 ## 0.14.5 (2020-05-03)
