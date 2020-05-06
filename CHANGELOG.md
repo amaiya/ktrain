@@ -18,6 +18,7 @@ Most recent releases are shown at the top. Each release shows:
 ### Fixed:
 - fix pandas `SettingwithCopyWarning` from `images_from_csv`
 - fixed issue with `return_proba=True` including class labels for multilabel image classification
+- resolved issue with class labels not being set correctly in `images_from_array`
 
 
 ## 0.14.5 (2020-05-03)
