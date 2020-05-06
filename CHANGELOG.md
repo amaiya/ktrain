@@ -16,7 +16,7 @@ Most recent releases are shown at the top. Each release shows:
 - issue warning if Learner cannot save original weights
 
 ### Fixed:
-- N/A
+- fix pandas `SettingwithCopyWarning` from `images_from_csv`
 
 
 ## 0.14.5 (2020-05-03)

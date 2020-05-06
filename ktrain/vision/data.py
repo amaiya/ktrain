@@ -497,9 +497,10 @@ def images_from_csv(train_filepath,
 
     # fix file extensions, if necessary
     if suffix:
-        train_df[image_column] = train_df[image_column].apply(lambda x : x+suffix)
-        val_df[image_column] = val_df[image_column].apply(lambda x : x+suffix)
-
+        train_df = train_df.copy()
+        val_df = val_df.copy()
+        train_df[image_column] = train_df.copy()[image_column].apply(lambda x : x+suffix)
+        val_df[image_column] = val_df.copy()[image_column].apply(lambda x : x+suffix)
 
     # 1-hot-encode string labels
     if isinstance(label_columns, str) or \
@@ -517,8 +518,6 @@ def images_from_csv(train_filepath,
         label_columns = list(le.classes_)
         train_df = pd.DataFrame(zip(train_df[image_column].values, *y_train_pd), columns=[image_column]+label_columns)
         val_df = pd.DataFrame(zip(val_df[image_column].values, *y_val_pd), columns=[image_column]+label_columns)
-
-
 
 
 
