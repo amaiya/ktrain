@@ -55,7 +55,8 @@ Here is how you can quickly get started using *ktrain*:
 
 - For more information on Jupyter notebooks, see [this video](https://www.youtube.com/watch?v=HW29067qVWk).
 
-*ktrain* is inspired by some other libraries like `fastai` and `ludwig`. For a deeper dive into neural networks, the fastai MOOC is recommended.
+*ktrain* is inspired by some other libraries like `fastai` and `ludwig`. For a deeper dive into neural networks, the *fastai MOOC* and the
+*TensorFlow and Deep Learning Without a PhD* series are recommended.
 
 
 ### How do I obtain the word or sentence embeddings after fine-tuning a Transformer-based text classifier?
