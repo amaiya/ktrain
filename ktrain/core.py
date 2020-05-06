@@ -233,11 +233,11 @@ class Learner(ABC):
         return
 
 
-    def load_model(self, fpath):
+    def load_model(self, fpath, custom_objects=None):
         """
         a wrapper to load_model
         """
-        self.model = _load_model(fpath, train_data=self.train_data)
+        self.model = _load_model(fpath, train_data=self.train_data, custom_objects=custom_objects)
         return
 
     def _is_adamlike(self):
@@ -1385,10 +1385,9 @@ def release_gpu_memory(device=0):
     return
 
 
-def _load_model(fname, preproc=None, train_data=None):
+def _load_model(fname, preproc=None, train_data=None, custom_objects=None):
     if not preproc and not train_data:
         raise ValueError('Either preproc or train_data is required.')
-    custom_objects=None
     if preproc and isinstance(preproc, TransformersPreprocessor):
         # note: with transformer models, fname is actually a directory
         model = preproc.get_model(fpath=fname)
