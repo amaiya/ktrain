@@ -98,7 +98,7 @@ def get_data_aug(
                  width_shift_range=0.2,
                  height_shift_range=0.2,
                  horizontal_flip=False,
-                 vertical_flip=False, 
+                 vertical_flip=False,
                  featurewise_center=True,
                  featurewise_std_normalization=True,
                  samplewise_center=False,
@@ -121,7 +121,7 @@ def get_data_aug(
                                 width_shift_range=width_shift_range,
                                 height_shift_range=height_shift_range,
                                 horizontal_flip=horizontal_flip,
-                                vertical_flip=vertical_flip, 
+                                vertical_flip=vertical_flip,
                                 featurewise_center=featurewise_center,
                                 featurewise_std_normalization=featurewise_std_normalization,
                                 samplewise_center=samplewise_center,
@@ -154,7 +154,7 @@ def get_test_datagen(data_aug=None):
 
 def process_datagen(data_aug, train_array=None, train_directory=None,
                     target_size=None,
-                    color_mode='rgb', 
+                    color_mode='rgb',
                     flat_dir=False):
     # set generators for train and test
     if data_aug is not None:
@@ -165,7 +165,7 @@ def process_datagen(data_aug, train_array=None, train_directory=None,
         test_datagen = get_test_datagen()
 
     # compute statistics for normalization
-    fit_datagens(train_datagen, test_datagen, 
+    fit_datagens(train_datagen, test_datagen,
                  train_array=train_array,
                  train_directory=train_directory,
                  target_size=target_size,
@@ -175,7 +175,7 @@ def process_datagen(data_aug, train_array=None, train_directory=None,
 
 
 
-def fit_datagens(train_datagen, test_datagen, 
+def fit_datagens(train_datagen, test_datagen,
                  train_array=None, train_directory=None,
                  target_size=None,
                  color_mode='rgb', flat_dir=False):
@@ -191,7 +191,7 @@ def fit_datagens(train_datagen, test_datagen,
     else:
         if target_size is None:
             raise ValueError('target_size is required when train_directory is supplied')
-        fit_samples = sample_image_folder(train_directory, target_size, 
+        fit_samples = sample_image_folder(train_directory, target_size,
                                           color_mode=color_mode, flat_dir=flat_dir)
         train_datagen.fit(fit_samples)
         test_datagen.fit(fit_samples)
@@ -205,7 +205,7 @@ def datagen_needs_fit(datagen):
     else:
         return False
 
-def sample_image_folder(train_directory, 
+def sample_image_folder(train_directory,
                          target_size,
                          color_mode='rgb', flat_dir=False):
 
@@ -239,7 +239,7 @@ def sample_image_folder(train_directory,
     return imgs
 
 
-def detect_color_mode(train_directory, 
+def detect_color_mode(train_directory,
                      target_size=(32,32)):
     try:
         fname = glob.glob(os.path.join(train_directory, '**/*'))[0]
@@ -270,7 +270,7 @@ def preprocess_csv(csv_in, csv_out, x_col='filename', y_col=None,
     02.jpg,1,1,0,0
     03.jpg,1,0,1,0
     Args:
-        csv_in (str):  filepath to input CSV file 
+        csv_in (str):  filepath to input CSV file
         csv_out (str): filepath to output CSV file
         x_col (str):  name of column containing file names
         y_col (str): name of column containing the classes
@@ -333,7 +333,7 @@ def images_from_folder(datadir, target_size=(224,224),
     Assumes output will be 2D one-hot-encoded labels for categorization.
     Note: This function preprocesses the input in preparation
           for a ResNet50 model.
-	
+
     Args:
     datadir (string): path to training (or validation/test) dataset
         Assumes folder follows this structure:
@@ -343,13 +343,13 @@ def images_from_folder(datadir, target_size=(224,224),
         │   │   ├── class1       # folder containing documents of class 1
         │   │   ├── class2       # folder containing documents of class 2
         │   │   └── classN       # folder containing documents of class N
-        │   └── test 
+        │   └── test
         │       ├── class0       # folder containing documents of class 0
         │       ├── class1       # folder containing documents of class 1
         │       ├── class2       # folder containing documents of class 2
         │       └── classN       # folder containing documents of class N
 
-    target_size (tuple):  image dimensions 
+    target_size (tuple):  image dimensions
     classes (list):  optional list of class subdirectories (e.g., ['cats','dogs'])
     color_mode (string):  color mode
     train_test_names(list): names for train and test subfolders
@@ -372,11 +372,11 @@ def images_from_folder(datadir, target_size=(224,224),
     if PIL_INSTALLED:
         inferred_color_mode = detect_color_mode(train_dir)
         if inferred_color_mode is not None and (inferred_color_mode != color_mode):
-            U.vprint('color_mode detected (%s) different than color_mode selected (%s)' % (inferred_color_mode, color_mode), 
+            U.vprint('color_mode detected (%s) different than color_mode selected (%s)' % (inferred_color_mode, color_mode),
                      verbose=verbose)
 
     # get train and test data generators
-    (train_datagen, test_datagen) = process_datagen(data_aug, 
+    (train_datagen, test_datagen) = process_datagen(data_aug,
                                         train_directory=train_dir,
                                         target_size=target_size,
                                         color_mode=color_mode)
@@ -398,14 +398,14 @@ def images_from_folder(datadir, target_size=(224,224),
 
     # setup preprocessor
     class_tup = sorted(batches_tr.class_indices.items(), key=operator.itemgetter(1))
-    preproc = ImagePreprocessor(test_datagen, 
+    preproc = ImagePreprocessor(test_datagen,
                                 [x[0] for x in class_tup],
-                                target_size=target_size, 
+                                target_size=target_size,
                                 color_mode=color_mode)
     return (batches_tr, batches_te, preproc)
 
 
-def images_from_csv(train_filepath, 
+def images_from_csv(train_filepath,
                    image_column,
                    label_columns=[],
                    directory=None,
@@ -421,7 +421,7 @@ def images_from_csv(train_filepath,
     Assumes output will be 2D one-hot-encoded labels for categorization.
     Note: This function preprocesses the input in preparation
           for a ResNet50 model.
-	
+
     Args:
     train_filepath (string): path to training dataset in CSV format with header row
     image_column (string): name of column containing the filenames of images
@@ -451,8 +451,8 @@ def images_from_csv(train_filepath,
                  Used when the filenames in image_column do not contain file extensions.
                  The extension in suffx should include ".".
     val_filepath (string): path to validation dataset in CSV format
-    suffix(string): suffix to add to file names in image_column 
-    target_size (tuple):  image dimensions 
+    suffix(string): suffix to add to file names in image_column
+    target_size (tuple):  image dimensions
     color_mode (string):  color mode
     data_aug(ImageDataGenerator):  a keras.preprocessing.image.ImageDataGenerator
                                   for data augmentation
@@ -471,7 +471,7 @@ def images_from_csv(train_filepath,
     else:
         df = pd.read_csv(train_filepath)
         img_folder =  os.path.dirname(df[image_column].iloc[0])
-    (train_datagen, test_datagen) = process_datagen(data_aug, 
+    (train_datagen, test_datagen) = process_datagen(data_aug,
                                                     train_directory=img_folder,
                                                     target_size=target_size,
                                                     color_mode=color_mode,
@@ -543,10 +543,10 @@ def images_from_csv(train_filepath,
                                       interpolation='bicubic',
                                       color_mode = color_mode)
 
-    # setup preprocessor 
-    preproc = ImagePreprocessor(test_datagen, 
+    # setup preprocessor
+    preproc = ImagePreprocessor(test_datagen,
                                 label_columns,
-                                target_size=target_size, 
+                                target_size=target_size,
                                 color_mode=color_mode)
     return (batches_tr, batches_te, preproc)
 
@@ -563,7 +563,7 @@ def images_from_fname( train_folder,
 
     """
     Returns image generator (Iterator instance).
-	
+
     Args:
     train_folder (str): directory containing images
     pat (str):  regular expression to extract class from file name of each image
@@ -571,7 +571,7 @@ def images_from_fname( train_folder,
                 By default, it will extract classes from file names of the form:
                    <class_name>_<numbers>.jpg
     val_folder (str): directory containing validation images. default:None
-    target_size (tuple):  image dimensions 
+    target_size (tuple):  image dimensions
     color_mode (string):  color mode
     data_aug(ImageDataGenerator):  a keras.preprocessing.image.ImageDataGenerator
                                   for data augmentation
@@ -586,7 +586,7 @@ def images_from_fname( train_folder,
     """
 
     # get train and test data generators
-    (train_datagen, test_datagen) = process_datagen(data_aug, 
+    (train_datagen, test_datagen) = process_datagen(data_aug,
                                                     train_directory=train_folder,
                                                     target_size=target_size,
                                                     color_mode=color_mode,
@@ -633,10 +633,10 @@ def images_from_fname( train_folder,
     else:
         batches_te = None
 
-    # setup preprocessor 
-    preproc = ImagePreprocessor(test_datagen, 
+    # setup preprocessor
+    preproc = ImagePreprocessor(test_datagen,
                                 class_names,
-                                target_size=target_size, 
+                                target_size=target_size,
                                 color_mode=color_mode)
     return (batches_tr, batches_te, preproc)
 
@@ -677,9 +677,10 @@ def _img_fnames_to_df(img_folder, pattern, verbose=1):
 
 
 
-def images_from_array(x_train, y_train, 
+def images_from_array(x_train, y_train,
                       validation_data=None,
-                      data_aug=None):
+                      data_aug=None,
+                      classes=None):
 
     """
     Returns image generator (Iterator instance) from training
@@ -687,7 +688,7 @@ def images_from_array(x_train, y_train,
     Assumes output will be 2D one-hot-encoded labels for categorization.
     Note: This function preprocesses the input in preparation
           for a ResNet50 model.
-	
+
     Args:
     x_train(numpy.ndarray):  training gdata
     y_train(numpy.ndarray):  labels
@@ -720,7 +721,11 @@ def images_from_array(x_train, y_train,
     if validation_data:
         batches_te = test_datagen.flow(x_test, y_test,
                                        shuffle=False)
-        classes = map(str, list(range(len(y_train[0]))))
+        if classes == None:
+            classes = list(map(str, range(len(y_train[0]))))
+        else:
+            assert len(classes) == len(y_train[0]), \
+                "Number of classes has to match length of the one-hot encoding"
         preproc = ImagePreprocessor(test_datagen, classes, target_size=None, color_mode=None)
     return (batches_tr, batches_te, preproc)
 
