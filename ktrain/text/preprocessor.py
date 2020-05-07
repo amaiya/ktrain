@@ -1,7 +1,7 @@
 from ..imports import *
 from .. import utils as U
 from ..preprocessor import Preprocessor
-from ..data import Dataset
+from ..data import SequenceDataset
 from . import textutils as TU
 
 DistilBertTokenizer = transformers.DistilBertTokenizer
@@ -1158,7 +1158,7 @@ class TransformerEmbedding():
         return np.array(embeddings)
 
 
-class TransformerDataset(Dataset):
+class TransformerDataset(SequenceDataset):
     """
     Wrapper for Transformer datasets.
     """

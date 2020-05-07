@@ -1,7 +1,7 @@
 from ...imports import *
 from ... import utils as U
 from ...preprocessor import Preprocessor
-from ...data import Dataset
+from ...data import SequenceDataset
 from .. import textutils as TU
 from .. import preprocessor as tpp
 from .anago.utils import filter_embeddings
@@ -188,7 +188,7 @@ class SentenceGetter(object):
 
 
 
-class NERSequence(Dataset):
+class NERSequence(SequenceDataset):
 
     def __init__(self, x, y, batch_size=1, p=None):
         self.x = x
