@@ -72,7 +72,7 @@ class TFDataset(Dataset):
         if not isinstance(tfdataset, tf.data.Dataset):
             raise ValueError('tfdataset must be a fully-configured tf.data.Dataset with batch_size, etc. set appropriately')
         self.tfdataset = tfdataset
-        self.bs = next(tfdataset.as_numpy_iterator())[0].shape[0] # extract batch_size from tfdataset
+        self.bs = next(tfdataset.as_numpy_iterator())[-1].shape[0] # extract batch_size from tfdataset
         self.n = n
         self.y = y
 
