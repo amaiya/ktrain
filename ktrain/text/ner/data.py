@@ -9,9 +9,9 @@ from .anago.preprocessing import IndexTransformer
 
 
 MAXLEN = 128
-WORD_COL = 'Word'
-TAG_COL = 'Tag'
-SENT_COL = 'SentenceID'
+WORD_COL = pp.WORD_COL
+TAG_COL = pp.TAG_COL
+SENT_COL = pp.SENT_COL
 
 
 

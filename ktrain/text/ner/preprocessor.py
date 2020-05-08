@@ -10,6 +10,11 @@ OTHER = 'O'
 W2V = 'word2vec'
 SUPPORTED_EMBEDDINGS = [W2V]
 
+WORD_COL = 'Word'
+TAG_COL = 'Tag'
+SENT_COL = 'SentenceID'
+
+
 #tokenizer_filter = rs='!"#$%&()*+,-./:;<=>?@[\\]^_`{|}~\t\n'
 re_tok = re.compile(f'([{string.punctuation}“”¨«»®´·º½¾¿¡§£₤‘’])')
 def tokenize(s): return re_tok.sub(r' \1 ', s).split()
