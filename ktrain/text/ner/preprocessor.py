@@ -105,6 +105,12 @@ class NERPreprocessor(Preprocessor):
         return NERSequence(x_list, y_list, batch_size=U.DEFAULT_BS, p=self.p)
 
 
+    def preprocess_test_from_conll2003(self, filepath, verbose=1):
+        df = conll2003_to_df(filepath)
+        (x, y)  = process_df(df)
+        return self.preprocess_test(x, y, verbose=verbose)
+
+
     def undo(self, nerseq):
         """
         undoes preprocessing and returns raw data by:

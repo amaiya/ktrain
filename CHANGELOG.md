@@ -13,7 +13,7 @@ Most recent releases are shown at the top. Each release shows:
 - Added `TFDataset` class for use as wrapper around arbitrary `tf.data.Dataset` objects for use in *ktrain*
 
 ### Changed
-- N/A
+- Added `NERPreprocessor.preprocess_train_from_conll2003`
 
 ### Fixed:
 - ensure NER data is properly prepared `text.ner.learner.validate`
