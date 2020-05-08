@@ -49,10 +49,10 @@ class NERLearner(GenLearner):
             label_pred.extend(y_pred)
 
         score = ner_f1_score(label_true, label_pred)
-        acc = ner_accuracy_score(label_true, label_pred)
+        #acc = ner_accuracy_score(label_true, label_pred)
         if print_report:
             print('   F1:  {:04.2f}'.format(score * 100))
-            print('   ACC: {:04.2f}'.format(acc * 100))
+            #print('   ACC: {:04.2f}'.format(acc * 100))
             print(ner_classification_report(label_true, label_pred))
 
         return score
