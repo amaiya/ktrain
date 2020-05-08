@@ -27,6 +27,9 @@ class NERLearner(GenLearner):
         """
         val = self._check_val(val_data)
 
+        if not val.prepare_called:
+            val.prepare()
+
         if not U.is_ner(model=self.model, data=val):
             warnings.warn('learner.validate_ner is only for sequence taggers.')
             return
