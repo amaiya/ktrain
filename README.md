@@ -287,13 +287,12 @@ This code was tested on Ubuntu 18.04 LTS using TensorFlow 2.1.0
 
 Please cite the [following paper](https://arxiv.org/abs/2004.10703) when using **ktrain**:
 ```
-@misc{maiya2020ktrain,
-    title={ktrain: A Low-Code Library for Augmented Machine Learning},
-    author={Arun S. Maiya},
-    year={2020},
-    eprint={2004.10703},
-    archivePrefix={arXiv},
-    primaryClass={cs.LG}
+@article{maiya2020ktrain,
+         title={ktrain: A Low-Code Library for Augmented Machine Learning},
+         author={Arun S. Maiya},
+         journal={ArXiv [cs.LG]},
+         year={2020},
+         volume={2004.10703}
 }
 ```
 
