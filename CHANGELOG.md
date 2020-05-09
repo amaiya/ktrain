@@ -14,6 +14,7 @@ Most recent releases are shown at the top. Each release shows:
 
 ### Changed
 - Added `NERPreprocessor.preprocess_train_from_conll2003`
+- Removed extraneous imports from `text.__init__.py` and `vision.__init__.py`
 
 ### Fixed:
 - ensure NER data is properly prepared `text.ner.learner.validate`
