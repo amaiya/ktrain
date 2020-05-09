@@ -290,9 +290,9 @@ Please cite the [following paper](https://arxiv.org/abs/2004.10703) when using *
 @article{maiya2020ktrain,
          title={ktrain: A Low-Code Library for Augmented Machine Learning},
          author={Arun S. Maiya},
-         journal={ArXiv [cs.LG]},
+         journal={ArXiv},
          year={2020},
-         volume={2004.10703}
+         volume={arXiv:2004.10703 [cs.LG]}
 }
 ```
 
