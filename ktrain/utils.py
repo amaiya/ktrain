@@ -175,7 +175,7 @@ def is_multilabel(data):
         for idx, y in enumerate(Y):
             if idx >= 16: break
             #y = v[1]
-            if len(y.shape) == 1 or y.shape[1] == 1: return False
+            if np.issubdtype(type(y), np.integer) or len(y.shape) == 1 or y.shape[1] == 1: return False
             total_per_batch = np.sum(y, axis=1)
             if any(i>1 for i in total_per_batch):
                 multilabel=True
