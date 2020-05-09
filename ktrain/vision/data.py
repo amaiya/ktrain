@@ -704,7 +704,7 @@ def images_from_array(x_train, y_train,
     Returns:
       batches: a tuple of two image.Iterator - one for train and one for test and ImagePreprocessor instance
     """
-    if classes is not None: raise ValueError('Please use class_names argument')
+    if classes is not None: raise ValueError('Please use class_names argument instead of "classes".')
 
     # one-hot-encode if necessary
     if np.issubdtype(type(y_train[0]), np.integer) or\
