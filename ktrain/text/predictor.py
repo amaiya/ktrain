@@ -44,7 +44,7 @@ class TextPredictor(Predictor):
         if U.is_huggingface(model=self.model):
             tseq = self.preproc.preprocess_test(texts, verbose=0)
             tseq.batch_size = self.batch_size
-            texts = tseq.to_tfdataset(shuffle=False, repeat=False)
+            texts = tseq.to_tfdataset(train=False)
             preds = self.model.predict(texts)
         else:
             texts = self.preproc.preprocess(texts)

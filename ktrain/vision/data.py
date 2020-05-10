@@ -599,6 +599,7 @@ def images_from_fname( train_folder,
     if val_folder is not None:
         val_df, _ = _img_fnames_to_df(val_folder, pattern, verbose=verbose)
     elif val_pct:
+        df = train_df.copy()
         prop = 1-val_pct
         if random_state is not None: np.random.seed(42)
         msk = np.random.rand(len(df)) < prop
@@ -682,7 +683,8 @@ def images_from_array(x_train, y_train,
                       val_pct=0.1,
                       random_state=None,
                       data_aug=None,
-                      classes=None):
+                      classes=None,
+                      class_names=None):
 
     """
     Returns image generator (Iterator instance) from training
@@ -698,9 +700,12 @@ def images_from_array(x_train, y_train,
       val_pct(float): percentage of training data to use for validaton if validation_data is None
       random_state(int): random state to use for splitting data
       data_aug(ImageDataGenerator):  a keras.preprocessing.image.ImageDataGenerator
+      classes(str): old name for class_names - should no longer be used
+      class_names(str): list of strings to use as class names
     Returns:
       batches: a tuple of two image.Iterator - one for train and one for test and ImagePreprocessor instance
     """
+    if classes is not None: raise ValueError('Please use class_names argument instead of "classes".')
 
     # one-hot-encode if necessary
     if np.issubdtype(type(y_train[0]), np.integer) or\
@@ -721,17 +726,17 @@ def images_from_array(x_train, y_train,
         y_test = None
 
     # set class labels
-    if classes == None:
-        classes = list(map(str, range(len(y_train[0]))))
+    if class_names == None:
+        class_names = list(map(str, range(len(y_train[0]))))
     else:
-        assert len(classes) == len(y_train[0]), \
+        assert len(class_names) == len(y_train[0]), \
             "Number of classes has to match length of the one-hot encoding"
 
     # train and test data generators
     (train_datagen, test_datagen) = process_datagen(data_aug, train_array=x_train)
 
     # Image preprocessor
-    preproc = ImagePreprocessor(test_datagen, classes, target_size=None, color_mode=None)
+    preproc = ImagePreprocessor(test_datagen, class_names, target_size=None, color_mode=None)
 
     # training data
     batches_tr = train_datagen.flow(x_train, y_train, shuffle=True)

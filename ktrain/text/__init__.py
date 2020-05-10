@@ -1,5 +1,5 @@
-from .models import *
-from .data import *
+from .models import print_text_classifiers, print_text_regression_models, text_classifier, text_regression_model
+from .data import texts_from_folder, texts_from_csv, texts_from_df,  texts_from_array
 from .ner.data import entities_from_gmb, entities_from_conll2003, entities_from_txt, entities_from_df, entities_from_array
 from .ner.models import sequence_tagger, print_sequence_taggers
 from .eda import get_topic_model
@@ -13,7 +13,7 @@ from . import textutils
 __all__ = [
            'text_classifier', 'text_regression_model',
            'print_text_classifiers', 'print_text_regression_models',
-           'texts_from_folder', 'texts_from_csv',
+           'texts_from_folder', 'texts_from_csv', 'texts_from_df', 'texts_from_array',
            'entities_from_gmb',
            'entities_from_conll2003',
            'entities_from_txt',

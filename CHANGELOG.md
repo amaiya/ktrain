@@ -7,6 +7,21 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.14.7 (2020-05-10)
+
+### New:
+- Added `TFDataset` class for use as wrapper around arbitrary `tf.data.Dataset` objects for use in *ktrain*
+
+### Changed
+- Added `NERPreprocessor.preprocess_train_from_conll2003`
+- Removed extraneous imports from `text.__init__.py` and `vision.__init__.py`
+- `classes` argument in `images_from_array` changed to `class_names`
+
+### Fixed:
+- ensure NER data is properly prepared `text.ner.learner.validate`
+- fixed typo with `df` reference in `images_from_fname`
+
+
 ## 0.14.6 (2020-05-06)
 
 ### New:

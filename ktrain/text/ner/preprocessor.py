@@ -1,7 +1,7 @@
 from ...imports import *
 from ... import utils as U
 from ...preprocessor import Preprocessor
-from ...data import Dataset
+from ...data import SequenceDataset
 from .. import textutils as TU
 from .. import preprocessor as tpp
 from .anago.utils import filter_embeddings
@@ -9,6 +9,11 @@ from .anago.utils import filter_embeddings
 OTHER = 'O'
 W2V = 'word2vec'
 SUPPORTED_EMBEDDINGS = [W2V]
+
+WORD_COL = 'Word'
+TAG_COL = 'Tag'
+SENT_COL = 'SentenceID'
+
 
 #tokenizer_filter = rs='!"#$%&()*+,-./:;<=>?@[\\]^_`{|}~\t\n'
 re_tok = re.compile(f'([{string.punctuation}“”¨«»®´·º½¾¿¡§£₤‘’])')
@@ -100,6 +105,12 @@ class NERPreprocessor(Preprocessor):
         return NERSequence(x_list, y_list, batch_size=U.DEFAULT_BS, p=self.p)
 
 
+    def preprocess_test_from_conll2003(self, filepath, verbose=1):
+        df = conll2003_to_df(filepath)
+        (x, y)  = process_df(df)
+        return self.preprocess_test(x, y, verbose=verbose)
+
+
     def undo(self, nerseq):
         """
         undoes preprocessing and returns raw data by:
@@ -124,6 +135,52 @@ class NERPreprocessor(Preprocessor):
         """
         return self.p.transform(X, y=y)
 
+
+
+def array_to_df(x_list, y_list):
+    ids = []
+    words = []
+    tags = []
+    for idx, lst in enumerate(x_list):
+        length = len(lst)
+        words.extend(lst)
+        tags.extend(y_list[idx])
+        ids.extend([idx] * length)
+    return pd.DataFrame(zip(ids, words, tags), columns=[SENT_COL, WORD_COL, TAG_COL])
+
+
+
+
+def conll2003_to_df(filepath, encoding='latin1'):
+    # read data and convert to dataframe
+    sents, words, tags = [],  [], []
+    sent_id = 0
+    docstart = False
+    with open(filepath, encoding=encoding) as f:
+        for line in f:
+            line = line.rstrip()
+            if line:
+                if line.startswith('-DOCSTART-'): 
+                    docstart=True
+                    continue
+                else:
+                    docstart=False
+                    parts = line.split()
+                    words.append(parts[0])
+                    tags.append(parts[-1])
+                    sents.append(sent_id)
+            else:
+                if not docstart:
+                    sent_id +=1
+    df = pd.DataFrame({SENT_COL: sents, WORD_COL : words, TAG_COL:tags})
+    df = df.fillna(method="ffill")
+    return df
+
+
+def gmb_to_df(filepath, encoding='latin1'):
+    df = pd.read_csv(filepath, encoding=encoding)
+    df = df.fillna(method="ffill")
+    return df
 
 
 
@@ -188,7 +245,7 @@ class SentenceGetter(object):
 
 
 
-class NERSequence(Dataset):
+class NERSequence(SequenceDataset):
 
     def __init__(self, x, y, batch_size=1, p=None):
         self.x = x

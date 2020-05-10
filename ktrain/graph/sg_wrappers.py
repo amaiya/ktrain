@@ -1,5 +1,5 @@
 from ..imports import *
-from ..data import Dataset
+from ..data import SequenceDataset
 
 
 # import stellargraph
@@ -12,7 +12,7 @@ if version.parse(sg.__version__) < version.parse('0.8'):
     raise Exception(SG_ERRMSG)
 
 
-class NodeSequenceWrapper(node_mappers.NodeSequence, Dataset):
+class NodeSequenceWrapper(node_mappers.NodeSequence, SequenceDataset):
     def __init__(self, node_seq):
         if not isinstance(node_seq, node_mappers.NodeSequence):
             raise ValueError('node_seq must by a stellargraph NodeSequence object')
@@ -88,7 +88,7 @@ class NodeSequenceWrapper(node_mappers.NodeSequence, Dataset):
 
 
 
-class LinkSequenceWrapper(link_mappers.LinkSequence, Dataset):
+class LinkSequenceWrapper(link_mappers.LinkSequence, SequenceDataset):
     def __init__(self, link_seq):
         if not isinstance(link_seq, link_mappers.LinkSequence):
             raise ValueError('link_seq must by a stellargraph LinkSequence object')
