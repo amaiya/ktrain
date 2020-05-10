@@ -143,7 +143,7 @@ The objective of the CoNLL2003 task is to classify sequences of words as belongi
 - [mnist-image_from_array_example.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/vision):  Build an MNIST model using `images_from_array`
 
 #### [MNIST](http://yann.lecun.com/exdb/mnist/):  Multiclass Classification
-- [mnist_tf_workflow.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/vision):  Illustrates how *ktrain* can be used in minimally-invasive way with normal TF workflow
+- [mnist-tf_workflow.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/vision):  Illustrates how *ktrain* can be used in minimally-invasive way with normal TF workflow
 
 #### [CIFAR10](https://www.cs.toronto.edu/~kriz/cifar.html):  Multiclass Classification
 - [cifar10-WRN22.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/vision):  A randomly-initialized Wide Residual Network applied to CIFAR10
