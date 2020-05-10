@@ -7,7 +7,7 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
-## 0.14.7 (TBD)
+## 0.14.7 (2020-05-10)
 
 ### New:
 - Added `TFDataset` class for use as wrapper around arbitrary `tf.data.Dataset` objects for use in *ktrain*
@@ -19,6 +19,7 @@ Most recent releases are shown at the top. Each release shows:
 
 ### Fixed:
 - ensure NER data is properly prepared `text.ner.learner.validate`
+- fixed typo with `df` reference in `images_from_fname`
 
 
 ## 0.14.6 (2020-05-06)

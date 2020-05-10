@@ -599,6 +599,7 @@ def images_from_fname( train_folder,
     if val_folder is not None:
         val_df, _ = _img_fnames_to_df(val_folder, pattern, verbose=verbose)
     elif val_pct:
+        df = train_df.copy()
         prop = 1-val_pct
         if random_state is not None: np.random.seed(42)
         msk = np.random.rand(len(df)) < prop
