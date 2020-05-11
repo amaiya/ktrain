@@ -185,7 +185,7 @@ class TestImageClassification(TestCase):
         (trn, val, preproc) = vis.images_from_array(x_train, y_train, 
                                                     validation_data=(x_test, y_test),
                                                     data_aug=data_aug,
-                                                    classes=classes)
+                                                    class_names=classes)
 
         model = vis.image_classifier('default_cnn', trn, val)
         learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=128)
