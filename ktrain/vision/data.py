@@ -405,12 +405,182 @@ def images_from_folder(datadir, target_size=(224,224),
     return (batches_tr, batches_te, preproc)
 
 
+def images_from_df(train_df,
+                   image_column,
+                   label_columns=[],
+                   directory=None,
+                   val_directory=None,
+                   suffix='',
+                   val_df=None,
+                   is_regression=False,
+                   target_size=(224,224),
+                    color_mode='rgb',
+                    data_aug=None,
+                    val_pct=0.1, random_state=None):
+
+    """
+    Returns image generator (Iterator instance).
+    Assumes output will be 2D one-hot-encoded labels for categorization.
+    Note: This function preprocesses the input in preparation
+          for a ResNet50 model.
+
+    Args:
+    train_df (DataFrame):  pandas dataframe for training dataset 
+    image_column (string): name of column containing the filenames of images
+                           If values in image_column do not have a file extension,
+                           the extension should be supplied with suffix argument.
+                           If values in image_column are not full file paths,
+                           then the path to directory containing images should be supplied
+                           as directory argument.
+
+    label_columns(list or str): list or str representing the columns that store labels
+                                Labels can be in any one of the following formats:
+                                1. a single column string string (or integer) labels
+
+                                   image_fname,label
+                                   -----------------
+                                   image01,cat
+                                   image02,dog
+
+                                2. multiple columns for one-hot-encoded labels
+                                   image_fname,cat,dog
+                                   image01,1,0
+                                   image02,0,1
+
+                                3. a single column of numeric values for image regression
+                                   image_fname,age
+                                   -----------------
+                                   image01,68
+                                   image02,18
+
+    directory (string): path to directory containing images
+                        not required if image_column contains full filepaths
+    val_directory(strin): path to directory containing validation images.
+                          only required if validation images are in different folder than train images
+    suffix(str): will be appended to each entry in image_column
+                 Used when the filenames in image_column do not contain file extensions.
+                 The extension in suffx should include ".".
+    val_df (DataFrame): pandas dataframe for validation set
+
+    is_regression(bool): If True, task is treated as regression. 
+                         Used when there is single column of numeric values and
+                         numeric values should be treated as numeric targets as opposed to class labels
+    target_size (tuple):  image dimensions
+    color_mode (string):  color mode
+    data_aug(ImageDataGenerator):  a keras.preprocessing.image.ImageDataGenerator
+                                  for data augmentation
+    val_pct(float):  proportion of training data to be used for validation
+                     only used if val_filepath is None
+    random_state(int): random seed for train/test split
+
+    Returns:
+    batches: a tuple of two Iterators - one for train and one for test
+
+    """
+
+    if isinstance(label_columns, (list, np.ndarray)) and len(label_columns) == 1:
+        label_columns = label_columns[0]
+
+    peek = train_df[label_columns].iloc[0]
+    if isinstance(label_columns, str) and peek.isdigit() and not is_regression:
+        warnings.warn('Targets are integers, but is_regression=False. Task treated as classification instead of regression.')
+    if isinstance(peek, str) and is_regression:
+        train_df[label_columns] = train_df[label_columns].astype('float32')
+        if val_df is not None:
+            val_df[label_columns] = val_df[label_columns].astype('float32')
+    peek = train_df[label_columns].iloc[0]
+
+
+    # get train and test data generators
+    if directory:
+        img_folder = directory
+    else:
+        img_folder =  os.path.dirname(train_df[image_column].iloc[0])
+    (train_datagen, test_datagen) = process_datagen(data_aug,
+                                                    train_directory=img_folder,
+                                                    target_size=target_size,
+                                                    color_mode=color_mode,
+                                                    flat_dir=True)
+
+    # convert to dataframes
+    if val_df is None:
+        if val_pct:
+            df = train_df.copy()
+            prop = 1-val_pct
+            if random_state is not None: np.random.seed(42)
+            msk = np.random.rand(len(df)) < prop
+            train_df = df[msk]
+            val_df = df[~msk]
+
+    # class names
+    if isinstance(label_columns, (list, np.ndarray)): label_columns.sort()
+
+    # fix file extensions, if necessary
+    if suffix:
+        train_df = train_df.copy()
+        val_df = val_df.copy()
+        train_df[image_column] = train_df.copy()[image_column].apply(lambda x : x+suffix)
+        val_df[image_column] = val_df.copy()[image_column].apply(lambda x : x+suffix)
+
+    # 1-hot-encode string or integer labels
+    if isinstance(label_columns, str) or \
+       (isinstance(label_columns, (list, np.ndarray)) and len(label_columns) == 1):
+        label_col_name = label_columns if isinstance(label_columns, str) else label_columns[0]
+        #if not isinstance(df[label_col_name].values[0], str):
+            #raise ValueError('If a single label column is provided, labels must be in the form of a string.')
+        if not is_regression:
+            le = LabelEncoder()
+            train_labels = train_df[label_col_name].values
+            le.fit(train_labels)
+            y_train = to_categorical(le.transform(train_labels))
+            y_val = to_categorical(le.transform(val_df[label_col_name].values))
+            y_train_pd = [y_train[:,i] for i in range(y_train.shape[1])]
+            y_val_pd = [y_val[:,i] for i in range(y_val.shape[1])]
+            label_columns = list(le.classes_)
+            train_df = pd.DataFrame(zip(train_df[image_column].values, *y_train_pd), columns=[image_column]+label_columns)
+            val_df = pd.DataFrame(zip(val_df[image_column].values, *y_val_pd), columns=[image_column]+label_columns)
+
+
+    batches_tr = train_datagen.flow_from_dataframe(
+                                      train_df,
+                                      directory=directory,
+                                      x_col = image_column,
+                                      y_col=label_columns,
+                                      target_size=target_size,
+                                      class_mode='other',
+                                      shuffle=True,
+                                      interpolation='bicubic',
+                                      color_mode = color_mode)
+    batches_te = None
+    if val_df is not None:
+        d =  val_directory if val_directory is not None else directory
+        batches_te = test_datagen.flow_from_dataframe(
+                                          val_df,
+                                          directory=d,
+                                          x_col = image_column,
+                                          y_col=label_columns,
+                                          target_size=target_size,
+                                          class_mode='other',
+                                          shuffle=False,
+                                          interpolation='bicubic',
+                                          color_mode = color_mode)
+
+    # setup preprocessor
+    preproc = ImagePreprocessor(test_datagen,
+                                label_columns,
+                                target_size=target_size,
+                                color_mode=color_mode)
+    return (batches_tr, batches_te, preproc)
+
+
+
 def images_from_csv(train_filepath,
                    image_column,
                    label_columns=[],
                    directory=None,
                    suffix='',
                    val_filepath=None,
+                   is_regression=False,
                    target_size=(224,224),
                     color_mode='rgb',
                     data_aug=None,
@@ -433,7 +603,7 @@ def images_from_csv(train_filepath,
 
     label_columns(list or str): list or str representing the columns that store labels
                                 Labels can be in any one of the following formats:
-                                1. a single column string string labels
+                                1. a single column string string (or integer) labels
 
                                    image_fname,label
                                    -----------------
@@ -445,6 +615,12 @@ def images_from_csv(train_filepath,
                                    image01,1,0
                                    image02,0,1
 
+                                3. a single column of numeric values for image regression
+                                   image_fname,age
+                                   -----------------
+                                   image01,68
+                                   image02,18
+
     directory (string): path to directory containing images
                         not required if image_column contains full filepaths
     suffix(str): will be appended to each entry in image_column
@@ -452,6 +628,9 @@ def images_from_csv(train_filepath,
                  The extension in suffx should include ".".
     val_filepath (string): path to validation dataset in CSV format
     suffix(string): suffix to add to file names in image_column
+    is_regression(bool): If True, task is treated as regression. 
+                         Used when there is single column of numeric values and
+                         numeric values should be treated as numeric targets as opposed to class labels
     target_size (tuple):  image dimensions
     color_mode (string):  color mode
     data_aug(ImageDataGenerator):  a keras.preprocessing.image.ImageDataGenerator
@@ -465,96 +644,32 @@ def images_from_csv(train_filepath,
 
     """
 
-    # get train and test data generators
-    if directory:
-        img_folder = directory
-    else:
-        df = pd.read_csv(train_filepath)
-        img_folder =  os.path.dirname(df[image_column].iloc[0])
-    (train_datagen, test_datagen) = process_datagen(data_aug,
-                                                    train_directory=img_folder,
-                                                    target_size=target_size,
-                                                    color_mode=color_mode,
-                                                    flat_dir=True)
-
     # convert to dataframes
-    df = pd.read_csv(train_filepath)
-    if not val_filepath:
-        if val_pct:
-            prop = 1-val_pct
-            if random_state is not None: np.random.seed(42)
-            msk = np.random.rand(len(df)) < prop
-            train_df = df[msk]
-            val_df = df[~msk]
-        else:
-            val_df = None
-    else:
-        train_df = df
+    train_df = pd.read_csv(train_filepath)
+    val_df = None
+    if val_filepath is not None:
         val_df = pd.read_csv(val_filepath)
 
-    # class names
-    label_columns.sort()
 
-    # fix file extensions, if necessary
-    if suffix:
-        train_df = train_df.copy()
-        val_df = val_df.copy()
-        train_df[image_column] = train_df.copy()[image_column].apply(lambda x : x+suffix)
-        val_df[image_column] = val_df.copy()[image_column].apply(lambda x : x+suffix)
+    return images_from_df(train_df,
+                          image_column,
+                          label_columns=label_columns,
+                          directory=directory,
+                          suffix=suffix,
+                          val_df=val_df,
+                          is_regression=is_regression,
+                          target_size=target_size,
+                          color_mode=color_mode,
+                          data_aug=data_aug,
+                          val_pct=val_pct, random_state=random_state)
 
-    # 1-hot-encode string labels
-    if isinstance(label_columns, str) or \
-       (isinstance(label_columns, (list, np.ndarray)) and len(label_columns) == 1):
-        label_col_name = label_columns if isinstance(label_columns, str) else label_columns[0]
-        if not isinstance(df[label_col_name].values[0], str):
-            raise ValueError('If a single label column is provided, labels must be in the form of a string.')
-        le = LabelEncoder()
-        train_labels = train_df[label_col_name].values
-        le.fit(train_labels)
-        y_train = to_categorical(le.transform(train_labels))
-        y_val = to_categorical(le.transform(val_df[label_col_name].values))
-        y_train_pd = [y_train[:,i] for i in range(y_train.shape[1])]
-        y_val_pd = [y_val[:,i] for i in range(y_val.shape[1])]
-        label_columns = list(le.classes_)
-        train_df = pd.DataFrame(zip(train_df[image_column].values, *y_train_pd), columns=[image_column]+label_columns)
-        val_df = pd.DataFrame(zip(val_df[image_column].values, *y_val_pd), columns=[image_column]+label_columns)
-
-
-
-    batches_tr = train_datagen.flow_from_dataframe(
-                                      train_df,
-                                      directory=directory,
-                                      x_col = image_column,
-                                      y_col=label_columns,
-                                      target_size=target_size,
-                                      class_mode='other',
-                                      shuffle=True,
-                                      interpolation='bicubic',
-                                      color_mode = color_mode)
-
-    batches_te = test_datagen.flow_from_dataframe(
-                                      val_df,
-                                      directory=directory,
-                                      x_col = image_column,
-                                      y_col=label_columns,
-                                      target_size=target_size,
-                                      class_mode='other',
-                                      shuffle=False,
-                                      interpolation='bicubic',
-                                      color_mode = color_mode)
-
-    # setup preprocessor
-    preproc = ImagePreprocessor(test_datagen,
-                                label_columns,
-                                target_size=target_size,
-                                color_mode=color_mode)
-    return (batches_tr, batches_te, preproc)
 
 
 
 def images_from_fname( train_folder,
                       pattern=r'([^/]+)_\d+.jpg$',
                       val_folder=None,
+                      is_regression=False,
                      target_size=(224,224),
                      color_mode='rgb',
                      data_aug=None,
@@ -571,6 +686,9 @@ def images_from_fname( train_folder,
                 By default, it will extract classes from file names of the form:
                    <class_name>_<numbers>.jpg
     val_folder (str): directory containing validation images. default:None
+    is_regression(bool): If True, task is treated as regression. 
+                         Used when there is single column of numeric values and
+                         numeric values should be treated as numeric targets as opposed to class labels
     target_size (tuple):  image dimensions
     color_mode (string):  color mode
     data_aug(ImageDataGenerator):  a keras.preprocessing.image.ImageDataGenerator
@@ -585,65 +703,29 @@ def images_from_fname( train_folder,
 
     """
 
-    # get train and test data generators
-    (train_datagen, test_datagen) = process_datagen(data_aug,
-                                                    train_directory=train_folder,
-                                                    target_size=target_size,
-                                                    color_mode=color_mode,
-                                                    flat_dir=True)
-
-    # train df
-    train_df, class_names = _img_fnames_to_df(train_folder, pattern, verbose=verbose)
-
-    # val df
+    image_column = 'image_name'
+    label_column = 'label'
+    train_df = _img_fnames_to_df(train_folder, pattern, 
+                                 image_column=image_column, label_column=label_column, verbose=verbose)
+    val_df = None
     if val_folder is not None:
-        val_df, _ = _img_fnames_to_df(val_folder, pattern, verbose=verbose)
-    elif val_pct:
-        df = train_df.copy()
-        prop = 1-val_pct
-        if random_state is not None: np.random.seed(42)
-        msk = np.random.rand(len(df)) < prop
-        train_df = df[msk]
-        val_df = df[~msk]
-        val_folder = train_folder
-    else:
-        val_df = None
-
-    batches_tr = train_datagen.flow_from_dataframe(
-                                      train_df,
-                                      directory=train_folder,
-                                      x_col = 'image_name',
-                                      y_col=class_names,
-                                      target_size=target_size,
-                                      class_mode='other',
-                                      shuffle=True,
-                                      interpolation='bicubic',
-                                      color_mode = color_mode)
-
-    if val_df is not None:
-        batches_te = test_datagen.flow_from_dataframe(
-                                          val_df,
-                                          directory=val_folder,
-                                          x_col = 'image_name',
-                                          y_col=class_names,
-                                          target_size=target_size,
-                                          class_mode='other',
-                                          shuffle=False,
-                                          interpolation='bicubic',
-                                          color_mode = color_mode)
-    else:
-        batches_te = None
-
-    # setup preprocessor
-    preproc = ImagePreprocessor(test_datagen,
-                                class_names,
-                                target_size=target_size,
-                                color_mode=color_mode)
-    return (batches_tr, batches_te, preproc)
+        val_df = _img_fnames_to_df(val_folder, pattern, 
+                                   image_column=image_column, label_column=label_column, verbose=verbose)
+    return images_from_df(train_df,
+                          image_column,
+                          label_columns=label_column,
+                          directory=train_folder,
+                          val_directory=val_folder,
+                          val_df=val_df,
+                          is_regression=is_regression,
+                          target_size=target_size,
+                          color_mode=color_mode,
+                          data_aug=data_aug,
+                          val_pct=val_pct, random_state=random_state)
 
 
 
-def _img_fnames_to_df(img_folder, pattern, verbose=1):
+def _img_fnames_to_df(img_folder,pattern, image_column='image_name', label_column='label',  verbose=1):
     # get fnames
     fnames = []
     for ext in ('*.gif', '*.png', '*.jpg'):
@@ -659,22 +741,25 @@ def _img_fnames_to_df(img_folder, pattern, verbose=1):
             image_names.append(os.path.basename(fname))
             labels.append(r.group(1))
         else:
-            warnings.warn('Could not extract class for %s -  skipping this file'% (fname))
-    class_names = list(set(labels))
-    class_names.sort()
-    c2i = {k:v for v,k in enumerate(class_names)}
-    labels = [c2i[label] for label in labels]
-    labels = to_categorical(labels)
-    #class_names = [str(c) in class_names]
-    U.vprint('Found %s classes: %s' % (len(class_names), class_names), verbose=verbose)
-    U.vprint('y shape: (%s,%s)' % (labels.shape[0], labels.shape[1]), verbose=verbose)
-    dct = {'image_name': image_names}
-    for i in range(labels.shape[1]):
-        dct[class_names[i]] = labels[:,i]
+            warnings.warn('Could not extract target for %s -  skipping this file'% (fname))
+    dct = {'image_name': image_names, 'label':labels}
+    return pd.DataFrame(dct)
+    
+#    class_names = list(set(labels))
+#    class_names.sort()
+#    c2i = {k:v for v,k in enumerate(class_names)}
+#    labels = [c2i[label] for label in labels]
+#    labels = to_categorical(labels)
+#    #class_names = [str(c) in class_names]
+#    U.vprint('Found %s classes: %s' % (len(class_names), class_names), verbose=verbose)
+#    U.vprint('y shape: (%s,%s)' % (labels.shape[0], labels.shape[1]), verbose=verbose)
+#    dct = {'image_name': image_names}
+#    for i in range(labels.shape[1]):
+#        dct[class_names[i]] = labels[:,i]
 
-    # convert to dataframes
-    df = pd.DataFrame(dct)
-    return (df, class_names)
+#    # convert to dataframes
+#    df = pd.DataFrame(dct)
+#    return (df, class_names)
 
 
 
@@ -688,7 +773,9 @@ def images_from_array(x_train, y_train,
 
     """
     Returns image generator (Iterator instance) from training
-    and validation data in the form of NumPy arrays
+    and validation data in the form of NumPy arrays.
+    This function only supports image classification.
+    For image regression, please use images_from_df.
 
     Args:
       x_train(numpy.ndarray):  training gdata
