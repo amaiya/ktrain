@@ -727,7 +727,7 @@ def _img_fnames_to_df(img_folder,pattern, image_column='image_name', label_colum
             image_names.append(os.path.basename(fname))
             labels.append(r.group(1))
         else:
-            warnings.warn('Could not extract class for %s -  skipping this file'% (fname))
+            warnings.warn('Could not extract target for %s -  skipping this file'% (fname))
     dct = {'image_name': image_names, 'label':labels}
     return pd.DataFrame(dct)
     
@@ -759,7 +759,9 @@ def images_from_array(x_train, y_train,
 
     """
     Returns image generator (Iterator instance) from training
-    and validation data in the form of NumPy arrays
+    and validation data in the form of NumPy arrays.
+    This function only supports image classification.
+    For image regression, please use images_from_df.
 
     Args:
       x_train(numpy.ndarray):  training gdata
