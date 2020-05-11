@@ -86,6 +86,14 @@ def images_from_csv():
     return (trn, val, preproc)
 
 
+def images_from_fname():
+    trn, val, preproc = vis.images_from_fname(
+                          './image_data/image_folder/all',
+                          pattern=r'([^/]+).\d+.jpg$',
+                          data_aug=vis.get_data_aug(horizontal_flip=True))
+    return (trn, val, preproc)
+
+
 
 class TestTextData(TestCase):
 
