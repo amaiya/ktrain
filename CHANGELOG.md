@@ -7,6 +7,19 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.15.0 (TBD)
+
+### New:
+- Out-of-the-box support for image regression
+- `vision.images_from_df` function to load image data from *pandas* DataFrames
+
+### Changed
+- N/A
+
+### Fixed:
+- N/A
+
+
 ## 0.14.7 (2020-05-10)
 
 ### New:
