@@ -18,8 +18,8 @@ PREDEFINED_MODELS = PRETRAINED_MODELS + [RESNET50, MOBILENET, INCEPTION]
 IMAGE_CLASSIFIERS = {
                      PRETRAINED_RESNET50: '50-layer Residual Network (pretrained on ImageNet)',
                      RESNET50:  '50-layer Resididual Network (randomly initialized)',
-                     PRETRAINED_MOBILENET: 'MobileNet Neural Network (pretrained on ImageNet - TF only)',
-                     MOBILENET:  'MobileNet Neural Network (randomly initialized - TF only)',
+                     PRETRAINED_MOBILENET: 'MobileNet Neural Network (pretrained on ImageNet)',
+                     MOBILENET:  'MobileNet Neural Network (randomly initialized)',
                      PRETRAINED_INCEPTION: 'Inception Version 3  (pretrained on ImageNet)',
                      INCEPTION:  'Inception Version 3 (randomly initialized)',
                      WRN22: '22-layer Wide Residual Network (randomly initialized)',
@@ -28,6 +28,12 @@ IMAGE_CLASSIFIERS = {
 def print_image_classifiers():
     for k,v in IMAGE_CLASSIFIERS.items():
         print("%s: %s" % (k,v))
+
+
+def print_image_regression_models():
+    for k,v in IMAGE_CLASSIFIERS.items():
+        print("%s: %s" % (k,v))
+
 
 def pretrained_datagen(data, name):
     if not data or not U.is_iter(data): return
@@ -64,7 +70,6 @@ def pretrained_datagen(data, name):
 
 
 
-
 def image_classifier(name,
                      train_data,
                      val_data=None,
@@ -80,6 +85,116 @@ def image_classifier(name,
     """
     Returns a pre-trained ResNet50 model ready to be fine-tuned
     for multi-class classification. By default, all layers are
+    trainable/unfrozen.
+
+
+    Args:
+        name (string): one of {'pretrained_resnet50', 'resnet50', 'default_cnn'}
+        train_data (image.Iterator): train data. Note: Will be manipulated here!
+        val_data (image.Iterator): validation data.  Note: Will be manipulated here!
+        freeze_layers (int):  number of beginning layers to make untrainable
+                            If None, then all layers except new Dense layers
+                            will be frozen/untrainable.
+        metric (string):  metric to use
+        optimizer_name(str): name of Keras optimizer (e.g., 'adam', 'sgd')
+        multilabel(bool):  If True, model will be build to support
+                           multilabel classificaiton (labels are not mutually exclusive).
+                           If False, binary/multiclassification model will be returned.
+                           If None, multilabel status will be inferred from data.
+        multigpu_number (int): Repicate model on this many GPUS.
+                               Must either be None or greater than 1.
+                               If greater than 1, must meet system specifications.
+                               If None, model is not replicated on multiple GPUS.
+        pt_fc (list of ints): number of hidden units in extra Dense layers
+                                before final Dense layer of pretrained model.
+                                Only takes effect if name in PRETRAINED_MODELS
+        pt_ps (list of floats): dropout probabilities to use before
+                                each extra Dense layer in pretrained model.
+                                Only takes effect if name in PRETRAINED_MODELS
+        verbose (int):         verbosity
+    Return:
+        model(Model):  the compiled model ready to be fine-tuned/trained
+
+        
+    """
+    return image_model(name, train_data, val_data=val_data, freeze_layers=freeze_layers,
+                       metric=metric, optimizer_name=optimizer_name, multilabel=multilabel,
+                       multigpu_number=multigpu_number,
+                       pt_fc=pt_fc, pt_ps=pt_ps, verbose=verbose)
+
+
+
+
+def image_regression_model(name,
+                          train_data,
+                          val_data=None,
+                          freeze_layers=None, 
+                          metric='mae',
+                          optimizer_name = U.DEFAULT_OPT,
+                          multigpu_number=None, 
+                          pt_fc = [],
+                          pt_ps = [],
+                          verbose=1):
+
+    """
+    Returns a pre-trained ResNet50 model ready to be fine-tuned
+    for multi-class classification. By default, all layers are
+    trainable/unfrozen.
+
+
+    Args:
+        name (string): one of {'pretrained_resnet50', 'resnet50', 'default_cnn'}
+        train_data (image.Iterator): train data. Note: Will be manipulated here!
+        val_data (image.Iterator): validation data.  Note: Will be manipulated here!
+        freeze_layers (int):  number of beginning layers to make untrainable
+                            If None, then all layers except new Dense layers
+                            will be frozen/untrainable.
+        metric (string):  metric to use
+        optimizer_name(str): name of Keras optimizer (e.g., 'adam', 'sgd')
+        multilabel(bool):  If True, model will be build to support
+                           multilabel classificaiton (labels are not mutually exclusive).
+                           If False, binary/multiclassification model will be returned.
+                           If None, multilabel status will be inferred from data.
+        multigpu_number (int): Repicate model on this many GPUS.
+                               Must either be None or greater than 1.
+                               If greater than 1, must meet system specifications.
+                               If None, model is not replicated on multiple GPUS.
+        pt_fc (list of ints): number of hidden units in extra Dense layers
+                                before final Dense layer of pretrained model.
+                                Only takes effect if name in PRETRAINED_MODELS
+        pt_ps (list of floats): dropout probabilities to use before
+                                each extra Dense layer in pretrained model.
+                                Only takes effect if name in PRETRAINED_MODELS
+        verbose (int):         verbosity
+    Return:
+        model(Model):  the compiled model ready to be fine-tuned/trained
+
+        
+    """
+
+
+    return image_model(name, train_data, val_data=val_data, freeze_layers=freeze_layers,
+                       metric=metric, optimizer_name=optimizer_name, multilabel=False,
+                       multigpu_number=multigpu_number,
+                       pt_fc=pt_fc, pt_ps=pt_ps, verbose=verbose)
+
+
+
+def image_model( name,
+                 train_data,
+                 val_data=None,
+                 freeze_layers=None, 
+                 metric='accuracy',
+                 optimizer_name = U.DEFAULT_OPT,
+                 multilabel=None,
+                 multigpu_number=None, 
+                 pt_fc = [],
+                 pt_ps = [],
+                 verbose=1):
+
+    """
+    Returns a pre-trained ResNet50 model ready to be fine-tuned
+    for multi-class classification or regression. By default, all layers are
     trainable/unfrozen.
 
 
@@ -148,16 +263,11 @@ def image_classifier(name,
                 ' model. If you decide to use a different model, please reload your' +\
                 ' dataset with a ktrain.vision.data.images_from* function.\n', verbose=verbose)
 
-
-
-    # determine number of classes and shape
-    num_classes = U.nclasses_from_data(train_data)
-    input_shape = U.shape_from_data(train_data)
-
     # determine if multilabel
     if multilabel is None:
         multilabel = U.is_multilabel(train_data)
-    U.vprint("Is Multi-Label? %s" % (multilabel), verbose=verbose)
+    is_regression=False
+    if not multilabel and len(train_data[0][-1].shape) == 1: is_regression=True
 
     # set loss and acivations
     loss_func = 'categorical_crossentropy'
@@ -165,6 +275,19 @@ def image_classifier(name,
     if multilabel:
         loss_func = 'binary_crossentropy'
         activation = 'sigmoid'
+    elif is_regression:
+        loss_func = 'mse'
+        activation = None
+        if metric == 'accuracy': metric = 'mae'
+
+    U.vprint("Is Multi-Label? %s" % (multilabel), verbose=verbose)
+    U.vprint("Is Regression? %s" % (is_regression), verbose=verbose)
+
+
+    # determine number of classes and shape
+    num_classes = 1 if is_regression else U.nclasses_from_data(train_data)
+    input_shape = U.shape_from_data(train_data)
+
 
 
     #------------

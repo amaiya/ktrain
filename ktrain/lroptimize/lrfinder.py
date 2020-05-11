@@ -151,7 +151,7 @@ class LRFinder:
             # this code was adapted from fastai: https://github.com/fastai/fastai
             try: 
                 ml = np.argmin(self.losses)
-                mg = (np.gradient(np.array(self.losses[10:ml]))).argmin()
+                mg = (np.gradient(np.array(self.losses[32:ml]))).argmin()
             except:
                 print("Failed to compute the gradients, there might not be enough points.\n" +\
                        "Plot displayed without suggestion.")
@@ -159,8 +159,9 @@ class LRFinder:
             else:
                 print('Two possible suggestions for LR from plot:')
                 print(f"\tMin numerical gradient: {self.lrs[mg]:.2E}")
-                ax.plot(self.lrs[mg],self.losses[mg], markersize=10,marker='o',color='red')
                 print(f"\tMin loss divided by 10: {self.lrs[ml]/10:.2E}")
+                print(mg)
+                ax.plot(self.lrs[mg],self.losses[mg], markersize=10,marker='o',color='red')
         return
 
 

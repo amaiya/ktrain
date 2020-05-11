@@ -478,6 +478,19 @@ def images_from_df(train_df,
 
     """
 
+    if isinstance(label_columns, (list, np.ndarray)) and len(label_columns) == 1:
+        label_columns = label_columns[0]
+
+    peek = train_df[label_columns].iloc[0]
+    if peek.isdigit() and not is_regression:
+        warnings.warn('Targets are integers, but is_regression=False. Task treated as classification instead of regression.')
+    if isinstance(peek, str) and is_regression:
+        train_df[label_columns] = train_df[label_columns].astype('float32')
+        if val_df is not None:
+            val_df[label_columns] = val_df[label_columns].astype('float32')
+    peek = train_df[label_columns].iloc[0]
+
+
     # get train and test data generators
     if directory:
         img_folder = directory
@@ -488,7 +501,6 @@ def images_from_df(train_df,
                                                     target_size=target_size,
                                                     color_mode=color_mode,
                                                     flat_dir=True)
-
 
     # convert to dataframes
     if val_df is None:
@@ -645,6 +657,7 @@ def images_from_csv(train_filepath,
                           directory=directory,
                           suffix=suffix,
                           val_df=val_df,
+                          is_regression=is_regression,
                           target_size=target_size,
                           color_mode=color_mode,
                           data_aug=data_aug,
@@ -704,6 +717,7 @@ def images_from_fname( train_folder,
                           directory=train_folder,
                           val_directory=val_folder,
                           val_df=val_df,
+                          is_regression=is_regression,
                           target_size=target_size,
                           color_mode=color_mode,
                           data_aug=data_aug,
