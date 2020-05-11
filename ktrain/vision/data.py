@@ -489,8 +489,9 @@ def images_from_df(train_df,
                                                     color_mode=color_mode,
                                                     flat_dir=True)
 
+
     # convert to dataframes
-    if val_df is not None:
+    if val_df is None:
         if val_pct:
             df = train_df.copy()
             prop = 1-val_pct
@@ -498,11 +499,9 @@ def images_from_df(train_df,
             msk = np.random.rand(len(df)) < prop
             train_df = df[msk]
             val_df = df[~msk]
-        else:
-            val_df = None
 
     # class names
-    label_columns.sort()
+    if isinstance(label_columns, (list, np.ndarray)): label_columns.sort()
 
     # fix file extensions, if necessary
     if suffix:
@@ -695,6 +694,7 @@ def images_from_fname( train_folder,
     label_column = 'label'
     train_df = _img_fnames_to_df(train_folder, pattern, 
                                  image_column=image_column, label_column=label_column, verbose=verbose)
+    val_df = None
     if val_folder is not None:
         val_df = _img_fnames_to_df(val_folder, pattern, 
                                    image_column=image_column, label_column=label_column, verbose=verbose)
@@ -711,7 +711,7 @@ def images_from_fname( train_folder,
 
 
 
-def _img_fnames_to_df(img_folder, pattern, verbose=1):
+def _img_fnames_to_df(img_folder,pattern, image_column='image_name', label_column='label',  verbose=1):
     # get fnames
     fnames = []
     for ext in ('*.gif', '*.png', '*.jpg'):

@@ -89,7 +89,8 @@ def images_from_csv():
 def images_from_fname():
     trn, val, preproc = vis.images_from_fname(
                           './image_data/image_folder/all',
-                          pattern=r'([^/]+).\d+.jpg$',
+                          pattern=r'([^/]+)\.\d+.jpg$',
+                          val_pct=0.25, random_state=42,
                           data_aug=vis.get_data_aug(horizontal_flip=True))
     return (trn, val, preproc)
 
@@ -210,14 +211,18 @@ class TestImageData(TestCase):
         (trn, val, preproc)  = images_from_csv()
         self.__test_images(trn, val, preproc)
 
+    def test_images_from_fname(self):
+        (trn, val, preproc)  = images_from_fname()
+        self.__test_images(trn, val, preproc, nsamples=20)
 
-    def __test_images(self, trn, val, preproc):
+
+    def __test_images(self, trn, val, preproc, nsamples=16):
         self.assertTrue(U.is_iter(trn))
         self.assertEqual(U.shape_from_data(trn), (224, 224, 3))
         self.assertTrue(U.ondisk(trn))
-        self.assertEqual(U.nsamples_from_data(trn), 16)
+        self.assertEqual(U.nsamples_from_data(trn), nsamples)
         self.assertEqual(U.nclasses_from_data(trn), 2)
-        self.assertEqual(U.y_from_data(trn).shape, (16,2))
+        self.assertEqual(U.y_from_data(trn).shape, (nsamples,2))
         self.assertFalse(U.bert_data_tuple(trn))
         self.assertEqual(preproc.get_classes(), ['cat', 'dog'])
         (gen, steps)  = preproc.preprocess('./image_data/image_folder/all')
