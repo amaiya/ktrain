@@ -482,7 +482,7 @@ def images_from_df(train_df,
         label_columns = label_columns[0]
 
     peek = train_df[label_columns].iloc[0]
-    if peek.isdigit() and not is_regression:
+    if isinstance(label_columns, str) and peek.isdigit() and not is_regression:
         warnings.warn('Targets are integers, but is_regression=False. Task treated as classification instead of regression.')
     if isinstance(peek, str) and is_regression:
         train_df[label_columns] = train_df[label_columns].astype('float32')
