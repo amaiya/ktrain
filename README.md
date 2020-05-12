@@ -241,6 +241,18 @@ learner.validate(class_names=t.get_classes()) # class_names must be string value
 #          weighted avg       0.96      0.96      0.96      1502
 ```
 
+#### NER With [BioBERT](https://arxiv.org/abs/1901.08746) Embeddings
+```python
+# NER with BioBERT embeddings
+import ktrain
+from ktrain import text as txt
+x_train= [['IL-2', 'responsiveness', 'requires', 'three', 'distinct', 'elements', 'within', 'the', 'enhancer', '.'], ...]
+y_train=[['B-protein', 'O', 'O', 'O', 'O', 'B-DNA', 'O', 'O', 'B-DNA', 'O'], ...]
+(trn, val, preproc) = txt.entities_from_array(x_train, y_train)
+model = txt.sequence_tagger('bilstm-bert', preproc, bert_model='monologg/biobert_v1.1_pubmed')
+learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=128)
+learner.fit(0.01, 1, cycle_len=5)
+```
 
 Using *ktrain* on **Google Colab**?  See these Colab examples:
 -  [a simple demo of Multiclass Text Classification with BERT](https://colab.research.google.com/drive/1AH3fkKiEqBpVpO5ua00scp7zcHs5IDLK)
