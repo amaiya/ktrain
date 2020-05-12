@@ -14,7 +14,7 @@ Most recent releases are shown at the top. Each release shows:
 - `vision.images_from_df` function to load image data from *pandas* DataFrames
 
 ### Changed
-- N/A
+- references to `fit_generator` and `predict_generator` removed
 
 ### Fixed:
 - N/A
