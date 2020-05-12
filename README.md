@@ -8,7 +8,7 @@
 
 ### News and Announcements
 - **2020-05-13:**  
-  - ***ktrain*** **v0.15.x is released** and now includes support for:
+  - ***ktrain*** **v0.15.x is released** and includes support for:
     - **image regression**:  See the [example notebook on age prediction from photos](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/vision/utk_faces_age_prediction-resnet50.ipynb).
     - **`tf.data.Datasets`**:  See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/vision/mnist-tf_workflow.ipynb) on using `tf.data.Datasets` in *ktrain* for custom models and data formats.
 - **2020-04-15:**  
