@@ -43,6 +43,14 @@ class TestImageClassification(TestCase):
         model = vis.image_classifier('pretrained_resnet50', trn, val)
         learner = ktrain.get_learner(model=model, train_data=trn, val_data=val, batch_size=1)
         learner.freeze()
+
+
+        # test weight decay
+        self.assertEqual(learner.get_weight_decay(), None)
+        learner.set_weight_decay(1e-2)
+        self.assertAlmostEqual(learner.get_weight_decay(), 1e-2)
+
+        # train
         hist = learner.autofit(1e-3, monitor=VAL_ACC_NAME)
 
         # test train
@@ -59,10 +67,6 @@ class TestImageClassification(TestCase):
         else:
             self.assertEqual(max(hist.history[VAL_ACC_NAME]), 1)
 
-        # test weight decay
-        self.assertEqual(learner.get_weight_decay(), None)
-        learner.set_weight_decay(1e-2)
-        self.assertAlmostEqual(learner.get_weight_decay(), 1e-2)
 
         # test load and save model
         learner.save_model('/tmp/test_model')

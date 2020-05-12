@@ -50,9 +50,10 @@ class TestTransformers(TestCase):
         learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=6, eval_batch_size=EVAL_BS)
 
         # test weight decay
-        self.assertEqual(learner.get_weight_decay(), None)
-        learner.set_weight_decay(1e-2)
-        self.assertAlmostEqual(learner.get_weight_decay(), 1e-2)
+        # NOTE due to transformers and/or AdamW bug, # val_accuracy is missing in training history if setting weight decay prior to training
+        #self.assertEqual(learner.get_weight_decay(), None)
+        #learner.set_weight_decay(1e-2)
+        #self.assertAlmostEqual(learner.get_weight_decay(), 1e-2)
 
         # train
         lr = 5e-5
@@ -67,6 +68,11 @@ class TestTransformers(TestCase):
         obs = learner.top_losses(n=1, val_data=None)
         self.assertIn(obs[0][0], list(range(len(val.x))))
         learner.view_top_losses(preproc=preproc, n=1, val_data=None)
+
+        # test weight decay
+        self.assertEqual(learner.get_weight_decay(), None)
+        learner.set_weight_decay(1e-2)
+        self.assertAlmostEqual(learner.get_weight_decay(), 1e-2)
 
 
         # test load and save model
