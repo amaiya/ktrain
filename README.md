@@ -241,7 +241,7 @@ learner.validate(class_names=t.get_classes()) # class_names must be string value
 #          weighted avg       0.96      0.96      0.96      1502
 ```
 
-#### NER With [BioBERT](https://arxiv.org/abs/1901.08746) Embeddings
+#### Example: NER With [BioBERT](https://arxiv.org/abs/1901.08746) Embeddings
 ```python
 # NER with BioBERT embeddings
 import ktrain
