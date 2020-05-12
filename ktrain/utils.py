@@ -174,33 +174,20 @@ def is_multilabel(data):
     checks for multilabel from data
     """
     data_arg_check(val_data=data, val_required=True)
-    if is_iter(data): 
-        if is_ner(data=data): return False   # NERSequence
-        elif is_nodeclass(data=data): return False  # NodeSequenceWrapper
-        multilabel = False
-        Y = y_from_data(data)
-        for idx, y in enumerate(Y):
-            if idx >= 16: break
-            #y = v[1]
-            if np.issubdtype(type(y), np.integer) or np.issubdtype(type(y), np.floating) or\
-               len(y.shape) == 1 or y.shape[1] == 1: 
-                   return False
-            total_per_batch = np.sum(y, axis=1)
-            if any(i>1 for i in total_per_batch):
-                multilabel=True
-                break
-        return multilabel
-    else:
-        if len(data[1].shape) == 1: return False
-        multilabel = False
-        for idx, y in enumerate(data[1]):
-            if idx >= 128: break
-            total = sum(y)
-            if total > 1:
-                multilabel=True
-                break
-        return multilabel
-
+    if is_ner(data=data): return False   # NERSequence
+    elif is_nodeclass(data=data): return False  # NodeSequenceWrapper
+    multilabel = False
+    Y = y_from_data(data)
+    if len(Y.shape) == 1 or (len(Y.shape) > 1 and Y.shape[1] == 1): return False
+    for idx, y in enumerate(Y):
+        if idx >= 1024: break
+        if np.issubdtype(type(y), np.integer) or np.issubdtype(type(y), np.floating):
+            return False
+        total_for_example = sum(y)
+        if total_for_example > 1:
+            multilabel=True
+            break
+    return multilabel
 
 
 def shape_from_data(data):
