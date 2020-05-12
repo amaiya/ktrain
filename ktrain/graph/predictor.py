@@ -35,7 +35,9 @@ class NodePredictor(Predictor):
         """
         gen = self.preproc.preprocess_valid(node_ids)
         gen.batch_size = self.batch_size
-        preds = self.model.predict_generator(gen)
+        # *_generator methods are deprecated from TF 2.1.0
+        #preds = self.model.predict_generator(gen)
+        preds = self.model.predict(gen)
         result =  preds if return_proba else [self.c[np.argmax(pred)] for pred in preds]
         return result
 
@@ -48,7 +50,9 @@ class NodePredictor(Predictor):
 
         gen = self.preproc.preprocess(df, G)
         gen.batch_size = self.batch_size
-        preds = self.model.predict_generator(gen)
+        # *_generator methods are deprecated from TF 2.1.0
+        #preds = self.model.predict_generator(gen)
+        preds = self.model.predict(gen)
         result =  preds if return_proba else [self.c[np.argmax(pred)] for pred in preds]
         return result
 
@@ -81,7 +85,9 @@ class LinkPredictor(Predictor):
         """
         gen = self.preproc.preprocess(G, edge_ids)
         gen.batch_size = self.batch_size
-        preds = self.model.predict_generator(gen)
+        # *_generator methods are deprecated from TF 2.1.0
+        #preds = self.model.predict_generator(gen)
+        preds = self.model.predict(gen)
         preds = np.squeeze(preds)
         if return_proba:
             return [[1-pred, pred] for pred in preds] 

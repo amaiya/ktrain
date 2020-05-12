@@ -26,7 +26,7 @@ class ImagePreprocessor(Preprocessor):
         """
         Receives raw data and returns 
         tuple containing the generator and steps
-        argument for model.predict_generator.
+        argument for model.predict.
         """
         # input is an array of pixel values
         if isinstance(data, np.ndarray):
