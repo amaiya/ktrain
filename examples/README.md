@@ -162,7 +162,7 @@ Image labels are in the form of a CSV containing paths to images.
 
 ### <a name="imageregression"></a> Image Regression
 
-#### [Age Prediction](http://aicip.eecs.utk.edu/wiki/UTKFace):  Imae Regression 
+#### [Age Prediction](http://aicip.eecs.utk.edu/wiki/UTKFace):  Image Regression 
 - [utk_faces_age_prediction-resnet50.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/vision):  ResNet50 pretrained on ImageNet for age prediction  using UTK Face dataset
 
 
