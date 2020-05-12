@@ -38,6 +38,13 @@ DEFAULT_TRANSFORMER_NUM_SPECIAL = 2
 # DATA/MODEL INSPECTORS
 #------------------------------------------------------------------------------
 
+def loss_fn_from_model(model):
+    if version.parse(tf.__version__) < version.parse('2.2'):
+        return model.loss_functions[0].fn
+    else: # TF 2.2.0
+        return model.compiled_loss._get_loss_object(model.compiled_loss._losses[0].name).fn
+
+
 def is_classifier(model):
     """
     checks for classification and mutlilabel from model

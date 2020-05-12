@@ -170,10 +170,11 @@ class Learner(ABC):
         # compute loss
         # this doesn't work in tf.keras 1.14
         #losses = self.model.loss_functions[0](tf.convert_to_tensor(y_true), tf.convert_to_tensor(y_pred))
-        if U.is_tf_keras():
-            L = self.model.loss_functions[0].fn
-        else:
-            L = self.model.loss_functions[0]
+        #if U.is_tf_keras():
+            #L = self.model.loss_functions[0].fn
+        #else:
+            #L = self.model.loss_functions[0]
+        L = U.loss_fn_from_model(self.model)
         losses = L(tf.convert_to_tensor(y_true), tf.convert_to_tensor(y_pred))
         if DISABLE_V2_BEHAVIOR:
             losses = tf.Session().run(losses)
