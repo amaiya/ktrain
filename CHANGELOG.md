@@ -14,7 +14,7 @@ Most recent releases are shown at the top. Each release shows:
 - `vision.images_from_df` function to load image data from *pandas* DataFrames
 
 ### Changed
-- references to `fit_generator` and `predict_generator` removed
+- references to `fit_generator` and `predict_generator` converted to `fit` and `predict`
 
 ### Fixed:
 - Resolved issue with multilabel detection returning `False` for valid multilabel problems when data is in form of generator
