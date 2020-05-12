@@ -105,11 +105,8 @@ class LRFinder:
 
 
         if use_gen:
-            if version.parse(tf.__version__) < version.parse('2.0'):
-                fit_fn = self.model.fit_generator
-            else:
-                fit_fn = self.model.fit
-            
+            # *_generator methods are deprecated from TF 2.1.0
+            fit_fn = self.model.fit
             fit_fn(train_data, steps_per_epoch=steps_per_epoch, 
                    epochs=epochs, 
                    workers=workers, use_multiprocessing=use_multiprocessing,
