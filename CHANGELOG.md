@@ -7,6 +7,19 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.15.0 (2020-05-13)
+
+### New:
+- Out-of-the-box support for image regression
+- `vision.images_from_df` function to load image data from *pandas* DataFrames
+
+### Changed
+- references to `fit_generator` and `predict_generator` converted to `fit` and `predict`
+
+### Fixed:
+- Resolved issue with multilabel detection returning `False` for valid multilabel problems when data is in form of generator
+
+
 ## 0.14.7 (2020-05-10)
 
 ### New:

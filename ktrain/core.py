@@ -170,10 +170,11 @@ class Learner(ABC):
         # compute loss
         # this doesn't work in tf.keras 1.14
         #losses = self.model.loss_functions[0](tf.convert_to_tensor(y_true), tf.convert_to_tensor(y_pred))
-        if U.is_tf_keras():
-            L = self.model.loss_functions[0].fn
-        else:
-            L = self.model.loss_functions[0]
+        #if U.is_tf_keras():
+            #L = self.model.loss_functions[0].fn
+        #else:
+            #L = self.model.loss_functions[0]
+        L = U.loss_fn_from_model(self.model)
         losses = L(tf.convert_to_tensor(y_true), tf.convert_to_tensor(y_pred))
         if DISABLE_V2_BEHAVIOR:
             losses = tf.Session().run(losses)
@@ -889,8 +890,10 @@ class Learner(ABC):
         if U.is_iter(val):
             if hasattr(val, 'reset'): val.reset()
             steps = np.ceil(U.nsamples_from_data(val)/val.batch_size)
-            result = self.model.predict_generator(self._prepare(val, train=False), 
-                                                steps=steps)
+            # *_generator methods are deprecated from TF 2.1.0
+            #result = self.model.predict_generator(self._prepare(val, train=False), 
+                                                #steps=steps)
+            result = self.model.predict(self._prepare(val, train=False), steps=steps)
             return result
         else:
             return self.model.predict(val[0], batch_size=self.eval_batch_size)
@@ -1103,7 +1106,7 @@ class GenLearner(Learner):
             lr_decay=1.0, checkpoint_folder=None, early_stopping=None, 
             class_weight=None, callbacks=[], verbose=1):
         """
-        Trains the model. By default, fit is simply a wrapper for model.fit_generator.
+        Trains the model. By default, fit is simply a wrapper for model.fit (for generators/sequences).
         When cycle_len parameter is supplied, an SGDR learning rate schedule is used.
 
         lr (float): learning rate 
@@ -1165,21 +1168,7 @@ class GenLearner(Learner):
         # train model
         with warnings.catch_warnings():
             warnings.filterwarnings('ignore', message='.*Check your callbacks.*')
-            # bug in TF2 causes fit_generator to be very slow
-            # https://github.com/tensorflow/tensorflow/issues/33024
-            if version.parse(tf.__version__) < version.parse('2.0'):
-                fit_fn = self.model.fit_generator
-            else:
-                # TF bug with using multiple inputs with utils.Sequence and model.fit
-                # TODO: check data and proceed accordingly
-                # potential patch is to have Sequence subclasses return tuple(batch_x), y
-                if U.is_nodeclass(model=self.model, data=self.train_data) or\
-                   U.is_ner(model=self.model, data=self.train_data):
-                    fit_fn = self.model.fit_generator
-                else:
-                    fit_fn = self.model.fit
-                # fixed in 2.1.0
-                #fit_fn = self.model.fit
+            fit_fn = self.model.fit
             hist = fit_fn(self._prepare(self.train_data),
                                         steps_per_epoch = steps_per_epoch,
                                         validation_steps = validation_steps,

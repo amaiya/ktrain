@@ -116,10 +116,15 @@ class ImagePredictor(Predictor):
         #    return_proba=True
         #    treat_multilabel = True
         classification, multilabel = U.is_classifier(self.model)
-        preds =  self.model.predict_generator(generator, steps=steps)
+        if not classification: return_proba=True
+        # *_generator methods are deprecated from TF 2.1.0
+        #preds =  self.model.predict_generator(generator, steps=steps)
+        preds =  self.model.predict(generator, steps=steps)
         result =  preds if return_proba or multilabel else [self.c[np.argmax(pred)] for pred in preds]
         if multilabel and not return_proba:
             return [list(zip(self.c, r)) for r in result]
+        if not classification:
+            return np.squeeze(result, axis=1)
         else:
             return result
 
@@ -160,7 +165,9 @@ class ImagePredictor(Predictor):
             return
 
         y_true = generator.classes
-        y_pred = self.model.predict_generator(generator)
+        # *_generator methods are deprecated from TF 2.1.0
+        #y_pred = self.model.predict_generator(generator)
+        y_pred = self.model.predict(generator)
         y_pred = np.argmax(y_pred, axis=1)
         if print_report:
             print(classification_report(y_true, y_pred, target_names=self.c))

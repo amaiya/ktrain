@@ -105,11 +105,8 @@ class LRFinder:
 
 
         if use_gen:
-            if version.parse(tf.__version__) < version.parse('2.0'):
-                fit_fn = self.model.fit_generator
-            else:
-                fit_fn = self.model.fit
-            
+            # *_generator methods are deprecated from TF 2.1.0
+            fit_fn = self.model.fit
             fit_fn(train_data, steps_per_epoch=steps_per_epoch, 
                    epochs=epochs, 
                    workers=workers, use_multiprocessing=use_multiprocessing,
@@ -151,7 +148,7 @@ class LRFinder:
             # this code was adapted from fastai: https://github.com/fastai/fastai
             try: 
                 ml = np.argmin(self.losses)
-                mg = (np.gradient(np.array(self.losses[10:ml]))).argmin()
+                mg = (np.gradient(np.array(self.losses[32:ml]))).argmin()
             except:
                 print("Failed to compute the gradients, there might not be enough points.\n" +\
                        "Plot displayed without suggestion.")
@@ -159,8 +156,9 @@ class LRFinder:
             else:
                 print('Two possible suggestions for LR from plot:')
                 print(f"\tMin numerical gradient: {self.lrs[mg]:.2E}")
-                ax.plot(self.lrs[mg],self.losses[mg], markersize=10,marker='o',color='red')
                 print(f"\tMin loss divided by 10: {self.lrs[ml]/10:.2E}")
+                print(mg)
+                ax.plot(self.lrs[mg],self.losses[mg], markersize=10,marker='o',color='red')
         return
 
 

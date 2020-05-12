@@ -7,6 +7,10 @@
 
 
 ### News and Announcements
+- **2020-05-13:**  
+  - ***ktrain*** **v0.15.x is released** and includes support for:
+    - **image regression**:  See the [example notebook on age prediction from photos](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/vision/utk_faces_age_prediction-resnet50.ipynb).
+    - **`tf.data.Datasets`**:  See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/vision/mnist-tf_workflow.ipynb) on using `tf.data.Datasets` in *ktrain* for custom models and data formats.
 - **2020-04-15:**  
   - ***ktrain*** **v0.14.x is released** and now includes support for **open-domain question-answering**.  See the [example QA notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/question_answering_with_bert.ipynb)
 - **2020-04-09:**  
@@ -20,21 +24,6 @@ ts = text.TransformerSummarizer()
 ts.summarize(some_long_document)
 ```
 
-- **2020-03-31:**  
-  - ***ktrain*** **v0.12.x is released** and now includes BERT embeddings (i.e., BERT, DistilBert, and Albert) that can be used for downstream tasks like building sequence-taggers (i.e., NER) 
-      for any language such as English, Chinese, Russian, Arabic, Dutch, etc.  See [this English NER example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/CoNLL2003-BiLSTM.ipynb) or the [Dutch NER notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/CoNLL2002_Dutch-BiLSTM.ipynb) for examples on how to use this feature.
-	  *ktrain* also supports NER with domain-specific embeddings from [community-uploaded Hugging Face models](https://huggingface.co/models) such as [BioBERT](https://arxiv.org/abs/1901.08746) for the biomedical domain:
-```python
-# NER with BioBERT embeddings
-import ktrain
-from ktrain import text as txt
-x_train= [['IL-2', 'responsiveness', 'requires', 'three', 'distinct', 'elements', 'within', 'the', 'enhancer', '.'], ...]
-y_train=[['B-protein', 'O', 'O', 'O', 'O', 'B-DNA', 'O', 'O', 'B-DNA', 'O'], ...]
-(trn, val, preproc) = txt.entities_from_array(x_train, y_train)
-model = txt.sequence_tagger('bilstm-bert', preproc, bert_model='monologg/biobert_v1.1_pubmed')
-learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=128)
-learner.fit(0.01, 1, cycle_len=5)
-```
 ----
 
 ### Overview
@@ -54,6 +43,7 @@ learner.fit(0.01, 1, cycle_len=5)
      - **Open-Domain Question-Answering**:  ask a large text corpus questions and receive exact answers <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/question_answering_with_bert.ipynb)]</sup></sub>
   - `vision` data:
     - **image classification** (e.g., [ResNet](https://arxiv.org/abs/1512.03385), [Wide ResNet](https://arxiv.org/abs/1605.07146), [Inception](https://www.cs.unc.edu/~wliu/papers/GoogLeNet.pdf)) <sub><sup>[[example notebook](https://colab.research.google.com/drive/1WipQJUPL7zqyvLT10yekxf_HNMXDDtyR)]</sup></sub>
+    - **image regression** for predicting numerical targets from photos (e.g., age prediction) <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/vision/utk_faces_age_prediction-resnet50.ipynb)]</sup></sub>
   - `graph` data:
     - **node classification** with graph neural networks ([GraphSAGE](https://cs.stanford.edu/people/jure/pubs/graphsage-nips17.pdf)) <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/graphs/pubmed_node_classification-GraphSAGE.ipynb)]</sup></sub>
     - **link prediction** with graph neural networks ([GraphSAGE](https://cs.stanford.edu/people/jure/pubs/graphsage-nips17.pdf)) <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/graphs/cora_link_prediction-GraphSAGE.ipynb)]</sup></sub>
@@ -251,13 +241,25 @@ learner.validate(class_names=t.get_classes()) # class_names must be string value
 #          weighted avg       0.96      0.96      0.96      1502
 ```
 
+#### Example: NER With [BioBERT](https://arxiv.org/abs/1901.08746) Embeddings
+```python
+# NER with BioBERT embeddings
+import ktrain
+from ktrain import text as txt
+x_train= [['IL-2', 'responsiveness', 'requires', 'three', 'distinct', 'elements', 'within', 'the', 'enhancer', '.'], ...]
+y_train=[['B-protein', 'O', 'O', 'O', 'O', 'B-DNA', 'O', 'O', 'B-DNA', 'O'], ...]
+(trn, val, preproc) = txt.entities_from_array(x_train, y_train)
+model = txt.sequence_tagger('bilstm-bert', preproc, bert_model='monologg/biobert_v1.1_pubmed')
+learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=128)
+learner.fit(0.01, 1, cycle_len=5)
+```
 
 Using *ktrain* on **Google Colab**?  See these Colab examples:
 -  [a simple demo of Multiclass Text Classification with BERT](https://colab.research.google.com/drive/1AH3fkKiEqBpVpO5ua00scp7zcHs5IDLK)
 -  [a simple demo of Multiclass Text Classification with Hugging Face Transformers](https://colab.research.google.com/drive/1YxcceZxsNlvK35pRURgbwvkgejXwFxUt)
 -  [image classification with Cats vs. Dogs](https://colab.research.google.com/drive/1WipQJUPL7zqyvLT10yekxf_HNMXDDtyR)
 
-**Additional examples can be found [here](https://github.com/amaiya/ktrain/tree/master/examples).**
+#### Additional examples can be found [here](https://github.com/amaiya/ktrain/tree/master/examples).
 
 
 
@@ -271,6 +273,7 @@ While *ktrain* will probably work with other versions of TensorFlow 2.x, v2.1.0 
 2. Install *ktrain*: `pip3 install ktrain`
 
 **Some things to note:**
+- *ktrain* will automatically install TensorFlow 2 as a dependency.
 - Since some *ktrain* dependencies have not yet been migrated to `tf.keras` in TensorFlow 2 (or may have other issues), 
   *ktrain* is temporarily using forked versions of some libraries. Specifically, *ktrain* uses forked versions of the `eli5` and `stellargraph` libraries.  If not installed, *ktrain* will complain  when a method or function needing 
   either of these libraries is invoked.
