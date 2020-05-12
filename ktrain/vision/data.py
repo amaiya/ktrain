@@ -769,7 +769,8 @@ def images_from_array(x_train, y_train,
                       random_state=None,
                       data_aug=None,
                       classes=None,
-                      class_names=None):
+                      class_names=None,
+                      is_regression=False):
 
     """
     Returns image generator (Iterator instance) from training
@@ -789,20 +790,29 @@ def images_from_array(x_train, y_train,
       data_aug(ImageDataGenerator):  a keras.preprocessing.image.ImageDataGenerator
       classes(str): old name for class_names - should no longer be used
       class_names(str): list of strings to use as class names
+      is_regression(bool): If True, task is treated as regression. 
+                           Used when there is single column of numeric values and
+                           numeric values should be treated as numeric targets as opposed to class labels
     Returns:
       batches: a tuple of two image.Iterator - one for train and one for test and ImagePreprocessor instance
     """
     if classes is not None: raise ValueError('Please use class_names argument instead of "classes".')
+    if class_names and is_regression:
+        warnings.warn('is_regression=True, but class_names is not empty.  Task treated as regression.')
 
     # one-hot-encode if necessary
-    if np.issubdtype(type(y_train[0]), np.integer) or\
+    do_y_transform = False
+    if np.issubdtype(type(y_train[0]), np.integer) or np.issubdtype(type(y_train[0]), np.floating) or\
         (isinstance(y_train[0], (list, np.ndarray)) and len(y_train[0]) == 1):
-        y_train = to_categorical(y_train)
+        if not is_regression:
+            if np.issubdtype(type(y_train[0]), np.integer) and not class_names:
+                warnings.warn('Targets are integers, but is_regression=False. Task treated as classification instead of regression.')
+            y_train = to_categorical(y_train)
+            do_y_transform = True
     if validation_data:
         x_test = validation_data[0]
         y_test = validation_data[1]
-        if np.issubdtype(type(y_test[0]), np.integer) or\
-           (isinstance(y_test[0], (list, np.ndarray)) and len(y_test[0]) == 1):
+        if do_y_transform:
             y_test = to_categorical(y_test)
     elif val_pct is not None and val_pct >0:
         x_train, x_test, y_train, y_test = train_test_split(x_train, y_train,
@@ -813,9 +823,9 @@ def images_from_array(x_train, y_train,
         y_test = None
 
     # set class labels
-    if class_names == None:
+    if not class_names and not is_regression:
         class_names = list(map(str, range(len(y_train[0]))))
-    else:
+    elif class_names and not is_regression:
         assert len(class_names) == len(y_train[0]), \
             "Number of classes has to match length of the one-hot encoding"
 
