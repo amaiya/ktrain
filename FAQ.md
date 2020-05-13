@@ -33,7 +33,7 @@ It is built on top of a library by Google called TensorFlow. Only very basic and
 
 
 A challenge for newcomers is setting up the programming environment.  This includes 1) gaining access to a computer with a GPU, 2) installing and setting up the TensorFlow library to use the GPU, and 3) setting up Jupyter notebook.
-(A Jupyter notebook is a programming environemnt that allows you to type code and see and save results of that code in an interacive fashion.)  
+(A Jupyter notebook is a programming environment that allows you to type code and see and save results of that code in an interacive fashion.)  
 Fortunately, Google did a nice thing and made notebook environments with GPU access freely available "in the cloud" to anyone with a Gmail account.
 
 Here is how you can quickly get started using *ktrain*:
