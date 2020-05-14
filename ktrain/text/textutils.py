@@ -191,6 +191,13 @@ def detect_lang(texts, sample_size=32):
     """
     detect language
     """
+
+    # convert sentence pairs
+    if isinstance(texts, (tuple, list, np.ndarray)) and len(texts) == 2:
+        texts = [texts[0], texts[1]]
+    elif isinstance(texts, (list, np.ndarray)) and isinstance(texts[0], (tuple, list, np.ndarray)) and len(texts[0]) == 2:
+        texts = [t[0] for t in texts]
+
     if isinstance(texts, (pd.Series, pd.DataFrame)):
         texts = texts.values
     if isinstance(texts, str): texts = [texts]
