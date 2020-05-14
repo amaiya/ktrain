@@ -5,6 +5,7 @@ This directory contains various example notebooks using *ktrain*.  The directory
   - [text classification](#textclass): examples using various text classification models and datasets
   - [text regression](#textregression): example for predicting continuous value purely from text
   - [text sequence labeling](#seqlab):  sequence tagging models
+  - [sentence pair classification](#sentpair):  sentence pair classification for tasks such as paraphrase or sarcasm detection
   - [topic modeling](#lda):  unsupervised learning from unlabeled text data
   - [document similarity with one-class learning](#docsim): given a sample of interesting documents, find and score new documents that are semantically similar to it using One-Class text classification
   - [document recommender system](#docrec):  given text from a sample document, recommend documents that are semantically similar to it from a larger corpus 
@@ -91,6 +92,13 @@ The objective of the CoNLL2003 task is to classify sequences of words as belongi
 #### [CoNLL2002 NER Task (Dutch)](https://www.clips.uantwerpen.be/conll2002/ner/):  Named Entity Recognition for Dutch
 
 - [CoNLL2002_Dutch-BiLSTM.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text):  A Bidirectional LSTM model that uses pretrained BERT embeddings along with pretrained fasttext word embeddings - both for Dutch.
+
+
+### <a name="sentpair"></a> Sentence Pair Classification
+
+#### [Microsoft Research Paraphrase Corpus (MRPC)](https://www.microsoft.com/en-us/download/details.aspx?id=52398):  Paraphrase Detection
+
+- [MRPC-BERT.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text):  Using BERT for sentence pair classification on MRPC dataset
 
 
 ### <a name="lda"></a> Topic Modeling

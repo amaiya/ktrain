@@ -1,6 +1,6 @@
 from ..imports import *
 from ..predictor import Predictor
-from .preprocessor import TextPreprocessor, TransformersPreprocessor
+from .preprocessor import TextPreprocessor, TransformersPreprocessor, detect_text_format
 from .. import utils as U
 
 class TextPredictor(Predictor):
@@ -32,12 +32,9 @@ class TextPredictor(Predictor):
         If return_proba is True, returns probabilities of each class.
         """
 
-        is_str = False
-        if isinstance(texts, str):
-            is_str = True
-            texts = [texts]
-        elif not isinstance(texts, np.ndarray) and not isinstance(texts, list):
-            raise ValueError('data must be numpy.ndarray or list (of texts)')
+        is_array, is_pair = detect_text_format(texts)
+        if not is_array: texts = [texts]
+
         classification, multilabel = U.is_classifier(self.model)
 
         # get predictions
@@ -63,7 +60,7 @@ class TextPredictor(Predictor):
         result =  preds if return_proba or multilabel or not self.c else [self.c[np.argmax(pred)] for pred in preds] 
         if multilabel and not return_proba:
             result =  [list(zip(self.c, r)) for r in result]
-        if is_str: return result[0]
+        if not is_array: return result[0]
         else:      return result
 
 
@@ -86,8 +83,12 @@ class TextPredictor(Predictor):
             all_targets(bool):  If True, show visualization for
                                 each target.
         """
+        is_array, is_pair = detect_text_format(doc)
+        if is_pair: 
+            warnings.warn('currently_unsupported: explain does not support sentence pair classification')
+            return
         if not self.c:
-            warnings.warn('currently_unsupported:  explain does not support text regression')
+            warnings.warn('currently_unsupported: explain does not support text regression')
             return
         try:
             import eli5

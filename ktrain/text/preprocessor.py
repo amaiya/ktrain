@@ -219,6 +219,27 @@ def bert_tokenize(docs, tokenizer, maxlen, verbose=1):
 #         #tf.TensorShape(])))
 
 
+def detect_text_format(texts):
+    is_pair = False
+    is_array = False
+    err_msg = 'texts should be list of strings or valid sentence pairs'
+    if isinstance(texts, (list, np.ndarray)):
+        is_array = True
+        if len(texts) == 0: raise ValueError('texts is empty')
+        peek = texts[0]
+        if isinstance(peek, (tuple, list, np.ndarray)) and len(peek) == 2 and\
+                isinstance(peek[0], str) and isinstance(peek[1], str):
+            is_pair = True
+        elif not isinstance(peek, str):
+            raise ValueError(err_msg)
+    elif isinstance(texts, (tuple, list, np.ndarray)) and len(texts) == 2 and\
+       isinstance(texts[0], str) and isinstance(texts[1], str):
+        is_pair = True 
+    elif not isinstance(texts, str):
+        raise ValueError(err_msg)
+    return is_array, is_pair
+
+
 
 def hf_features_to_tfdataset(features_list, labels):
     features_list = np.array(features_list)
@@ -232,7 +253,7 @@ def hf_features_to_tfdataset(features_list, labels):
 
 
 
-def hf_convert_example(text, tokenizer=None,
+def hf_convert_example(text_a, text_b=None, tokenizer=None,
                        max_length=512,
                        pad_on_left=False,
                        pad_token=0,
@@ -242,10 +263,9 @@ def hf_convert_example(text, tokenizer=None,
     convert InputExample to InputFeature for Hugging Face transformer
     """
     if tokenizer is None: raise ValueError('tokenizer is required')
-
     inputs = tokenizer.encode_plus(
-        text,
-        None,
+        text_a,
+        text_b,
         add_special_tokens=True,
         return_token_type_ids=True,
         max_length=max_length,
@@ -294,7 +314,7 @@ def hf_convert_examples(texts, y=None, tokenizer=None,
     """
     Loads a data file into a list of ``InputFeatures``
     Args:
-        texts: texts of documents
+        texts: texts of documents or sentence pairs
         y:  labels for documents
         tokenizer: Instance of a tokenizer that will tokenize the examples
         max_length: Maximum example length
@@ -310,16 +330,20 @@ def hf_convert_examples(texts, y=None, tokenizer=None,
         a list of task-specific ``InputFeatures`` which can be fed to the model.
     """
 
-
-
+    is_array, is_pair = detect_text_format(texts)
     data = []
     mb = master_bar(range(1))
     features_list = []
     labels = []
     for i in mb:
         for (idx, text) in enumerate(progress_bar(texts, parent=mb)):
-
-            features = hf_convert_example(text, tokenizer=tokenizer,
+            if is_pair:
+                text_a = text[0]
+                text_b = text[1]
+            else:
+                text_a = text
+                text_b = None
+            features = hf_convert_example(text_a, text_b=text_b, tokenizer=tokenizer,
                                           max_length=max_length,
                                           pad_on_left=pad_on_left,
                                           pad_token=pad_token,
@@ -807,9 +831,17 @@ class TransformersPreprocessor(TextPreprocessor):
         """
 
         U.vprint('preprocessing %s...' % (mode), verbose=verbose)
+
+        # detect sentence pairs
+        is_array, is_pair = detect_text_format(texts)
+        if not is_array: raise ValueError('texts must be a list of strings or a list of sentence pairs')
+
+        # detect language
         if self.lang is None and mode=='train': self.lang = TU.detect_lang(texts)
         U.vprint('language: %s' % (self.lang), verbose=verbose)
-        self.print_seqlen_stats(texts, mode, verbose=verbose)
+
+        # print stats
+        if not is_pair: self.print_seqlen_stats(texts, mode, verbose=verbose)
 
         # transform y
         if y is None and mode == 'train':
@@ -817,6 +849,8 @@ class TransformersPreprocessor(TextPreprocessor):
         elif y is None:
             y = np.array([1] * len(texts))
         y = self._transform_y(y)
+
+        # convert examples
         dataset = hf_convert_examples(texts, y=y, tokenizer=self.tok, max_length=self.maxlen,
                                       pad_on_left=bool(self.name in ['xlnet']),
                                       pad_token=self.tok.convert_tokens_to_ids([self.tok.pad_token][0]),
