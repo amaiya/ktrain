@@ -35,6 +35,8 @@ class TextPredictor(Predictor):
                            a list of str.
                            For sentence pair classification, texts should be either
                            a tuple of form (str, str) or list of tuples.
+                           A single tuple of the form (str, str) is automatically treated as sentence pair classification, so
+                           please refrain from using tuples for text classification tasks.
           return_proba(bool): If True, return probabilities instead of predicted class labels
         """
 
