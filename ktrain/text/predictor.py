@@ -30,6 +30,12 @@ class TextPredictor(Predictor):
         Makes predictions for a list of strings where each string is a document
         or text snippet.
         If return_proba is True, returns probabilities of each class.
+        Args:
+          texts(str|list): For text classification, texts should be either a str or
+                           a list of str.
+                           For sentence pair classification, texts should be either
+                           a tuple of form (str, str) or list of tuples.
+          return_proba(bool): If True, return probabilities instead of predicted class labels
         """
 
         is_array, is_pair = detect_text_format(texts)
