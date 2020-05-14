@@ -85,7 +85,7 @@ class TextPredictor(Predictor):
         """
         is_array, is_pair = detect_text_format(doc)
         if is_pair: 
-            warnings.warn('currently_unsupported: explain does not support sentence pair classification')
+            warnings.warn('currently_unsupported: explain does not currently support sentence pair classification')
             return
         if not self.c:
             warnings.warn('currently_unsupported: explain does not support text regression')
