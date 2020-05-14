@@ -10,7 +10,8 @@
 - **2020-05-13:**  
   - ***ktrain*** **v0.15.x is released** and includes support for:
     - **image regression**:  See the [example notebook on age prediction from photos](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/vision/utk_faces_age_prediction-resnet50.ipynb).
-    - **`tf.data.Datasets`**:  See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/vision/mnist-tf_workflow.ipynb) on using `tf.data.Datasets` in *ktrain* for custom models and data formats.
+    - **tf.data.Datasets**:  See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/vision/mnist-tf_workflow.ipynb) on using `tf.data.Datasets` in *ktrain* for custom models and data formats.
+    - **sentence pair classification**:  See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/MRPC-BERT.ipynb) on using BERT for paraphrase detection.<sub><sup>(Sentence pair classification included in v0.15.0, but not v0.15.0.)</sup></sub>
 - **2020-04-15:**  
   - ***ktrain*** **v0.14.x is released** and now includes support for **open-domain question-answering**.  See the [example QA notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/question_answering_with_bert.ipynb)
 - **2020-04-09:**  

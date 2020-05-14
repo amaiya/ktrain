@@ -7,6 +7,17 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.15.1 (2020-05-14)
+
+### New:
+- N/A
+
+### Changed
+- Changed `Transformer.preprocess*` methods to accept sentence pairs for sentence pair classification
+
+### Fixed:
+- N/A
+
 ## 0.15.0 (2020-05-13)
 
 ### New:
