@@ -1,6 +1,6 @@
 from ..imports import *
 from ..predictor import Predictor
-from .preprocessor import TextPreprocessor, TransformersPreprocessor
+from .preprocessor import TextPreprocessor, TransformersPreprocessor, detect_text_format
 from .. import utils as U
 
 class TextPredictor(Predictor):
@@ -30,14 +30,19 @@ class TextPredictor(Predictor):
         Makes predictions for a list of strings where each string is a document
         or text snippet.
         If return_proba is True, returns probabilities of each class.
+        Args:
+          texts(str|list): For text classification, texts should be either a str or
+                           a list of str.
+                           For sentence pair classification, texts should be either
+                           a tuple of form (str, str) or list of tuples.
+                           A single tuple of the form (str, str) is automatically treated as sentence pair classification, so
+                           please refrain from using tuples for text classification tasks.
+          return_proba(bool): If True, return probabilities instead of predicted class labels
         """
 
-        is_str = False
-        if isinstance(texts, str):
-            is_str = True
-            texts = [texts]
-        elif not isinstance(texts, np.ndarray) and not isinstance(texts, list):
-            raise ValueError('data must be numpy.ndarray or list (of texts)')
+        is_array, is_pair = detect_text_format(texts)
+        if not is_array: texts = [texts]
+
         classification, multilabel = U.is_classifier(self.model)
 
         # get predictions
@@ -63,7 +68,7 @@ class TextPredictor(Predictor):
         result =  preds if return_proba or multilabel or not self.c else [self.c[np.argmax(pred)] for pred in preds] 
         if multilabel and not return_proba:
             result =  [list(zip(self.c, r)) for r in result]
-        if is_str: return result[0]
+        if not is_array: return result[0]
         else:      return result
 
 
@@ -86,8 +91,12 @@ class TextPredictor(Predictor):
             all_targets(bool):  If True, show visualization for
                                 each target.
         """
+        is_array, is_pair = detect_text_format(doc)
+        if is_pair: 
+            warnings.warn('currently_unsupported: explain does not currently support sentence pair classification')
+            return
         if not self.c:
-            warnings.warn('currently_unsupported:  explain does not support text regression')
+            warnings.warn('currently_unsupported: explain does not support text regression')
             return
         try:
             import eli5
