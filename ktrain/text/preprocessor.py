@@ -218,25 +218,33 @@ def bert_tokenize(docs, tokenizer, maxlen, verbose=1):
 #         tf.TensorShape([None])))
 #         #tf.TensorShape(])))
 
+def _is_sentence_pair(tup):
+    if isinstance(tup, (tuple)) and len(tup) == 2 and\
+            isinstance(tup[0], str) and isinstance(tup[1], str):
+        return True
+    else:
+        if isinstance(tup, (list, np.ndarray)) and len(tup) == 2 and\
+                isinstance(tup[0], str) and isinstance(tup[1], str):
+            is_pair = False
+            warnings.warn('List or array of two texts supplied, so task being treated as text classification. ' +\
+                          'If this is a sentence pair classification task, please cast to tuple.')
+        return False
+
 
 def detect_text_format(texts):
     is_pair = False
     is_array = False
-    err_msg = 'texts should be list of strings or valid sentence pairs'
-    if isinstance(texts, (list, np.ndarray)):
+    err_msg = 'invalid text format: texts should be list of strings or list of sentence pairs in form of tuples (str, str)'
+    if _is_sentence_pair(texts):
+        is_pair=True
+        is_array = False
+    elif isinstance(texts, (tuple, list, np.ndarray)):
         is_array = True
         if len(texts) == 0: raise ValueError('texts is empty')
         peek = texts[0]
-        if isinstance(peek, (tuple, list, np.ndarray)) and len(peek) == 2 and\
-                isinstance(peek[0], str) and isinstance(peek[1], str):
-            is_pair = True
-        elif not isinstance(peek, str):
+        is_pair = _is_sentence_pair(peek)
+        if not is_pair and not isinstance(peek, str):
             raise ValueError(err_msg)
-    elif isinstance(texts, (tuple, list, np.ndarray)) and len(texts) == 2 and\
-       isinstance(texts[0], str) and isinstance(texts[1], str):
-        is_pair = True 
-    elif not isinstance(texts, str):
-        raise ValueError(err_msg)
     return is_array, is_pair
 
 
