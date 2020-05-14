@@ -225,7 +225,6 @@ def _is_sentence_pair(tup):
     else:
         if isinstance(tup, (list, np.ndarray)) and len(tup) == 2 and\
                 isinstance(tup[0], str) and isinstance(tup[1], str):
-            is_pair = False
             warnings.warn('List or array of two texts supplied, so task being treated as text classification. ' +\
                           'If this is a sentence pair classification task, please cast to tuple.')
         return False
