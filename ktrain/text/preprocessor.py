@@ -850,6 +850,7 @@ class TransformersPreprocessor(TextPreprocessor):
 
         # print stats
         if not is_pair: self.print_seqlen_stats(texts, mode, verbose=verbose)
+        if is_pair: U.vprint('sentence pairs detected', verbose=verbose)
 
         # transform y
         if y is None and mode == 'train':
