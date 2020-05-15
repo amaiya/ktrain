@@ -17,7 +17,11 @@
 - [How do I retrieve or visualize training history?](#how-do-i-retrieve-or-visualize-training-history)
 
 - [I have a model that accepts multiple inputs (e.g., both text and other numerical or categorical variables).  How do I train it with *ktrain*?](#i-have-a-model-that-accepts-multiple-inputs-eg-both-text-and-other-numerical-or-categorical-variables--how-do-i-train-it-with-ktrain)
+
 - [Can I use `tf.data.Dataset` instances with *ktrain*?](#can-i-use-tfdatadataset-instances-with-ktrain)
+
+- [Why am I seeing an ERROR when installing *ktrain* on Google Colab?](#why-am-i-seeing-an-error-when-installing-ktrain-on-google-colab)
+
 
 ### I am a newcomer and am having trouble figuring out how to even get started. Where do I begin?
 
@@ -38,7 +42,7 @@ Fortunately, Google did a nice thing and made notebook environments with GPU acc
 
 Here is how you can quickly get started using *ktrain*:
 
-1. Go to the [Google Colab](https://colab.research.google.com/notebooks/intro.ipynb) and sign in using your Gmail account.
+1. Go to [Google Colab](https://colab.research.google.com/notebooks/intro.ipynb) and sign in using your Gmail account.
 2. Go to this [example notebook on image classification](https://colab.research.google.com/drive/1WipQJUPL7zqyvLT10yekxf_HNMXDDtyR). 
 3. Save the notebook to your Google Drive: `File --> Save a copy in Drive`
 4. Make sure the notebook is setup to use a GPU: `Runtime --> Change runtime type` and select `GPU` in the menu.
@@ -125,13 +129,14 @@ import tensorflow as tf
 mirrored_strategy = tf.distribute.MirroredStrategy()
 import ktrain
 from ktrain import text
+BATCH_SIZE = 6 * 2 # desired BS times 2
 MODEL_NAME = 'distilbert-base-uncased'
 t = text.Transformer(MODEL_NAME, maxlen=500, class_names=train_b.target_names)
 trn = t.preprocess_train(x_train, y_train)
 val = t.preprocess_test(x_test, y_test)
 with mirrored_strategy.scope():
     model = t.get_classifier()
-learner = ktrain.get_learner(model, train_data=trn, batch_size=6)
+learner = ktrain.get_learner(model, train_data=trn, batch_size=BATCH_SIZE)
 learner.fit_onecycle(5e-5, 2)
 learner.save_model('/tmp/my_model')
 learner.load_model('/tmp/my_model', preproc=t)
@@ -226,5 +231,12 @@ that *ktrain* can more easily inspect your data.
 
 See [this tutorial](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-A4-customdata-text_regression_with_extra_regressors.ipynb) for more information.
 
+
+[[Back to Top](#frequently-asked-questions-about-ktrain)]
+
+
+### Why am I seeing an ERROR when installing *ktrain* on Google Colab?
+
+These errors (e.g., `has requirement gast>=0.3.2, but you'll have gast 0.2.2 which is incompatible`) are related to TensorFlow and can be usually be safely ignored and shouldn't affect operation of *ktrain*.
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
