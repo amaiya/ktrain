@@ -42,7 +42,7 @@ Fortunately, Google did a nice thing and made notebook environments with GPU acc
 
 Here is how you can quickly get started using *ktrain*:
 
-1. Go to the [Google Colab](https://colab.research.google.com/notebooks/intro.ipynb) and sign in using your Gmail account.
+1. Go to [Google Colab](https://colab.research.google.com/notebooks/intro.ipynb) and sign in using your Gmail account.
 2. Go to this [example notebook on image classification](https://colab.research.google.com/drive/1WipQJUPL7zqyvLT10yekxf_HNMXDDtyR). 
 3. Save the notebook to your Google Drive: `File --> Save a copy in Drive`
 4. Make sure the notebook is setup to use a GPU: `Runtime --> Change runtime type` and select `GPU` in the menu.
