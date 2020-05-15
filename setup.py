@@ -23,7 +23,7 @@ setup(
   keywords = ['tensorflow', 'keras', 'deep learning', 'machine learning'],
   install_requires=[
           'tensorflow==2.1.0',
-          'scikit-learn >= 0.21.3',
+          'scikit-learn==0.21.3', # affects format of predictor.explain
           'matplotlib >= 3.0.0',
           'pandas >= 1.0.1',
           'fastprogress >= 0.1.21',

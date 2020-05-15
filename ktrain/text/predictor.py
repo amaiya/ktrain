@@ -82,7 +82,7 @@ class TextPredictor(Predictor):
         return self.predict(texts, return_proba=True)
 
 
-    def explain(self, doc, truncate_len=512, all_targets=False):
+    def explain(self, doc, truncate_len=512, all_targets=False, n_samples=2500):
         """
         Highlights text to explain prediction
         Args:
@@ -90,6 +90,9 @@ class TextPredictor(Predictor):
             truncate_len(int): truncate document to this many words
             all_targets(bool):  If True, show visualization for
                                 each target.
+            n_samples(int): number of samples to generate and train on.
+                            Larger values give better results, but will take more time.
+                            Lower this value if explain is taking too long.
         """
         is_array, is_pair = detect_text_format(doc)
         if is_pair: 
@@ -114,7 +117,7 @@ class TextPredictor(Predictor):
             doc = self.preproc.process_chinese([doc])
             doc = doc[0]
         doc = ' '.join(doc.split()[:truncate_len])
-        te = TextExplainer(random_state=42)
+        te = TextExplainer(random_state=42, n_samples=n_samples)
         _ = te.fit(doc, self.predict_proba)
         return te.show_prediction(target_names=self.preproc.get_classes(), targets=prediction)
 
