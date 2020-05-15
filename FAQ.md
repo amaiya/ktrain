@@ -22,7 +22,7 @@
 
 - [Why am I seeing an ERROR when installing *ktrain* on Google Colab?](#why-am-i-seeing-an-error-when-installing-ktrain-on-google-colab)
 
-- [Running predictor.explain for text classification is slow.  How can I speed it up?](#why-am-i-seeing-an-error-when-installing-ktrain-on-google-colab)
+- [Running `predictor.explain` for text classification is slow.  How can I speed it up?](#running-predictorexplain-for-text-classification-is-slow--how-can-i-speed-it-up)
 
 
 ### I am a newcomer and am having trouble figuring out how to even get started. Where do I begin?
@@ -247,9 +247,9 @@ These errors (e.g., `has requirement gast>=0.3.2, but you'll have gast 0.2.2 whi
 ### Why am I seeing an ERROR when installing *ktrain* on Google Colab?
 
 
-### Running predictor.explain for text classification is slow.  How can I speed it up?
+### Running `predictor.explain` for text classification is slow.  How can I speed it up?
 
-The `TextPredictor.explain` method accepts a parameter called `n_samples`.  At the default value of 2500, `explain` returns results on Google Colab in ~25 seconds.
+The `TextPredictor.explain` method accepts a parameter called `n_samples`, which governs the number of synthetic samples created and used to generate the explanation.  At the default value of 2500, `explain` returns results on Google Colab in ~25 seconds.
 If you pass `n_samples=500` to `explain`, results are returned in ~5 seconds on Google Colab.  In theory, higher sample sizes  yield better explanations. In practice,
 smaller sample sizes (e.g., 500, 1000) may be sufficient for your use case.
 
