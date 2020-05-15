@@ -9,6 +9,7 @@ from .summarization import TransformerSummarizer
 from . import shallownlp
 from .qa import SimpleQA
 from . import textutils
+import pickle
 
 __all__ = [
            'text_classifier', 'text_regression_model',

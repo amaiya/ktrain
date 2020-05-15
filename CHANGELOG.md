@@ -17,7 +17,7 @@ Most recent releases are shown at the top. Each release shows:
 - Lock to version 0.21.3 of `scikit-learn` to ensure old-style explanations are generated from `TextPredictor.explain`
 
 ### Fixed:
-- N/A
+- added missing `import pickle` to ensure saved topic models can be loaded
 
 
 ## 0.15.1 (2020-05-14)
