@@ -7,6 +7,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.15.2 (2020-05-15)
+
+### New:
+- N/A
+
+### Changed
+- Added `n_samples` argument to `TextPredictor.explain` to address slowness of `explain` on Google Colab
+
+### Fixed:
+- N/A
+
+
 ## 0.15.1 (2020-05-14)
 
 ### New:
