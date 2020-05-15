@@ -14,6 +14,7 @@ Most recent releases are shown at the top. Each release shows:
 
 ### Changed
 - Added `n_samples` argument to `TextPredictor.explain` to address slowness of `explain` on Google Colab
+- Lock to version 0.21.3 of `scikit-learn` to ensure old-style explanations are generated from `TextPredictor.explain`
 
 ### Fixed:
 - N/A
