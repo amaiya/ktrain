@@ -244,8 +244,6 @@ These errors (e.g., `has requirement gast>=0.3.2, but you'll have gast 0.2.2 whi
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
 
 
-### Why am I seeing an ERROR when installing *ktrain* on Google Colab?
-
 
 ### Running `predictor.explain` for text classification is slow.  How can I speed it up?
 
