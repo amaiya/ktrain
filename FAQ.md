@@ -83,7 +83,7 @@ t = text.Transformer(MODEL_NAME, maxlen=500, class_names=train_b.target_names)
 trn = t.preprocess_train(x_train, y_train)
 val = t.preprocess_test(x_test, y_test)
 model = t.get_classifier()
-learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=6)
+learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=6*2)
 learner.fit_onecycle(5e-5, 1)
 
 # load model to generate embeddingsmodel.save_pretrained('/tmp/mymodel')
