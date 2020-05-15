@@ -78,12 +78,13 @@ test_b = fetch_20newsgroups(subset='test',categories=categories, shuffle=True)
 # build, train, and validate model (Transformer is wrapper around transformers library)
 import ktrain
 from ktrain import text
+BATCH_SIZE=6*2 # desired bs times 2
 MODEL_NAME = 'distilbert-base-uncased'
 t = text.Transformer(MODEL_NAME, maxlen=500, class_names=train_b.target_names)
 trn = t.preprocess_train(x_train, y_train)
 val = t.preprocess_test(x_test, y_test)
 model = t.get_classifier()
-learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=6*2)
+learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=BACH_SIZE)
 learner.fit_onecycle(5e-5, 1)
 
 # load model to generate embeddingsmodel.save_pretrained('/tmp/mymodel')
