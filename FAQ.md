@@ -20,7 +20,7 @@
 
 - [Can I use `tf.data.Dataset` instances with *ktrain*?](#can-i-use-tfdatadataset-instances-with-ktrain)
 
-- [I'm getting seeing an ERROR when installing *ktrain* on Google Colab?]()
+- [I'm getting seeing an ERROR when installing *ktrain* on Google Colab?](#im-getting-seeing-an-error-when-installing-ktrain-on-google-colab)
 
 
 ### I am a newcomer and am having trouble figuring out how to even get started. Where do I begin?
@@ -236,6 +236,6 @@ See [this tutorial](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/maste
 
 ### I'm getting seeing an ERROR when installing *ktrain* on Google Colab?
 
-Errors to the effect of `has requirement gast>=0.3.2, but you'll have gast 0.2.2 which is incompatible`, can be safely ignored and shouldn't affect operation of *ktrain*.
+These errors (e.g., `has requirement gast>=0.3.2, but you'll have gast 0.2.2 which is incompatible`) are related to TensorFlow and can be usually be safely ignored and shouldn't affect operation of *ktrain*.
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
