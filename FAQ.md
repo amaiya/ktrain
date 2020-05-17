@@ -24,6 +24,9 @@
 
 - [Running `predictor.explain` for text classification is slow.  How can I speed it up?](#running-predictorexplain-for-text-classification-is-slow--how-can-i-speed-it-up)
 
+- [What kinds of applications have been built with *ktrain*?](#what-kinds-of-applications-have-been-built-with-ktrain)
+
+
 
 ### I am a newcomer and am having trouble figuring out how to even get started. Where do I begin?
 
@@ -253,3 +256,18 @@ smaller sample sizes (e.g., 500, 1000) may be sufficient for your use case.
 
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
+
+### What kinds of applications have been built with *ktrain*?
+
+- **medical informatics:**  analyzing doctors' written analyses of patients and medical imagery
+- **finance:** analyzing financial and stock-related news stories
+- **insurance:** detecting fraud in insurance claims
+- **social science:** making sense of text-based responses in surveys and emotion-classification from text data
+- **linguistics:** detecting sarcasm in the news
+- **education:** analysis of attitudes towards educational institutions in social media
+- **local government:**: auto-categorizing citizen complaints to local governments
+- **federal government:** extracting insights from documents about government programs and policies
+
+[[Back to Top](#frequently-asked-questions-about-ktrain)]
+
+
