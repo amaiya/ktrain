@@ -259,6 +259,8 @@ smaller sample sizes (e.g., 500, 1000) may be sufficient for your use case.
 
 ### What kinds of applications have been built with *ktrain*?
 
+Examples include:
+
 - **medical informatics:**  analyzing doctors' written analyses of patients and medical imagery
 - **finance:** analyzing financial and stock-related news stories
 - **insurance:** detecting fraud in insurance claims
