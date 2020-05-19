@@ -21,7 +21,11 @@ class TestQA(TestCase):
         newsgroups_test = fetch_20newsgroups(subset='test', remove=remove)
         docs = newsgroups_train.data +  newsgroups_test.data
 
-        tmp_folder = '/tmp/qa_test'
+        #tmp_folder = '/tmp/qa_test'
+        import tempfile
+        import shutil
+        tmp_folder = tempfile.mkdtemp()
+        shutil.rmtree(tmp_folder)
         text.SimpleQA.initialize_index(tmp_folder)
         text.SimpleQA.index_from_list(docs, tmp_folder, commit_every=len(docs))
         qa = text.SimpleQA(tmp_folder)
