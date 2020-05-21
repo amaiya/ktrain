@@ -22,6 +22,11 @@
 
 - [Why am I seeing an ERROR when installing *ktrain* on Google Colab?](#why-am-i-seeing-an-error-when-installing-ktrain-on-google-colab)
 
+- [Running `predictor.explain` for text classification is slow.  How can I speed it up?](#running-predictorexplain-for-text-classification-is-slow--how-can-i-speed-it-up)
+
+- [What kinds of applications have been built with *ktrain*?](#what-kinds-of-applications-have-been-built-with-ktrain)
+
+
 
 ### I am a newcomer and am having trouble figuring out how to even get started. Where do I begin?
 
@@ -157,7 +162,51 @@ See [this post](https://github.com/amaiya/ktrain/issues/126#issuecomment-6165456
 
 ### How do I deploy a model using Flask?
 
-See [this post](https://github.com/amaiya/ktrain/issues/37#issuecomment-568085054).
+First, implement the Flask server with something like this:
+
+```python
+# my_server.py
+import flask
+import ktrain
+app = flask.Flask(__name__)
+predictor = None
+def load_predictor():
+    global predictor
+    predictor = ktrain.load_predictor('/tmp/my_saved_predictor')
+
+@app.route('/predict', methods=['GET'])
+def predict():
+    data = {"success": False}
+    if flask.request.method in ["GET"]:
+        text = flask.request.args.get('text')
+        if text is None: return flask.jsonify(data)
+        prediction = predictor.predict(text)
+        data['prediction'] = prediction
+        data["success"] = True
+    return flask.jsonify(data)
+
+if __name__ == "__main__":
+    load_predictor()
+    port =8888 
+    app.run(host='0.0.0.0', port=port)
+    app.run()
+
+```
+
+Note that `/tmp_my_saved_predictor` is the path you supplied to `predictor.save`.  The `predictor.save` method
+stores both the model and a `.preproc` object, so make sure both exist on the deployment server.
+
+Next, start the server with: `python3 my_server.py`.
+
+Finally, point your browser to the following to get a prediction:
+
+```
+http://0.0.0.0:8888/predict?text=text%20you%20want%20to%20classify
+```
+
+In this toy example, we are supplying the text data to classify in the URL as a GET request.
+
+
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
 
@@ -226,8 +275,8 @@ See [this tutorial](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/maste
 
 ### Can I use `tf.data.Dataset` instances with *ktrain*?
 
-Yes, but you'll need to wrap your dataset in a `ktrain.Dataset` instance (which is simply a [utils.Sequence](https://www.tensorflow.org/api_docs/python/tf/keras/utils/Sequence)), so
-that *ktrain* can more easily inspect your data.
+Yes, but you'll need to wrap your dataset in a `ktrain.Dataset` instance, so that *ktrain* can more easily inspect your data.  
+For instance, you can directly wrap a `tf.data.Dataset` instance as a `ktrain.TFDataset`, as shown in [this example](https://github.com/amaiya/ktrain/blob/master/examples/vision/mnist-tf_workflow.ipynb).
 
 See [this tutorial](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-A4-customdata-text_regression_with_extra_regressors.ipynb) for more information.
 
@@ -240,3 +289,31 @@ See [this tutorial](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/maste
 These errors (e.g., `has requirement gast>=0.3.2, but you'll have gast 0.2.2 which is incompatible`) are related to TensorFlow and can be usually be safely ignored and shouldn't affect operation of *ktrain*.
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
+
+
+
+### Running `predictor.explain` for text classification is slow.  How can I speed it up?
+
+The `TextPredictor.explain` method accepts a parameter called `n_samples`, which governs the number of synthetic samples created and used to generate the explanation.  At the default value of 2500, `explain` returns results on Google Colab in ~25 seconds.
+If you pass `n_samples=500` to `explain`, results are returned in ~5 seconds on Google Colab.  In theory, higher sample sizes  yield better explanations. In practice,
+smaller sample sizes (e.g., 500, 1000) may be sufficient for your use case.
+
+
+[[Back to Top](#frequently-asked-questions-about-ktrain)]
+
+### What kinds of applications have been built with *ktrain*?
+
+Examples include:
+
+- **medical informatics:**  analyzing doctors' written analyses of patients and medical imagery
+- **finance:** analyzing financial and stock-related news stories
+- **insurance:** detecting fraud in insurance claims
+- **social science:** making sense of text-based responses in surveys and emotion-classification from text data
+- **linguistics:** detecting sarcasm in the news
+- **education:** analysis of attitudes towards educational institutions in social media
+- **local government:**: auto-categorizing citizen complaints to local governments
+- **federal government:** extracting insights from documents about government programs and policies
+
+[[Back to Top](#frequently-asked-questions-about-ktrain)]
+
+
