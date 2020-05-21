@@ -162,7 +162,51 @@ See [this post](https://github.com/amaiya/ktrain/issues/126#issuecomment-6165456
 
 ### How do I deploy a model using Flask?
 
-See [this post](https://github.com/amaiya/ktrain/issues/37#issuecomment-568085054).
+First, implement the Flask server with something like this:
+
+```python
+# my_server.py
+import flask
+import ktrain
+app = flask.Flask(__name__)
+predictor = None
+def load_predictor():
+    global predictor
+    predictor = ktrain.load_predictor('/tmp/my_saved_predictor')
+
+@app.route('/predict', methods=['GET'])
+def predict():
+    data = {"success": False}
+    if flask.request.method in ["GET"]:
+        text = flask.request.args.get('text')
+        if text is None: return flask.jsonify(data)
+        prediction = predictor.predict(text)
+        data['prediction'] = prediction
+        data["success"] = True
+    return flask.jsonify(data)
+
+if __name__ == "__main__":
+    load_predictor()
+    port =8888 
+    app.run(host='0.0.0.0', port=port)
+    app.run()
+
+```
+
+Note that `/tmp_my_saved_predictor` is the path you supplied to `predictor.save`.  The `predictor.save` method
+stores both the model and a `.preproc` object, so make sure both exist on the deployment server.
+
+Next, start the server with: `python3 my_server.py`.
+
+Finally, point your browser to the following to get a prediction:
+
+```
+http://0.0.0.0:8888/predict?text=text%20you%20want%20to%20classify
+```
+
+In this toy example, we are supplying the text data to classify in the URL as a GET request.
+
+
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
 
