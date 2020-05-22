@@ -376,7 +376,7 @@ class TextPreprocessor(Preprocessor):
     Text preprocessing base class
     """
 
-    def __init__(self, maxlen, class_names, lang='en', multilabel=False):
+    def __init__(self, maxlen, class_names, lang='en', multilabel=None):
 
         self.set_classes(class_names) # converts to list of necessary
         self.maxlen = maxlen
