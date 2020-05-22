@@ -7,6 +7,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.15.3 (TBD)
+
+### New:
+- N/A
+
+### Changed
+- N/A
+
+### Fixed:
+- In `text.TextPreprocessor`, allow user to explicitly set `multilabel=True` even if labels in supplied data are mutually-exclusive
+
+
 ## 0.15.2 (2020-05-15)
 
 ### New:
