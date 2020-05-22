@@ -421,9 +421,16 @@ class TextPreprocessor(Preprocessor):
         raise NotImplementedError
 
 
-    def set_multilabel(self, data, mode):
+    def set_multilabel(self, data, mode, verbose=1):
         if mode == 'train' and self.get_classes():
+            original_multilabel = self.multilabel
             self.multilabel = U.is_multilabel(data)
+            if original_multilabel is True and self.multilabel is False:
+                warnings.warn('The multilabel=True argument was supplied, but labels do not indicate '+\
+                              'a multilabel problem.  Using multilabel=True anyways.')
+                self.multilabel = original_multilabel
+            else:
+                U.vprint("Is Multi-Label? %s" % (self.multilabel), verbose=verbose)
 
 
     def undo(self, doc):
@@ -863,7 +870,7 @@ class TransformersPreprocessor(TextPreprocessor):
                                       pad_on_left=bool(self.name in ['xlnet']),
                                       pad_token=self.tok.convert_tokens_to_ids([self.tok.pad_token][0]),
                                       pad_token_segment_id=4 if self.name in ['xlnet'] else 0)
-        self.set_multilabel(dataset, mode)
+        self.set_multilabel(dataset, mode, verbose=verbose)
         if mode == 'train':  self.preprocess_train_called = True
         return dataset
 
