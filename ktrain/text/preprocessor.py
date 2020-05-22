@@ -424,13 +424,16 @@ class TextPreprocessor(Preprocessor):
     def set_multilabel(self, data, mode, verbose=1):
         if mode == 'train' and self.get_classes():
             original_multilabel = self.multilabel
-            self.multilabel = U.is_multilabel(data)
-            if original_multilabel is True and self.multilabel is False:
+            discovered_multilabel = U.is_multilabel(data)
+            if original_multilabel is None:
+                self.multilabel = discovered_multilabel
+            elif original_multilabel is True and discovered_multilabel is False:
                 warnings.warn('The multilabel=True argument was supplied, but labels do not indicate '+\
-                              'a multilabel problem.  Using multilabel=True anyways.')
-                self.multilabel = original_multilabel
-            else:
-                U.vprint("Is Multi-Label? %s" % (self.multilabel), verbose=verbose)
+                              'a multilabel problem (labels appear to be mutually-exclusive).  Using multilabel=True anyways.')
+            elif original_multilabel is False and discovered_multilabel is True:
+                warnings.warn('The multilabel=False argument was supplied, but labels inidcate that  '+\
+                              'this is a multilabel problem (labels are not mutually-exclusive).  Using multilabel=False anyways.')
+            U.vprint("Is Multi-Label? %s" % (self.multilabel), verbose=verbose)
 
 
     def undo(self, doc):
@@ -534,7 +537,7 @@ class StandardTextPreprocessor(TextPreprocessor):
     """
 
     def __init__(self, maxlen, max_features, class_names=[], classes=[], 
-                 lang='en', ngram_range=1, multilabel=False):
+                 lang='en', ngram_range=1, multilabel=None):
         class_names = self.migrate_classes(class_names, classes)
         super().__init__(maxlen, class_names, lang=lang, multilabel=multilabel)
         self.tok = None
@@ -713,7 +716,7 @@ class BERTPreprocessor(TextPreprocessor):
     """
 
     def __init__(self, maxlen, max_features, class_names=[], classes=[], 
-                lang='en', ngram_range=1, multilabel=False):
+                lang='en', ngram_range=1, multilabel=None):
         class_names = self.migrate_classes(class_names, classes)
 
 
@@ -784,7 +787,7 @@ class TransformersPreprocessor(TextPreprocessor):
 
     def __init__(self,  model_name,
                 maxlen, max_features, class_names=[], classes=[], 
-                lang='en', ngram_range=1, multilabel=False):
+                lang='en', ngram_range=1, multilabel=None):
         class_names = self.migrate_classes(class_names, classes)
 
         if maxlen > 512: raise ValueError('Transformer models only supports maxlen <= 512')
@@ -972,7 +975,7 @@ class Transformer(TransformersPreprocessor):
     """
 
     def __init__(self, model_name, maxlen=128, class_names=[], classes=[],
-                 batch_size=None, multilabel=False,
+                 batch_size=None, multilabel=None,
                  use_with_learner=True):
         """
         Args:
@@ -996,8 +999,9 @@ class Transformer(TransformersPreprocessor):
                                      return a ktrain TransformerDataset object for use with
                                      ktrain.get_learner.
             batch_size (int): batch_size - only required if use_with_learner=False
-            multilabel (int):  if True, classifier will be configured for
+            multilabel (int):  If True, classifier will be configured for
                                   multilabel classification.
+                               If None, data will be inspected during preprocessing and this will be set automatically
 
         """
         class_names = self.migrate_classes(class_names, classes)
