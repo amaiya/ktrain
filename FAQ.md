@@ -91,7 +91,8 @@ model = t.get_classifier()
 learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=6)
 learner.fit_onecycle(5e-5, 1)
 
-# load model to generate embeddingsmodel.save_pretrained('/tmp/mymodel')
+# load model to generate embeddings
+model.save_pretrained('/tmp/mymodel')
 from transformers import *
 import tensorflow as tf
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
