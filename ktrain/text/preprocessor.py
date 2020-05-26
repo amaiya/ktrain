@@ -908,9 +908,10 @@ class TransformersPreprocessor(TextPreprocessor):
         creates a model for classification
         Args:
           fpath(str): optional path to saved pretrained model. Typically left as None.
-          multilabel(bool): If True, model will be configured for multilabel task.
-                            If None, multilabel status is discovered from data.
-                            This is typically left as None also.
+          multilabel(bool): If None, multilabel status is discovered from data [recommended].
+                            If True, model will be forcibly configured for multilabel task.
+                            If False, model will be forcibly configured for non-multilabel task.
+                            It is recommended to leave this as None.
         """
         self.check_trained()
         if not self.get_classes():
