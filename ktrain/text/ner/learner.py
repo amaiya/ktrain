@@ -142,10 +142,11 @@ class NERLearner(GenLearner):
         """
         a wrapper to model.save
         """
+        self._make_model_folder(fpath)
         if U.is_crf(self.model):
             from .anago.layers import crf_loss
             self.model.compile(loss=crf_loss, optimizer=U.DEFAULT_OPT)
-        self.model.save(fpath, save_format='h5')
+        self.model.save(os.path.join(fpath, U.MODEL_NAME), save_format='h5')
         return
 
 

@@ -226,11 +226,23 @@ class Learner(ABC):
         raise NotImplementedError('view_top_losses must be overriden by Learner subclass')
 
 
+    def _make_model_folder(self, fpath):
+        if os.path.isfile(fpath):
+            raise ValueError(f'There is an existing file named {fpath}. ' +\
+                              'Please use dfferent value for fpath.')
+        elif os.path.exists(fpath):
+            #warnings.warn('model is being saved to folder that already exists: %s' % (fpath))
+            pass
+        elif not os.path.exists(fpath):
+            os.makedirs(fpath)
+
+
     def save_model(self, fpath):
         """
         a wrapper to model.save
         """
-        self.model.save(fpath, save_format='h5')
+        self._make_model_folder(fpath)
+        self.model.save(os.path.join(fpath, U.MODEL_NAME), save_format='h5')
         return
 
 
@@ -1302,21 +1314,30 @@ def get_predictor(model, preproc, batch_size=U.DEFAULT_BS):
         raise Exception('preproc of type %s not currently supported' % (type(preproc)))
 
 
-def load_predictor(fname, batch_size=U.DEFAULT_BS):
+def load_predictor(fpath, batch_size=U.DEFAULT_BS):
     """
     Loads a previously saved Predictor instance
     Args
-      fname(str): predictor path name (value supplied to predictor.save)
+      fpath(str): predictor path name (value supplied to predictor.save)
+                  From v0.16.x, this is always the path to a folder.
+                  Pre-v0.16.x, this is the base name used to save model and .preproc instance.
       batch_size(int): batch size to use for predictions. default:32
     """
 
     # load the preprocessor
     preproc = None
-    with open(fname +'.preproc', 'rb') as f:
-        preproc = pickle.load(f)
+    try:
+        preproc_name = os.path.join(fpath, U.PREPROC_NAME)
+        with open(preproc_name, 'rb') as f: preproc = pickle.load(f)
+    except:
+        try:
+            preproc_name = fpath +'.preproc'
+            with open(preproc_name, 'rb') as f: preproc = pickle.load(f)
+        except:
+            raise Exception('Could not find a .preproc file in either the post v0.16.x loction (%s) or pre v0.16.x location (%s)' % (os.path.join(fpath. U.PRERPC_NAME), fpath+'.preproc'))
 
     # load the model
-    model = _load_model(fname, preproc=preproc)
+    model = _load_model(fpath, preproc=preproc)
 
 
     # preprocessing functions in ImageDataGenerators are not pickable
@@ -1374,12 +1395,12 @@ def release_gpu_memory(device=0):
     return
 
 
-def _load_model(fname, preproc=None, train_data=None, custom_objects=None):
+def _load_model(fpath, preproc=None, train_data=None, custom_objects=None):
     if not preproc and not train_data:
         raise ValueError('Either preproc or train_data is required.')
     if preproc and isinstance(preproc, TransformersPreprocessor):
         # note: with transformer models, fname is actually a directory
-        model = preproc.get_model(fpath=fname)
+        model = preproc.get_model(fpath=fpath)
         return model
     elif (preproc and (isinstance(preproc, BERTPreprocessor) or \
                     type(preproc).__name__ == 'BERTPreprocessor')) or\
@@ -1407,10 +1428,14 @@ def _load_model(fname, preproc=None, train_data=None, custom_objects=None):
     custom_objects['AdamWeightDecay'] = AdamWeightDecay
     try:
         try:
-            model = load_model(fname, custom_objects=custom_objects)
+            model = load_model(os.path.join(fpath, U.MODEL_NAME), custom_objects=custom_objects)
         except:
-            # for bilstm models without CRF layer on TF2 where CRF is not supported 
-            model = load_model(fname, custom_objects={'AdamWeightDecay':AdamWeightDecay})
+            try:
+                # pre-0.16: model fpath was file name of model not folder for non-Transformer models
+                model = load_model(fpath, custom_objects=custom_objects)
+            except:
+                # for bilstm models without CRF layer on TF2 where CRF is not supported 
+                model = load_model(fname, custom_objects={'AdamWeightDecay':AdamWeightDecay})
     except Exception as e:
         print('Call to keras.models.load_model failed.  '
               'Try using the learner.model.save_weights and '
