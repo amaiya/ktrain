@@ -32,6 +32,10 @@ DEFAULT_ROP = 2
 DEFAULT_TRANSFORMER_LAYERS = [-2] # second-to-last hidden state
 DEFAULT_TRANSFORMER_MAXLEN = 512
 DEFAULT_TRANSFORMER_NUM_SPECIAL = 2
+MODEL_BASENAME = 'tf_model'
+MODEL_NAME = MODEL_BASENAME+'.h5'
+PREPROC_NAME = MODEL_BASENAME+'.preproc'
+
 
 
 #------------------------------------------------------------------------------
