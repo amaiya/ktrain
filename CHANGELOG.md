@@ -13,7 +13,9 @@ Most recent releases are shown at the top. Each release shows:
 - N/A
 
 ### Changed
-- N/A
+- The methods `predictor.save`, `ktrain.load_predictor`, `learner.save_model`, `learner.load_model` all accept a path to folder where
+  all files (e.g., model file, `.preproc` file) will be saved.  This should not be a breaking change as the `load*` methods
+  will still look for files in the old location if new-style format fails.
 
 ### Fixed:
 - In `text.TextPreprocessor`, allow user to explicitly set `multilabel=True` even if labels in supplied data are mutually-exclusive
