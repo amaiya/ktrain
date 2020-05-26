@@ -13,10 +13,8 @@ Most recent releases are shown at the top. Each release shows:
 - N/A
 
 ### Changed
-- [**breaking change**] The `multilabel` argument in `text.Transformer` constructor was moved to `Transformer.get_classifier` to allow
-  users to forcibly configure model for multilabel task regardless as to what data suggests.
-- In `text.TextPreprocessor`, allow one to pass explicitly set `multilabel=True` even if labels in supplied data are mutually-exclusive.
-  This is largely an internal change and should not affect user-facing API.
+- [**breaking change**] The `multilabel` argument in `text.Transformer` constructor was moved to `Transformer.get_classifier` and now correctly allows
+  users to forcibly configure model for multilabel task regardless as to what data suggests. However, it is recommended to leave this value as `None`.
 - The methods `predictor.save`, `ktrain.load_predictor`, `learner.save_model`, `learner.load_model` all now accept a path to folder where
   all files (e.g., model file, `.preproc` file) will be saved. If path does not exist, it will be created.
    This should not be a breaking change as the `load*` methods will still look for files in the old location if model or predictor was saved
