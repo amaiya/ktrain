@@ -381,7 +381,7 @@ class TextPreprocessor(Preprocessor):
         self.set_classes(class_names) # converts to list of necessary
         self.maxlen = maxlen
         self.lang = lang
-        self.multilabel = multilabel
+        self.multilabel = multilabel # currently, this is always initially set None until set by set_multilabel
         self.preprocess_train_called = False
         self.label_encoder = None # only set if y is in string format
         self.c = self.c.tolist() if isinstance(self.c, np.ndarray) else self.c
@@ -903,15 +903,34 @@ class TransformersPreprocessor(TextPreprocessor):
 
 
 
-    def get_classifier(self, fpath=None):
+    def get_classifier(self, fpath=None, multilabel=None):
+        """
+        creates a model for classification
+        Args:
+          fpath(str): optional path to saved pretrained model. Typically left as None.
+          multilabel(bool): If True, model will be configured for multilabel task.
+                            If None, multilabel status is discovered from data.
+                            This is typically left as None also.
+        """
         self.check_trained()
         if not self.get_classes():
             warnings.warn('no class labels were provided - treating as regression')
             return self.get_regression_model()
+
+        # process multilabel task
+        multilabel = self.multilabel if multilabel is None else multilabel
+        if multilabel is True and self.multilabel is False:
+            warnings.warn('The multilabel=True argument was supplied, but labels do not indicate '+\
+                          'a multilabel problem (labels appear to be mutually-exclusive).  Using multilabel=True anyways.')
+        elif multilabel is False and self.multilabel is True:
+                warnings.warn('The multilabel=False argument was supplied, but labels inidcate that  '+\
+                              'this is a multilabel problem (labels are not mutually-exclusive).  Using multilabel=False anyways.')
+
+        # setup model
         num_labels = len(self.get_classes())
         mname = fpath if fpath is not None else self.model_name
         model = self._load_pretrained(mname, num_labels)
-        if self.multilabel:
+        if multilabel:
             loss_fn =  keras.losses.BinaryCrossentropy(from_logits=True)
         else:
             loss_fn = keras.losses.CategoricalCrossentropy(from_logits=True)
@@ -975,8 +994,7 @@ class Transformer(TransformersPreprocessor):
     """
 
     def __init__(self, model_name, maxlen=128, class_names=[], classes=[],
-                 batch_size=None, multilabel=None,
-                 use_with_learner=True):
+                 batch_size=None, use_with_learner=True):
         """
         Args:
             model_name (str):  name of Hugging Face pretrained model
@@ -999,11 +1017,12 @@ class Transformer(TransformersPreprocessor):
                                      return a ktrain TransformerDataset object for use with
                                      ktrain.get_learner.
             batch_size (int): batch_size - only required if use_with_learner=False
-            multilabel (int):  If True, classifier will be configured for
-                                  multilabel classification.
-                               If None, data will be inspected during preprocessing and this will be set automatically
+
+
+
 
         """
+        multilabel = None # force discovery of multilabel task from data in preprocess_train->set_multilabel
         class_names = self.migrate_classes(class_names, classes)
         if not use_with_learner and batch_size is None:
             raise ValueError('batch_size is required when use_with_learner=False')
