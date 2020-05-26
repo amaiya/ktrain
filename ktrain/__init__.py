@@ -37,8 +37,11 @@ def get_learner(model, train_data=None, val_data=None,
                            val_data is instance of utils.Sequence.
                            default:32
     workers (int): number of cpu processes used to load data.
-                   only applicable if train_data is is a generator.
+                   This is ignored unless train_data/val_data is an instance of 
+                   tf.keras.preprocessing.image.DirectoryIterator or tf.keras.preprocessing.image.DataFrameIterator. 
     use_multiprocessing(bool):  whether or not to use multiprocessing for workers
+                               This is ignored unless train_data/val_data is an instance of 
+                               tf.keras.preprocessing.image.DirectoryIterator or tf.keras.preprocessing.image.DataFrameIterator. 
     multigpu(bool):             Lets the Learner know that the model has been 
                                 replicated on more than 1 GPU.
                                 Only supported for models from vision.image_classifiers

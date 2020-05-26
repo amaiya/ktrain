@@ -165,11 +165,7 @@ class TransformerTextClassLearner(GenLearner):
         """
         save Transformers model
         """
-        if os.path.isfile(fpath):
-            raise ValueError(f'There is an existing file named {fpath}. ' +\
-                              'Please use dfferent value for fpath.')
-        elif not os.path.exists(fpath):
-            os.mkdir(fpath)
+        self._make_model_folder(fpath)
         self.model.save_pretrained(fpath)
         return
 
@@ -177,6 +173,9 @@ class TransformerTextClassLearner(GenLearner):
     def load_model(self, fpath, preproc=None):
         """
         load Transformers model
+        Args:
+          fpath(str): path to folder containing model files
+          preproc(TransformerPreprocessor): a TransformerPreprocessor instance.
         """
         if preproc is None or not isinstance(preproc, TransformersPreprocessor):
             raise ValueError('preproc arg is required to load Transformer models from disk. ' +\

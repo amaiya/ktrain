@@ -179,12 +179,9 @@ class ImagePredictor(Predictor):
         return cm
 
 
-
-    def save(self, fname):
-        self.model.save(fname, save_format='h5')
-
-        fname_preproc = fname+'.preproc'
-        with open(fname_preproc, 'wb') as f:
+    def _save_preproc(self, fpath):
+        preproc_name = 'tf_model.preproc'
+        with open(os.path.join(fpath, preproc_name), 'wb') as f:
             datagen = self.preproc.get_preprocessor()
             pfunc = datagen.preprocessing_function
             datagen.preprocessing_function = None
