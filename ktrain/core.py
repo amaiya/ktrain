@@ -1433,7 +1433,7 @@ def _load_model(fpath, preproc=None, train_data=None, custom_objects=None):
         except:
             try:
                 # pre-0.16: model fpath was file name of model not folder for non-Transformer models
-                warnings.warn('could not load %s - attempting to load model as %s' % (os.path.join(fpath, U.MODEL_NAME), fpath))
+                warnings.warn('could not load model as %s - attempting to load model as %s' % (os.path.join(fpath, U.MODEL_NAME), fpath))
                 model = load_model(fpath, custom_objects=custom_objects)
             except:
                 # for bilstm models without CRF layer on TF2 where CRF is not supported 
