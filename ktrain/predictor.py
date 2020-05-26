@@ -39,7 +39,7 @@ class Predictor(ABC):
             from .text.ner import crf_loss
             self.model.compile(loss=crf_loss, optimizer=U.DEFAULT_OPT)
         model_path = os.path.join(fpath, U.MODEL_NAME)
-        self.model.save(fname, save_format='h5')
+        self.model.save(model_path, save_format='h5')
         return
 
 

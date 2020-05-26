@@ -1328,13 +1328,11 @@ def load_predictor(fpath, batch_size=U.DEFAULT_BS):
     preproc = None
     try:
         preproc_name = os.path.join(fpath, U.PREPROC_NAME)
-        with open(fname +'.preproc', 'rb') as f:
-            preproc = pickle.load(f)
+        with open(preproc_name, 'rb') as f: preproc = pickle.load(f)
     except:
         try:
             preproc_name = fpath +'.preproc'
-            with open(fname +'.preproc', 'rb') as f:
-                preproc = pickle.load(f)
+            with open(preproc_name, 'rb') as f: preproc = pickle.load(f)
         except:
             raise Exception('Could not find a .preproc file in either the post v0.16.x loction (%s) or pre v0.16.x location (%s)' % (os.path.join(fpath. U.PRERPC_NAME), fpath+'.preproc'))
 
