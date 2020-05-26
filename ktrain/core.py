@@ -1332,7 +1332,7 @@ def load_predictor(fpath, batch_size=U.DEFAULT_BS):
     except:
         try:
             preproc_name = fpath +'.preproc'
-            warnings.warn('could not find .preproc file at %s - looking for %s' % (os.path.join(fpath, U.PREPROC_NAME), preproc_name))
+            warnings.warn('could load .preproc file as %s - attempting to load as %s' % (os.path.join(fpath, U.PREPROC_NAME), preproc_name))
             with open(preproc_name, 'rb') as f: preproc = pickle.load(f)
         except:
             raise Exception('Could not find a .preproc file in either the post v0.16.x loction (%s) or pre v0.16.x location (%s)' % (os.path.join(fpath. U.PRERPC_NAME), fpath+'.preproc'))
@@ -1433,7 +1433,7 @@ def _load_model(fpath, preproc=None, train_data=None, custom_objects=None):
         except:
             try:
                 # pre-0.16: model fpath was file name of model not folder for non-Transformer models
-                warnings.warn('could not find %s - attempting to load %s as model file' % (os.path.join(fpath, U.MODEL_NAME), fpath))
+                warnings.warn('could not load %s - attempting to load model as %s' % (os.path.join(fpath, U.MODEL_NAME), fpath))
                 model = load_model(fpath, custom_objects=custom_objects)
             except:
                 # for bilstm models without CRF layer on TF2 where CRF is not supported 
