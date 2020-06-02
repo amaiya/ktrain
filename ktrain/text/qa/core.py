@@ -171,7 +171,8 @@ class SimpleQA(QA):
                 idx +=1
                 if idx % commit_every == 0:
                     writer.commit()
-                    writer = ix.writer()
+                    #writer = ix.writer()
+                    writer = ix.writer(procs=procs, limitmb=limitmb, multisegment=multisegment)
             writer.commit()
         return
 
@@ -207,7 +208,8 @@ class SimpleQA(QA):
             idx +=1
             if idx % commit_every == 0:
                 writer.commit()
-                writer = ix.writer()
+                #writer = ix.writer()
+                writer = ix.writer(procs=procs, limitmb=limitmb, multisegment=multisegment)
                 if verbose: print("%s docs indexed" % (idx))
         writer.commit()
         return
