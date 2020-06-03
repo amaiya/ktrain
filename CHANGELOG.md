@@ -7,7 +7,7 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
-## 0.15.4 (TBD)
+## 0.15.4 (2020-06-03)
 
 ### New:
 - N/A
@@ -20,6 +20,7 @@ Most recent releases are shown at the top. Each release shows:
   to speedup indexing when necessary.  Supplying `multisegment=True` speeds things up significantly, for example. Defaults, however, are
   the same as before. Users must explicitly change values if desiring a speedup.
 - Load `xlm-roberta*` as `jplu/tf-xlm-roberta*` to bypass error from `transformers`
+
 
 ## 0.15.3 (2020-05-28)
 
