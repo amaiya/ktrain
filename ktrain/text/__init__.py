@@ -6,6 +6,7 @@ from .eda import get_topic_model
 from .textutils import extract_filenames, load_text_files, filter_by_id
 from .preprocessor import Transformer, TransformerEmbedding
 from .summarization import TransformerSummarizer
+from .zsl import ZeroShotClassifier
 from . import shallownlp
 from .qa import SimpleQA
 from . import textutils
@@ -27,6 +28,7 @@ __all__ = [
            'TranformerEmbedding',
            'shallownlp',
            'TransformerSummarizer',
+           'ZeroShotClassifier',
            'SimpleQA',
            'extract_filenames', 
            'load_text_files',
