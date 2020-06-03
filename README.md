@@ -7,23 +7,29 @@
 
 
 ### News and Announcements
+- **2020-06-03:**  
+  - ***ktrain*** **v0.16.x is released** and includes support for **Zero-Shot Topic Classification**, where documents can be classified into user-provided topics **without** any training examples.
+```python
+from ktrain import text 
+
+zsl = text.ZeroShotClassifier()
+topic_strings=['politics', 'elections', 'sports', 'films', 'television']
+doc = 'I am extremely dissatisfied with the President and will definitely vote in 2020.'
+zsl.predict(doc, topic_strings=topic_strings, include_labels=True)
+# output:
+# [('politics', 0.9829113483428955),
+#  ('elections', 0.9880988001823425),
+#  ('sports', 0.00030677582253701985),
+#  ('films', 0.0008969294722191989),
+#  ('television', 0.00045271270209923387)]
+```
 - **2020-05-13:**  
   - ***ktrain*** **v0.15.x is released** and includes support for:
     - **image regression**:  See the [example notebook on age prediction from photos](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/vision/utk_faces_age_prediction-resnet50.ipynb).
-    - **tf.data.Datasets**:  See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/vision/mnist-tf_workflow.ipynb) on using `tf.data.Datasets` in *ktrain* for custom models and data formats.
     - **sentence pair classification**:  See this [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/MRPC-BERT.ipynb) on using BERT for paraphrase detection.<sub><sup>(Sentence pair classification included in v0.15.1, but not v0.15.0.)</sup></sub>
+    - **tf.data.Datasets**:  See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/vision/mnist-tf_workflow.ipynb) on using `tf.data.Datasets` in *ktrain* for custom models and data formats.
 - **2020-04-15:**  
   - ***ktrain*** **v0.14.x is released** and now includes support for **open-domain question-answering**.  See the [example QA notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/question_answering_with_bert.ipynb)
-- **2020-04-09:**  
-  - ***ktrain*** **v0.13.x is released** and includes support for:
-    - **link prediction** using graph neural networks - [see example link prediction notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/graphs/cora_link_prediction-GraphSAGE.ipynb) on citation prediction
-    - **text summarization** with pretrained BART - [see example summarization notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/text_summarization_with_bart.ipynb) <sub><sup>(Summarization included in v0.13.1, but not v0.13.0.)</sup></sub>
-```python
-# text summarization with BART
-from ktrain import text
-ts = text.TransformerSummarizer()
-ts.summarize(some_long_document)
-```
 
 ----
 
@@ -43,6 +49,7 @@ ts.summarize(some_long_document)
      - **Document Recommendation Engine**:  given text from a sample document, recommend documents that are thematically-related to it from a larger corpus  <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/20newsgroups-recommendation_engine.ipynb)]</sup></sub>
      - **Text Summarization**:  summarize long documents with a pretrained BART model - no training required <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/text_summarization_with_bart.ipynb)]</sup></sub>
      - **Open-Domain Question-Answering**:  ask a large text corpus questions and receive exact answers <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/question_answering_with_bert.ipynb)]</sup></sub>
+     - **Zero-Shot Topic Classification**:  classify documents into user-provided topics **without** any training examples <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/zero_shot_classification_with_bart.ipynb)]</sup></sub>
   - `vision` data:
     - **image classification** (e.g., [ResNet](https://arxiv.org/abs/1512.03385), [Wide ResNet](https://arxiv.org/abs/1605.07146), [Inception](https://www.cs.unc.edu/~wliu/papers/GoogLeNet.pdf)) <sub><sup>[[example notebook](https://colab.research.google.com/drive/1WipQJUPL7zqyvLT10yekxf_HNMXDDtyR)]</sup></sub>
     - **image regression** for predicting numerical targets from photos (e.g., age prediction) <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/vision/utk_faces_age_prediction-resnet50.ipynb)]</sup></sub>
