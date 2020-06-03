@@ -10,6 +10,8 @@
 - **2020-06-03:**  
   - ***ktrain*** **v0.16.x is released** and includes support for **Zero-Shot Learning**, where documents can be classified into user-provided topics **without** any training examples. See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/zero_shot_learning_with_nli.ipynb?flush_cache=true).  <sub><sup>(This feature currently requires that PyTorch be installed.)</sup></sub>
 ```python
+# Zero-Shot Topic Classification in ktrain
+
 from ktrain import text 
 zsl = text.ZeroShotClassifier()
 topic_strings=['politics', 'elections', 'sports', 'films', 'television']
