@@ -7,7 +7,7 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
-## 0.16.0 (TBD)
+## 0.16.0 (2020-06-03)
 
 ### New:
 - support for Zero-Shot Topic Classification via the `text.ZeroShotClassifier`.  
