@@ -19,6 +19,7 @@ Most recent releases are shown at the top. Each release shows:
 - Added the `procs`, `limitmb`, and `multisegment` argumetns to `index_from_list` and `index_from_folder` method in `text.SimpleQA`
   to speedup indexing when necessary.  Supplying `multisegment=True` speeds things up significantly, for example. Defaults, however, are
   the same as before. Users must explicitly change values if desiring a speedup.
+- Load `xlm-roberta*` as `jplu/tf-xlm-roberta*` to bypass error from `transformers`
 
 ## 0.15.3 (2020-05-28)
 
