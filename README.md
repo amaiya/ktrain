@@ -15,7 +15,7 @@
 from ktrain import text 
 zsl = text.ZeroShotClassifier()
 topic_strings=['politics', 'elections', 'sports', 'films', 'television']
-doc = 'I am extremely dissatisfied with the President and will definitely vote in 2020.'
+doc = 'I am unhappy with decisions of the government and will definitely vote in 2020.'
 zsl.predict(doc, topic_strings=topic_strings, include_labels=True)
 # output:
 # [('politics', 0.9829113483428955),
