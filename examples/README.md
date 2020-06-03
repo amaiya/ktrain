@@ -12,6 +12,7 @@ This directory contains various example notebooks using *ktrain*.  The directory
   - [Shallow NLP](#shallownlp):  a small collection of miscellaneous text utilities amenable to being used on machines with only a CPU available (no GPU required)
   - [Text Summarization](#bart):  an example of text summarization using a pretrained BART model
   - [Open-Domain Question-Answering](#textqa):  ask questions to a large text corpus and receive exact candidate answers
+  - [Zero-Shot Learning](#zsl):  classify documents by user-supplied topics **without** any training examples
 - `vision`:  
   - [image classification](#imageclass):  models for image datasetsimage classification examples using various models and datasets
   - [image regression](#imageregression): example of predicting numerical values purely from images/photos
@@ -133,6 +134,7 @@ The objective of the CoNLL2003 task is to classify sequences of words as belongi
 
 ### <a name="bart"></a>Text Summarization with pretrained BART: [text_summarization_with_bart.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text)
 ### <a name="textqa"></a>Open-Domain Question-Answering: [question_answering_with_bert.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text)
+### <a name="zsl"></a>Zero-Shot Learning: [zero_shot_learning_with_nli.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text)
 
 
 ## Vision Data
