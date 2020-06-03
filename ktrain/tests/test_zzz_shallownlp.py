@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """
-Tests of ktrain text classification flows
+Tests of ktrain shallownlp module:
+2020-05-26: renamed test_zzz_shallownlp.py because
+            causes issues for tests following it when run in conjunction with test_regression.py.
 """
 import testenv
 from unittest import TestCase, main, skip

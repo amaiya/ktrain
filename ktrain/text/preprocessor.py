@@ -798,6 +798,7 @@ class TransformersPreprocessor(TextPreprocessor):
         self.name = model_name.split('-')[0]
         if model_name.startswith('xlm-roberta'): 
             self.name = 'xlm_roberta'
+            self.model_name = 'jplu/tf-' + self.model_name
         else:
             self.name = model_name.split('-')[0]
         if self.name not in TRANSFORMER_MODELS:

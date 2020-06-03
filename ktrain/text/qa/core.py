@@ -145,16 +145,23 @@ class SimpleQA(QA):
         return ix
 
     @classmethod
-    def index_from_list(cls, docs, index_dir, commit_every=1024):
+    def index_from_list(cls, docs, index_dir, commit_every=1024,
+                        procs=1, limitmb=256, multisegment=False):
         """
-        index documents from list
+        index documents from list.
+        The procs, limitmb, and especially multisegment arguments can be used to 
+        speed up indexing, if it is too slow.  Please see the whoosh documentation
+        for more information on these parameters:  https://whoosh.readthedocs.io/en/latest/batch.html
         Args:
           docs(list): list of strings representing documents
           commit_every(int): commet after adding this many documents
+          procs(int): number of processors
+          limitmb(int): memory limit in MB for each process
+          multisegment(bool): new segments written instead of merging
         """
         if not isinstance(docs, (np.ndarray, list)): raise ValueError('docs must be a list of strings')
         ix = index.open_dir(index_dir)
-        writer = ix.writer()
+        writer = ix.writer(procs=procs, limitmb=limitmb, multisegment=multisegment)
         mb = master_bar(range(1))
         for i in mb:
             for idx, doc in enumerate(progress_bar(docs, parent=mb)):
@@ -164,23 +171,33 @@ class SimpleQA(QA):
                 idx +=1
                 if idx % commit_every == 0:
                     writer.commit()
-                    writer = ix.writer()
+                    #writer = ix.writer()
+                    writer = ix.writer(procs=procs, limitmb=limitmb, multisegment=multisegment)
             writer.commit()
         return
 
 
     @classmethod
-    def index_from_folder(cls, folder_path, index_dir,  commit_every=1024, verbose=1, encoding='utf-8'):
+    def index_from_folder(cls, folder_path, index_dir,  commit_every=1024, verbose=1, encoding='utf-8',
+                          procs=1, limitmb=256, multisegment=False):
         """
-        index all plain text documents within a folder
+        index all plain text documents within a folder.
+        The procs, limitmb, and especially multisegment arguments can be used to 
+        speed up indexing, if it is too slow.  Please see the whoosh documentation
+        for more information on these parameters:  https://whoosh.readthedocs.io/en/latest/batch.html
+
         Args:
           folder_path(str): path to folder containing plain text documents
           commit_every(int): commet after adding this many documents
+          procs(int): number of processors
+          limitmb(int): memory limit in MB for each process
+          multisegment(bool): new segments written instead of merging
+
         """
         if not os.path.isdir(folder_path): raise ValueError('folder_path is not a valid folder')
         if folder_path[-1] != os.sep: folder_path += os.sep
         ix = index.open_dir(index_dir)
-        writer = ix.writer()
+        writer = ix.writer(procs=procs, limitmb=limitmb, multisegment=multisegment)
         for idx, fpath in enumerate(TU.extract_filenames(folder_path)):
             if not TU.is_txt(fpath): continue
             reference = "%s" % (fpath.join(fpath.split(folder_path)[1:]))
@@ -191,7 +208,8 @@ class SimpleQA(QA):
             idx +=1
             if idx % commit_every == 0:
                 writer.commit()
-                writer = ix.writer()
+                #writer = ix.writer()
+                writer = ix.writer(procs=procs, limitmb=limitmb, multisegment=multisegment)
                 if verbose: print("%s docs indexed" % (idx))
         writer.commit()
         return
