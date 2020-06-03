@@ -10,7 +10,7 @@ Most recent releases are shown at the top. Each release shows:
 ## 0.16.0 (TBD)
 
 ### New:
-- Zero Shot Topic Classification via the `text.ZeroShotClassifier`.  
+- support for Zero-Shot Topic Classification via the `text.ZeroShotClassifier`.  
 
 ### Changed
 - N/A/
