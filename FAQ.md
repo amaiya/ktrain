@@ -307,7 +307,7 @@ smaller sample sizes (e.g., 500, 1000) may be sufficient for your use case.
 Examples include:
 
 - **medical informatics:**  analyzing doctors' written analyses of patients and medical imagery
-- **finance:** analyzing financial and stock-related news stories
+- **finance:**  financial crime analytics, mining stock-related news stories
 - **insurance:** detecting fraud in insurance claims
 - **social science:** making sense of text-based responses in surveys and emotion-classification from text data
 - **linguistics:** detecting sarcasm in the news
