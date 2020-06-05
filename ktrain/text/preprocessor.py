@@ -817,20 +817,28 @@ class TransformersPreprocessor(TextPreprocessor):
         # NOTE: As of v0.16.1, do not unnecessarily instantiate tokenizer
         # as it will be saved/pickled along with Preprocessor, which causes
         # problems for some community-uploaded models like bert-base-japanse-whole-word-masking.
-
         #tokenizer = self.tokenizer_type.from_pretrained(model_name)
         #self.tok = tokenizer
+        self.tok = None # not pickled,  see __getstate__ 
 
         self.tok_dct = None
         self.max_features = max_features # ignored
         self.ngram_range = 1 # ignored
 
 
+    def __getstate__(self):
+        return {k: v for k, v in self.__dict__.items() if k not in ['tok']}
+
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        if not hasattr(self, 'tok'): self.tok = None
 
 
     def get_preprocessor(self):
-        tokenizer = self.tokenizer_type.from_pretrained(self.model_name)
-        return (tokenizer, self.tok_dct)
+        if self.tok is None:
+            self.tok = self.tokenizer_type.from_pretrained(self.model_name)
+        return (self.tok, self.tok_dct)
 
 
 
