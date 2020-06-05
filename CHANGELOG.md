@@ -7,6 +7,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.16.1 (2020-06-05)
+
+### New:
+- N/A
+
+### Changed
+- N/A/
+
+### Fixed:
+- prevent `transformer` tokenizers from being pickled during `predictor.save`, as it causes problems for
+  some community-uploaded models like `bert-base-japanese-whole-word-masking`.
+
 ## 0.16.0 (2020-06-03)
 
 ### New:
