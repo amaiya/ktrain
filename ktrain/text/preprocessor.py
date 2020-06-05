@@ -814,9 +814,13 @@ class TransformersPreprocessor(TextPreprocessor):
         if "bert-base-japanese" in model_name:
             self.tokenizer_type = transformers.BertJapaneseTokenizer
 
-        tokenizer = self.tokenizer_type.from_pretrained(model_name)
+        # NOTE: As of v0.16.1, do not unnecessarily instantiate tokenizer
+        # as it will be saved/pickled along with Preprocessor, which causes
+        # problems for some community-uploaded models like bert-base-japanse-whole-word-masking.
 
-        self.tok = tokenizer
+        #tokenizer = self.tokenizer_type.from_pretrained(model_name)
+        #self.tok = tokenizer
+
         self.tok_dct = None
         self.max_features = max_features # ignored
         self.ngram_range = 1 # ignored
@@ -825,7 +829,8 @@ class TransformersPreprocessor(TextPreprocessor):
 
 
     def get_preprocessor(self):
-        return (self.tok, self.tok_dct)
+        tokenizer = self.tokenizer_type.from_pretrained(self.model_name)
+        return (tokenizer, self.tok_dct)
 
 
 
@@ -839,6 +844,7 @@ class TransformersPreprocessor(TextPreprocessor):
         undoes preprocessing and returns raw data by:
         converting a list or array of Word IDs back to words
         """
+        tok, _ = self.get_preprocessor()
         return self.tok.convert_ids_to_tokens(doc)
         #raise Exception('currently_unsupported: Transformers.Preprocessor.undo is not yet supported')
 
@@ -870,9 +876,10 @@ class TransformersPreprocessor(TextPreprocessor):
         y = self._transform_y(y)
 
         # convert examples
-        dataset = hf_convert_examples(texts, y=y, tokenizer=self.tok, max_length=self.maxlen,
+        tok, _ = self.get_preprocessor()
+        dataset = hf_convert_examples(texts, y=y, tokenizer=tok, max_length=self.maxlen,
                                       pad_on_left=bool(self.name in ['xlnet']),
-                                      pad_token=self.tok.convert_tokens_to_ids([self.tok.pad_token][0]),
+                                      pad_token=tok.convert_tokens_to_ids([tok.pad_token][0]),
                                       pad_token_segment_id=4 if self.name in ['xlnet'] else 0)
         self.set_multilabel(dataset, mode, verbose=verbose)
         if mode == 'train':  self.preprocess_train_called = True
