@@ -17,7 +17,7 @@ Most recent releases are shown at the top. Each release shows:
 - added `device` argument to `TransformerSummarizer` constructor to control PyTorch device
 
 ### Fixed:
-- require `transformers>=2.11.0` due to breaking changes in 2.11 related to `bart` models
+- require `transformers>=2.11.0` due to breaking changes in v2.11 related to `BART` models
 
 
 ## 0.16.1 (2020-06-05)
