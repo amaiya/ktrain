@@ -6,21 +6,23 @@ class TransformerSummarizer():
     interface to Transformer-based text summarization
     """
 
-    def __init__(self, model_name='bart-large-cnn'):
+    def __init__(self, model_name='facebook/bart-large-cnn', device=None):
         """
         interface to BART-based text summarization using transformers library
 
         Args:
-          model_name(str): name of BART model
+          model_name(str): name of BART model for summarization
+          device(str): device to use (e.g., 'cuda', 'cpu')
         """
-        if model_name.split('-')[0] != 'bart': 
+        if 'bart' not in model_name:
             raise ValueError('TransformerSummarizer currently only accepts BART models')
         try:
             import torch
         except ImportError:
             raise Exception('TransformerSummarizer requires PyTorch to be installed.')
+        self.torch_device = device
+        if self.torch_device is None: self.torch_device = 'cuda' if torch.cuda.is_available() else 'cpu'
         from transformers import BartTokenizer, BartForConditionalGeneration
-        self.torch_device = 'cuda' if torch.cuda.is_available() else 'cpu'
         self.tokenizer = BartTokenizer.from_pretrained(model_name)
         self.model = BartForConditionalGeneration.from_pretrained(model_name).to(self.torch_device)
 

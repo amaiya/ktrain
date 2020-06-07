@@ -7,6 +7,19 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.16.2 (2020-06-07)
+
+### New:
+- N/A
+
+### Changed
+- default model for summarization changed to `facebook/bart-large-cnn` due to breaking change in v2.11
+- added `device` argument to `TransformerSummarizer` constructor to control PyTorch device
+
+### Fixed:
+- require `transformers>=2.11.0` due to breaking changes in 2.11 related to `bart` models
+
+
 ## 0.16.1 (2020-06-05)
 
 ### New:
