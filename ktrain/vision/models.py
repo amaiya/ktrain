@@ -74,7 +74,7 @@ def image_classifier(name,
                      train_data,
                      val_data=None,
                      freeze_layers=None, 
-                     metric='accuracy',
+                     metrics=['accuracy'],
                      optimizer_name = U.DEFAULT_OPT,
                      multilabel=None,
                      multigpu_number=None, 
@@ -95,7 +95,7 @@ def image_classifier(name,
         freeze_layers (int):  number of beginning layers to make untrainable
                             If None, then all layers except new Dense layers
                             will be frozen/untrainable.
-        metric (string):  metric to use
+        metrics (list):  metrics to use
         optimizer_name(str): name of Keras optimizer (e.g., 'adam', 'sgd')
         multilabel(bool):  If True, model will be build to support
                            multilabel classificaiton (labels are not mutually exclusive).
@@ -118,7 +118,7 @@ def image_classifier(name,
         
     """
     return image_model(name, train_data, val_data=val_data, freeze_layers=freeze_layers,
-                       metric=metric, optimizer_name=optimizer_name, multilabel=multilabel,
+                       metrics=metrics, optimizer_name=optimizer_name, multilabel=multilabel,
                        multigpu_number=multigpu_number,
                        pt_fc=pt_fc, pt_ps=pt_ps, verbose=verbose)
 
@@ -129,7 +129,7 @@ def image_regression_model(name,
                           train_data,
                           val_data=None,
                           freeze_layers=None, 
-                          metric='mae',
+                          metrics=['mae'],
                           optimizer_name = U.DEFAULT_OPT,
                           multigpu_number=None, 
                           pt_fc = [],
@@ -149,7 +149,7 @@ def image_regression_model(name,
         freeze_layers (int):  number of beginning layers to make untrainable
                             If None, then all layers except new Dense layers
                             will be frozen/untrainable.
-        metric (string):  metric to use
+        metrics (list):  metrics to use
         optimizer_name(str): name of Keras optimizer (e.g., 'adam', 'sgd')
         multilabel(bool):  If True, model will be build to support
                            multilabel classificaiton (labels are not mutually exclusive).
@@ -174,7 +174,7 @@ def image_regression_model(name,
 
 
     return image_model(name, train_data, val_data=val_data, freeze_layers=freeze_layers,
-                       metric=metric, optimizer_name=optimizer_name, multilabel=False,
+                       metrics=metrics, optimizer_name=optimizer_name, multilabel=False,
                        multigpu_number=multigpu_number,
                        pt_fc=pt_fc, pt_ps=pt_ps, verbose=verbose)
 
@@ -184,7 +184,7 @@ def image_model( name,
                  train_data,
                  val_data=None,
                  freeze_layers=None, 
-                 metric='accuracy',
+                 metrics=['accuracy'],
                  optimizer_name = U.DEFAULT_OPT,
                  multilabel=None,
                  multigpu_number=None, 
@@ -205,7 +205,7 @@ def image_model( name,
         freeze_layers (int):  number of beginning layers to make untrainable
                             If None, then all layers except new Dense layers
                             will be frozen/untrainable.
-        metric (string):  metric to use
+        metrics (list):  metrics to use
         optimizer_name(str): name of Keras optimizer (e.g., 'adam', 'sgd')
         multilabel(bool):  If True, model will be build to support
                            multilabel classificaiton (labels are not mutually exclusive).
@@ -278,7 +278,7 @@ def image_model( name,
     elif is_regression:
         loss_func = 'mse'
         activation = None
-        if metric == 'accuracy': metric = 'mae'
+        if metrics == ['accuracy']: metrics = ['mae']
 
     U.vprint("Is Multi-Label? %s" % (multilabel), verbose=verbose)
     U.vprint("Is Regression? %s" % (is_regression), verbose=verbose)
@@ -306,7 +306,7 @@ def image_model( name,
                                       pt_ps = pt_ps)
         parallel_model = multi_gpu_model(model, gpus=multigpu_number)
         parallel_model.compile(optimizer=optimizer_name, 
-                               loss='categorical_crossentropy', metrics=[metric])
+                               loss='categorical_crossentropy', metrics=metrics)
         return parallel_model
     else:
         model = build_visionmodel(name,
@@ -316,7 +316,7 @@ def image_model( name,
                                   activation=activation,
                                   pt_fc = pt_fc,
                                   pt_ps = pt_ps)
-        model.compile(optimizer=optimizer_name, loss=loss_func, metrics=[metric])
+        model.compile(optimizer=optimizer_name, loss=loss_func, metrics=metrics)
         return model
 
 
