@@ -22,9 +22,9 @@ class ZeroShotClassifier():
             raise Exception('ZeroShotClassifier requires PyTorch to be installed.')
         self.torch_device = device
         if self.torch_device is None: self.torch_device = 'cuda' if torch.cuda.is_available() else 'cpu'
-        from transformers import BartForSequenceClassification, BartTokenizer
-        self.tokenizer = BartTokenizer.from_pretrained(model_name)
-        self.model = BartForSequenceClassification.from_pretrained(model_name).to(self.torch_device)
+        from transformers import AutoModelForSequenceClassification, AutoTokenizer
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+        self.model = AutoModelForSequenceClassification.from_pretrained(model_name).to(self.torch_device)
 
 
     def predict(self, doc, topic_strings=[], include_labels=False):

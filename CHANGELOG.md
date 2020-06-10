@@ -7,6 +7,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.16.4 (TBD)
+
+### New:
+- N/A
+
+### Changed
+- `text.zsl.ZeroShotClassifier` changed to use `AutoModel*` and `AutoTokenizer` in order to load any `mlni` model
+
+### Fixed:
+- N/A
+
+
 ## 0.16.3 (2020-06-10)
 
 ### New:
