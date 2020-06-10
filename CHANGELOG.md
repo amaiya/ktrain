@@ -14,6 +14,7 @@ Most recent releases are shown at the top. Each release shows:
 
 ### Changed
 - `text.zsl.ZeroShotClassifier` changed to use `AutoModel*` and `AutoTokenizer` in order to load any `mlni` model
+- remove external modules from `ktrain.__init__.py` so that they do not appear when pressing TAB in notebook
 
 ### Fixed:
 - N/A
