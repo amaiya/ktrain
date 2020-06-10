@@ -52,7 +52,7 @@ def calc_r(y_i, x, y):
     return np.log(calc_pr(y_i, x, y, True) / calc_pr(y_i, x, y, False))
 
 
-def _text_model(name, train_data, preproc=None, multilabel=None, classification=True, verbose=1):
+def _text_model(name, train_data, preproc=None, multilabel=None, classification=True, metrics=['accuracy'], verbose=1):
     """
     Build and return a text classification or text regression model.
 
@@ -73,6 +73,7 @@ def _text_model(name, train_data, preproc=None, multilabel=None, classification=
                             If None, multilabel will be inferred from data.
         classification(bool): If True, will build a text classificaton model.
                               Otherwise, a text regression model will be returned.
+        metrics(list): list of metrics to use
         verbose (boolean): verbosity of output
     Return:
         model (Model): A Keras Model instance
@@ -103,7 +104,7 @@ def _text_model(name, train_data, preproc=None, multilabel=None, classification=
         raise ValueError('you preprocessed for %s but want to build a %s model' % (preproc.name, name))
  
     if not classification: # regression
-        metrics=['mae']
+        if metrics is None or metrics==['accuracy']: metrics=['mae']
         num_classes = 1
         multilabel = False
         loss_func = 'mse'
@@ -113,7 +114,7 @@ def _text_model(name, train_data, preproc=None, multilabel=None, classification=
         maxlen = U.shape_from_data(train_data)[1]
         U.vprint('maxlen is %s' % (maxlen), verbose=verbose)
     else:                 # classification
-        metrics = ['accuracy']
+        if metrics is None: metrics = ['accuracy']
         # set number of classes and multilabel flag
         num_classes = U.nclasses_from_data(train_data)
 
@@ -436,7 +437,7 @@ def _build_bigru(num_classes,
 
 
 
-def text_classifier(name, train_data, preproc=None, multilabel=None, verbose=1):
+def text_classifier(name, train_data, preproc=None, multilabel=None, metrics=['accuracy'], verbose=1):
     """
     Build and return a text classification model.
 
@@ -456,6 +457,7 @@ def text_classifier(name, train_data, preproc=None, multilabel=None, verbose=1):
         multilabel (bool):  If True, multilabel model will be returned.
                             If false, binary/multiclass model will be returned.
                             If None, multilabel will be inferred from data.
+        metrics(list): metrics to use
         verbose (boolean): verbosity of output
     Return:
         model (Model): A Keras Model instance
@@ -465,10 +467,10 @@ def text_classifier(name, train_data, preproc=None, multilabel=None, verbose=1):
     if preproc is not None and not preproc.get_classes():
         raise ValueError('preproc.get_classes() is empty, but required for text classification')
     return _text_model(name, train_data, preproc=preproc,
-                       multilabel=multilabel, classification=True, verbose=verbose)
+                       multilabel=multilabel, classification=True, metrics=metrics, verbose=verbose)
 
 
-def text_regression_model(name, train_data, preproc=None, verbose=1):
+def text_regression_model(name, train_data, preproc=None, metrics=['mae'],  verbose=1):
     """
     Build and return a text regression model.
 
@@ -484,6 +486,7 @@ def text_regression_model(name, train_data, preproc=None, verbose=1):
         train_data (tuple): a tuple of numpy.ndarrays: (x_train, y_train)
         preproc: a ktrain.text.TextPreprocessor instance.
                  As of v0.8.0, this is required.
+        metrics(list): metrics to use
         verbose (boolean): verbosity of output
     Return:
         model (Model): A Keras Model instance
@@ -493,4 +496,4 @@ def text_regression_model(name, train_data, preproc=None, verbose=1):
     if preproc is not None and preproc.get_classes():
         raise ValueError('preproc.get_classes() is supposed to be empty for text regression tasks')
     return _text_model(name, train_data, preproc=preproc,
-                      multilabel=False, classification=False,  verbose=verbose)
+                      multilabel=False, classification=False, metrics=metrics, verbose=verbose)

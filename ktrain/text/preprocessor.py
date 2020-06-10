@@ -919,15 +919,16 @@ class TransformersPreprocessor(TextPreprocessor):
 
 
 
-    def get_classifier(self, fpath=None, multilabel=None):
+    def get_classifier(self, fpath=None, multilabel=None, metrics=['accuracy']):
         """
-        creates a model for classification
+        creates a model for text classification
         Args:
           fpath(str): optional path to saved pretrained model. Typically left as None.
           multilabel(bool): If None, multilabel status is discovered from data [recommended].
                             If True, model will be forcibly configured for multilabel task.
                             If False, model will be forcibly configured for non-multilabel task.
                             It is recommended to leave this as None.
+          metrics(list): metrics to use
         """
         self.check_trained()
         if not self.get_classes():
@@ -953,11 +954,17 @@ class TransformersPreprocessor(TextPreprocessor):
             loss_fn = keras.losses.CategoricalCrossentropy(from_logits=True)
         model.compile(loss=loss_fn,
                       optimizer=U.DEFAULT_OPT,
-                      metrics=['accuracy'])
+                      metrics=metrics)
         return model
 
 
-    def get_regression_model(self, fpath=None):
+    def get_regression_model(self, fpath=None, metrics=['mae']):
+        """
+        creates a model for text regression
+        Args:
+          fpath(str): optional path to saved pretrained model. Typically left as None.
+          metrics(list): metrics to use
+        """
         self.check_trained()
         if self.get_classes():
             warnings.warn('class labels were provided - treating as classification problem')
@@ -968,7 +975,7 @@ class TransformersPreprocessor(TextPreprocessor):
         loss_fn = 'mse'
         model.compile(loss=loss_fn,
                       optimizer=U.DEFAULT_OPT,
-                      metrics=['mae'])
+                      metrics=metrics)
         return model
 
 

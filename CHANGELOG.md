@@ -7,6 +7,19 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.16.3 (2020-06-10)
+
+### New:
+- added `metrics` parameter to `text.text_classifier` and `text.text_regression_model` functions
+- added `metrics` parameter to `Transformer.get_classifier` and `Transformer.get_regrssion_model` methods
+
+### Changed
+- `metric` parameter in `vision.image_classifier` and `vision.image_regression_model` functions changed to `metrics`
+
+### Fixed:
+- N/A
+
+
 ## 0.16.2 (2020-06-07)
 
 ### New:
