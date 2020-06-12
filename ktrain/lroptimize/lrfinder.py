@@ -152,6 +152,7 @@ class LRFinder:
             except:
                 print("Failed to compute the gradients, there might not be enough points.\n" +\
                        "Plot displayed without suggestion.")
+                plt.show()
                 return
             else:
                 print('Two possible suggestions for LR from plot:')
@@ -159,6 +160,7 @@ class LRFinder:
                 print(f"\tMin loss divided by 10: {self.lrs[ml]/10:.2E}")
                 print(mg)
                 ax.plot(self.lrs[mg],self.losses[mg], markersize=10,marker='o',color='red')
+                plt.show()
         return
 
 
