@@ -17,7 +17,7 @@ Most recent releases are shown at the top. Each release shows:
 - remove external modules from `ktrain.__init__.py` so that they do not appear when pressing TAB in notebook
 
 ### Fixed:
-- N/A
+- explicitly call `plt.show()` in `LRFinder.plot_loss` to resolved issues with plot not displaying under in certain cases (PR #170)
 
 
 ## 0.16.3 (2020-06-10)
