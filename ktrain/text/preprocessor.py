@@ -835,10 +835,29 @@ class TransformersPreprocessor(TextPreprocessor):
         if not hasattr(self, 'tok'): self.tok = None
 
 
-    def get_preprocessor(self):
+    def get_tokenizer(self, fpath=None):
+        model_name = self.model_name if fpath is None else fpath
         if self.tok is None:
-            self.tok = self.tokenizer_type.from_pretrained(self.model_name)
-        return (self.tok, self.tok_dct)
+            self.tok = self.tokenizer_type.from_pretrained(model_name)
+        return self.tok
+
+
+    def save_tokenizer(self, fpath):
+        if os.path.isfile(fpath):
+            raise ValueError(f'There is an existing file named {fpath}. ' +\
+                              'Please use dfferent value for fpath.')
+        elif os.path.exists(fpath):
+            pass
+        elif not os.path.exists(fpath):
+            os.makedirs(fpath)
+        tok =self.get_tokenizer()
+        tok.save_pretrained(fpath)
+        return
+
+
+
+    def get_preprocessor(self):
+        return (self.get_tokenizer(), self.tok_dct)
 
 
 

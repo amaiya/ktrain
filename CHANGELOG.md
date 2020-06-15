@@ -15,6 +15,8 @@ Most recent releases are shown at the top. Each release shows:
 ### Changed
 - `text.zsl.ZeroShotClassifier` changed to use `AutoModel*` and `AutoTokenizer` in order to load any `mlni` model
 - remove external modules from `ktrain.__init__.py` so that they do not appear when pressing TAB in notebook
+- added `Transformer.save_tokenizer` and `Transformer.get_tokenizer` methods to facilitate training on machines
+  with no internet
 
 ### Fixed:
 - explicitly call `plt.show()` in `LRFinder.plot_loss` to resolved issues with plot not displaying under in certain cases (PR #170)
