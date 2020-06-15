@@ -10,7 +10,7 @@ Most recent releases are shown at the top. Each release shows:
 ## 0.16.4 (TBD)
 
 ### New:
-- N/A
+- added `core.evaluate` as alias to `core.validate`
 
 ### Changed
 - `text.zsl.ZeroShotClassifier` changed to use `AutoModel*` and `AutoTokenizer` in order to load any `mlni` model

@@ -66,6 +66,13 @@ class Learner(ABC):
         
 
 
+    def evaluate(self, test_data=None, print_report=True, class_names=[]):
+        """
+        alias for self.validate()
+        """
+        return self.validate(val_data=test_data, print_report=print_report, class_names=class_names)
+
+
 
     def validate(self, val_data=None, print_report=True, class_names=[]):
         """
@@ -73,6 +80,9 @@ class Learner(ABC):
         a classification report.
         This is currently only supported for binary and multiclass
         classification, not multilabel classification.
+
+        By default, this uses val_data, as supplied to ktrain.get_learner().
+        Other validation or test data can be optionally be supplied as argument.
         """
         if val_data is not None:
             val = val_data
