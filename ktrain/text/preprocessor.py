@@ -493,7 +493,7 @@ class TextPreprocessor(Preprocessor):
                 print("\t%s : %s" % (k, int(round(stat_dict[k]))))
 
 
-    def _transform_y(self, y_data):
+    def _transform_y(self, y_data, verbose=1):
         """
         preprocess y
         If shape of y is 1, then task is considered classification if self.c exists
@@ -504,9 +504,10 @@ class TextPreprocessor(Preprocessor):
 
         # check for errors and warnings
         if not isinstance(y_data[0], str) and len(y_data.shape) ==1 and not self.get_classes():
-            warnings.warn('Task is being treated as TEXT REGRESSION because ' +\
-                          'class_names argument was not supplied. ' + \
-                          'If this is incorrect, supply class_names argument.')
+            if verbose:
+                warnings.warn('Task is being treated as TEXT REGRESSION because ' +\
+                              'class_names argument was not supplied. ' + \
+                              'If this is incorrect, supply class_names argument.')
         elif len(y_data.shape) > 1 and not self.get_classes():
             raise ValueError('y-values are 1-hot or multi-hot encoded but self.get_classes() is empty. ' +\
                              'The classes argument should have been supplied.')
@@ -594,7 +595,7 @@ class StandardTextPreprocessor(TextPreprocessor):
         U.vprint('x_train shape: ({},{})'.format(x_train.shape[0], x_train.shape[1]), verbose=verbose)
 
         # transform y
-        y_train = self._transform_y(y_train)
+        y_train = self._transform_y(y_train, verbose=verbose)
         if y_train is not None and verbose:
             print('y_train shape: %s' % (y_train.shape,))
 
@@ -630,7 +631,7 @@ class StandardTextPreprocessor(TextPreprocessor):
         U.vprint('x_test shape: ({},{})'.format(x_test.shape[0], x_test.shape[1]), verbose=verbose)
 
         # transform y
-        y_test = self._transform_y(y_test)
+        y_test = self._transform_y(y_test, verbose=verbose)
         if y_test is not None and verbose:
             print('y_test shape: %s' % (y_test.shape,))
 
@@ -767,7 +768,7 @@ class BERTPreprocessor(TextPreprocessor):
         x = bert_tokenize(texts, self.tok, self.maxlen, verbose=verbose)
 
         # transform y
-        y = self._transform_y(y)
+        y = self._transform_y(y, verbose=verbose)
         result = (x, y)
         self.set_multilabel(result, mode)
         if mode == 'train': self.preprocess_train_called = True
@@ -900,7 +901,7 @@ class TransformersPreprocessor(TextPreprocessor):
             raise ValueError('y is required for training sets')
         elif y is None:
             y = np.array([1] * len(texts))
-        y = self._transform_y(y)
+        y = self._transform_y(y, verbose=verbose)
 
         # convert examples
         tok, _ = self.get_preprocessor()
