@@ -309,6 +309,7 @@ Examples include:
 - **medical informatics:**  analyzing doctors' written analyses of patients and medical imagery
 - **finance:**  financial crime analytics, mining stock-related news stories
 - **insurance:** detecting fraud in insurance claims
+- **customer relationship management (CRM):** making sense of feedback from customers and/or patients
 - **social science:** making sense of text-based responses in surveys and emotion-classification from text data
 - **linguistics:** detecting sarcasm in the news
 - **education:** analysis of attitudes towards educational institutions in social media
