@@ -498,8 +498,9 @@ class Learner(ABC):
             U.vprint('Please invoke the Learner.lr_plot() method to visually inspect '
                   'the loss plot to help identify the maximal learning rate '
                   'associated with falling loss.', verbose=verbose)
-        return 
-
+        ml = np.argmin(self.lr_finder.losses)
+        mg = (np.gradient(np.array(self.lr_finder.losses[32:ml]))).argmin()
+        return self.lr_finder.lrs[mg]
 
     def lr_plot(self, n_skip_beginning=10, n_skip_end=5, suggest=False):
         """
