@@ -212,7 +212,10 @@ In this toy example, we are supplying the text data to classify in the URL as a 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
 
 ### How do I use custom metrics with *ktrain*?
-You can use custom callbacks:
+
+The `Transformer.get_classifier`, `text.text_classifier`, and `vision.image_classifier` methods/functions all accept a `metrics` argument.
+
+You can also use custom Keras callbacks:
 
 ```python
 # define a custom callback for ROC-AUC
