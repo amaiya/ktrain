@@ -4,6 +4,8 @@
 
 - [How do I obtain the word or sentence embeddings after fine-tuning a Transformer-based text classifier?](#how-do-i-obtain-the-word-or-sentence-embeddings-after-fine-tuning-a-transformer-based-text-classifier)
 
+- [How do I use ktrain without an internet connections](#how-do-i-use-ktrain-without-an-internet-connection)
+
 - [How do I train using multiple GPUs?](#how-do-i-train-using-multiple-gpus)
 
 - [How do I train a model using mixed precision?](#how-do-i-train-a-model-using-mixed-precision)
@@ -110,6 +112,39 @@ See also [this post](https://github.com/huggingface/transformers/issues/1950) on
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
 
 
+### How do I use ktrain without an internet connection?
+
+When using pretrained models or pretrained word embeddings in *ktrain*, files are automatically downloaded.  For instance,
+pretrained models and tokenizers from the `transformers` library are downloaded to `<home_directory>/.cache/torch.transformers`
+by default.  Other data like pretrained word vectors are downloaded to the `<home_directory>/ktrain_data` folder.
+
+In some settings, it is necessary to either train models or make predictions in environments with no internet 
+access (e.g., behind a firewall, air-gapped networks).  Typically, it is sufficient to copy the above folders
+to the machine without internet access. 
+
+However, due to a current bug in the `transformers` library, files from `<home_directory>/.cache/torch.transformers` are
+not loaded.  To get around this, you can download the model files from [here]( https://huggingface.co/models) and point
+*ktrain* to the folder.  There are typically three fiels you need, and it is important that the downloaded files are rennamed 
+to `tf_model.h5`, `config.json`, and 'vocab.txt'.
+
+Here is an example of how to run `SimpleQA` for [open-domain question-answering](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/question_answering_with_bert.ipynb) without internet access:
+
+1. On a machine with public internet access, go to the Hugging Face model repository: [https://huggingface.co/models](https://huggingface.co/models)
+2. Select the model you want and click "List all files in model".  For `SimpleQA`, you will need `bert-large-uncased-whole-word-masking-finetuned-squad` and `bert-base-uncased`
+3. Download the `tf_model.h5`, `config.json`, and `vocab.txt` files into a folder  It is important that these are renamed specifically as the three aforementioned file names.
+4. Copy these folders to the machine without public internet access
+5. When invoking `SimpleQA`, provide these folders as arguments to the `bert_squad_model` and `bert_emb_model` parameters:
+```python
+qa = text.SimpleQA(INDEXDIR,
+                    bert_squad_model='/path/to/squad/model/bert-squad',
+                    bert_emb_model='/path/to/bert-base-uncased/bert-emb')
+```
+
+You can use simlar steps for text classification using the `ktrain.text.Transformer` class, for example.
+
+
+
+[[Back to Top](#frequently-asked-questions-about-ktrain)]
 
 ### How do I train using multiple GPUs?
 
@@ -290,7 +325,7 @@ See [this tutorial](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/maste
 
 ### Why am I seeing an ERROR when installing *ktrain* on Google Colab?
 
-These errors (e.g., `has requirement gast>=0.3.2, but you'll have gast 0.2.2 which is incompatible`) are related to TensorFlow and can be usually be safely ignored and shouldn't affect operation of *ktrain*.
+These errors (e.g., `has requirement gast>=0.3.2, but you'll have gast 0.2.2 which is incompatible`) are related to TensorFlow and can be usually safely ignored and shouldn't affect operation of *ktrain*.
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
 
