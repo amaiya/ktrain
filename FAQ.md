@@ -125,7 +125,7 @@ to the machine without internet access.
 However, due to a current bug in the `transformers` library, files from `<home_directory>/.cache/torch.transformers` are
 not loaded when there is no internet access.  To get around this, you can download the model files from [here]( https://huggingface.co/models) and point
 *ktrain* to the folder.  There are typically three fiels you need, and it is important that the downloaded files are rennamed 
-to `tf_model.h5`, `config.json`, and 'vocab.txt'.
+to `tf_model.h5`, `config.json`, and `vocab.txt`.
 
 Here is an example of how to run `SimpleQA` for [open-domain question-answering](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/question_answering_with_bert.ipynb) without internet access:
 
