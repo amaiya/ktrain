@@ -140,7 +140,7 @@ qa = text.SimpleQA(INDEXDIR,
                     bert_emb_model='/path/to/bert-base-uncased/bert-emb')
 ```
 
-You can use simlar steps for text classification using the `ktrain.text.Transformer` class, for example.
+You can use simlar steps for other models that use the `transformers` library like text classification using the `ktrain.text.Transformer` class, for example.
 
 
 
