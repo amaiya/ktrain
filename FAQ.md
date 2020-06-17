@@ -4,7 +4,7 @@
 
 - [How do I obtain the word or sentence embeddings after fine-tuning a Transformer-based text classifier?](#how-do-i-obtain-the-word-or-sentence-embeddings-after-fine-tuning-a-transformer-based-text-classifier)
 
-- [How do I use ktrain without an internet connections](#how-do-i-use-ktrain-without-an-internet-connection)
+- [How do I use ktrain without an internet connection?](#how-do-i-use-ktrain-without-an-internet-connection)
 
 - [How do I train using multiple GPUs?](#how-do-i-train-using-multiple-gpus)
 
