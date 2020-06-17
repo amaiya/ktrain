@@ -124,20 +124,20 @@ to the machine without internet access.
 
 However, due to a current bug in the `transformers` library, files from `<home_directory>/.cache/torch/transformers` are
 not loaded when there is no internet access.  To get around this, you can download the model files from [here]( https://huggingface.co/models) and point
-*ktrain* to the folder.  There are typically three fiels you need, and it is important that the downloaded files are rennamed 
+*ktrain* to the folder.  There are typically three files you need, and it is important that the downloaded files are rennamed 
 to `tf_model.h5`, `config.json`, and `vocab.txt`.
 
 Here is an example of how to run `SimpleQA` for [open-domain question-answering](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/question_answering_with_bert.ipynb) without internet access:
 
 1. On a machine with public internet access, go to the Hugging Face model repository: [https://huggingface.co/models](https://huggingface.co/models)
 2. Select the model you want and click "List all files in model".  For `SimpleQA`, you will need `bert-large-uncased-whole-word-masking-finetuned-squad` and `bert-base-uncased`
-3. Download the `tf_model.h5`, `config.json`, and `vocab.txt` files into a folder  It is important that these are renamed specifically as the three aforementioned file names.
+3. Download the `tf_model.h5`, `config.json`, and `vocab.txt` files into a folder.  It is important that these downloaded files are renamed specifically to the three aforementioned file names.
 4. Copy these folders to the machine without public internet access
-5. When invoking `SimpleQA`, provide these folders as arguments to the `bert_squad_model` and `bert_emb_model` parameters:
+5. When invoking `SimpleQA`, provide these folders containing the downloaded files as arguments to the `bert_squad_model` and `bert_emb_model` parameters:
 ```python
 qa = text.SimpleQA(INDEXDIR,
-                    bert_squad_model='/path/to/squad/model/bert-squad',
-                    bert_emb_model='/path/to/bert-base-uncased/bert-emb')
+                    bert_squad_model='/path/to/bert/squad/model/folder',
+                    bert_emb_model='/path/to/bert-base-uncased/folder')
 ```
 
 You can use simlar steps for other models that use the `transformers` library like text classification using the `ktrain.text.Transformer` class, for example.
