@@ -26,6 +26,9 @@
 
 - [Running `predictor.explain` for text classification is slow.  How can I speed it up?](#running-predictorexplain-for-text-classification-is-slow--how-can-i-speed-it-up)
 
+- [Why does `texts_from_csv` throw an error on Google Cloud Storage?](#why-does-texts_from_csv-throw-an-error-on-google-cloud-storage)
+
+
 - [What kinds of applications have been built with *ktrain*?](#what-kinds-of-applications-have-been-built-with-ktrain)
 
 
@@ -336,6 +339,20 @@ These errors (e.g., `has requirement gast>=0.3.2, but you'll have gast 0.2.2 whi
 The `TextPredictor.explain` method accepts a parameter called `n_samples`, which governs the number of synthetic samples created and used to generate the explanation.  At the default value of 2500, `explain` returns results on Google Colab in ~25 seconds.
 If you pass `n_samples=500` to `explain`, results are returned in ~5 seconds on Google Colab.  In theory, higher sample sizes  yield better explanations. In practice,
 smaller sample sizes (e.g., 500, 1000) may be sufficient for your use case.
+
+
+[[Back to Top](#frequently-asked-questions-about-ktrain)]
+
+
+### Why does `texts_from_csv` throw an error on Google Cloud Storage?
+
+The error is probably happening because *ktrain* tries to auto-detect the character encoding using `open(train_filepath, 'rb')` which may be problematic with Google Cloud Storage. 
+One solution is to explicitly provide the `encoding` to `texts_from_csv` as an argument so this step is skipped (default is *None*, which activates auto-detect).
+
+Alternatively, you can read the data in yourself as a *pandas* DataFrame using one of [these methods](https://stackoverflow.com/a/50201179/13550699). For instance, *pandas* evidently supports GCS, so you can simply do this: `df = pd.read_csv('gs://bucket/your_path.csv')
+`
+
+Then, using *ktrain*, you can use `ktrain.text.texts_from_df` (or `ktrain.text.texts_from_array`) to load and preprocess your data.
 
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
