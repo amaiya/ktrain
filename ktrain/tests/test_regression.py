@@ -9,7 +9,7 @@ Sequential = ktrain.imports.Sequential
 Dense = ktrain.imports.Dense
 
 def bostonhousing():
-    from keras.datasets import boston_housing
+    from tensorflow.keras.datasets import boston_housing
     (x_train, y_train), (x_test, y_test) = boston_housing.load_data()
 
     model = Sequential()
