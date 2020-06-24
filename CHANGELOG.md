@@ -7,9 +7,10 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
-## 0.16.4 (TBD)
+## 0.17.0 (2020-06-24)
 
 ### New:
+- support for language translation using pretraiend `MarianMT` models
 - added `core.evaluate` as alias to `core.validate`
 
 ### Changed

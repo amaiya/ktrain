@@ -7,6 +7,21 @@
 
 
 ### News and Announcements
+- **2020-06-26:**  
+  - ***ktrain*** **v0.17.x is released** and includes support for **language translation**. See the [example language translation notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/zero_shot_learning_with_nli.ipynb) for more information.  <sub><sup>(This feature currently requires that PyTorch be installed.)</sup></sub>
+```python
+# Translating Arabic to English (NOTE: Language Translation uses PyTorch instead of TensorFlow)
+
+from ktrain import text 
+translator = text.EnglishTranslator(src_lang='ar')
+src_text = '''لقد أحدث الوباء دمارا في اقتصادات العالم.
+ومع ذلك ، اعتبارًا من يونيو 2020 ، استمرت سوق الأسهم الأمريكية في الارتفاع.
+'''
+print(translator.translate(src_text))
+# printed output:
+# The epidemic has devastated the world's economies.
+# However, as of June 2020, the American stock market continued to rise.
+```
 - **2020-06-03:**  
   - ***ktrain*** **v0.16.x is released** and includes support for **Zero-Shot Learning**, where documents can be classified into user-provided topics **without** any training examples. See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/zero_shot_learning_with_nli.ipynb).  <sub><sup>(This feature currently requires that PyTorch be installed.)</sup></sub>
 ```python
