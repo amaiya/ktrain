@@ -10,8 +10,8 @@
 - **2020-06-26:**  
   - ***ktrain*** **v0.17.x is released** and includes support for **language translation**. See the [example language translation notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/zero_shot_learning_with_nli.ipynb) for more information.  <sub><sup>(This feature currently requires that PyTorch be installed.)</sup></sub>
 ```python
-# Translating Arabic to English (NOTE: Language Translation uses PyTorch instead of TensorFlow)
-
+# Translating Arabic to English 
+# NOTE: Language Translation uses PyTorch instead of TensorFlow)
 from ktrain import text 
 translator = text.EnglishTranslator(src_lang='ar')
 src_text = '''لقد أحدث الوباء دمارا في اقتصادات العالم.
