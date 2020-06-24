@@ -250,3 +250,17 @@ UPCOMING PLANETARY PROBES - MISSIONS AND SCHEDULES
 
 print(ts.summarize(sample_doc))
 
+
+# zsl
+from ktrain import text 
+zsl = text.ZeroShotClassifier()
+topic_strings=['politics', 'elections', 'sports', 'films', 'television']
+doc = 'I am unhappy with decisions of the government and will definitely vote in 2020.'
+print(zsl.predict(doc, topic_strings=topic_strings, include_labels=True))
+
+
+# translation
+translator = text.EnglishTranslator(src_lang='zh')
+src_text = '''大流行对世界经济造成了严重破坏。但是，截至2020年6月，美国股票市场持续上涨。'''
+print(translator.translate(src_text))
+
