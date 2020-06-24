@@ -405,7 +405,7 @@ class Learner(ABC):
 
 
     def lr_find(self, start_lr=1e-7, lr_mult=1.01, max_epochs=None, 
-                stop_factor=4, show_plot=False, verbose=1):
+                stop_factor=4, show_plot=False, suggest=False, verbose=1):
         """
         Plots loss as learning rate is increased.  Highest learning rate 
         corresponding to a still falling loss should be chosen.
@@ -435,11 +435,19 @@ class Learner(ABC):
                               Increase this if loss is erratic and lr_find
                               exits too early.
             show_plot (bool):  If True, automatically invoke lr_plot
+            suggest(bool):  If True, returns numerical estimates of lr using two different methods:
+                              1. learning rate associated with minimum numerical gradient
+                              2. learning rate associated with minimum loss divided by 10
+                            Since neither of these methods are fool-proof and can 
+                            potentially return bad estimates, suggest=False is default.
             verbose (bool): specifies how much output to print
         Returns:
-            float:  Numerical estimate of best lr.  
-                    The lr_plot method should be invoked to
-                    identify the maximal loss associated with falling loss.
+            if suggest is True:
+                tuple:  tuple of form (float, float), which represent two numerical estimates of best lr.  
+                        First estimate is lr for minimum numerical gradient. Can be None if gradient computation fails.
+                        Second estimate is lr associated with minimum loss divided by 10.
+            else:
+                None
         """
 
         U.vprint('simulating training for different learning rates... this may take a few moments...',
@@ -498,9 +506,9 @@ class Learner(ABC):
             U.vprint('Please invoke the Learner.lr_plot() method to visually inspect '
                   'the loss plot to help identify the maximal learning rate '
                   'associated with falling loss.', verbose=verbose)
-        ml = np.argmin(self.lr_finder.losses)
-        mg = (np.gradient(np.array(self.lr_finder.losses[32:ml]))).argmin()
-        return self.lr_finder.lrs[mg]
+        if suggest: return self.lr_finder.estimate_lr()
+        return
+
 
     def lr_plot(self, n_skip_beginning=10, n_skip_end=5, suggest=False):
         """
