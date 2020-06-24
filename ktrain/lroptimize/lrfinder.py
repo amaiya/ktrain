@@ -165,7 +165,7 @@ class LRFinder:
                 ml = self.ml
                 print('Two possible suggestions for LR from plot:')
                 print(f"\tMin numerical gradient: {self.lrs[mg]:.2E}")
-                print(f"\tMin loss divided by 10: {self.lrs[ml]/10:.2E}")
+                print(f"\tMin loss divided by 5: {self.lrs[ml]/5:.2E}")
                 ax.plot(self.lrs[mg],self.losses[mg], markersize=10,marker='o',color='red')
                 plt.show()
         return
@@ -190,7 +190,7 @@ class LRFinder:
         """
         Generates two numerical estimates of lr: 
           1. lr associated with minum numerical gradient (None if gradient computation fails)
-          2. lr associated with minimum loss divided by 10
+          2. lr associated with minimum loss divided by 5
         Args:
           tuple: (float, float)
 
@@ -201,7 +201,7 @@ class LRFinder:
         lr2 = None
         if self.mg is not None:
             lr1 = self.lrs[self.mg]
-        lr2 = self.lrs[self.ml]/10
+        lr2 = self.lrs[self.ml]/5
         return (lr1, lr2)
 
 
