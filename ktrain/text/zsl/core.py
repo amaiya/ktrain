@@ -8,10 +8,10 @@ class ZeroShotClassifier():
 
     def __init__(self, model_name='facebook/bart-large-mnli', device=None):
         """
-        interface to BART-based text summarization using transformers library
+        ZeroShotClassifier constructor
 
         Args:
-          model_name(str): name of BART model
+          model_name(str): name of a BART NLI model
           device(str): device to use (e.g., 'cuda', 'cpu')
         """
         if 'mnli' not in model_name and 'xnli' not in model_name:
