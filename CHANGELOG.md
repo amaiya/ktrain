@@ -12,6 +12,8 @@ Most recent releases are shown at the top. Each release shows:
 ### New:
 - support for language translation using pretraiend `MarianMT` models
 - added `core.evaluate` as alias to `core.validate`
+- `Learner.estimate_lr` method will return numerical estimates of learning rate using two different methods.
+   Should only be called **after** running `Learner.lr_find`.
 
 ### Changed
 - `text.zsl.ZeroShotClassifier` changed to use `AutoModel*` and `AutoTokenizer` in order to load any `mlni` model
