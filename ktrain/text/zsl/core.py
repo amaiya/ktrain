@@ -14,8 +14,8 @@ class ZeroShotClassifier():
           model_name(str): name of BART model
           device(str): device to use (e.g., 'cuda', 'cpu')
         """
-        if 'mnli' not in model_name:
-            raise ValueError('ZeroShotClasifier requires an MNLI model')
+        if 'mnli' not in model_name and 'xnli' not in model_name:
+            raise ValueError('ZeroShotClasifier requires an MNLI or XNLI model')
         try:
             import torch
         except ImportError:

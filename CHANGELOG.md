@@ -21,6 +21,7 @@ Most recent releases are shown at the top. Each release shows:
 ### Fixed:
 - explicitly call `plt.show()` in `LRFinder.plot_loss` to resolved issues with plot not displaying under in certain cases (PR #170)
 - suppress warning about text regression when making text regression predictions
+- allow `xnli` models for `zsl` module
 
 
 ## 0.16.3 (2020-06-10)
