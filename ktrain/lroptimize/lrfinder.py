@@ -166,7 +166,6 @@ class LRFinder:
                 print('Two possible suggestions for LR from plot:')
                 print(f"\tMin numerical gradient: {self.lrs[mg]:.2E}")
                 print(f"\tMin loss divided by 10: {self.lrs[ml]/10:.2E}")
-                print(mg)
                 ax.plot(self.lrs[mg],self.losses[mg], markersize=10,marker='o',color='red')
                 plt.show()
         return
@@ -179,11 +178,11 @@ class LRFinder:
         Stored as mg and ml respectively
         """
         # this code was adapted from fastai: https://github.com/fastai/fastai
+        self.ml = np.argmin(self.losses)
         try: 
-            self.mg = (np.gradient(np.array(self.losses[32:ml]))).argmin()
+            self.mg = (np.gradient(np.array(self.losses[32:self.ml]))).argmin()
         except:
             self.mg = None
-        self.ml = np.argmin(self.losses)
         return
 
 
@@ -201,8 +200,8 @@ class LRFinder:
         lr1 = None
         lr2 = None
         if self.mg is not None:
-            lr1 = self.lrs[mg]
-        lr2 = self.lrs[ml]/10
+            lr1 = self.lrs[self.mg]
+        lr2 = self.lrs[self.ml]/10
         return (lr1, lr2)
 
 
