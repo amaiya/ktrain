@@ -37,14 +37,6 @@ zsl.predict(doc, topic_strings=topic_strings, include_labels=True)
 #  ('films', 0.0008969294722191989),
 #  ('television', 0.00045271270209923387)]
 ```
-- **2020-05-13:**  
-  - ***ktrain*** **v0.15.x is released** and includes support for:
-    - **image regression**:  See the [example notebook on age prediction from photos](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/vision/utk_faces_age_prediction-resnet50.ipynb).
-    - **sentence pair classification**:  See this [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/MRPC-BERT.ipynb) on using BERT for paraphrase detection.<sub><sup>(Sentence pair classification included in v0.15.1, but not v0.15.0.)</sup></sub>
-    - **tf.data.Datasets**:  See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/vision/mnist-tf_workflow.ipynb) on using `tf.data.Datasets` in *ktrain* for custom models and data formats.
-- **2020-04-15:**  
-  - ***ktrain*** **v0.14.x is released** and now includes support for **open-domain question-answering**.  See the [example QA notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/question_answering_with_bert.ipynb)
-
 ----
 
 ### Overview
