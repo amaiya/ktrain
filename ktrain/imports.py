@@ -18,6 +18,7 @@ if SUPPRESS_TF_WARNINGS:
     warnings.simplefilter(action='ignore', category=FutureWarning)
     # elevate warnings to errors for debugging dependencies
     #warnings.simplefilter('error', FutureWarning)
+    logging.getLogger('mosestokenizer').setLevel(logging.ERROR)
 
 
 
