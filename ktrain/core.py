@@ -510,7 +510,7 @@ class Learner(ABC):
         Returns:
           tuple: tuple of the form (float, float), where 
             First element is lr associated with minimum numerical gradient (None if gradient computation fails).
-            Second element is lr associated with minimum loss divided by 5.
+            Second element is lr associated with minimum loss divided by 10.
         """
         if self.lr_finder is None or self.lr_finder.ml is None: raise ValueError('Please call lr_find first.')
         return self.lr_finder.estimate_lr()
