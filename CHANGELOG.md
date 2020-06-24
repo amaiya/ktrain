@@ -20,7 +20,7 @@ Most recent releases are shown at the top. Each release shows:
   with no internet
 
 ### Fixed:
-- explicitly call `plt.show()` in `LRFinder.plot_loss` to resolved issues with plot not displaying under in certain cases (PR #170)
+- explicitly call `plt.show()` in `LRFinder.plot_loss` to resolved issues with plot not displaying in certain cases (PR #170)
 - suppress warning about text regression when making text regression predictions
 - allow `xnli` models for `zsl` module
 
