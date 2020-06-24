@@ -2,7 +2,7 @@ from ...imports import *
 from ... import utils as U
 from .. import textutils as TU
 
-SUPPORTED_SRC_LANGS = ['zh', 'ar', 'de', 'es', 'fr', 'it']
+SUPPORTED_SRC_LANGS = ['zh', 'ar', 'de', 'af', 'es', 'fr', 'it', 'pt']
 
 class Translator():
     """
@@ -65,12 +65,14 @@ class EnglishTranslator():
         Args:
           src_lang(str): language code of source language.
                          Must be one of SUPPORTED_SRC_LANGS:
-                           'zh': Chinese
+                           'zh': Chinese (either tradtional or simplified)
                            'ar': Arabic
                            'de': German
+                           'af': Afrikaans
                            'es': Spanish
                            'fr': French
                            'it': Italian
+                           'pt': Portuguese
           device(str): device to use (e.g., 'cuda', 'cpu')
         """
 
@@ -82,7 +84,9 @@ class EnglishTranslator():
             self.translators.append(Translator(model_name='Helsinki-NLP/opus-mt-ar-en', device=device))
         elif src_lang == 'de':
             self.translators.append(Translator(model_name='Helsinki-NLP/opus-mt-de-en', device=device))
-        elif src_lang in ['es', 'fr', 'it']:
+        elif src_lang == 'af':
+            self.translators.append(Translator(model_name='Helsinki-NLP/opus-mt-af-en', device=device))
+        elif src_lang in ['es', 'fr', 'it', 'pt']:
             self.translators.append(Translator(model_name='Helsinki-NLP/opus-mt-ROMANCE-en', device=device))
         elif src_lang == 'zh': # could not find zh->en model, so currently doing two-step translation to English via German
             self.translators.append(Translator(model_name='Helsinki-NLP/opus-mt-ZH-de', device=device))
