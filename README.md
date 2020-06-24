@@ -16,7 +16,7 @@ from ktrain import text
 translator = text.Translator(model_name='Helsinki-NLP/opus-mt-ZH-de')
 src_text = '''大流行对世界经济造成了严重破坏。但是，截至2020年6月，美国股票市场持续上涨。'''
 print(translator.translate(src_text))
-# printed output:
+# output:
 # Die Pandemie hat eine ernste Zerstörung der Weltwirtschaft verursacht.
 # Aber bis Juni 2020 stieg der US-Markt weiter an.
 ```
