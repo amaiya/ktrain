@@ -21,6 +21,10 @@ class LRFinder:
         self.batch_num = 0
         self.beta = 0.98
 
+        # stats computed by _compute_stats
+        self.mg = None # index of minimum numerical gradient
+        self.ml = None # index of minimum loss
+
     def on_batch_end(self, batch, logs):
         # Log the learning rate
         lr = K.get_value(self.model.optimizer.lr)
@@ -125,6 +129,9 @@ class LRFinder:
         # Restore the original learning rate
         K.set_value(self.model.optimizer.lr, original_lr)
 
+        # compute stats for numerical estimates of lr
+        self._compute_stats()
+
 
         return 
 
@@ -138,6 +145,8 @@ class LRFinder:
             suggest(bool): will highlight numerical estimate
                            of best lr if True - methods adapted from fastai
         """
+        if self.ml is None: raise ValueError('Please call find first.')
+        
         fig, ax = plt.subplots()
         plt.ylabel("loss")
         plt.xlabel("learning rate (log scale)")
@@ -146,15 +155,14 @@ class LRFinder:
 
         if suggest:
             # this code was adapted from fastai: https://github.com/fastai/fastai
-            try: 
-                ml = np.argmin(self.losses)
-                mg = (np.gradient(np.array(self.losses[32:ml]))).argmin()
-            except:
+            if self.mg is None:
                 print("Failed to compute the gradients, there might not be enough points.\n" +\
                        "Plot displayed without suggestion.")
                 plt.show()
                 return
             else:
+                mg = self.mg
+                ml = self.ml
                 print('Two possible suggestions for LR from plot:')
                 print(f"\tMin numerical gradient: {self.lrs[mg]:.2E}")
                 print(f"\tMin loss divided by 10: {self.lrs[ml]/10:.2E}")
@@ -162,6 +170,42 @@ class LRFinder:
                 ax.plot(self.lrs[mg],self.losses[mg], markersize=10,marker='o',color='red')
                 plt.show()
         return
+
+
+    def _compute_stats(self):
+        """
+        generates the index associated with minum numerical gradient and the 
+        index associated with minum loss.
+        Stored as mg and ml respectively
+        """
+        # this code was adapted from fastai: https://github.com/fastai/fastai
+        try: 
+            self.mg = (np.gradient(np.array(self.losses[32:ml]))).argmin()
+        except:
+            self.mg = None
+        self.ml = np.argmin(self.losses)
+        return
+
+
+    def estimate_lr(self):
+        """
+        Generates two numerical estimates of lr: 
+          1. lr associated with minum numerical gradient (None if gradient computation fails)
+          2. lr associated with minimum loss divided by 10
+        Args:
+          tuple: (float, float)
+
+          If gradient computation fails, first element of tuple will be None.
+        """
+        if self.ml is None: raise ValueError('Please call find first.')
+        lr1 = None
+        lr2 = None
+        if self.mg is not None:
+            lr1 = self.lrs[mg]
+        lr2 = self.lrs[ml]/10
+        return (lr1, lr2)
+
+
 
 
 

@@ -514,6 +514,7 @@ class Learner(ABC):
                            of best lr if True - methods adapted from fastai
           
         """
+        if self.lr_finder.ml is None: raise ValueError('Please call lr_find first.')
         self.lr_finder.plot_loss(n_skip_beginning=n_skip_beginning,
                                  n_skip_end=n_skip_end, suggest=suggest)
         return
