@@ -8,23 +8,23 @@ class ZeroShotClassifier():
 
     def __init__(self, model_name='facebook/bart-large-mnli', device=None):
         """
-        interface to BART-based text summarization using transformers library
+        ZeroShotClassifier constructor
 
         Args:
-          model_name(str): name of BART model
+          model_name(str): name of a BART NLI model
           device(str): device to use (e.g., 'cuda', 'cpu')
         """
-        if 'mnli' not in model_name:
-            raise ValueError('ZeroShotClasifier requires an MNLI model')
+        if 'mnli' not in model_name and 'xnli' not in model_name:
+            raise ValueError('ZeroShotClasifier requires an MNLI or XNLI model')
         try:
             import torch
         except ImportError:
             raise Exception('ZeroShotClassifier requires PyTorch to be installed.')
         self.torch_device = device
         if self.torch_device is None: self.torch_device = 'cuda' if torch.cuda.is_available() else 'cpu'
-        from transformers import BartForSequenceClassification, BartTokenizer
-        self.tokenizer = BartTokenizer.from_pretrained(model_name)
-        self.model = BartForSequenceClassification.from_pretrained(model_name).to(self.torch_device)
+        from transformers import AutoModelForSequenceClassification, AutoTokenizer
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+        self.model = AutoModelForSequenceClassification.from_pretrained(model_name).to(self.torch_device)
 
 
     def predict(self, doc, topic_strings=[], include_labels=False):

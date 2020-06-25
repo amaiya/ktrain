@@ -7,6 +7,7 @@ from .textutils import extract_filenames, load_text_files, filter_by_id
 from .preprocessor import Transformer, TransformerEmbedding
 from .summarization import TransformerSummarizer
 from .zsl import ZeroShotClassifier
+from .translation import EnglishTranslator, Translator
 from . import shallownlp
 from .qa import SimpleQA
 from . import textutils
@@ -29,6 +30,8 @@ __all__ = [
            'shallownlp',
            'TransformerSummarizer',
            'ZeroShotClassifier',
+           'EnglishTranslator',
+           'Translator',
            'SimpleQA',
            'extract_filenames', 
            'load_text_files',

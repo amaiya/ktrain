@@ -7,6 +7,26 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.17.0 (2020-06-24)
+
+### New:
+- support for language translation using pretraiend `MarianMT` models
+- added `core.evaluate` as alias to `core.validate`
+- `Learner.estimate_lr` method will return numerical estimates of learning rate using two different methods.
+   Should only be called **after** running `Learner.lr_find`.
+
+### Changed
+- `text.zsl.ZeroShotClassifier` changed to use `AutoModel*` and `AutoTokenizer` in order to load any `mlni` model
+- remove external modules from `ktrain.__init__.py` so that they do not appear when pressing TAB in notebook
+- added `Transformer.save_tokenizer` and `Transformer.get_tokenizer` methods to facilitate training on machines
+  with no internet
+
+### Fixed:
+- explicitly call `plt.show()` in `LRFinder.plot_loss` to resolved issues with plot not displaying in certain cases (PR #170)
+- suppress warning about text regression when making text regression predictions
+- allow `xnli` models for `zsl` module
+
+
 ## 0.16.3 (2020-06-10)
 
 ### New:
