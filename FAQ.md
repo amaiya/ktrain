@@ -123,8 +123,8 @@ by default.  Other data like pretrained word vectors are downloaded to the `<hom
 
 In some settings, it is necessary to either train models or make predictions in environments with no internet 
 access (e.g., behind a firewall, air-gapped networks).  Typically, it is sufficient to copy the above folders
-to the machine without internet access. For instance, if you when loading and using a `Predictor` instance as shown below,
-the all that's needed is a vocabulary file that is typically retrieved from the cache:
+to the machine without internet access. For instance, if loading and using a `Predictor` instance as shown below,
+then all that is typically needed is a vocabulary file that is typically retrieved from the cache:
 ```python
 p = ktrain.load_predictor('/tmp/mypred')
 p.predict(data)
