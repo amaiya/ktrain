@@ -2,7 +2,7 @@ from ...imports import *
 from ... import utils as U
 from .. import textutils as TU
 
-SUPPORTED_SRC_LANGS = ['zh', 'ar', 'de', 'af', 'es', 'fr', 'it', 'pt']
+SUPPORTED_SRC_LANGS = ['zh', 'ar', 'ru', 'de', 'af', 'es', 'fr', 'it', 'pt']
 
 class Translator():
     """
@@ -18,11 +18,11 @@ class Translator():
           device(str): device to use (e.g., 'cuda', 'cpu')
         """
         if 'Helsinki-NLP' not in model_name:
-            raise ValueError('BasicTranslator requires a Helsinki-NLP model: https://huggingface.co/Helsinki-NLP')
+            raise ValueError('Translator requires a Helsinki-NLP model: https://huggingface.co/Helsinki-NLP')
         try:
             import torch
         except ImportError:
-            raise Exception('BasicTranslator requires PyTorch to be installed.')
+            raise Exception('Translator requires PyTorch to be installed.')
         self.torch_device = device
         if self.torch_device is None: self.torch_device = 'cuda' if torch.cuda.is_available() else 'cpu'
         from transformers import MarianMTModel, MarianTokenizer
@@ -67,6 +67,7 @@ class EnglishTranslator():
                          Must be one of SUPPORTED_SRC_LANGS:
                            'zh': Chinese (either tradtional or simplified)
                            'ar': Arabic
+                           'ru' : Russian
                            'de': German
                            'af': Afrikaans
                            'es': Spanish
@@ -82,6 +83,8 @@ class EnglishTranslator():
         self.translators = []
         if src_lang == 'ar':
             self.translators.append(Translator(model_name='Helsinki-NLP/opus-mt-ar-en', device=device))
+        elif src_lang == 'ru':
+            self.translators.append(Translator(model_name='Helsinki-NLP/opus-mt-ru-en', device=device))
         elif src_lang == 'de':
             self.translators.append(Translator(model_name='Helsinki-NLP/opus-mt-de-en', device=device))
         elif src_lang == 'af':

@@ -7,6 +7,17 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.17.2 (2020-06-25)
+
+### New:
+- Added support for Russian in `text.EnglishTranslator`
+
+### Changed
+- N/A
+
+### Fixed:
+- N/A
+
 ## 0.17.1 (2020-06-24)
 
 ### New:
