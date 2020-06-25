@@ -11,6 +11,7 @@
   - ***ktrain*** **v0.17.x is released** and includes support for **language translation**. See the [example language translation notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/language_translation_example.ipynb) for more information.  <sub><sup>(This feature currently requires that PyTorch be installed.)</sup></sub>
 ```python
 # Translating Chinese to German
+
 # NOTE: Language Translation uses PyTorch instead of TensorFlow
 from ktrain import text 
 translator = text.Translator(model_name='Helsinki-NLP/opus-mt-ZH-de')
