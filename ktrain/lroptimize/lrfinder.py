@@ -145,7 +145,7 @@ class LRFinder:
             suggest(bool): will highlight numerical estimate
                            of best lr if True - methods adapted from fastai
         """
-        if self.ml is None: raise ValueError('Please call find first.')
+        if not self.find_called: raise ValueError('Please call find first.')
         
         fig, ax = plt.subplots()
         plt.ylabel("loss")
@@ -196,7 +196,7 @@ class LRFinder:
 
           If gradient computation fails, first element of tuple will be None.
         """
-        if self.ml is None: raise ValueError('Please call find first.')
+        if not self.find_called(): raise ValueError('Please call find first.')
         lr1 = None
         lr2 = None
         if self.mg is not None:
@@ -205,7 +205,8 @@ class LRFinder:
         return (lr1, lr2)
 
 
-
+    def find_called(self):
+        return self.ml is not None
 
 
         
