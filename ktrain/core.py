@@ -512,7 +512,7 @@ class Learner(ABC):
             First element is lr associated with minimum numerical gradient (None if gradient computation fails).
             Second element is lr associated with minimum loss divided by 10.
         """
-        if self.lr_finder is None or not self.lr_finder.find_called() is None: raise ValueError('Please call lr_find first.')
+        if self.lr_finder is None or not self.lr_finder.find_called(): raise ValueError('Please call lr_find first.')
         return self.lr_finder.estimate_lr()
         
 
