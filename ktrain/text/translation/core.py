@@ -27,7 +27,7 @@ class Translator():
         if self.torch_device is None: self.torch_device = 'cuda' if torch.cuda.is_available() else 'cpu'
         from transformers import MarianMTModel, MarianTokenizer
         self.tokenizer = MarianTokenizer.from_pretrained(model_name)
-        self.model = MarianMTModel.from_pretrained(model_name)
+        self.model = MarianMTModel.from_pretrained(model_name).to(self.torch_device)
 
 
     def translate(self, src_text, join_with='\n'):
@@ -48,7 +48,7 @@ class Translator():
         """
         # tokenize text into sentences:
         sentences = TU.sent_tokenize(src_text)
-        translated = self.model.generate(**self.tokenizer.prepare_translation_batch(sentences))
+        translated = self.model.generate(**self.tokenizer.prepare_translation_batch(sentences).to(self.torch_device))
         tgt_sentences = [self.tokenizer.decode(t, skip_special_tokens=True) for t in translated]
         return join_with.join(tgt_sentences)
 

@@ -7,6 +7,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.17.1 (2020-06-24)
+
+### New:
+- N/A
+
+### Changed
+- N/A
+
+### Fixed:
+- Properly set device in `text.Translator` and use cuda when available
+
+
 ## 0.17.0 (2020-06-24)
 
 ### New:
