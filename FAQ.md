@@ -123,10 +123,16 @@ by default.  Other data like pretrained word vectors are downloaded to the `<hom
 
 In some settings, it is necessary to either train models or make predictions in environments with no internet 
 access (e.g., behind a firewall, air-gapped networks).  Typically, it is sufficient to copy the above folders
-to the machine without internet access. 
+to the machine without internet access. For instance, if you when loading and using a `Predictor` instance as shown below,
+the all that's needed is a vocabulary file that is typically retrieved from the cache:
+```python
+p = ktrain.load_predictor('/tmp/mypred')
+p.predict(data)
+```
 
-However, due to a current bug in the `transformers` library, files from `<home_directory>/.cache/torch/transformers` are
-not loaded when there is no internet access.  To get around this, you can download the model files from [here]( https://huggingface.co/models) and point
+In some cases (e.g., when training a model on a system with no internet access or using pretrained model for question-answering),
+ due to a current bug in the `transformers` library, files from `<home_directory>/.cache/torch/transformers` may
+not load when there is no internet access even when present.  To get around this, you can download the model files from [here]( https://huggingface.co/models) and point
 *ktrain* to the folder.  There are typically three files you need, and it is important that the downloaded files are rennamed 
 to `tf_model.h5`, `config.json`, and `vocab.txt`.
 
