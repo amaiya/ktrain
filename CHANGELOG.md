@@ -7,6 +7,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.17.3 (2020-06-26)
+
+### New:
+- N/A
+
+### Changed
+- N/A
+
+### Fixed:
+- Changed `setup.py` to open README file using `encoding="utf-8"` to prevent installation problems on Windows machines with `cp1252` encoding
+
+
 ## 0.17.2 (2020-06-25)
 
 ### New:

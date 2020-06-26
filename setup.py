@@ -1,7 +1,7 @@
 from distutils.core import setup
 import setuptools
 
-with open('README.md') as readme_file: 
+with open('README.md', encoding='utf-8') as readme_file: 
     readme_file.readline()
     readme = readme_file.read()
 exec(open('ktrain/version.py').read())
