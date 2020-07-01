@@ -82,7 +82,7 @@ Here is how you can quickly get started using *ktrain*:
 
 #### Method 1: Using Predictor API (works for any model)
 ```python
-# save model and Preprocessor instance after partially training
+# save Predictor (i.e., model and Preprocessor instance) after partially training
 ktrain.get_predictor(model, preproc).save('/tmp/my_predictor')
 
 # reload Predictor and extract model
