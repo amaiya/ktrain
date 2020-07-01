@@ -95,7 +95,7 @@ learner.fit_onecycle(2e-5, 1)
 Note that `preproc` here is a *Preprocessor* instance.  If using a data-loading function like `texts_from_csv` or `images_from_folder`, it will be the third return value from the function. Or, if using the *Transformer* API, it will be the output of invoking `text.Transformer` (i.e., `preproc = text.Transformer('bert-base-uncased', ...)`).
 
 
-#### Method 2: Using transformers API (if training Hugging Face Transformers model)
+#### Method 2: Using `transformers` library (if training Hugging Face Transformers model)
 If the model is a Hugging Face transformers model, you can use `transformers` directly:
 ```python
 # save model using transformers API after partially training
@@ -111,14 +111,16 @@ learner = ktrain.get_learner(model, train_data=trn, val_data=val)
 learner.fit_onecycle(2e-5, 1)
 ```
 
-#### Method 3: Using `checkpoing_folder` argument to save model weights
+#### Method 3: Using `checkpoint_folder` argument to save model weights
 
 The `checkpoint_folder` argument (e.g., `learner.autofit(1e-4, 4, checkpoint_folder='/tmp/saved_weights')`), saves the weights only of the model after each epoch. 
 The weights of any epoch can be reloaded into the model using the `model.load_weights` method as you normally would in `tf.Keras`.  You just need to first re-create
 the model first.  For instance, if training an NER model, it would work as follows:
 ```python
 # recreate model from scratch
-txt.sequence_tagger(...
+import ktrain
+from ktrain import text
+model = text.sequence_tagger(...
 # load checkpoint weights into model
 model.load_weights('../models/checkpoints/weights-10.hdf5')
 # recreate learner
