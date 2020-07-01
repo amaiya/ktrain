@@ -2,6 +2,8 @@
 
 - [I am a newcomer and am having trouble figuring out how to even get started. Where do I begin?](#i-am-a-newcomer-and-am-having-trouble-figuring-out-how-to-even-get-started-where-do-i-begin)
 
+- [How do I resume training from a saved checkpoint?](#how-do-i-resume-training-from-a-saved-checkpoint)
+
 - [How do I obtain the word or sentence embeddings after fine-tuning a Transformer-based text classifier?](#how-do-i-obtain-the-word-or-sentence-embeddings-after-fine-tuning-a-transformer-based-text-classifier)
 
 - [How do I use ktrain without an internet connection?](#how-do-i-use-ktrain-without-an-internet-connection)
@@ -72,6 +74,63 @@ Here is how you can quickly get started using *ktrain*:
 *ktrain* is inspired by some other libraries like `fastai` and `ludwig`. For a deeper dive into neural networks, the *fastai MOOC* and the
 *TensorFlow and Deep Learning Without a PhD* series are recommended.
 
+
+[[Back to Top](#frequently-asked-questions-about-ktrain)]
+
+
+### How do I resume training from a saved checkpoint?
+
+#### Method 1: Using Predictor API (works for any model)
+```python
+# save model and Preprocessor instance after partially training
+ktrain.get_predictor(model, preproc).save('/tmp/my_predictor')
+
+# reload Predictor and extract model
+model = ktrain.load_predictor('/tmp/my_predictor').model
+
+# re-instantiate Learner and continue training
+learner = ktrain.get_learner(model, train_data=trn, val_data=val)
+learner.fit_onecycle(2e-5, 1)
+```
+Note that `preproc` here is a *Preprocessor* instance.  If using a data-loading function like `texts_from_csv` or `images_from_folder`, it will be the third return value from the function. Or, if using the *Transformer* API, it will be the output of invoking `text.Transformer` (i.e., `preproc = text.Transformer('bert-base-uncased', ...)`).
+
+
+#### Method 2: Using transformers API (if training Hugging Face Transformers model)
+If the model is a Hugging Face transformers model, you can use `transformers` directly:
+```python
+# save model using transformers API after partially training
+learner.model.save_pretrained('/tmp/my_model')
+
+# reload the model using transformers directly
+from transformers import *
+model = TFAutoModelForSequenceClassification.from_pretrained('/tmp/my_model')
+model.compile(loss='categorical_crossentropy',optimizer='adam', metrics=['accuracy'])
+
+# re-instantiate Learner and continue training
+learner = ktrain.get_learner(model, train_data=trn, val_data=val)
+learner.fit_onecycle(2e-5, 1)
+```
+
+#### Method 3: Using `checkpoing_folder` argument to save model weights
+
+The `checkpoint_folder` argument (e.g., `learner.autofit(1e-4, 4, checkpoint_folder='/tmp/saved_weights')`), saves the weights only of the model after each epoch. 
+The weights of any epoch can be reloaded into the model using the `model.load_weights` method as you normally would in `tf.Keras`.  You just need to first re-create
+the model first.  For instance, if training an NER model, it would work as follows:
+```python
+# recreate model from scratch
+txt.sequence_tagger(...
+# load checkpoint weights into model
+model.load_weights('../models/checkpoints/weights-10.hdf5')
+# recreate learner
+learner = ktrain.get_learner(model, ...
+# continue training here
+```
+
+Finally, there is also a `learner.save_model` and `learner.load_model` methods intended for saving and reloading models when training interactively during a single session.
+
+
+
+[[Back to Top](#frequently-asked-questions-about-ktrain)]
 
 ### How do I obtain the word or sentence embeddings after fine-tuning a Transformer-based text classifier?
 Here is a self-contained example of generating word embeddings from a fine-tuned `Transformer` model:
