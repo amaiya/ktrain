@@ -92,7 +92,7 @@ model = ktrain.load_predictor('/tmp/my_predictor').model
 learner = ktrain.get_learner(model, train_data=trn, val_data=val)
 learner.fit_onecycle(2e-5, 1)
 ```
-Note that `preproc` here is a *Preprocessor* instance.  If using a data-loading function like `texts_from_csv` or `images_from_folder`, it will be the third return value from the function. Or, if using the *Transformer* API for text classification, it will be the output of invoking `text.Transformer` (i.e., `preproc = text.Transformer('bert-base-uncased', ...)`).
+Note that `preproc` here is a *Preprocessor* instance.  If using a data-loading function like `texts_from_csv` or `images_from_folder`, it will be the third return value from the function. Or, if using the [Transformer API](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-A3-hugging_face_transformers.ipynb) for text classification, it will be the output of invoking `text.Transformer` (i.e., `preproc = text.Transformer('bert-base-uncased', ...)`).
 
 
 #### Method 2: Using `transformers` library (if training Hugging Face Transformers model)
