@@ -6,6 +6,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.17.4 (2020-07-02)
+
+### New:
+- N/A
+
+### Changed
+- N/A
+
+### Fixed:
+- Explicitly supply `'truncate='longest_first'` to prevent sentence pair classification from breaking in `transformers==3.0.0`
+
+
 
 ## 0.17.3 (2020-06-26)
 
