@@ -289,12 +289,14 @@ class Learner(ABC):
                                    #loss=self.model.loss,
                                    #metrics=metrics)
         metrics = U.metrics_from_model(self.model)
-        if wd is not None and type(self.model.optimizer).__name__ != 'AdamWeightDecay':
+        if wd is not None and wd > 0 and type(self.model.optimizer).__name__ != 'AdamWeightDecay':
             warnings.warn('recompiling model to use AdamWeightDecay as opimizer with weight decay of %s' % (wd) )
             optimizer = U.get_default_optimizer(wd=wd)
-        elif wd is not None:
+        elif wd is not None and wd > 0:
             optimizer = U.get_default_optimizer(wd=wd)
-        else:
+        elif wd is not None and wd == 0:
+            optimizer = U.DEFAULT_OPT
+        else: # wd is None -> don't modify optimizer
             optimizer = self.model.optimizer
         self.model.compile(optimizer=optimizer,
                            loss=self.model.loss,
