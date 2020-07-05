@@ -290,7 +290,7 @@ While *ktrain* will probably work with other versions of TensorFlow 2.x, v2.1.0 
 2. Install *ktrain*: `pip3 install ktrain`
 
 **Some things to note:**
-- *ktrain* will automatically install TensorFlow 2 as a dependency.
+- *ktrain* will automatically install TensorFlow 2.1.0 as a dependency. Since TensorFlow 2.1.0 does not support Python 3.8, running `pip install ktrain` on a system with Python 3.8 as default (e.g., Ubuntu 20.04) will currently not work, as TensorFlow 2.1.0 will not be able to be downloaded.  *ktrain* will support TensorFlow 2.2.0 (and Python 3.8) in the near future.  In the meantime, if you are on a system with Python 3.8 as default (like Ubuntu 20.04 LTS), you will need to install Python 3.7 and use that version of Python with *ktrain*. 
 - Since some *ktrain* dependencies have not yet been migrated to `tf.keras` in TensorFlow 2 (or may have other issues), 
   *ktrain* is temporarily using forked versions of some libraries. Specifically, *ktrain* uses forked versions of the `eli5` and `stellargraph` libraries.  If not installed, *ktrain* will complain  when a method or function needing 
   either of these libraries is invoked.
