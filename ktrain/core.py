@@ -288,7 +288,7 @@ class Learner(ABC):
                 #self.model.compile(optimizer=self.model.optimizer,
                                    #loss=self.model.loss,
                                    #metrics=metrics)
-        metrics = [m.name for m in self.model.metrics] if U.is_tf_keras() else self.model.metrics
+        metrics = U.metrics_from_model(self.model)
         if wd is not None and type(self.model.optimizer).__name__ != 'AdamWeightDecay':
             warnings.warn('recompiling model to use AdamWeightDecay as opimizer with weight decay of %s' % (wd) )
             optimizer = U.get_default_optimizer(wd=wd)
