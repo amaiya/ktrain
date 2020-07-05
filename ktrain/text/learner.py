@@ -154,11 +154,16 @@ class TransformerTextClassLearner(GenLearner):
         preds = self.model.predict(self._prepare(val, train=False))
         if classification:
             if multilabel:
-                return activations.sigmoid(tf.convert_to_tensor(preds)).numpy()
+                prediction = activations.sigmoid(tf.convert_to_tensor(preds)).numpy()
             else:
-                return activations.softmax(tf.convert_to_tensor(preds)).numpy()
+                prediction = activations.softmax(tf.convert_to_tensor(preds)).numpy()
         else:
-            return preds
+            prediction = preds
+        # fixes for TensorFlow 2.2.0 weirdness
+        if isinstance(prediction, tuple): prediction = prediction[0]
+        if len(prediction.shape) > 2 and prediction.shape[0] == 1: prediction = np.squeeze(prediction, axis=0)
+        return prediction
+
 
 
     def save_model(self, fpath):
