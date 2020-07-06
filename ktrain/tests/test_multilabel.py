@@ -89,7 +89,15 @@ class TestMultilabel(TestCase):
                                      train_data=(X, Y),
                                      val_data=(X, Y),
                                      batch_size=1)
+        #import tempfile
+        #new_file, weightfile = tempfile.mkstemp()
+        #model.save_weights(weightfile)
+        #hist = learner.fit(0.1, 5)
+        #model.load_weights(weightfile)
         learner.lr_find()
+
+
+        # use loss instead of accuracy due to: https://github.com/tensorflow/tensorflow/issues/41114
         hist = learner.fit(0.001, 200)
         learner.view_top_losses(n=5)
         learner.validate()
