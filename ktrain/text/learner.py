@@ -152,6 +152,10 @@ class TransformerTextClassLearner(GenLearner):
         if hasattr(val, 'reset'): val.reset()
         classification, multilabel = U.is_classifier(self.model)
         preds = self.model.predict(self._prepare(val, train=False))
+
+        # transformers in TF 2.2.0 returns a tuple insead of NumPy array for some reason
+        if isinstance(preds, tuple) and len(tuple) == 1: preds = preds[0] 
+
         if classification:
             if multilabel:
                 return activations.sigmoid(tf.convert_to_tensor(preds)).numpy()
