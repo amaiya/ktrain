@@ -6,6 +6,23 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.17.6 (2020-07-06)
+
+### New:
+- N/A
+
+### Changed
+- N/A
+
+### Fixed:
+- Fixes for strangeness in TensorFlow 2.2.0:
+  - created `metrics_from_model` function due to changes in the way metrics are extracted from compiled model
+  - use `loss_fn_from_model` function due to changes in they way loss functions are extracted from compiled model
+  - addd `**kwargs` to `AdamWeightDecay based on [this issue](https://github.com/tensorflow/addons/issues/1645)
+  - changed `TransformerTextClassLearner.predict` method to deal with tuples being returned by `predict` in TensorFlow 2.2.0
+  - changed multilabel test to use loss insead of accuracy due to [TF 2.2.0 issue](https://github.com/tensorflow/tensorflow/issues/41114)
+
+
 ## 0.17.5 (2020-07-02)
 
 ### New:
