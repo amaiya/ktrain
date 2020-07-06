@@ -152,18 +152,17 @@ class TransformerTextClassLearner(GenLearner):
         if hasattr(val, 'reset'): val.reset()
         classification, multilabel = U.is_classifier(self.model)
         preds = self.model.predict(self._prepare(val, train=False))
+
+        # transformers in TF 2.2.0 returns a tuple insead of NumPy array for some reason
+        if isinstance(preds, tuple) and len(tuple) == 1: preds = preds[0] 
+
         if classification:
             if multilabel:
-                prediction = activations.sigmoid(tf.convert_to_tensor(preds)).numpy()
+                return activations.sigmoid(tf.convert_to_tensor(preds)).numpy()
             else:
-                prediction = activations.softmax(tf.convert_to_tensor(preds)).numpy()
+                return activations.softmax(tf.convert_to_tensor(preds)).numpy()
         else:
-            prediction = preds
-        # fixes for TensorFlow 2.2.0 weirdness
-        if isinstance(prediction, tuple): prediction = prediction[0]
-        if len(prediction.shape) > 2 and prediction.shape[0] == 1: prediction = np.squeeze(prediction, axis=0)
-        return prediction
-
+            return preds
 
 
     def save_model(self, fpath):

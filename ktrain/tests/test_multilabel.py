@@ -93,9 +93,13 @@ class TestMultilabel(TestCase):
         hist = learner.fit(0.001, 200)
         learner.view_top_losses(n=5)
         learner.validate()
-        final_acc = hist.history[VAL_ACC_NAME][-1]
-        print('final_accuracy:%s' % (final_acc))
-        self.assertGreater(final_acc, 0.97)
+        #final_acc = hist.history[VAL_ACC_NAME][-1]
+        #print('final_accuracy:%s' % (final_acc))
+        #self.assertGreater(final_acc, 0.97)
+
+        final_loss = hist.history['val_loss'][-1]
+        print('final_loss:%s' % (final_loss))
+        self.assertLess(final_loss, 0.05)
 
 
 if __name__ == "__main__":
