@@ -453,9 +453,11 @@ class Learner(ABC):
                 verbose=verbose)
 
         # save current weights and temporarily restore original weights
-        new_file, weightfile = tempfile.mkstemp()
-        self.model.save_weights(weightfile)
-        #self.model.load_weights(self._original_weights)
+        # 2020-0707: temporarily use save_model instead of save_weights due to https://github.com/tensorflow/tensorflow/issues/41116
+        #new_file, weightfile = tempfile.mkstemp()
+        #self.model.save_weights(weightfile)
+        temp_folder = tempfile.mkdtemp()
+        self.save_model(temp_folder)
 
 
          # compute steps_per_epoch
@@ -489,11 +491,14 @@ class Learner(ABC):
                                 verbose=verbose)
         except KeyboardInterrupt:
             # re-load current weights
-            self.model.load_weights(weightfile)
+            #self.model.load_weights(weightfile)
+            self.load_model(temp_folder)
             return
 
         # re-load current weights
-        self.model.load_weights(weightfile)
+        # 2020-0707: temporarily use load_model instead of load_weights due to https://github.com/tensorflow/tensorflow/issues/41116
+        #self.model.load_weights(weightfile)
+        self.load_model(temp_folder)
 
         # instructions to invoker
         U.vprint('\n', verbose=verbose)
