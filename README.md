@@ -9,7 +9,7 @@
 ### News and Announcements
 - **2020-07-07:**  
   - ***ktrain*** **v0.18.x is released** and now supports TensorFlow 2.2.0.  
-    Since TensorFlow 2.2.0 supports Python 3.8 and Python 3.8 is the default version on Ubuntu 20.04, users on Ubuntu 20.04 systems can now install *ktrain* normally with:
+    Since TensorFlow 2.2.0 supports Python 3.8 and Python 3.8 is the default on Ubuntu 20.04, Ubuntu 20.04 users can now install *ktrain* normally with:
     `pip3 install ktrain`.
 - **2020-06-26:**  
   - ***ktrain*** **v0.17.x is released** and includes support for **language translation**. See the [example language translation notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/language_translation_example.ipynb) for more information.  <sub><sup>(This feature currently requires that PyTorch be installed.)</sup></sub>
