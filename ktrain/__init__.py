@@ -116,3 +116,8 @@ def get_learner(model, train_data=None, val_data=None,
     return learner(model, train_data=train_data, val_data=val_data, 
                    batch_size=batch_size, eval_batch_size=eval_batch_size, 
                    workers=workers, use_multiprocessing=use_multiprocessing, multigpu=multigpu)
+
+
+# keys
+# currently_unsupported: unsupported or disabled features (e.g., xai graph neural networks have not been implemented)
+# dep_fix:  a fix to address a problem in a dependency

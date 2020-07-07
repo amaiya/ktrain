@@ -153,7 +153,7 @@ class TransformerTextClassLearner(GenLearner):
         classification, multilabel = U.is_classifier(self.model)
         preds = self.model.predict(self._prepare(val, train=False))
 
-        # transformers in TF 2.2.0 returns a tuple insead of NumPy array for some reason
+        # dep_fix: transformers in TF 2.2.0 returns a tuple insead of NumPy array for some reason
         if isinstance(preds, tuple) and len(preds) == 1: preds = preds[0] 
 
         if classification:

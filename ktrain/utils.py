@@ -43,12 +43,14 @@ PREPROC_NAME = MODEL_BASENAME+'.preproc'
 #------------------------------------------------------------------------------
 
 def loss_fn_from_model(model):
+    # dep_fix
     if version.parse(tf.__version__) < version.parse('2.2'):
         return model.loss_functions[0].fn
     else: # TF 2.2.0
         return model.compiled_loss._get_loss_object(model.compiled_loss._losses[0].name).fn
 
 def metrics_from_model(model):
+    # dep_fix
     if version.parse(tf.__version__) < version.parse('2.2') or DISABLE_V2_BEHAVIOR:
         return [m.name for m in model.metrics] if is_tf_keras() else model.metrics
     else: # TF 2.2.0

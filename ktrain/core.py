@@ -453,7 +453,7 @@ class Learner(ABC):
                 verbose=verbose)
 
         # save current weights and temporarily restore original weights
-        # 2020-0707: temporarily use save_model instead of save_weights due to https://github.com/tensorflow/tensorflow/issues/41116
+        # dep_fix: temporarily use save_model instead of save_weights due to https://github.com/tensorflow/tensorflow/issues/41116
         #new_file, weightfile = tempfile.mkstemp()
         #self.model.save_weights(weightfile)
         temp_folder = tempfile.mkdtemp()
