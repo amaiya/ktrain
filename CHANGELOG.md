@@ -12,7 +12,7 @@ Most recent releases are shown at the top. Each release shows:
 - N/A
 
 ### Changed
-- Use `tensorflow==2.1.0` if Python 3.6/3.7 and use `tensorflow==2.2.0` only if on Python 3.8
+- Use `tensorflow==2.1.0` if Python 3.6/3.7 and use `tensorflow==2.2.0` only if on Python 3.8 due to TensorFlow v2.2.0 issues
 
 ### Fixed:
 - N/A
