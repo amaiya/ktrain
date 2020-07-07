@@ -357,7 +357,7 @@ All `predict` methods in `Predictor` instances accept a `return_proba` argument.
 ### How do I handle imbalanced datasets?
 
 All `*fit*` methods (e.g., `learner.fit`, `learner.autofit`, `learner.fit_onecycle`) accept a `class_weight` parameter, which is passed
-to the `model.fit` method in `tf.Keras`.
+to the `model.fit` method in `tf.Keras`.  See [this StackOverflow post](https://stackoverflow.com/questions/44716150/how-can-i-assign-a-class-weight-in-keras-in-a-simple-way) for more details.
 
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
