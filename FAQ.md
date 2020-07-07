@@ -190,6 +190,9 @@ in various ways (e.g., average vectors).
 
 See also [this post](https://github.com/huggingface/transformers/issues/1950) on the `transformers` GitHub repo.
 
+Note that, once a `transformers` model is trained and saved (e.g., using `predictor.save` or `learner.save_model` or `learner.model.save_pretrained`), it 
+can be reloaded into other libraries that support `transformers` (e.g., `sentence-transformers`).
+
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
 
 
