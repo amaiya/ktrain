@@ -256,9 +256,16 @@ class Learner(ABC):
         return
 
 
-    def load_model(self, fpath, custom_objects=None):
+    def load_model(self, fpath, custom_objects=None, **kwargs):
         """
-        a wrapper to load_model
+        loads model from file path to folder.
+        Note: **kwargs included for backwards compatibility only, as TransformerTextClassLearner.load_model was removed in v0.18.0.
+        Args:
+          fpath(str): path to folder containing model
+          custom_objects(dict): custom objects required to load model.
+                                For models included with ktrain, this is populated automatically
+                                and can be disregarded.
+        
         """
         self.model = _load_model(fpath, train_data=self.train_data, custom_objects=custom_objects)
         return
@@ -1428,9 +1435,12 @@ def release_gpu_memory(device=0):
 def _load_model(fpath, preproc=None, train_data=None, custom_objects=None):
     if not preproc and not train_data:
         raise ValueError('Either preproc or train_data is required.')
-    if preproc and isinstance(preproc, TransformersPreprocessor):
-        # note: with transformer models, fname is actually a directory
-        model = preproc.get_model(fpath=fpath)
+    if (preproc and isinstance(preproc, TransformersPreprocessor)) or \
+       (train_data and U.is_huggingface(data=train_data)):
+        if preproc:
+            model = preproc.get_model(fpath=fpath)
+        else:
+            model = TransformersPreprocessor.load_model_and_configure_from_data(fpath, train_data)
         return model
     elif (preproc and (isinstance(preproc, BERTPreprocessor) or \
                     type(preproc).__name__ == 'BERTPreprocessor')) or\

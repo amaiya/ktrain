@@ -179,13 +179,27 @@ def is_imageclass_from_data(data):
     return type(data).__name__ in ['DirectoryIterator', 'DataFrameIterator', 'NumpyArrayIterator']
 
 
+def is_regression_from_data(data):
+    """
+    checks for regression task from data
+    """
+    data_arg_check(val_data=data, val_required=True)
+    if is_ner(data=data): return False          # NERSequence
+    elif is_nodeclass(data=data): return False  # NodeSequenceWrapper
+    elif is_linkpred(data=data): return False   #LinkSequenceWrapper
+    Y = y_from_data(data)
+    if len(Y.shape) == 1 or (len(Y.shape) > 1 and Y.shape[1] == 1): return True
+    return False
+
+
 def is_multilabel(data):
     """
     checks for multilabel from data
     """
     data_arg_check(val_data=data, val_required=True)
-    if is_ner(data=data): return False   # NERSequence
+    if is_ner(data=data): return False          # NERSequence
     elif is_nodeclass(data=data): return False  # NodeSequenceWrapper
+    elif is_linkpred(data=data): return False   #LinkSequenceWrapper
     multilabel = False
     Y = y_from_data(data)
     if len(Y.shape) == 1 or (len(Y.shape) > 1 and Y.shape[1] == 1): return False
