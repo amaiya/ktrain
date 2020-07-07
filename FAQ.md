@@ -1,22 +1,28 @@
 # Frequently Asked Questions About *ktrain*
 
+## Getting Started
+
 - [I am a newcomer and am having trouble figuring out how to even get started. Where do I begin?](#i-am-a-newcomer-and-am-having-trouble-figuring-out-how-to-even-get-started-where-do-i-begin)
 
-- [How do I resume training from a saved checkpoint?](#how-do-i-resume-training-from-a-saved-checkpoint)
+- [What kinds of applications have been built with *ktrain*?](#what-kinds-of-applications-have-been-built-with-ktrain)
 
-- [How do I obtain the word or sentence embeddings after fine-tuning a Transformer-based text classifier?](#how-do-i-obtain-the-word-or-sentence-embeddings-after-fine-tuning-a-transformer-based-text-classifier)
-
+## Installation/Deployment Issues
 - [How do I use ktrain without an internet connection?](#how-do-i-use-ktrain-without-an-internet-connection)
+
+- [Why am I seeing an ERROR when installing *ktrain* on Google Colab?](#why-am-i-seeing-an-error-when-installing-ktrain-on-google-colab)
+
+- [Why does `texts_from_csv` throw an error on Google Cloud Storage?](#why-does-texts_from_csv-throw-an-error-on-google-cloud-storage)
+
+- [How do I deploy a model using Flask?](#how-do-i-deploy-a-model-using-flask)
+
+
+## Training
+
+- [How do I resume training from a saved checkpoint?](#how-do-i-resume-training-from-a-saved-checkpoint)
 
 - [How do I train using multiple GPUs?](#how-do-i-train-using-multiple-gpus)
 
 - [How do I train a model using mixed precision?](#how-do-i-train-a-model-using-mixed-precision)
-
-- [How do I deploy a model using Flask?](#how-do-i-deploy-a-model-using-flask)
-
-- [How do I use custom metrics with ktrain?](#how-do-i-use-custom-metrics-with-ktrain)
-
-- [How do I get the predicted class "probabilities" of a model?](#how-do-i-get-the-predicted-class-probabilities-of-a-model)
 
 - [How do I handle imbalanced datasets?](#how-do-i-handle-imbalanced-datasets)
 
@@ -26,14 +32,23 @@
 
 - [Can I use `tf.data.Dataset` instances with *ktrain*?](#can-i-use-tfdatadataset-instances-with-ktrain)
 
-- [Why am I seeing an ERROR when installing *ktrain* on Google Colab?](#why-am-i-seeing-an-error-when-installing-ktrain-on-google-colab)
+
+
+## Evaluation, Inspection, and Prediction
+- [How do I get the predicted class "probabilities" of a model?](#how-do-i-get-the-predicted-class-probabilities-of-a-model)
+
+- [How do I use custom metrics with ktrain?](#how-do-i-use-custom-metrics-with-ktrain)
+
+- [How do I obtain the word or sentence embeddings after fine-tuning a Transformer-based text classifier?](#how-do-i-obtain-the-word-or-sentence-embeddings-after-fine-tuning-a-transformer-based-text-classifier)
 
 - [Running `predictor.explain` for text classification is slow.  How can I speed it up?](#running-predictorexplain-for-text-classification-is-slow--how-can-i-speed-it-up)
 
-- [Why does `texts_from_csv` throw an error on Google Cloud Storage?](#why-does-texts_from_csv-throw-an-error-on-google-cloud-storage)
 
 
-- [What kinds of applications have been built with *ktrain*?](#what-kinds-of-applications-have-been-built-with-ktrain)
+---
+
+
+
 
 
 
