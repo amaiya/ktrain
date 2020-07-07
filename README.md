@@ -7,6 +7,8 @@
 
 
 ### News and Announcements
+- **2020-07-07:**  
+  - ***ktrain*** **v0.18.x is released** and now supports TensorFlow 2.2.0.
 - **2020-06-26:**  
   - ***ktrain*** **v0.17.x is released** and includes support for **language translation**. See the [example language translation notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/language_translation_example.ipynb) for more information.  <sub><sup>(This feature currently requires that PyTorch be installed.)</sup></sub>
 ```python
@@ -282,15 +284,16 @@ Using *ktrain* on **Google Colab**?  See these Colab examples:
 
 ### Installation
 
-*ktrain* currently uses [TensorFlow 2.1.0](https://www.tensorflow.org/install/pip?lang=python3), which will be installed automatically when installing *ktrain*. 
-While *ktrain* will probably work with other versions of TensorFlow 2.x, v2.1.0 is the current recommended and tested version.
+*ktrain* currently uses [TensorFlow 2.2.0](https://www.tensorflow.org/install/pip?lang=python3), which will be installed automatically when installing *ktrain*. 
+While *ktrain* will probably work with other versions of TensorFlow 2.x, v2.1.0 and v2.2.0 are the current recommended and tested versions.
 
 1.  Make sure pip is up-to-date with: `pip3 install -U pip`
 
 2. Install *ktrain*: `pip3 install ktrain`
 
 **Some things to note:**
-- *ktrain* will automatically install TensorFlow 2.1.0 as a dependency. Since TensorFlow 2.1.0 does not support Python 3.8, running `pip install ktrain` on a system with Python 3.8 as default (e.g., Ubuntu 20.04) will currently not work, as TensorFlow 2.1.0 will not be able to be downloaded.  *ktrain* will support TensorFlow 2.2.0 (and Python 3.8) in the near future.  In the meantime, if you are on a system with Python 3.8 as default (like Ubuntu 20.04 LTS), you will need to install Python 3.7 and use that version of Python with *ktrain*. 
+- *ktrain* will automatically install TensorFlow 2.2.0 as a dependency if TensorFlow is not already installed on your system.  
+  If TensorFlow 2.1.0 is already installed, *ktrain* will not install TensorFlow 2.2.0 and use TensorFlow 2.1.0 instead.
 - Since some *ktrain* dependencies have not yet been migrated to `tf.keras` in TensorFlow 2 (or may have other issues), 
   *ktrain* is temporarily using forked versions of some libraries. Specifically, *ktrain* uses forked versions of the `eli5` and `stellargraph` libraries.  If not installed, *ktrain* will complain  when a method or function needing 
   either of these libraries is invoked.
