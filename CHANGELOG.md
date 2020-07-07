@@ -6,6 +6,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.18.1 (2020-07-07)
+
+### New:
+- N/A
+
+### Changed
+- Use `tensorflow==2.1.0` if Python 3.6/3.7 and use `tensorflow==2.2.0` only if on Python 3.8
+
+### Fixed:
+- N/A
+
+
 ## 0.18.0 (2020-07-07)
 
 ### New:

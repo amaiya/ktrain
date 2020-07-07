@@ -39,6 +39,7 @@ class LRFinder:
 
 
         # Check whether the loss got too large or NaN
+        #print("\n%s:%s\n" % (smoothed_loss, self.stop_factor * self.best_loss))
         if self.batch_num > 1 and smoothed_loss > self.stop_factor * self.best_loss:
             self.model.stop_training = True
             return

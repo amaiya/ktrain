@@ -1,3 +1,10 @@
+import sys
+if sys.version_info.major != 3: raise Exception('ktrain requires Python 3')
+tf_version_str = 'tensorflow==2.1.0'
+if sys.version_info.minor == 8:
+    tf_version_str = 'tensorflow==2.2.0'
+
+
 from distutils.core import setup
 import setuptools
 
@@ -22,7 +29,7 @@ setup(
   url = 'https://github.com/amaiya/ktrain',
   keywords = ['tensorflow', 'keras', 'deep learning', 'machine learning'],
   install_requires=[
-          'tensorflow>=2.1.0,<=2.2.0',
+          tf_version_str,
           'scipy>=1.4.1', # was previously pinned to 1.4.1 due to TF 2.1.0 issue
           'scikit-learn==0.21.3', # affects format of predictor.explain
           'matplotlib >= 3.0.0',
