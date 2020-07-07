@@ -284,15 +284,17 @@ Using *ktrain* on **Google Colab**?  See these Colab examples:
 
 ### Installation
 
-*ktrain* currently uses [TensorFlow 2.2.0](https://www.tensorflow.org/install/pip?lang=python3), which will be installed automatically when installing *ktrain*. 
-While *ktrain* will probably work with other versions of TensorFlow 2.x, v2.1.0 and v2.2.0 are the current recommended and tested versions, with v2.1.0 being preferred.
+*ktrain* currently uses [TensorFlow 2.1.0 and 2.2.0](https://www.tensorflow.org/install/pip?lang=python3), which will be installed automatically when installing *ktrain*. 
+TensorFlow 2.1.0 will be installed as dependency on Python 3.6 and 3.7 systems.  TensorFlow 2.2.0 will be installed only if using Python 3.8.
+While *ktrain* will probably work with other versions of TensorFlow 2.x, v2.1.0 is the current recommended and tested versions.
 
 1.  Make sure pip is up-to-date with: `pip3 install -U pip`
 
 2. Install *ktrain*: `pip3 install ktrain`
 
 **Some things to note:**
-- *ktrain* will automatically install TensorFlow 2.1.0 as a dependency on Python 3.6/3.7 systems and only use TensorFlow 2.2.0 on Python 3.8 systems.
+- *ktrain* will automatically install TensorFlow 2.1.0 as a dependency on Python 3.6/3.7 systems and only use TensorFlow 2.2.0 on Python 3.8 systems. This is due
+  to a number of issues in TensorFlow 2.2.0. TensorFlow 2.2.0 is only installed if using Python 3.8 because it is the only version that supports Python 3.8.
 - Since some *ktrain* dependencies have not yet been migrated to `tf.keras` in TensorFlow 2 (or may have other issues), 
   *ktrain* is temporarily using forked versions of some libraries. Specifically, *ktrain* uses forked versions of the `eli5` and `stellargraph` libraries.  If not installed, *ktrain* will complain  when a method or function needing 
   either of these libraries is invoked.
