@@ -22,7 +22,7 @@ setup(
   url = 'https://github.com/amaiya/ktrain',
   keywords = ['tensorflow', 'keras', 'deep learning', 'machine learning'],
   install_requires=[
-          'tensorflow>=2.1,<=2.2',
+          'tensorflow>=2.1.0,<=2.2.0',
           'scipy>=1.4.1', # was previously pinned to 1.4.1 due to TF 2.1.0 issue
           'scikit-learn==0.21.3', # affects format of predictor.explain
           'matplotlib >= 3.0.0',
