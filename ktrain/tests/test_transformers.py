@@ -78,7 +78,7 @@ class TestTransformers(TestCase):
         # test load and save model
         tmp_folder = ktrain.imports.tempfile.mkdtemp()
         learner.save_model(tmp_folder)
-        learner.load_model(tmp_folder, preproc=preproc)
+        learner.load_model(tmp_folder)
 
         # test validate
         cm = learner.validate()
@@ -126,7 +126,7 @@ class TestTransformers(TestCase):
         # test load and save model
         tmp_folder = ktrain.imports.tempfile.mkdtemp()
         learner.save_model(tmp_folder)
-        learner.load_model(tmp_folder, preproc=preproc)
+        learner.load_model(tmp_folder)
 
         # test validate
         cm = learner.validate()

@@ -18,6 +18,8 @@
 
 - [How do I get the predicted class "probabilities" of a model?](#how-do-i-get-the-predicted-class-probabilities-of-a-model)
 
+- [How do I handle imbalanced datasets?](#how-do-i-handle-imbalanced-datasets)
+
 - [How do I retrieve or visualize training history?](#how-do-i-retrieve-or-visualize-training-history)
 
 - [I have a model that accepts multiple inputs (e.g., both text and other numerical or categorical variables).  How do I train it with *ktrain*?](#i-have-a-model-that-accepts-multiple-inputs-eg-both-text-and-other-numerical-or-categorical-variables--how-do-i-train-it-with-ktrain)
@@ -350,6 +352,12 @@ learner.autofit(0.005, 2, callbacks=[RocAuc])
 ### How do I get the predicted class "probabilities" of a model?
 
 All `predict` methods in `Predictor` instances accept a `return_proba` argument.  Set it to true to obtain the class probabilities.
+
+
+### How do I handle imbalanced datasets?
+
+All `*fit*` methods (e.g., `learner.fit`, `learner.autofit`, `learner.fit_onecycle`) accept a `class_weight` parameter, which is passed
+to the `model.fit` method in `tf.Keras`.  See [this StackOverflow post](https://stackoverflow.com/questions/44716150/how-can-i-assign-a-class-weight-in-keras-in-a-simple-way) for more details.
 
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]

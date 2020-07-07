@@ -921,6 +921,34 @@ class TransformersPreprocessor(TextPreprocessor):
         return self.preprocess_train(texts, y=y, mode=mode, verbose=verbose)
 
 
+    @classmethod
+    def load_model_and_configure_from_data(cls, fpath, transformer_ds):
+        """
+        loads model from file path and configures loss function and metrics automatically
+        based on inspecting data
+        Args:
+          fpath(str): path to model folder
+          transformer_ds(TransformerDataset): an instance of TransformerDataset
+        """
+        is_regression = U.is_regression_from_data(transformer_ds)
+        multilabel = U.is_multilabel(transformer_ds)
+        model = TFAutoModelForSequenceClassification.from_pretrained(fpath)
+        if is_regression:
+            metrics = ['mae']
+            loss_fn = 'mse'
+        else:
+            metrics = ['accuracy']
+            if multilabel:
+                loss_fn =  keras.losses.BinaryCrossentropy(from_logits=True)
+            else:
+                loss_fn = keras.losses.CategoricalCrossentropy(from_logits=True)
+        model.compile(loss=loss_fn,
+                      optimizer=U.DEFAULT_OPT,
+                      metrics=metrics)
+        return model
+
+
+
     def _load_pretrained(self, mname, num_labels):
         """
         load pretrained model

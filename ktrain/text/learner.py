@@ -152,6 +152,10 @@ class TransformerTextClassLearner(GenLearner):
         if hasattr(val, 'reset'): val.reset()
         classification, multilabel = U.is_classifier(self.model)
         preds = self.model.predict(self._prepare(val, train=False))
+
+        # dep_fix: transformers in TF 2.2.0 returns a tuple insead of NumPy array for some reason
+        if isinstance(preds, tuple) and len(preds) == 1: preds = preds[0] 
+
         if classification:
             if multilabel:
                 return activations.sigmoid(tf.convert_to_tensor(preds)).numpy()
@@ -170,22 +174,23 @@ class TransformerTextClassLearner(GenLearner):
         return
 
 
-    def load_model(self, fpath, preproc=None):
-        """
-        load Transformers model
-        Args:
-          fpath(str): path to folder containing model files
-          preproc(TransformerPreprocessor): a TransformerPreprocessor instance.
-        """
-        if preproc is None or not isinstance(preproc, TransformersPreprocessor):
-            raise ValueError('preproc arg is required to load Transformer models from disk. ' +\
-                              'Supply a TransformersPreprocessor instance. This is ' +\
-                              'either the third return value from texts_from* function or '+\
-                              'the result of calling ktrain.text.Transformer')
+    # 2020-07-07: removed, as core.Learner.load_model calls TransformerPreprocessor.load_model_and_configure
+    #def load_model(self, fpath, preproc=None):
+    #    """
+    #    load Transformers model
+    #    Args:
+    #      fpath(str): path to folder containing model files
+    #      preproc(TransformerPreprocessor): a TransformerPreprocessor instance.
+    #    """
+    #    if preproc is None or not isinstance(preproc, TransformersPreprocessor):
+    #        raise ValueError('preproc arg is required to load Transformer models from disk. ' +\
+    #                          'Supply a TransformersPreprocessor instance. This is ' +\
+    #                          'either the third return value from texts_from* function or '+\
+    #                          'the result of calling ktrain.text.Transformer')
 
 
-        self.model = _load_model(fpath, preproc=preproc)
-        return
+    #    self.model = _load_model(fpath, preproc=preproc)
+    #    return
 
 
 

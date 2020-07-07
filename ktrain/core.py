@@ -256,9 +256,16 @@ class Learner(ABC):
         return
 
 
-    def load_model(self, fpath, custom_objects=None):
+    def load_model(self, fpath, custom_objects=None, **kwargs):
         """
-        a wrapper to load_model
+        loads model from file path to folder.
+        Note: **kwargs included for backwards compatibility only, as TransformerTextClassLearner.load_model was removed in v0.18.0.
+        Args:
+          fpath(str): path to folder containing model
+          custom_objects(dict): custom objects required to load model.
+                                For models included with ktrain, this is populated automatically
+                                and can be disregarded.
+        
         """
         self.model = _load_model(fpath, train_data=self.train_data, custom_objects=custom_objects)
         return
@@ -288,13 +295,15 @@ class Learner(ABC):
                 #self.model.compile(optimizer=self.model.optimizer,
                                    #loss=self.model.loss,
                                    #metrics=metrics)
-        metrics = [m.name for m in self.model.metrics] if U.is_tf_keras() else self.model.metrics
-        if wd is not None and type(self.model.optimizer).__name__ != 'AdamWeightDecay':
+        metrics = U.metrics_from_model(self.model)
+        if wd is not None and wd > 0 and type(self.model.optimizer).__name__ != 'AdamWeightDecay':
             warnings.warn('recompiling model to use AdamWeightDecay as opimizer with weight decay of %s' % (wd) )
             optimizer = U.get_default_optimizer(wd=wd)
-        elif wd is not None:
+        elif wd is not None and wd > 0:
             optimizer = U.get_default_optimizer(wd=wd)
-        else:
+        elif wd is not None and wd == 0:
+            optimizer = U.DEFAULT_OPT
+        else: # wd is None -> don't modify optimizer
             optimizer = self.model.optimizer
         self.model.compile(optimizer=optimizer,
                            loss=self.model.loss,
@@ -444,9 +453,11 @@ class Learner(ABC):
                 verbose=verbose)
 
         # save current weights and temporarily restore original weights
-        new_file, weightfile = tempfile.mkstemp()
-        self.model.save_weights(weightfile)
-        #self.model.load_weights(self._original_weights)
+        # dep_fix: temporarily use save_model instead of save_weights due to https://github.com/tensorflow/tensorflow/issues/41116
+        #new_file, weightfile = tempfile.mkstemp()
+        #self.model.save_weights(weightfile)
+        temp_folder = tempfile.mkdtemp()
+        self.save_model(temp_folder)
 
 
          # compute steps_per_epoch
@@ -480,11 +491,14 @@ class Learner(ABC):
                                 verbose=verbose)
         except KeyboardInterrupt:
             # re-load current weights
-            self.model.load_weights(weightfile)
+            #self.model.load_weights(weightfile)
+            self.load_model(temp_folder)
             return
 
         # re-load current weights
-        self.model.load_weights(weightfile)
+        # 2020-0707: temporarily use load_model instead of load_weights due to https://github.com/tensorflow/tensorflow/issues/41116
+        #self.model.load_weights(weightfile)
+        self.load_model(temp_folder)
 
         # instructions to invoker
         U.vprint('\n', verbose=verbose)
@@ -1426,9 +1440,12 @@ def release_gpu_memory(device=0):
 def _load_model(fpath, preproc=None, train_data=None, custom_objects=None):
     if not preproc and not train_data:
         raise ValueError('Either preproc or train_data is required.')
-    if preproc and isinstance(preproc, TransformersPreprocessor):
-        # note: with transformer models, fname is actually a directory
-        model = preproc.get_model(fpath=fpath)
+    if (preproc and isinstance(preproc, TransformersPreprocessor)) or \
+       (train_data and U.is_huggingface(data=train_data)):
+        if preproc:
+            model = preproc.get_model(fpath=fpath)
+        else:
+            model = TransformersPreprocessor.load_model_and_configure_from_data(fpath, train_data)
         return model
     elif (preproc and (isinstance(preproc, BERTPreprocessor) or \
                     type(preproc).__name__ == 'BERTPreprocessor')) or\

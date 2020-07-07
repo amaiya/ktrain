@@ -51,6 +51,8 @@ class TextPredictor(Predictor):
             tseq.batch_size = self.batch_size
             texts = tseq.to_tfdataset(train=False)
             preds = self.model.predict(texts)
+            # dep_fix: transformers in TF 2.2.0 returns a tuple insead of NumPy array for some reason
+            if isinstance(preds, tuple) and len(preds) == 1: preds = preds[0] 
         else:
             texts = self.preproc.preprocess(texts)
             preds = self.model.predict(texts, batch_size=self.batch_size)
