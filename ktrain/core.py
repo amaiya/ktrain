@@ -68,7 +68,15 @@ class Learner(ABC):
 
     def evaluate(self, test_data=None, print_report=True, class_names=[]):
         """
-        alias for self.validate()
+        alias for self.validate().
+        Returns confusion matrix and optionally prints
+        a classification report.
+        This is currently only supported for binary and multiclass
+        classification, not multilabel classification.
+
+        By default, this uses val_data, as supplied to ktrain.get_learner().
+        Other validation or test data can be optionally be supplied as argument via <test_data> argument.
+        Supply class_names to include labels instead of intenger class integer values in classification report.
         """
         return self.validate(val_data=test_data, print_report=print_report, class_names=class_names)
 
@@ -83,6 +91,7 @@ class Learner(ABC):
 
         By default, this uses val_data, as supplied to ktrain.get_learner().
         Other validation or test data can be optionally be supplied as argument.
+        Supply class_names to include labels instead of intenger class integer values in classification report.
         """
         if val_data is not None:
             val = val_data
@@ -230,7 +239,7 @@ class Learner(ABC):
 
     def view_top_losses(self, n=4, preproc=None, val_data=None):
         """
-        Views observations with top losses in validation set.
+        View observations with top losses in validation set.
         Musta be overridden by Learner subclasses.
         """
         raise NotImplementedError('view_top_losses must be overriden by Learner subclass')
@@ -250,6 +259,10 @@ class Learner(ABC):
     def save_model(self, fpath):
         """
         a wrapper to model.save
+        Args:
+          fpath(str): path to folder in which to save model
+        Returns:
+          None
         """
         self._make_model_folder(fpath)
         self.model.save(os.path.join(fpath, U.MODEL_NAME), save_format='h5')
@@ -258,7 +271,7 @@ class Learner(ABC):
 
     def load_model(self, fpath, custom_objects=None, **kwargs):
         """
-        loads model from file path to folder.
+        loads model from folder.
         Note: **kwargs included for backwards compatibility only, as TransformerTextClassLearner.load_model was removed in v0.18.0.
         Args:
           fpath(str): path to folder containing model
@@ -384,23 +397,10 @@ class Learner(ABC):
         return
 
 
-    def reset_weights(self, nosave=False, verbose=1):
+    def reset_weights(self, verbose=1):
         """
-        Re-initializes network - use with caution, as this may not be robust
+        Re-initializes network with original weights
         """
-        #initial_weights = self.model.get_weights()
-        #backend_name = K.backend()
-        #if backend_name == 'tensorflow': 
-            #k_eval = lambda placeholder: placeholder.eval(session=K.get_session())
-        #elif backend_name == 'theano': 
-            #k_eval = lambda placeholder: placeholder.eval()
-        #else: 
-            #raise ValueError("Unsupported backend")
-        #new_weights = [k_eval(glorot_uniform()(w.shape)) for w in initial_weights]
-        #if nosave: return new_weights
-        #self.model.set_weights(new_weights)
-        #self.history = None
-        #print('Weights of moedl have been reset.')
 
         if os.path.isfile(self._original_weights):
             self.model.load_weights(self._original_weights)
@@ -496,7 +496,7 @@ class Learner(ABC):
             return
 
         # re-load current weights
-        # 2020-0707: temporarily use load_model instead of load_weights due to https://github.com/tensorflow/tensorflow/issues/41116
+        # dep_fix: temporarily use load_model instead of load_weights due to https://github.com/tensorflow/tensorflow/issues/41116
         #self.model.load_weights(weightfile)
         self.load_model(temp_folder)
 
@@ -598,6 +598,7 @@ class Learner(ABC):
         """
         prints the layers of the model along with indices
         """
+        if show_wd: warnings.warn('set_weight_decay now uses AdamWeightDecay instead of kernel_regularizers.')
         for i, layer in enumerate(self.model.layers):
             if show_wd and hasattr(layer, 'kernel_regularizer'):
                 reg = layer.kernel_regularizer
@@ -1248,7 +1249,7 @@ class GenLearner(Learner):
     def layer_output(self, layer_id, example_id=0, batch_id=0, use_val=False):
         """
         Prints output of layer with index <layer_id> to help debug models.
-        Uses first example (example_id=0) from training set, by default.
+        Uses first example (example_id=0) from first batch from training set, by default.
         """
                                                                                 
         inp = self.model.layers[0].input

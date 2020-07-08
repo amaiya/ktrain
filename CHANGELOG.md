@@ -6,6 +6,20 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.18.2 (2020-07-08)
+
+### New:
+- N/A
+
+### Changed
+- updated doc comments in core module
+- removed unused `nosave` parameter from `reset_weights`
+- added warning about obsolete `show_wd` parameter in `print_layers` method
+
+### Fixed:
+- N/A
+
+
 ## 0.18.1 (2020-07-07)
 
 ### New:
