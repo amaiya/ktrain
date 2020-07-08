@@ -15,6 +15,7 @@ Most recent releases are shown at the top. Each release shows:
 - updated doc comments in core module
 - removed unused `nosave` parameter from `reset_weights`
 - added warning about obsolete `show_wd` parameter in `print_layers` method
+- pin to `scipy==1.4.1` due to TensorFlow requirement
 
 ### Fixed:
 - N/A
