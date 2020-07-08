@@ -16,6 +16,7 @@ Most recent releases are shown at the top. Each release shows:
 - removed unused `nosave` parameter from `reset_weights`
 - added warning about obsolete `show_wd` parameter in `print_layers` method
 - pin to `scipy==1.4.1` due to TensorFlow requirement
+- added warning to `setup.py` if using Python 3.8 due to TensorFlow 2.2.0 issues [like this](https://github.com/tensorflow/tensorflow/issues/41174).
 
 ### Fixed:
 - N/A

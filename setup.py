@@ -3,6 +3,9 @@ if sys.version_info.major != 3: raise Exception('ktrain requires Python 3')
 tf_version_str = 'tensorflow==2.1.0'
 if sys.version_info.minor == 8:
     tf_version_str = 'tensorflow==2.2.0'
+    import warnings
+    warnings.warn("We noticed you're using Python 3.8. Due to problems in TensorFlow > 2.1.0, we recommend using ktrain with Python 3.6 or 3.7.")
+
 
 
 from distutils.core import setup
