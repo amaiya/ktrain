@@ -286,8 +286,8 @@ Using *ktrain* on **Google Colab**?  See these Colab examples:
 ### Installation
 
 *ktrain* currently uses [TensorFlow 2.1.0 or 2.2.0](https://www.tensorflow.org/install/pip?lang=python3), which will be installed automatically when installing *ktrain*. 
-TensorFlow 2.1.0 will be installed as dependency on Python 3.6 and 3.7 systems.  TensorFlow 2.2.0 will be installed only if using Python 3.8.
-While *ktrain* will probably work with other versions of TensorFlow 2.x, v2.1.0 is the current recommended and tested versions.
+TensorFlow 2.1.0 will be installed as a dependency on Python 3.6 and 3.7 systems.  TensorFlow 2.2.0 will be installed only if using Python 3.8 (as TF 2.1.0 does not support Python 3.8).
+ On systems where Python 3.8 is the default (e.g., Ubuntu 20.04), we strongly recommend installing and using Python 3.6/3.7 with *ktrain* due to problems in TensorFlow 2.2.0.
 
 1.  Make sure pip is up-to-date with: `pip3 install -U pip`
 
