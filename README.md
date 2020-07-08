@@ -294,8 +294,6 @@ TensorFlow 2.1.0 will be installed as a dependency on Python 3.6 and 3.7 systems
 2. Install *ktrain*: `pip3 install ktrain`
 
 **Some things to note:**
-- *ktrain* will automatically install TensorFlow 2.1.0 as a dependency on Python 3.6/3.7 systems and only use TensorFlow 2.2.0 on Python 3.8 systems. This is due
-  to a number of issues in TensorFlow 2.2.0. TensorFlow 2.2.0 is only installed if using Python 3.8 because it is the only version that supports Python 3.8.
 - Since some *ktrain* dependencies have not yet been migrated to `tf.keras` in TensorFlow 2 (or may have other issues), 
   *ktrain* is temporarily using forked versions of some libraries. Specifically, *ktrain* uses forked versions of the `eli5` and `stellargraph` libraries.  If not installed, *ktrain* will complain  when a method or function needing 
   either of these libraries is invoked.
