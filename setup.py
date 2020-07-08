@@ -4,7 +4,6 @@ tf_version_str = 'tensorflow==2.1.0'
 if sys.version_info.minor == 8:
     tf_version_str = 'tensorflow==2.2.0'
 
-
 from distutils.core import setup
 import setuptools
 
@@ -30,7 +29,7 @@ setup(
   keywords = ['tensorflow', 'keras', 'deep learning', 'machine learning'],
   install_requires=[
           tf_version_str,
-          'scipy>=1.4.1', # was previously pinned to 1.4.1 due to TF 2.1.0 issue
+          'scipy==1.4.1', # pinned to 1.4.1 due to TF 2.1.0/2.2.0 setup.py requirement
           'scikit-learn==0.21.3', # affects format of predictor.explain
           'matplotlib >= 3.0.0',
           'pandas >= 1.0.1',
