@@ -8,8 +8,8 @@
 
 ### News and Announcements
 - **2020-07-07:**  
-  - ***ktrain*** **v0.18.x is released** and now includes support for TensorFlow 2.2.0. Due to discovered TensorFlow 2.2.0 issues, TF 2.2.0 is only used if Python 3.8 is being used. 
-    Otherwise,  TensorFlow 2.1.0 is always used (e.g, on Python 3.6/3.7 systems).
+  - ***ktrain*** **v0.18.x is released** and now includes support for TensorFlow 2.2.0. Due to discovered TensorFlow 2.2.0 issues, TF 2.2.0 is only installed if Python 3.8 is being used. 
+    Otherwise,  TensorFlow 2.1.0 is always installed (i.e., on Python 3.6 and 3.7 systems).
 - **2020-06-26:**  
   - ***ktrain*** **v0.17.x is released** and includes support for **language translation**. See the [example language translation notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/language_translation_example.ipynb) for more information.  <sub><sup>(This feature currently requires that PyTorch be installed.)</sup></sub>
 ```python
