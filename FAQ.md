@@ -77,8 +77,8 @@ Here is how you can quickly get started using *ktrain*:
 4. Make sure the notebook is setup to use a GPU: `Runtime --> Change runtime type` and select `GPU` in the menu.
 5. Click on each cell in the notebook and execute it by pressing `SHIFT` and `ENTER` at the same time. The notebook shows you how to build a neural network that recoginizes cats vs. dogs in photos.
 
-
-- For more information on `ktrain`, see [the tutorials](https://github.com/amaiya/ktrain#tutorials).
+Next, you can go through [the tutorials](https://github.com/amaiya/ktrain#tutorials) to learn more.  If you have questions about a method or function, 
+type a question mark before the method and press ENTER in a Google Colab or Jupyter notebook to learn more.  Example: `?learner.autofit`.
 
 - For more information on Python, see [here](https://learnpythonthehardway.org/).
 
