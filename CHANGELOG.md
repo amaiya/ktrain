@@ -6,6 +6,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.18.3 (TBD)
+
+### New:
+- N/A
+
+### Changed
+- N/A
+
+### Fixed:
+- fixed typo in `load_predictor` error message
+
+
 ## 0.18.2 (2020-07-08)
 
 ### New:
