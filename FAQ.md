@@ -132,7 +132,7 @@ learner.fit_onecycle(2e-5, 1)
 
 The `checkpoint_folder` argument (e.g., `learner.autofit(1e-4, 4, checkpoint_folder='/tmp/saved_weights')`), saves the weights only of the model after each epoch. 
 The weights of any epoch can be reloaded into the model using the `model.load_weights` method as you normally would in `tf.Keras`.  You just need to first re-create
-the model first.  For instance, if training an NER model, it would work as follows:
+the model.  For instance, if training an NER model, it would work as follows:
 ```python
 # recreate model from scratch
 import ktrain
