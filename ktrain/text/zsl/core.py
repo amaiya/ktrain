@@ -27,7 +27,7 @@ class ZeroShotClassifier():
         self.model = AutoModelForSequenceClassification.from_pretrained(model_name).to(self.torch_device)
 
 
-    def predict(self, doc, topic_strings=[], include_labels=False):
+    def predict(self, doc, topic_strings=[], include_labels=False, batch_size=8):
         """
         zero-shot topic classification
         Args:
@@ -35,26 +35,35 @@ class ZeroShotClassifier():
           topic_strings(list): a list of strings representing topics of your choice
                                Example:
                                topic_strings=['political science', 'sports', 'science']
+                               NOTE: len(topic_strings) is treated as batch_size.
+                               If the number of topics is greater than a reasonable batch_size
+                               for your system, you should break up the topic_strings into 
+                               chunks and invoke predict separately on each chunk.
+          include_labels(bool): If True, will return topic labels along with topic probabilities
+          batch_size(int): batch_size to use.
+                           Increase this value to speed up predictions - especially
+                           if len(topic_strings) is large.
         Returns:
           inferred probabilities
         """
         if topic_strings is None or len(topic_strings) == 0:
             raise ValueError('topic_strings must be a list of strings')
-        true_probs = []
-        for topic_string in topic_strings:
-            premise = doc
-            hypothesis = 'This text is about %s.' % (topic_string)
-            input_ids = self.tokenizer.encode(premise, hypothesis, return_tensors='pt').to(self.torch_device)
-            logits = self.model(input_ids)[0]
-
-            # we throw away "neutral" (dim 1) and take the probability of
-            # "entailment" (2) as the probability of the label being true 
-            # reference: https://joeddav.github.io/blog/2020/05/29/ZSL.html
+        if batch_size > len(topic_strings): batch_size = len(topic_strings)
+        topic_chunks = list(U.list2chunks(topic_strings, n=math.ceil(len(topic_strings)/batch_size)))
+        result = []
+        for topics in topic_chunks:
+            pairs = []
+            for topic_string in topics:
+                premise = doc
+                hypothesis = 'This text is about %s.' % (topic_string)
+                pairs.append( (premise, hypothesis) )
+            batch = self.tokenizer.batch_encode_plus(pairs, return_tensors='pt', padding='longest').to(self.torch_device)
+            logits = self.model(batch['input_ids'], attention_mask=batch['attention_mask'])[0]
             entail_contradiction_logits = logits[:,[0,2]]
             probs = entail_contradiction_logits.softmax(dim=1)
-            true_prob = probs[:,1].item() 
-            true_probs.append(true_prob)
-        if include_labels:
-            true_probs = list(zip(topic_strings, true_probs))
-        return true_probs
+            true_probs = list(probs[:,1].cpu().detach().numpy())
+            if include_labels:
+                true_probs = list(zip(topics, true_probs))
+            result.extend(true_probs)
+        return result
 

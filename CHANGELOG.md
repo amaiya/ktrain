@@ -6,10 +6,11 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
-## 0.18.3 (TBD)
+## 0.18.3 (2020-07-12)
 
 ### New:
-- N/A
+- added `batch_size` argument to `ZeroShotClassifier.predict` that can be increased to speed up predictions.
+  This is especially useful if `len(topic_strings)` is large.
 
 ### Changed
 - N/A
