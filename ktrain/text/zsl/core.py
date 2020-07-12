@@ -40,7 +40,7 @@ class ZeroShotClassifier():
                                for your system, you should break up the topic_strings into 
                                chunks and invoke predict separately on each chunk.
           include_labels(bool): If True, will return topic labels along with topic probabilities
-          batch_size(int): batch_size to use.
+          batch_size(int): batch_size to use. default:8
                            Increase this value to speed up predictions - especially
                            if len(topic_strings) is large.
         Returns:
@@ -50,6 +50,8 @@ class ZeroShotClassifier():
             raise ValueError('topic_strings must be a list of strings')
         if batch_size > len(topic_strings): batch_size = len(topic_strings)
         topic_chunks = list(U.list2chunks(topic_strings, n=math.ceil(len(topic_strings)/batch_size)))
+        if len(topic_strings) >= 100 and batch_size==8:
+            warnings.warn('TIP: Try increasing batch_size to speedup ZeroShotClassifier predictions')
         result = []
         for topics in topic_chunks:
             pairs = []
