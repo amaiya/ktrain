@@ -212,6 +212,7 @@ access (e.g., behind a firewall, air-gapped networks).  Typically, it is suffici
 to the machine without internet access. For instance, if loading and using a `Predictor` instance as shown below,
 then all that is typically needed is a vocabulary file that is typically retrieved from the cache:
 ```python
+# this should work on machine with no internet connectivity if cache folder is populated correctly
 p = ktrain.load_predictor('/tmp/mypred')
 p.predict(data)
 ```
