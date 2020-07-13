@@ -259,7 +259,7 @@ to `tf_model.h5`, `config.json`, and `vocab.txt`.  We will show two examples of 
    ```python
    import ktrain
    from ktrain import text
-   t = text.Transformer('/tmp/my_model_files`, maxlen=500, class_names=label_list)
+   t = text.Transformer('/tmp/my_model_files', maxlen=500, class_names=label_list)
    trn = t.preprocess_train(x_train, y_train)
    model = t.get_classifier()
    learner = ktrain.get_learner(model, train_data=trn, batch_size=8)
