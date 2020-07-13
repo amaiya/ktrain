@@ -253,8 +253,9 @@ to `tf_model.h5`, `config.json`, and `vocab.txt`.  We will show two examples of 
        ```
        In the example above, you would rename `26bc1ad6.542ce428` to `vocab.txt`, rename` a41e817d.8949e27a` to `config.json`, and
        rename `cce28882.e02bd57e.h5` to `tf_model.h5`. Notice that we omitted the `.json` when renaming, as we want to rename the actual model files, not these `.json` files containing URLs.
-       (With knowledge of the URLs, you can also download the three model files from the listed URLs and name them appropriately, if you prefer.)
-2. Point *ktrain* to the folder:
+       Once the files are renamed, copy them to a folder of your choice (e.g., `my_model_files`).
+       (With knowledge of the URLs, you can also download the three model files from the listed URLs to your `my_model_files` folder and rename them appropriately, if you prefer.)
+2. Copy the folder you created in the previous step (e.g., `my_model_files`) to the machine with no internet connectivity and point *ktrain* to the folder:
    ```python
    import ktrain
    from ktrain import text
