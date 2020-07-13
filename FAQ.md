@@ -219,7 +219,7 @@ p.predict(data)
 
 In some cases (e.g., when training a model on a system with no internet access or using pretrained model for question-answering),
  due to a [current bug](https://github.com/huggingface/transformers/issues/5016) in the `transformers` library, files from `<home_directory>/.cache/torch/transformers` may
-not load when there is no internet access even when present.  To get around this, you can download the model files and point
+not load when there is no internet access even when present in the cache.  To get around this, you can download the model files and point
 *ktrain* to the folder.  There are typically three files you need, and it is important that the downloaded files are rennamed 
 to `tf_model.h5`, `config.json`, and `vocab.txt`.  We will show two examples of training and/or applying Hugging Face `transformers` models
 **without** an internet connection.
