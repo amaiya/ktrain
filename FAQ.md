@@ -217,12 +217,65 @@ p.predict(data)
 ```
 
 In some cases (e.g., when training a model on a system with no internet access or using pretrained model for question-answering),
- due to a current bug in the `transformers` library, files from `<home_directory>/.cache/torch/transformers` may
-not load when there is no internet access even when present.  To get around this, you can download the model files from [here]( https://huggingface.co/models) and point
+ due to a [current bug](https://github.com/huggingface/transformers/issues/5016) in the `transformers` library, files from `<home_directory>/.cache/torch/transformers` may
+not load when there is no internet access even when present.  To get around this, you can download the model files and point
 *ktrain* to the folder.  There are typically three files you need, and it is important that the downloaded files are rennamed 
-to `tf_model.h5`, `config.json`, and `vocab.txt`.
+to `tf_model.h5`, `config.json`, and `vocab.txt`.  We will show two examples of training and/or applying Hugging Face `transformers` models
+**without** and internet connection.
 
-Here is an example of how to run `SimpleQA` for [open-domain question-answering](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/question_answering_with_bert.ipynb) without internet access:
+#### Example 1: Text Classification (with no internet)
+1. Download the model files.  There are two different ways to do this:
+  - **Method 1:** On a machine with public internet access, go to the Hugging Face model repository: [https://huggingface.co/models](https://huggingface.co/models), 
+    click on "List all files in model", and download `tf_model.h5`, `config.json`, and `vocab.txt`. It is important that these downloaded files are renamed specifically 
+    to the three aforementioned file names. If you do not see a link to one or more of the required files (e.g., `vocab.txt` is sometimes not listed), you will have to
+    download it using **Method 2**.
+  - **Method 2:** 
+    a. Make sure  cache folder, `<home_directory>/.cache/torch/transformers`, is empty.  
+    b. On a machine with public internet access, run the following steps to download the model files to the cache folder:
+     ```python
+	from ktrain import text
+	MODEL_NAME = 'distilbert-base-uncased'
+	dummy_texts = ['hello world', 'goodbye world', 'hi world']
+	dummy_labels = ['hello', 'bye', 'hello']
+	t = text.Transformer(MODEL_NAME, maxlen=500)
+	trn = t.preprocess_train(dummy_texts, dummy_labels)
+	model = t.get_classifier()
+    ```
+    c. After the previous step, the cache folder will contain the three required files, but these files will be named with random characters. Each of
+       the model files has a corresponding `.json` file that contains the URL from where the model file was downloaded. On a Linux machine,
+       you can type `grep etag *.json` to see which file names map to which required file:
+       ```
+       $ grep  etag *.json
+        26bc1ad6.542ce428.json:{"url": "https://s3.amazonaws.com/models.huggingface.co/bert/bert-base-uncased-vocab.txt", "etag": "\"64800d5d8528ce344256daf115d4965e\""}
+        a41e817d.8949e27a.json:{"url": "https://s3.amazonaws.com/models.huggingface.co/bert/distilbert-base-uncased-config.json", "etag": "\"73e3e66b2b29478be775da997515e69a\""}
+        cce28882.e02bd57e.h5.json:{"url": "https://cdn.huggingface.co/distilbert-base-uncased-tf_model.h5", "etag": "\"b02023739d9f6377fc63d88926b29118-44\""}
+       ```
+       In the example above, you would rename `26bc1ad6.542ce428` to `vocab.txt`, rename` a41e817d.8949e27a` to `config.json`, and
+       rename `cce28882.e02bd57e.h5` to `tf_model.h5`. Notice that we omitted the `.json`, as we want to rename the actual model files, not these `.json` files containing URLs.
+       (With knowledge of the URLs, you can also download the three model files from the URL and name them appropriately, if you prefer.)
+2. Point *ktrain* to the folder:
+   ```python
+   import ktrain
+   from ktrain import text
+   t = text.Transformer('/tmp/my_model_files`, maxlen=500, class_names=label_list)
+   trn = t.preprocess_train(x_train, y_train)
+   model = t.get_classifier()
+   learner = ktrain.get_learner(model, train_data=trn, batch_size=8)
+   learner.fit_onecycle(5e-5, 1)
+   ```
+
+Note that the above steps are typically only necessary if training a model on the machine with no internet connectivity.  
+The [bug](https://github.com/huggingface/transformers/issues/5016) does not affect loading predictors on machines with no internet.
+That is, if all your doing is making the predictions on the machine with no internet connectivity, doing `p = ktrain.load_predictor('/tmp/path_to_predictor')` is sufficient
+provided the cache folder (i.e. `<home_directory>/.cache/torch/transformers`), contains the required model files. The vocab file is typically the only thing that
+needs to be present in the cache for these scenarios.
+
+
+
+#### Example 2: Open-Domain QA (with no internet)
+
+
+Here is a second example of how to run `SimpleQA` for [open-domain question-answering](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/question_answering_with_bert.ipynb) without internet access:
 
 1. On a machine with public internet access, go to the Hugging Face model repository: [https://huggingface.co/models](https://huggingface.co/models)
 2. Select the model you want and click "List all files in model".  For `SimpleQA`, you will need `bert-large-uncased-whole-word-masking-finetuned-squad` and `bert-base-uncased`
@@ -235,7 +288,7 @@ qa = text.SimpleQA(INDEXDIR,
                     bert_emb_model='/path/to/bert-base-uncased/folder')
 ```
 
-You can use simlar steps for other models that use the `transformers` library like text classification using the `ktrain.text.Transformer` class, for example.
+You can use simlar steps for other models that use the `transformers` library like `bert-bilstm` for NER.
 
 
 
