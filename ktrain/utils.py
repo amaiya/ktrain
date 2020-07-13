@@ -488,3 +488,7 @@ def get_random_colors(n, name='hsv', hex_format=True):
     return np.array(result)
 
 
+def list2chunks(a, n):
+    k, m = divmod(len(a), n)
+    return (a[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n))
+

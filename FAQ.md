@@ -77,8 +77,8 @@ Here is how you can quickly get started using *ktrain*:
 4. Make sure the notebook is setup to use a GPU: `Runtime --> Change runtime type` and select `GPU` in the menu.
 5. Click on each cell in the notebook and execute it by pressing `SHIFT` and `ENTER` at the same time. The notebook shows you how to build a neural network that recoginizes cats vs. dogs in photos.
 
-
-- For more information on `ktrain`, see [the tutorials](https://github.com/amaiya/ktrain#tutorials).
+Next, you can go through [the tutorials](https://github.com/amaiya/ktrain#tutorials) to learn more.  If you have questions about a method or function, 
+type a question mark before the method and press ENTER in a Google Colab or Jupyter notebook to learn more.  Example: `?learner.autofit`.
 
 - For more information on Python, see [here](https://learnpythonthehardway.org/).
 
@@ -132,7 +132,7 @@ learner.fit_onecycle(2e-5, 1)
 
 The `checkpoint_folder` argument (e.g., `learner.autofit(1e-4, 4, checkpoint_folder='/tmp/saved_weights')`), saves the weights only of the model after each epoch. 
 The weights of any epoch can be reloaded into the model using the `model.load_weights` method as you normally would in `tf.Keras`.  You just need to first re-create
-the model first.  For instance, if training an NER model, it would work as follows:
+the model.  For instance, if training an NER model, it would work as follows:
 ```python
 # recreate model from scratch
 import ktrain

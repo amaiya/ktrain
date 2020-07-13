@@ -10,6 +10,8 @@
 - **2020-07-07:**  
   - ***ktrain*** **v0.18.x is released** and now includes support for TensorFlow 2.2.0. Due to various TensorFlow 2.2.0 bugs, TF 2.2.0 is only installed if Python 3.8 is being used. 
     Otherwise,  TensorFlow 2.1.0 is always installed (i.e., on Python 3.6 and 3.7 systems).
+- **2020-06-28:**  
+  - Hamiz Ahmed published his Medium article: [Finetuning BERT using ktrain for Disaster Tweets Classification](https://medium.com/analytics-vidhya/finetuning-bert-using-ktrain-for-disaster-tweets-classification-18f64a50910b) 
 - **2020-06-26:**  
   - ***ktrain*** **v0.17.x is released** and includes support for **language translation**. See the [example language translation notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/language_translation_example.ipynb) for more information.  <sub><sup>(This feature currently requires that PyTorch be installed.)</sup></sub>
 ```python
@@ -101,6 +103,8 @@ Some blog tutorials about *ktrain* are shown below:
 > [**Text Classification with Hugging Face Transformers in  TensorFlow 2 (Without Tears)**](https://medium.com/@asmaiya/text-classification-with-hugging-face-transformers-in-tensorflow-2-without-tears-ee50e4f3e7ed)
 
 > [**Build an Open-Domain Question-Answering System With BERT in 3 Lines of Code**](https://towardsdatascience.com/build-an-open-domain-question-answering-system-with-bert-in-3-lines-of-code-da0131bc516b)
+
+> [**Finetuning BERT using ktrain for Disaster Tweets Classification**](https://medium.com/analytics-vidhya/finetuning-bert-using-ktrain-for-disaster-tweets-classification-18f64a50910b) by Hamiz Ahmed
 
 
 
@@ -285,16 +289,14 @@ Using *ktrain* on **Google Colab**?  See these Colab examples:
 
 ### Installation
 
-*ktrain* currently uses [TensorFlow 2.1.0 or 2.2.0](https://www.tensorflow.org/install/pip?lang=python3), which will be installed automatically when installing *ktrain*. 
-TensorFlow 2.1.0 will be installed as a dependency on Python 3.6 and 3.7 systems.  TensorFlow 2.2.0 will be installed only if using Python 3.8 (as TF 2.1.0 does not support Python 3.8).
- On systems where Python 3.8 is the default (e.g., Ubuntu 20.04), we strongly recommend installing and using Python 3.6/3.7 and TensorFlow 2.1.0 with *ktrain* due to problems that currently exist 
-in versions of TensorFlow >= 2.2.0.
-
-1.  Make sure pip is up-to-date with: `pip3 install -U pip`
+1. Make sure pip is up-to-date with: `pip3 install -U pip`
 
 2. Install *ktrain*: `pip3 install ktrain`
 
-**Some things to note:**
+**Some important things to note about installation:**
+- *ktrain* currently uses [TensorFlow 2.1.0 or 2.2.0](https://www.tensorflow.org/install/pip?lang=python3), which will be installed automatically when installing *ktrain*. 
+TensorFlow 2.1.0 will be installed as a dependency on Python 3.6 and 3.7 systems.  TensorFlow 2.2.0 will be installed only if using Python 3.8 (as TF 2.1.0 does not support Python 3.8).
+ On systems where Python 3.8 is the default (e.g., Ubuntu 20.04), we recommend installing and using Python 3.6/3.7 and TensorFlow 2.1.0 with *ktrain* due to unresolved bugs in versions of TensorFlow >= 2.2.0.
 - Since some *ktrain* dependencies have not yet been migrated to `tf.keras` in TensorFlow 2 (or may have other issues), 
   *ktrain* is temporarily using forked versions of some libraries. Specifically, *ktrain* uses forked versions of the `eli5` and `stellargraph` libraries.  If not installed, *ktrain* will complain  when a method or function needing 
   either of these libraries is invoked.
