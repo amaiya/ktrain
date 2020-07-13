@@ -221,7 +221,7 @@ In some cases (e.g., when training a model on a system with no internet access o
 not load when there is no internet access even when present.  To get around this, you can download the model files and point
 *ktrain* to the folder.  There are typically three files you need, and it is important that the downloaded files are rennamed 
 to `tf_model.h5`, `config.json`, and `vocab.txt`.  We will show two examples of training and/or applying Hugging Face `transformers` models
-**without** and internet connection.
+**without** an internet connection.
 
 #### Example 1: Text Classification (with no internet)
 1. Download the model files.  There are two different ways to do this:
