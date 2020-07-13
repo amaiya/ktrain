@@ -204,7 +204,7 @@ can be reloaded into other libraries that support `transformers` (e.g., `sentenc
 ### How do I use ktrain without an internet connection?
 
 When using pretrained models or pretrained word embeddings in *ktrain*, files are automatically downloaded.  For instance,
-pretrained models and tokenizers from the `transformers` library are downloaded to `<home_directory>/.cache/torch/transformers`
+pretrained models and vocabulary files from the `transformers` library are downloaded to `<home_directory>/.cache/torch/transformers`
 by default.  Other data like pretrained word vectors are downloaded to the `<home_directory>/ktrain_data` folder.
 
 In some settings, it is necessary to either train models or make predictions in environments with no internet 
@@ -230,6 +230,7 @@ to `tf_model.h5`, `config.json`, and `vocab.txt`.  We will show two examples of 
     to the three aforementioned file names. If you do not see a link to one or more of the required files (e.g., `vocab.txt` is sometimes not listed), you will have to
     download it using **Method 2**.
   - **Method 2:** 
+
     a. Make sure  cache folder, `<home_directory>/.cache/torch/transformers`, is empty.  
     b. On a machine with public internet access, run the following steps to download the model files to the cache folder:
      ```python
