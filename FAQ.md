@@ -231,8 +231,8 @@ to `tf_model.h5`, `config.json`, and `vocab.txt`.  We will show two examples of 
     download it using **Method 2**.
   - **Method 2:** 
 
-    a. Make sure  cache folder, `<home_directory>/.cache/torch/transformers`, is empty.  
-    b. On a machine with public internet access, run the following steps to download the model files to the cache folder:
+    1. Make sure  cache folder, `<home_directory>/.cache/torch/transformers`, is empty.  
+    2. On a machine with public internet access, run the following steps to download the model files to the cache folder:
      ```python
 	from ktrain import text
 	MODEL_NAME = 'distilbert-base-uncased'
@@ -242,7 +242,7 @@ to `tf_model.h5`, `config.json`, and `vocab.txt`.  We will show two examples of 
 	trn = t.preprocess_train(dummy_texts, dummy_labels)
 	model = t.get_classifier()
     ```
-    c. After the previous step, the cache folder will contain the three required files, but these files will be named with random characters. Each of
+    3. After the previous step, the cache folder will contain the three required files, but these files will be named with random characters. Each of
        the model files has a corresponding `.json` file that contains the URL from where the model file was downloaded. On a Linux machine,
        you can type `grep etag *.json` to see which file names map to which required file:
        ```
