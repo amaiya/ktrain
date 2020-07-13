@@ -18,7 +18,10 @@
 
 ## Training
 
+
 - [How do I resume training from a saved checkpoint?](#how-do-i-resume-training-from-a-saved-checkpoint)
+
+- [How do I save and/or reload a trained model?](#how-do-i-resume-training-from-a-saved-checkpoint)
 
 - [How do I train using multiple GPUs?](#how-do-i-train-using-multiple-gpus)
 
@@ -96,6 +99,8 @@ type a question mark before the method and press ENTER in a Google Colab or Jupy
 
 
 ### How do I resume training from a saved checkpoint?
+
+This answer shows different ways to save/reload a model and resume training.
 
 #### Method 1: Using Predictor API (works for any model)
 ```python
