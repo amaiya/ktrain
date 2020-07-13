@@ -233,7 +233,7 @@ to `tf_model.h5`, `config.json`, and `vocab.txt`.  We will show two examples of 
   - **Method 2:** 
 
     1. Make sure  cache folder, `<home_directory>/.cache/torch/transformers`, is empty.  
-    2. On a machine with public internet access, run the following steps to download the model files to the cache folder:
+    2. On a machine with public internet access, run the following steps to download the model files to the cache folder (replace `MODEL_NAME` with model you want):
      ```python
 	from ktrain import text
 	MODEL_NAME = 'distilbert-base-uncased'
