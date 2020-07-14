@@ -209,7 +209,7 @@ by default.  Other data like pretrained word vectors are downloaded to the `<hom
 
 In some settings, it is necessary to either train models or make predictions in environments with no internet 
 access (e.g., behind a firewall, air-gapped networks).  Typically, it is sufficient to copy the above folders
-to the machine without internet access. For instance, if loading and using a `Predictor` instance as shown below,
+to the machine without internet access. For instance, if loading and using a `Predictor` instance associated with a `transformers` model as shown below,
 then all that is typically needed is a vocabulary file that is typically retrieved from the cache:
 ```python
 # this should work on machine with no internet connectivity if cache folder is populated correctly
@@ -269,7 +269,7 @@ to `tf_model.h5`, `config.json`, and `vocab.txt`.  We will show two examples of 
 
 Note that the above steps are typically only necessary if training a model on the machine with no internet connectivity.  
 The [bug](https://github.com/huggingface/transformers/issues/5016) does not affect loading predictors on machines with no internet.
-That is, if all your doing is making the predictions on the machine with no internet connectivity, doing `p = ktrain.load_predictor('/tmp/path_to_predictor')` is sufficient
+That is, if all you're doing is making the predictions on the machine with no internet connectivity, doing `p = ktrain.load_predictor('/tmp/path_to_predictor')` is sufficient
 provided the cache folder (i.e. `<home_directory>/.cache/torch/transformers`), contains the required model files. The vocab file is typically the only thing that
 needs to be present in the cache for these scenarios.
 
