@@ -8,44 +8,119 @@ class TabularPreprocessor(Preprocessor):
     Tabular preprocessing base class
     """
 
-    def __init__(self, class_names=[], target_columns=[], date_columns=[]):
-        self.c = class_names
-        self.target_columns = target_columns
-        self.date_columns = date_columns
+    def __init__(self, predictor_columns, label_columns, date_columns=[], is_regression=False):
+        self.is_regression=is_regression
+        self.c  = None
+        self.original_predictor_columns = predictor_columns
+        self.original_label_columns = label_columns
+        self.original_date_columns = date_columns
+        self.label_columns = None
+        self.predictor_columns = None
+        self.le = None
 
 
     def get_preprocessor(self):
-        return (self.target_columns, self.date_columns)
+        return self.le
 
 
     def get_classes(self):
-        return self.c
+        return self.label_columns
 
 
     def preprocess(self, df):
         return self.preprocess_test(df)
 
 
+    def _adjust_for_regression(self, df):
+        # check for regression
+        peek = df[self.original_label_columns].iloc[0]
+        if isinstance(self.original_label_columns, str) and peek.isdigit() and not self.is_regression:
+            warnings.warn('Targets are integers, but is_regression=False. Task treated as classification instead of regression.')
+        if isinstance(peek, str) and self.is_regression:
+            df[self.original_label_columns] = df[self.original_label_columns].astype('float32')
+        return df
 
-    def preprocess_train(self, df):
+    def _validate_columns(self, df):
+        missing_columns = []
+        for col in df.columns.values:
+            if col not in self.original_label_columns and col not in self.original_predictor_columns:
+                missing_columns.append(col)
+        if len(missing_columns) > 0:
+            raise ValueError('df is missing columns: %s' % (missing_columns))
+        return
+
+
+    def preprocess_train(self, df, mode='train', verbose=1):
         """
         preprocess training set
         """
-        pass
+        if not isinstance(df, pd.DataFrame):
+            raise ValueError('df must be a pd.DataFrame')
 
-    def preprocess_valid(self, df):
+        # validate columns
+        self._validate_columns(df)
+
+        # validate mode
+        if mode != 'train' and self.le is None:
+            raise ValueError('self.le is None but mode is %s' % (mode))
+
+        # verbose
+        if verbose:
+            print('processing %s: %s rows x %s columns' % (mode, df.shape[0], df.shape[1]))
+
+
+        # adjust regression targets, if necessary
+        df = self._adjust_for_regression(df)
+
+        # convert date fields
+        for field in self.original_date_columns:
+            df = df.copy()
+            df = add_datepart(df, field)
+
+        # define predictor_columns
+        predictor_columns = [col for col in df.columns.values if col not in self.original_label_columns]
+
+        # define and process label_columns
+        if isinstance(self.original_label_columns, (list, np.ndarray)): 
+            label_columns = self.original_label_columns[:]
+            label_columns.sort()
+        else:
+            label_columns = self.original_label_columns
+        if isinstance(label_columns, str) or \
+           (isinstance(label_columns, (list, np.ndarray)) and len(label_columns) == 1):
+            label_col_name = label_columns if isinstance(label_columns, str) else label_columns[0]
+            targets = df[label_col_name].values
+            if not self.is_regression:
+                if mode == 'train':
+                    self.le = LabelEncoder()
+                    self.le.fit(targets)
+                y_data = to_categorical(self.le.transform(targets))
+                label_columns = list(self.le.classes_)
+                df = df[predictor_columns]
+                for i, col in enumerate(label_columns):
+                    df[col] = y_data[:,i]
+
+        # save post-processed columns
+        if mode == 'train':
+            self.predictor_columns = predictor_columns
+            self.label_columns = label_columns
+        return df
+
+
+
+    def preprocess_valid(self, df, verbose=1):
         """
         preprocess validation set
         """
-        return self.preprocess_test(df)
+        return self.preprocess_train(df, mode='valid', verbose=verbose)
 
 
 
-    def preprocess_test(self, df):
+    def preprocess_test(self, df, verbose=1):
         """
         preprocess test set
         """
-        pass
+        return self.preprocess_train(df, mode='test', verbose=verbose)
 
 
 
