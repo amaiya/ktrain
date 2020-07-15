@@ -492,3 +492,22 @@ def list2chunks(a, n):
     k, m = divmod(len(a), n)
     return (a[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n))
 
+
+def pd_data_types(df, return_df=False):
+    """
+    infers data type of each column in Pandas DataFrame
+    Args:
+      df(pd.DataFrame): pandas DataFrame
+      return_df(bool): If True, returns columns and types in DataFrame. 
+                       Otherwise, a dictionary is returned.
+    """
+
+    infer_type = lambda x: pd.api.types.infer_dtype(x, skipna=True)
+    df.apply(infer_type, axis=0)
+
+    # DataFrame with column names & new types
+    df_types = pd.DataFrame(df.apply(pd.api.types.infer_dtype, axis=0)).reset_index().rename(columns={'index': 'column', 0: 'type'})
+    if return_df: return df_types
+    cols = list(df_types['column'].values)
+    col_types = list(df_types['type'].values)
+    return dict(list(zip(cols, col_types)))
