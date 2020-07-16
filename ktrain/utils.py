@@ -493,12 +493,153 @@ def list2chunks(a, n):
     return (a[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n))
 
 
+class YTransform:
+    def __init__(self, labels=[], is_regression=False):
+        self.lc= labels
+        self.le = None
+        self.is_regression=is_regression
+
+    def get_labels(self):
+        return self.lc if self.le is None else list(self.le.classes_)
+
+    def _need_transform(self, targets):
+        peek = targets[0]
+        if not np.issubdtype(type(peek), np.integer) and not np.issubdtype(type(peek), np.floating) and  not isinstance(peek, str): 
+            raise ValueError('targets must by strings (classification), floats (regression) or integers (classification or regression)')
+        need_trasform = False
+        if np.issubdtype(type(peek), np.floating): # no transform required
+            if not self.is_regression: raise ValueError('target has floats but is_regression=False')
+            need_transform = False
+        elif isinstance(peek, str):            
+            if self.is_regression: raise ValueError('targets contain strings but is_regression=True')
+            need_transform = True
+        else: # integer
+            if self.is_regression:
+                #df[label_col_name] = df[label_col_name].astype('float32')
+                targets = np.array(targets, dtype=np.float32)
+            need_transform = not self.is_regression
+        return need_transform
+
+    def _need_float_conversion(self, targets):
+        return np.issubdtype(type(targets[0]), np.integer) and self.is_regression
+
+    def _y_transform(self, targets, train=True):
+        if train:
+            self.le = LabelEncoder()
+            self.le.fit(targets)
+        y_data = to_categorical(self.le.transform(targets))
+        label_columns = list(self.le.classes_)
+        return (y_data, label_columns)
+
+    def apply_train(self, df):
+        return self.apply(df, train=True)
+
+    def apply_test(self,df):
+        return self.apply(df, train=False)
+
+    def apply(self, df, train=True):
+        raise NotImplementedError
 
 
 
+class YTransformArray(YTransform):
+    def __init__(self, labels=[], is_regression=False):
+        super().__init__(labels=labels, is_regression=is_regression)
+
+    def apply(self, targets, train=True):
+
+        # check data
+        targets = np.array(targets) if type(targets) == list else targets
+        if len(targets.shape) <=1 or targets.shape[1] > 1: return
+        targets = np.squeeze(targets)
+
+        # check targets
+        need_transform = self._need_transform(targets)
+
+        # float conversion
+        if self._need_float_conversion(targets): targets = np.array(targets, dtype=np.float32)
+
+        # transform
+        if not need_transform: return
+        targets, label_columns = self._y_transform(targets, train=train)
+
+        return 
+
+
+class YTransformDataFrame(YTransform):
+    def __init__(self, labels=[], is_regression=False):
+        super().__init__(labels=labels, is_regression=is_regression)
+
+    def apply(self, df, train=True):
+
+        # checks DataFrame labels
+        if isinstance(self.lc, (list, np.ndarray)) and len(self.lc) > 1: return
+        label_col_name = self.lc if isinstance(self.lc, str) else self.lc[0]
+
+        # check targets
+        targets = df[label_col_name].values
+        need_transform = self._need_transform(targets)
+
+        # float conversion
+        if self._need_float_conversion(targets):  df[label_col_name] = df[label_col_name].astype('float32')
+
+        # transform
+        if not need_transform: return
+        targets, label_columns = self._y_transform(targets, train=train)
+
+        # modify DataFrame
+        del df[self.lc] # delete old label columns
+        for i, col in enumerate(label_columns):
+            df[col] = targets[:,i]
+        return 
 
 
 
+#class DataFrameYTransform():
+#    def __init__(self, label_columns, is_regression=False):
+#        self.lc= label_columns
+#        self.le = None
+#        self.is_regression=is_regression
 
+#    def get_labels(self):
+#        return self.lc if self.le is None else list(self.le._classes_)
 
+#    def apply(self, df, train=True):
+
+#        # checks
+#        if not isinstance(self.lc, str) and not (isinstance(self.lc, (list, np.ndarray)) and len(self.lc) == 1): return
+#        label_col_name = self.lc if isinstance(self.lc, str) else self.lc[0]
+#        targets = df[label_col_name].values
+#        peek = targets[0]
+#        if not np.issubdtype(type(peek), np.integer) and not np.issubdtype(type(peek), np.floating) and  not isinstance(peek, str): 
+#            raise ValueError('targets must by strings (classification), floats (regression) or integers (classification or regression)')
+#        need_trasform = False
+#        if np.issubdtype(type(peek), np.floating): # no transform required
+#            if not self.is_regression: raise ValueError('target has floats but is_regression=False')
+#            need_transform = False
+#        elif isinstance(peek, str):            
+#            if self.is_regression: raise ValueError('targets contain strings but is_regression=True')
+#            need_transform = True
+#        else: # integer
+#            if self.is_regression:
+#                df[label_col_name] = df[label_col_name].astype('float32')
+#            need_transform = not self.is_regression
+#        if not need_transform: return
+
+#        # transform
+#        if train:
+#            self.le = LabelEncoder()
+#            self.le.fit(targets)
+#        y_data = to_categorical(self.le.transform(targets))
+#        label_columns = list(self.le.classes_)
+#        del df[self.lc] # delete old label columns
+#        for i, col in enumerate(label_columns):
+#            df[col] = y_data[:,i]
+#        return 
+
+#    def apply_train(self, df):
+#        return self.apply(df, train=True)
+
+#    def apply_test(self,df):
+#        return self.apply(df, train=False)
 

@@ -13,40 +13,32 @@ class TabularPreprocessor(Preprocessor):
                  is_regression=False, procs=[]):
         self.is_regression=is_regression
         self.c  = None
-        self.original_predictor_columns = predictor_columns
-        self.original_label_columns = label_columns
-        self.original_date_columns = date_columns
+        self.pc = predictor_columns
+        self.lc = label_columns
+        self.dc = date_columns
         self.label_columns = None
-        self.predictor_columns = None
-        self.le = None
+        self.cat_names = None
+        self.cont_names = None
+        self.label_transform = None
         self.procs = procs
 
 
     def get_preprocessor(self):
-        return self.le
+        return (self.label_transform, self.procs)
 
 
     def get_classes(self):
-        return self.label_columns
+        return self.label_columns if self.is_regression else []
 
 
     def preprocess(self, df):
         return self.preprocess_test(df)
 
 
-    def _adjust_for_regression(self, df):
-        # check for regression
-        peek = df[self.original_label_columns].iloc[0]
-        if isinstance(self.original_label_columns, str) and peek.isdigit() and not self.is_regression:
-            warnings.warn('Targets are integers, but is_regression=False. Task treated as classification instead of regression.')
-        if isinstance(peek, str) and self.is_regression:
-            df[self.original_label_columns] = df[self.original_label_columns].astype('float32')
-        return df
-
     def _validate_columns(self, df):
         missing_columns = []
         for col in df.columns.values:
-            if col not in self.original_label_columns and col not in self.original_predictor_columns:
+            if col not in self.lc and col not in self.pc:
                 missing_columns.append(col)
         if len(missing_columns) > 0:
             raise ValueError('df is missing columns: %s' % (missing_columns))
@@ -64,55 +56,34 @@ class TabularPreprocessor(Preprocessor):
         self._validate_columns(df)
 
         # validate mode
-        if mode != 'train' and self.le is None:
-            raise ValueError('self.le is None but mode is %s' % (mode))
+        if mode != 'train' and self.label_transform is None:
+            raise ValueError('self.label_transform is None but mode is %s: are you sure preprocess_train was invoked first?' % (mode))
 
         # verbose
         if verbose:
             print('processing %s: %s rows x %s columns' % (mode, df.shape[0], df.shape[1]))
 
-        # adjust regression targets, if necessary
-        df = self._adjust_for_regression(df)
-
         # convert date fields
-        for field in self.original_date_columns:
+        for field in self.dc:
             df = df.copy()
             df = add_datepart(df, field)
 
-        # define predictor_columns
-        predictor_columns = [col for col in df.columns.values if col not in self.original_label_columns]
-
-        # define and process label_columns
-        if isinstance(self.original_label_columns, (list, np.ndarray)): 
-            label_columns = self.original_label_columns[:]
-            label_columns.sort()
-        else:
-            label_columns = self.original_label_columns
-        if isinstance(label_columns, str) or \
-           (isinstance(label_columns, (list, np.ndarray)) and len(label_columns) == 1):
-            label_col_name = label_columns if isinstance(label_columns, str) else label_columns[0]
-            targets = df[label_col_name].values
-            if not self.is_regression:
-                if mode == 'train':
-                    self.le = LabelEncoder()
-                    self.le.fit(targets)
-                y_data = to_categorical(self.le.transform(targets))
-                label_columns = list(self.le.classes_)
-                df = df[predictor_columns]
-                for i, col in enumerate(label_columns):
-                    df[col] = y_data[:,i]
-
-        # save post-processed columns
+        # preprocess labels and data
         if mode == 'train':
-            self.predictor_columns = predictor_columns
-            self.label_columns = label_columns
+            label_columns = self.lc
+            if isinstance(self.lc, (list, np.ndarray)): 
+                label_columns = self.lc[:]
+                label_columns.sort()
+            self.label_transform = U.YTransformDataFrame(label_columns, is_regression=self.is_regression)
+            self.label_transform.apply_train(df)
+            self.label_columns = self.label_transform.get_labels()
             self.cont_names, self.cat_names = cont_cat_split(df, label_columns=self.label_columns)
-            self.procs = [proc(self.cat_names, self.cont_names) for proc in self.procs] # objectivy
+            self.procs = [proc(self.cat_names, self.cont_names) for proc in self.procs] # "objectivy"
+        else:
+            self.label_transform.apply_test(df)
+        for proc in self.procs: proc(df, test=mode!='train')  # apply processors
 
-        # apply processors
-        for proc in self.procs: proc(df, test=mode!='train')
-
-        return df
+        return TabularDataset(df, self.cat_names, self.cont_names, self.label_columns)
 
 
 
@@ -174,17 +145,6 @@ class TabularDataset(SequenceDataset):
 
     def nclasses(self):
         return self.get_y().shape[1]
-
-
-#def add_missing(df, include_present=False):
-    #cols_missing = [col for col in df.columns if df[col].isnull().any()]
-    #for col in cols_missing:
-        #df["MISSING_%s" % (col)] = df[col].isnull().astype(int)
-    #if include_present:
-        #cols_present = [col for col in df.columns if not df[col].isnull().any()]
-        #for col in cols_present:
-            #df["MISSING_%s" % (col)] = 0
-    #return df
 
 
 def pd_data_types(df, return_df=False):
@@ -405,5 +365,6 @@ class Normalize(TabularProc):
         for n in self.cont_names:
             out_df[n] =  (df[n] * (1e-7 + self.stds[n])) + self.means[n]
         return out_df
+
 
 
