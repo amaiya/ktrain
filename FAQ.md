@@ -484,7 +484,7 @@ See [this tutorial](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/maste
 
 ### Why am I seeing a "list index out of range" error when calling predict?
 
-The set of integer labels in your training set need to be complete and consecutive (e.g., `[0,1]` or `[0,1,2,3,4]`, but not `[0, 3]`). See [this post](https://github.com/amaiya/ktrain/issues/116#issuecomment-614864565.)
+The set of integer labels in your training set need to be complete and consecutive (e.g., `[0,1]` or `[0,1,2,3,4]`, but not `[0, 3]`). See [this post](https://github.com/amaiya/ktrain/issues/116#issuecomment-614864565).
 
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
