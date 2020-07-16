@@ -567,8 +567,8 @@ class YTransformArray(YTransform):
 
 
 class YTransformDataFrame(YTransform):
-    def __init__(self, labels=[], is_regression=False):
-        super().__init__(labels=labels, is_regression=is_regression)
+    def __init__(self, label_columns=[], is_regression=False):
+        super().__init__(labels=label_columns, is_regression=is_regression)
 
     def apply(self, df, train=True):
 
