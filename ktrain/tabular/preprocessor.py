@@ -1,6 +1,7 @@
 from ..imports import *
 from .. import utils as U
 from ..preprocessor import Preprocessor
+from ..data import SequenceDataset
 
 
 class TabularPreprocessor(Preprocessor):
@@ -129,6 +130,50 @@ class TabularPreprocessor(Preprocessor):
         """
         return self.preprocess_train(df, mode='test', verbose=verbose)
 
+
+
+class TabularDataset(SequenceDataset):
+    def __init__(self, df, cat_columns, cont_columns, label_columns, batch_size=32, shuffle=True):
+        # error checks
+        if not isinstance(df, pd.DataFrame): raise ValueError('df must be pandas Dataframe')
+        all_columns = cat_columns + cont_columns + label_columns
+        missing_columns = []
+        for col in df.columns.values:
+            if col not in all_columns: missing_columns.append(col)
+        if len(missing_columns) > 0: raise ValueError('df is missing these columns: %s' % (missing_columns))
+
+        # set variables
+        super().__init__(batch_size=batch_size)
+        self.indices = np.arange(df.shape[0])
+        self.df = df
+        self.cat_columns = cat_columns
+        self.cont_columns = cont_columns
+        self.label_columns = label_columns
+        self.shuffle = shuffle
+
+    def __len__(self):
+        return math.ceil(self.df.shape[0] / self.batch_size)
+
+    def __getitem__(self, idx):
+        inds = self.indices[idx * self.batch_size:(idx + 1) * self.batch_size]
+        batch_x = self.df[self.cat_columns+self.cont_columns].iloc[inds]
+        batch_y = self.df[self.label_columns].iloc[inds]
+        return batch_x, batch_y
+
+    def nsamples(self):
+        return self.df.shape[0]
+
+    def get_y(self):
+        return self.df[self.label_columns].values
+
+    def on_epoch_end(self):
+        if self.shuffle: np.random.shuffle(self.indices)
+
+    def xshape(self):
+        return self.df.shape
+
+    def nclasses(self):
+        return self.get_y().shape[1]
 
 
 #def add_missing(df, include_present=False):
