@@ -8,7 +8,8 @@ class TabularPreprocessor(Preprocessor):
     Tabular preprocessing base class
     """
 
-    def __init__(self, predictor_columns, label_columns, date_columns=[], is_regression=False):
+    def __init__(self, predictor_columns, label_columns, date_columns=[], 
+                 is_regression=False, procs=[]):
         self.is_regression=is_regression
         self.c  = None
         self.original_predictor_columns = predictor_columns
@@ -17,6 +18,7 @@ class TabularPreprocessor(Preprocessor):
         self.label_columns = None
         self.predictor_columns = None
         self.le = None
+        self.procs = procs
 
 
     def get_preprocessor(self):
@@ -68,7 +70,6 @@ class TabularPreprocessor(Preprocessor):
         if verbose:
             print('processing %s: %s rows x %s columns' % (mode, df.shape[0], df.shape[1]))
 
-
         # adjust regression targets, if necessary
         df = self._adjust_for_regression(df)
 
@@ -104,6 +105,12 @@ class TabularPreprocessor(Preprocessor):
         if mode == 'train':
             self.predictor_columns = predictor_columns
             self.label_columns = label_columns
+            self.cont_names, self.cat_names = cont_cat_split(df, label_columns=self.label_columns)
+            self.procs = [proc(self.cat_names, self.cont_names) for proc in self.procs] # objectivy
+
+        # apply processors
+        for proc in self.procs: proc(df, test=mode!='train')
+
         return df
 
 
@@ -124,15 +131,35 @@ class TabularPreprocessor(Preprocessor):
 
 
 
-def add_missing(df, include_present=False):
-    cols_missing = [col for col in df.columns if df[col].isnull().any()]
-    for col in cols_missing:
-        df["MISSING_%s" % (col)] = df[col].isnull().astype(int)
-    if include_present:
-        cols_present = [col for col in df.columns if not df[col].isnull().any()]
-        for col in cols_present:
-            df["MISSING_%s" % (col)] = 0
-    return df
+#def add_missing(df, include_present=False):
+    #cols_missing = [col for col in df.columns if df[col].isnull().any()]
+    #for col in cols_missing:
+        #df["MISSING_%s" % (col)] = df[col].isnull().astype(int)
+    #if include_present:
+        #cols_present = [col for col in df.columns if not df[col].isnull().any()]
+        #for col in cols_present:
+            #df["MISSING_%s" % (col)] = 0
+    #return df
+
+
+def pd_data_types(df, return_df=False):
+    """
+    infers data type of each column in Pandas DataFrame
+    Args:
+      df(pd.DataFrame): pandas DataFrame
+      return_df(bool): If True, returns columns and types in DataFrame. 
+                       Otherwise, a dictionary is returned.
+    """
+
+    infer_type = lambda x: pd.api.types.infer_dtype(x, skipna=True)
+    df.apply(infer_type, axis=0)
+
+    # DataFrame with column names & new types
+    df_types = pd.DataFrame(df.apply(pd.api.types.infer_dtype, axis=0)).reset_index().rename(columns={'index': 'column', 0: 'type'})
+    if return_df: return df_types
+    cols = list(df_types['column'].values)
+    col_types = list(df_types['type'].values)
+    return dict(list(zip(cols, col_types)))
 
 
 
@@ -141,10 +168,14 @@ def add_missing(df, include_present=False):
 # https://github.com/fastai/fastai
 # -------------------------------------------------------------------
 
+
 from numbers import Number
 from typing import Any, AnyStr, Callable, Collection, Dict, Hashable, Iterator, List, Mapping, NewType, Optional
 from typing import Sequence, Tuple, TypeVar, Union
 from types import SimpleNamespace
+
+
+from pandas.api.types import is_numeric_dtype, is_categorical_dtype
 
 
 def ifnone(a,b):
@@ -164,13 +195,13 @@ def make_date(df, date_field):
     return
 
 
-def cont_cat_split(df, max_card=20, dep_var=None):
+def cont_cat_split(df, max_card=25, label_columns=[]):
     "Helper function that returns column names of cont and cat variables from given df."
     cont_names, cat_names = [], []
-    for label in df:
-        if label == dep_var: continue
-        if df[label].dtype == int and df[label].unique().shape[0] > max_card or df[label].dtype == float: cont_names.append(label)
-        else: cat_names.append(label)
+    for col in df:
+        if col in label_columns: continue
+        if df[col].dtype == int and df[col].unique().shape[0] > max_card or df[col].dtype == float: cont_names.append(col)
+        else: cat_names.append(col)
     return cont_names, cat_names
 
 
@@ -225,4 +256,109 @@ def add_cyclic_datepart(df:pd.DataFrame, field_name:str, prefix:str=None, drop:b
     for column in columns: df[column] = df_feats[column]
     if drop: df.drop(field_name, axis=1, inplace=True)
     return df
+
+
+
+class TabularProc():
+    "A processor for tabular dataframes."
+
+    def __init__(self, cat_names, cont_names):
+        self.cat_names = cat_names
+        self.cont_names = cont_names
+
+    def __call__(self, df, test=False):
+        "Apply the correct function to `df` depending on `test`."
+        func = self.apply_test if test else self.apply_train
+        func(df)
+
+    def apply_train(self, df):
+        "Function applied to `df` if it's the train set."
+        raise NotImplementedError
+    def apply_test(self, df):
+        "Function applied to `df` if it's the test set."
+        self.apply_train(df)
+
+
+class Categorify(TabularProc):
+    def __init__(self, cat_names, cont_names):
+        super().__init__(cat_names, cont_names)
+        self.categories = None
+
+    def apply_train(self, df):
+        self.categories = {}
+        for n in self.cat_names:
+            df.loc[:,n] = df.loc[:,n].astype('category').cat.as_ordered()
+            self.categories[n] = df[n].cat.categories
+
+    def apply_test(self, df):
+        for n in self.cat_names:
+            df.loc[:,n] = pd.Categorical(df[n], categories=self.categories[n], ordered=True)
+
+FILL_MEDIAN = 'median'
+FILL_CONSTANT = 'constant'
+class FillMissing(TabularProc):
+    "Fill the missing values in continuous columns."
+    def __init__(self, cat_names, cont_names, fill_strategy=FILL_MEDIAN, add_col=True, fill_val=0.):
+        super().__init__(cat_names, cont_names)
+        self.fill_strategy = fill_strategy
+        self.add_col = add_col
+        self.fill_val = fill_val
+        self.na_dict = None
+
+    def apply_train(self, df):
+        self.na_dict = {}
+        for name in self.cont_names:
+            if pd.isnull(df[name]).sum():
+                if self.add_col:
+                    df[name+'_na'] = pd.isnull(df[name])
+                    if name+'_na' not in self.cat_names: self.cat_names.append(name+'_na')
+                if self.fill_strategy == FILL_MEDIAN: filler = df[name].median()
+                elif self.fill_strategy == FILL_CONSTANT: filler = self.fill_val
+                else: filler = df[name].dropna().value_counts().idxmax()
+                df[name] = df[name].fillna(filler)
+                self.na_dict[name] = filler
+
+    def apply_test(self, df):
+        "Fill missing values in `self.cont_names` like in `apply_train`."
+        for name in self.cont_names:
+            if name in self.na_dict:
+                if self.add_col:
+                    df[name+'_na'] = pd.isnull(df[name])
+                    if name+'_na' not in self.cat_names: self.cat_names.append(name+'_na')
+                df[name] = df[name].fillna(self.na_dict[name])
+            elif pd.isnull(df[name]).sum() != 0:
+                raise Exception(f"""There are nan values in field {name} but there were none in the training set. 
+                Please fix those manually.""")
+           
+
+class Normalize(TabularProc):
+    "Normalize the continuous variables."
+    def __init__(self, cat_names, cont_names):
+        super().__init__(cat_names, cont_names)
+        self.means = None
+        self.stds = None
+
+    def apply_train(self, df):
+        "Compute the means and stds of `self.cont_names` columns to normalize them."
+        self.means,self.stds = {},{}
+        for n in self.cont_names:
+            assert is_numeric_dtype(df[n]), (f"""Cannot normalize '{n}' column as it isn't numerical.
+                Are you sure it doesn't belong in the categorical set of columns?""")
+            self.means[n],self.stds[n] = df[n].mean(),df[n].std()
+            df[n] = (df[n]-self.means[n]) / (1e-7 + self.stds[n])
+
+    def apply_test(self, df):
+        "Normalize `self.cont_names` with the same statistics as in `apply_train`."
+        for n in self.cont_names:
+            df[n] = (df[n]-self.means[n]) / (1e-7 + self.stds[n])
+
+    def revert(self,df):
+        """
+        Undoes normalization and returns reverted dataframe
+        """
+        out_df = df.copy()
+        for n in self.cont_names:
+            out_df[n] =  (df[n] * (1e-7 + self.stds[n])) + self.means[n]
+        return out_df
+
 

@@ -26,7 +26,9 @@ def table_from_df(train_df, label_columns=[], date_columns=[], val_df=None, val_
             train_df = df[msk]
             val_df = df[~msk]
 
-    preproc = pp.TabularPreprocessor(predictor_columns, label_columns, date_columns=date_columns, is_regression=is_regression)
+    procs = [pp.FillMissing, pp.Categorify, pp.Normalize]
+    preproc = pp.TabularPreprocessor(predictor_columns, label_columns, date_columns=date_columns, 
+                                     is_regression=is_regression, procs=procs)
     trn = preproc.preprocess_train(train_df, verbose=verbose)
     val = None if val_df is None else preproc.preprocess_test(val_df, verbose=verbose)
     return (trn, val, preproc)
