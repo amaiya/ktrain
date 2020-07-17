@@ -578,8 +578,8 @@ class YTransformDataFrame(YTransform):
         if isinstance(label_columns, str): label_columns = [label_columns]
         self.label_columns = label_columns
         if not label_columns: raise ValueError('label_columns is required')
-        class_names = label_columns if len(label_columns) > 1 else []
-        super().__init__(class_names=class_names)
+        #class_names = label_columns if len(label_columns) > 1 else []
+        super().__init__(class_names=[])
 
     def apply(self, df, train=True):
 
@@ -592,9 +592,14 @@ class YTransformDataFrame(YTransform):
                 if l not in df.columns.values: missing_cols.append(l)
             if len(missing_cols) > 0: 
                 raise ValueError('These label_columns do not exist in df: %s' % (missing_cols))
+
+            # set targets
             targets = df[self.label_columns].values
+            # set class names
+            self.set_classes(self.label_columns)
         # single column
         else: 
+            # set targets
             targets = df[self.label_columns[0]].values
             # set class_names if classification task and targets with integer labels
             if not self.is_regression: 
