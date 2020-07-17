@@ -584,7 +584,11 @@ class YTransformDataFrame(YTransform):
         # single column
         else: 
             targets = df[label_columns[0]].values
-            # todo: convert to strings?
+            if not self.is_regression: 
+                class_names = list(set(targets))
+                class_names.sort()
+                class_names = list( map(str, class_names) )
+                self.set_classes(class_names)
 
         targets = super().apply(targets, train=train) # self.c (new label_columns) may be modified here
 
