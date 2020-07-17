@@ -510,7 +510,7 @@ class YTransform:
         self.c = class_names
 
     def get_classes(self):
-        self.c
+        return self.c
 
     def set_classes(self, class_names):
         self.c = class_names.tolist() if isinstance(class_names, np.ndarray) else class_names
@@ -554,10 +554,10 @@ class YTransform:
         return targets
 
     def apply_train(self, targets):
-        self.apply(targets, train=True)
+        return self.apply(targets, train=True)
 
     def apply_test(self, targets):
-        self.apply(targets, train=False)
+        return self.apply(targets, train=False)
 
 
 
@@ -596,7 +596,8 @@ class YTransformDataFrame(YTransform):
                 class_names = list(set(targets))
                 class_names.sort()
                 class_names = list( map(str, class_names) )
-                self.set_classes(class_names)
+                # if targets include labels, don't call set_classes to avoid warning
+                if not isinstance(class_names[0], str): self.set_classes(class_names)
 
         # transform targets
         targets = super().apply(targets, train=train) # self.c (new label_columns) may be modified here
@@ -605,12 +606,12 @@ class YTransformDataFrame(YTransform):
         for l in self.label_columns: del df[l] # delete old label columns
         for i, col in enumerate(self.c):
             df[col] = targets[:,i]
-        return targets
+        return df
 
     def apply_train(self, df):
-        self.apply(df, train=True)
+        return self.apply(df, train=True)
     def apply_test(self, df):
-        self.apply(df, train=False)
+        return self.apply(df, train=False)
 
 
 

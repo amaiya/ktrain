@@ -75,12 +75,12 @@ class TabularPreprocessor(Preprocessor):
                 label_columns = self.lc[:]
                 label_columns.sort()
             self.label_transform = U.YTransformDataFrame(label_columns, is_regression=self.is_regression)
-            self.label_transform.apply_train(df)
-            self.label_columns = self.label_transform.get_labels()
+            df = self.label_transform.apply_train(df)
+            self.label_columns = self.label_transform.get_classes()
             self.cont_names, self.cat_names = cont_cat_split(df, label_columns=self.label_columns)
             self.procs = [proc(self.cat_names, self.cont_names) for proc in self.procs] # "objectivy"
         else:
-            self.label_transform.apply_test(df)
+            df = self.label_transform.apply_test(df)
         for proc in self.procs: proc(df, test=mode!='train')  # apply processors
 
         return TabularDataset(df, self.cat_names, self.cont_names, self.label_columns)
