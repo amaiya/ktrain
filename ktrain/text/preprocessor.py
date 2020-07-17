@@ -514,8 +514,10 @@ class TextPreprocessor(Preprocessor):
                              'The classes argument should have been supplied.')
 
         # convert string labels to integers, if necessary
+        train = False
         if isinstance(y_data[0], str):
             if self.label_encoder is None:
+                train = True
                 self.label_encoder = LabelEncoder()
                 self.label_encoder.fit(y_data)
                 if self.get_classes(): warnings.warn('class_names argument was ignored, as they were extracted from string labels in dataset')
@@ -527,7 +529,9 @@ class TextPreprocessor(Preprocessor):
         # depending on class_names existing
         y_data = to_categorical(y_data) if len(y_data.shape) == 1 and self.get_classes() else y_data
         if self.get_classes():
-            if y_data.shape[1] != len(self.get_classes()):
+            x = y_data.shape[1]
+            y = len(self.get_classes())
+            if train and y_data.shape[1] != len(self.get_classes()):
                 raise Exception('Class labels in training set are %s, but y_data has %s classes' % (self.get_classes(), y_data.shape[1]))
         return y_data
 
