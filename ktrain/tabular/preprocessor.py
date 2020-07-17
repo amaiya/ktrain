@@ -127,9 +127,9 @@ class TabularDataset(SequenceDataset):
 
     def __getitem__(self, idx):
         inds = self.indices[idx * self.batch_size:(idx + 1) * self.batch_size]
-        batch_x = self.df[self.cat_columns+self.cont_columns].iloc[inds]
-        batch_y = self.df[self.label_columns].iloc[inds]
-        return batch_x, batch_y
+        batch_x = self.df[self.cat_columns+self.cont_columns].iloc[inds].values
+        batch_y = self.df[self.label_columns].iloc[inds].values
+        return tuple(batch_x), batch_y
 
     def nsamples(self):
         return self.df.shape[0]
