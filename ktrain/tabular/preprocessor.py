@@ -56,8 +56,8 @@ class TabularPreprocessor(Preprocessor):
         self._validate_columns(df)
 
         # validate mode
-        if mode != 'train' and self.label_transform is None:
-            raise ValueError('self.label_transform is None but mode is %s: are you sure preprocess_train was invoked first?' % (mode))
+        #if mode != 'train' and self.label_transform is None:
+            #raise ValueError('self.label_transform is None but mode is %s: are you sure preprocess_train was invoked first?' % (mode))
 
         # verbose
         if verbose:

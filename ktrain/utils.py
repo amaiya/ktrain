@@ -541,15 +541,23 @@ class YTransform:
                 self.le = LabelEncoder()
                 self.le.fit(targets)
                 if self.get_classes(): warnings.warn('class_names argument was ignored, as they were extracted from string labels in dataset')
-                self.set_classes(self.label_encoder.classes_)
-            targets = self.label_encoder.transform(targets)
+                self.set_classes(self.le.classes_)
+            targets = self.le.transform(targets)
 
         # numeric targets (classification)
         # TODO: revert other check
-        if len(targets.shape) == 1 and len(set(targets)) != len(list(range(max(targets)))):
-            raise ValueError('targets should contain %s but do contain %s' % (list(set(targets)), list(range(max(targets)))))
+        if np.issubdtype(type(max(targets)), np.floating):
+            raise ValueError('class_names=[] implies classification but targets array contains float(s) ')
+        if len(targets.shape) == 1 and len(set(targets)) != len(list(range(max(targets)+1))):
+            raise ValueError('targets should contain %s but do contain %s' % (list(set(targets)), list(range(max(targets)+1))))
         targets = to_categorical(targets) if len(targets.shape) == 1 and self.get_classes() else targets
         return targets
+
+    def apply_train(self, targets):
+        self.apply(targets, train=True)
+
+    def apply_test(self, targets):
+        self.apply(targets, train=False)
 
 
 
@@ -563,7 +571,7 @@ class YTransformDataFrame(YTransform):
                                IF False, task is classification and integer targets are treated as class IDs.
         """
         self.is_regression = is_regression
-        if isinstance(label_columns, 'str'): label_columns = [label_columns]
+        if isinstance(label_columns, str): label_columns = [label_columns]
         self.label_columns = label_columns
         if not label_columns: raise ValueError('label_columns is required')
         class_names = label_columns if len(label_columns) > 1 else []
@@ -580,21 +588,29 @@ class YTransformDataFrame(YTransform):
                 if l not in df.columns.values: missing_cols.append(l)
             if len(missing_cols) > 0: 
                 raise ValueError('These label_columns do not exist in df: %s' % (missing_cols))
-            targets = df[self.label_columns]
+            targets = df[self.label_columns].values
         # single column
         else: 
-            targets = df[label_columns[0]].values
+            targets = df[self.label_columns[0]].values
             if not self.is_regression: 
                 class_names = list(set(targets))
                 class_names.sort()
                 class_names = list( map(str, class_names) )
                 self.set_classes(class_names)
 
+        # transform targets
         targets = super().apply(targets, train=train) # self.c (new label_columns) may be modified here
 
-        del df[label_columns] # delete old label columns
+        # modify DataFrame
+        for l in self.label_columns: del df[l] # delete old label columns
         for i, col in enumerate(self.c):
             df[col] = targets[:,i]
         return targets
+
+    def apply_train(self, df):
+        self.apply(df, train=True)
+    def apply_test(self, df):
+        self.apply(df, train=False)
+
 
 
