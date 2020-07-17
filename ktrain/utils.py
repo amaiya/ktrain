@@ -544,7 +544,7 @@ class YTransform:
                 raise ValueError('targets are 1-hot or multi-hot encoded but class_names is empty. ' +\
                                  'The classes argument should have been supplied.')
             else:
-                if len(self_get_classes()) != targets.shape[1]:
+                if train and len(self_get_classes()) != targets.shape[1]:
                     raise ValueError('targets have shape (%s,%s), but len(class_names) is %s' % (targets.shape[0], 
                                                                                                  targets.shape[1], 
                                                                                                   len(self.get_classes())))
