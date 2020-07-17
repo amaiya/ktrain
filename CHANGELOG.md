@@ -16,7 +16,7 @@ Most recent releases are shown at the top. Each release shows:
 
 ### Fixed:
 - return gracefully if no documents match question in `qa` module
-- tokenize question in `qa` module to prevent zero results
+- tokenize question in `qa` module to ensure all candidate documents are returned
 - Added error in `text.preprocessor` when training set has incomplete integer labels
 
 
