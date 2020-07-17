@@ -1,6 +1,6 @@
 from ...imports import *
 from ...predictor import Predictor
-from .preprocessor import NERPreprocessor, tokenize
+from .preprocessor import NERPreprocessor
 from ... import utils as U
 from .. import textutils as TU
 

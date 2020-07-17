@@ -279,9 +279,13 @@ class SimpleQA(QA):
           list
         """
         # locate candidate document contexts
-        doc_results = self.search(question, limit=n_docs_considered)
         paragraphs = []
         refs = []
+        #doc_results = self.search(question, limit=n_docs_considered)
+        doc_results = self.search(TU.tokenize(question, join_tokens=True), limit=n_docs_considered)
+        if not doc_results: 
+            warnings.warn('No documents matched words in question')
+            return []
         for doc_result in doc_results:
             rawtext = doc_result.get('rawtext', '')
             reference = doc_result.get('reference', '')
@@ -356,6 +360,7 @@ class SimpleQA(QA):
 
 
     def display_answers(self, answers):
+        if not answers: return
         df = self.answers2df(answers)
         from IPython.core.display import display, HTML
         display(HTML(df.to_html(render_links=True, escape=False)))
