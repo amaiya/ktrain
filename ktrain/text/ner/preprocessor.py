@@ -16,8 +16,8 @@ SENT_COL = 'SentenceID'
 
 
 #tokenizer_filter = rs='!"#$%&()*+,-./:;<=>?@[\\]^_`{|}~\t\n'
-re_tok = re.compile(f'([{string.punctuation}“”¨«»®´·º½¾¿¡§£₤‘’])')
-def tokenize(s): return re_tok.sub(r' \1 ', s).split()
+#re_tok = re.compile(f'([{string.punctuation}“”¨«»®´·º½¾¿¡§£₤‘’])')
+#def tokenize(s): return re_tok.sub(r' \1 ', s).split()
 
 
 class NERPreprocessor(Preprocessor):
@@ -83,7 +83,7 @@ class NERPreprocessor(Preprocessor):
                 tokenize_chinese = lambda text:[c for c in text]
                 tokens = tokenize_chinese(s)
             else:
-                tokens = tokenize(s)
+                tokens = TU.tokenize(s)
             X.append(tokens)
             y.append([OTHER] * len(tokens))
         nerseq = NERSequence(X, y, p=self.p)
