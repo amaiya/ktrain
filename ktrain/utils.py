@@ -508,6 +508,7 @@ class YTransform:
                          2. targets are strings and task is classification (populated automatically)
         """
         self.c = class_names
+        self.le = None
 
     def get_classes(self):
         return self.c
