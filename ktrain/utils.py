@@ -520,6 +520,10 @@ class YTransform:
 
 
     def apply(self, targets, train=True):
+        if targets is None and train: 
+            raise ValueError('targets is None')
+        elif targets is None and not train:
+            return
 
         # validate labels against data
         targets = np.array(targets) if type(targets) == list else targets
