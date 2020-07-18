@@ -495,7 +495,7 @@ def list2chunks(a, n):
 
 
 class YTransform:
-    def __init__(self, class_names=[]):
+    def __init__(self, class_names=[], label_encoder=None):
         """
         Cheks and transforms array of targets. Targets are transformed in place.
         Args:
@@ -506,6 +506,8 @@ class YTransform:
                          Not required if:
                          1. targets are numeric and task is regression
                          2. targets are strings and task is classification (populated automatically)
+          label_encoder(LabelEncoder): a prior instance of LabelEncoder.  If None, will be created
+                                       when train=True
         """
         self.c = class_names
         self.le = None
