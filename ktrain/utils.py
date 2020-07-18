@@ -533,7 +533,7 @@ class YTransform:
             targets = np.array(targets, dtype=np.float32)
         # string targets (classification)
         elif len(targets.shape) == 1 and isinstance(targets[0], str):
-            if train:
+            if train or self.le is None:
                 self.le = LabelEncoder()
                 self.le.fit(targets)
                 if self.get_classes(): warnings.warn('class_names argument was ignored, as they were extracted from string labels in dataset')
