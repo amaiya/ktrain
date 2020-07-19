@@ -557,11 +557,12 @@ class YTransform:
                                                                                                   len(self.get_classes())))
 
         # numeric targets (classification)
-        if np.issubdtype(type(max(targets)), np.floating):
-            warnings.warn('class_names=[] implies classification but targets array contains float(s) instead of integers or strings')
-        if len(targets.shape) == 1 and len(set(targets)) != len(list(range(max(targets)+1))):
-            raise ValueError('targets should contain %s but instead contain %s' % (list(set(targets)), list(range(int(max(targets))+1))))
-        targets = to_categorical(targets) if len(targets.shape) == 1 and self.get_classes() else targets
+        if len(targets.shape) == 1 and self.get_classes():
+            if np.issubdtype(type(max(targets)), np.floating):
+                warnings.warn('class_names=[] implies classification but targets array contains float(s) instead of integers or strings')
+            if len(set(targets)) != len(list(range(int(max(targets)+1)))):
+                raise ValueError('targets should contain %s but instead contain %s' % (list(set(targets)), list(range(int(max(targets))+1))))
+            targets = to_categorical(targets)
         return targets
 
     def apply_train(self, targets):
