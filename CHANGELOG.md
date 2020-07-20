@@ -17,6 +17,7 @@ Most recent releases are shown at the top. Each release shows:
 ### Fixed:
 - Changed `qa` module to use use 'Auto' when loading `QuestionAnswering` models and tokenizer
 - try `from_pt=True` for `qa` module if initial model-loading fails
+- use `get_hf_model_name` in `qa` module
 
 
 ## 0.18.4 (2020-07-17)
