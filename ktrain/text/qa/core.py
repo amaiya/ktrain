@@ -56,7 +56,7 @@ class QA(ABC):
             token_type_ids = np.array([segment_ids[:self.maxlen]])
 
         # Added from: https://github.com/huggingface/transformers/commit/16ce15ed4bd0865d24a94aa839a44cf0f400ef50
-        if self.model_name.split('-')[0] in ['xlm', 'roberta', 'distilbert']:
+        if U.get_hf_model_name(self.model_name) in  ['xlm', 'roberta', 'distilbert']:
             start_scores, end_scores = self.model(input_ids)
         else:
             start_scores, end_scores = self.model(input_ids, token_type_ids=token_type_ids)
