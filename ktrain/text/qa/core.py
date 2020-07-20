@@ -10,8 +10,10 @@ from whoosh import qparser
 from whoosh.qparser import QueryParser
 
 
-from transformers import TFBertForQuestionAnswering
-from transformers import BertTokenizer
+#from transformers import TFBertForQuestionAnswering
+#from transformers import BertTokenizer
+from transformers import TFAutoModelForQuestionAnswering
+from transformers import AutoTokenizer
 LOWCONF = -10000
 
 
@@ -23,8 +25,8 @@ class QA(ABC):
     def __init__(self, bert_squad_model='bert-large-uncased-whole-word-masking-finetuned-squad',
                  bert_emb_model='bert-base-uncased'):
         self.model_name = bert_squad_model
-        self.model = TFBertForQuestionAnswering.from_pretrained(self.model_name)
-        self.tokenizer = BertTokenizer.from_pretrained(self.model_name)
+        self.model = TFAutoModelForQuestionAnswering.from_pretrained(self.model_name)
+        self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
         self.maxlen = 512
         self.te = tpp.TransformerEmbedding(bert_emb_model, layers=[-2])
 

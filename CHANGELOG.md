@@ -6,7 +6,7 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
-## 0.18.4 (2020-07-17)
+## 0.18.5 (TBD)
 
 ### New:
 - N/A
@@ -15,9 +15,7 @@ Most recent releases are shown at the top. Each release shows:
 - N/A
 
 ### Fixed:
-- return gracefully if no documents match question in `qa` module
-- tokenize question in `qa` module to ensure all candidate documents are returned
-- Added error in `text.preprocessor` when training set has incomplete integer labels
+- Changed `qa` module to use use 'Auto' when loading `QuestionAnswering` models and tokenizer
 
 
 ## 0.18.3 (2020-07-12)
