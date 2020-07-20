@@ -492,3 +492,16 @@ def list2chunks(a, n):
     k, m = divmod(len(a), n)
     return (a[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n))
 
+
+def get_hf_model_name(model_id):
+    parts = model_id.split('/')
+    if len(parts) == 1:
+        model_id = parts[0]
+    else:
+        model_id = '/'.join(parts[1:])
+    if model_id.startswith('xlm-roberta'): 
+        model_name = 'xlm-roberta'
+    else:
+        model_name = model_id.split('-')[0]
+    return model_name
+
