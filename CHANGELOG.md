@@ -6,7 +6,7 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
-## 0.18.5 (TBD)
+## 0.18.5 (2020-07-20)
 
 ### New:
 - N/A
@@ -16,6 +16,7 @@ Most recent releases are shown at the top. Each release shows:
 
 ### Fixed:
 - Changed `qa` module to use use 'Auto' when loading `QuestionAnswering` models and tokenizer
+- try `from_pt=True` for `qa` module if initial model-loading fails
 
 
 ## 0.18.4 (2020-07-17)

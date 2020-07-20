@@ -25,7 +25,10 @@ class QA(ABC):
     def __init__(self, bert_squad_model='bert-large-uncased-whole-word-masking-finetuned-squad',
                  bert_emb_model='bert-base-uncased'):
         self.model_name = bert_squad_model
-        self.model = TFAutoModelForQuestionAnswering.from_pretrained(self.model_name)
+        try:
+            self.model = TFAutoModelForQuestionAnswering.from_pretrained(self.model_name)
+        except:
+            self.model = TFAutoModelForQuestionAnswering.from_pretrained(self.model_name, from_pt=True)
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
         self.maxlen = 512
         self.te = tpp.TransformerEmbedding(bert_emb_model, layers=[-2])
