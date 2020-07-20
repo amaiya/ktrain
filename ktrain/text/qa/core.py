@@ -48,12 +48,19 @@ class QA(ABC):
         assert len(segment_ids) == len(input_ids)
         n_ids = len(segment_ids)
         if n_ids < self.maxlen:
-            start_scores, end_scores = self.model(np.array([input_ids]), 
-                                             token_type_ids=np.array([segment_ids]))
+            input_ids = np.array([input_ids])
+            token_type_ids = np.array([segment_ids])
         else:
             #TODO: use different truncation strategies or run multiple inferences
-            start_scores, end_scores = self.model(np.array([input_ids[:self.maxlen]]), 
-                                             token_type_ids=np.array([segment_ids[:self.maxlen]]))
+            input_ids = np.array([input_ids[:self.maxlen]])
+            token_type_ids = np.array([segment_ids[:self.maxlen]])
+
+        # Added from: https://github.com/huggingface/transformers/commit/16ce15ed4bd0865d24a94aa839a44cf0f400ef50
+        if self.model_name.split('-')[0] in ['xlm', 'roberta', 'distilbert']:
+            start_scores, end_scores = self.model(input_ids)
+        else:
+            start_scores, end_scores = self.model(input_ids, token_type_ids=token_type_ids)
+
         start_scores = start_scores[:,1:-1]
         end_scores = end_scores[:,1:-1]
         answer_start = np.argmax(start_scores)
