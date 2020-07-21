@@ -6,6 +6,19 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.18.6 (TBD)
+
+### New:
+- N/A
+
+### Changed
+- N/A
+
+### Fixed:
+- added `save_path` argument to `Learner.validate` and `Learner.evaluate`.  If `print_report=False`, classification
+  report will be saved as CSV to `save_path`.
+
+
 ## 0.18.5 (2020-07-20)
 
 ### New:
