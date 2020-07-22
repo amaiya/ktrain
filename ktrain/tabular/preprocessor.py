@@ -128,12 +128,14 @@ class TabularDataset(SequenceDataset):
     def __getitem__(self, idx):
         inds = self.indices[idx * self.batch_size:(idx + 1) * self.batch_size]
         batch_x = []
+        df = self.df[self.cat_columns+self.cont_columns].iloc[inds]
         for cat_name in self.cat_columns:
-            #batch_x = self.df[self.cat_columns+self.cont_columns].iloc[inds].values
-            codes = np.stack([c.cat.codes.values for n,c in self.df[[cat_name]].items()], 0).astype(np.int64) + 1
+            codes = np.stack([c.cat.codes.values for n,c in df[[cat_name]].items()], 0).astype(np.int64) + 1
+            codes = np.squeeze(codes) if self.batch_size > 1 else np.squeeze(codes, 1)
             batch_x.append(codes)
-        conts = np.stack([c.astype('float32').values for n,c in self.df[self.cont_columns].items()], 1)
-        batch_x.append(conts)
+        if len(self.cont_columns) > 0:
+            conts = np.stack([c.astype('float32').values for n,c in df[self.cont_columns].items()], 1)
+            batch_x.append(conts)
         batch_y = self.df[self.label_columns].iloc[inds].values
         return tuple(batch_x), batch_y
 
