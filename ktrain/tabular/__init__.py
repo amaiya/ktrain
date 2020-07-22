@@ -1,1 +1,1 @@
-from .data import table_from_csv
+from .data import tabular_from_csv, tabular_from_df

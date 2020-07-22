@@ -2,7 +2,7 @@ from ..imports import *
 from .. import utils as U
 from . import preprocessor as pp
 
-def table_from_df(train_df, label_columns=[], date_columns=[], val_df=None, val_pct=0.1, 
+def tabular_from_df(train_df, label_columns=[], date_columns=[], val_df=None, val_pct=0.1, 
                   is_regression=False, random_state=None, verbose=1):
 
     # TODO: this code is similar to images_from_df: must refactor and cleaned up
@@ -35,7 +35,7 @@ def table_from_df(train_df, label_columns=[], date_columns=[], val_df=None, val_
 
 
 
-def table_from_csv(train_csv, label_columns=[], date_columns=[], val_csv=None, val_pct=0.1, is_regression=False, random_state=None):
+def tabular_from_csv(train_csv, label_columns=[], date_columns=[], val_csv=None, val_pct=0.1, is_regression=False, random_state=None):
     """
     Loads tabular data from CSV file
     """
@@ -45,7 +45,7 @@ def table_from_csv(train_csv, label_columns=[], date_columns=[], val_csv=None, v
     val_df = None
     if val_csv is not None:
         val_df = pd.read_csv(val_csv, index_col=0)
-    return table_from_df(train_df, label_columns=label_columns, date_columns=date_columns, val_df=val_df, val_pct=val_pct, 
+    return tabular_from_df(train_df, label_columns=label_columns, date_columns=date_columns, val_df=val_df, val_pct=val_pct, 
                          is_regression=is_regression, random_state=random_state)
  
 

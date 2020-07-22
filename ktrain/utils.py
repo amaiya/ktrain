@@ -93,6 +93,8 @@ def is_classifier(model):
                 is_multilabel = True
     return (is_classifier, is_multilabel)
 
+def is_tabular_from_data(data):
+    return type(data).__name__ in ['TabularDataset']
 
 def is_huggingface(model=None, data=None):
     """
