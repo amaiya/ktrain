@@ -9,7 +9,9 @@ Most recent releases are shown at the top. Each release shows:
 ## 0.18.6 (TBD)
 
 ### New:
-- N/A
+- added `restore_weights_only` flag to `lr_find`.  When True, only the model weights will be restored after
+  simulating training, not the optimizer weights. In at least a few observed cases, this "warm up" seems to improve performance
+  when actual training begins. Further investigation is needed, so it is False by default.
 
 ### Changed
 - N/A
