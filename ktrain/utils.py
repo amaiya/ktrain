@@ -509,6 +509,10 @@ class YTransform:
           label_encoder(LabelEncoder): a prior instance of LabelEncoder.  If None, will be created
                                        when train=True
         """
+        if type(class_names) != list:
+            if isinstance(class_names, (pd.Series, np.ndarray)): class_names = class_names.tolist()
+            else:
+                raise ValueError('class_names must be list')
         self.c = class_names
         self.le = None
 
