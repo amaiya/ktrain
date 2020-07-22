@@ -511,15 +511,15 @@ class YTransform:
         """
         Cheks and transforms array of targets. Targets are transformed in place.
         Args:
-          class_names(list):  labels associated with targets
+          class_names(list):  labels associated with targets (e.g., ['negative', 'positive'])
                          Only used/required if:
                          1. targets are one/multi-hot-encoded
                          2. targets are integers and represent class IDs for classification task
                          Not required if:
                          1. targets are numeric and task is regression
-                         2. targets are strings and task is classification (populated automatically)
-          label_encoder(LabelEncoder): a prior instance of LabelEncoder.  If None, will be created
-                                       when train=True
+                         2. targets are strings and task is classification (class_names are populated automatically)
+          label_encoder(LabelEncoder): a prior instance of LabelEncoder.  
+                                       If None, will be created when train=True
         """
         if type(class_names) != list:
             if isinstance(class_names, (pd.Series, np.ndarray)): class_names = class_names.tolist()
@@ -555,7 +555,8 @@ class YTransform:
             targets = np.array(targets, dtype=np.float32)
         # string targets (classification)
         elif len(targets.shape) == 1 and isinstance(targets[0], str):
-            if train or self.le is None:
+            if not train and self.le is None: raise ValueError('LabelEncoder has not been trained. Call with train=True')
+            if train:
                 self.le = LabelEncoder()
                 self.le.fit(targets)
                 if self.get_classes(): warnings.warn('class_names argument was ignored, as they were extracted from string labels in dataset')
