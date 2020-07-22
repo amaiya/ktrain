@@ -130,8 +130,7 @@ class TabularDataset(SequenceDataset):
         batch_x = []
         df = self.df[self.cat_columns+self.cont_columns].iloc[inds]
         for cat_name in self.cat_columns:
-            codes = np.stack([c.cat.codes.values for n,c in df[[cat_name]].items()], 0).astype(np.int64) + 1
-            codes = np.squeeze(codes) if self.batch_size > 1 else np.squeeze(codes, 1)
+            codes = np.stack([c.cat.codes.values for n,c in df[[cat_name]].items()], 1).astype(np.int64) + 1
             batch_x.append(codes)
         if len(self.cont_columns) > 0:
             conts = np.stack([c.astype('float32').values for n,c in df[self.cont_columns].items()], 1)
