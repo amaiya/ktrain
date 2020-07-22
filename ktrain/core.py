@@ -482,7 +482,7 @@ class Learner(ABC):
         # save current weights and temporarily restore original weights
         # dep_fix: temporarily use save_model instead of save_weights as default due to https://github.com/tensorflow/tensorflow/issues/41116
         _weights_only=True
-        if resore_weights_only:
+        if restore_weights_only:
             new_file, weightfile = tempfile.mkstemp()
             self.model.save_weights(weightfile)
         else:
