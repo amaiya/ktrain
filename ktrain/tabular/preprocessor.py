@@ -10,7 +10,7 @@ class TabularPreprocessor(Preprocessor):
     """
 
     def __init__(self, predictor_columns, label_columns, date_columns=[], 
-                 is_regression=False, procs=[]):
+                 is_regression=False, procs=[], max_card=20):
         self.is_regression=is_regression
         self.c  = None
         self.pc = predictor_columns
@@ -21,6 +21,7 @@ class TabularPreprocessor(Preprocessor):
         self.cont_names = None
         self.label_transform = None
         self.procs = procs
+        self.max_card = max_card
 
 
     def get_preprocessor(self):
@@ -77,7 +78,7 @@ class TabularPreprocessor(Preprocessor):
             self.label_transform = U.YTransformDataFrame(label_columns, is_regression=self.is_regression)
             df = self.label_transform.apply_train(df)
             self.label_columns = self.label_transform.get_classes()
-            self.cont_names, self.cat_names = cont_cat_split(df, label_columns=self.label_columns)
+            self.cont_names, self.cat_names = cont_cat_split(df, label_columns=self.label_columns, max_card=self.max_card)
             self.procs = [proc(self.cat_names, self.cont_names) for proc in self.procs] # "objectivy"
         else:
             df = self.label_transform.apply_test(df)
@@ -207,7 +208,7 @@ def make_date(df, date_field):
     return
 
 
-def cont_cat_split(df, max_card=25, label_columns=[]):
+def cont_cat_split(df, max_card=20, label_columns=[]):
     "Helper function that returns column names of cont and cat variables from given df."
     cont_names, cat_names = [], []
     for col in df:
