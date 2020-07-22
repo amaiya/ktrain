@@ -66,7 +66,7 @@ class Learner(ABC):
         
 
 
-    def evaluate(self, test_data=None, print_report=True, class_names=[]):
+    def evaluate(self, test_data=None, print_report=True, save_path='ktrain_classification_report.csv', class_names=[]):
         """
         alias for self.validate().
         Returns confusion matrix and optionally prints
@@ -77,12 +77,22 @@ class Learner(ABC):
         By default, this uses val_data, as supplied to ktrain.get_learner().
         Other validation or test data can be optionally be supplied as argument via <test_data> argument.
         Supply class_names to include labels instead of intenger class integer values in classification report.
+        Args:
+          test_data(Dataset|np.ndarray): test or validation data.  If None, self.val_data is used.
+          print_report(bool): If True, classification report will be printed. If False, report will be saved to CSV 
+                              at save_path.
+          save_path(str): Classification report will be saved to this file path/name if print_report=False
+          class_names(list): list of class names to be used in classification report instead of 
+                             class integer IDs.
         """
         return self.validate(val_data=test_data, print_report=print_report, class_names=class_names)
 
 
 
-    def validate(self, val_data=None, print_report=True, class_names=[]):
+    def validate(self, val_data=None, 
+                 print_report=True,
+                 save_path='ktrain_classification_report.csv', 
+                 class_names=[]):
         """
         Returns confusion matrix and optionally prints
         a classification report.
@@ -92,6 +102,13 @@ class Learner(ABC):
         By default, this uses val_data, as supplied to ktrain.get_learner().
         Other validation or test data can be optionally be supplied as argument.
         Supply class_names to include labels instead of intenger class integer values in classification report.
+        Args:
+          val_data(Dataset|np.ndarray): validation data.  If None, self.val_data is used.
+          print_report(bool): If True, classification report will be printed. If False, report will be saved to CSV 
+                              at save path.
+          save_path(str): Classification report will be saved to this file path/name if print_report=False
+          class_names(list): list of class names to be used in classification report instead of 
+                             class integer IDs.
         """
         if val_data is not None:
             val = val_data
@@ -118,16 +135,21 @@ class Learner(ABC):
         else:
             y_pred = np.argmax(y_pred, axis=1)
             y_true = np.argmax(y_true, axis=1)
-        if print_report:
+        if print_report or save_path is not None:
             if class_names:
                 try:
                     class_names = [str(s) for s in class_names]
                 except:
                     pass
-                report = classification_report(y_true, y_pred, target_names=class_names)
+                report = classification_report(y_true, y_pred, target_names=class_names, output_dict=not print_report)
             else:
-                report = classification_report(y_true, y_pred)
-            print(report)
+                report = classification_report(y_true, y_pred, output_dict=not print_report)
+            if print_report: 
+                print(report)
+            else:
+                df = pd.DataFrame(report).transpose()
+                df.to_csv(save_path)
+                print('classification report saved to: %s' % (save_path))
             cm_func = confusion_matrix
         cm =  confusion_matrix(y_true,  y_pred)
         return cm

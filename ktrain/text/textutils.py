@@ -301,6 +301,14 @@ def read_text(filename):
     return decoded_text.strip()
 
 
+#tokenizer_filter = rs='!"#$%&()*+,-./:;<=>?@[\\]^_`{|}~\t\n'
+re_tok = re.compile(f'([{string.punctuation}“”¨«»®´·º½¾¿¡§£₤‘’])')
+def tokenize(s, join_tokens=False, join_char=' '): 
+    tokens = re_tok.sub(r' \1 ', s).split()
+    if join_tokens: tokens = join_char.join(tokens)
+    return tokens
+
+
 
 def sent_tokenize(text):
     """

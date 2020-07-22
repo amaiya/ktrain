@@ -6,6 +6,47 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.18.6 (TBD)
+
+### New:
+- N/A
+
+### Changed
+- N/A
+
+### Fixed:
+- added `save_path` argument to `Learner.validate` and `Learner.evaluate`.  If `print_report=False`, classification
+  report will be saved as CSV to `save_path`.
+
+
+## 0.18.5 (2020-07-20)
+
+### New:
+- N/A
+
+### Changed
+- N/A
+
+### Fixed:
+- Changed `qa` module to use use 'Auto' when loading `QuestionAnswering` models and tokenizer
+- try `from_pt=True` for `qa` module if initial model-loading fails
+- use `get_hf_model_name` in `qa` module
+
+
+## 0.18.4 (2020-07-17)
+
+### New:
+- N/A
+
+### Changed
+- N/A
+
+### Fixed:
+- return gracefully if no documents match question in `qa` module
+- tokenize question in `qa` module to ensure all candidate documents are returned
+- Added error in `text.preprocessor` when training set has incomplete integer labels
+
+
 ## 0.18.3 (2020-07-12)
 
 ### New:

@@ -10,8 +10,10 @@ from whoosh import qparser
 from whoosh.qparser import QueryParser
 
 
-from transformers import TFBertForQuestionAnswering
-from transformers import BertTokenizer
+#from transformers import TFBertForQuestionAnswering
+#from transformers import BertTokenizer
+from transformers import TFAutoModelForQuestionAnswering
+from transformers import AutoTokenizer
 LOWCONF = -10000
 
 
@@ -23,8 +25,11 @@ class QA(ABC):
     def __init__(self, bert_squad_model='bert-large-uncased-whole-word-masking-finetuned-squad',
                  bert_emb_model='bert-base-uncased'):
         self.model_name = bert_squad_model
-        self.model = TFBertForQuestionAnswering.from_pretrained(self.model_name)
-        self.tokenizer = BertTokenizer.from_pretrained(self.model_name)
+        try:
+            self.model = TFAutoModelForQuestionAnswering.from_pretrained(self.model_name)
+        except:
+            self.model = TFAutoModelForQuestionAnswering.from_pretrained(self.model_name, from_pt=True)
+        self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
         self.maxlen = 512
         self.te = tpp.TransformerEmbedding(bert_emb_model, layers=[-2])
 
@@ -43,12 +48,19 @@ class QA(ABC):
         assert len(segment_ids) == len(input_ids)
         n_ids = len(segment_ids)
         if n_ids < self.maxlen:
-            start_scores, end_scores = self.model(np.array([input_ids]), 
-                                             token_type_ids=np.array([segment_ids]))
+            input_ids = np.array([input_ids])
+            token_type_ids = np.array([segment_ids])
         else:
             #TODO: use different truncation strategies or run multiple inferences
-            start_scores, end_scores = self.model(np.array([input_ids[:self.maxlen]]), 
-                                             token_type_ids=np.array([segment_ids[:self.maxlen]]))
+            input_ids = np.array([input_ids[:self.maxlen]])
+            token_type_ids = np.array([segment_ids[:self.maxlen]])
+
+        # Added from: https://github.com/huggingface/transformers/commit/16ce15ed4bd0865d24a94aa839a44cf0f400ef50
+        if U.get_hf_model_name(self.model_name) in  ['xlm', 'roberta', 'distilbert']:
+            start_scores, end_scores = self.model(input_ids)
+        else:
+            start_scores, end_scores = self.model(input_ids, token_type_ids=token_type_ids)
+
         start_scores = start_scores[:,1:-1]
         end_scores = end_scores[:,1:-1]
         answer_start = np.argmax(start_scores)
@@ -279,9 +291,13 @@ class SimpleQA(QA):
           list
         """
         # locate candidate document contexts
-        doc_results = self.search(question, limit=n_docs_considered)
         paragraphs = []
         refs = []
+        #doc_results = self.search(question, limit=n_docs_considered)
+        doc_results = self.search(TU.tokenize(question, join_tokens=True), limit=n_docs_considered)
+        if not doc_results: 
+            warnings.warn('No documents matched words in question')
+            return []
         for doc_result in doc_results:
             rawtext = doc_result.get('rawtext', '')
             reference = doc_result.get('reference', '')
@@ -356,6 +372,7 @@ class SimpleQA(QA):
 
 
     def display_answers(self, answers):
+        if not answers: return
         df = self.answers2df(answers)
         from IPython.core.display import display, HTML
         display(HTML(df.to_html(render_links=True, escape=False)))
