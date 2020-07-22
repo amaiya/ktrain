@@ -567,15 +567,14 @@ class YTransform:
                 raise ValueError('targets are 1-hot or multi-hot encoded but class_names is empty. ' +\
                                  'The classes argument should have been supplied.')
             else:
-                if train and len(self_get_classes()) != targets.shape[1]:
-                    raise ValueError('targets have shape (%s,%s), but len(class_names) is %s' % (targets.shape[0], 
-                                                                                                 targets.shape[1], 
-                                                                                                  len(self.get_classes())))
+                if train and len(self.get_classes()) != targets.shape[1]:
+                    raise ValueError('training targets suggest %s classes, but class_names are %s' % (targets.shape[1], 
+                                                                                                     self.get_classes()))
 
         # numeric targets (classification)
         if len(targets.shape) == 1 and self.get_classes():
             if np.issubdtype(type(max(targets)), np.floating):
-                warnings.warn('class_names=[] implies classification but targets array contains float(s) instead of integers or strings')
+                warnings.warn('non-empty class_names implies classification but targets array contains float(s) instead of integers or strings')
             if len(set(targets)) != len(list(range(int(max(targets)+1)))):
                 raise ValueError('targets should contain %s but instead contain %s' % (list(set(targets)), list(range(int(max(targets))+1))))
             targets = to_categorical(targets)
