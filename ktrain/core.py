@@ -436,7 +436,7 @@ class Learner(ABC):
 
 
     def lr_find(self, start_lr=1e-7, lr_mult=1.01, max_epochs=None, 
-                stop_factor=4, show_plot=False, suggest=False, verbose=1):
+                stop_factor=4, show_plot=False, suggest=False, restore_weights_only=False, verbose=1):
         """
         Plots loss as learning rate is increased.  Highest learning rate 
         corresponding to a still falling loss should be chosen.
@@ -466,6 +466,12 @@ class Learner(ABC):
                               Increase this if loss is erratic and lr_find
                               exits too early.
             show_plot (bool):  If True, automatically invoke lr_plot
+            restore_weights_only(bool): If True, when training simulation is complete,
+                                        the model weights only are restored, but not
+                                        the original optimizer weights.  
+                                        In at least a few cases, this seems to improve performance
+                                        when actual training begins. Further investigation is needed,
+                                        so it is False by default.
             verbose (bool): specifies how much output to print
         Returns:
             None
@@ -473,13 +479,15 @@ class Learner(ABC):
 
         U.vprint('simulating training for different learning rates... this may take a few moments...',
                 verbose=verbose)
-
         # save current weights and temporarily restore original weights
-        # dep_fix: temporarily use save_model instead of save_weights due to https://github.com/tensorflow/tensorflow/issues/41116
-        #new_file, weightfile = tempfile.mkstemp()
-        #self.model.save_weights(weightfile)
-        temp_folder = tempfile.mkdtemp()
-        self.save_model(temp_folder)
+        # dep_fix: temporarily use save_model instead of save_weights as default due to https://github.com/tensorflow/tensorflow/issues/41116
+        _weights_only=True
+        if resore_weights_only:
+            new_file, weightfile = tempfile.mkstemp()
+            self.model.save_weights(weightfile)
+        else:
+            temp_folder = tempfile.mkdtemp()
+            self.save_model(temp_folder)
 
 
          # compute steps_per_epoch
@@ -518,9 +526,11 @@ class Learner(ABC):
             return
 
         # re-load current weights
-        # dep_fix: temporarily use load_model instead of load_weights due to https://github.com/tensorflow/tensorflow/issues/41116
-        #self.model.load_weights(weightfile)
-        self.load_model(temp_folder)
+        # dep_fix: temporarily use load_model instead of load_weights as default due to https://github.com/tensorflow/tensorflow/issues/41116
+        if restore_weights_only:
+            self.model.load_weights(weightfile)
+        else:
+            self.load_model(temp_folder)
 
         # instructions to invoker
         U.vprint('\n', verbose=verbose)
