@@ -1,13 +1,11 @@
 from ..imports import *
 from .. import utils as U
-
+from ..models import bn_drop_lin
 
 MLP = 'mlp'
 TABULAR_MODELS = {
                     MLP: "a configurable multilayer perceptron with categorical variable embeddings [https://arxiv.org/abs/1604.06737]",
                     } 
-
-
 
 def print_tabular_classifiers():
     for k,v in TABULAR_MODELS.items():
@@ -19,7 +17,8 @@ def print_tabular_regression_models():
 
 
 
-def _tabular_model(name, train_data, multilabel=None, is_regression=False, metrics=['accuracy'], verbose=1):
+def _tabular_model(name, train_data, multilabel=None, is_regression=False, metrics=['accuracy'], 
+                   layers=[1000, 500], dropouts=[0.001, 0.01], output_dropout=0.5, bn=True, verbose=1):
     """
     Build and return a classification or regression model for tabular data
 
@@ -31,6 +30,10 @@ def _tabular_model(name, train_data, multilabel=None, is_regression=False, metri
                             If None, multilabel will be inferred from data.
         is_regression(bool): If True, will build a regression model, else classification model.
         metrics(list): list of metrics to use
+        layers(list): number of units in each hidden layer of MLP
+        dropouts(list): Dropout values for each hidden layer of MLP
+        output_dropout(float): dropout for output layer
+        bn(bool): If True, BatchNormalization will be used with each hidden layer in MLP
         verbose (boolean): verbosity of output
     Return:
         model (Model): A Keras Model instance
@@ -38,10 +41,12 @@ def _tabular_model(name, train_data, multilabel=None, is_regression=False, metri
     # check arguments
     if not U.is_tabular_from_data(train_data):
         err ="""
-            Please pass training data in the form of data returned from a ktrain table_from* function.
+            Please pass training data in the form of data returned from a ktrain tabular_from* function.
             """
         raise Exception(err)
+    if len(layers) != len(dropouts): raise ValueError('len(layers) must equal len(dropouts)')
 
+    # set model configuration values
     if is_regression: # regression
         if metrics is None or metrics==['accuracy']: metrics=['mae']
         num_classes = 1
@@ -65,13 +70,46 @@ def _tabular_model(name, train_data, multilabel=None, is_regression=False, metri
             loss_func = 'binary_crossentropy'
             activation = 'sigmoid'
 
-    # return dummy model temporarily as placeholder
-    model = Sequential()
-    model.add(Dense(num_classes, input_shape=(42,), activation=activation))
-    model.compile(optimizer=U.DEFAULT_OPT, loss=loss_func, metrics=metrics])
 
+    # construct model
+
+    ilayers = []
+    n_cat = len(train_data.cat_columns)
+    n_cont = len(train_data.cont_columns)
+    if n_cat ==0 and n_cont == 0: raise ValueError('There are zero continuous and cateorical variables.')
+
+    # categorical inputs and embeddings
+    if n_cat > 0:
+        emblayers = []
+        num_uniques = [max(c.cat.codes.values+1)+1 for n, c in train_data.df[train_data.cat_columns].items()]
+        for i in range(n_cat):
+            inp = keras.layers.Input(shape=(1,))
+            ilayers.append(inp)
+            emb_size = min(50, (num_uniques[i]//2)+1)
+            #emb_size = min(600, round(1.6 * num_uniques[i]**0.56))
+            emb = keras.layers.Embedding(num_uniques[i], emb_size, input_length=1)(inp)
+            emblayers.append(emb)
+        x = keras.layers.concatenate(emblayers)
+
+    # continuous inputs
+    if n_cont > 0:
+        x_cont = keras.layers.Input(shape=(n_cont,))
+        ilayers.append(x_cont)
+        x = keras.layers.concatenate([x, x_cont]) if n_cat > 0 else x_cont
+
+    # hidden layers
+    for i, n_out in enumerate(layers):
+        out = bn_drop_lin(x, n_out, bn=bn, p=dropouts[i], actn='relu')
+
+    # output layer
+    out = bn_drop_lin(out, num_classes , bn=bn, p=output_dropout, actn=activation)
+
+    # construct and compile model
+    model = Model(inputs=ilayers, outputs=out)
+    model.compile(optimizer=U.DEFAULT_OPT, loss=loss_func, metrics=metrics)
     U.vprint('done.', verbose=verbose)
     return model
+
 
 
 def tabular_classifier(name, train_data, multilabel=None, metrics=['accuracy'], verbose=1):
@@ -85,13 +123,19 @@ def tabular_classifier(name, train_data, multilabel=None, metrics=['accuracy'], 
                             If false, binary/multiclass model will be returned.
                             If None, multilabel will be inferred from data.
         metrics(list): list of metrics to use
+        layers(list): number of units in each hidden layer of MLP
+        dropouts(list): Dropout values for each hidden layer of MLP
+        output_dropout(float): dropout for output layer
+        bn(bool): If True, BatchNormalization will be used with each hidden layer in MLP
         verbose (boolean): verbosity of output
     Return:
         model (Model): A Keras Model instance
     """
 
 
-    self._tabular_model(name, train_data, multilabel=multilabel, metrics=metrics, verbose=verbose, is_regression=False)
+    self._tabular_model(name, train_data, multilabel=multilabel, metrics=metrics,
+                        layers=layers, dropouts=dropouts, output_dropout=output_dropout, bn=bn,
+                        verbose=verbose, is_regression=False)
 
 
 def tabular_regression_model(name, train_data,  metrics=['mae'], verbose=1):
@@ -102,10 +146,16 @@ def tabular_regression_model(name, train_data,  metrics=['mae'], verbose=1):
         name (string): currently accepts 'mlp' for multilayer perceptron
         train_data (TabularDataset): TabularDataset instance returned from one of the tabular_from_* functions
         metrics(list): list of metrics to use
+        layers(list): number of units in each hidden layer of MLP
+        dropouts(list): Dropout values for each hidden layer of MLP
+        output_dropout(float): dropout for output layer
+        bn(bool): If True, BatchNormalization will be used with each hidden layer in MLP
         verbose (boolean): verbosity of output
     Return:
         model (Model): A Keras Model instance
     """
 
 
-    self._tabular_model(name, train_data, multilabel=None, metrics=metrics, verbose=verbose, is_regression=True)
+    self._tabular_model(name, train_data, multilabel=None, metrics=metrics, 
+                        layers=layers, dropouts=dropouts, output_dropout=output_dropout, bn=bn,
+                        verbose=verbose, is_regression=True)
