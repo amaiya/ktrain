@@ -14,6 +14,8 @@ from .text.ner.predictor import NERPredictor
 from .text.ner.preprocessor import NERPreprocessor
 from .graph.predictor import NodePredictor, LinkPredictor
 from .graph.preprocessor import NodePreprocessor, LinkPreprocessor
+from .tabular.predictor import TabularPredictor
+from .tabular.preprocessor import TabularPreprocessor
 
 
 class Learner(ABC):
@@ -1371,7 +1373,7 @@ def get_predictor(model, preproc, batch_size=U.DEFAULT_BS):
     # check arguments
     if not isinstance(model, Model):
         raise ValueError('model must be of instance Model')
-    if not isinstance(preproc, (ImagePreprocessor,TextPreprocessor, NERPreprocessor, NodePreprocessor, LinkPreprocessor)):
+    if not isinstance(preproc, (ImagePreprocessor,TextPreprocessor, NERPreprocessor, NodePreprocessor, LinkPreprocessor, TabularPreprocessor)):
         raise ValueError('preproc must be instance of ktrain.preprocessor.Preprocessor')
     if isinstance(preproc, ImagePreprocessor):
         return ImagePredictor(model, preproc, batch_size=batch_size)
@@ -1384,6 +1386,9 @@ def get_predictor(model, preproc, batch_size=U.DEFAULT_BS):
         return NodePredictor(model, preproc, batch_size=batch_size)
     elif isinstance(preproc, LinkPreprocessor):
         return LinkPredictor(model, preproc, batch_size=batch_size)
+    elif isinstance(preproc, TabularPreprocessor):
+        return TabularPredictor(model, preproc, batch_size=batch_size)
+
     else:
         raise Exception('preproc of type %s not currently supported' % (type(preproc)))
 

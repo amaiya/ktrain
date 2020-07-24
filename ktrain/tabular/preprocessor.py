@@ -29,7 +29,7 @@ class TabularPreprocessor(Preprocessor):
 
 
     def get_classes(self):
-        return self.label_columns if self.is_regression else []
+        return self.label_columns if not self.is_regression else []
 
 
     def preprocess(self, df):

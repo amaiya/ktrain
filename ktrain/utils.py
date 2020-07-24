@@ -580,7 +580,7 @@ class YTransform:
                 warnings.warn('non-empty class_names implies classification but targets array contains float(s) instead of integers or strings')
             if len(set(targets)) != len(list(range(int(max(targets)+1)))):
                 raise ValueError('targets should contain %s but instead contain %s' % (list(set(targets)), list(range(int(max(targets))+1))))
-            targets = to_categorical(targets)
+            targets = to_categorical(targets, num_classes=len(self.get_classes()))
         return targets
 
     def apply_train(self, targets):
@@ -608,6 +608,10 @@ class YTransformDataFrame(YTransform):
         super().__init__(class_names=[])
 
     def apply(self, df, train=True):
+        labels_exist = True
+        lst = self.label_columns[:]
+        if not all(x in df.columns.values for x in lst): labels_exist = False
+        if train and not labels_exist: raise ValueError('dataframe is missing label columns: %s' % (self.label_columns))
 
         # extract targets
         # todo: sort?
@@ -620,26 +624,27 @@ class YTransformDataFrame(YTransform):
                 raise ValueError('These label_columns do not exist in df: %s' % (missing_cols))
 
             # set targets
-            targets = df[self.label_columns].values
+            targets = df[self.label_columns].values if labels_exist else np.zeros((df.shape[0], len(self.label_columns)))
             # set class names
-            self.set_classes(self.label_columns)
+            if train: self.set_classes(self.label_columns)
         # single column
         else: 
             # set targets
-            targets = df[self.label_columns[0]].values
+            targets = df[self.label_columns[0]].values if labels_exist else np.zeros(df.shape[0], dtype=np.int)
             # set class_names if classification task and targets with integer labels
             if not self.is_regression: 
                 if not isinstance(targets[0], str):
                     class_names = list(set(targets))
                     class_names.sort()
                     class_names = list( map(str, class_names) )
-                    self.set_classes(class_names)
+                    if train: self.set_classes(class_names)
 
         # transform targets
         targets = super().apply(targets, train=train) # self.c (new label_columns) may be modified here
 
         # modify DataFrame
-        for l in self.label_columns: del df[l] # delete old label columns
+        if labels_exist:
+            for l in self.label_columns: del df[l] # delete old label columns
         df = df.copy() # dep_fix: SettingWithCopy
         for i, col in enumerate(self.c):
             df[col] = targets[:,i]
