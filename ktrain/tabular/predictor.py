@@ -33,6 +33,7 @@ class TabularPredictor(Predictor):
         """
         if not isinstance(df, pd.DataFrame):
             raise ValueError('df must be a pd.DataFrame')
+        df = df.copy()
 
         classification, multilabel = U.is_classifier(self.model)
 
