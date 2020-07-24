@@ -554,7 +554,7 @@ class YTransform:
                 warnings.warn('Task is being treated as REGRESSION because ' +\
                               'class_names argument was not supplied. ' + \
                               'If this is incorrect, supply class_names argument.')
-            targets = np.array(targets, dtype=np.float32)
+            if not self.get_classes(): targets = np.array(targets, dtype=np.float32)
         # string targets (classification)
         elif len(targets.shape) == 1 and isinstance(targets[0], str):
             if not train and self.le is None: raise ValueError('LabelEncoder has not been trained. Call with train=True')
@@ -640,8 +640,10 @@ class YTransformDataFrame(YTransform):
 
         # modify DataFrame
         for l in self.label_columns: del df[l] # delete old label columns
+        df = df.copy() # dep_fix: SettingWithCopy
         for i, col in enumerate(self.c):
             df[col] = targets[:,i]
+            #df.loc[:,col] = targets[:,i]
         return df
 
     def apply_train(self, df):

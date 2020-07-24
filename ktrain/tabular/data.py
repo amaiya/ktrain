@@ -9,11 +9,12 @@ def tabular_from_df(train_df, label_columns=[], date_columns=[], val_df=None, va
 
 
     # strip space from string columns
+    #print(pp.pd_data_types(train_df))
     for k,v in pp.pd_data_types(train_df).items():
         if v != 'string': continue
         train_df[k] = train_df[k].str.strip()
         if val_df is None: continue
-        if k not in val_df.column: raise ValueError('val_df is missing %s column' % (k))
+        if k not in val_df.columns: raise ValueError('val_df is missing %s column' % (k))
         val_df[k] = val_df[k].str.strip()
 
     # check label_columns
