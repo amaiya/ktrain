@@ -137,7 +137,8 @@ class TabularDataset(SequenceDataset):
             conts = np.stack([c.astype('float32').values for n,c in df[self.cont_columns].items()], 1)
             batch_x.append(conts)
         batch_y = self.df[self.label_columns].iloc[inds].values
-        return tuple(batch_x), batch_y
+        batch_x = batch_x[0] if len(batch_x)==1 else tuple(batch_x)
+        return batch_x, batch_y
 
     def nsamples(self):
         return self.df.shape[0]

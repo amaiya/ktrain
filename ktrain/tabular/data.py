@@ -5,7 +5,16 @@ from . import preprocessor as pp
 def tabular_from_df(train_df, label_columns=[], date_columns=[], val_df=None, val_pct=0.1, 
                     is_regression=False, max_card=20, random_state=None, verbose=1):
 
-    # TODO: this code is similar to images_from_df: must refactor and cleaned up
+
+
+
+    # strip space from string columns
+    for k,v in pp.pd_data_types(train_df).items():
+        if v != 'string': continue
+        train_df[k] = train_df[k].str.strip()
+        if val_df is None: continue
+        if k not in val_df.column: raise ValueError('val_df is missing %s column' % (k))
+        val_df[k] = val_df[k].str.strip()
 
     # check label_columns
     if label_columns is None or (isinstance(label_columns, (list, np.ndarray)) and len(label_columns) == 0):
