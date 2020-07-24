@@ -321,16 +321,18 @@ class FillMissing(TabularProc):
 
     def apply_train(self, df):
         self.na_dict = {}
+        self.filler_dict = {}
         for name in self.cont_names:
+            if self.fill_strategy == FILL_MEDIAN: filler = df[name].median()
+            elif self.fill_strategy == FILL_CONSTANT: filler = self.fill_val
+            else: filler = df[name].dropna().value_counts().idxmax()
+            self.filler_dict[name] = filler
             if pd.isnull(df[name]).sum():
                 if self.add_col:
                     df[name+'_na'] = pd.isnull(df[name])
                     if name+'_na' not in self.cat_names: self.cat_names.append(name+'_na')
-                if self.fill_strategy == FILL_MEDIAN: filler = df[name].median()
-                elif self.fill_strategy == FILL_CONSTANT: filler = self.fill_val
-                else: filler = df[name].dropna().value_counts().idxmax()
                 df[name] = df[name].fillna(filler)
-                self.na_dict[name] = filler
+                self.na_dict[name] = True
 
     def apply_test(self, df):
         "Fill missing values in `self.cont_names` like in `apply_train`."
@@ -339,10 +341,13 @@ class FillMissing(TabularProc):
                 if self.add_col:
                     df[name+'_na'] = pd.isnull(df[name])
                     if name+'_na' not in self.cat_names: self.cat_names.append(name+'_na')
-                df[name] = df[name].fillna(self.na_dict[name])
+                df[name] = df[name].fillna(self.filler_dict[name])
             elif pd.isnull(df[name]).sum() != 0:
-                raise Exception(f"""There are nan values in field {name} but there were none in the training set. 
-                Please fix those manually.""")
+                warnings.warn(f"""There are nan values in field {name} but there were none in the training set. 
+                Filled with {self.fill_strategy}.""")
+                df[name] = df[name].fillna(self.filler_dict[name])
+                #raise Exception(f"""There are nan values in field {name} but there were none in the training set. 
+                #Please fix those manually.""")
            
 
 class Normalize(TabularProc):
