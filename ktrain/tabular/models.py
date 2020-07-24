@@ -33,7 +33,7 @@ def _tabular_model(name, train_data, multilabel=None, is_regression=False, metri
         layers(list): number of units in each hidden layer of MLP
         dropouts(list): Dropout values for each hidden layer of MLP
         output_dropout(float): dropout for output layer
-        bn(bool): If True, BatchNormalization will be used with each hidden layer in MLP
+        bn(bool): If True, BatchNormalization will be used with each hidden layer in MLP (i.e., BatchNorm->Dropout->Dense)
         verbose (boolean): verbosity of output
     Return:
         model (Model): A Keras Model instance
@@ -89,7 +89,8 @@ def _tabular_model(name, train_data, multilabel=None, is_regression=False, metri
             #emb_size = min(600, round(1.6 * num_uniques[i]**0.56))
             emb = keras.layers.Embedding(num_uniques[i], emb_size, input_length=1)(inp)
             emblayers.append(emb)
-        x = keras.layers.concatenate(emblayers)
+        x = keras.layers.concatenate(emblayers)if len(emblayers) > 1 else emblayers[0]
+        x = keras.layers.Flatten()(x)
 
     # continuous inputs
     if n_cont > 0:
@@ -98,21 +99,23 @@ def _tabular_model(name, train_data, multilabel=None, is_regression=False, metri
         x = keras.layers.concatenate([x, x_cont]) if n_cat > 0 else x_cont
 
     # hidden layers
+    output = x
     for i, n_out in enumerate(layers):
-        out = bn_drop_lin(x, n_out, bn=bn, p=dropouts[i], actn='relu')
+        output = bn_drop_lin(output, n_out, bn=bn, p=dropouts[i], actn='relu')
 
     # output layer
-    out = bn_drop_lin(out, num_classes , bn=bn, p=output_dropout, actn=activation)
+    output = bn_drop_lin(output, num_classes , bn=bn, p=output_dropout, actn=activation)
 
     # construct and compile model
-    model = Model(inputs=ilayers, outputs=out)
+    model = Model(inputs=ilayers, outputs=output)
     model.compile(optimizer=U.DEFAULT_OPT, loss=loss_func, metrics=metrics)
     U.vprint('done.', verbose=verbose)
     return model
 
 
 
-def tabular_classifier(name, train_data, multilabel=None, metrics=['accuracy'], verbose=1):
+def tabular_classifier(name, train_data, multilabel=None, metrics=['accuracy'], 
+                       layers=[1000, 500], dropouts=[0.001, 0.01], output_dropout=0.5, bn=True, verbose=1):
     """
     Build and return a classification model for tabular data
 
@@ -126,19 +129,20 @@ def tabular_classifier(name, train_data, multilabel=None, metrics=['accuracy'], 
         layers(list): number of units in each hidden layer of MLP
         dropouts(list): Dropout values for each hidden layer of MLP
         output_dropout(float): dropout for output layer
-        bn(bool): If True, BatchNormalization will be used with each hidden layer in MLP
+        bn(bool): If True, BatchNormalization will be used with each hidden layer in MLP (i.e., BatchNorm->Dropout->Dense)
         verbose (boolean): verbosity of output
     Return:
         model (Model): A Keras Model instance
     """
 
 
-    self._tabular_model(name, train_data, multilabel=multilabel, metrics=metrics,
-                        layers=layers, dropouts=dropouts, output_dropout=output_dropout, bn=bn,
-                        verbose=verbose, is_regression=False)
+    return _tabular_model(name, train_data, multilabel=multilabel, metrics=metrics,
+                          layers=layers, dropouts=dropouts, output_dropout=output_dropout, bn=bn,
+                          verbose=verbose, is_regression=False)
 
 
-def tabular_regression_model(name, train_data,  metrics=['mae'], verbose=1):
+def tabular_regression_model(name, train_data,  metrics=['mae'], 
+                             layers=[1000, 500], dropouts=[0.001, 0.01], output_dropout=0.5, bn=True, verbose=1):
     """
     Build and return a regression model for tabular data
 
@@ -149,13 +153,13 @@ def tabular_regression_model(name, train_data,  metrics=['mae'], verbose=1):
         layers(list): number of units in each hidden layer of MLP
         dropouts(list): Dropout values for each hidden layer of MLP
         output_dropout(float): dropout for output layer
-        bn(bool): If True, BatchNormalization will be used with each hidden layer in MLP
+        bn(bool): If True, BatchNormalization will be used with each hidden layer in MLP (i.e., BatchNorm->Dropout->Dense)
         verbose (boolean): verbosity of output
     Return:
         model (Model): A Keras Model instance
     """
 
 
-    self._tabular_model(name, train_data, multilabel=None, metrics=metrics, 
-                        layers=layers, dropouts=dropouts, output_dropout=output_dropout, bn=bn,
-                        verbose=verbose, is_regression=True)
+    return _tabular_model(name, train_data, multilabel=None, metrics=metrics, 
+                          layers=layers, dropouts=dropouts, output_dropout=output_dropout, bn=bn,
+                          verbose=verbose, is_regression=True)
