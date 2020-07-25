@@ -77,7 +77,7 @@ class TabularPreprocessor(Preprocessor):
                 label_columns.sort()
             self.label_transform = U.YTransformDataFrame(label_columns, is_regression=self.is_regression)
             df = self.label_transform.apply_train(df)
-            self.label_columns = self.label_transform.get_classes()
+            self.label_columns = self.label_transform.get_classes() if not self.is_regression else self.label_transform.label_columns
             self.cont_names, self.cat_names = cont_cat_split(df, label_columns=self.label_columns, max_card=self.max_card)
             self.procs = [proc(self.cat_names, self.cont_names) for proc in self.procs] # "objectivy"
         else:

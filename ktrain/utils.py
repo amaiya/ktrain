@@ -552,8 +552,8 @@ class YTransform:
             # numeric targets
             if not self.get_classes() and train:
                 warnings.warn('Task is being treated as REGRESSION because ' +\
-                              'class_names argument was not supplied. ' + \
-                              'If this is incorrect, supply class_names argument.')
+                              'either class_names argument was not supplied or is_regression=True. ' + \
+                              'If this is incorrect, change accordingly.')
             if not self.get_classes(): targets = np.array(targets, dtype=np.float32)
         # string targets (classification)
         elif len(targets.shape) == 1 and isinstance(targets[0], str):
@@ -579,7 +579,7 @@ class YTransform:
             if np.issubdtype(type(max(targets)), np.floating):
                 warnings.warn('class_names implies classification but targets array contains float(s) instead of integers or strings')
             if len(set(targets)) != len(list(range(int(max(targets)+1)))):
-                raise ValueError('targets should contain %s but instead contain %s' % (list(set(targets)), list(range(int(max(targets))+1))))
+                raise ValueError('len(set(targets) is %s but len(list(range(int(max(targets)+1))) is  %s' % (len(list(set(targets))), len(list(range(int(max(targets))+1)))))
             targets = to_categorical(targets, num_classes=len(self.get_classes()))
         return targets
 
@@ -643,7 +643,7 @@ class YTransformDataFrame(YTransform):
         targets = super().apply(targets, train=train) # self.c (new label_columns) may be modified here
 
         # modify DataFrame
-        if labels_exist:
+        if labels_exist and not self.is_regression:
             for l in self.label_columns: del df[l] # delete old label columns
         df = df.copy() # dep_fix: SettingWithCopy
         for i, col in enumerate(self.c):
