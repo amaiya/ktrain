@@ -545,7 +545,7 @@ class YTransform:
 
         # validate labels against data
         targets = np.array(targets) if type(targets) == list else targets
-        targets = np.squeeze(targets)
+        if len(targets.shape) > 1: targets = np.squeeze(targets)
 
         # handle numeric targets (regression)
         if len(targets.shape) ==1 and not isinstance(targets[0], str):
