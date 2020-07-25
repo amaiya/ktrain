@@ -577,7 +577,7 @@ class YTransform:
         # numeric targets (classification)
         if len(targets.shape) == 1 and self.get_classes():
             if np.issubdtype(type(max(targets)), np.floating):
-                warnings.warn('non-empty class_names implies classification but targets array contains float(s) instead of integers or strings')
+                warnings.warn('class_names implies classification but targets array contains float(s) instead of integers or strings')
             if len(set(targets)) != len(list(range(int(max(targets)+1)))):
                 raise ValueError('targets should contain %s but instead contain %s' % (list(set(targets)), list(range(int(max(targets))+1))))
             targets = to_categorical(targets, num_classes=len(self.get_classes()))
