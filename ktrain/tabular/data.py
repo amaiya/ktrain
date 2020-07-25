@@ -46,18 +46,19 @@ def tabular_from_df(train_df, label_columns=[], date_columns=[], val_df=None, va
 
 
 
-def tabular_from_csv(train_csv, label_columns=[], date_columns=[], val_csv=None, val_pct=0.1, is_regression=False, max_card=20, random_state=None):
+def tabular_from_csv(train_csv, label_columns=[], date_columns=[], val_csv=None, val_pct=0.1, 
+                     index_col=None, is_regression=False, max_card=20, random_state=None):
     """
     Loads tabular data from CSV file
     """
 
     # read in dataset
-    train_df = pd.read_csv(train_csv, index_col=0)
+    train_df = pd.read_csv(train_csv, index_col=index_col)
     val_df = None
     if val_csv is not None:
-        val_df = pd.read_csv(val_csv, index_col=0)
+        val_df = pd.read_csv(val_csv, index_col=index_col)
     return tabular_from_df(train_df, label_columns=label_columns, date_columns=date_columns, val_df=val_df, val_pct=val_pct, 
-                         is_regression=is_regression, max_card=max_card, random_state=random_state)
+                          is_regression=is_regression, max_card=max_card, random_state=random_state)
  
 
 
