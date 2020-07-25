@@ -46,6 +46,16 @@ class TabularPreprocessor(Preprocessor):
         return
 
 
+    def denormalize(self, df):
+        normalizer = None
+        for proc in self.procs:
+            if type(proc).__name__ == 'Normalize':
+                normalizer = proc
+                break
+        if normalizer is None: return df
+        return normalizer.revert(df)
+
+
     def preprocess_train(self, df, mode='train', verbose=1):
         """
         preprocess training set
