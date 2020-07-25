@@ -6,8 +6,7 @@ def tabular_from_df(train_df, label_columns=[], date_columns=[], val_df=None, va
                     is_regression=False, max_card=20, random_state=None, verbose=1):
 
 
-
-
+    train_df = train_df.copy()
     # strip space from string columns
     #print(pp.pd_data_types(train_df))
     for k,v in pp.pd_data_types(train_df).items():
@@ -35,6 +34,8 @@ def tabular_from_df(train_df, label_columns=[], date_columns=[], val_df=None, va
             msk = np.random.rand(len(df)) < prop
             train_df = df[msk]
             val_df = df[~msk]
+    else:
+        val_df = val_df.copy()
 
     procs = [pp.FillMissing, pp.Categorify, pp.Normalize]
     preproc = pp.TabularPreprocessor(predictor_columns, label_columns, date_columns=date_columns, 
