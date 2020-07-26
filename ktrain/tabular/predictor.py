@@ -56,7 +56,7 @@ class TabularPredictor(Predictor):
         return result   
 
 
-    def explain(self, test_df, row_index=None, row_id=None, class_id=None, background_size=50, nsamples=500):
+    def explain(self, test_df, row_index=None, row_num=None, class_id=None, background_size=50, nsamples=500):
         """
         Explain the prediction of an example using SHAP.
         Args:
@@ -67,8 +67,8 @@ class TabularPredictor(Predictor):
                             variables as strings).
           row_index(int): index of row in DataFrame to explain (e.g., PassengerID in Titanic dataset).
                           mutually-exclusive with row_id
-          row_id(int): ID of row in DataFrame to explain (i.e., 0=first row, 1=second rows, etc.)
-                       mutually-exclusive with row_index
+          row_num(int): raw row number in DataFrame to explain (i.e., 0=first row, 1=second rows, etc.)
+                         mutually-exclusive with row_index
           class_id(int): Only required for classification
           background_size(int): size of background data (SHAP parameter)
           nsamples(int): number of samples (SHAP parameter)
@@ -105,19 +105,19 @@ class TabularPredictor(Predictor):
         df_display = df_display[tabseq.cat_columns + tabseq.cont_columns]
 
         # select row
-        if row_id is not None and row_index is not None:
-            raise ValueError('row_id and row_index are mutually exclusive with eachother.')
+        if row_num is not None and row_index is not None:
+            raise ValueError('row_num and row_index are mutually exclusive with eachother.')
 
         if row_index is not None:
             df_row = df[df.index.isin([row_index])].iloc[0,:]
             df_display_row = df_display[df_display.index.isin([row_index])].iloc[0,:]
             r_key = 'row_index' if df.index.name is None else df.index.name
             r_val = row_index
-        elif row_id is not None:
-            df_row = df.iloc[row_id,:]
-            df_display_row = df_display.iloc[row_id,:]
-            r_key = 'row_id'
-            r_val = row_id 
+        elif row_num is not None:
+            df_row = df.iloc[row_num,:]
+            df_display_row = df_display.iloc[row_num,:]
+            r_key = 'row_num'
+            r_val = row_num 
         #print(df_row)
         #print(df_display_row)
 
