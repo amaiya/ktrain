@@ -127,9 +127,9 @@ class TabularPredictor(Predictor):
         expected_value = explainer.expected_value
 
         if not np.issubdtype(type(explainer.expected_value), np.floating):
-            expected_value = explainer.expected_value[class_id]
+            expected_value = explainer.expected_value[0 if class_id is None else class_id]
         if type(shap_values) == list:
-            shap_values = shap_values[class_id]
+            shap_values = shap_values[0 if class_id is None else class_id]
 
         if classification:  print('Explanation for class = %s (%s=%s): ' % (self.get_classes()[class_id], r_key, r_val))
         plt.show(shap.force_plot(expected_value, shap_values, df_display_row, matplotlib=True))
