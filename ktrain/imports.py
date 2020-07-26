@@ -19,6 +19,7 @@ if SUPPRESS_TF_WARNINGS:
     # elevate warnings to errors for debugging dependencies
     #warnings.simplefilter('error', FutureWarning)
     logging.getLogger('mosestokenizer').setLevel(logging.ERROR)
+    logging.getLogger('shap').setLevel(logging.ERROR)
 os.environ['NUMEXPR_MAX_THREADS'] = '8' # suppress warning from NumExpr on machines with many CPUs
 
 
