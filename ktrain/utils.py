@@ -606,6 +606,7 @@ class YTransformDataFrame(YTransform):
         if isinstance(label_columns, str): label_columns = [label_columns]
         self.label_columns = label_columns
         if not label_columns: raise ValueError('label_columns is required')
+        self.label_columns = [self.label_columns] if isinstance(self.label_columns, str) else self.label_columns
         #class_names = label_columns if len(label_columns) > 1 else []
         super().__init__(class_names=[])
 

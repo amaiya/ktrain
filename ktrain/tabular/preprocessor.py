@@ -15,15 +15,20 @@ class TabularPreprocessor(Preprocessor):
         self.c  = None
         self.pc = predictor_columns
         self.lc = label_columns
+        self.lc = [self.lc] if isinstance(self.lc, str) else self.lc
         self.dc = date_columns
         self.label_columns = None
-        self.cat_names = None
-        self.cont_names = None
+        self.cat_names = []
+        self.cont_names = []
+        self.date_names = []
         self.label_transform = None
         self.procs = procs
         self.max_card = max_card
 
-
+    @property
+    def na_names(self):
+        return [n for n in self.cat_names if n[-3:] == '_na']
+        
     def get_preprocessor(self):
         return (self.label_transform, self.procs)
 
@@ -55,6 +60,13 @@ class TabularPreprocessor(Preprocessor):
         if normalizer is None: return df
         return normalizer.revert(df)
 
+    #def codify(self, df):
+        #df = df.copy()
+        #for lab in self.lc:
+            #df[lab] = df[lab].cat.codes
+        #return df
+
+
 
     def preprocess_train(self, df, mode='train', verbose=1):
         """
@@ -77,14 +89,13 @@ class TabularPreprocessor(Preprocessor):
         # convert date fields
         for field in self.dc:
             df = df.copy()
-            df = add_datepart(df, field)
+            df, date_names = add_datepart(df, field)
+            self.date_names = date_names
 
         # preprocess labels and data
         if mode == 'train':
-            label_columns = self.lc
-            if isinstance(self.lc, (list, np.ndarray)): 
-                label_columns = self.lc[:]
-                label_columns.sort()
+            label_columns = self.lc[:]
+            label_columns.sort() # TODO: track
             self.label_transform = U.YTransformDataFrame(label_columns, is_regression=self.is_regression)
             df = self.label_transform.apply_train(df)
             self.label_columns = self.label_transform.get_classes() if not self.is_regression else self.label_transform.label_columns
@@ -229,7 +240,7 @@ def cont_cat_split(df, max_card=20, label_columns=[]):
     return cont_names, cat_names
 
 
-def add_datepart(df:pd.DataFrame, field_name:str, prefix:str=None, drop:bool=True, time:bool=False):
+def add_datepart(df:pd.DataFrame, field_name:str, prefix:str=None, drop:bool=True, time:bool=False, return_added_columns=True):
     "Helper function that adds columns relevant to a date in the column `field_name` of `df`."
     make_date(df, field_name)
     field = df[field_name]
@@ -237,10 +248,16 @@ def add_datepart(df:pd.DataFrame, field_name:str, prefix:str=None, drop:bool=Tru
     attr = ['Year', 'Month', 'Week', 'Day', 'Dayofweek', 'Dayofyear', 'Is_month_end', 'Is_month_start',
             'Is_quarter_end', 'Is_quarter_start', 'Is_year_end', 'Is_year_start']
     if time: attr = attr + ['Hour', 'Minute', 'Second']
-    for n in attr: df[prefix + n] = getattr(field.dt, n.lower())
+    added_columns = []
+    for n in attr: 
+        df[prefix + n] = getattr(field.dt, n.lower())
+        added_columns.append(prefix+n)
     df[prefix + 'Elapsed'] = field.astype(np.int64) // 10 ** 9
     if drop: df.drop(field_name, axis=1, inplace=True)
-    return df
+    if return_added_columns:
+        return (df, added_columns)
+    else:
+        return df
 
 
 def cyclic_dt_feat_names(time:bool=True, add_linear:bool=False)->List[str]:
