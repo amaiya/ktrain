@@ -7,9 +7,10 @@ def tabular_from_df(train_df, label_columns=[], date_columns=[], val_df=None, va
 
 
     train_df = train_df.copy()
-    # strip space from string columns
-    #print(pp.pd_data_types(train_df))
-    for k,v in pp.pd_data_types(train_df).items():
+
+    # strip space from string columns and check supplied val_df
+    train_type_dict = pp.pd_data_types(train_df)
+    for k,v in train_type_dict.items():
         if v != 'string': continue
         train_df[k] = train_df[k].str.strip()
         if val_df is None: continue
@@ -41,6 +42,13 @@ def tabular_from_df(train_df, label_columns=[], date_columns=[], val_df=None, va
     preproc = pp.TabularPreprocessor(predictor_columns, label_columns, date_columns=date_columns, 
                                      is_regression=is_regression, procs=procs, max_card=max_card)
     trn = preproc.preprocess_train(train_df, verbose=verbose)
+    if verbose:
+        for col in preproc.cat_names:
+            integer_cats = []
+            if train_type_dict.get(col, None) == 'integer':  integer_cats.append(col)
+            if integer_cats:
+                print(f'\nThe following integer column(s) are being treated as categorical variables:\n{integer_cats}\n' +\
+                      'To treat any column(s) as numerical, cast the column to float in DataFrame or CSV\n and re-run tabular_from* function.\n')
     val = None if val_df is None else preproc.preprocess_test(val_df, verbose=verbose)
     return (trn, val, preproc)
 

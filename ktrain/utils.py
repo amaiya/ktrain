@@ -545,7 +545,7 @@ class YTransform:
 
         # validate labels against data
         targets = np.array(targets) if type(targets) == list else targets
-        if len(targets.shape) > 1: targets = np.squeeze(targets)
+        if len(targets.shape) > 1 and targets.shape[1] == 1: targets = np.squeeze(targets, axis=1)
 
         # handle numeric targets (regression)
         if len(targets.shape) ==1 and not isinstance(targets[0], str):
@@ -655,7 +655,6 @@ class YTransformDataFrame(YTransform):
         df = df.copy() # dep_fix: SettingWithCopy
         for i, col in enumerate(self.c):
             df[col] = targets[:,i]
-            #df.loc[:,col] = targets[:,i]
         return df
 
     def apply_train(self, df):

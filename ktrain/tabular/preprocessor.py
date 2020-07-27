@@ -95,7 +95,7 @@ class TabularPreprocessor(Preprocessor):
         # preprocess labels and data
         if mode == 'train':
             label_columns = self.lc[:]
-            label_columns.sort() # TODO: track
+            #label_columns.sort() # leave label columns sorted in same order as in DataFrame
             self.label_transform = U.YTransformDataFrame(label_columns, is_regression=self.is_regression)
             df = self.label_transform.apply_train(df)
             self.label_columns = self.label_transform.get_classes() if not self.is_regression else self.label_transform.label_columns
