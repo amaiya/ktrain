@@ -640,6 +640,10 @@ class YTransformDataFrame(YTransform):
                     class_names = list(set(targets))
                     class_names.sort()
                     class_names = list( map(str, class_names) )
+                    if len(class_names) == 2: 
+                        class_names = ['not_'+self.label_columns[0], self.label_columns[0]]
+                    else:
+                        class_names = [self.label_columns[0]+'_'+c for c in class_names]
                     if train: self.set_classes(class_names)
 
         # transform targets
