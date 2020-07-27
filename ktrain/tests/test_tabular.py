@@ -15,7 +15,7 @@ class TestTabular(TestCase):
 
 
     def test_classification(self):
-        train_df = pd.read_csv('tabular_data/titanic.csv', index_col=0)
+        train_df = pd.read_csv('tabular_data/train.csv', index_col=0)
         train_df = train_df.drop('Name', 1)
         train_df = train_df.drop('Ticket', 1)
         trn, val, preproc = tabular.tabular_from_df(train_df, label_columns='Survived', random_state=42)
