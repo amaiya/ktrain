@@ -48,7 +48,7 @@ def tabular_from_df(train_df, label_columns=[], date_columns=[], val_df=None, va
             if train_type_dict.get(col, None) == 'integer':  integer_cats.append(col)
         if integer_cats:
             print(f'\nThe following integer column(s) are being treated as categorical variables:\n{integer_cats}\n' +\
-                  'To treat any column(s) as numerical, cast the column to float in DataFrame or CSV\n and re-run tabular_from* function.\n')
+                  'To treat any of these column(s) as numerical, cast the column to float in DataFrame or CSV\n and re-run tabular_from* function.\n')
     val = None if val_df is None else preproc.preprocess_test(val_df, verbose=verbose)
     return (trn, val, preproc)
 
