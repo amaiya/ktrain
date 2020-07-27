@@ -90,7 +90,7 @@ class TabularPreprocessor(Preprocessor):
 
         # convert date fields
         for field in self.dc:
-            df = df.copy()
+            df = df.copy()  # TODO: fix this
             df, date_names = add_datepart(df, field)
             self.date_names = date_names
 
