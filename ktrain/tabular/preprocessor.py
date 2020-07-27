@@ -72,6 +72,8 @@ class TabularPreprocessor(Preprocessor):
         """
         preprocess training set
         """
+        df = df.copy()
+
         if not isinstance(df, pd.DataFrame):
             raise ValueError('df must be a pd.DataFrame')
 
@@ -126,7 +128,7 @@ class TabularPreprocessor(Preprocessor):
 
 
 class TabularDataset(SequenceDataset):
-    def __init__(self, df, cat_columns, cont_columns, label_columns, batch_size=32, shuffle=True):
+    def __init__(self, df, cat_columns, cont_columns, label_columns, batch_size=32, shuffle=False):
         # error checks
         if not isinstance(df, pd.DataFrame): raise ValueError('df must be pandas Dataframe')
         all_columns = cat_columns + cont_columns + label_columns
