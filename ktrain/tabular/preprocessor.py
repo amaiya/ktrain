@@ -72,7 +72,7 @@ class TabularPreprocessor(Preprocessor):
         """
         preprocess training set
         """
-        df = df.copy()
+        #df = df.copy()
 
         if not isinstance(df, pd.DataFrame):
             raise ValueError('df must be a pd.DataFrame')
@@ -105,7 +105,7 @@ class TabularPreprocessor(Preprocessor):
             self.procs = [proc(self.cat_names, self.cont_names) for proc in self.procs] # "objectivy"
         else:
             df = self.label_transform.apply_test(df)
-        for proc in self.procs: proc(df, test=mode!='train')  # apply processors
+        #for proc in self.procs: proc(df, test=mode!='train')  # apply processors
 
         return TabularDataset(df, self.cat_names, self.cont_names, self.label_columns)
 

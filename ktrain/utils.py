@@ -611,6 +611,8 @@ class YTransformDataFrame(YTransform):
         super().__init__(class_names=[])
 
     def apply(self, df, train=True):
+        df = df.copy() # dep_fix: SettingWithCopy - prevent original DataFrame from losing old label columns
+
         labels_exist = True
         lst = self.label_columns[:]
         if not all(x in df.columns.values for x in lst): labels_exist = False
@@ -652,7 +654,6 @@ class YTransformDataFrame(YTransform):
         # modify DataFrame
         if labels_exist and not self.is_regression:
             for l in self.label_columns: del df[l] # delete old label columns
-        df = df.copy() # dep_fix: SettingWithCopy
         for i, col in enumerate(self.c):
             df[col] = targets[:,i]
         return df
