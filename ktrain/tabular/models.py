@@ -18,7 +18,7 @@ def print_tabular_regression_models():
 
 
 def _tabular_model(name, train_data, multilabel=None, is_regression=False, metrics=['accuracy'], 
-                   layers=[1000, 500], dropouts=[0.25, 0.25], output_dropout=0.5, bn=True, verbose=1):
+                   layers=[1000, 500], dropouts=[0.001, 0.01], output_dropout=0.5, bn=True, verbose=1):
     """
     Build and return a classification or regression model for tabular data
 
