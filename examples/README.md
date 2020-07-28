@@ -1,6 +1,6 @@
 # Example Notebooks
 
-This directory contains various example notebooks using *ktrain*.  The directory currently has three folders:
+This directory contains various example notebooks using *ktrain*.  The directory currently has four folders:
 - `text`:  
   - [text classification](#textclass): examples using various text classification models and datasets
   - [text regression](#textregression): example for predicting continuous value purely from text
