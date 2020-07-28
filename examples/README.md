@@ -243,3 +243,8 @@ The original goal of this dataset is to predict the individuals that make over $
 and predict the Age attribute for each individual.  This is the same dataset used in the [AutoGluon regression example](https://autogluon.mxnet.io/tutorials/tabular_prediction/tabular-quickstart.html).
 
 - [tabular_classification_and_regression_example.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/tabular): MLP for tabular regression
+
+
+#### [House Price Prediction](https://www.kaggle.com/c/house-prices-advanced-regression-techniques):  Tabular Regression
+
+- [HousePricePrediction-MLP.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/tabular): MLP for tabular regression

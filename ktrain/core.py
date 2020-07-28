@@ -82,8 +82,10 @@ class Learner(ABC):
         Args:
           test_data(Dataset|np.ndarray): test or validation data.  If None, self.val_data is used.
           print_report(bool): If True, classification report will be printed. If False, report will be saved to CSV 
-                              at save_path.
+                              at save_path. Not applicable to regression models.
+                              Not applicable to regression models.
           save_path(str): Classification report will be saved to this file path/name if print_report=False
+                          Not applicable to regression models.
           class_names(list): list of class names to be used in classification report instead of 
                              class integer IDs.
         """
@@ -107,7 +109,7 @@ class Learner(ABC):
         Args:
           val_data(Dataset|np.ndarray): validation data.  If None, self.val_data is used.
           print_report(bool): If True, classification report will be printed. If False, report will be saved to CSV 
-                              at save path.
+                              at save path. Not applicable to regression models.
           save_path(str): Classification report will be saved to this file path/name if print_report=False
           class_names(list): list of class names to be used in classification report instead of 
                              class integer IDs.
@@ -119,10 +121,11 @@ class Learner(ABC):
 
         classification, multilabel = U.is_classifier(self.model)
         if not classification:
-            warnings.warn('learner.validate is only for classification problems. ' 
-                          'For regression, etc., use learner.predict and learner.ground_truth '
-                          'to manually validate.')
-            return
+            #warnings.warn('learner.validate is only for classification problems. ' 
+                          #'For regression, etc., use learner.predict and learner.ground_truth '
+                          #'to manually validate.')
+            #return
+            pass
             
         if U.is_multilabel(val) or multilabel:
             warnings.warn('multilabel confusion matrices not yet supported')
@@ -131,6 +134,24 @@ class Learner(ABC):
         y_true = self.ground_truth(val_data=val)
         y_pred = np.squeeze(y_pred)
         y_true = np.squeeze(y_true)
+
+
+        # regression evaluation
+        if not classification:
+            from sklearn.metrics import mean_absolute_error, mean_squared_error
+            regout = []
+            metrics = U.metrics_from_model(self.model)
+            for m in metrics:
+                if m in ['mae', 'mean_absolute_error']:
+                    regout.append( (m, mean_absolute_error(y_true,  y_pred)) )
+                elif m in ['mse', 'mean_squared_error']:
+                    regout.append( (m, mean_squared_error(y_true,  y_pred)) )
+            if not regout:
+                warnings.warn('%s is not supported by validate/evaluate - falling back to MAE')
+                regout.append( ('mae', mean_absolute_error(y_true,  y_pred)) )
+            return regout
+
+
         if len(y_pred.shape) == 1:
             y_pred = np.where(y_pred > 0.5, 1, 0)
             y_true = np.where(y_true > 0.5, 1, 0)
