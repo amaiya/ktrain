@@ -21,8 +21,8 @@ This directory contains various example notebooks using *ktrain*.  The directory
   - [node classification](#-graph-node-classification-datasets): node classification in graphs or networks
   - [link prediction](#-graph-link-prediction-datasets): link prediction in graphs or networks
 - `tabular`: 
-  - [classification](#-graph-node-classification-datasets): node classification in graphs or networks
-  - [prediction](#-graph-link-prediction-datasets): link prediction in graphs or networks
+  - [classification](#-tabular-classification-datasets): classification for tabular data
+  - [prediction](#-tabular-regression-datasets): regression for tabular data
 
 
 ## Text Data
