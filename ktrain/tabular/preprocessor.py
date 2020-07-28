@@ -74,6 +74,8 @@ class TabularPreprocessor(Preprocessor):
         """
         df = df.copy()
 
+        clean_df(df)
+
         if not isinstance(df, pd.DataFrame):
             raise ValueError('df must be a pd.DataFrame')
 
@@ -198,6 +200,20 @@ def pd_data_types(df, return_df=False):
     col_types = list(df_types['type'].values)
     return dict(list(zip(cols, col_types)))
 
+
+
+
+
+def clean_df(train_df, val_df=None, return_types=False):
+    train_type_dict = pd_data_types(train_df)
+    for k,v in train_type_dict.items():
+        if v != 'string': continue
+        train_df[k] = train_df[k].str.strip()
+        if val_df is None: continue
+        if k not in val_df.columns: raise ValueError('val_df is missing %s column' % (k))
+        val_df[k] = val_df[k].str.strip()
+    if return_types: return train_type_dict
+    return
 
 
 #--------------------------------------------------------------------

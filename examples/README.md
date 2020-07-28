@@ -224,6 +224,16 @@ This is the well-studied Titanic dataset from Kaggle.  The goal is to predict wh
 
 - [tabular_classification_and_regression_example.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/tabular): MLP for tabular classification
 
+
+#### [Income Prediction from Census Data](http://archive.ics.uci.edu/ml/datasets/Adult):  Tabular Classification
+
+This is the same dataset used in the [AutoGluon classification example](https://autogluon.mxnet.io/tutorials/tabular_prediction/tabular-quickstart.html).
+The goal is to predict which individuals make over $50K per year.
+
+
+- [IncomePrediction-MLP.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/tabular): MLP for tabular classification
+
+
 ### <a name="#tabularreg"></a> Tabular Regression Datasets
 
 
