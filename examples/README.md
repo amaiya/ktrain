@@ -214,6 +214,7 @@ In the Cora citation graph, each node represents a paper. Links represent citati
 - [cora_link_prediction-GraphSAGE.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/graphs): GraphSAGE model to predict missing links in the citation network.
 
 
+## Tabular Data
 
 ### <a name="#tabularclass"></a> Tabular Classification Datasets
 
