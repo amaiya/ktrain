@@ -500,6 +500,8 @@ class TextPreprocessor(Preprocessor):
         If shape of y is 1, then task is considered classification if self.c exists
         or regression if not.
         """
+        # TODO: replace/standardize with YTransform
+
         if y_data is None: return y_data
         y_data = np.array(y_data) if type(y_data) == list else y_data
 
