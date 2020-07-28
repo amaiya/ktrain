@@ -8,7 +8,7 @@
 
 ### News and Announcements
 - **2020-07-30:**  
-  - ***ktrain*** **v0.19.x is released** and includes support for "traditional" **tabular data** and **explainable AI for tabular predictions**.  See the [tutorial notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/tutorials/tutorial-08-tabular_classification_and_regression.ipynb) for both:
+  - ***ktrain*** **v0.19.x is released** and now includes support for "traditional" **tabular data** and **explainable AI for tabular predictions**.  See the [tutorial notebook on tabular models](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/tutorials/tutorial-08-tabular_classification_and_regression.ipynb) for both:
     - a classification example ([Titanic passenger survival prediction](https://www.kaggle.com/c/titanic)) 
     - a regression example (age prediction from [census data](http://archive.ics.uci.edu/ml/datasets/Census+Income))
 - **2020-07-07:**  
