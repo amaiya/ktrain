@@ -22,7 +22,7 @@ This directory contains various example notebooks using *ktrain*.  The directory
   - [link prediction](#-graph-link-prediction-datasets): link prediction in graphs or networks
 - `tabular`: 
   - [classification](#-tabular-classification-datasets): classification for tabular data
-  - [prediction](#-tabular-regression-datasets): regression for tabular data
+  - [regression](#-tabular-regression-datasets): regression for tabular data
 
 
 ## Text Data
