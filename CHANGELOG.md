@@ -21,6 +21,7 @@ Most recent releases are shown at the top. Each release shows:
 ### Fixed:
 - added `save_path` argument to `Learner.validate` and `Learner.evaluate`.  If `print_report=False`, classification
   report will be saved as CSV to `save_path`.
+- Use `torch.no_grad` with `ZeroShotClassifier.predict` to [prevent OOM](https://github.com/amaiya/ktrain/issues/215)
 
 
 ## 0.18.5 (2020-07-20)
