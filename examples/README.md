@@ -20,6 +20,9 @@ This directory contains various example notebooks using *ktrain*.  The directory
 - `graphs`: 
   - [node classification](#-graph-node-classification-datasets): node classification in graphs or networks
   - [link prediction](#-graph-link-prediction-datasets): link prediction in graphs or networks
+- `tabular`: 
+  - [classification](#-graph-node-classification-datasets): node classification in graphs or networks
+  - [prediction](#-graph-link-prediction-datasets): link prediction in graphs or networks
 
 
 ## Text Data
@@ -212,3 +215,20 @@ In the Cora citation graph, each node represents a paper. Links represent citati
 
 
 
+### <a name="#tabularclass"></a> Tabular Classification Datasets
+
+#### [Titanic Survival Prediction](https://www.kaggle.com/c/titanic):  Tabular Classification
+
+This is the well-studied Titanic dataset from Kaggle.  The goal is to predict which passengers survived the Titanic disaster based on their attributes.
+
+- [tabular_classification_and_regression_example.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/tabular): MLP for tabular classification
+
+### <a name="#tabularreg"></a> Tabular Regression Datasets
+
+
+#### [Adults Census Dataset](http://archive.ics.uci.edu/ml/datasets/Adult):  Tabular Regression
+
+The original goal of this dataset is to predict the individuals that make over $50K in this Census dataset.  We change the task to a regression problem
+and predict the Age attribute for each individual.  This is the same dataset used in the [AutoGluon regression example](https://autogluon.mxnet.io/tutorials/tabular_prediction/tabular-quickstart.html).
+
+- [tabular_classification_and_regression_example.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/tabular): MLP for tabular regression
