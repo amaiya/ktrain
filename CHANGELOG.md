@@ -6,7 +6,7 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
-## 0.19.0 (2020-07-30)
+## 0.19.0 (2020-07-29)
 
 ### New:
 - support for `tabular` data including explainable AI for tabular predictions

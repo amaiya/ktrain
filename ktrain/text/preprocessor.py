@@ -893,6 +893,8 @@ class TransformersPreprocessor(TextPreprocessor):
         """
 
         U.vprint('preprocessing %s...' % (mode), verbose=verbose)
+        if not isinstance(texts, (list, np.ndarray)): raise ValueError('texts must be a list or NumPy array')
+        if not isinstance(y, (list, np.ndarray)): raise ValueError('y must be a list or NumPy array')
 
         # detect sentence pairs
         is_array, is_pair = detect_text_format(texts)
