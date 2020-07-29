@@ -93,6 +93,8 @@ def is_classifier(model):
                 is_multilabel = True
     return (is_classifier, is_multilabel)
 
+def is_tabular_from_data(data):
+    return type(data).__name__ in ['TabularDataset']
 
 def is_huggingface(model=None, data=None):
     """
@@ -504,4 +506,172 @@ def get_hf_model_name(model_id):
     else:
         model_name = model_id.split('-')[0]
     return model_name
+
+
+class YTransform:
+    def __init__(self, class_names=[], label_encoder=None):
+        """
+        Cheks and transforms array of targets. Targets are transformed in place.
+        Args:
+          class_names(list):  labels associated with targets (e.g., ['negative', 'positive'])
+                         Only used/required if:
+                         1. targets are one/multi-hot-encoded
+                         2. targets are integers and represent class IDs for classification task
+                         Not required if:
+                         1. targets are numeric and task is regression
+                         2. targets are strings and task is classification (class_names are populated automatically)
+          label_encoder(LabelEncoder): a prior instance of LabelEncoder.  
+                                       If None, will be created when train=True
+        """
+        if type(class_names) != list:
+            if isinstance(class_names, (pd.Series, np.ndarray)): class_names = class_names.tolist()
+            else:
+                raise ValueError('class_names must be list')
+        self.c = class_names
+        self.le = None
+
+    def get_classes(self):
+        return self.c
+
+    def set_classes(self, class_names):
+        self.c = class_names.tolist() if isinstance(class_names, np.ndarray) else class_names
+
+
+    def apply(self, targets, train=True):
+        if targets is None and train: 
+            raise ValueError('targets is None')
+        elif targets is None and not train:
+            return
+
+        # validate labels against data
+        targets = np.array(targets) if type(targets) == list else targets
+        if len(targets.shape) > 1 and targets.shape[1] == 1: targets = np.squeeze(targets, axis=1)
+
+        # handle numeric targets (regression)
+        if len(targets.shape) ==1 and not isinstance(targets[0], str):
+            # numeric targets
+            if not self.get_classes() and train:
+                warnings.warn('Task is being treated as REGRESSION because ' +\
+                              'either class_names argument was not supplied or is_regression=True. ' + \
+                              'If this is incorrect, change accordingly.')
+            if not self.get_classes(): targets = np.array(targets, dtype=np.float32)
+        # string targets (classification)
+        elif len(targets.shape) == 1 and isinstance(targets[0], str):
+            if not train and self.le is None: raise ValueError('LabelEncoder has not been trained. Call with train=True')
+            if train:
+                self.le = LabelEncoder()
+                self.le.fit(targets)
+                if self.get_classes(): warnings.warn('class_names argument was ignored, as they were extracted from string labels in dataset')
+                self.set_classes(self.le.classes_)
+            targets = self.le.transform(targets) # convert to numerical targets for classfication
+        # handle categorical targets (classification)
+        elif len(targets.shape) > 1:
+            if not self.get_classes():
+                raise ValueError('targets are 1-hot or multi-hot encoded but class_names is empty. ' +\
+                                 'The classes argument should have been supplied.')
+            else:
+                if train and len(self.get_classes()) != targets.shape[1]:
+                    raise ValueError('training targets suggest %s classes, but class_names are %s' % (targets.shape[1], 
+                                                                                                     self.get_classes()))
+
+        # numeric targets (classification)
+        if len(targets.shape) == 1 and self.get_classes():
+            if np.issubdtype(type(max(targets)), np.floating):
+                warnings.warn('class_names implies classification but targets array contains float(s) instead of integers or strings')
+
+            # TODO check logic
+            if train and ( len(set(targets)) != len(list(range(int(max(targets)+1)))) ):
+                raise ValueError('len(set(targets) is %s but len(list(range(int(max(targets)+1))) is  %s' % (len(list(set(targets))), len(list(range(int(max(targets))+1)))))
+            targets = to_categorical(targets, num_classes=len(self.get_classes()))
+        return targets
+
+    def apply_train(self, targets):
+        return self.apply(targets, train=True)
+
+    def apply_test(self, targets):
+        return self.apply(targets, train=False)
+
+
+
+class YTransformDataFrame(YTransform):
+    def __init__(self, label_columns=[], is_regression=False):
+        """
+        Checks and transforms label columns in DataFrame. DataFrame is modified in place
+        Args:
+          label_columns(list): list of columns storing labels 
+          is_regression(bool): If True, task is regression and integer targets are treated as numeric dependent variable.
+                               IF False, task is classification and integer targets are treated as class IDs.
+        """
+        self.is_regression = is_regression
+        if isinstance(label_columns, str): label_columns = [label_columns]
+        self.label_columns = label_columns
+        if not label_columns: raise ValueError('label_columns is required')
+        self.label_columns = [self.label_columns] if isinstance(self.label_columns, str) else self.label_columns
+        #class_names = label_columns if len(label_columns) > 1 else []
+        super().__init__(class_names=[])
+
+    def apply(self, df, train=True):
+        df = df.copy() # dep_fix: SettingWithCopy - prevent original DataFrame from losing old label columns
+
+        labels_exist = True
+        lst = self.label_columns[:]
+        if not all(x in df.columns.values for x in lst): labels_exist = False
+        if train and not labels_exist: raise ValueError('dataframe is missing label columns: %s' % (self.label_columns))
+
+        # extract targets
+        # todo: sort?
+        if len(self.label_columns) > 1: 
+            cols = df.columns.values
+            missing_cols = []
+            for l in self.label_columns:
+                if l not in df.columns.values: missing_cols.append(l)
+            if len(missing_cols) > 0: 
+                raise ValueError('These label_columns do not exist in df: %s' % (missing_cols))
+
+            # set targets
+            targets = df[self.label_columns].values if labels_exist else np.zeros((df.shape[0], len(self.label_columns)))
+            # set class names
+            if train: self.set_classes(self.label_columns)
+        # single column
+        else: 
+            # set targets
+            targets = df[self.label_columns[0]].values if labels_exist else np.zeros(df.shape[0], dtype=np.int)
+            # set class_names if classification task and targets with integer labels
+            if not self.is_regression: 
+                if not isinstance(targets[0], str):
+                    class_names = list(set(targets))
+                    class_names.sort()
+                    class_names = list( map(str, class_names) )
+                    if len(class_names) == 2: 
+                        class_names = ['not_'+self.label_columns[0], self.label_columns[0]]
+                    else:
+                        class_names = [self.label_columns[0]+'_'+c for c in class_names]
+                    if train: self.set_classes(class_names)
+
+        # transform targets
+        targets = super().apply(targets, train=train) # self.c (new label_columns) may be modified here
+
+        # modify DataFrame
+        if labels_exist and not self.is_regression:
+            for l in self.label_columns: del df[l] # delete old label columns
+        for i, col in enumerate(self.c):
+            df[col] = targets[:,i]
+        return df
+
+    def apply_train(self, df):
+        return self.apply(df, train=True)
+    def apply_test(self, df):
+        return self.apply(df, train=False)
+
+
+
+
+
+
+
+
+
+
+
+
 

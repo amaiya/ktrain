@@ -6,6 +6,26 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.19.0 (2020-07-29)
+
+### New:
+- support for `tabular` data including explainable AI for tabular predictions
+- `learner.validate` and `learner.evaluate` now support regression models
+- added `restore_weights_only` flag to `lr_find`.  When True, only the model weights will be restored after
+  simulating training, not the optimizer weights. In at least a few observed cases, this "warm up" seems to improve performance
+  when actual training begins. Further investigation is needed, so it is False by default.
+
+### Changed
+- N/A
+
+### Fixed:
+- added `save_path` argument to `Learner.validate` and `Learner.evaluate`.  If `print_report=False`, classification
+  report will be saved as CSV to `save_path`.
+- Use `torch.no_grad` with `ZeroShotClassifier.predict` to [prevent OOM](https://github.com/amaiya/ktrain/issues/215)
+- Added `max_length` parameter to `ZeroShotClassifier.predict` to [prevent errors on long documnets](https://github.com/amaiya/ktrain/issues/215)
+- Added type check to `TransformersPreprocessor.preprocess_train`
+
+
 ## 0.18.5 (2020-07-20)
 
 ### New:

@@ -1,6 +1,6 @@
 # Example Notebooks
 
-This directory contains various example notebooks using *ktrain*.  The directory currently has three folders:
+This directory contains various example notebooks using *ktrain*.  The directory currently has four folders:
 - `text`:  
   - [text classification](#textclass): examples using various text classification models and datasets
   - [text regression](#textregression): example for predicting continuous value purely from text
@@ -20,6 +20,9 @@ This directory contains various example notebooks using *ktrain*.  The directory
 - `graphs`: 
   - [node classification](#-graph-node-classification-datasets): node classification in graphs or networks
   - [link prediction](#-graph-link-prediction-datasets): link prediction in graphs or networks
+- `tabular`: 
+  - [classification](#-tabular-classification-datasets): classification for tabular data
+  - [regression](#-tabular-regression-datasets): regression for tabular data
 
 
 ## Text Data
@@ -211,4 +214,37 @@ In the Cora citation graph, each node represents a paper. Links represent citati
 - [cora_link_prediction-GraphSAGE.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/graphs): GraphSAGE model to predict missing links in the citation network.
 
 
+## Tabular Data
 
+### <a name="#tabularclass"></a> Tabular Classification Datasets
+
+#### [Titanic Survival Prediction](https://www.kaggle.com/c/titanic):  Tabular Classification
+
+This is the well-studied Titanic dataset from Kaggle.  The goal is to predict which passengers survived the Titanic disaster based on their attributes.
+
+- [tabular_classification_and_regression_example.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/tabular): MLP for tabular classification
+
+
+#### [Income Prediction from Census Data](http://archive.ics.uci.edu/ml/datasets/Adult):  Tabular Classification
+
+This is the same dataset used in the [AutoGluon classification example](https://autogluon.mxnet.io/tutorials/tabular_prediction/tabular-quickstart.html).
+The goal is to predict which individuals make over $50K per year.
+
+
+- [IncomePrediction-MLP.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/tabular): MLP for tabular classification
+
+
+### <a name="#tabularreg"></a> Tabular Regression Datasets
+
+
+#### [Adults Census Dataset](http://archive.ics.uci.edu/ml/datasets/Adult):  Tabular Regression
+
+The original goal of this dataset is to predict the individuals that make over $50K in this Census dataset.  We change the task to a regression problem
+and predict the Age attribute for each individual.  This is the same dataset used in the [AutoGluon regression example](https://autogluon.mxnet.io/tutorials/tabular_prediction/tabular-quickstart.html).
+
+- [tabular_classification_and_regression_example.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/tabular): MLP for tabular regression
+
+
+#### [House Price Prediction](https://www.kaggle.com/c/house-prices-advanced-regression-techniques):  Tabular Regression
+
+- [HousePricePrediction-MLP.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/tabular): MLP for tabular regression

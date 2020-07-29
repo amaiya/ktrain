@@ -27,7 +27,7 @@ class ZeroShotClassifier():
         self.model = AutoModelForSequenceClassification.from_pretrained(model_name).to(self.torch_device)
 
 
-    def predict(self, doc, topic_strings=[], include_labels=False, batch_size=8):
+    def predict(self, doc, topic_strings=[], include_labels=False, max_length=512, batch_size=8):
         """
         zero-shot topic classification
         Args:
@@ -40,12 +40,14 @@ class ZeroShotClassifier():
                                for your system, you should break up the topic_strings into 
                                chunks and invoke predict separately on each chunk.
           include_labels(bool): If True, will return topic labels along with topic probabilities
+          max_length(int): truncate long documents to this many tokens
           batch_size(int): batch_size to use. default:8
                            Increase this value to speed up predictions - especially
                            if len(topic_strings) is large.
         Returns:
           inferred probabilities
         """
+        import torch
         if topic_strings is None or len(topic_strings) == 0:
             raise ValueError('topic_strings must be a list of strings')
         if batch_size > len(topic_strings): batch_size = len(topic_strings)
@@ -59,8 +61,9 @@ class ZeroShotClassifier():
                 premise = doc
                 hypothesis = 'This text is about %s.' % (topic_string)
                 pairs.append( (premise, hypothesis) )
-            batch = self.tokenizer.batch_encode_plus(pairs, return_tensors='pt', padding='longest').to(self.torch_device)
-            logits = self.model(batch['input_ids'], attention_mask=batch['attention_mask'])[0]
+            batch = self.tokenizer.batch_encode_plus(pairs, return_tensors='pt', max_length=max_length, truncation='only_first', padding=True).to(self.torch_device)
+            with torch.no_grad():
+                logits = self.model(batch['input_ids'], attention_mask=batch['attention_mask'])[0]
             entail_contradiction_logits = logits[:,[0,2]]
             probs = entail_contradiction_logits.softmax(dim=1)
             true_probs = list(probs[:,1].cpu().detach().numpy())

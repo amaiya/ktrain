@@ -500,6 +500,8 @@ class TextPreprocessor(Preprocessor):
         If shape of y is 1, then task is considered classification if self.c exists
         or regression if not.
         """
+        # TODO: replace/standardize with YTransform
+
         if y_data is None: return y_data
         y_data = np.array(y_data) if type(y_data) == list else y_data
 
@@ -891,6 +893,8 @@ class TransformersPreprocessor(TextPreprocessor):
         """
 
         U.vprint('preprocessing %s...' % (mode), verbose=verbose)
+        if not isinstance(texts, (list, np.ndarray)): raise ValueError('texts must be a list or NumPy array')
+        if y is not None and not isinstance(y, (list, np.ndarray)): raise ValueError('y must be a list or NumPy array')
 
         # detect sentence pairs
         is_array, is_pair = detect_text_format(texts)

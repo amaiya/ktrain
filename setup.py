@@ -49,7 +49,8 @@ setup(
           'transformers>=2.11.0', # due to breaking change in v2.11.0
           'ipython',
           'syntok',
-          'whoosh'
+          'whoosh',
+          'shap',
           #'stellargraph>=0.8.2',
           #'eli5 >= 0.10.0',
           #'allennlp', # required for Elmo embeddings since TF2 TF_HUB does not work

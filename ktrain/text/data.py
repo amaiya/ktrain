@@ -258,6 +258,8 @@ def texts_from_df(train_df,
         x_train, x_test, y_train, y_test = train_test_split(x, y, 
                                                             test_size=val_pct,
                                                             random_state=random_state)
+
+    # TODO: replace/standardize with YTransform or YTransformDataFrame
     y_train = np.squeeze(y_train)
     y_test = np.squeeze(y_test)
     if isinstance(label_columns, str) or (isinstance(label_columns, list) and len(label_columns) == 1):

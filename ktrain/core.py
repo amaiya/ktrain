@@ -14,6 +14,8 @@ from .text.ner.predictor import NERPredictor
 from .text.ner.preprocessor import NERPreprocessor
 from .graph.predictor import NodePredictor, LinkPredictor
 from .graph.preprocessor import NodePreprocessor, LinkPreprocessor
+from .tabular.predictor import TabularPredictor
+from .tabular.preprocessor import TabularPreprocessor
 
 
 class Learner(ABC):
@@ -66,7 +68,7 @@ class Learner(ABC):
         
 
 
-    def evaluate(self, test_data=None, print_report=True, class_names=[]):
+    def evaluate(self, test_data=None, print_report=True, save_path='ktrain_classification_report.csv', class_names=[]):
         """
         alias for self.validate().
         Returns confusion matrix and optionally prints
@@ -77,12 +79,24 @@ class Learner(ABC):
         By default, this uses val_data, as supplied to ktrain.get_learner().
         Other validation or test data can be optionally be supplied as argument via <test_data> argument.
         Supply class_names to include labels instead of intenger class integer values in classification report.
+        Args:
+          test_data(Dataset|np.ndarray): test or validation data.  If None, self.val_data is used.
+          print_report(bool): If True, classification report will be printed. If False, report will be saved to CSV 
+                              at save_path. Not applicable to regression models.
+                              Not applicable to regression models.
+          save_path(str): Classification report will be saved to this file path/name if print_report=False
+                          Not applicable to regression models.
+          class_names(list): list of class names to be used in classification report instead of 
+                             class integer IDs.
         """
         return self.validate(val_data=test_data, print_report=print_report, class_names=class_names)
 
 
 
-    def validate(self, val_data=None, print_report=True, class_names=[]):
+    def validate(self, val_data=None, 
+                 print_report=True,
+                 save_path='ktrain_classification_report.csv', 
+                 class_names=[]):
         """
         Returns confusion matrix and optionally prints
         a classification report.
@@ -92,6 +106,13 @@ class Learner(ABC):
         By default, this uses val_data, as supplied to ktrain.get_learner().
         Other validation or test data can be optionally be supplied as argument.
         Supply class_names to include labels instead of intenger class integer values in classification report.
+        Args:
+          val_data(Dataset|np.ndarray): validation data.  If None, self.val_data is used.
+          print_report(bool): If True, classification report will be printed. If False, report will be saved to CSV 
+                              at save path. Not applicable to regression models.
+          save_path(str): Classification report will be saved to this file path/name if print_report=False
+          class_names(list): list of class names to be used in classification report instead of 
+                             class integer IDs.
         """
         if val_data is not None:
             val = val_data
@@ -100,10 +121,11 @@ class Learner(ABC):
 
         classification, multilabel = U.is_classifier(self.model)
         if not classification:
-            warnings.warn('learner.validate is only for classification problems. ' 
-                          'For regression, etc., use learner.predict and learner.ground_truth '
-                          'to manually validate.')
-            return
+            #warnings.warn('learner.validate is only for classification problems. ' 
+                          #'For regression, etc., use learner.predict and learner.ground_truth '
+                          #'to manually validate.')
+            #return
+            pass
             
         if U.is_multilabel(val) or multilabel:
             warnings.warn('multilabel confusion matrices not yet supported')
@@ -112,22 +134,45 @@ class Learner(ABC):
         y_true = self.ground_truth(val_data=val)
         y_pred = np.squeeze(y_pred)
         y_true = np.squeeze(y_true)
+
+
+        # regression evaluation
+        if not classification:
+            from sklearn.metrics import mean_absolute_error, mean_squared_error
+            regout = []
+            metrics = U.metrics_from_model(self.model)
+            for m in metrics:
+                if m in ['mae', 'mean_absolute_error']:
+                    regout.append( (m, mean_absolute_error(y_true,  y_pred)) )
+                elif m in ['mse', 'mean_squared_error']:
+                    regout.append( (m, mean_squared_error(y_true,  y_pred)) )
+            if not regout:
+                warnings.warn('%s is not supported by validate/evaluate - falling back to MAE')
+                regout.append( ('mae', mean_absolute_error(y_true,  y_pred)) )
+            return regout
+
+
         if len(y_pred.shape) == 1:
             y_pred = np.where(y_pred > 0.5, 1, 0)
             y_true = np.where(y_true > 0.5, 1, 0)
         else:
             y_pred = np.argmax(y_pred, axis=1)
             y_true = np.argmax(y_true, axis=1)
-        if print_report:
+        if print_report or save_path is not None:
             if class_names:
                 try:
                     class_names = [str(s) for s in class_names]
                 except:
                     pass
-                report = classification_report(y_true, y_pred, target_names=class_names)
+                report = classification_report(y_true, y_pred, target_names=class_names, output_dict=not print_report)
             else:
-                report = classification_report(y_true, y_pred)
-            print(report)
+                report = classification_report(y_true, y_pred, output_dict=not print_report)
+            if print_report: 
+                print(report)
+            else:
+                df = pd.DataFrame(report).transpose()
+                df.to_csv(save_path)
+                print('classification report saved to: %s' % (save_path))
             cm_func = confusion_matrix
         cm =  confusion_matrix(y_true,  y_pred)
         return cm
@@ -414,7 +459,7 @@ class Learner(ABC):
 
 
     def lr_find(self, start_lr=1e-7, lr_mult=1.01, max_epochs=None, 
-                stop_factor=4, show_plot=False, suggest=False, verbose=1):
+                stop_factor=4, show_plot=False, suggest=False, restore_weights_only=False, verbose=1):
         """
         Plots loss as learning rate is increased.  Highest learning rate 
         corresponding to a still falling loss should be chosen.
@@ -444,6 +489,12 @@ class Learner(ABC):
                               Increase this if loss is erratic and lr_find
                               exits too early.
             show_plot (bool):  If True, automatically invoke lr_plot
+            restore_weights_only(bool): If True, when training simulation is complete,
+                                        the model weights only are restored, but not
+                                        the original optimizer weights.  
+                                        In at least a few cases, this seems to improve performance
+                                        when actual training begins. Further investigation is needed,
+                                        so it is False by default.
             verbose (bool): specifies how much output to print
         Returns:
             None
@@ -451,13 +502,15 @@ class Learner(ABC):
 
         U.vprint('simulating training for different learning rates... this may take a few moments...',
                 verbose=verbose)
-
         # save current weights and temporarily restore original weights
-        # dep_fix: temporarily use save_model instead of save_weights due to https://github.com/tensorflow/tensorflow/issues/41116
-        #new_file, weightfile = tempfile.mkstemp()
-        #self.model.save_weights(weightfile)
-        temp_folder = tempfile.mkdtemp()
-        self.save_model(temp_folder)
+        # dep_fix: temporarily use save_model instead of save_weights as default due to https://github.com/tensorflow/tensorflow/issues/41116
+        _weights_only=True
+        if restore_weights_only:
+            new_file, weightfile = tempfile.mkstemp()
+            self.model.save_weights(weightfile)
+        else:
+            temp_folder = tempfile.mkdtemp()
+            self.save_model(temp_folder)
 
 
          # compute steps_per_epoch
@@ -496,9 +549,11 @@ class Learner(ABC):
             return
 
         # re-load current weights
-        # dep_fix: temporarily use load_model instead of load_weights due to https://github.com/tensorflow/tensorflow/issues/41116
-        #self.model.load_weights(weightfile)
-        self.load_model(temp_folder)
+        # dep_fix: temporarily use load_model instead of load_weights as default due to https://github.com/tensorflow/tensorflow/issues/41116
+        if restore_weights_only:
+            self.model.load_weights(weightfile)
+        else:
+            self.load_model(temp_folder)
 
         # instructions to invoker
         U.vprint('\n', verbose=verbose)
@@ -1339,7 +1394,7 @@ def get_predictor(model, preproc, batch_size=U.DEFAULT_BS):
     # check arguments
     if not isinstance(model, Model):
         raise ValueError('model must be of instance Model')
-    if not isinstance(preproc, (ImagePreprocessor,TextPreprocessor, NERPreprocessor, NodePreprocessor, LinkPreprocessor)):
+    if not isinstance(preproc, (ImagePreprocessor,TextPreprocessor, NERPreprocessor, NodePreprocessor, LinkPreprocessor, TabularPreprocessor)):
         raise ValueError('preproc must be instance of ktrain.preprocessor.Preprocessor')
     if isinstance(preproc, ImagePreprocessor):
         return ImagePredictor(model, preproc, batch_size=batch_size)
@@ -1352,6 +1407,9 @@ def get_predictor(model, preproc, batch_size=U.DEFAULT_BS):
         return NodePredictor(model, preproc, batch_size=batch_size)
     elif isinstance(preproc, LinkPreprocessor):
         return LinkPredictor(model, preproc, batch_size=batch_size)
+    elif isinstance(preproc, TabularPreprocessor):
+        return TabularPredictor(model, preproc, batch_size=batch_size)
+
     else:
         raise Exception('preproc of type %s not currently supported' % (type(preproc)))
 
@@ -1399,7 +1457,7 @@ def load_predictor(fpath, batch_size=U.DEFAULT_BS):
     # return the appropriate predictor
     if not isinstance(model, Model):
         raise ValueError('model must be of instance Model')
-    if not isinstance(preproc, (ImagePreprocessor, TextPreprocessor, NERPreprocessor, NodePreprocessor, LinkPreprocessor)):
+    if not isinstance(preproc, (ImagePreprocessor, TextPreprocessor, NERPreprocessor, NodePreprocessor, LinkPreprocessor, TabularPreprocessor)):
         raise ValueError('preproc must be instance of ktrain.preprocessor.Preprocessor')
     if isinstance(preproc, ImagePreprocessor):
         return ImagePredictor(model, preproc, batch_size=batch_size)
@@ -1411,6 +1469,8 @@ def load_predictor(fpath, batch_size=U.DEFAULT_BS):
         return NodePredictor(model, preproc, batch_size=batch_size)
     elif isinstance(preproc, LinkPreprocessor):
         return LinkPredictor(model, preproc, batch_size=batch_size)
+    elif isinstance(preproc, TabularPreprocessor):
+        return TabularPredictor(model, preproc, batch_size=batch_size)
     else:
         raise Exception('preprocessor not currently supported')
 

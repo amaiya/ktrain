@@ -522,6 +522,7 @@ def images_from_df(train_df,
         train_df[image_column] = train_df.copy()[image_column].apply(lambda x : x+suffix)
         val_df[image_column] = val_df.copy()[image_column].apply(lambda x : x+suffix)
 
+    # TODO: replace/standardize with YTransform or YTransformDataFrame
     # 1-hot-encode string or integer labels
     if isinstance(label_columns, str) or \
        (isinstance(label_columns, (list, np.ndarray)) and len(label_columns) == 1):
@@ -800,6 +801,8 @@ def images_from_array(x_train, y_train,
     if class_names and is_regression:
         warnings.warn('is_regression=True, but class_names is not empty.  Task treated as regression.')
 
+
+    # TODO: replace/standardize with YTransform
     # one-hot-encode if necessary
     do_y_transform = False
     if np.issubdtype(type(y_train[0]), np.integer) or np.issubdtype(type(y_train[0]), np.floating) or\
