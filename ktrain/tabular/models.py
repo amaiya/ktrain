@@ -18,7 +18,7 @@ def print_tabular_regression_models():
 
 
 def _tabular_model(name, train_data, multilabel=None, is_regression=False, metrics=['accuracy'], 
-                   hidden_layers=[1000, 500], hidden_dropouts=[0., 0.], output_dropout=0.5, bn=False, verbose=1):
+                   hidden_layers=[1000, 500], hidden_dropouts=[0., 0.5], bn=False, verbose=1):
     """
     Build and return a classification or regression model for tabular data
 
@@ -31,13 +31,13 @@ def _tabular_model(name, train_data, multilabel=None, is_regression=False, metri
         is_regression(bool): If True, will build a regression model, else classification model.
         metrics(list): list of metrics to use
         hidden_layers(list): number of units in each hidden layer of NN
-        hidden_dropouts(list): Dropout values for each hidden layer of NN
-        output_dropout(float): dropout for output layer
-        bn(bool): If True, BatchNormalization will be used with each hidden layer in MLP (i.e., BatchNorm->Dropout->Dense)
+        hidden_dropouts(list): Dropout values after each hidden layer of NN
+        bn(bool): If True, BatchNormalization will be used before each fully-connected layer in NN
         verbose (boolean): verbosity of output
     Return:
         model (Model): A Keras Model instance
     """
+
     # check arguments
     if not U.is_tabular_from_data(train_data):
         err ="""
@@ -45,6 +45,11 @@ def _tabular_model(name, train_data, multilabel=None, is_regression=False, metri
             """
         raise Exception(err)
     if len(hidden_layers) != len(hidden_dropouts): raise ValueError('len(hidden_layers) must equal len(hidden_dropouts)')
+
+    # reformat dropouts for each of construction
+    output_dropout = hidden_dropouts[1]
+    hidden_dropouts[1] = hidden_dropouts[0]
+    hidden_dropouts[0] = 0.
 
     # set model configuration values
     if is_regression: # regression
@@ -115,7 +120,7 @@ def _tabular_model(name, train_data, multilabel=None, is_regression=False, metri
 
 
 def tabular_classifier(name, train_data, multilabel=None, metrics=['accuracy'], 
-                       hidden_layers=[1000, 500], hidden_dropouts=[0., 0.], output_dropout=0.5, bn=False, verbose=1):
+                       hidden_layers=[1000, 500], hidden_dropouts=[0., 0.5], bn=False, verbose=1):
     """
     Build and return a classification model for tabular data
 
@@ -127,9 +132,8 @@ def tabular_classifier(name, train_data, multilabel=None, metrics=['accuracy'],
                             If None, multilabel will be inferred from data.
         metrics(list): list of metrics to use
         hidden_layers(list): number of units in each hidden layer of NN
-        hidden_dropouts(list): Dropout values for each hidden layer of NN
-        output_dropout(float): dropout for output layer
-        bn(bool): If True, BatchNormalization will be used with each hidden layer in NN (i.e., BatchNorm->Dropout->Dense)
+        hidden_dropouts(list): Dropout values after each hidden layer of NN
+        bn(bool): If True, BatchNormalization will be used before each fully-connected layer in NN
         verbose (boolean): verbosity of output
     Return:
         model (Model): A Keras Model instance
@@ -137,12 +141,12 @@ def tabular_classifier(name, train_data, multilabel=None, metrics=['accuracy'],
 
 
     return _tabular_model(name, train_data, multilabel=multilabel, metrics=metrics,
-                          hidden_layers=hidden_layers, hidden_dropouts=hidden_dropouts, output_dropout=output_dropout, bn=bn,
+                          hidden_layers=hidden_layers, hidden_dropouts=hidden_dropouts, bn=bn,
                           verbose=verbose, is_regression=False)
 
 
 def tabular_regression_model(name, train_data,  metrics=['mae'], 
-                             hidden_layers=[1000, 500], hidden_dropouts=[0., 0.], output_dropout=0.5, bn=False, verbose=1):
+                             hidden_layers=[1000, 500], hidden_dropouts=[0., 0.5], bn=False, verbose=1):
     """
     Build and return a regression model for tabular data
 
@@ -151,9 +155,8 @@ def tabular_regression_model(name, train_data,  metrics=['mae'],
         train_data (TabularDataset): TabularDataset instance returned from one of the tabular_from_* functions
         metrics(list): list of metrics to use
         hidden_layers(list): number of units in each hidden layer of NN
-        hidden_dropouts(list): Dropout values for each hidden layer of NN
-        output_dropout(float): dropout for output layer
-        bn(bool): If True, BatchNormalization will be used with each hidden layer in NN (i.e., BatchNorm->Dropout->Dense)
+        hidden_dropouts(list): Dropout values after each hidden layer of NN
+        bn(bool): If True, BatchNormalization will be before used each fully-connected layer in NN
         verbose (boolean): verbosity of output
     Return:
         model (Model): A Keras Model instance
@@ -161,5 +164,5 @@ def tabular_regression_model(name, train_data,  metrics=['mae'],
 
 
     return _tabular_model(name, train_data, multilabel=None, metrics=metrics, 
-                          hidden_layers=hidden_layers, hidden_dropouts=hidden_dropouts, output_dropout=output_dropout, bn=bn,
+                          hidden_layers=hidden_layers, hidden_dropouts=hidden_dropouts, bn=bn,
                           verbose=verbose, is_regression=True)
