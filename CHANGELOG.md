@@ -23,6 +23,7 @@ Most recent releases are shown at the top. Each release shows:
   report will be saved as CSV to `save_path`.
 - Use `torch.no_grad` with `ZeroShotClassifier.predict` to [prevent OOM](https://github.com/amaiya/ktrain/issues/215)
 - Added `max_length` parameter to `ZeroShotClassifier.predict` to [prevent errors on long documnets](https://github.com/amaiya/ktrain/issues/215)
+- Added type check to `TransformersPreprocessor.preprocess_train`
 
 
 ## 0.18.5 (2020-07-20)
