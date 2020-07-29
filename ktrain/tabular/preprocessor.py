@@ -74,7 +74,7 @@ class TabularPreprocessor(Preprocessor):
         """
         df = df.copy()
 
-        clean_df(df)
+        clean_df(df, pc=self.pc, lc=self.lc, check_labels=mode=='train')
 
         if not isinstance(df, pd.DataFrame):
             raise ValueError('df must be a pd.DataFrame')
@@ -204,14 +204,21 @@ def pd_data_types(df, return_df=False):
 
 
 
-def clean_df(train_df, val_df=None, return_types=False):
+def clean_df(train_df, val_df=None, pc=[], lc=[], check_labels=True, return_types=False):
     train_type_dict = pd_data_types(train_df)
     for k,v in train_type_dict.items():
         if v != 'string': continue
         train_df[k] = train_df[k].str.strip()
-        if val_df is None: continue
-        if k not in val_df.columns: raise ValueError('val_df is missing %s column' % (k))
-        val_df[k] = val_df[k].str.strip()
+        if val_df is not None:
+            if k not in val_df.columns: raise ValueError('val_df is missing %s column' % (k))
+            val_df[k] = val_df[k].str.strip()
+    if (pc and not lc) or (not pc and lc): raise ValueError('pc and lc: both or neither must exist')
+    if pc and lc:
+        inp_cols = train_df.columns.values if check_labels else [col for col in train_df.columns.values if col not in lc]
+        original_cols = pc + lc if check_labels else pc
+        if set(original_cols) != set(inp_cols):
+            raise ValueError('DataFrame is either missing columns or includes extra columns: \n'+\
+                    'expected: %s\nactual: %s' % (original_cols, inp_cols))
     if return_types: return train_type_dict
     return
 
