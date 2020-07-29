@@ -18,7 +18,7 @@ def print_tabular_regression_models():
 
 
 def _tabular_model(name, train_data, multilabel=None, is_regression=False, metrics=['accuracy'], 
-                   layers=[1000, 500], dropouts=[0.001, 0.01], output_dropout=0.5, bn=True, verbose=1):
+                   hidden_layers=[1000, 500], hidden_dropouts=[0., 0.], output_dropout=0.5, bn=False, verbose=1):
     """
     Build and return a classification or regression model for tabular data
 
@@ -30,8 +30,8 @@ def _tabular_model(name, train_data, multilabel=None, is_regression=False, metri
                             If None, multilabel will be inferred from data.
         is_regression(bool): If True, will build a regression model, else classification model.
         metrics(list): list of metrics to use
-        layers(list): number of units in each hidden layer of MLP
-        dropouts(list): Dropout values for each hidden layer of MLP
+        hidden_layers(list): number of units in each hidden layer of NN
+        hidden_dropouts(list): Dropout values for each hidden layer of NN
         output_dropout(float): dropout for output layer
         bn(bool): If True, BatchNormalization will be used with each hidden layer in MLP (i.e., BatchNorm->Dropout->Dense)
         verbose (boolean): verbosity of output
@@ -44,7 +44,7 @@ def _tabular_model(name, train_data, multilabel=None, is_regression=False, metri
             Please pass training data in the form of data returned from a ktrain tabular_from* function.
             """
         raise Exception(err)
-    if len(layers) != len(dropouts): raise ValueError('len(layers) must equal len(dropouts)')
+    if len(hidden_layers) != len(hidden_dropouts): raise ValueError('len(hidden_layers) must equal len(hidden_dropouts)')
 
     # set model configuration values
     if is_regression: # regression
@@ -100,8 +100,8 @@ def _tabular_model(name, train_data, multilabel=None, is_regression=False, metri
 
     # hidden layers
     output = x
-    for i, n_out in enumerate(layers):
-        output = bn_drop_lin(output, n_out, bn=bn, p=dropouts[i], actn='relu')
+    for i, n_out in enumerate(hidden_layers):
+        output = bn_drop_lin(output, n_out, bn=bn, p=hidden_dropouts[i], actn='relu')
 
     # output layer
     output = bn_drop_lin(output, num_classes , bn=bn, p=output_dropout, actn=activation)
@@ -115,7 +115,7 @@ def _tabular_model(name, train_data, multilabel=None, is_regression=False, metri
 
 
 def tabular_classifier(name, train_data, multilabel=None, metrics=['accuracy'], 
-                       layers=[1000, 500], dropouts=[0.25, 0.25], output_dropout=0.5, bn=True, verbose=1):
+                       hidden_layers=[1000, 500], hidden_dropouts=[0., 0.], output_dropout=0.5, bn=False, verbose=1):
     """
     Build and return a classification model for tabular data
 
@@ -126,10 +126,10 @@ def tabular_classifier(name, train_data, multilabel=None, metrics=['accuracy'],
                             If false, binary/multiclass model will be returned.
                             If None, multilabel will be inferred from data.
         metrics(list): list of metrics to use
-        layers(list): number of units in each hidden layer of MLP
-        dropouts(list): Dropout values for each hidden layer of MLP
+        hidden_layers(list): number of units in each hidden layer of NN
+        hidden_dropouts(list): Dropout values for each hidden layer of NN
         output_dropout(float): dropout for output layer
-        bn(bool): If True, BatchNormalization will be used with each hidden layer in MLP (i.e., BatchNorm->Dropout->Dense)
+        bn(bool): If True, BatchNormalization will be used with each hidden layer in NN (i.e., BatchNorm->Dropout->Dense)
         verbose (boolean): verbosity of output
     Return:
         model (Model): A Keras Model instance
@@ -137,12 +137,12 @@ def tabular_classifier(name, train_data, multilabel=None, metrics=['accuracy'],
 
 
     return _tabular_model(name, train_data, multilabel=multilabel, metrics=metrics,
-                          layers=layers, dropouts=dropouts, output_dropout=output_dropout, bn=bn,
+                          hidden_layers=hidden_layers, hidden_dropouts=hidden_dropouts, output_dropout=output_dropout, bn=bn,
                           verbose=verbose, is_regression=False)
 
 
 def tabular_regression_model(name, train_data,  metrics=['mae'], 
-                             layers=[1000, 500], dropouts=[0.25, 0.25], output_dropout=0.5, bn=True, verbose=1):
+                             hidden_layers=[1000, 500], hidden_dropouts=[0., 0.], output_dropout=0.5, bn=False, verbose=1):
     """
     Build and return a regression model for tabular data
 
@@ -150,10 +150,10 @@ def tabular_regression_model(name, train_data,  metrics=['mae'],
         name (string): currently accepts 'mlp' for multilayer perceptron
         train_data (TabularDataset): TabularDataset instance returned from one of the tabular_from_* functions
         metrics(list): list of metrics to use
-        layers(list): number of units in each hidden layer of MLP
-        dropouts(list): Dropout values for each hidden layer of MLP
+        hidden_layers(list): number of units in each hidden layer of NN
+        hidden_dropouts(list): Dropout values for each hidden layer of NN
         output_dropout(float): dropout for output layer
-        bn(bool): If True, BatchNormalization will be used with each hidden layer in MLP (i.e., BatchNorm->Dropout->Dense)
+        bn(bool): If True, BatchNormalization will be used with each hidden layer in NN (i.e., BatchNorm->Dropout->Dense)
         verbose (boolean): verbosity of output
     Return:
         model (Model): A Keras Model instance
@@ -161,5 +161,5 @@ def tabular_regression_model(name, train_data,  metrics=['mae'],
 
 
     return _tabular_model(name, train_data, multilabel=None, metrics=metrics, 
-                          layers=layers, dropouts=dropouts, output_dropout=output_dropout, bn=bn,
+                          hidden_layers=hidden_layers, hidden_dropouts=hidden_dropouts, output_dropout=output_dropout, bn=bn,
                           verbose=verbose, is_regression=True)
