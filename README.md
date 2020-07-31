@@ -287,6 +287,19 @@ learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=128
 learner.fit(0.01, 1, cycle_len=5)
 ```
 
+#### Example: Tabular Classification for [Titanic Survival Prediction](https://www.kaggle.com/c/titanic) Using an MLP 
+```python
+import ktrain
+from ktrain import tabular
+import pandas as pd
+train_df = pd.read_csv('train.csv', index_col=0)
+train_df = train_df.drop('[Name', 'Ticket', 'Cabin'], 1)
+trn, val, preproc = tabular.tabular_from_df(train_df, label_columns=['Survived'], random_state=42)
+learner = ktrain.get_learner(tabular.tabular_classifier('mlp', trn), train_data=trn, val_data=val)
+learner.fit_onecycle(5e-3, 10)
+```
+
+
 Using *ktrain* on **Google Colab**?  See these Colab examples:
 -  [a simple demo of Multiclass Text Classification with BERT](https://colab.research.google.com/drive/1AH3fkKiEqBpVpO5ua00scp7zcHs5IDLK)
 -  [a simple demo of Multiclass Text Classification with Hugging Face Transformers](https://colab.research.google.com/drive/1YxcceZxsNlvK35pRURgbwvkgejXwFxUt)
