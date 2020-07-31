@@ -300,6 +300,10 @@ trn, val, preproc = tabular.tabular_from_df(train_df, label_columns=['Survived']
 learner = ktrain.get_learner(tabular.tabular_classifier('mlp', trn), train_data=trn, val_data=val)
 learner.lr_find(show_plot=True, max_epochs=5) # estimate learning rate
 learner.fit_onecycle(5e-3, 10)
+
+# evaluate held-out labeled test set
+tst = preproc.preprocess_test(pd.read_csv('heldout.csv', index_col=0))
+learner.evaluate(tst, class_names=preproc.get_class_names)
 ```
 
 
