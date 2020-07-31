@@ -872,7 +872,7 @@ class Learner(ABC):
                                       NOTE: If reduce_on_plateau is also enabled, then
                                       early_stopping must be greater than reduce_on_plateau.
                                       Example: early_stopping=6, reduce_on_plateau=3.
-            recuce_on_plateau (int):  If not None, will lower learning rate when
+            reduce_on_plateau (int):  If not None, will lower learning rate when
                                       when validation loss fails to improve after
                                       the specified number of epochs.
                                       NOTE: If early_stopping is enabled, then

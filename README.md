@@ -9,8 +9,8 @@
 ### News and Announcements
 - **2020-07-29:**  
   - ***ktrain*** **v0.19.x is released** and now includes support for "traditional" **tabular data** and **explainable AI for tabular predictions**.  See the [tutorial notebook on tabular models](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/tutorials/tutorial-08-tabular_classification_and_regression.ipynb) for both:
-    - a classification example (using the [Kaggle's Titanic passenger survival prediction dataset](https://www.kaggle.com/c/titanic)) 
-    - a regression example (using the [UCI's Adults census dataset](http://archive.ics.uci.edu/ml/datasets/Census+Income) for age prediction)
+    - a classification example (using the Kaggle's Titanic passenger survival prediction dataset) 
+    - a regression example (using the UCI Adults census dataset for age prediction)
 - **2020-07-07:**  
   - ***ktrain*** **v0.18.x is released** and now includes support for TensorFlow 2.2.0. Due to various TensorFlow 2.2.0 bugs, TF 2.2.0 is only installed if Python 3.8 is being used. 
     Otherwise,  TensorFlow 2.1.0 is always installed (i.e., on Python 3.6 and 3.7 systems).
@@ -274,6 +274,7 @@ learner.validate(class_names=t.get_classes()) # class_names must be string value
 #          weighted avg       0.96      0.96      0.96      1502
 ```
 
+<!--
 #### Example: NER With [BioBERT](https://arxiv.org/abs/1901.08746) Embeddings
 ```python
 # NER with BioBERT embeddings
@@ -286,6 +287,25 @@ model = txt.sequence_tagger('bilstm-bert', preproc, bert_model='monologg/biobert
 learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=128)
 learner.fit(0.01, 1, cycle_len=5)
 ```
+-->
+
+#### Example: Tabular Classification for [Titanic Survival Prediction](https://www.kaggle.com/c/titanic) Using an MLP 
+```python
+import ktrain
+from ktrain import tabular
+import pandas as pd
+train_df = pd.read_csv('train.csv', index_col=0)
+train_df = train_df.drop(['Name', 'Ticket', 'Cabin'], 1)
+trn, val, preproc = tabular.tabular_from_df(train_df, label_columns=['Survived'], random_state=42)
+learner = ktrain.get_learner(tabular.tabular_classifier('mlp', trn), train_data=trn, val_data=val)
+learner.lr_find(show_plot=True, max_epochs=5) # estimate learning rate
+learner.fit_onecycle(5e-3, 10)
+
+# evaluate held-out labeled test set
+tst = preproc.preprocess_test(pd.read_csv('heldout.csv', index_col=0))
+learner.evaluate(tst, class_names=preproc.get_classes())
+```
+
 
 Using *ktrain* on **Google Colab**?  See these Colab examples:
 -  [a simple demo of Multiclass Text Classification with BERT](https://colab.research.google.com/drive/1AH3fkKiEqBpVpO5ua00scp7zcHs5IDLK)
