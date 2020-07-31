@@ -128,7 +128,7 @@ Some blog tutorials about *ktrain* are shown below:
 Tasks such as text classification and image classification can be accomplished easily with 
 only a few lines of code.
 
-#### Example: Text Classification of [IMDb Movie Reviews](https://ai.stanford.edu/~amaas/data/sentiment/) Using [BERT](https://arxiv.org/pdf/1810.04805.pdf)
+#### Example: Text Classification of [IMDb Movie Reviews](https://ai.stanford.edu/~amaas/data/sentiment/) Using [BERT](https://arxiv.org/pdf/1810.04805.pdf) [see notebook](https://github.com/amaiya/ktrain/blob/master/examples/text/IMDb-BERT.ipynb)
 ```python
 import ktrain
 from ktrain import text as txt
@@ -157,7 +157,7 @@ learner.fit_onecycle(2e-5, 3)
 ```
 
 
-#### Example: Classifying Images of [Dogs and Cats](https://www.kaggle.com/c/dogs-vs-cats) Using a Pretrained [ResNet50](https://arxiv.org/abs/1512.03385) model
+#### Example: Classifying Images of [Dogs and Cats](https://www.kaggle.com/c/dogs-vs-cats) Using a Pretrained [ResNet50](https://arxiv.org/abs/1512.03385) model [see notebook](https://colab.research.google.com/drive/1WipQJUPL7zqyvLT10yekxf_HNMXDDtyR)
 ```python
 import ktrain
 from ktrain import vision as vis
@@ -184,7 +184,7 @@ learner.lr_plot()             # visually identify best learning rate
 learner.autofit(1e-4, checkpoint_folder='/tmp/saved_weights') 
 ```
 
-#### Example: Sequence Labeling for [Named Entity Recognition](https://www.kaggle.com/abhinavwalia95/entity-annotated-corpus/version/2) using a randomly initialized [Bidirectional LSTM CRF](https://arxiv.org/abs/1603.01360) model
+#### Example: Sequence Labeling for [Named Entity Recognition](https://www.kaggle.com/abhinavwalia95/entity-annotated-corpus/version/2) using a randomly initialized [Bidirectional LSTM CRF](https://arxiv.org/abs/1603.01360) model [see notebook](https://github.com/amaiya/ktrain/blob/master/examples/text/CoNLL2003-BiLSTM_CRF.ipynb)
 ```python
 import ktrain
 from ktrain import text as txt
@@ -209,7 +209,7 @@ learner.fit(1e-3, 1)
 ```
 
 
-#### Example: Node Classification on [Cora Citation Graph](https://linqs-data.soe.ucsc.edu/public/lbc/cora.tgz) using a [GraphSAGE](https://arxiv.org/abs/1706.02216) model
+#### Example: Node Classification on [Cora Citation Graph](https://linqs-data.soe.ucsc.edu/public/lbc/cora.tgz) using a [GraphSAGE](https://arxiv.org/abs/1706.02216) model [see notbook](https://github.com/amaiya/ktrain/blob/master/examples/graphs/cora_node_classification-GraphSAGE.ipynb)
 ```python
 import ktrain
 from ktrain import graph as gr
@@ -239,7 +239,7 @@ learner.autofit(0.01, checkpoint_folder='/tmp/saved_weights')
 ```
 
 
-#### Example: Text Classification with [Hugging Face Transformers](https://github.com/huggingface/transformers) on [20 Newsgroups Dataset](https://scikit-learn.org/stable/tutorial/text_analytics/working_with_text_data.html) Using [DistilBERT](https://arxiv.org/abs/1910.01108)
+#### Example: Text Classification with [Hugging Face Transformers](https://github.com/huggingface/transformers) on [20 Newsgroups Dataset](https://scikit-learn.org/stable/tutorial/text_analytics/working_with_text_data.html) Using [DistilBERT](https://arxiv.org/abs/1910.01108) [see notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-A3-hugging_face_transformers.ipynb)
 ```python
 # load text data
 categories = ['alt.atheism', 'soc.religion.christian','comp.graphics', 'sci.med']
@@ -289,7 +289,7 @@ learner.fit(0.01, 1, cycle_len=5)
 ```
 -->
 
-#### Example: Tabular Classification for [Titanic Survival Prediction](https://www.kaggle.com/c/titanic) Using an MLP 
+#### Example: Tabular Classification for [Titanic Survival Prediction](https://www.kaggle.com/c/titanic) Using an MLP  [see notebook](https://github.com/amaiya/ktrain/blob/master/examples/tabular/tabular_classification_and_regression_example.ipynb)
 ```python
 import ktrain
 from ktrain import tabular
