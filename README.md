@@ -75,7 +75,7 @@ zsl.predict(doc, topic_strings=topic_strings, include_labels=True)
     - **link prediction** with graph neural networks ([GraphSAGE](https://cs.stanford.edu/people/jure/pubs/graphsage-nips17.pdf)) <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/graphs/cora_link_prediction-GraphSAGE.ipynb)]</sup></sub>
   - `tabular` data:
     - **tabular classification** (e.g., Titanic survival prediction) <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-08-tabular_classification_and_regression.ipynb)]</sup></sub>
-    - **tabular regression** (e.g, predicting house prices) <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/tabular/HousePricePrediction-MLP.ipynb)]</sup></sub>
+    - **tabular regression** (e.g., predicting house prices) <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/tabular/HousePricePrediction-MLP.ipynb)]</sup></sub>
 
 - estimate an optimal learning rate for your model given your data using a Learning Rate Finder
 - utilize learning rate schedules such as the [triangular policy](https://arxiv.org/abs/1506.01186), the [1cycle policy](https://arxiv.org/abs/1803.09820), and [SGDR](https://arxiv.org/abs/1608.03983) to effectively minimize loss and improve generalization
