@@ -298,6 +298,7 @@ train_df = pd.read_csv('train.csv', index_col=0)
 train_df = train_df.drop(['Name', 'Ticket', 'Cabin'], 1)
 trn, val, preproc = tabular.tabular_from_df(train_df, label_columns=['Survived'], random_state=42)
 learner = ktrain.get_learner(tabular.tabular_classifier('mlp', trn), train_data=trn, val_data=val)
+learner.lr_find(show_plot=True, max_epochs=5) # estimate learning rate
 learner.fit_onecycle(5e-3, 10)
 ```
 
