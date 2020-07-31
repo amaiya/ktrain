@@ -274,6 +274,7 @@ learner.validate(class_names=t.get_classes()) # class_names must be string value
 #          weighted avg       0.96      0.96      0.96      1502
 ```
 
+<!--
 #### Example: NER With [BioBERT](https://arxiv.org/abs/1901.08746) Embeddings
 ```python
 # NER with BioBERT embeddings
@@ -286,6 +287,7 @@ model = txt.sequence_tagger('bilstm-bert', preproc, bert_model='monologg/biobert
 learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=128)
 learner.fit(0.01, 1, cycle_len=5)
 ```
+-->
 
 #### Example: Tabular Classification for [Titanic Survival Prediction](https://www.kaggle.com/c/titanic) Using an MLP 
 ```python
@@ -293,7 +295,7 @@ import ktrain
 from ktrain import tabular
 import pandas as pd
 train_df = pd.read_csv('train.csv', index_col=0)
-train_df = train_df.drop('[Name', 'Ticket', 'Cabin'], 1)
+train_df = train_df.drop(['Name', 'Ticket', 'Cabin'], 1)
 trn, val, preproc = tabular.tabular_from_df(train_df, label_columns=['Survived'], random_state=42)
 learner = ktrain.get_learner(tabular.tabular_classifier('mlp', trn), train_data=trn, val_data=val)
 learner.fit_onecycle(5e-3, 10)
