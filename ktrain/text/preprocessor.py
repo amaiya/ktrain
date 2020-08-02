@@ -531,12 +531,8 @@ class TextPreprocessor(Preprocessor):
         # depending on class_names existing
         y_data = to_categorical(y_data) if len(y_data.shape) == 1 and self.get_classes() else y_data
         if self.get_classes():
-            print('here')
             x = y_data.shape[1]
             y = len(self.get_classes())
-            print(x)
-            print(y)
-            print(train)
             if train and y_data.shape[1] != len(self.get_classes()):
                 raise Exception('Class labels in training set are %s, but y_data has %s classes' % (self.get_classes(), y_data.shape[1]))
         return y_data
