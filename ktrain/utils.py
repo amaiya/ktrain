@@ -528,7 +528,7 @@ class YTransform:
             else:
                 raise ValueError('class_names must be list')
         self.c = class_names
-        self.le = None
+        self.le = label_encoder
 
     def get_classes(self):
         return self.c
