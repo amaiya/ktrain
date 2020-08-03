@@ -14,6 +14,7 @@ Most recent releases are shown at the top. Each release shows:
 ### Changed
 - `TextPreprocessor` instance now use `YTransform` class to transform targets
 - `texts_from_df`, `texts_from_csv`, and `texts_from_array` employ the use of either `YTransformDataFrame` or `YTransform`
+- `images_from_df`, `images_from_fname`, `images_from_csv`, and `imagas_from_array` use `YTransformDataFrame` or `YTransform`
 
 ### Fixed:
 - N/A
