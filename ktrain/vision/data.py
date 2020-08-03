@@ -491,6 +491,7 @@ def images_from_df(train_df,
     train_df = ytransdf.apply_train(train_df)
     val_df = ytransdf.apply_test(val_df)
     class_names = ytransdf.get_classes()
+    label_columns = ytransdf.get_label_columns()
 
 
     # get train and test data generators

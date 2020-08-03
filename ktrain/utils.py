@@ -529,6 +529,7 @@ class YTransform:
                 raise ValueError('class_names must be list')
         self.c = class_names
         self.le = label_encoder
+        self.train_called = False
 
     def get_classes(self):
         return self.c
@@ -583,6 +584,7 @@ class YTransform:
             if train and ( len(set(targets)) != len(list(range(int(max(targets)+1)))) ):
                 raise ValueError('len(set(targets) is %s but len(list(range(int(max(targets)+1))) is  %s' % (len(list(set(targets))), len(list(range(int(max(targets))+1)))))
             targets = to_categorical(targets, num_classes=len(self.get_classes()))
+        if train: self.train_called=True
         return targets
 
     def apply_train(self, targets):
@@ -609,6 +611,18 @@ class YTransformDataFrame(YTransform):
         self.label_columns = [self.label_columns] if isinstance(self.label_columns, str) else self.label_columns
         #class_names = label_columns if len(label_columns) > 1 else []
         super().__init__(class_names=[])
+
+
+    def get_label_columns(self):
+        """
+        Returns label columns of transformed DataFrame
+        """
+        if not self.train_called: raise Exception('apply_train should be called first')
+        if not self.is_regression:
+            new_lab_cols = self.c
+        else:
+            new_lab_cols = self.label_columns
+        return new_lab_cols
 
     def apply(self, df, train=True):
         df = df.copy() # dep_fix: SettingWithCopy - prevent original DataFrame from losing old label columns
@@ -660,10 +674,8 @@ class YTransformDataFrame(YTransform):
         # modify DataFrame
         if labels_exist:
             for l in self.label_columns: del df[l] # delete old label columns
-        if not self.is_regression:
-            new_lab_cols = self.c
-        else:
-            new_lab_cols = self.label_columns
+
+        new_lab_cols = self.get_label_columns()
         if len(new_lab_cols) != targets.shape[1]:
             raise ValueError('mismatch between target shape and number of labels - please open ktrain GitHub issue')
         for i, col in enumerate(new_lab_cols):
