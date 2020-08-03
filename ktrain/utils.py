@@ -621,6 +621,8 @@ class YTransformDataFrame(YTransform):
         # extract targets
         # todo: sort?
         if len(self.label_columns) > 1: 
+            if train and self.is_regression:
+                warnings.warn('is_regression=True was supplied but ignored because multiple label columns imply classification')
             cols = df.columns.values
             missing_cols = []
             for l in self.label_columns:
@@ -636,17 +638,19 @@ class YTransformDataFrame(YTransform):
         else: 
             # set targets
             targets = df[self.label_columns[0]].values if labels_exist else np.zeros(df.shape[0], dtype=np.int)
+            if train and self.is_regression and isinstance(targets[0], str):
+                warnings.warn('is_regression=True was supplied but ignored as string targets imply classification')
+
             # set class_names if classification task and targets with integer labels
-            if not self.is_regression: 
-                if not isinstance(targets[0], str):
-                    class_names = list(set(targets))
-                    class_names.sort()
-                    class_names = list( map(str, class_names) )
-                    if len(class_names) == 2: 
-                        class_names = ['not_'+self.label_columns[0], self.label_columns[0]]
-                    else:
-                        class_names = [self.label_columns[0]+'_'+c for c in class_names]
-                    if train: self.set_classes(class_names)
+            if train and not self.is_regression and not isinstance(targets[0], str):
+                class_names = list(set(targets))
+                class_names.sort()
+                class_names = list( map(str, class_names) )
+                if len(class_names) == 2: 
+                    class_names = ['not_'+self.label_columns[0], self.label_columns[0]]
+                else:
+                    class_names = [self.label_columns[0]+'_'+c for c in class_names]
+                self.set_classes(class_names)
 
         # transform targets
         targets = super().apply(targets, train=train) # self.c (new label_columns) may be modified here
