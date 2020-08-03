@@ -6,6 +6,19 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.19.3 (2020-08-03)
+
+### New:
+- N/A
+
+### Changed
+- `TextPreprocessor` instance now use `YTransform` class to transform targets
+
+### Fixed:
+- N/A
+
+
+
 ## 0.19.2 (2020-08-03)
 
 ### New:
