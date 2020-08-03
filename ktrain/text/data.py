@@ -127,7 +127,9 @@ def texts_from_csv(train_filepath,
                    val_pct=0.1, ngram_range=1, preprocess_mode='standard', 
                    encoding=None,  # auto-detected
                    lang=None,      # auto-detected
-                   sep=',', random_state=None,       
+                   sep=',', 
+                   is_regression=False,
+                   random_state=None,       
                    verbose=1):
     """
     Loads text data from CSV or TSV file. Class labels are assumed to be
@@ -144,8 +146,11 @@ def texts_from_csv(train_filepath,
                  text|label
                  I like this movie.|positive
                  I hated this movie.|negative
-
-    This treats task as classification problem. If this is a text regression task, use texts_from_array.
+       3. labels are a single column of numerical values for text regression
+          NOTE: Must supply is_regression=True for labels to be treated as numerical targets
+                 wine_description|wine_price
+                 Exquisite wine!|100
+                 Wine for budget shoppers|8
 
     Args:
         train_filepath(str): file path to training CSV
@@ -167,6 +172,7 @@ def texts_from_csv(train_filepath,
         encoding (str):        character encoding to use. Auto-detected if None
         lang (str):            language.  Auto-detected if None.
         sep(str):              delimiter for CSV (comma is default)
+        is_regression(bool):  If True, integer targets will be treated as numerical targets instead of class IDs
         random_state(int):      If integer is supplied, train/test split is reproducible.
                                 If None, train/test split will be random
         verbose (boolean): verbosity
@@ -189,7 +195,7 @@ def texts_from_csv(train_filepath,
                          val_pct=val_pct,
                          ngram_range=ngram_range, 
                          preprocess_mode=preprocess_mode,
-                         lang=lang, random_state=random_state,
+                         lang=lang, is_regression=is_regression, random_state=random_state,
                          verbose=verbose)
 
 
@@ -219,12 +225,10 @@ def texts_from_df(train_df,
                  I like this movie.|positive
                  I hated this movie.|negative
        3. labels are a single column of numerical values for text regression
-          Must supply is_regression=True for labels to be treated as numerical targets
+          NOTE: Must supply is_regression=True for labels to be treated as numerical targets
                  wine_description|wine_price
                  Exquisite wine!|100
                  Wine for budget shoppers|8
-
-    This treats task as classification problem. If this is a text regression task, use texts_from_array.
 
     Args:
         train_df(dataframe): Pandas dataframe
