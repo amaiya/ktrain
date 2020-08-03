@@ -225,7 +225,7 @@ def texts_from_df(train_df,
                  I like this movie.|positive
                  I hated this movie.|negative
        3. labels are a single column of numerical values for text regression
-          NOTE: Must supply is_regression=True for labels to be treated as numerical targets
+          NOTE: Must supply is_regression=True for integer labels to be treated as numerical targets
                  wine_description|wine_price
                  Exquisite wine!|100
                  Wine for budget shoppers|8
