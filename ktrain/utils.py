@@ -655,12 +655,20 @@ class YTransformDataFrame(YTransform):
 
         # transform targets
         targets = super().apply(targets, train=train) # self.c (new label_columns) may be modified here
+        targets = targets if len(targets.shape) > 1 else np.expand_dims(targets, 1) # since self.label_columns is list
 
         # modify DataFrame
         if labels_exist and not self.is_regression:
             for l in self.label_columns: del df[l] # delete old label columns
-        for i, col in enumerate(self.c):
-            df[col] = targets[:,i]
+        if not self.is_regression:
+            new_lab_cols = self.c
+        else:
+            new_lab_cols = self.label_columns
+        if len(new_lab_cols) != targets.shape[1]:
+            raise ValueError('mismatch between target shape and number of labels - please open ktrain GitHub issue')
+        df[new_lab_cols] = targets
+        df[new_lab_cols] = df[new_lab_cols].astype('float32')
+
         return df
 
     def apply_train(self, df):
