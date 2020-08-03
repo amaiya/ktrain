@@ -9,7 +9,7 @@
 ### News and Announcements
 - **2020-07-29:**  
   - ***ktrain*** **v0.19.x is released** and now includes support for "traditional" **tabular data** and **explainable AI for tabular predictions**.  See the [tutorial notebook on tabular models](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/tutorials/tutorial-08-tabular_classification_and_regression.ipynb) for both:
-    - a classification example (using the Kaggle's Titanic passenger survival prediction dataset) 
+    - a classification example (using the Kaggle Titanic passenger survival prediction dataset) 
     - a regression example (using the UCI Adults census dataset for age prediction)
 - **2020-07-07:**  
   - ***ktrain*** **v0.18.x is released** and now includes support for TensorFlow 2.2.0. Due to various TensorFlow 2.2.0 bugs, TF 2.2.0 is only installed if Python 3.8 is being used. 
