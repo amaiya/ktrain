@@ -200,6 +200,7 @@ def texts_from_df(train_df,
                    max_features=MAX_FEATURES, maxlen=MAXLEN, 
                    val_pct=0.1, ngram_range=1, preprocess_mode='standard', 
                    lang=None, # auto-detected
+                   is_regression=False,
                    random_state=None,
                    verbose=1):
     """
@@ -212,18 +213,23 @@ def texts_from_df(train_df,
                 I hated this movie.|0|1
             Classification will have a single one in each row: [[1,0,0], [0,1,0]]]
             Multi-label classification will have one more ones in each row: [[1,1,0], [0,1,1]]
-        2. labels are in a single column of string or integer values representing classs labels
+        2. labels are in a single column of string or integer values representing class labels
                Example with label_columns=['label'] and text_column='text':
                  text|label
                  I like this movie.|positive
                  I hated this movie.|negative
+       3. labels are a single column of numerical values for text regression
+          Must supply is_regression=True for labels to be treated as numerical targets
+                 wine_description|wine_price
+                 Exquisite wine!|100
+                 Wine for budget shoppers|8
 
     This treats task as classification problem. If this is a text regression task, use texts_from_array.
 
     Args:
         train_df(dataframe): Pandas dataframe
         text_column(str): name of column containing the text
-        label_column(list): list of columns that are to be treated as labels
+        label_columns(list): list of columns that are to be treated as labels
         val_df(dataframe): file path to test dataframe.  If not supplied,
                                10% of documents in training df will be
                                used for testing/validation.
@@ -238,43 +244,30 @@ def texts_from_df(train_df,
                                 tokenization and preprocessing for use with 
                                 BERT/DistilBert text classification model.
         lang (str):            language.  Auto-detected if None.
+        is_regression(bool):  If True, integer targets will be treated as numerical targets instead of class IDs
         random_state(int):      If integer is supplied, train/test split is reproducible.
                                 If None, train/test split will be random
         verbose (boolean): verbosity
     """
 
     # read in train and test data
-    train = train_df
-
-    x = train[text_column].fillna('fillna').values
-    y = train[label_columns].values
+    train_df = train_df.copy()
+    train_df[text_column].fillna('fillna', inplace=True)
     if val_df is not None:
-        test = val_df
-        x_test = test[text_column].fillna('fillna').values
-        y_test = test[label_columns].values
-        x_train = x
-        y_train = y
+        val_df = val_df.copy()
+        val_df[text_column].fillna('fillna', inplace=True)
     else:
-        x_train, x_test, y_train, y_test = train_test_split(x, y, 
-                                                            test_size=val_pct,
-                                                            random_state=random_state)
+        train_df, val_df = train_test_split(train_df, random_state=random_state)
 
-    # TODO: replace/standardize with YTransform or YTransformDataFrame
-    y_train = np.squeeze(y_train)
-    y_test = np.squeeze(y_test)
-    if isinstance(label_columns, str) or (isinstance(label_columns, list) and len(label_columns) == 1):
-        class_names = list(set(y_train))
-        need_transform = True if isinstance(class_names[0], str) else False
-        class_names.sort()
-        class_names = [str(c) for c in class_names]
-        if need_transform:
-            encoder = LabelEncoder()
-            encoder.fit(y_train)
-            y_train = encoder.transform(y_train)
-            y_test = encoder.transform(y_test)
-            class_names = encoder.classes_
-    else:
-        class_names = label_columns
+    # transform labels
+    ytransdf = U.YTransformDataFrame(label_columns, is_regression=is_regression)
+    t_df = ytransdf.apply_train(train_df)
+    v_df = ytransdf.apply_test(val_df)
+    class_names = ytransdf.get_classes()
+    x_train = t_df[text_column].values
+    y_train = t_df[class_names].values
+    x_test = v_df[text_column].values
+    y_test = v_df[class_names].values
 
     # detect language
     if lang is None: lang = TU.detect_lang(x_train)
