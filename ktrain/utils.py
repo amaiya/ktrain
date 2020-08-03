@@ -621,7 +621,7 @@ class YTransformDataFrame(YTransform):
         # extract targets
         # todo: sort?
         if len(self.label_columns) > 1: 
-            if train and is_regression:
+            if train and self.is_regression:
                 warnings.warn('is_regression=True was supplied but ignored because multiple label columns imply classification')
             cols = df.columns.values
             missing_cols = []
