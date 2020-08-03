@@ -95,6 +95,15 @@ def images_from_fname():
     return (trn, val, preproc)
 
 
+def images_from_fname_regression():
+    trn, val, preproc = vis.images_from_fname(
+                          './image_data/image_folder/all',
+                          pattern=r'[^/]+\.(\d+).jpg$',
+                          val_pct=0.25, random_state=42, is_regression=True,
+                          data_aug=vis.get_data_aug(horizontal_flip=True))
+    return (trn, val, preproc)
+
+
 
 class TestTextData(TestCase):
 
@@ -213,7 +222,7 @@ class TestImageData(TestCase):
 
     def test_images_from_fname(self):
         (trn, val, preproc)  = images_from_fname()
-        self.__test_images(trn, val, preproc, nsamples=20)
+        self.__test_images(trn, val, preproc, nsamples=18)
 
 
     def __test_images(self, trn, val, preproc, nsamples=16):
@@ -225,6 +234,21 @@ class TestImageData(TestCase):
         self.assertEqual(U.y_from_data(trn).shape, (nsamples,2))
         self.assertFalse(U.bert_data_tuple(trn))
         self.assertEqual(preproc.get_classes(), ['cat', 'dog'])
+        (gen, steps)  = preproc.preprocess('./image_data/image_folder/all')
+        self.assertEqual(type(gen).__name__, 'DirectoryIterator')
+        self.assertEqual(steps, 1)
+
+    def test_images_from_fname_regression(self):
+        (trn, val, preproc)  = images_from_fname_regression()
+        nsamples = 18
+        self.assertTrue(U.is_iter(trn))
+        self.assertEqual(U.shape_from_data(trn), (224, 224, 3))
+        self.assertTrue(U.ondisk(trn))
+        self.assertEqual(U.nsamples_from_data(trn), nsamples)
+        self.assertEqual(U.nclasses_from_data(trn), 1)
+        self.assertEqual(U.y_from_data(trn).shape, (nsamples,1))
+        self.assertFalse(U.bert_data_tuple(trn))
+        self.assertEqual(preproc.get_classes(), [])
         (gen, steps)  = preproc.preprocess('./image_data/image_folder/all')
         self.assertEqual(type(gen).__name__, 'DirectoryIterator')
         self.assertEqual(steps, 1)
