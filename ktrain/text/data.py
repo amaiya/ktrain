@@ -261,7 +261,7 @@ def texts_from_df(train_df,
         val_df = val_df.copy()
         val_df[text_column].fillna('fillna', inplace=True)
     else:
-        train_df, val_df = train_test_split(train_df, random_state=random_state)
+        train_df, val_df = train_test_split(train_df, test_size=val_pct, random_state=random_state)
 
     # transform labels
     ytransdf = U.YTransformDataFrame(label_columns, is_regression=is_regression)
