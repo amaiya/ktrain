@@ -448,6 +448,10 @@ def get_ktrain_data():
 #------------------------------------------------------------------------------
 # MISC UTILITIES
 #------------------------------------------------------------------------------
+def check_array(X, y=None, X_name='X', y_name='targets' )
+    if not isinstance(X, (list, np.ndarray)): raise ValueError("%s must be a list or NumPy array" % X_name)
+    if y is not None and not isinstance(y, (list, np.ndarray)): raise ValueError("%s must be a list or NumPy array" % y_name)
+    return
 
 def is_tf_keras():
     if keras.__name__ == 'keras':

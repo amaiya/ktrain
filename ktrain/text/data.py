@@ -329,7 +329,7 @@ def texts_from_array(x_train, y_train, x_test=None, y_test=None,
                                 If None, train/test split will be random.
         verbose (boolean): verbosity
     """
-
+    U.check_array(x_train,  y=y_train, X_name='x_train', y_name='y_train')
     if not class_names and verbose:
         #classes =  list(set(y_train))
         #classes.sort()
@@ -342,6 +342,9 @@ def texts_from_array(x_train, y_train, x_test=None, y_test=None,
         x_train, x_test, y_train, y_test = train_test_split(x_train, y_train, 
                                                             test_size=val_pct,
                                                             random_state=random_state)
+    else:
+        U.check_array(x_test,  y=y_test, X_name='x_test', y_name='y_test')
+
 
     # removed as TextPreprocessor now handles this.
     #if isinstance(y_train[0], str):
