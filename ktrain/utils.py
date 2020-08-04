@@ -675,7 +675,7 @@ class YTransformDataFrame(YTransform):
         if labels_exist:
             for l in self.label_columns: del df[l] # delete old label columns
 
-        new_lab_cols = self.get_label_columns()
+        new_lab_cols = self.get_label_columns(squeeze=False)
         if len(new_lab_cols) != targets.shape[1]:
             raise ValueError('mismatch between target shape and number of labels - please open ktrain GitHub issue')
         for i, col in enumerate(new_lab_cols):

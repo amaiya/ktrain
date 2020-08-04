@@ -270,9 +270,9 @@ def texts_from_df(train_df,
     class_names = ytransdf.get_classes()
     new_lab_cols = ytransdf.get_label_columns(squeeze=True)
     x_train = t_df[text_column].values
-    y_train = t_df[new_lab_columns].values
+    y_train = t_df[new_lab_cols].values
     x_test = v_df[text_column].values
-    y_test = v_df[new_lab_columns].values
+    y_test = v_df[new_lab_cols].values
 
     # detect language
     if lang is None: lang = TU.detect_lang(x_train)
