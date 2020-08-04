@@ -613,7 +613,7 @@ class YTransformDataFrame(YTransform):
         super().__init__(class_names=[])
 
 
-    def get_label_columns(self):
+    def get_label_columns(self, squeeze=True):
         """
         Returns label columns of transformed DataFrame
         """
@@ -622,7 +622,7 @@ class YTransformDataFrame(YTransform):
             new_lab_cols = self.c
         else:
             new_lab_cols = self.label_columns
-        return new_lab_cols
+        return new_lab_cols[0] if len(new_lab_cols) ==1 and squeeze else new_lab_cols
 
     def apply(self, df, train=True):
         df = df.copy() # dep_fix: SettingWithCopy - prevent original DataFrame from losing old label columns
