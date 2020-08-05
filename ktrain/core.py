@@ -16,6 +16,7 @@ from .graph.predictor import NodePredictor, LinkPredictor
 from .graph.preprocessor import NodePreprocessor, LinkPreprocessor
 from .tabular.predictor import TabularPredictor
 from .tabular.preprocessor import TabularPreprocessor
+MONITOR_METRICS = [VAL_ACC_NAME, 'val_mse', 'val_mae', 'val_loss']
 
 
 class Learner(ABC):
@@ -891,7 +892,7 @@ class Learner(ABC):
                                         File name will be of the form: 
                                         weights-{epoch:02d}-{val_loss:.2f}.hdf5
             monitor (str):              what metric to monitor for early_stopping
-                                        and reduce_on_plateau (either val_loss or val_accuracy).
+                                        and reduce_on_plateau. Defaults to 'val_loss'.
                                         Only used if early_stopping or reduce_on_plateau
                                         is enabled.
             class_weight (dict):       Optional dictionary mapping class indices (integers) to a weight (float) 
@@ -905,8 +906,8 @@ class Learner(ABC):
             cycle_momentum=False
 
         # check monitor
-        if monitor not in [VAL_ACC_NAME, 'val_loss']:
-            raise ValueError("monitor must be one of {%s, val_loss'}" % (VAL_ACC_NAME))
+        if monitor not in MONITOR_METRICS:
+            raise ValueError("monitor must be one of {%s}" % (MONITOR_METRICS))
 
         # setup learning rate policy 
         num_samples = U.nsamples_from_data(self.train_data)
