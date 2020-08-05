@@ -70,7 +70,7 @@ class NERPreprocessor(Preprocessor):
 
 
 
-    def preprocess(self, sentences, lang=None):
+    def preprocess(self, sentences, lang=None, custom_tokenizer=None):
         if type(sentences) != list:
             raise ValueError('Param sentences must be a list of strings')
 
@@ -83,7 +83,10 @@ class NERPreprocessor(Preprocessor):
                 tokenize_chinese = lambda text:[c for c in text]
                 tokens = tokenize_chinese(s)
             else:
-                tokens = TU.tokenize(s)
+                if custom_tokenizer:
+                    tokens = custom_tokenizer(s)
+                else:
+                    tokens = TU.tokenize(s)
             X.append(tokens)
             y.append([OTHER] * len(tokens))
         nerseq = NERSequence(X, y, p=self.p)
