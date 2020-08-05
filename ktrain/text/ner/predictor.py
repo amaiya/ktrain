@@ -26,7 +26,7 @@ class NERPredictor(Predictor):
         return self.c
 
 
-    def predict(self, sentence, return_proba=False, merge_tokens=False):
+    def predict(self, sentence, return_proba=False, merge_tokens=False, custom_tokenizer=None):
         """
         Makes predictions for a string-representation of a sentence
         Args:
@@ -35,6 +35,7 @@ class NERPredictor(Predictor):
           merge_tokens(bool):  If True, tokens will be merged together by the entity
                                to which they are associated:
                                ('Paul', 'B-PER'), ('Newman', 'I-PER') becomes ('Paul Newman', 'PER')
+          custom_tokenizer(Callable): If specified, sentence will be tokenized based on custom tokenizer
 
         Returns:
           list: list of tuples representing each token.
@@ -44,7 +45,7 @@ class NERPredictor(Predictor):
         if return_proba and merge_tokens:
             raise ValueError('return_proba and merge_tokens are mutually exclusive with one another.')
         lang = TU.detect_lang([sentence])
-        nerseq = self.preproc.preprocess([sentence], lang=lang)
+        nerseq = self.preproc.preprocess([sentence], lang=lang, custom_tokenizer=custom_tokenizer)
         if not nerseq.prepare_called:
             nerseq.prepare()
         nerseq.batch_size = self.batch_size
