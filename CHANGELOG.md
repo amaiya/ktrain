@@ -6,7 +6,7 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
-## 0.19.3 (2020-08-03)
+## 0.19.4 (TBD)
 
 ### New:
 - N/A
@@ -15,6 +15,18 @@ Most recent releases are shown at the top. Each release shows:
 - `TextPreprocessor` instance now use `YTransform` class to transform targets
 - `texts_from_df`, `texts_from_csv`, and `texts_from_array` employ the use of either `YTransformDataFrame` or `YTransform`
 - `images_from_df`, `images_from_fname`, `images_from_csv`, and `imagas_from_array` use `YTransformDataFrame` or `YTransform`
+
+### Fixed:
+- N/A
+
+
+## 0.19.3 (2020-08-05)
+
+### New:
+- N/A/
+
+### Changed
+- `NERPredictor.predict` was changed to accept an optional `custom_tokenizer` argument
 
 ### Fixed:
 - N/A

@@ -70,24 +70,31 @@ class NERPreprocessor(Preprocessor):
 
 
 
-    def preprocess(self, sentences, lang=None):
+    def preprocess(self, sentences, lang=None, custom_tokenizer=None):
         if type(sentences) != list:
             raise ValueError('Param sentences must be a list of strings')
 
         # language detection
         if lang is None: lang = TU.detect_lang(sentences)
+
+        # set tokenizer
+        if custom_tokenizer is not None:
+            tokfunc = custom_tokenizer
+        elif TU.is_chinese(lang, strict=False): # strict=False: workaround for langdetect bug on short chinese texts
+            tokfunc = lambda text:[c for c in text]
+        else:
+            tokfunc = TU.tokenize
+
+        # preprocess
         X = []
         y = []
         for s in sentences:
-            if TU.is_chinese(lang, strict=False): # strict=False: workaround for langdetect bug on short chinese texts
-                tokenize_chinese = lambda text:[c for c in text]
-                tokens = tokenize_chinese(s)
-            else:
-                tokens = TU.tokenize(s)
+            tokens = tokfunc(s)
             X.append(tokens)
             y.append([OTHER] * len(tokens))
         nerseq = NERSequence(X, y, p=self.p)
         return nerseq
+
 
     def preprocess_test(self, x_test, y_test, verbose=1):
         """
