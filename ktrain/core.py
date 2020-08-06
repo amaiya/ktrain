@@ -16,7 +16,6 @@ from .graph.predictor import NodePredictor, LinkPredictor
 from .graph.preprocessor import NodePreprocessor, LinkPreprocessor
 from .tabular.predictor import TabularPredictor
 from .tabular.preprocessor import TabularPreprocessor
-MONITOR_METRICS = [VAL_ACC_NAME, 'val_mse', 'val_mae', 'val_loss']
 
 
 class Learner(ABC):
@@ -43,6 +42,22 @@ class Learner(ABC):
         except:
             warnings.warn('Could not save original model weights')
             self._original_weights = None
+
+    @property
+    def _monitor_metrics(self):
+        """
+        monitor metrics
+        """
+        metrics = ['loss']
+        try:
+            m = U.metrics_from_model(self.model)
+            if isinstance(m, list): metrics.extend(m)
+        except:
+            pass
+        if self.val_data is not None:
+            for m in metrics[:]:
+                metrics.append('val_%s' % (m))
+        return metrics
 
 
     def get_weight_decay(self):
@@ -908,9 +923,6 @@ class Learner(ABC):
                            'optimizer is not "Adam-like" with beta_1 param')
             cycle_momentum=False
 
-        # check monitor
-        if monitor not in MONITOR_METRICS:
-            raise ValueError("monitor must be one of {%s}" % (MONITOR_METRICS))
 
         # setup learning rate policy 
         num_samples = U.nsamples_from_data(self.train_data)
@@ -934,11 +946,12 @@ class Learner(ABC):
                           'Either reduce reduce_on_plateau or set early_stopping ' +\
                           'to be higher.')
 
-        if self.val_data is None and monitor in ['val_loss', VAL_ACC_NAME] and\
-           (reduce_on_plateau is not None or early_stopping is not None):
-            raise Exception('cannot monitor %s ' % (monitor)  +\
-                            'without validation data - please change monitor')
-
+        # check monitor
+        if reduce_on_plateau is not None or early_stopping is not None:
+            if monitor.startswith('val_') and self.val_data is None:
+                raise ValueError('monitor is %s but no val_data was supplied.\nChange monitor or supply val_data to get_learner function.' % monitor)
+            if monitor != 'val_loss' and  monitor not in self._monitor_metrics:
+                raise ValueError("monitor must be one of {%s}" % (self._monitor_metrics))
 
 
         # setup callbacks for learning rates and early stopping
