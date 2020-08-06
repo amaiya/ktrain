@@ -1092,7 +1092,7 @@ class ArrayLearner(Learner):
                                   cycle_len, cycle_mult, lr_decay, callbacks=kcallbacks)
         kcallbacks = self._cb_checkpoint(checkpoint_folder, callbacks=kcallbacks)
         kcallbacks = self._cb_earlystopping(early_stopping, callbacks=kcallbacks)
-        sgdr = [cb for cb in kcallbacks if type(cb).__name__ == 'SGDRScheduler']
+        sgdr = [cb for cb in kcallbacks if type(cb).__name__ == 'SGDRScheduler'] if kcallbacks else None
         sgdr = sgdr[0] if sgdr else None
 
 
@@ -1271,9 +1271,9 @@ class GenLearner(Learner):
                                   cycle_len, cycle_mult, lr_decay, callbacks=kcallbacks)
         kcallbacks = self._cb_checkpoint(checkpoint_folder, callbacks=kcallbacks)
         kcallbacks = self._cb_earlystopping(early_stopping, callbacks=kcallbacks)
-        sgdr = [cb for cb in kcallbacks if type(cb).__name__ == 'SGDRScheduler']
+        sgdr = [cb for cb in kcallbacks if type(cb).__name__ == 'SGDRScheduler'] if kcallbacks else None
         sgdr = sgdr[0] if sgdr else None
-        if kcallbacks: print([type(cb).__name__ for cb in kcallbacks])
+        #if kcallbacks: print([type(cb).__name__ for cb in kcallbacks])
 
             
         # MNIST times per epoch on Titan V
