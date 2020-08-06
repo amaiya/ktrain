@@ -702,6 +702,7 @@ class Learner(ABC):
 
 
     def _cb_sgdr(self, max_lr, steps_per_epoch, cycle_len, cycle_mult, lr_decay=1.0, callbacks=[]):
+        if callbacks and 'SGDRScheduler' in [type(cb).__name__ for cb in callbacks]: return callbacks
         # configuration
         min_lr = 1e-9
         if max_lr <= min_lr: min_lr = max_lr/10
@@ -721,6 +722,7 @@ class Learner(ABC):
 
 
     def _cb_checkpoint(self, folder, callbacks=[]):
+        if callbacks and 'ModelCheckpoint' in [type(cb).__name__ for cb in callbacks]: return callbacks
         if folder is not None:
             os.makedirs(folder, exist_ok=True)
             if not isinstance(callbacks, list): callbacks = []
@@ -732,6 +734,7 @@ class Learner(ABC):
 
 
     def _cb_earlystopping(self, early_stopping, callbacks=[]):
+        if callbacks and 'EarlyStopping' in [type(cb).__name__ for cb in callbacks]: return callbacks
         if early_stopping:
             if not isinstance(callbacks, list): callbacks = []
             #if StrictVersion(keras.__version__) >= StrictVersion('2.2.3'):
@@ -1081,15 +1084,17 @@ class ArrayLearner(Learner):
         # setup learning rate schedule
         epochs = self._check_cycles(n_cycles, cycle_len, cycle_mult)
         self.set_lr(lr)
+
+        # set call backs
+        kcallbacks = callbacks if callbacks else None
         kcallbacks = self._cb_sgdr(lr, 
-                                  np.ceil(len(x_train)/self.batch_size), 
-                                  cycle_len, cycle_mult, lr_decay=lr_decay, callbacks=None)
-        sgdr = kcallbacks[0] if kcallbacks is not None else None
+                                  np.ceil(len(x_train)/self.batch_size),
+                                  cycle_len, cycle_mult, lr_decay, callbacks=kcallbacks)
         kcallbacks = self._cb_checkpoint(checkpoint_folder, callbacks=kcallbacks)
         kcallbacks = self._cb_earlystopping(early_stopping, callbacks=kcallbacks)
-        if callbacks:
-            if kcallbacks is None: kcallbacks = []
-            kcallbacks.extend(callbacks)
+        sgdr = [cb for cb in kcallbacks if type(cb).__name__ == 'SGDRScheduler']
+        sgdr = sgdr[0] if sgdr else None
+
 
         # train model
         with warnings.catch_warnings():
@@ -1257,15 +1262,19 @@ class GenLearner(Learner):
 
         epochs = self._check_cycles(n_cycles, cycle_len, cycle_mult)
         self.set_lr(lr)
+
+
+        # set call backs
+        kcallbacks = callbacks if callbacks else None
         kcallbacks = self._cb_sgdr(lr, 
                                   steps_per_epoch,
-                                  cycle_len, cycle_mult, lr_decay, callbacks=None)
-        sgdr = kcallbacks[0] if kcallbacks is not None else None
+                                  cycle_len, cycle_mult, lr_decay, callbacks=kcallbacks)
         kcallbacks = self._cb_checkpoint(checkpoint_folder, callbacks=kcallbacks)
         kcallbacks = self._cb_earlystopping(early_stopping, callbacks=kcallbacks)
-        if callbacks:
-            if kcallbacks is None: kcallbacks = []
-            kcallbacks.extend(callbacks)
+        sgdr = [cb for cb in kcallbacks if type(cb).__name__ == 'SGDRScheduler']
+        sgdr = sgdr[0] if sgdr else None
+        if kcallbacks: print([type(cb).__name__ for cb in kcallbacks])
+
             
         # MNIST times per epoch on Titan V
         # workers=4, usemp=True 9 sec.
