@@ -43,6 +43,22 @@ class Learner(ABC):
             warnings.warn('Could not save original model weights')
             self._original_weights = None
 
+    @property
+    def _monitor_metrics(self):
+        """
+        monitor metrics
+        """
+        metrics = ['loss']
+        try:
+            m = U.metrics_from_model(self.model)
+            if isinstance(m, list): metrics.extend(m)
+        except:
+            pass
+        if self.val_data is not None:
+            for m in metrics[:]:
+                metrics.append('val_%s' % (m))
+        return metrics
+
 
     def get_weight_decay(self):
         """
@@ -701,6 +717,7 @@ class Learner(ABC):
 
 
     def _cb_sgdr(self, max_lr, steps_per_epoch, cycle_len, cycle_mult, lr_decay=1.0, callbacks=[]):
+        if callbacks and 'SGDRScheduler' in [type(cb).__name__ for cb in callbacks]: return callbacks
         # configuration
         min_lr = 1e-9
         if max_lr <= min_lr: min_lr = max_lr/10
@@ -720,6 +737,7 @@ class Learner(ABC):
 
 
     def _cb_checkpoint(self, folder, callbacks=[]):
+        if callbacks and 'ModelCheckpoint' in [type(cb).__name__ for cb in callbacks]: return callbacks
         if folder is not None:
             os.makedirs(folder, exist_ok=True)
             if not isinstance(callbacks, list): callbacks = []
@@ -731,6 +749,7 @@ class Learner(ABC):
 
 
     def _cb_earlystopping(self, early_stopping, callbacks=[]):
+        if callbacks and 'EarlyStopping' in [type(cb).__name__ for cb in callbacks]: return callbacks
         if early_stopping:
             if not isinstance(callbacks, list): callbacks = []
             #if StrictVersion(keras.__version__) >= StrictVersion('2.2.3'):
@@ -891,7 +910,7 @@ class Learner(ABC):
                                         File name will be of the form: 
                                         weights-{epoch:02d}-{val_loss:.2f}.hdf5
             monitor (str):              what metric to monitor for early_stopping
-                                        and reduce_on_plateau (either val_loss or val_accuracy).
+                                        and reduce_on_plateau. Defaults to 'val_loss'.
                                         Only used if early_stopping or reduce_on_plateau
                                         is enabled.
             class_weight (dict):       Optional dictionary mapping class indices (integers) to a weight (float) 
@@ -904,9 +923,6 @@ class Learner(ABC):
                            'optimizer is not "Adam-like" with beta_1 param')
             cycle_momentum=False
 
-        # check monitor
-        if monitor not in [VAL_ACC_NAME, 'val_loss']:
-            raise ValueError("monitor must be one of {%s, val_loss'}" % (VAL_ACC_NAME))
 
         # setup learning rate policy 
         num_samples = U.nsamples_from_data(self.train_data)
@@ -930,11 +946,12 @@ class Learner(ABC):
                           'Either reduce reduce_on_plateau or set early_stopping ' +\
                           'to be higher.')
 
-        if self.val_data is None and monitor in ['val_loss', VAL_ACC_NAME] and\
-           (reduce_on_plateau is not None or early_stopping is not None):
-            raise Exception('cannot monitor %s ' % (monitor)  +\
-                            'without validation data - please change monitor')
-
+        # check monitor
+        if reduce_on_plateau is not None or early_stopping is not None:
+            if monitor.startswith('val_') and self.val_data is None:
+                raise ValueError('monitor is %s but no val_data was supplied.\nChange monitor or supply val_data to get_learner function.' % monitor)
+            if monitor != 'val_loss' and  monitor not in self._monitor_metrics:
+                raise ValueError("monitor must be one of {%s}" % (self._monitor_metrics))
 
 
         # setup callbacks for learning rates and early stopping
@@ -1080,15 +1097,17 @@ class ArrayLearner(Learner):
         # setup learning rate schedule
         epochs = self._check_cycles(n_cycles, cycle_len, cycle_mult)
         self.set_lr(lr)
+
+        # set call backs
+        kcallbacks = callbacks if callbacks else None
         kcallbacks = self._cb_sgdr(lr, 
-                                  np.ceil(len(x_train)/self.batch_size), 
-                                  cycle_len, cycle_mult, lr_decay=lr_decay, callbacks=None)
-        sgdr = kcallbacks[0] if kcallbacks is not None else None
+                                  np.ceil(len(x_train)/self.batch_size),
+                                  cycle_len, cycle_mult, lr_decay, callbacks=kcallbacks)
         kcallbacks = self._cb_checkpoint(checkpoint_folder, callbacks=kcallbacks)
         kcallbacks = self._cb_earlystopping(early_stopping, callbacks=kcallbacks)
-        if callbacks:
-            if kcallbacks is None: kcallbacks = []
-            kcallbacks.extend(callbacks)
+        sgdr = [cb for cb in kcallbacks if type(cb).__name__ == 'SGDRScheduler'] if kcallbacks else None
+        sgdr = sgdr[0] if sgdr else None
+
 
         # train model
         with warnings.catch_warnings():
@@ -1256,15 +1275,19 @@ class GenLearner(Learner):
 
         epochs = self._check_cycles(n_cycles, cycle_len, cycle_mult)
         self.set_lr(lr)
+
+
+        # set call backs
+        kcallbacks = callbacks if callbacks else None
         kcallbacks = self._cb_sgdr(lr, 
                                   steps_per_epoch,
-                                  cycle_len, cycle_mult, lr_decay, callbacks=None)
-        sgdr = kcallbacks[0] if kcallbacks is not None else None
+                                  cycle_len, cycle_mult, lr_decay, callbacks=kcallbacks)
         kcallbacks = self._cb_checkpoint(checkpoint_folder, callbacks=kcallbacks)
         kcallbacks = self._cb_earlystopping(early_stopping, callbacks=kcallbacks)
-        if callbacks:
-            if kcallbacks is None: kcallbacks = []
-            kcallbacks.extend(callbacks)
+        sgdr = [cb for cb in kcallbacks if type(cb).__name__ == 'SGDRScheduler'] if kcallbacks else None
+        sgdr = sgdr[0] if sgdr else None
+        #if kcallbacks: print([type(cb).__name__ for cb in kcallbacks])
+
             
         # MNIST times per epoch on Titan V
         # workers=4, usemp=True 9 sec.

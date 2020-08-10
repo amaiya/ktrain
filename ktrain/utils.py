@@ -448,6 +448,10 @@ def get_ktrain_data():
 #------------------------------------------------------------------------------
 # MISC UTILITIES
 #------------------------------------------------------------------------------
+def check_array(X, y=None, X_name='X', y_name='targets' ):
+    if not isinstance(X, (list, np.ndarray)): raise ValueError("%s must be a list or NumPy array" % X_name)
+    if y is not None and not isinstance(y, (list, np.ndarray)): raise ValueError("%s must be a list or NumPy array" % y_name)
+    return
 
 def is_tf_keras():
     if keras.__name__ == 'keras':
@@ -528,7 +532,8 @@ class YTransform:
             else:
                 raise ValueError('class_names must be list')
         self.c = class_names
-        self.le = None
+        self.le = label_encoder
+        self.train_called = False
 
     def get_classes(self):
         return self.c
@@ -583,6 +588,7 @@ class YTransform:
             if train and ( len(set(targets)) != len(list(range(int(max(targets)+1)))) ):
                 raise ValueError('len(set(targets) is %s but len(list(range(int(max(targets)+1))) is  %s' % (len(list(set(targets))), len(list(range(int(max(targets))+1)))))
             targets = to_categorical(targets, num_classes=len(self.get_classes()))
+        if train: self.train_called=True
         return targets
 
     def apply_train(self, targets):
@@ -610,6 +616,18 @@ class YTransformDataFrame(YTransform):
         #class_names = label_columns if len(label_columns) > 1 else []
         super().__init__(class_names=[])
 
+
+    def get_label_columns(self, squeeze=True):
+        """
+        Returns label columns of transformed DataFrame
+        """
+        if not self.train_called: raise Exception('apply_train should be called first')
+        if not self.is_regression:
+            new_lab_cols = self.c
+        else:
+            new_lab_cols = self.label_columns
+        return new_lab_cols[0] if len(new_lab_cols) ==1 and squeeze else new_lab_cols
+
     def apply(self, df, train=True):
         df = df.copy() # dep_fix: SettingWithCopy - prevent original DataFrame from losing old label columns
 
@@ -621,6 +639,8 @@ class YTransformDataFrame(YTransform):
         # extract targets
         # todo: sort?
         if len(self.label_columns) > 1: 
+            if train and self.is_regression:
+                warnings.warn('is_regression=True was supplied but ignored because multiple label columns imply classification')
             cols = df.columns.values
             missing_cols = []
             for l in self.label_columns:
@@ -636,26 +656,37 @@ class YTransformDataFrame(YTransform):
         else: 
             # set targets
             targets = df[self.label_columns[0]].values if labels_exist else np.zeros(df.shape[0], dtype=np.int)
+            if self.is_regression and isinstance(targets[0], str):
+                warnings.warn('is_regression=True was supplied but targets are strings - casting to floats')
+                targets = targets.astype(np.float)
+
             # set class_names if classification task and targets with integer labels
-            if not self.is_regression: 
-                if not isinstance(targets[0], str):
-                    class_names = list(set(targets))
-                    class_names.sort()
-                    class_names = list( map(str, class_names) )
-                    if len(class_names) == 2: 
-                        class_names = ['not_'+self.label_columns[0], self.label_columns[0]]
-                    else:
-                        class_names = [self.label_columns[0]+'_'+c for c in class_names]
-                    if train: self.set_classes(class_names)
+            if train and not self.is_regression and not isinstance(targets[0], str):
+                class_names = list(set(targets))
+                class_names.sort()
+                class_names = list( map(str, class_names) )
+                if len(class_names) == 2: 
+                    class_names = ['not_'+self.label_columns[0], self.label_columns[0]]
+                else:
+                    class_names = [self.label_columns[0]+'_'+c for c in class_names]
+                self.set_classes(class_names)
 
         # transform targets
         targets = super().apply(targets, train=train) # self.c (new label_columns) may be modified here
+        targets = targets if len(targets.shape) > 1 else np.expand_dims(targets, 1) # since self.label_columns is list
 
         # modify DataFrame
-        if labels_exist and not self.is_regression:
+        if labels_exist:
             for l in self.label_columns: del df[l] # delete old label columns
-        for i, col in enumerate(self.c):
+
+        new_lab_cols = self.get_label_columns(squeeze=False)
+        if len(new_lab_cols) != targets.shape[1]:
+            raise ValueError('mismatch between target shape and number of labels - please open ktrain GitHub issue')
+        for i, col in enumerate(new_lab_cols):
             df[col] = targets[:,i]
+        df[new_lab_cols] = targets
+        df[new_lab_cols] = df[new_lab_cols].astype('float32')
+
         return df
 
     def apply_train(self, df):

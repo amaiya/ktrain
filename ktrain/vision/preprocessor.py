@@ -22,6 +22,14 @@ class ImagePreprocessor(Preprocessor):
     def get_classes(self):
         return self.c
 
+
+    def preprocess_test(self, data, batch_size=U.DEFAULT_BS):
+        """
+        Alias for preprocess
+        """
+        return self.preprocess(data, batch_size=batch_size)
+
+
     def preprocess(self, data, batch_size=U.DEFAULT_BS):
         """
         Receives raw data and returns 

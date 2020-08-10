@@ -478,17 +478,21 @@ def images_from_df(train_df,
 
     """
 
-    if isinstance(label_columns, (list, np.ndarray)) and len(label_columns) == 1:
-        label_columns = label_columns[0]
 
-    peek = train_df[label_columns].iloc[0]
-    if isinstance(label_columns, str) and peek.isdigit() and not is_regression:
-        warnings.warn('Targets are integers, but is_regression=False. Task treated as classification instead of regression.')
-    if isinstance(peek, str) and is_regression:
-        train_df[label_columns] = train_df[label_columns].astype('float32')
-        if val_df is not None:
-            val_df[label_columns] = val_df[label_columns].astype('float32')
-    peek = train_df[label_columns].iloc[0]
+    # read in train and test data
+    train_df = train_df.copy()
+    if val_df is not None:
+        val_df = val_df.copy()
+    else:
+        train_df, val_df = train_test_split(train_df, test_size=val_pct, random_state=random_state)
+
+    # transform labels
+    ytransdf = U.YTransformDataFrame(label_columns, is_regression=is_regression)
+    train_df = ytransdf.apply_train(train_df)
+    val_df = ytransdf.apply_test(val_df)
+    class_names = ytransdf.get_classes()
+    label_columns = ytransdf.get_label_columns(squeeze=True)
+   
 
 
     # get train and test data generators
@@ -502,19 +506,6 @@ def images_from_df(train_df,
                                                     color_mode=color_mode,
                                                     flat_dir=True)
 
-    # convert to dataframes
-    if val_df is None:
-        if val_pct:
-            df = train_df.copy()
-            prop = 1-val_pct
-            if random_state is not None: np.random.seed(42)
-            msk = np.random.rand(len(df)) < prop
-            train_df = df[msk]
-            val_df = df[~msk]
-
-    # class names
-    if isinstance(label_columns, (list, np.ndarray)): label_columns.sort()
-
     # fix file extensions, if necessary
     if suffix:
         train_df = train_df.copy()
@@ -522,26 +513,8 @@ def images_from_df(train_df,
         train_df[image_column] = train_df.copy()[image_column].apply(lambda x : x+suffix)
         val_df[image_column] = val_df.copy()[image_column].apply(lambda x : x+suffix)
 
-    # TODO: replace/standardize with YTransform or YTransformDataFrame
-    # 1-hot-encode string or integer labels
-    if isinstance(label_columns, str) or \
-       (isinstance(label_columns, (list, np.ndarray)) and len(label_columns) == 1):
-        label_col_name = label_columns if isinstance(label_columns, str) else label_columns[0]
-        #if not isinstance(df[label_col_name].values[0], str):
-            #raise ValueError('If a single label column is provided, labels must be in the form of a string.')
-        if not is_regression:
-            le = LabelEncoder()
-            train_labels = train_df[label_col_name].values
-            le.fit(train_labels)
-            y_train = to_categorical(le.transform(train_labels))
-            y_val = to_categorical(le.transform(val_df[label_col_name].values))
-            y_train_pd = [y_train[:,i] for i in range(y_train.shape[1])]
-            y_val_pd = [y_val[:,i] for i in range(y_val.shape[1])]
-            label_columns = list(le.classes_)
-            train_df = pd.DataFrame(zip(train_df[image_column].values, *y_train_pd), columns=[image_column]+label_columns)
-            val_df = pd.DataFrame(zip(val_df[image_column].values, *y_val_pd), columns=[image_column]+label_columns)
 
-
+    # get generators
     batches_tr = train_datagen.flow_from_dataframe(
                                       train_df,
                                       directory=directory,
@@ -568,7 +541,7 @@ def images_from_df(train_df,
 
     # setup preprocessor
     preproc = ImagePreprocessor(test_datagen,
-                                label_columns,
+                                class_names,
                                 target_size=target_size,
                                 color_mode=color_mode)
     return (batches_tr, batches_te, preproc)
@@ -799,24 +772,13 @@ def images_from_array(x_train, y_train,
     """
     if classes is not None: raise ValueError('Please use class_names argument instead of "classes".')
     if class_names and is_regression:
-        warnings.warn('is_regression=True, but class_names is not empty.  Task treated as regression.')
+        warnings.warn('is_regression=True, but class_names is not empty.  Task being treated as regression.')
 
 
-    # TODO: replace/standardize with YTransform
-    # one-hot-encode if necessary
-    do_y_transform = False
-    if np.issubdtype(type(y_train[0]), np.integer) or np.issubdtype(type(y_train[0]), np.floating) or\
-        (isinstance(y_train[0], (list, np.ndarray)) and len(y_train[0]) == 1):
-        if not is_regression:
-            if np.issubdtype(type(y_train[0]), np.integer) and not class_names:
-                warnings.warn('Targets are integers, but is_regression=False. Task treated as classification instead of regression.')
-            y_train = to_categorical(y_train)
-            do_y_transform = True
+    # split out validation set if necessary
     if validation_data:
         x_test = validation_data[0]
         y_test = validation_data[1]
-        if do_y_transform:
-            y_test = to_categorical(y_test)
     elif val_pct is not None and val_pct >0:
         x_train, x_test, y_train, y_test = train_test_split(x_train, y_train,
                                                             test_size=val_pct,
@@ -825,12 +787,11 @@ def images_from_array(x_train, y_train,
         x_test = None
         y_test = None
 
-    # set class labels
-    if not class_names and not is_regression:
-        class_names = list(map(str, range(len(y_train[0]))))
-    elif class_names and not is_regression:
-        assert len(class_names) == len(y_train[0]), \
-            "Number of classes has to match length of the one-hot encoding"
+    # transform labels
+    ytrans = U.YTransform(class_names=class_names if not is_regression else [])
+    y_train = ytrans.apply_train(y_train)
+    y_test = ytrans.apply_test(y_test)
+    class_names = ytrans.get_classes()
 
     # train and test data generators
     (train_datagen, test_datagen) = process_datagen(data_aug, train_array=x_train)

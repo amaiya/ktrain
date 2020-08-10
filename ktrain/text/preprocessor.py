@@ -384,7 +384,8 @@ class TextPreprocessor(Preprocessor):
         self.lang = lang
         self.multilabel = multilabel # currently, this is always initially set None until set by set_multilabel
         self.preprocess_train_called = False
-        self.label_encoder = None # only set if y is in string format
+        #self.label_encoder = None # only set if y is in string format
+        self.ytransform = None
         self.c = self.c.tolist() if isinstance(self.c, np.ndarray) else self.c
 
 
@@ -494,50 +495,15 @@ class TextPreprocessor(Preprocessor):
                 print("\t%s : %s" % (k, int(round(stat_dict[k]))))
 
 
-    def _transform_y(self, y_data, verbose=1):
+    def _transform_y(self, y_data, train=False, verbose=1):
         """
         preprocess y
         If shape of y is 1, then task is considered classification if self.c exists
         or regression if not.
         """
-        # TODO: replace/standardize with YTransform
-
-        if y_data is None: return y_data
-        y_data = np.array(y_data) if type(y_data) == list else y_data
-
-        # check for errors and warnings
-        if not isinstance(y_data[0], str) and len(y_data.shape) ==1 and not self.get_classes():
-            if verbose:
-                warnings.warn('Task is being treated as TEXT REGRESSION because ' +\
-                              'class_names argument was not supplied. ' + \
-                              'If this is incorrect, supply class_names argument.')
-        elif len(y_data.shape) > 1 and not self.get_classes():
-            raise ValueError('y-values are 1-hot or multi-hot encoded but self.get_classes() is empty. ' +\
-                             'The classes argument should have been supplied.')
-
-        # convert string labels to integers, if necessary
-        train = False
-        if isinstance(y_data[0], str):
-            if self.label_encoder is None:
-                train = True
-                self.label_encoder = LabelEncoder()
-                self.label_encoder.fit(y_data)
-                if self.get_classes(): warnings.warn('class_names argument was ignored, as they were extracted from string labels in dataset')
-                self.set_classes(self.label_encoder.classes_)
-            y_data = self.label_encoder.transform(y_data)
-
-
-        # if shape is 1, this is either a classification or regression task 
-        # depending on class_names existing
-        y_data = to_categorical(y_data, num_classes=len(self.get_classes())) if len(y_data.shape) == 1 and self.get_classes() else y_data
-        if self.get_classes():
-            if train and y_data.shape[1] != len(self.get_classes()):
-                raise Exception('Class labels in training set are %s, but y_data has %s classes' % (self.get_classes(), y_data.shape[1]))
-        return y_data
-
-
-
-
+        if self.ytransform is None:
+            self.ytransform = U.YTransform(class_names=self.get_classes())
+        return self.ytransform.apply(y_data, train=train)
 
 
 class StandardTextPreprocessor(TextPreprocessor):
@@ -603,7 +569,7 @@ class StandardTextPreprocessor(TextPreprocessor):
         U.vprint('x_train shape: ({},{})'.format(x_train.shape[0], x_train.shape[1]), verbose=verbose)
 
         # transform y
-        y_train = self._transform_y(y_train, verbose=verbose)
+        y_train = self._transform_y(y_train, train=True, verbose=verbose)
         if y_train is not None and verbose:
             print('y_train shape: %s' % (y_train.shape,))
 
@@ -639,7 +605,7 @@ class StandardTextPreprocessor(TextPreprocessor):
         U.vprint('x_test shape: ({},{})'.format(x_test.shape[0], x_test.shape[1]), verbose=verbose)
 
         # transform y
-        y_test = self._transform_y(y_test, verbose=verbose)
+        y_test = self._transform_y(y_test, train=False, verbose=verbose)
         if y_test is not None and verbose:
             print('y_test shape: %s' % (y_test.shape,))
 
@@ -776,7 +742,7 @@ class BERTPreprocessor(TextPreprocessor):
         x = bert_tokenize(texts, self.tok, self.maxlen, verbose=verbose)
 
         # transform y
-        y = self._transform_y(y, verbose=verbose)
+        y = self._transform_y(y, train=mode=='train', verbose=verbose)
         result = (x, y)
         self.set_multilabel(result, mode)
         if mode == 'train': self.preprocess_train_called = True
@@ -842,6 +808,9 @@ class TransformersPreprocessor(TextPreprocessor):
     def __setstate__(self, state):
         self.__dict__.update(state)
         if not hasattr(self, 'tok'): self.tok = None
+        if not hasattr(self, 'ytransform'): 
+            le = self.label_encoder if hasattr(self, 'label_encoder') else None
+            self.ytransform = U.YTransform(class_names=self.get_classes(), label_encoder=le)
 
 
     def get_tokenizer(self, fpath=None):
@@ -891,8 +860,7 @@ class TransformersPreprocessor(TextPreprocessor):
         """
 
         U.vprint('preprocessing %s...' % (mode), verbose=verbose)
-        if not isinstance(texts, (list, np.ndarray)): raise ValueError('texts must be a list or NumPy array')
-        if y is not None and not isinstance(y, (list, np.ndarray)): raise ValueError('y must be a list or NumPy array')
+        U.check_array(texts, y=y, X_name='texts')
 
         # detect sentence pairs
         is_array, is_pair = detect_text_format(texts)
@@ -911,7 +879,7 @@ class TransformersPreprocessor(TextPreprocessor):
             raise ValueError('y is required for training sets')
         elif y is None:
             y = np.array([1] * len(texts))
-        y = self._transform_y(y, verbose=verbose)
+        y = self._transform_y(y, train=mode=='train', verbose=verbose)
 
         # convert examples
         tok, _ = self.get_preprocessor()
