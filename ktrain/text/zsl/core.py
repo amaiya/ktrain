@@ -1,5 +1,13 @@
-from ...imports import *
-from ... import utils as U
+# 2020-08-10: unnecessary imports removed for ZSL to address #225
+#from ...imports import *
+#from ... import utils as U
+
+import math
+
+# duplicated from ktrain.utils
+def list2chunks(a, n):
+    k, m = divmod(len(a), n)
+    return (a[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n))
 
 class ZeroShotClassifier():
     """
@@ -52,7 +60,7 @@ class ZeroShotClassifier():
             if topic_strings is None or len(topic_strings) == 0:
                 raise ValueError('topic_strings must be a list of strings')
             if batch_size > len(topic_strings): batch_size = len(topic_strings)
-            topic_chunks = list(U.list2chunks(topic_strings, n=math.ceil(len(topic_strings)/batch_size)))
+            topic_chunks = list(list2chunks(topic_strings, n=math.ceil(len(topic_strings)/batch_size)))
             if len(topic_strings) >= 100 and batch_size==8:
                 warnings.warn('TIP: Try increasing batch_size to speedup ZeroShotClassifier predictions')
             result = []
