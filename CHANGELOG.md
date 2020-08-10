@@ -16,7 +16,8 @@ Most recent releases are shown at the top. Each release shows:
 - `texts_from_df`, `texts_from_csv`, and `texts_from_array` employ the use of either `YTransformDataFrame` or `YTransform`
 - `images_from_df`, `images_from_fname`, `images_from_csv`, and `imagas_from_array` use `YTransformDataFrame` or `YTransform`
 - Extra imports removed from PyTorch-based `zsl.core.ZeroShotClassifier` and `summarization.core.TransformerSummarizer`. If necessary, 
-   both can now be used without having TensorFlow installed by importing these modules using a method like [this](https://stackoverflow.com/a/58423785).
+   both can now be used without having TensorFlow installed by installing ktrain using `--no-deps` and importing these modules using 
+    a method like [this](https://stackoverflow.com/a/58423785).
 
 ### Fixed:
 - N/A
