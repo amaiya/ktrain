@@ -1,5 +1,6 @@
-from ...imports import *
-from ... import utils as U
+# 2020-08-10: unnecessary imports removed for ZSL to address #225
+#from ...imports import *
+#from ... import utils as U
 
 class TransformerSummarizer():
     """
