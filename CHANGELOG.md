@@ -6,6 +6,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.19.5 (2020-08-11)
+
+### New:
+- N/A
+
+### Changed
+-N/A
+
+### Fixed:
+- Ensure transition to `YTransform` is backwards compatibility for `StandardTextPreprocessor` and `BertPreprocessor`
+
+
 ## 0.19.4 (2020-08-10)
 
 ### New:

@@ -521,6 +521,21 @@ class StandardTextPreprocessor(TextPreprocessor):
         self.ngram_range = ngram_range
 
 
+    def __getstate__(self):
+        return {k: v for k, v in self.__dict__.items()}
+
+
+    def __setstate__(self, state):
+        """
+        For backwards compatibility with pre-ytransform versions
+        """
+        self.__dict__.update(state)
+        if not hasattr(self, 'ytransform'):
+            le = self.label_encoder if hasattr(self, 'label_encoder') else None
+            self.ytransform = U.YTransform(class_names=self.get_classes(), label_encoder=le)
+
+
+
     def get_preprocessor(self):
         return (self.tok, self.tok_dct)
 
@@ -711,6 +726,20 @@ class BERTPreprocessor(TextPreprocessor):
         self.ngram_range = 1 # ignored
 
 
+    def __getstate__(self):
+        return {k: v for k, v in self.__dict__.items()}
+
+
+    def __setstate__(self, state):
+        """
+        For backwards compatibility with pre-ytransform versions
+        """
+        self.__dict__.update(state)
+        if not hasattr(self, 'ytransform'):
+            le = self.label_encoder if hasattr(self, 'label_encoder') else None
+            self.ytransform = U.YTransform(class_names=self.get_classes(), label_encoder=le)
+
+
     def get_preprocessor(self):
         return (self.tok, self.tok_dct)
 
@@ -806,6 +835,10 @@ class TransformersPreprocessor(TextPreprocessor):
 
 
     def __setstate__(self, state):
+        """
+        For backwards compatibility with previous versions of ktrain
+        that saved tokenizer and did not use ytransform
+        """
         self.__dict__.update(state)
         if not hasattr(self, 'tok'): self.tok = None
         if not hasattr(self, 'ytransform'): 
