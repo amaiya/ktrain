@@ -58,7 +58,7 @@ class LRFinder:
             return
 
 
-    def find(self, train_data, steps_per_epoch, use_gen=False,
+    def find(self, train_data, steps_per_epoch, use_gen=False, class_weight=None,
              start_lr=1e-7, lr_mult=1.01, max_epochs=None, 
              batch_size=U.DEFAULT_BS, workers=1, use_multiprocessing=False, verbose=1):
         """
@@ -113,13 +113,14 @@ class LRFinder:
             # *_generator methods are deprecated from TF 2.1.0
             fit_fn = self.model.fit
             fit_fn(train_data, steps_per_epoch=steps_per_epoch, 
-                   epochs=epochs, 
+                   epochs=epochs, class_weight=class_weight,
                    workers=workers, use_multiprocessing=use_multiprocessing,
                    verbose=verbose,
                    callbacks=[callback])
         else:
             self.model.fit(train_data[0], train_data[1],
-                            batch_size=batch_size, epochs=epochs, verbose=verbose,
+                            batch_size=batch_size, epochs=epochs, class_weight=class_weight, 
+                            verbose=verbose,
                             callbacks=[callback])
 
 
