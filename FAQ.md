@@ -499,7 +499,7 @@ if using `focal_loss` with a `transformers` model like DistilBert.
 *ktrain* is just a lightweight wrapper around `tf.keras`, so this would be done in the exact same way as you would in Keras.
 More specifically, you can simply recompile your model with the loss function or optimizer you want by invoking `model.compile`.
 
-For example, here is how to use **focal loss** with a DistilBert model:
+For example, here is how to use [focal loss](https://www.dlology.com/blog/multi-class-classification-with-focal-loss-for-imbalanced-datasets/) with a DistilBert model:
 
 ```python
 import tensorflow as tf
