@@ -6,6 +6,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.19.6 (2020-08-12)
+
+### New:
+- N/A
+
+### Changed
+-N/A
+
+### Fixed:
+- include metrics check in `is_classifier` function to support with non-standard loss functions
+
+
 ## 0.19.5 (2020-08-11)
 
 ### New:
