@@ -29,6 +29,8 @@
 
 - [How do I handle imbalanced datasets?](#how-do-i-handle-imbalanced-datasets)
 
+- [How do I use custom loss functions or optimizers?](#how-do-i-use-custom-loss-functions-or-optimizers)
+
 - [How do I retrieve or visualize training history?](#how-do-i-retrieve-or-visualize-training-history)
 
 - [I have a model that accepts multiple inputs (e.g., both text and other numerical or categorical variables).  How do I train it with *ktrain*?](#i-have-a-model-that-accepts-multiple-inputs-eg-both-text-and-other-numerical-or-categorical-variables--how-do-i-train-it-with-ktrain)
@@ -439,6 +441,135 @@ All `predict` methods in `Predictor` instances accept a `return_proba` argument.
 
 All `*fit*` methods (e.g., `learner.fit`, `learner.autofit`, `learner.fit_onecycle`) accept a `class_weight` parameter, which is passed
 to the `model.fit` method in `tf.Keras`.  See [this StackOverflow post](https://stackoverflow.com/questions/44716150/how-can-i-assign-a-class-weight-in-keras-in-a-simple-way) for more details.
+
+Alternatively, you can also try using [focal loss](https://www.dlology.com/blog/multi-class-classification-with-focal-loss-for-imbalanced-datasets/):
+
+```python
+import tensorflow as tf
+from tensorflow.keras import activations
+def focal_loss(gamma=2., alpha=4., from_logits=False):
+
+    gamma = float(gamma)
+    alpha = float(alpha)
+
+    def focal_loss_fixed(y_true, y_pred):
+        """Focal loss for multi-classification
+        FL(p_t)=-alpha(1-p_t)^{gamma}ln(p_t)
+        Notice: y_pred is probability after softmax if from_logits is False.
+        gradient is d(Fl)/d(p_t) not d(Fl)/d(x) as described in paper
+        d(Fl)/d(p_t) * [p_t(1-p_t)] = d(Fl)/d(x)
+        Focal Loss for Dense Object Detection
+        https://arxiv.org/abs/1708.02002
+
+        Arguments:
+            y_true {tensor} -- ground truth labels, shape of [batch_size, num_cls]
+            y_pred {tensor} -- model's output, shape of [batch_size, num_cls]
+
+        Keyword Arguments:
+            gamma {float} -- (default: {2.0})
+            alpha {float} -- (default: {4.0})
+
+        Returns:
+            [tensor] -- loss.
+        """
+        epsilon = 1.e-9
+        y_true = tf.cast(y_true, dtype=tf.float32)
+        y_pred = tf.cast(y_pred, dtype=tf.float32)
+        if from_logits:
+            y_pred = activations.softmax(y_pred)
+
+        model_out = tf.add(y_pred, epsilon)
+        ce = tf.multiply(y_true, -tf.math.log(model_out))
+        weight = tf.multiply(y_true, tf.pow(tf.subtract(1., model_out), gamma))
+        fl = tf.multiply(alpha, tf.multiply(weight, ce))
+        reduced_fl = tf.reduce_max(fl, axis=1)
+        return tf.reduce_mean(reduced_fl)
+    return focal_loss_fixed
+```
+
+As mentioned in [this issue](https://github.com/amaiya/ktrain/issues/228#issuecomment-672972996), you must use `from_logits=True`
+if using `focal_loss` with a `transformers` model like DistilBert.
+
+
+[[Back to Top](#frequently-asked-questions-about-ktrain)]
+
+
+### How do I use custom loss functions or optimizers?
+
+*ktrain* is just a lightweight wrapper around `tf.keras`, so this would be done in the exact same way as you would in Keras.
+More specifically, you can simply recompile your model with the loss function or optimizer you want by invoking `model.compile`.
+
+For example, here is how to use **focal loss** with a DistilBert model:
+
+```python
+import tensorflow as tf
+from tensorflow.keras import activations
+def focal_loss(gamma=2., alpha=4., from_logits=False):
+
+    gamma = float(gamma)
+    alpha = float(alpha)
+
+    def focal_loss_fixed(y_true, y_pred):
+        """Focal loss for multi-classification
+        FL(p_t)=-alpha(1-p_t)^{gamma}ln(p_t)
+        Notice: y_pred is probability after softmax if from_logits is False.
+        gradient is d(Fl)/d(p_t) not d(Fl)/d(x) as described in paper
+        d(Fl)/d(p_t) * [p_t(1-p_t)] = d(Fl)/d(x)
+        Focal Loss for Dense Object Detection
+        https://arxiv.org/abs/1708.02002
+
+        Arguments:
+            y_true {tensor} -- ground truth labels, shape of [batch_size, num_cls]
+            y_pred {tensor} -- model's output, shape of [batch_size, num_cls]
+
+        Keyword Arguments:
+            gamma {float} -- (default: {2.0})
+            alpha {float} -- (default: {4.0})
+
+        Returns:
+            [tensor] -- loss.
+        """
+        epsilon = 1.e-9
+        y_true = tf.cast(y_true, dtype=tf.float32)
+        y_pred = tf.cast(y_pred, dtype=tf.float32)
+        if from_logits:
+            y_pred = activations.softmax(y_pred)
+
+        model_out = tf.add(y_pred, epsilon)
+        ce = tf.multiply(y_true, -tf.math.log(model_out))
+        weight = tf.multiply(y_true, tf.pow(tf.subtract(1., model_out), gamma))
+        fl = tf.multiply(alpha, tf.multiply(weight, ce))
+        reduced_fl = tf.reduce_max(fl, axis=1)
+        return tf.reduce_mean(reduced_fl)
+    return focal_loss_fixed
+
+# load text data
+categories = ['alt.atheism', 'soc.religion.christian','comp.graphics', 'sci.med']
+from sklearn.datasets import fetch_20newsgroups
+train_b = fetch_20newsgroups(subset='train', categories=categories, shuffle=True)
+test_b = fetch_20newsgroups(subset='test',categories=categories, shuffle=True)
+(x_train, y_train) = (train_b.data, train_b.target)
+(x_test, y_test) = (test_b.data, test_b.target)
+
+# preprocess data and build model
+import ktrain
+from ktrain import text
+MODEL_NAME = 'distilbert-base-uncased'
+t = text.Transformer(MODEL_NAME, maxlen=500, class_names=train_b.target_names)
+trn = t.preprocess_train(x_train, y_train)
+val = t.preprocess_test(x_test, y_test)
+model = t.get_classifier()
+
+# recompile model with custom loss function
+# using from_logits=True because output of transformer models are not run through softmax beforehand
+model.compile(loss=focal_loss(alpha=1, from_logits=True),
+              optimizer='adam',
+              metrics=['accuracy'])
+
+# train with focal loss
+learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=6)
+learner.fit_onecycle(5e-5, 1)
+```
 
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
