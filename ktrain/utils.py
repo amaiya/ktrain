@@ -79,6 +79,10 @@ def is_classifier(model):
                  'sparse_categorical_crossentropy',
                  'binary_crossentropy']:
         is_classifier = True
+    else:
+        mlist = metrics_from_model(model)
+        if isinstance(mlist, (list, np.ndarray)) and 'accuracy' in mlist:
+            is_classifier = True
 
     # check for multilabel
     if loss == 'binary_crossentropy':
