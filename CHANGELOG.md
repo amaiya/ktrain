@@ -6,6 +6,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.19.7 (2020-08-12)
+
+### New:
+- N/A
+
+### Changed
+- added `class_weight` parameter to `lr_find` for imbalanced datasets
+
+### Fixed:
+- N/A
+
+
 ## 0.19.6 (2020-08-12)
 
 ### New:
