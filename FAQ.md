@@ -561,6 +561,7 @@ val = t.preprocess_test(x_test, y_test)
 model = t.get_classifier()
 
 # recompile model with custom loss function
+# using from_logits=True because output of transformer models are not run through softmax beforehand
 model.compile(loss=focal_loss(alpha=1, from_logits=True),
               optimizer='adam',
               metrics=['accuracy'])
