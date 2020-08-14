@@ -30,7 +30,7 @@ setup(
   install_requires=[
           tf_version_str,
           'scipy==1.4.1', # pinned to 1.4.1 due to TF 2.1.0/2.2.0 setup.py requirement
-          'scikit-learn==0.21.3', # affects format of predictor.explain
+          'scikit-learn', # previously pinned to 0.21.3 due to retain old of TextPredictor.explain
           'matplotlib >= 3.0.0',
           'pandas >= 1.0.1',
           'fastprogress >= 0.1.21',
@@ -39,8 +39,7 @@ setup(
           'joblib',
           'langdetect',
           'jieba',
-          # fix cchardet to 2.1.5 due to this issue: https://github.com/PyYoshi/cChardet/issues/61
-          'cchardet==2.1.5', 
+          'cchardet',  # previously pinned to 2.1.5 due to this issue: https://github.com/PyYoshi/cChardet/issues/61
           'networkx>=2.3',
           'bokeh',
           'seqeval',
