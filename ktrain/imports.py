@@ -246,5 +246,4 @@ ALLENNLP_ERRMSG  = 'To use ELMo embedings, please install allenlp:\n' +\
 
 
 # ELI5
-KTRAIN_ELI5_TAG = 'ktrain_eli5-1.0'
-
+KTRAIN_ELI5_TAG = '0.10.1-1'
