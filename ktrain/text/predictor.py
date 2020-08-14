@@ -111,6 +111,10 @@ class TextPredictor(Predictor):
                   'Install with: pip3 install git+https://github.com/amaiya/eli5@tfkeras_0_10_1'
             warnings.warn(msg)
             return
+        if eli5.__version__ != ELI5_VERSION:
+            msg = 'ktrain requires a forked version of eli5 to support tf.keras. It is either missing or not up-to-date. '+\
+                  'Uninstall the current version and install/re-install the fork with: pip3 install git+https://github.com/amaiya/eli5@tfkeras_0_10_1'
+
 
         prediction = [self.predict(doc)] if not all_targets else None
 

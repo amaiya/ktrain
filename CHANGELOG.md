@@ -14,6 +14,7 @@ Most recent releases are shown at the top. Each release shows:
 ### Changed
 - added `class_weight` parameter to `lr_find` for imbalanced datasets
 - removed pins for `cchardet` and `scikitlearn` from `setup.py`
+- added version check for `eli5` fork
 
 ### Fixed:
 - N/A
