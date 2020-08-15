@@ -16,6 +16,7 @@ Most recent releases are shown at the top. Each release shows:
 - removed pins for `cchardet` and `scikitlearn` from `setup.py`
 - added version check for `eli5` fork
 - removed `scipy` pin from `setup.py`
+- Allow TensorFlow 2.3 for Python 3.8
 
 ### Fixed:
 - N/A

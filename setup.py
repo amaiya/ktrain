@@ -2,7 +2,7 @@ import sys
 if sys.version_info.major != 3: raise Exception('ktrain requires Python 3')
 tf_version_str = 'tensorflow==2.1.0'
 if sys.version_info.minor == 8:
-    tf_version_str = 'tensorflow==2.2.0'
+    tf_version_str = 'tensorflow>=2.2.0'
 
 from distutils.core import setup
 import setuptools
