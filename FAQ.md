@@ -212,7 +212,9 @@ can be reloaded into other libraries that support `transformers` (e.g., `sentenc
 
 ### How do I install ktrain on a Windows machine?
 
-Here are detailed instructions for getting started with *ktrain* and TensorFlow on a Windows 10 computer:
+Here are detailed instructions for getting started with *ktrain* and TensorFlow on a Windows 10 computer.
+
+#### Installation on Windows
 
 1. Download and Install the [Miniconda Python distribution](https://docs.conda.io/en/latest/miniconda.html).  You will most likely want the **Python 3.8 Miniconda3 Windows 64-bit**.
 2. Download and Install the [Microsft Visual C++ Redistributable](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads)
@@ -223,10 +225,14 @@ Here are detailed instructions for getting started with *ktrain* and TensorFlow 
 
 If your machine has a GPU (which is needed for larger models), you'll need to perform [GPU setup for TensorFlow](https://www.tensorflow.org/install/gpu).
 
-If you experience SSL certificate problems with either `pip` or `conda`, run `conda config --set ssl_verify false` and 
+#### Resolving Problems
+- If you experience SSL certificate problems with either `pip` or `conda`, run `conda config --set ssl_verify false` and 
 replace all `pip` comands above with `pip --trusted-host pypi.org --trusted-host files.pythonhosted.org`.
+- If you experience a **Kernel Error** when running `jupyter notebook`, follow the [instructions here](https://stackoverflow.com/a/60611014)
+  and copy the two files in `C:\Users\<your_user_name>\Miniconda3\envs\kt\Lib\site-packages\pywin32_system32` to `C:\Windows\System32`.
 
-Once installed, you can fire up Jupyter notebook and test out *ktrain* with something like this:
+#### Running an Example
+Once installed, you can fire up Jupyter notebook (`jupyter notebook`) and test out *ktrain* with something like this:
 ```python
 # download Cats vs. Dogs image classification dataset
 !curl -k --output C:/temp/cats_and_dogs_filtered.zip --url https://storage.googleapis.com/mledu-datasets/cats_and_dogs_filtered.zip 
