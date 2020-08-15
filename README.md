@@ -327,8 +327,8 @@ The above should be all you need on Linux systems and cloud computing environmen
 
 **Some important things to note about installation:**
 - If using *ktrain* on a local machine with a GPU (versus Google Colab, for example), you'll need to [install GPU support for TensorFlow 2](https://www.tensorflow.org/install/gpu).
-- *ktrain* currently uses [TensorFlow 2.1.0 or 2.3.0](https://www.tensorflow.org/install/pip?lang=python3), which will be installed automatically when installing *ktrain*. 
-TensorFlow 2.1.0 will be installed as a dependency on Python 3.6 and 3.7 systems (due to some TensorFlow bugs that will not be fixed by Google until TensorFlow 2.4).  TensorFlow `2.3.0` will be installed only if using Python 3.8 (as TF 2.1.0 does not support Python 3.8).
+- *ktrain* currently uses [TensorFlow 2](https://www.tensorflow.org/install/pip?lang=python3), which will be installed automatically when installing *ktrain*. 
+TensorFlow 2.1.0 will be installed as a dependency on Python 3.6 and 3.7 systems (due to some TensorFlow bugs that will not be fixed by Google until TensorFlow 2.4).  TensorFlow `>=2.2.0` will be installed only if using Python 3.8 (as TF 2.1.0 does not support Python 3.8).
 - Since some *ktrain* dependencies have not yet been migrated to `tf.keras` in TensorFlow 2 (or may have other issues), 
   *ktrain* is temporarily using forked versions of some libraries. Specifically, *ktrain* uses forked versions of the `eli5` and `stellargraph` libraries.  If not installed, *ktrain* will complain  when a method or function needing 
   either of these libraries is invoked.
