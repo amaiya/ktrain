@@ -222,6 +222,7 @@ Here are detailed instructions for getting started with *ktrain* and TensorFlow 
 6. Type: `pip install ktrain`
 
 If your machine has a GPU (which is needed for larger models), you'll need to perform [GPU setup for TensorFlow](https://www.tensorflow.org/install/gpu).
+
 If you experience SSL certificate problems with either `pip` or `conda`, run `conda config --set ssl_verify false` and 
 replace all `pip` comands above with `pip --trusted-host pypi.org --trusted-host files.pythonhosted.org`.
 
