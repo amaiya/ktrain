@@ -226,13 +226,14 @@ Here are detailed instructions for getting started with *ktrain* and TensorFlow 
 If your machine has a GPU (which is needed for larger models), you'll need to perform [GPU setup for TensorFlow](https://www.tensorflow.org/install/gpu).
 
 #### Resolving Problems
-- If you experience SSL certificate problems with either `pip` or `conda`, run `conda config --set ssl_verify false` and 
-replace all `pip` comands above with `pip --trusted-host pypi.org --trusted-host files.pythonhosted.org`.
 - If you experience a **Kernel Error** when running `jupyter notebook`, follow the [instructions here](https://stackoverflow.com/a/60611014)
   and copy the two files in `C:\Users\<your_user_name>\Miniconda3\envs\kt\Lib\site-packages\pywin32_system32` to `C:\Windows\System32`.
+- If you experience SSL certificate problems with either `pip` or `conda`, run `conda config --set ssl_verify false` and 
+replace all `pip` comands above with `pip --trusted-host pypi.org --trusted-host files.pythonhosted.org`.
+
 
 #### Running an Example
-Once installed, you can fire up Jupyter notebook (Type `jupyter notebook` at command prompt) and test out *ktrain* with something like this:
+Once installed, you can fire up Jupyter notebook (type:`jupyter notebook` at command prompt) and test out *ktrain* with something like this:
 ```python
 # download Cats vs. Dogs image classification dataset
 !curl -k --output C:/temp/cats_and_dogs_filtered.zip --url https://storage.googleapis.com/mledu-datasets/cats_and_dogs_filtered.zip 
