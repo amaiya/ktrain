@@ -547,6 +547,10 @@ class TopicModel():
         classifiers are more strict than traditional binary classifiers.
         Documents with negative scores closer to zero are good candidates for
         inclusion in a training set for binary classification (e.g., active labeling).
+
+        NOTE: The score method currently employs the use of LocalOutLierFactor, which
+        means you should not try to score documents that were used in training. Only
+        new, unseen documents should be scored for similarity.
  
         Args:
             texts(list of str): list of document texts.  Mutually-exclusive with <doc_topics>
