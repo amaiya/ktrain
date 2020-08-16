@@ -41,7 +41,7 @@ class ImagePredictor(Predictor):
             import eli5
         except:
             msg = 'ktrain requires a forked version of eli5 to support tf.keras. '+\
-                  'Install with: pip3 install git+https://github.com/amaiya/eli5@tfkeras_0_10_1'
+                  'Install with: pip install git+https://github.com/amaiya/eli5@tfkeras_0_10_1'
             warnings.warn(msg)
             return
 
@@ -51,7 +51,7 @@ class ImagePredictor(Predictor):
                            "We do not detect this forked version (or it is out-of-date), so predictor.explain may not work.  " +\
                            "It will work if you uninstall the current version of eli5 and install "+\
                            "the forked version:  " +\
-                           "pip3 install git+https://github.com/amaiya/eli5@tfkeras_0_10_1")
+                           "pip install git+https://github.com/amaiya/eli5@tfkeras_0_10_1")
             return
 
         if not DISABLE_V2_BEHAVIOR:

@@ -53,7 +53,7 @@ class NER:
            with redirect_stdout(f):
                import ktrain
         except:
-           raise ValueError('ktrain could not be imported. Install with: pip3 install ktrain')
+           raise ValueError('ktrain could not be imported. Install with: pip install ktrain')
         self.predictor = ktrain.load_predictor(fpath)
 
 

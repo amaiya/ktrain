@@ -334,8 +334,8 @@ TensorFlow 2.1.0 will be installed as a dependency on Python 3.6 and 3.7 systems
   either of these libraries is invoked.
   To install these forked versions, you can do the following:
 ```
-pip3 install git+https://github.com/amaiya/eli5@tfkeras_0_10_1
-pip3 install git+https://github.com/amaiya/stellargraph@no_tf_dep_082
+pip install git+https://github.com/amaiya/eli5@tfkeras_0_10_1
+pip install git+https://github.com/amaiya/stellargraph@no_tf_dep_082
 ```
 
 This code was tested on Ubuntu 18.04 LTS using TensorFlow 2.1.0 and 2.2.0 and Python 3.6.9.

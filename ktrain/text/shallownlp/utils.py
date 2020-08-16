@@ -22,7 +22,7 @@ def detect_lang(texts, sample_size=32):
     detect language
     """
     if not LANGDETECT:
-        raise ValueError('langdetect is missing - install with pip3 install langdetect')
+        raise ValueError('langdetect is missing - install with pip install langdetect')
 
     if isinstance(texts, str): texts = [texts]
     if not isinstance(texts, (list, np.ndarray)):
@@ -48,7 +48,7 @@ def is_chinese(lang):
 
 def split_chinese(texts):
     if not JIEBA:
-        raise ValueError('jieba is missing - install with pip3 install jieba')
+        raise ValueError('jieba is missing - install with pip install jieba')
     if isinstance(texts, str): texts=[texts]
 
     split_texts = []
@@ -88,7 +88,7 @@ def decode_by_line(texts, encoding='utf-8', verbose=1):
 
 def detect_encoding(texts, sample_size=32):
     if not CHARDET:
-        raise ValueError('cchardet is missing - install with pip3 install cchardet')
+        raise ValueError('cchardet is missing - install with pip install cchardet')
     if isinstance(texts, str): texts = [texts]
     lst = [chardet.detect(doc)['encoding'] for doc in texts[:sample_size]]
     encoding = max(set(lst), key=lst.count)
