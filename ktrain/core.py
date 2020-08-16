@@ -474,7 +474,7 @@ class Learner(ABC):
 
 
 
-    def lr_find(self, start_lr=1e-7, lr_mult=1.01, max_epochs=None, 
+    def lr_find(self, start_lr=1e-7, lr_mult=1.01, max_epochs=None, class_weight=None,
                 stop_factor=4, show_plot=False, suggest=False, restore_weights_only=False, verbose=1):
         """
         Plots loss as learning rate is increased.  Highest learning rate 
@@ -500,6 +500,8 @@ class Learner(ABC):
                                Default is None. Set max_epochs to an integer
                                (e.g., 5) if lr_find is taking too long
                                and running for more epochs than desired.
+            class_weight(dict): class_weight parameter passed to model.fit
+                                for imbalanced datasets.
             stop_factor(int): factor used to determine threhsold that loss 
                               must exceed to stop training simulation.
                               Increase this if loss is erratic and lr_find
@@ -554,6 +556,7 @@ class Learner(ABC):
                                 use_gen=use_gen,
                                 start_lr=start_lr, lr_mult=lr_mult, 
                                 max_epochs=max_epochs,
+                                class_weight=class_weight,
                                 workers=self.workers, 
                                 use_multiprocessing=self.use_multiprocessing, 
                                 batch_size=self.batch_size,

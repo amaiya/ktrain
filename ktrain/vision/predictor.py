@@ -45,9 +45,10 @@ class ImagePredictor(Predictor):
             warnings.warn(msg)
             return
 
-        if not hasattr(eli5, 'KTRAIN'):
+        #if not hasattr(eli5, 'KTRAIN'):
+        if not hasattr(eli5, 'KTRAIN_ELI5_TAG') or eli5.KTRAIN_ELI5_TAG != KTRAIN_ELI5_TAG:
             warnings.warn("Since eli5 does not yet support tf.keras, ktrain uses a forked version of eli5.  " +\
-                           "We do not detect this forked version, so predictor.explain will not work.  " +\
+                           "We do not detect this forked version (or it is out-of-date), so predictor.explain may not work.  " +\
                            "It will work if you uninstall the current version of eli5 and install "+\
                            "the forked version:  " +\
                            "pip3 install git+https://github.com/amaiya/eli5@tfkeras_0_10_1")

@@ -245,4 +245,5 @@ ALLENNLP_ERRMSG  = 'To use ELMo embedings, please install allenlp:\n' +\
                    'pip3 install allennlp'
 
 
-
+# ELI5
+KTRAIN_ELI5_TAG = '0.10.1-1'

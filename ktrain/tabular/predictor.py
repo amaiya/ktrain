@@ -73,7 +73,13 @@ class TabularPredictor(Predictor):
           background_size(int): size of background data (SHAP parameter)
           nsamples(int): number of samples (SHAP parameter)
         """
-        import shap
+        try:
+            import shap
+        except ImportError:
+            msg = 'TabularPredictor.explain requires shap library. Please install with: pip install shap. '+\
+                    'Conda users should use this command instead: conda install -c conda-forge shap'
+            warnings.warn(msg)
+            return
 
         classification, multilabel = U.is_classifier(self.model)
         if classification and class_id is None:

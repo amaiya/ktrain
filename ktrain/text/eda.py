@@ -515,6 +515,12 @@ class TopicModel():
         Trains a scorer that can score documents based on similarity to a
         seed set of documents represented by topic_ids and doc_ids.
 
+        NOTE: The score method currently employs the use of LocalOutLierFactor, which
+        means you should not try to score documents that were used in training. Only
+        new, unseen documents should be scored for similarity. 
+        REFERENCE: 
+        https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.LocalOutlierFactor.html#sklearn.neighbors.LocalOutlierFactor
+
         Args:
             topic_ids(list of ints): list of topid IDs where each id is in the range
                                      of range(self.n_topics).  Documents associated
@@ -547,6 +553,10 @@ class TopicModel():
         classifiers are more strict than traditional binary classifiers.
         Documents with negative scores closer to zero are good candidates for
         inclusion in a training set for binary classification (e.g., active labeling).
+
+        NOTE: The score method currently employs the use of LocalOutLierFactor, which
+        means you should not try to score documents that were used in training. Only
+        new, unseen documents should be scored for similarity.
  
         Args:
             texts(list of str): list of document texts.  Mutually-exclusive with <doc_topics>

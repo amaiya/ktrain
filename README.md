@@ -61,8 +61,8 @@ zsl.predict(doc, topic_strings=topic_strings, include_labels=True)
      - **Ready-to-Use NER models for English, Chinese, and Russian** with no training required <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/shallownlp-examples.ipynb)]</sup></sub>
      - **Sentence Pair Classification**  for tasks like paraphrase detection <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/MRPC-BERT.ipynb)]</sup></sub>
      - **Unsupervised Topic Modeling** with [LDA](http://www.jmlr.org/papers/volume3/blei03a/blei03a.pdf)  <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/20newsgroups-topic_modeling.ipynb)]</sup></sub>
-     - **Document Similarity with One-Class Learning**:  given some documents of interest, find and score new documents that are semantically similar to them using [One-Class Text Classification](https://en.wikipedia.org/wiki/One-class_classification) <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/20newsgroups-document_similarity_scorer.ipynb)]</sup></sub>
-     - **Document Recommendation Engine**:  given text from a sample document, recommend documents that are thematically-related to it from a larger corpus  <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/20newsgroups-recommendation_engine.ipynb)]</sup></sub>
+     - **Document Similarity with One-Class Learning**:  given some documents of interest, find and score new documents that are thematically similar to them using [One-Class Text Classification](https://en.wikipedia.org/wiki/One-class_classification) <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/20newsgroups-document_similarity_scorer.ipynb)]</sup></sub>
+     - **Document Recommendation Engines and Semantic Searches**:  given a text snippet from a sample document, recommend documents that are semantically-related from a larger corpus  <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/20newsgroups-recommendation_engine.ipynb)]</sup></sub>
      - **Text Summarization**:  summarize long documents with a pretrained BART model - no training required <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/text_summarization_with_bart.ipynb)]</sup></sub>
      - **Open-Domain Question-Answering**:  ask a large text corpus questions and receive exact answers <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/question_answering_with_bert.ipynb)]</sup></sub>
      - **Zero-Shot Learning**:  classify documents into user-provided topics **without** training examples <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/zero_shot_learning_with_nli.ipynb)]</sup></sub>
@@ -318,15 +318,17 @@ Using *ktrain* on **Google Colab**?  See these Colab examples:
 
 ### Installation
 
-1. Make sure pip is up-to-date with: `pip3 install -U pip`
+1. Make sure pip is up-to-date with: `pip install -U pip`
 
-2. Install *ktrain*: `pip3 install ktrain`
+2. Install *ktrain*: `pip install ktrain`
+
+The above should be all you need on Linux systems and cloud computing environments like Google Colab and AWS EC2.  If you are using *ktrain* on a **Windows computer**, you can follow these 
+[more detailed instructions](https://github.com/amaiya/ktrain/blob/master/FAQ.md#how-do-i-install-ktrain-on-a-windows-machine) that include some extra steps.
 
 **Some important things to note about installation:**
 - If using *ktrain* on a local machine with a GPU (versus Google Colab, for example), you'll need to [install GPU support for TensorFlow 2](https://www.tensorflow.org/install/gpu).
-- *ktrain* currently uses [TensorFlow 2.1.0 or 2.2.0](https://www.tensorflow.org/install/pip?lang=python3), which will be installed automatically when installing *ktrain*. 
-TensorFlow 2.1.0 will be installed as a dependency on Python 3.6 and 3.7 systems.  TensorFlow 2.2.0 will be installed only if using Python 3.8 (as TF 2.1.0 does not support Python 3.8).
- On systems where Python 3.8 is the default (e.g., Ubuntu 20.04), we recommend installing and using Python 3.6/3.7 and TensorFlow 2.1.0 with *ktrain* due to unresolved bugs in versions of TensorFlow >= 2.2.0.
+- *ktrain* currently uses [TensorFlow 2](https://www.tensorflow.org/install/pip?lang=python3), which will be installed automatically when installing *ktrain*. 
+TensorFlow 2.1.0 will be installed as a dependency on Python 3.6 and 3.7 systems (due to some TensorFlow bugs that will not be fixed by Google until TensorFlow 2.4).  TensorFlow `>=2.2.0` will be installed only if using Python 3.8 (as TF 2.1.0 does not support Python 3.8).
 - Since some *ktrain* dependencies have not yet been migrated to `tf.keras` in TensorFlow 2 (or may have other issues), 
   *ktrain* is temporarily using forked versions of some libraries. Specifically, *ktrain* uses forked versions of the `eli5` and `stellargraph` libraries.  If not installed, *ktrain* will complain  when a method or function needing 
   either of these libraries is invoked.

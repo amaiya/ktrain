@@ -7,6 +7,8 @@
 - [What kinds of applications have been built with *ktrain*?](#what-kinds-of-applications-have-been-built-with-ktrain)
 
 ## Installation/Deployment Issues
+- [How do I install ktrain on a Windows machine?](#how-do-i-install-ktrain-on-a-windows-machine)
+
 - [How do I use ktrain without an internet connection?](#how-do-i-use-ktrain-without-an-internet-connection)
 
 - [Why am I seeing an ERROR when installing *ktrain* on Google Colab?](#why-am-i-seeing-an-error-when-installing-ktrain-on-google-colab)
@@ -83,6 +85,8 @@ Here is how you can quickly get started using *ktrain*:
 3. Save the notebook to your Google Drive: `File --> Save a copy in Drive`
 4. Make sure the notebook is setup to use a GPU: `Runtime --> Change runtime type` and select `GPU` in the menu.
 5. Click on each cell in the notebook and execute it by pressing `SHIFT` and `ENTER` at the same time. The notebook shows you how to build a neural network that recoginizes cats vs. dogs in photos.
+
+If you're on a Windows laptop, you can also try out *ktrain* locally (insead of using Google Colab) by [following these instructions](#how-do-i-install-ktrain-on-a-windows-machine)
 
 Next, you can go through [the tutorials](https://github.com/amaiya/ktrain#tutorials) to learn more.  If you have questions about a method or function, 
 type a question mark before the method and press ENTER in a Google Colab or Jupyter notebook to learn more.  Example: `?learner.autofit`.
@@ -201,6 +205,65 @@ See also [this post](https://github.com/huggingface/transformers/issues/1950) on
 
 Note that, once a `transformers` model is trained and saved (e.g., using `predictor.save` or `learner.save_model` or `learner.model.save_pretrained`), it 
 can be reloaded into other libraries that support `transformers` (e.g., `sentence-transformers`).
+
+[[Back to Top](#frequently-asked-questions-about-ktrain)]
+
+
+
+### How do I install ktrain on a Windows machine?
+
+Here are detailed instructions for getting started with *ktrain* and TensorFlow on a Windows 10 computer.
+
+#### Installation on Windows
+
+1. Download and Install the [Miniconda Python distribution](https://docs.conda.io/en/latest/miniconda.html).  You will most likely want the **Python 3.8 Miniconda3 Windows 64-bit**.
+2. Download and Install the [Microsft Visual C++ Redistributable](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads)
+3. Click on **Anaconda Powershell Prompt** in the Start Menu.
+4. Create a conda environment for *ktrain*: `conda create -n kt python=3.7; conda activate kt`
+5. Type: `pip install -U pip setuptools_scm jupyter` (run twice if error or use `--user` option)
+6. Type: `pip install ktrain`
+
+If your machine has a GPU (which is needed for larger models), you'll need to perform [GPU setup for TensorFlow](https://www.tensorflow.org/install/gpu).
+
+#### Resolving Problems
+- If you experience a **Kernel Error** when running `jupyter notebook`, follow the [instructions here](https://stackoverflow.com/a/60611014)
+  and copy the two files in `C:\Users\<your_user_name>\Miniconda3\envs\kt\Lib\site-packages\pywin32_system32` to `C:\Windows\System32`.
+- If you experience SSL certificate problems with either `pip` or `conda`, run `conda config --set ssl_verify false` and 
+replace all `pip` comands above with `pip --trusted-host pypi.org --trusted-host files.pythonhosted.org`.
+- We have selected Python 3.7 in STEP 4 above with `python=3.7`, but Python 3.8 is default if removed. We recommend using Python 3.6 or Python 3.7 for time being due
+  to yet-to-be-resolved bugs in the current version of TensorFlow. 
+
+
+#### Running an Example
+Once installed, you can fire up Jupyter notebook (type:`jupyter notebook` at command prompt) and test out *ktrain* with something like this:
+```python
+# download Cats vs. Dogs image classification dataset
+!curl -k --output C:/temp/cats_and_dogs_filtered.zip --url https://storage.googleapis.com/mledu-datasets/cats_and_dogs_filtered.zip 
+import os
+import zipfile
+local_zip = 'C:/temp/cats_and_dogs_filtered.zip'
+zip_ref = zipfile.ZipFile(local_zip, 'r')
+zip_ref.extractall('C:/temp')
+zip_ref.close()
+
+# train model
+import ktrain
+from ktrain import vision as vis
+(trn, val, preproc) = vis.images_from_folder(
+                                              datadir='C:/temp/cats_and_dogs_filtered',
+                                              data_aug = vis.get_data_aug(horizontal_flip=True),
+                                              train_test_names=['train', 'validation'])
+learner = ktrain.get_learner(model=vis.image_classifier('pretrained_mobilenet', trn, val, freeze_layers=15), 
+                             train_data=trn, val_data=val, workers=4, batch_size=64)
+learner.fit_onecycle(1e-4, 1)
+
+# make prediction
+predictor = ktrain.get_predictor(learner.model, preproc)
+predictor.predict_filename('C:/temp/cats_and_dogs_filtered/validation/cats/cat.2000.jpg')
+```
+
+
+
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
 
@@ -499,7 +562,7 @@ if using `focal_loss` with a `transformers` model like DistilBert.
 *ktrain* is just a lightweight wrapper around `tf.keras`, so this would be done in the exact same way as you would in Keras.
 More specifically, you can simply recompile your model with the loss function or optimizer you want by invoking `model.compile`.
 
-For example, here is how to use **focal loss** with a DistilBert model:
+For example, here is how to use [focal loss](https://www.dlology.com/blog/multi-class-classification-with-focal-loss-for-imbalanced-datasets/) with a DistilBert model:
 
 ```python
 import tensorflow as tf

@@ -6,6 +6,23 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.19.7 (2020-08-16)
+
+### New:
+- N/A
+
+### Changed
+- added `class_weight` parameter to `lr_find` for imbalanced datasets
+- removed pins for `cchardet` and `scikitlearn` from `setup.py`
+- added version check for `eli5` fork
+- removed `scipy` pin from `setup.py`
+- Allow TensorFlow 2.3 for Python 3.8
+- Request  manual installation of `shap` in `TabularPredictor.explain` instead of inclusion in `setup.py`
+
+### Fixed:
+- N/A
+
+
 ## 0.19.6 (2020-08-12)
 
 ### New:
