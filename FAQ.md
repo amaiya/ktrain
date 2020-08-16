@@ -219,7 +219,7 @@ Here are detailed instructions for getting started with *ktrain* and TensorFlow 
 1. Download and Install the [Miniconda Python distribution](https://docs.conda.io/en/latest/miniconda.html).  You will most likely want the **Python 3.8 Miniconda3 Windows 64-bit**.
 2. Download and Install the [Microsft Visual C++ Redistributable](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads)
 3. Click on **Anaconda Powershell Prompt** in the Start Menu.
-4. Create a conda environment for *ktrain*: `conda create -n kt python=3.7; conda activate kt` (We are selecting Python 3.7 here with `python=3.7`, but Python 3.8 is default if removed.)
+4. Create a conda environment for *ktrain*: `conda create -n kt python=3.7; conda activate kt`
 5. Type: `pip install -U pip setuptools_scm jupyter` (run twice if error or use `--user` option)
 6. Type: `pip install ktrain`
 
@@ -230,6 +230,8 @@ If your machine has a GPU (which is needed for larger models), you'll need to pe
   and copy the two files in `C:\Users\<your_user_name>\Miniconda3\envs\kt\Lib\site-packages\pywin32_system32` to `C:\Windows\System32`.
 - If you experience SSL certificate problems with either `pip` or `conda`, run `conda config --set ssl_verify false` and 
 replace all `pip` comands above with `pip --trusted-host pypi.org --trusted-host files.pythonhosted.org`.
+- We have selected Python 3.7 in STEP 4 above with `python=3.7`, but Python 3.8 is default if removed. We recommend using Python 3.6 or Python 3.7 for time being due
+  to yet-to-be-resolved bugs in the current version of TensorFlow. 
 
 
 #### Running an Example
