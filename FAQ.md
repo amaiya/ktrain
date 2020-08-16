@@ -220,7 +220,7 @@ Here are detailed instructions for getting started with *ktrain* and TensorFlow 
 2. Download and Install the [Microsft Visual C++ Redistributable](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads)
 3. Click on **Anaconda Powershell Prompt** in the Start Menu.
 4. Create a conda environment for *ktrain*: `conda create -n kt; conda activate kt` 
-5. Type: `pip install -U pip setuptools_scm jupyter` (run twice if error)
+5. Type: `pip install -U pip setuptools_scm jupyter` (run twice if error or use `--user` option)
 6. Type: `pip install ktrain`
 
 If your machine has a GPU (which is needed for larger models), you'll need to perform [GPU setup for TensorFlow](https://www.tensorflow.org/install/gpu).
