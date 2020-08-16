@@ -318,9 +318,9 @@ Using *ktrain* on **Google Colab**?  See these Colab examples:
 
 ### Installation
 
-1. Make sure pip is up-to-date with: `pip3 install -U pip`
+1. Make sure pip is up-to-date with: `pip install -U pip`
 
-2. Install *ktrain*: `pip3 install ktrain`
+2. Install *ktrain*: `pip install ktrain`
 
 The above should be all you need on Linux systems and cloud computing environments like Google Colab and AWS EC2.  If you are using *ktrain* on a **Windows computer**, you can follow these 
 [more detailed instructions](https://github.com/amaiya/ktrain/blob/master/FAQ.md#how-do-i-install-ktrain-on-a-windows-machine) that include some extra steps.
