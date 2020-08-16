@@ -30,6 +30,7 @@ setup(
   install_requires=[
           tf_version_str,
           #'scipy==1.4.1', # removed due to https://github.com/tensorflow/tensorflow/commit/78026d6a66f7f0fc
+          #'pillow'
           'scikit-learn>=0.21.3', # previously pinned to 0.21.3 due to retain old of TextPredictor.explain
           'matplotlib >= 3.0.0',
           'pandas >= 1.0.1',
@@ -49,11 +50,11 @@ setup(
           'ipython',
           'syntok',
           'whoosh',
-          'shap',
-          #'stellargraph>=0.8.2',
-          #'eli5 >= 0.10.0',
+          # these libraries are manually installed on-the-fly when required by an invoked method
+          # 'shap',  # used by TabularPredictor.explain
+          #'eli5 >= 0.10.0', # forked v ersion used by TextPredictor.explain and ImagePredictor.explain
+          #'stellargraph>=0.8.2', # forked version used by graph module
           #'allennlp', # required for Elmo embeddings since TF2 TF_HUB does not work
-          #'pillow'
       ],
   classifiers=[  # Optional
     # How mature is this project? Common values are

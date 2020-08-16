@@ -17,6 +17,7 @@ Most recent releases are shown at the top. Each release shows:
 - added version check for `eli5` fork
 - removed `scipy` pin from `setup.py`
 - Allow TensorFlow 2.3 for Python 3.8
+- Request  manual installation of `shap` in `TabularPredictor.explain` instead of inclusion in `setup.py`
 
 ### Fixed:
 - N/A
