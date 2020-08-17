@@ -503,7 +503,9 @@ class TextPreprocessor(Preprocessor):
         """
         if self.ytransform is None:
             self.ytransform = U.YTransform(class_names=self.get_classes())
-        return self.ytransform.apply(y_data, train=train)
+        y = self.ytransform.apply(y_data, train=train)
+        if train: self.c = self.ytransform.get_classes()
+        return y
 
 
 class StandardTextPreprocessor(TextPreprocessor):
