@@ -31,7 +31,7 @@ setup(
           tf_version_str,
           #'scipy==1.4.1', # removed due to https://github.com/tensorflow/tensorflow/commit/78026d6a66f7f0fc
           #'pillow'
-          'scikit-learn>=0.21.3', # previously pinned to 0.21.3 due to retain old of TextPredictor.explain
+          'scikit-learn>=0.21.3', # previously pinned to 0.21.3 due to TextPredictor.explain, but no longer needed as of 0.19.7
           'matplotlib >= 3.0.0',
           'pandas >= 1.0.1',
           'fastprogress >= 0.1.21',
@@ -40,7 +40,7 @@ setup(
           'joblib',
           'langdetect',
           'jieba',
-          'cchardet',  # previously pinned to 2.1.5 due to this issue: https://github.com/PyYoshi/cChardet/issues/61
+          'cchardet',  # previously pinned to 2.1.5 (due to this issue: https://github.com/PyYoshi/cChardet/issues/61) but no longer needed
           'networkx>=2.3',
           'bokeh',
           'seqeval',
@@ -52,7 +52,7 @@ setup(
           'whoosh',
           # these libraries are manually installed on-the-fly when required by an invoked method
           # 'shap',  # used by TabularPredictor.explain
-          #'eli5 >= 0.10.0', # forked v ersion used by TextPredictor.explain and ImagePredictor.explain
+          #'eli5 >= 0.10.0', # forked version used by TextPredictor.explain and ImagePredictor.explain
           #'stellargraph>=0.8.2', # forked version used by graph module
           #'allennlp', # required for Elmo embeddings since TF2 TF_HUB does not work
       ],
