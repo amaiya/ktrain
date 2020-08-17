@@ -6,6 +6,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.19.8 (2020-08-17)
+
+### New:
+- N/A
+
+### Changed
+- N/A
+
+### Fixed:
+- In `TextPreprocessor` instances, correctly reset `class_names` when targets are in string format.
+
+
 ## 0.19.7 (2020-08-16)
 
 ### New:
