@@ -104,7 +104,7 @@ class TestTransformers(TestCase):
         self.assertEqual(type(p.explain(TEST_DOC)), IPython.core.display.HTML)
 
 
-    @skip('temporarily disabled')
+    #@skip('temporarily disabled')
     def test_transformers_api_2(self):
         MODEL_NAME = 'distilbert-base-uncased'
         preproc = txt.Transformer(MODEL_NAME, maxlen=500, classes=self.classes)
