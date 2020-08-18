@@ -30,9 +30,16 @@ class TestTransformers(TestCase):
         y_train = train_b.target
         x_test = test_b.data
         y_test = test_b.target
+
+        # convert to string labels
+        y_train = [train_b.target_names[y] for y in y_train]
+        y_test = [train_b.target_names[y] for y in y_test]
+
+        # setup
         self.trn = (x_train, y_train)
         self.val = (x_test, y_test)
-        self.classes = train_b.target_names
+        #self.classes = train_b.target_names
+        self.classes = []  # discover from string labels
 
 
 
@@ -97,7 +104,7 @@ class TestTransformers(TestCase):
         self.assertEqual(type(p.explain(TEST_DOC)), IPython.core.display.HTML)
 
 
-    #@skip('temporarily disabled')
+    @skip('temporarily disabled')
     def test_transformers_api_2(self):
         MODEL_NAME = 'distilbert-base-uncased'
         preproc = txt.Transformer(MODEL_NAME, maxlen=500, classes=self.classes)
