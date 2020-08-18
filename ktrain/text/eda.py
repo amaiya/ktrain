@@ -397,7 +397,7 @@ class TopicModel():
             from bokeh.models import HoverTool
             from bokeh.io import output_notebook
         except:
-            warnings.warn('visualize_documents method requires bokeh package: pip3 install bokeh')
+            warnings.warn('visualize_documents method requires bokeh package: pip install bokeh')
             return
 
         # prepare data
