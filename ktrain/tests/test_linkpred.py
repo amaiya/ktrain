@@ -10,7 +10,7 @@ import ktrain
 from ktrain import graph as gr
 from ktrain.imports import ACC_NAME, VAL_ACC_NAME
 
-class TestNodeClassification(TestCase):
+class TestLinkPrediction(TestCase):
 
 
     def test_cora(self):

@@ -330,13 +330,6 @@ def texts_from_array(x_train, y_train, x_test=None, y_test=None,
         verbose (boolean): verbosity
     """
     U.check_array(x_train,  y=y_train, X_name='x_train', y_name='y_train')
-    if not class_names and verbose:
-        #classes =  list(set(y_train))
-        #classes.sort()
-        #class_names = ["%s" % (c) for c in classes]
-        print('task: text regression (supply class_names argument if this is supposed to be classification task)')
-    else:
-        print('task: text classification')
 
     if x_test is None or y_test is None:
         x_train, x_test, y_train, y_test = train_test_split(x_train, y_train, 
@@ -369,6 +362,10 @@ def texts_from_array(x_train, y_train, x_test=None, y_test=None,
                            lang=lang, ngram_range=ngram_range)
     trn = preproc.preprocess_train(x_train, y_train, verbose=verbose)
     val = preproc.preprocess_test(x_test,  y_test, verbose=verbose)
+    if not preproc.get_classes() and verbose:
+        print('task: text regression (supply class_names argument if this is supposed to be classification task)')
+    else:
+        print('task: text classification')
     return (trn, val, preproc)
 
 

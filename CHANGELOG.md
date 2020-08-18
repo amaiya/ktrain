@@ -6,6 +6,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.19.9 (2020-08-17)
+
+### New:
+- N/A
+
+### Changed
+- N/A
+
+### Fixed:
+- In `texts_from_array`, check `class_names` only after preprocessing before printing classification vs. regression status.
+
+
 ## 0.19.8 (2020-08-17)
 
 ### New:
