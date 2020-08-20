@@ -6,6 +6,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.19.10 (TBD)
+
+### New:
+- N/A
+
+### Changed
+- N/A
+
+### Fixed:
+- Allow variations on `accuracy` metric such as `binary_accuracy` when inpecting model in `is_classifier`
+
+
 ## 0.19.9 (2020-08-17)
 
 ### New:
