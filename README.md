@@ -46,23 +46,6 @@ print(translator.translate(src_text))
 # Die Pandemie hat eine ernste Zerstörung der Weltwirtschaft verursacht.
 # Aber bis Juni 2020 stieg der US-Markt weiter an.
 ```
-- **2020-06-03:**  
-  - ***ktrain*** **v0.16.x is released** and includes support for **Zero-Shot Learning**, where documents can be classified into user-provided topics **without** any training examples. See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/zero_shot_learning_with_nli.ipynb).  <sub><sup>(This feature currently requires that PyTorch be installed.)</sup></sub>
-```python
-# Zero-Shot Topic Classification in ktrain (NOTE: Zero-Shot Learning uses PyTorch instead of TensorFlow)
-
-from ktrain import text 
-zsl = text.ZeroShotClassifier()
-topic_strings=['politics', 'elections', 'sports', 'films', 'television']
-doc = 'I am unhappy with decisions of the government and will definitely vote in 2020.'
-zsl.predict(doc, topic_strings=topic_strings, include_labels=True)
-# output:
-# [('politics', 0.9829113483428955),
-#  ('elections', 0.9880988001823425),
-#  ('sports', 0.00030677582253701985),
-#  ('films', 0.0008969294722191989),
-#  ('television', 0.00045271270209923387)]
-```
 ----
 
 ### Overview
