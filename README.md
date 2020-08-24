@@ -15,13 +15,13 @@
 
 from ktrain import text
 zsl = text.ZeroShotClassifier()
-docs = ['I will definitely not be seing this movie again, but the acting was good.', 
+docs = ['I will definitely not be seeing this movie again, but the acting was good.', 
         'This flick was riveting.', ...]
 zsl.predict(docs, labels=['negative', 'positive'], include_labels=True, 
-            nli_template='The sentiment of this movie is {}.', multilabel=False)
+            nli_template='The sentiment of this movie review is {}.', multilabel=False)
 # output:
-[[('negative', 0.7122098803520203), ('positive', 0.28779006004333496)],
- [('negative', 0.007318107411265373), ('positive', 0.9926819205284119)], ...]
+[[('negative', 0.6576018333435059), ('positive', 0.34239819645881653)],
+ [('negative', 0.004729847423732281), ('positive', 0.9952701330184937)], ...]
 ```
 
 - **2020-07-29:**  
