@@ -13,6 +13,8 @@ Most recent releases are shown at the top. Each release shows:
   can be predicted
 - efficiency improvements to `ZeroShotClassifier.predict` that allow faster predictions on large sequences
   of documents and a large numer of labels to predict
+- added 'multilabel` parameter to `ZeroShotClassifier.predict`
+- added `labels` parameter to `ZeroShotClassifer.predict`, an alias to `topic_strings` parameter
 
 ### Changed
 - N/A
