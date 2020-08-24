@@ -14,7 +14,8 @@
 
 from ktrain import text
 zsl = text.ZeroShotClassifier()
-docs = ['I will definitely not be seing this movie again, but the acting was good.', 'This flick was riveting.', ...]
+docs = ['I will definitely not be seing this movie again, but the acting was good.', 
+        'This flick was riveting.', ...]
 zsl.predict(docs, labels=['negative', 'positive'], include_labels=True, 
             nli_template='The sentiment of this movie is {}.', multilabel=False)
 # output:
