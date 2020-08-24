@@ -7,6 +7,24 @@
 
 
 ### News and Announcements
+- **2020-08-24:**
+  - ***ktrain*** **v0.20.x is released** and includes updates the `ZeroShotClassifier`, which allows documents to classified into user-provided categories **without** training exmaples. See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/zero_shot_learning_with_nli.ipynb). For instance, `ZeroShotClassifier` can now predict large sequences of documents and be customized for different text classification problems.
+```python
+# Zero-Shot Sentiment Analysis (NOTE: Zero-Shot Learning uses PyTorch instead of TensorFlow)
+
+from ktrain import text
+zsl = text.ZeroShotClassifier()
+docs = ['I will definitely not be seing this movie again, but the acting was good.', 'This movie was superb.', ...]
+zsl.predict(docs, labels=['negative', 'positive'], include_labels=True, 
+            nli_template='The sentiment of this movie is {}.', multilabel=False)
+# output:
+# [('politics', 0.9829113483428955),
+#  ('elections', 0.9880988001823425),
+#  ('sports', 0.00030677582253701985),
+#  ('films', 0.0008969294722191989),
+#  ('television', 0.00045271270209923387)]
+```
+
 - **2020-07-29:**  
   - ***ktrain*** **v0.19.x is released** and now includes support for "traditional" **tabular data** and **explainable AI for tabular predictions**.  See the [tutorial notebook on tabular models](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/tutorials/tutorial-08-tabular_classification_and_regression.ipynb) for both:
     - a classification example (using the Kaggle Titanic passenger survival prediction dataset) 
