@@ -8,7 +8,7 @@
 
 ### News and Announcements
 - **2020-08-24:**
-  - ***ktrain*** **v0.20.x is released** and includes updates to `ZeroShotClassifier`. The `ZeroShotClassifier` allows documents to be classified into user-provided categories **without** training examples.  Updates include the ability to predict large sequences of documents and the ability to customize inferences for different settings.  See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/zero_shot_learning_with_nli.ipynb) for more information.
+  - ***ktrain*** **v0.20.x is released** and includes updates to `ZeroShotClassifier`. The `ZeroShotClassifier` allows documents to be classified into user-provided categories **without** training examples.  Updates include the ability to predict large sequences of documents (and topics) and the ability to customize inferences for different settings.  See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/zero_shot_learning_with_nli.ipynb) for more information.
 ```python
 # Zero-Shot Sentiment Analysis (NOTE: Zero-Shot Learning uses PyTorch instead of TensorFlow)
 
