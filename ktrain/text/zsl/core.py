@@ -37,7 +37,7 @@ class ZeroShotClassifier():
         self.model = AutoModelForSequenceClassification.from_pretrained(model_name).to(self.torch_device)
 
 
-    def predict(self, docs, labels=[], include_labels=False, 
+    def predict(self, docs, labels=[], include_labels=False, multilabel=True,
                max_length=512, batch_size=8, nli_template='This text is about {}.',  topic_strings=[]):
         """
         This method performs zero-shot text classification using Natural Language Inference (NLI).
@@ -47,12 +47,14 @@ class ZeroShotClassifier():
                         Example:
                           labels=['political science', 'sports', 'science']
           include_labels(bool): If True, will return topic labels along with topic probabilities
+          multilabel(bool): If True, labels are considered independent and multiple labels can predicted true for document and be close to 1.
+                            If False, scores are normalized such that probabilities sum to 1.
           max_length(int): truncate long documents to this many tokens
           batch_size(int): batch_size to use. default:8
                            Increase this value to speed up predictions - especially
                            if len(topic_strings) is large.
           nli_template(str): labels are inserted into this template for use as hypotheses in natural language inference
-          topic_strings(list): alias for label_strings for backwards compatibility
+          topic_strings(list): alias for labels parameter for backwards compatibility
         Returns:
           inferred probabilities or list of inferred probabilities if doc is list
         """
@@ -84,26 +86,33 @@ class ZeroShotClassifier():
         # inference
         import torch
         with torch.no_grad():
-            result = []
+            outputs = []
             for sequences in sequence_chunks:
                 batch = self.tokenizer.batch_encode_plus(sequences, return_tensors='pt', max_length=max_length, truncation='only_first', padding=True).to(self.torch_device)
                 logits = self.model(batch['input_ids'], attention_mask=batch['attention_mask'])[0]
-                entail_contradiction_logits = logits[:,[0,2]]
-                probs = entail_contradiction_logits.softmax(dim=1)
-                true_probs = list(probs[:,1].cpu().detach().numpy())
-                result.extend(true_probs)
+                outputs.extend(logits.cpu().detach().numpy())
+                #entail_contradiction_logits = logits[:,[0,2]]
 
-        # format results
-        num_labels = len(labels)
-        result_per_doc = []
-        output = []
-        for i, r in enumerate(result):
-            l = labels[i%num_labels]
-            element = (labels[i%num_labels], r) if include_labels else r
-            result_per_doc.append(element)
-            if i%num_labels+1 == num_labels:
-                output.append(result_per_doc)
-                result_per_doc = []
-        if is_str_input: output = output[0]
-        return output
+                #probs = entail_contradiction_logits.softmax(dim=1)
+                #true_probs = list(probs[:,1].cpu().detach().numpy())
+                #result.extend(true_probs)
+        outputs = np.array(outputs)
+        outputs = outputs.reshape((len(docs), len(labels), -1))
+
+        # process outputs
+        # 2020-08-24: modified based on transformers pipeline implementation
+        if multilabel:
+            # softmax over the entailment vs. contradiction dim for each label independently
+            entail_contr_logits = outputs[..., [0, -1]]
+            scores = np.exp(entail_contr_logits) / np.exp(entail_contr_logits).sum(-1, keepdims=True)
+            scores = scores[..., 1]
+        else:
+            # softmax the "entailment" logits over all candidate labels
+            entail_logits = outputs[..., -1]
+            scores = np.exp(entail_logits) / np.exp(entail_logits).sum(-1, keepdims=True)
+        scores = scores.tolist()
+        if include_labels:
+            scores = [list(zip(labels, s)) for s in scores]
+        if is_str_input: scores = scores[0]
+        return scores
 
