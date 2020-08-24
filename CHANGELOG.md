@@ -6,6 +6,21 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.20.0 (2020-08-24)
+
+### New:
+- added `nli_template` parameter to `ZeroShotClassifier.predict` to allow versatility in the kinds of labels that
+  can be predicted
+- efficiency improvements to `ZeroShotClassifier.predict` that allow faster predictions on large sequences
+  of documents and a large numer of labels to predict
+
+### Changed
+- N/A
+
+### Fixed:
+- Allow variations on `accuracy` metric such as `binary_accuracy` when inpecting model in `is_classifier`
+
+
 ## 0.19.9 (2020-08-17)
 
 ### New:

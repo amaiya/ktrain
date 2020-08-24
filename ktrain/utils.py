@@ -81,7 +81,7 @@ def is_classifier(model):
         is_classifier = True
     else:
         mlist = metrics_from_model(model)
-        if isinstance(mlist, (list, np.ndarray)) and 'accuracy' in mlist:
+        if isinstance(mlist, (list, np.ndarray)) and any(['accuracy' in m for m in mlist]):
             is_classifier = True
 
     # check for multilabel
