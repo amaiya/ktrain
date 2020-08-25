@@ -6,6 +6,19 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.20.1 (2020-08-25)
+
+### New:
+- N/A
+
+### Changed
+- N/A
+
+### Fixed:
+- Added missing `torch.no_grad()` scope in `text.translation` and `text.summarization` modules
+
+
+
 ## 0.20.0 (2020-08-24)
 
 ### New:
