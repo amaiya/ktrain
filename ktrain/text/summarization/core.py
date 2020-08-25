@@ -36,16 +36,17 @@ class TransformerSummarizer():
         Returns:
           str: summary text
         """
+        import torch
+        with torch.no_grad():
+            answers_input_ids = self.tokenizer.batch_encode_plus([doc], 
+                                                                 return_tensors='pt', 
+                                                                 max_length=1024)['input_ids'].to(self.torch_device)
+            summary_ids = self.model.generate(answers_input_ids,
+                                              num_beams=4,
+                                              length_penalty=2.0,
+                                              max_length=142,
+                                              min_length=56,
+                                              no_repeat_ngram_size=3)
 
-        answers_input_ids = self.tokenizer.batch_encode_plus([doc], 
-                                                             return_tensors='pt', 
-                                                             max_length=1024)['input_ids'].to(self.torch_device)
-        summary_ids = self.model.generate(answers_input_ids,
-                                          num_beams=4,
-                                          length_penalty=2.0,
-                                          max_length=142,
-                                          min_length=56,
-                                          no_repeat_ngram_size=3)
-
-        exec_sum = self.tokenizer.decode(summary_ids.squeeze(), skip_special_tokens=True)
+            exec_sum = self.tokenizer.decode(summary_ids.squeeze(), skip_special_tokens=True)
         return exec_sum

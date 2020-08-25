@@ -46,10 +46,11 @@ class Translator():
         Returns:
           str: translated text
         """
-        # tokenize text into sentences:
         sentences = TU.sent_tokenize(src_text)
-        translated = self.model.generate(**self.tokenizer.prepare_translation_batch(sentences).to(self.torch_device))
-        tgt_sentences = [self.tokenizer.decode(t, skip_special_tokens=True) for t in translated]
+        import torch
+        with torch.no_grad():
+            translated = self.model.generate(**self.tokenizer.prepare_translation_batch(sentences).to(self.torch_device))
+            tgt_sentences = [self.tokenizer.decode(t, skip_special_tokens=True) for t in translated]
         return join_with.join(tgt_sentences)
 
 
