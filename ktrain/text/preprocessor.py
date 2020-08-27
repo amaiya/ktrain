@@ -4,30 +4,7 @@ from ..preprocessor import Preprocessor
 from ..data import SequenceDataset
 from . import textutils as TU
 
-DistilBertTokenizer = transformers.DistilBertTokenizer
 DISTILBERT= 'distilbert'
-
-from transformers import BertConfig, TFBertForSequenceClassification, BertTokenizer, TFBertModel
-from transformers import XLNetConfig, TFXLNetForSequenceClassification, XLNetTokenizer, TFXLNetModel 
-from transformers import XLMConfig, TFXLMForSequenceClassification, XLMTokenizer, TFXLMModel
-from transformers import RobertaConfig, TFRobertaForSequenceClassification, RobertaTokenizer, TFRobertaModel
-from transformers import DistilBertConfig, TFDistilBertForSequenceClassification, DistilBertTokenizer, TFDistilBertModel
-from transformers import AlbertConfig, TFAlbertForSequenceClassification, AlbertTokenizer, TFAlbertModel
-from transformers import CamembertConfig, TFCamembertForSequenceClassification, CamembertTokenizer, TFCamembertModel
-from transformers import XLMRobertaConfig, TFXLMRobertaForSequenceClassification, XLMRobertaTokenizer, TFXLMRobertaModel
-from transformers import AutoConfig, TFAutoModelForSequenceClassification, AutoTokenizer, TFAutoModel
-
-TRANSFORMER_MODELS = {
-    'bert':       (BertConfig, TFBertForSequenceClassification, BertTokenizer, TFBertModel),
-    'xlnet':      (XLNetConfig, TFXLNetForSequenceClassification, XLNetTokenizer, TFXLNetModel),
-    'xlm':        (XLMConfig, TFXLMForSequenceClassification, XLMTokenizer, TFXLMModel),
-    'roberta':    (RobertaConfig, TFRobertaForSequenceClassification, RobertaTokenizer, TFRobertaModel),
-    'distilbert': (DistilBertConfig, TFDistilBertForSequenceClassification, DistilBertTokenizer, TFDistilBertModel),
-    'albert':     (AlbertConfig, TFAlbertForSequenceClassification, AlbertTokenizer, TFAlbertModel),
-    'camembert':  (CamembertConfig, TFCamembertForSequenceClassification, CamembertTokenizer, TFCamembertModel),
-    'xlm_roberta':  (XLMRobertaConfig, TFXLMRobertaForSequenceClassification, XLMRobertaTokenizer, TFXLMRobertaModel)
-}
-
 
 NOSPACE_LANGS = ['zh-cn', 'zh-tw', 'ja']
 
