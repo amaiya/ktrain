@@ -4,6 +4,9 @@ from ..preprocessor import Preprocessor
 from ..data import SequenceDataset
 from . import textutils as TU
 
+from transformers import AutoConfig, TFAutoModelForSequenceClassification, AutoTokenizer, TFAutoModel
+
+
 DISTILBERT= 'distilbert'
 
 NOSPACE_LANGS = ['zh-cn', 'zh-tw', 'ja']
