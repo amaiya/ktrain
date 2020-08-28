@@ -4,30 +4,10 @@ from ..preprocessor import Preprocessor
 from ..data import SequenceDataset
 from . import textutils as TU
 
-DistilBertTokenizer = transformers.DistilBertTokenizer
-DISTILBERT= 'distilbert'
-
-from transformers import BertConfig, TFBertForSequenceClassification, BertTokenizer, TFBertModel
-from transformers import XLNetConfig, TFXLNetForSequenceClassification, XLNetTokenizer, TFXLNetModel 
-from transformers import XLMConfig, TFXLMForSequenceClassification, XLMTokenizer, TFXLMModel
-from transformers import RobertaConfig, TFRobertaForSequenceClassification, RobertaTokenizer, TFRobertaModel
-from transformers import DistilBertConfig, TFDistilBertForSequenceClassification, DistilBertTokenizer, TFDistilBertModel
-from transformers import AlbertConfig, TFAlbertForSequenceClassification, AlbertTokenizer, TFAlbertModel
-from transformers import CamembertConfig, TFCamembertForSequenceClassification, CamembertTokenizer, TFCamembertModel
-from transformers import XLMRobertaConfig, TFXLMRobertaForSequenceClassification, XLMRobertaTokenizer, TFXLMRobertaModel
 from transformers import AutoConfig, TFAutoModelForSequenceClassification, AutoTokenizer, TFAutoModel
 
-TRANSFORMER_MODELS = {
-    'bert':       (BertConfig, TFBertForSequenceClassification, BertTokenizer, TFBertModel),
-    'xlnet':      (XLNetConfig, TFXLNetForSequenceClassification, XLNetTokenizer, TFXLNetModel),
-    'xlm':        (XLMConfig, TFXLMForSequenceClassification, XLMTokenizer, TFXLMModel),
-    'roberta':    (RobertaConfig, TFRobertaForSequenceClassification, RobertaTokenizer, TFRobertaModel),
-    'distilbert': (DistilBertConfig, TFDistilBertForSequenceClassification, DistilBertTokenizer, TFDistilBertModel),
-    'albert':     (AlbertConfig, TFAlbertForSequenceClassification, AlbertTokenizer, TFAlbertModel),
-    'camembert':  (CamembertConfig, TFCamembertForSequenceClassification, CamembertTokenizer, TFCamembertModel),
-    'xlm_roberta':  (XLMRobertaConfig, TFXLMRobertaForSequenceClassification, XLMRobertaTokenizer, TFXLMRobertaModel)
-}
 
+DISTILBERT= 'distilbert'
 
 NOSPACE_LANGS = ['zh-cn', 'zh-tw', 'ja']
 
@@ -807,15 +787,9 @@ class TransformersPreprocessor(TextPreprocessor):
             self.model_name = 'jplu/tf-' + self.model_name
         else:
             self.name = model_name.split('-')[0]
-        if self.name not in TRANSFORMER_MODELS:
-            #raise ValueError('unsupported model name %s' % (model_name))
-            self.config = AutoConfig.from_pretrained(model_name)
-            self.model_type = TFAutoModelForSequenceClassification
-            self.tokenizer_type = AutoTokenizer
-        else:
-            self.config = None # use default config
-            self.model_type = TRANSFORMER_MODELS[self.name][1]
-            self.tokenizer_type = TRANSFORMER_MODELS[self.name][2]
+        self.config = AutoConfig.from_pretrained(model_name)
+        self.model_type = TFAutoModelForSequenceClassification
+        self.tokenizer_type = AutoTokenizer
 
         if "bert-base-japanese" in model_name:
             self.tokenizer_type = transformers.BertJapaneseTokenizer
@@ -1196,14 +1170,10 @@ class TransformerEmbedding():
         else:
             self.name = model_name.split('-')[0]
 
-        if self.name not in TRANSFORMER_MODELS:
-            self.config = AutoConfig.from_pretrained(model_name)
-            self.model_type = TFAutoModel
-            self.tokenizer_type = AutoTokenizer
-        else:
-            self.config = None # use default config
-            self.model_type = TRANSFORMER_MODELS[self.name][3]
-            self.tokenizer_type = TRANSFORMER_MODELS[self.name][2]
+        self.config = AutoConfig.from_pretrained(model_name)
+        self.model_type = TFAutoModel
+        self.tokenizer_type = AutoTokenizer
+
         if "bert-base-japanese" in model_name:
             self.tokenizer_type = transformers.BertJapaneseTokenizer
 

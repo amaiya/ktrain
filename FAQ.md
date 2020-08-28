@@ -687,7 +687,7 @@ The set of integer labels in your training set need to be complete and consecuti
 
 ### Why am I seeing an ERROR when installing *ktrain* on Google Colab?
 
-These errors (e.g., `has requirement gast>=0.3.2, but you'll have gast 0.2.2 which is incompatible`) are related to TensorFlow and can be usually safely ignored and shouldn't affect operation of *ktrain*.
+These errors (e.g., `tensorboard 2.1.1 requires setuptools>=41.0.0, but you'll have setuptools 39.0.1 which is incompatible.`) are related to TensorFlow and can be usually safely ignored and shouldn't affect operation of *ktrain*.  The errors should go away if you perform the indicated upgrades (e.g., `pip install -U setuptools`).
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
 
