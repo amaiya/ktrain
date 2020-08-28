@@ -790,15 +790,6 @@ class TransformersPreprocessor(TextPreprocessor):
         self.config = AutoConfig.from_pretrained(model_name)
         self.model_type = TFAutoModelForSequenceClassification
         self.tokenizer_type = AutoTokenizer
-        # code below removed in v0.20.2, so as to use Auto to load model due to Issue #239
-        #if self.name not in TRANSFORMER_MODELS:
-            #self.config = AutoConfig.from_pretrained(model_name)
-            #self.model_type = TFAutoModelForSequenceClassification
-            #self.tokenizer_type = AutoTokenizer
-        #else:
-            #self.config = None # use default config
-            #self.model_type = TRANSFORMER_MODELS[self.name][1]
-            #self.tokenizer_type = TRANSFORMER_MODELS[self.name][2]
 
         if "bert-base-japanese" in model_name:
             self.tokenizer_type = transformers.BertJapaneseTokenizer
@@ -1182,15 +1173,7 @@ class TransformerEmbedding():
         self.config = AutoConfig.from_pretrained(model_name)
         self.model_type = TFAutoModel
         self.tokenizer_type = AutoTokenizer
-	# code below removed in v0.20.2, so as to use Auto to load model due to Issue #239
-        #if self.name not in TRANSFORMER_MODELS:
-            #self.config = AutoConfig.from_pretrained(model_name)
-            #self.model_type = TFAutoModel
-            #self.tokenizer_type = AutoTokenizer
-        #else:
-            #self.config = None # use default config
-            #self.model_type = TRANSFORMER_MODELS[self.name][3]
-            #self.tokenizer_type = TRANSFORMER_MODELS[self.name][2]
+
         if "bert-base-japanese" in model_name:
             self.tokenizer_type = transformers.BertJapaneseTokenizer
 
