@@ -6,7 +6,7 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
-## 0.20.3 (2020-09-02)
+## 0.21.0 (2020-09-03)
 
 ### New:
 - Added `translate_sentences` method to `Translator` class that translates list of sentences, where list is fed to model as single batch
