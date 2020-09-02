@@ -12,10 +12,11 @@ Most recent releases are shown at the top. Each release shows:
 - N/A
 
 ### Changed
-- N/A
+- Added `truncation=True` to tokenization in `summarization` module
+- Require `transformers>=3.1.0` due to breaking changes
 
 ### Fixed:
-- N/A
+- Use `prepare_seq2seq_batch` insteadd of `prepare_translation_batch` in `translation` module due to breaking change in `transformers==3.1.0`
 
 
 ## 0.20.2 (2020-08-27)
