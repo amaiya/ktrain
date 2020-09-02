@@ -49,7 +49,7 @@ class Translator():
         sentences = TU.sent_tokenize(src_text)
         import torch
         with torch.no_grad():
-            translated = self.model.generate(**self.tokenizer.prepare_translation_batch(sentences).to(self.torch_device))
+            translated = self.model.generate(**self.tokenizer.prepare_seq2seq_batch(sentences).to(self.torch_device))
             tgt_sentences = [self.tokenizer.decode(t, skip_special_tokens=True) for t in translated]
         return join_with.join(tgt_sentences)
 

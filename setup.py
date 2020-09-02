@@ -46,7 +46,7 @@ setup(
           'seqeval',
           'packaging',
           'tensorflow_datasets',
-          'transformers>=2.11.0', # due to breaking change in v2.11.0
+          'transformers>=3.1.0', # due to breaking change in v3.1.0
           'ipython',
           'syntok',
           'whoosh',

@@ -39,7 +39,7 @@ class TransformerSummarizer():
         import torch
         with torch.no_grad():
             answers_input_ids = self.tokenizer.batch_encode_plus([doc], 
-                                                                 return_tensors='pt', 
+                                                                 return_tensors='pt', truncation=True,
                                                                  max_length=1024)['input_ids'].to(self.torch_device)
             summary_ids = self.model.generate(answers_input_ids,
                                               num_beams=4,
