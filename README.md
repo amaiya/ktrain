@@ -11,7 +11,7 @@
 
 ### News and Announcements
 - **2020-09-03:**
-  - As of v0.21.x, *ktrain* no longer installs TensorFlow 2 automatically, which allows *ktrain* to be used with any version of TensorFlow 2 installed by the user.
+  - As of v0.21.x, *ktrain* no longer installs TensorFlow 2 automatically, which allows *ktrain* to be used with any version of TensorFlow 2 installed by the user. See the [installation instructions](#installation).
 - **2020-08-24:**
   - ***ktrain*** **v0.20.x is released** and includes updates to `ZeroShotClassifier`. The `ZeroShotClassifier` allows documents to be classified into user-provided categories **without** training examples.  Updates include the ability to predict large sequences of documents (and topics) and the ability to customize inferences for different settings.  See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/zero_shot_learning_with_nli.ipynb) for more information.
 ```python
