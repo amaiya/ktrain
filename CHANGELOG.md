@@ -9,7 +9,7 @@ Most recent releases are shown at the top. Each release shows:
 ## 0.20.3 (2020-09-02)
 
 ### New:
-- N/A
+- Added `translate_sentences` method to `Translator` class that translates list of sentences, where list is fed to model as single batch
 
 ### Changed
 - Removed TensorFlow dependency from `setup.py` to allow users to use *ktrain* with any version of TensorFlow 2 they choose.
