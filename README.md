@@ -322,15 +322,16 @@ Using *ktrain* on **Google Colab**?  See these Colab examples:
 
 1. Make sure pip is up-to-date with: `pip install -U pip`
 
-2. Install *ktrain*: `pip install ktrain`
+2. [Install TensorFlow 2](https://www.tensorflow.org/install) if it is not already installed.
+
+3. Install *ktrain*: `pip install ktrain`
 
 The above should be all you need on Linux systems and cloud computing environments like Google Colab and AWS EC2.  If you are using *ktrain* on a **Windows computer**, you can follow these 
 [more detailed instructions](https://github.com/amaiya/ktrain/blob/master/FAQ.md#how-do-i-install-ktrain-on-a-windows-machine) that include some extra steps.
 
 **Some important things to note about installation:**
 - If using *ktrain* on a local machine with a GPU (versus Google Colab, for example), you'll need to [install GPU support for TensorFlow 2](https://www.tensorflow.org/install/gpu).
-- *ktrain* currently uses [TensorFlow 2](https://www.tensorflow.org/install/pip?lang=python3), which will be installed automatically when installing *ktrain*. 
-TensorFlow 2.1.0 will be installed as a dependency on Python 3.6 and 3.7 systems (due to some TensorFlow bugs that will not be fixed by Google until TensorFlow 2.4).  TensorFlow `>=2.2.0` will be installed only if using Python 3.8 (as TF 2.1.0 does not support Python 3.8).
+- You should be able to use *ktrain*  with any version of [TensorFlow 2](https://www.tensorflow.org/install/pip?lang=python3). However, we recommend using TensorFlow 2.1 (if possible) due to [a bug that will not be fixed until TensorFlow 2.4](https://github.com/tensorflow/tensorflow/issues/41174#issuecomment-656330268) that affects the *Learning-Rate-Finder*.
 - Since some *ktrain* dependencies have not yet been migrated to `tf.keras` in TensorFlow 2 (or may have other issues), 
   *ktrain* is temporarily using forked versions of some libraries. Specifically, *ktrain* uses forked versions of the `eli5` and `stellargraph` libraries.  If not installed, *ktrain* will complain  when a method or function needing 
   either of these libraries is invoked.
@@ -340,7 +341,7 @@ pip install git+https://github.com/amaiya/eli5@tfkeras_0_10_1
 pip install git+https://github.com/amaiya/stellargraph@no_tf_dep_082
 ```
 
-This code was tested on Ubuntu 18.04 LTS using TensorFlow 2.1.0 and 2.2.0 and Python 3.6.9.
+This code was tested on Ubuntu 18.04 LTS using TensorFlow 2.1.0 and 2.3.0 and Python 3.6.9.
 
 
 ### How to Cite

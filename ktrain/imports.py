@@ -34,7 +34,10 @@ if DISABLE_V2_BEHAVIOR:
     # TF2-transition
     ACC_NAME = 'acc'
     VAL_ACC_NAME = 'val_acc'
-    import tensorflow.compat.v1 as tf
+    try:
+        import tensorflow.compat.v1 as tf
+    except ImportError:
+        raise Exception('ktrain requires TensorFlow 2 to be installed: pip install tensorflow')
     tf.disable_v2_behavior()
     from tensorflow.compat.v1 import keras
     print('Using DISABLE_V2_BEHAVIOR with TensorFlow')
@@ -42,7 +45,11 @@ else:
     # TF2
     ACC_NAME = 'accuracy'
     VAL_ACC_NAME = 'val_accuracy'
-    import tensorflow as tf
+    try:
+        import tensorflow as tf
+    except ImportError:
+        raise Exception('ktrain requires TensorFlow 2 to be installed: pip install tensorflow')
+
     from tensorflow import keras
 
 # suppress autograph warnings
