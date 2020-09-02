@@ -6,12 +6,13 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
-## 0.20.3 (TBD)
+## 0.20.3 (2020-09-02)
 
 ### New:
 - N/A
 
 ### Changed
+- Removed TensorFlow dependency from `setup.py` to allow users to use *ktrain* with any version of TensorFlow 2 they choose.
 - Added `truncation=True` to tokenization in `summarization` module
 - Require `transformers>=3.1.0` due to breaking changes
 
