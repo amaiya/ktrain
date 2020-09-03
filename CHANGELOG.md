@@ -13,6 +13,7 @@ Most recent releases are shown at the top. Each release shows:
 
 ### Changed
 - added `num_beams` and `early_stopping` arguments to `translate` methods in `translation` module that can be set to improve translation speed
+- added `half` parameter to `Translator` construcor
 
 ### Fixed:
 - N/A
