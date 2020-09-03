@@ -9,13 +9,14 @@ class Translator():
     Translator: basic wrapper around MarianMT model for language translation
     """
 
-    def __init__(self, model_name=None, device=None):
+    def __init__(self, model_name=None, device=None, half=False):
         """
         basic wrapper around MarianMT model for language translation
 
         Args:
           model_name(str): Helsinki-NLP model
           device(str): device to use (e.g., 'cuda', 'cpu')
+          half(bool): If True, use half precision.
         """
         if 'Helsinki-NLP' not in model_name:
             raise ValueError('Translator requires a Helsinki-NLP model: https://huggingface.co/Helsinki-NLP')
@@ -28,6 +29,7 @@ class Translator():
         from transformers import MarianMTModel, MarianTokenizer
         self.tokenizer = MarianTokenizer.from_pretrained(model_name)
         self.model = MarianMTModel.from_pretrained(model_name).to(self.torch_device)
+        if half: self.model = self.model.half()
 
 
     def translate(self, src_text, join_with='\n', num_beams=None, early_stopping=None):
