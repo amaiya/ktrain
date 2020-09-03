@@ -15,6 +15,7 @@ Most recent releases are shown at the top. Each release shows:
 - Removed TensorFlow dependency from `setup.py` to allow users to use *ktrain* with any version of TensorFlow 2 they choose.
 - Added `truncation=True` to tokenization in `summarization` module
 - Require `transformers>=3.1.0` due to breaking changes
+- `SUPPRESS_TF_WARNINGS` environment variable changed to `SUPPRESS_KTRAIN_WARNINGS`
 
 ### Fixed:
 - Use `prepare_seq2seq_batch` insteadd of `prepare_translation_batch` in `translation` module due to breaking change in `transformers==3.1.0`
