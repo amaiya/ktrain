@@ -47,11 +47,28 @@ class Translator():
           str: translated text
         """
         sentences = TU.sent_tokenize(src_text)
+        tgt_sentences = self.translate_sentences(sentences)
+        return join_with.join(tgt_sentences)
+
+
+    def translate_sentences(self, sentences):
+        """
+        translate sentence using model_name as model
+        Args:
+          sentences(list): list of strings representing sentences that need to be translated
+                         IMPORTANT NOTE: Sentences are joined together and fed to model as single batch.
+                                         If the input text is very large (e.g., an entire book), you should
+                                         break it up into reasonbly-sized chunks (e.g., pages, paragraphs, or sentences) and 
+                                         feed each chunk separately into translate to avoid out-of-memory issues.
+        Returns:
+          str: translated sentences
+        """
         import torch
         with torch.no_grad():
-            translated = self.model.generate(**self.tokenizer.prepare_translation_batch(sentences).to(self.torch_device))
+            translated = self.model.generate(**self.tokenizer.prepare_seq2seq_batch(sentences).to(self.torch_device))
             tgt_sentences = [self.tokenizer.decode(t, skip_special_tokens=True) for t in translated]
-        return join_with.join(tgt_sentences)
+        return tgt_sentences
+
 
 
 class EnglishTranslator():

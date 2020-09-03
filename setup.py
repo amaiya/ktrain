@@ -28,7 +28,8 @@ setup(
   url = 'https://github.com/amaiya/ktrain',
   keywords = ['tensorflow', 'keras', 'deep learning', 'machine learning'],
   install_requires=[
-          tf_version_str,
+          #tf_version_str, # removed TensorFlow dependency in v0.20.3
+          #'tensorflow_datasets',
           #'scipy==1.4.1', # removed due to https://github.com/tensorflow/tensorflow/commit/78026d6a66f7f0fc
           #'pillow'
           'scikit-learn>=0.21.3', # previously pinned to 0.21.3 due to TextPredictor.explain, but no longer needed as of 0.19.7
@@ -45,8 +46,7 @@ setup(
           'bokeh',
           'seqeval',
           'packaging',
-          'tensorflow_datasets',
-          'transformers>=2.11.0', # due to breaking change in v2.11.0
+          'transformers>=3.1.0', # due to breaking change in v3.1.0
           'ipython',
           'syntok',
           'whoosh',

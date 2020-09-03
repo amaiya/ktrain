@@ -8,33 +8,19 @@ import warnings
 import logging
 from distutils.util import strtobool
 from packaging import version
-
-
-# suppress warnings
-SUPPRESS_TF_WARNINGS = strtobool(os.environ.get('SUPPRESS_TF_WARNINGS', '1'))
-if SUPPRESS_TF_WARNINGS:
-    os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
-    logging.getLogger('tensorflow').setLevel(logging.ERROR)
-    warnings.simplefilter(action='ignore', category=FutureWarning)
-    # elevate warnings to errors for debugging dependencies
-    #warnings.simplefilter('error', FutureWarning)
-    logging.getLogger('mosestokenizer').setLevel(logging.ERROR)
-    logging.getLogger('shap').setLevel(logging.ERROR)
+import re
 os.environ['NUMEXPR_MAX_THREADS'] = '8' # suppress warning from NumExpr on machines with many CPUs
 
-
-
-# TF1
-#import tensorflow as tf
-#tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
-#from tensorflow import keras
-
+# TensorFlow
 DISABLE_V2_BEHAVIOR = strtobool(os.environ.get('DISABLE_V2_BEHAVIOR', '0'))
 if DISABLE_V2_BEHAVIOR:
     # TF2-transition
     ACC_NAME = 'acc'
     VAL_ACC_NAME = 'val_acc'
-    import tensorflow.compat.v1 as tf
+    try:
+        import tensorflow.compat.v1 as tf
+    except ImportError:
+        raise Exception('ktrain requires TensorFlow 2 to be installed: pip install tensorflow')
     tf.disable_v2_behavior()
     from tensorflow.compat.v1 import keras
     print('Using DISABLE_V2_BEHAVIOR with TensorFlow')
@@ -42,12 +28,16 @@ else:
     # TF2
     ACC_NAME = 'accuracy'
     VAL_ACC_NAME = 'val_accuracy'
-    import tensorflow as tf
+    try:
+        import tensorflow as tf
+    except ImportError:
+        raise Exception('ktrain requires TensorFlow 2 to be installed: pip install tensorflow')
+
     from tensorflow import keras
 
 # suppress autograph warnings
 tf.autograph.set_verbosity(1)
-#if SUPPRESS_TF_WARNINGS:
+#if SUPPRESS_WARNINGS:
     #tf.autograph.set_verbosity(1)
 
 if version.parse(tf.__version__) < version.parse('2.0'):
@@ -225,9 +215,6 @@ import syntok.segmenter as segmenter
 
 
 # transformers
-try:
-    logging.getLogger('transformers').setLevel(logging.CRITICAL)
-except: pass
 import transformers
 
 
@@ -247,3 +234,30 @@ ALLENNLP_ERRMSG  = 'To use ELMo embedings, please install allenlp:\n' +\
 
 # ELI5
 KTRAIN_ELI5_TAG = '0.10.1-1'
+
+
+# Suppress Warnings
+SUPPRESS_KTRAIN_WARNINGS = strtobool(os.environ.get('SUPPRESS_KTRAIN_WARNINGS', '1'))
+def set_global_logging_level(level=logging.ERROR, prefices=[""]):
+    """
+    Override logging levels of different modules based on their name as a prefix.
+    It needs to be invoked after the modules have been loaded so that their loggers have been initialized.
+
+    Args:
+        - level: desired level. e.g. logging.INFO. Optional. Default is logging.ERROR
+        - prefices: list of one or more str prefices to match (e.g. ["transformers", "torch"]). Optional.
+          Default is `[""]` to match all active loggers.
+          The match is a case-sensitive `module_name.startswith(prefix)`
+    """
+    prefix_re = re.compile(fr'^(?:{ "|".join(prefices) })')
+    for name in logging.root.manager.loggerDict:
+        if re.match(prefix_re, name):
+            logging.getLogger(name).setLevel(level)
+if SUPPRESS_KTRAIN_WARNINGS:
+    os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+    warnings.simplefilter(action='ignore', category=FutureWarning)
+    # elevate warnings to errors for debugging dependencies
+    #warnings.simplefilter('error', FutureWarning)
+    import transformers # imported here to suppress transformers warnings
+    set_global_logging_level(logging.ERROR, ["transformers", "nlp", "torch", "tensorflow", "tensorboard", "wandb", 'mosestokenizer', 'shap'])
+

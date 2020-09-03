@@ -221,6 +221,7 @@ Here are detailed instructions for getting started with *ktrain* and TensorFlow 
 3. Click on **Anaconda Powershell Prompt** in the Start Menu.
 4. Create a conda environment for *ktrain*: `conda create -n kt python=3.7; conda activate kt`
 5. Type: `pip install -U pip setuptools_scm jupyter` (run twice if error or use `--user` option)
+6. [Install TensorFlow 2](https://www.tensorflow.org/install): `pip install tensorflow==2.1`
 6. Type: `pip install ktrain`
 
 If your machine has a GPU (which is needed for larger models), you'll need to perform [GPU setup for TensorFlow](https://www.tensorflow.org/install/gpu).
@@ -230,9 +231,8 @@ If your machine has a GPU (which is needed for larger models), you'll need to pe
   and copy the two files in `C:\Users\<your_user_name>\Miniconda3\envs\kt\Lib\site-packages\pywin32_system32` to `C:\Windows\System32`.
 - If you experience SSL certificate problems with either `pip` or `conda`, run `conda config --set ssl_verify false` and 
 replace all `pip` comands above with `pip --trusted-host pypi.org --trusted-host files.pythonhosted.org`.
-- We have selected Python 3.7 in STEP 4 above with `python=3.7`, but Python 3.8 is default if removed. We recommend using Python 3.6 or Python 3.7 for time being due
-  to yet-to-be-resolved bugs in the current version of TensorFlow. 
-
+- In the instructions above, we are installing TensorFlow 2.1 due to [a TensorFlow bug that is not fixed by Google yet](https://github.com/tensorflow/tensorflow/issues/41174#issuecomment-656330268). The bug affects the Learning-Rate-Finder in *ktrain*.  You can choose to use a newer version of TensorFlow 2 if you want (e.g., `pip install tensorflow==2.3`).
+- We have selected Python 3.7 in STEP 4 above with `python=3.7`, but Python 3.8 is default if removed. We are using Python 3.7 here because the version of TensorFlow selected (i.e., `tensorflow==2.1`) is not compatible with Python 3.8.  You should change this to `python=3.8` if using `tensorflow>2.1`.   
 
 #### Running an Example
 Once installed, you can fire up Jupyter notebook (type:`jupyter notebook` at command prompt) and test out *ktrain* with something like this:
