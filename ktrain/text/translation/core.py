@@ -9,7 +9,7 @@ class Translator():
     Translator: basic wrapper around MarianMT model for language translation
     """
 
-    def __init__(self, model_name=None, device=None):
+    def __init__(self, model_name=None, device=None, half=False):
         """
         basic wrapper around MarianMT model for language translation
 
@@ -27,8 +27,10 @@ class Translator():
         if self.torch_device is None: self.torch_device = 'cuda' if torch.cuda.is_available() else 'cpu'
         from transformers import MarianMTModel, MarianTokenizer
         self.tokenizer = MarianTokenizer.from_pretrained(model_name)
-        self.model = MarianMTModel.from_pretrained(model_name).to(self.torch_device)
-
+        if half:
+            self.model = MarianMTModel.from_pretrained(model_name).to(self.torch_device).half()
+        else:
+            self.model = MarianMTModel.from_pretrained(model_name).to(self.torch_device)
 
     def translate(self, src_text, join_with='\n'):
         """
