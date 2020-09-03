@@ -6,6 +6,19 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.21.1 (2020-09-03)
+
+### New:
+- N/A
+
+### Changed
+- added `num_beams` and `early_stopping` arguments to `translate` methods in `translation` module that can be set to improve translation speed
+
+### Fixed:
+- N/A
+
+
+
 ## 0.21.0 (2020-09-03)
 
 ### New:
