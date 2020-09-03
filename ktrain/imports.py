@@ -237,7 +237,7 @@ KTRAIN_ELI5_TAG = '0.10.1-1'
 
 
 # Suppress Warnings
-SUPPRESS_KTRAIN_WARNINGS = strtobool(os.environ.get('SUPPRESS_KTRAIN_WARNINGS', '1'))
+SUPPRESS_DEP_WARNINGS = strtobool(os.environ.get('SUPPRESS_DEP_WARNINGS', '1'))
 def set_global_logging_level(level=logging.ERROR, prefices=[""]):
     """
     Override logging levels of different modules based on their name as a prefix.
@@ -253,7 +253,7 @@ def set_global_logging_level(level=logging.ERROR, prefices=[""]):
     for name in logging.root.manager.loggerDict:
         if re.match(prefix_re, name):
             logging.getLogger(name).setLevel(level)
-if SUPPRESS_KTRAIN_WARNINGS:
+if SUPPRESS_DEP_WARNINGS:
     os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
     warnings.simplefilter(action='ignore', category=FutureWarning)
     # elevate warnings to errors for debugging dependencies

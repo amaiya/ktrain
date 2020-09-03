@@ -6,6 +6,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.21.2 (2020-09-03)
+
+### New:
+- N/A
+
+### Changed
+- `SUPPRESS_KTRAIN_WARNINGS` environment variable changed to `SUPPRESS_DEP_WARNINGS`
+
+### Fixed:
+- N/A
+
+
 ## 0.21.1 (2020-09-03)
 
 ### New:
