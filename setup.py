@@ -1,8 +1,5 @@
 import sys
 if sys.version_info.major != 3: raise Exception('ktrain requires Python 3')
-tf_version_str = 'tensorflow==2.1.0'
-if sys.version_info.minor == 8:
-    tf_version_str = 'tensorflow>=2.2.0'
 
 from distutils.core import setup
 import setuptools
@@ -28,8 +25,6 @@ setup(
   url = 'https://github.com/amaiya/ktrain',
   keywords = ['tensorflow', 'keras', 'deep learning', 'machine learning'],
   install_requires=[
-          #tf_version_str, # removed TensorFlow dependency in v0.20.3
-          #'tensorflow_datasets',
           #'scipy==1.4.1', # removed due to https://github.com/tensorflow/tensorflow/commit/78026d6a66f7f0fc
           #'pillow'
           'scikit-learn>=0.21.3', # previously pinned to 0.21.3 due to TextPredictor.explain, but no longer needed as of 0.19.7
