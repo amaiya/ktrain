@@ -51,7 +51,7 @@ class Translator():
         return join_with.join(tgt_sentences)
 
 
-    def translate_sentences(self, sentences):
+    def translate_sentences(self, sentences, num_beams=4, early_stopping=True):
         """
         translate sentence using model_name as model
         Args:
@@ -65,7 +65,7 @@ class Translator():
         """
         import torch
         with torch.no_grad():
-            translated = self.model.generate(**self.tokenizer.prepare_seq2seq_batch(sentences).to(self.torch_device))
+            translated = self.model.generate(**self.tokenizer.prepare_seq2seq_batch(sentences).to(self.torch_device), num_beams=num_beams, early_stopping=early_stopping)
             tgt_sentences = [self.tokenizer.decode(t, skip_special_tokens=True) for t in translated]
         return tgt_sentences
 
