@@ -30,9 +30,10 @@ class Translator():
         self.model = MarianMTModel.from_pretrained(model_name).to(self.torch_device)
 
 
-    def translate(self, src_text, join_with='\n'):
+    def translate(self, src_text, join_with='\n', num_beams=None, early_stopping=None):
         """
-        translate sentence using model_name as model
+        Translate document (src_text).
+        To speed up translations, you can set num_beams and early_stopping (e.g., num_beams=4, early_stopping=True).
         Args:
           src_text(str): source text.
                          The source text can either be a single sentence or an entire document with multiple sentences
@@ -43,29 +44,41 @@ class Translator():
                                          feed each chunk separately into translate to avoid out-of-memory issues.
           join_with(str):  list of translated sentences will be delimited with this character.
                            default: each sentence on separate line
+          num_beams(int): Number of beams for beam search. Defaults to None.  If None, the transformers library defaults this to 1, 
+                          whicn means no beam search.
+          early_stopping(bool):  Whether to stop the beam search when at least ``num_beams`` sentences 
+                                 are finished per batch or not. Defaults to None.  If None, the transformers library
+                                 sets this to False.
         Returns:
           str: translated text
         """
         sentences = TU.sent_tokenize(src_text)
-        tgt_sentences = self.translate_sentences(sentences)
+        tgt_sentences = self.translate_sentences(sentences, num_beams=num_beams, early_stopping=early_stopping)
         return join_with.join(tgt_sentences)
 
 
-    def translate_sentences(self, sentences):
+    def translate_sentences(self, sentences, num_beams=None, early_stopping=None):
         """
-        translate sentence using model_name as model
+        Translate sentences using model_name as model.
+        To speed up translations, you can set num_beams and early_stopping (e.g., num_beams=4, early_stopping=True).
         Args:
           sentences(list): list of strings representing sentences that need to be translated
                          IMPORTANT NOTE: Sentences are joined together and fed to model as single batch.
                                          If the input text is very large (e.g., an entire book), you should
                                          break it up into reasonbly-sized chunks (e.g., pages, paragraphs, or sentences) and 
                                          feed each chunk separately into translate to avoid out-of-memory issues.
+          num_beams(int): Number of beams for beam search. Defaults to None.  If None, the transformers library defaults this to 1, 
+                          whicn means no beam search.
+          early_stopping(bool):  Whether to stop the beam search when at least ``num_beams`` sentences 
+                                 are finished per batch or not. Defaults to None.  If None, the transformers library
+                                 sets this to False.
         Returns:
           str: translated sentences
         """
         import torch
         with torch.no_grad():
-            translated = self.model.generate(**self.tokenizer.prepare_seq2seq_batch(sentences).to(self.torch_device))
+            translated = self.model.generate(**self.tokenizer.prepare_seq2seq_batch(sentences).to(self.torch_device), 
+                                             num_beams=num_beams, early_stopping=early_stopping)
             tgt_sentences = [self.tokenizer.decode(t, skip_special_tokens=True) for t in translated]
         return tgt_sentences
 
@@ -116,9 +129,11 @@ class EnglishTranslator():
             raise ValueError('lang:%s is currently not supported.' % (src_lang))
 
 
-    def translate(self, src_text, join_with='\n'):
+    def translate(self, src_text, join_with='\n', num_beams=None, early_stopping=None):
         """
-        translate source sentence to English.
+        Translate source document to English.
+        To speed up translations, you can set num_beams and early_stopping (e.g., num_beams=4, early_stopping=True).
+
         Args:
           src_text(str): source text. Must be in language specified by src_lang (language code) supplied to constructor
                          The source text can either be a single sentence or an entire document with multiple sentences
@@ -129,12 +144,17 @@ class EnglishTranslator():
                                          feed each chunk separately into translate to avoid out-of-memory issues.
           join_with(str):  list of translated sentences will be delimited with this character.
                            default: each sentence on separate line
+          num_beams(int): Number of beams for beam search. Defaults to None.  If None, the transformers library defaults this to 1, 
+                          whicn means no beam search.
+          early_stopping(bool):  Whether to stop the beam search when at least ``num_beams`` sentences 
+                                 are finished per batch or not. Defaults to None.  If None, the transformers library
+                                 sets this to False.
         Returns:
           str: translated text
         """
         text = src_text
         for t in self.translators:
-             text = t.translate(text, join_with=join_with)
+             text = t.translate(text, join_with=join_with, num_beams=num_beams, early_stopping=early_stopping)
         return text
             
 
