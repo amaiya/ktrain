@@ -177,6 +177,25 @@ class TopicModel():
         return self.get_topics()
 
 
+    def get_word_weights(self, topic_id, n_words=100):
+        """
+        Returns a list tuples of the form: (word, weight) for given topic_id.
+        The weight can be interpreted as the number of times word was assigned to topic with given topic_id.
+        REFERENCE: https://stackoverflow.com/a/48890889/13550699
+        Args:
+            topic_id(int): topic ID
+        """
+        self._check_model()
+        if topic_id+1 > len(self.model.components_): 
+            raise ValueError('topic_id must be less than %s' % (len(self.model.components_)))
+        feature_names = self.vectorizer.get_feature_names()
+        word_probs = self.model.components_[topic_id]
+        word_ids = [i for i in word_probs.argsort()[:-n_words - 1:-1]]
+        words = [feature_names[i] for i in word_ids]
+        probs = [word_probs[i] for i in word_ids]
+        return list( zip(words, probs) )
+
+
     def get_topics(self, n_words=10, as_string=True):
         """
         Returns a list of discovered topics
