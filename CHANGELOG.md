@@ -13,6 +13,7 @@ Most recent releases are shown at the top. Each release shows:
 
 ### Changed
 - added `TopicModel.get_word_weights` method to retrieve the word weights for a given topic
+- added `return_fig` option to `Learner.lr_plot` and `Learner.plot`, which allows the matplotlib `Figure` to be returned to user
 
 ### Fixed:
 - N/A
