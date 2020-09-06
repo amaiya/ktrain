@@ -605,7 +605,7 @@ class Learner(ABC):
         
 
 
-    def lr_plot(self, n_skip_beginning=10, n_skip_end=5, suggest=False):
+    def lr_plot(self, n_skip_beginning=10, n_skip_end=5, suggest=False, return_fig=False):
         """
         Plots the loss vs. learning rate to help identify
         The maximal learning rate associated with a falling loss.
@@ -616,25 +616,29 @@ class Learner(ABC):
             n_skip_end(int):  number of batches to skip on the right.
             suggest(bool): will highlight numerical estimate
                            of best lr if True - methods adapted from fastai
+            return_fig(bool): If True, return matplotlib.figure.Figure
+        Returns:
+          matplotlib.figure.Figure if return_fig else None
           
         """
         if self.lr_finder is None or not self.lr_finder.find_called(): raise ValueError('Please call lr_find first.')
-        self.lr_finder.plot_loss(n_skip_beginning=n_skip_beginning,
-                                 n_skip_end=n_skip_end, suggest=suggest)
-        return
+        return self.lr_finder.plot_loss(n_skip_beginning=n_skip_beginning,
+                                        n_skip_end=n_skip_end, suggest=suggest, return_fig=return_fig)
 
 
-    def plot(self, plot_type='loss'):
+    def plot(self, plot_type='loss', return_fig=False):
         """
         plots training history
         Args:
           plot_type (str):  one of {'loss', 'lr', 'momentum'}
+          return_fig(bool):  If True, return matplotlib.figure.Figure
         Return:
-          None
+          matplotlib.figure.Figure if return_fig else None
         """
         if self.history is None:
             raise Exception('No training history - did you train the model yet?')
 
+        fig = None
         if plot_type == 'loss':
             plt.plot(self.history.history['loss'])
             if 'val_loss' in self.history.history:
@@ -646,6 +650,7 @@ class Learner(ABC):
             plt.ylabel('loss')
             plt.xlabel('epoch')
             plt.legend(legend_items, loc='upper left')
+            fig = plt.gcf()
             plt.show()
         elif plot_type == 'lr':
             if 'lr' not in self.history.history:
@@ -654,6 +659,7 @@ class Learner(ABC):
             plt.title('LR Schedule')
             plt.ylabel('lr')
             plt.xlabel('iterations')
+            fig = plt.gcf()
             plt.show()
         elif plot_type == 'momentum':
             if 'momentum' not in self.history.history:
@@ -662,9 +668,11 @@ class Learner(ABC):
             plt.title('Momentum Schedule')
             plt.ylabel('momentum')
             plt.xlabel('iterations')
+            fig = plt.gcf()
             plt.show()
         else:
             raise ValueError('invalid type: choose loss, lr, or momentum')
+        if return_fig: return fig
         return
 
 

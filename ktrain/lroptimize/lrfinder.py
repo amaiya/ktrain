@@ -138,7 +138,7 @@ class LRFinder:
         return 
 
 
-    def plot_loss(self, n_skip_beginning=10, n_skip_end=1, suggest=False):
+    def plot_loss(self, n_skip_beginning=10, n_skip_end=1, suggest=False, return_fig=False):
         """
         Plots the loss.
         Args:
@@ -146,6 +146,9 @@ class LRFinder:
             n_skip_end(int):  number of batches to skip on the right.
             suggest(bool): will highlight numerical estimate
                            of best lr if True - methods adapted from fastai
+            return_fig(bool):  If True, return matplotlib.figure.Figure
+        Returns:
+          matplotlib.figure.Figure if return_fig else None
         """
         if not self.find_called: raise ValueError('Please call find first.')
         
@@ -155,13 +158,12 @@ class LRFinder:
         ax.plot(self.lrs[n_skip_beginning:-n_skip_end], self.losses[n_skip_beginning:-n_skip_end])
         plt.xscale('log')
 
+        fig = None
         if suggest:
             # this code was adapted from fastai: https://github.com/fastai/fastai
             if self.mg is None:
                 print("Failed to compute the gradients, there might not be enough points.\n" +\
                        "Plot displayed without suggestion.")
-                plt.show()
-                return
             else:
                 mg = self.mg
                 ml = self.ml
@@ -169,7 +171,9 @@ class LRFinder:
                 print(f"\tMin numerical gradient: {self.lrs[mg]:.2E}")
                 print(f"\tMin loss divided by 10: {self.lrs[ml]/10:.2E}")
                 ax.plot(self.lrs[mg],self.losses[mg], markersize=10,marker='o',color='red')
-                plt.show()
+        fig = plt.gcf()
+        plt.show()
+        if return_fig: return fig
         return
 
 
