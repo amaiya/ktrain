@@ -83,7 +83,7 @@ print(translator.translate(src_text))
 
 - estimate an optimal learning rate for your model given your data using a Learning Rate Finder
 - utilize learning rate schedules such as the [triangular policy](https://arxiv.org/abs/1506.01186), the [1cycle policy](https://arxiv.org/abs/1803.09820), and [SGDR](https://arxiv.org/abs/1608.03983) to effectively minimize loss and improve generalization
-- build text classifiers for any language (e.g., [Arabic Sentiment Analysis with BERT](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/ArabicHotelReviews-nbsvm.ipynb), [Chinese Sentiment Analysis with NBSVM](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/ChineseHotelReviews-NBSVM.ipynb))
+- build text classifiers for any language (e.g., [Arabic Sentiment Analysis with BERT](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/ArabicHotelReviews-AraBERT.ipynb), [Chinese Sentiment Analysis with NBSVM](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/ChineseHotelReviews-nbsvm.ipynb))
 - easily train NER models for any language (e.g., [Dutch NER](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/CoNLL2002_Dutch-BiLSTM.ipynb) )
 - load and preprocess text and image data from a variety of formats 
 - inspect data points that were misclassified and [provide explanations](https://eli5.readthedocs.io/en/latest/) to help improve your model
