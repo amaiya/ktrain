@@ -184,6 +184,7 @@ class TopicModel():
         REFERENCE: https://stackoverflow.com/a/48890889/13550699
         Args:
             topic_id(int): topic ID
+            n_words=int): number of top words
         """
         self._check_model()
         if topic_id+1 > len(self.model.components_): 
