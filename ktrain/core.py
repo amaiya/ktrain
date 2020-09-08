@@ -650,8 +650,6 @@ class Learner(ABC):
             plt.ylabel('loss')
             plt.xlabel('epoch')
             plt.legend(legend_items, loc='upper left')
-            fig = plt.gcf()
-            plt.show()
         elif plot_type == 'lr':
             if 'lr' not in self.history.history:
                 raise ValueError('no lr in history: are you sure you used autofit or fit_onecycle to train?')
@@ -659,8 +657,6 @@ class Learner(ABC):
             plt.title('LR Schedule')
             plt.ylabel('lr')
             plt.xlabel('iterations')
-            fig = plt.gcf()
-            plt.show()
         elif plot_type == 'momentum':
             if 'momentum' not in self.history.history:
                 raise ValueError('no momentum history: are you sure you used autofit or fit_onecycle to train?')
@@ -668,10 +664,10 @@ class Learner(ABC):
             plt.title('Momentum Schedule')
             plt.ylabel('momentum')
             plt.xlabel('iterations')
-            fig = plt.gcf()
-            plt.show()
         else:
             raise ValueError('invalid type: choose loss, lr, or momentum')
+        fig = plt.gcf()
+        plt.show()
         if return_fig: return fig
         return
 
