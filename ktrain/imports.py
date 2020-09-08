@@ -215,6 +215,7 @@ import syntok.segmenter as segmenter
 
 
 # transformers
+logging.getLogger("transformers").setLevel(logging.ERROR)
 import transformers
 
 
@@ -258,6 +259,4 @@ if SUPPRESS_DEP_WARNINGS:
     warnings.simplefilter(action='ignore', category=FutureWarning)
     # elevate warnings to errors for debugging dependencies
     #warnings.simplefilter('error', FutureWarning)
-    import transformers # imported here to suppress transformers warnings
     set_global_logging_level(logging.ERROR, ["transformers", "nlp", "torch", "tensorflow", "tensorboard", "wandb", 'mosestokenizer', 'shap'])
-
