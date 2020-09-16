@@ -26,7 +26,7 @@ __all__ = [
            'print_sequence_taggers',
            'get_topic_model',
            'Transformer',
-           'TranformerEmbedding',
+           'TransformerEmbedding',
            'shallownlp',
            'TransformerSummarizer',
            'ZeroShotClassifier',
