@@ -91,7 +91,7 @@ print(translator.translate(src_text))
 
 
 ### Tutorials
-Please see the following tutorial notebooks for a guide on how to use *ktrain* on your projects:
+Please see the following tutorial notebooks for a guide on how to use **ktrain** on your projects:
 * Tutorial 1:  [Introduction](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-01-introduction.ipynb)
 * Tutorial 2:  [Tuning Learning Rates](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-02-tuning-learning-rates.ipynb)
 * Tutorial 3: [Image Classification](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-03-image-classification.ipynb)
@@ -106,7 +106,7 @@ Please see the following tutorial notebooks for a guide on how to use *ktrain* o
 * Tutorial A4: [Using Custom Data Formats and Models: Text Regression with Extra Regressors](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-A4-customdata-text_regression_with_extra_regressors.ipynb)
 
 
-Some blog tutorials about *ktrain* are shown below:
+Some blog tutorials about **ktrain** are shown below:
 
 > [**ktrain: A Lightweight Wrapper for Keras to Help Train Neural Networks**](https://towardsdatascience.com/ktrain-a-lightweight-wrapper-for-keras-to-help-train-neural-networks-82851ba889c) 
 
@@ -332,10 +332,10 @@ The above should be all you need on Linux systems and cloud computing environmen
 [more detailed instructions](https://github.com/amaiya/ktrain/blob/master/FAQ.md#how-do-i-install-ktrain-on-a-windows-machine) that include some extra steps.
 
 **Some important things to note about installation:**
-- If using *ktrain* on a local machine with a GPU (versus Google Colab, for example), you'll need to [install GPU support for TensorFlow 2](https://www.tensorflow.org/install/gpu).
-- As of v0.21.x, *ktrain* no longer installs TensorFlow 2 automatically.  As indicated above, you should install TensorFlow 2 yourself before installing and using *ktrain*.  On Google Colab, TensorFlow 2 should be already installed.  You should be able to use *ktrain*  with any version of [TensorFlow 2](https://www.tensorflow.org/install/pip?lang=python3). However, we currently recommend using TensorFlow 2.1 (if possible) due to [a TensorFlow bug that will not be fixed until TensorFlow 2.4](https://github.com/tensorflow/tensorflow/issues/41174#issuecomment-656330268) that affects the *Learning-Rate-Finder*.
-- Since some *ktrain* dependencies have not yet been migrated to `tf.keras` in TensorFlow 2 (or may have other issues), 
-  *ktrain* is temporarily using forked versions of some libraries. Specifically, *ktrain* uses forked versions of the `eli5` and `stellargraph` libraries.  If not installed, *ktrain* will complain  when a method or function needing 
+- If using **ktrain** on a local machine with a GPU (versus Google Colab, for example), you'll need to [install GPU support for TensorFlow 2](https://www.tensorflow.org/install/gpu).
+- As of v0.21.x, **ktrain** no longer installs TensorFlow 2 automatically.  As indicated above, you should install TensorFlow 2 yourself before installing and using **ktrain**.  On Google Colab, TensorFlow 2 should be already installed.  You should be able to use **ktrain**  with any version of [TensorFlow 2](https://www.tensorflow.org/install/pip?lang=python3). However, we currently recommend using TensorFlow 2.1 (if possible) due to [a TensorFlow bug that will not be fixed until TensorFlow 2.4](https://github.com/tensorflow/tensorflow/issues/41174#issuecomment-656330268) that affects the *Learning-Rate-Finder*.
+- Since some **ktrain** dependencies have not yet been migrated to `tf.keras` in TensorFlow 2 (or may have other issues), 
+  **ktrain** is temporarily using forked versions of some libraries. Specifically, **ktrain** uses forked versions of the `eli5` and `stellargraph` libraries.  If not installed, **ktrain** will complain  when a method or function needing 
   either of these libraries is invoked.
   To install these forked versions, you can do the following:
 ```
