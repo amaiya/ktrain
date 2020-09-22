@@ -311,7 +311,7 @@ learner.evaluate(tst, class_names=preproc.get_classes())
 ```
 
 
-Using *ktrain* on **Google Colab**?  See these Colab examples:
+Using **ktrain** on **Google Colab**?  See these Colab examples:
 -  [a simple demo of Multiclass Text Classification with BERT](https://colab.research.google.com/drive/1AH3fkKiEqBpVpO5ua00scp7zcHs5IDLK)
 -  [a simple demo of Multiclass Text Classification with Hugging Face Transformers](https://colab.research.google.com/drive/1YxcceZxsNlvK35pRURgbwvkgejXwFxUt)
 -  [image classification with Cats vs. Dogs](https://colab.research.google.com/drive/1WipQJUPL7zqyvLT10yekxf_HNMXDDtyR)
