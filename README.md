@@ -324,7 +324,7 @@ Using *ktrain* on **Google Colab**?  See these Colab examples:
 
 1. Make sure pip is up-to-date with: `pip install -U pip`
 
-2. [Install TensorFlow 2](https://www.tensorflow.org/install) if it is not already installed (e.g., `pip install tensorflow==2.1`)
+2. [Install TensorFlow 2](https://www.tensorflow.org/install) if it is not already installed (e.g., `pip install tensorflow`)
 
 3. Install *ktrain*: `pip install ktrain`
 
@@ -333,7 +333,7 @@ The above should be all you need on Linux systems and cloud computing environmen
 
 **Some important things to note about installation:**
 - If using *ktrain* on a local machine with a GPU (versus Google Colab, for example), you'll need to [install GPU support for TensorFlow 2](https://www.tensorflow.org/install/gpu).
-- As of v0.21.x, *ktrain* no longer installs TensorFlow 2 automatically.  As indicated above, you should install TensorFlow 2 yourself before installing and using *ktrain*.  On Google Colab, TensorFlow 2 should be already installed.  You should be able to use *ktrain*  with any version of [TensorFlow 2](https://www.tensorflow.org/install/pip?lang=python3). However, we currently recommend using TensorFlow 2.1 (if possible) due to [a TensorFlow bug that will not be fixed until TensorFlow 2.4](https://github.com/tensorflow/tensorflow/issues/41174#issuecomment-656330268) that affects the *Learning-Rate-Finder*.
+- As of v0.21.x, *ktrain* no longer installs TensorFlow 2 automatically.  As indicated above, you should install TensorFlow 2 yourself before installing and using *ktrain*.  On Google Colab, TensorFlow 2 should be already installed.  You should be able to use *ktrain*  with any version of [TensorFlow 2](https://www.tensorflow.org/install/pip?lang=python3). Note that there is a bug in TensorFlow 2.2 and 2.3 that affects the *Learning-Rate-Finder* [that will not be fixed until TensorFlow 2.4](https://github.com/tensorflow/tensorflow/issues/41174#issuecomment-656330268).  You can avoid the bug by using `tensorflow==2.1.0` and `transformers==3.1.0`.
 - Since some *ktrain* dependencies have not yet been migrated to `tf.keras` in TensorFlow 2 (or may have other issues), 
   *ktrain* is temporarily using forked versions of some libraries. Specifically, *ktrain* uses forked versions of the `eli5` and `stellargraph` libraries.  If not installed, *ktrain* will complain  when a method or function needing 
   either of these libraries is invoked.
@@ -343,7 +343,7 @@ pip install git+https://github.com/amaiya/eli5@tfkeras_0_10_1
 pip install git+https://github.com/amaiya/stellargraph@no_tf_dep_082
 ```
 
-This code was tested on Ubuntu 18.04 LTS using TensorFlow 2.1.0 and 2.3.0 and Python 3.6.9.
+This code was tested on Ubuntu 18.04 LTS using TensorFlow 2.3.0 and Python 3.6.9.
 
 
 ### How to Cite
