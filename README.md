@@ -11,7 +11,7 @@
 
 ### News and Announcements
 - **2020-09-03:**
-  - As of v0.21.x, *ktrain* no longer installs TensorFlow 2 automatically, which allows *ktrain* to be used with any version of TensorFlow 2 installed by the user. See the [installation instructions](https://github.com/amaiya/ktrain#installation) for more details.
+  - As of v0.21.x, *ktrain* no longer installs TensorFlow 2 automatically, which allows *ktrain* to be used with any version of TensorFlow 2 installed by the user. See the [installation instructions](https://github.com/amaiya/ktrain#installation) for more details. (Note that, if using `tensorflow<=2.1`, you must also downgrade the **transformers** library to `transformers==3.1`.)
 - **2020-08-24:**
   - ***ktrain*** **v0.20.x is released** and includes updates to `ZeroShotClassifier`. The `ZeroShotClassifier` allows documents to be classified into user-provided categories **without** training examples.  Updates include the ability to predict large sequences of documents (and topics) and the ability to customize inferences for different settings.  See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/zero_shot_learning_with_nli.ipynb) for more information.
 ```python
@@ -324,7 +324,7 @@ Using *ktrain* on **Google Colab**?  See these Colab examples:
 
 1. Make sure pip is up-to-date with: `pip install -U pip`
 
-2. [Install TensorFlow 2](https://www.tensorflow.org/install) if it is not already installed (e.g., `pip install tensorflow`)
+2. [Install TensorFlow 2](https://www.tensorflow.org/install) if it is not already installed: `pip install tensorflow`.  (Be sure to read extra installation nodes below.)
 
 3. Install *ktrain*: `pip install ktrain`
 
@@ -332,8 +332,8 @@ The above should be all you need on Linux systems and cloud computing environmen
 [more detailed instructions](https://github.com/amaiya/ktrain/blob/master/FAQ.md#how-do-i-install-ktrain-on-a-windows-machine) that include some extra steps.
 
 **Some important things to note about installation:**
+- As of v0.21.x, *ktrain* no longer installs TensorFlow 2 automatically.  As indicated above, you should install TensorFlow 2 yourself before installing and using *ktrain*.  On Google Colab, TensorFlow 2 should be already installed.  You should be able to use *ktrain*  with any version of [TensorFlow 2](https://www.tensorflow.org/install/pip?lang=python3). Note, however, that there is a bug in TensorFlow 2.2 and 2.3 that affects the *Learning-Rate-Finder* [that will not be fixed until TensorFlow 2.4](https://github.com/tensorflow/tensorflow/issues/41174#issuecomment-656330268).  You can avoid the bug by using `tensorflow==2.1.0` and downgrading to `transformers==3.1.0` (`transformers>=3.2` will not work with TF 2.1).
 - If using *ktrain* on a local machine with a GPU (versus Google Colab, for example), you'll need to [install GPU support for TensorFlow 2](https://www.tensorflow.org/install/gpu).
-- As of v0.21.x, *ktrain* no longer installs TensorFlow 2 automatically.  As indicated above, you should install TensorFlow 2 yourself before installing and using *ktrain*.  On Google Colab, TensorFlow 2 should be already installed.  You should be able to use *ktrain*  with any version of [TensorFlow 2](https://www.tensorflow.org/install/pip?lang=python3). Note that there is a bug in TensorFlow 2.2 and 2.3 that affects the *Learning-Rate-Finder* [that will not be fixed until TensorFlow 2.4](https://github.com/tensorflow/tensorflow/issues/41174#issuecomment-656330268).  You can avoid the bug by using `tensorflow==2.1.0` and `transformers==3.1.0`.
 - Since some *ktrain* dependencies have not yet been migrated to `tf.keras` in TensorFlow 2 (or may have other issues), 
   *ktrain* is temporarily using forked versions of some libraries. Specifically, *ktrain* uses forked versions of the `eli5` and `stellargraph` libraries.  If not installed, *ktrain* will complain  when a method or function needing 
   either of these libraries is invoked.
