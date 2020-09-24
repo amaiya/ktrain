@@ -37,19 +37,6 @@ zsl.predict(docs, labels=['negative', 'positive'], include_labels=True,
     Otherwise,  TensorFlow 2.1.0 is always installed (i.e., on Python 3.6 and 3.7 systems).
 - **2020-06-28:**  
   - Hamiz Ahmed published his Medium article: [Finetuning BERT using ktrain for Disaster Tweets Classification](https://medium.com/analytics-vidhya/finetuning-bert-using-ktrain-for-disaster-tweets-classification-18f64a50910b) 
-- **2020-06-26:**  
-  - ***ktrain*** **v0.17.x is released** and includes support for **language translation**. See the [example language translation notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/language_translation_example.ipynb) for more information.  <sub><sup>(This feature currently requires that PyTorch be installed.)</sup></sub>
-```python
-# Example: Translating Chinese to German
-# NOTE: Language Translation uses PyTorch instead of TensorFlow
-
-from ktrain import text 
-translator = text.Translator(model_name='Helsinki-NLP/opus-mt-ZH-de')
-src_text = '''大流行对世界经济造成了严重破坏。但是，截至2020年6月，美国股票市场持续上涨。'''
-print(translator.translate(src_text))
-# output:
-# Die Pandemie hat eine ernste Zerstörung der Weltwirtschaft verursacht.
-# Aber bis Juni 2020 stieg der US-Markt weiter an.
 ```
 ----
 
