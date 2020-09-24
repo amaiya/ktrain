@@ -231,7 +231,8 @@ If your machine has a GPU (which is needed for larger models), you'll need to pe
   and copy the two files in `C:\Users\<your_user_name>\Miniconda3\envs\kt\Lib\site-packages\pywin32_system32` to `C:\Windows\System32`.
 - If you experience SSL certificate problems with either `pip` or `conda`, run `conda config --set ssl_verify false` and 
 replace all `pip` comands above with `pip --trusted-host pypi.org --trusted-host files.pythonhosted.org`.
-- In the instructions above, we are installing TensorFlow 2.3. Note that there is a bug in both TensorFlow 2.3 and 2.2 affecting the *Learning-Rate-Finder* [that will not be fixed until TensorFlow 2.4](https://github.com/tensorflow/tensorflow/issues/41174#issuecomment-656330268).  You can avoid the bug by using `tensorflow==2.1.0` and `transformers==3.1.0`. 
+- In the instructions above, we are installing TensorFlow 2.3. Note that there is a bug in both TensorFlow 2.3 and 2.2 affecting the *Learning-Rate-Finder* [that will not be fixed until TensorFlow 2.4](https://github.com/tensorflow/tensorflow/issues/41174#issuecomment-656330268).  The bug causes the learning-rate-finder to complete all epochs even after loss has diverged (i.e., no automatic-stopping).
+- If using `tensorflow<=2.1`, you must also downgrade **transformers** to `transformers==3.1` to avoid errors.
 - We have selected Python 3.7 in STEP 4 above with `python=3.7` for illustration purposes, but Python 3.8 is default if removed. 
 
 #### Running an Example
