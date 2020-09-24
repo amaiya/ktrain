@@ -37,7 +37,6 @@ zsl.predict(docs, labels=['negative', 'positive'], include_labels=True,
     Otherwise,  TensorFlow 2.1.0 is always installed (i.e., on Python 3.6 and 3.7 systems).
 - **2020-06-28:**  
   - Hamiz Ahmed published his Medium article: [Finetuning BERT using ktrain for Disaster Tweets Classification](https://medium.com/analytics-vidhya/finetuning-bert-using-ktrain-for-disaster-tweets-classification-18f64a50910b) 
-```
 ----
 
 ### Overview
