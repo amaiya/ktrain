@@ -16,6 +16,7 @@ Most recent releases are shown at the top. Each release shows:
 
 ### Fixed:
 - fixed typos in `__all__` in `text` and graph` modules (PR #250)
+- fixed Chinese language translation based on on name-changes of models with `zh` as source language
 
 
 ## 0.21.3 (2020-09-08)
