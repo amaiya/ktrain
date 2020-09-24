@@ -332,6 +332,7 @@ The above should be all you need on Linux systems and cloud computing environmen
 [more detailed instructions](https://github.com/amaiya/ktrain/blob/master/FAQ.md#how-do-i-install-ktrain-on-a-windows-machine) that include some extra steps.
 
 **Some important things to note about installation:**
+- If using **ktrain** with `tensorflow<=2.1`, you must also downgrade the **transformers** library to `transformers==3.1`.
 - As of v0.21.x, *ktrain* no longer installs TensorFlow 2 automatically.  As indicated above, you should install TensorFlow 2 yourself before installing and using *ktrain*.  On Google Colab, TensorFlow 2 should be already installed.  You should be able to use *ktrain*  with any version of [TensorFlow 2](https://www.tensorflow.org/install/pip?lang=python3). Note, however, that there is a bug in TensorFlow 2.2 and 2.3 that affects the *Learning-Rate-Finder* [that will not be fixed until TensorFlow 2.4](https://github.com/tensorflow/tensorflow/issues/41174#issuecomment-656330268).  You can avoid the bug by using `tensorflow==2.1.0` and downgrading to `transformers==3.1.0` (`transformers>3.1` will not work with TF 2.1).
 - If using *ktrain* on a local machine with a GPU (versus Google Colab, for example), you'll need to [install GPU support for TensorFlow 2](https://www.tensorflow.org/install/gpu).
 - Since some *ktrain* dependencies have not yet been migrated to `tf.keras` in TensorFlow 2 (or may have other issues), 
