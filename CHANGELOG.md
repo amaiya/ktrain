@@ -6,13 +6,13 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
-## 0.21.4 (TBD)
+## 0.21.4 (2020-09-09-24)
 
 ### New:
 - N/A
 
 ### Changed
-- N/A
+- Changed installation instructions in `README.md` to reflect that using *ktrain* with TensorFlow 2.1 will require downgrading `transformers` to 3.1.0.
 
 ### Fixed:
 - fixed typos in `__all__` in `text` and graph` modules (PR #250)
