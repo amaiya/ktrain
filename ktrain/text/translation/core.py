@@ -124,9 +124,11 @@ class EnglishTranslator():
             self.translators.append(Translator(model_name='Helsinki-NLP/opus-mt-af-en', device=device))
         elif src_lang in ['es', 'fr', 'it', 'pt']:
             self.translators.append(Translator(model_name='Helsinki-NLP/opus-mt-ROMANCE-en', device=device))
-        elif src_lang == 'zh': # could not find zh->en model, so currently doing two-step translation to English via German
-            self.translators.append(Translator(model_name='Helsinki-NLP/opus-mt-ZH-de', device=device))
-            self.translators.append(Translator(model_name='Helsinki-NLP/opus-mt-de-en', device=device))
+        #elif src_lang == 'zh': # could not find zh->en model, so currently doing two-step translation to English via German
+            #self.translators.append(Translator(model_name='Helsinki-NLP/opus-mt-ZH-de', device=device))
+            #self.translators.append(Translator(model_name='Helsinki-NLP/opus-mt-de-en', device=device))
+        elif src_lang == 'zh':
+            self.translators.append(Translator(model_name='Helsinki-NLP/opus-mt-zh-en', device=device))
         else:
             raise ValueError('lang:%s is currently not supported.' % (src_lang))
 

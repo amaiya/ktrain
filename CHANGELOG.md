@@ -6,6 +6,21 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.21.4 (2020-09-24)
+
+### New:
+- N/A
+
+### Changed
+- Changed installation instructions in `README.md` to reflect that using *ktrain* with TensorFlow 2.1 will require downgrading `transformers` to 3.1.0.
+- updated requirements with `keras_bert>=0.86.0` due to TensorFlow 2.3 error with older versions of `keras_bert`
+- In  `lr_find` and `lr_plot`, check for TF 2.2 or 2.3 and make necessary adjustments due to TF bug 41174.
+
+### Fixed:
+- fixed typos in `__all__` in `text` and graph` modules (PR #250)
+- fixed Chinese language translation based on on name-changes of models with `zh` as source language
+
+
 ## 0.21.3 (2020-09-08)
 
 ### New:

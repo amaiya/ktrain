@@ -517,6 +517,13 @@ class Learner(ABC):
         Returns:
             None
         """
+        # dep_fix: bug in TF 2.2 and 2.3
+        if version.parse(tf.__version__) > version.parse('2.1') and version.parse(tf.__version__) < version.parse('2.4'):
+            if max_epochs is None:
+                warnings.warn('Due to a bug in TensorFlow 2.2 and 2.3, the max_epochs argument is temporarily required. Please re-run with max_epochs. \n' +\
+                              'More info: https://github.com/tensorflow/tensorflow/issues/41174#issuecomment-656330268')
+                return
+
 
         U.vprint('simulating training for different learning rates... this may take a few moments...',
                 verbose=verbose)
@@ -621,6 +628,10 @@ class Learner(ABC):
           matplotlib.figure.Figure if return_fig else None
           
         """
+        # dep_fix: bug in TF 2.2 and 2.3
+        if version.parse(tf.__version__) > version.parse('2.1') and version.parse(tf.__version__) < version.parse('2.4'):
+            if n_skip_end == 5: n_skip_end=10
+
         if self.lr_finder is None or not self.lr_finder.find_called(): raise ValueError('Please call lr_find first.')
         return self.lr_finder.plot_loss(n_skip_beginning=n_skip_beginning,
                                         n_skip_end=n_skip_end, suggest=suggest, return_fig=return_fig)
