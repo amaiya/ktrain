@@ -209,7 +209,7 @@ class TestTextClassification(TestCase):
 
         # test training results
         self.assertAlmostEqual(max(hist.history['lr']), lr)
-        self.assertGreater(max(hist.history[VAL_ACC_NAME]), 0.9)
+        self.assertGreater(max(hist.history[VAL_ACC_NAME]), 0.89)
         self.assertAlmostEqual(max(hist.history['momentum']), 0.95)
         self.assertAlmostEqual(min(hist.history['momentum']), 0.85)
 
