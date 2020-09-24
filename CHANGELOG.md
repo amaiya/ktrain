@@ -13,6 +13,7 @@ Most recent releases are shown at the top. Each release shows:
 
 ### Changed
 - Changed installation instructions in `README.md` to reflect that using *ktrain* with TensorFlow 2.1 will require downgrading `transformers` to 3.1.0.
+- updated requirements with `keras_bert>=0.86.0` due to TensorFlow 2.3 error with older versions of `keras_bert`
 
 ### Fixed:
 - fixed typos in `__all__` in `text` and graph` modules (PR #250)
