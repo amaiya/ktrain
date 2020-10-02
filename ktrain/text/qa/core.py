@@ -290,7 +290,7 @@ class SimpleQA(QA):
         return ix
 
     @classmethod
-    def index_from_list(cls, docs, index_dir, commit_every=1024,
+    def index_from_list(cls, docs, index_dir, commit_every=1024, breakup_docs=False,
                         procs=1, limitmb=256, multisegment=False):
         """
         index documents from list.
@@ -300,6 +300,9 @@ class SimpleQA(QA):
         Args:
           docs(list): list of strings representing documents
           commit_every(int): commet after adding this many documents
+          breakup_docs(bool): break up documents into smaller paragraphs and treat those as the documents.
+                              This can potentially improve the speed at which answers are returned by the ask method
+                              when documents being searched are longer.
           procs(int): number of processors
           limitmb(int): memory limit in MB for each process
           multisegment(bool): new segments written instead of merging
@@ -307,10 +310,26 @@ class SimpleQA(QA):
         if not isinstance(docs, (np.ndarray, list)): raise ValueError('docs must be a list of strings')
         ix = index.open_dir(index_dir)
         writer = ix.writer(procs=procs, limitmb=limitmb, multisegment=multisegment)
+        if breakup_docs:
+            refs = []
+            small_docs = []
+            mb = master_bar(range(1))
+            for i in mb:
+                for idx, doc in enumerate(progress_bar(docs, parent=mb)):
+                    paragraphs = TU.paragraph_tokenize(doc, join_sentences=True)
+                    small_docs.extend(paragraphs)
+                    refs.extend([idx] * len(paragraphs))
+                    mb.child.comment = f'breaking up documents'
+                mb.write(f'Finished breaking up documents')
+            docs = small_docs
+        else:
+            refs = [idx for idx, doc in enumerate(docs)]
+
+
         mb = master_bar(range(1))
         for i in mb:
             for idx, doc in enumerate(progress_bar(docs, parent=mb)):
-                reference = "%s" % (idx)
+                reference = "%s" % (refs[idx])
                 content = doc 
                 writer.add_document(reference=reference, content=content, rawtext=content)
                 idx +=1
@@ -318,7 +337,9 @@ class SimpleQA(QA):
                     writer.commit()
                     #writer = ix.writer()
                     writer = ix.writer(procs=procs, limitmb=limitmb, multisegment=multisegment)
+                mb.child.comment = f'indexing documents'
             writer.commit()
+            mb.write(f'Finished indexing documents')
         return
 
 
