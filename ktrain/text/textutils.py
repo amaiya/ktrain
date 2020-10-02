@@ -210,7 +210,8 @@ def detect_lang(texts, sample_size=32):
         except:
             continue
     if len(lst) == 0: 
-        warnings.warn('Defaulting to English: could not detect language in random sample of %s docs. Are you sure you provided a list of strings?'  % (sample_size))
+        warnings.warn('Defaulting to English for language detection: could not detect language from documents. '+\
+                      'This may be due to empty or invalid texts being provided to detect_lang.')
         lang = 'en'
     else:
         lang = max(set(lst), key=lst.count)
@@ -310,11 +311,11 @@ def tokenize(s, join_tokens=False, join_char=' '):
 
 
 
-def sent_tokenize(text):
+def sent_tokenize(text, lang=None):
     """
     segment text into sentences
     """
-    lang = detect_lang(text)
+    lang = detect_lang(text) if lang is None else lang
     sents = []
     if is_chinese(lang):
         for sent in re.findall(u'[^!?。\.\!\?]+[!?。\.\!\?]?', text, flags=re.U):
@@ -327,11 +328,11 @@ def sent_tokenize(text):
 
 
 
-def paragraph_tokenize(text, join_sentences=False):
+def paragraph_tokenize(text, join_sentences=False, lang=None):
     """
     segment text into sentences
     """
-    lang = detect_lang(text)
+    lang = detect_lang(text) if lang is None else lang
     if is_chinese(lang):
         raise ValueError('paragraph_tokenize does not currently support Chinese.')
     paragraphs = []
