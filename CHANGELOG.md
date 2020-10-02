@@ -12,7 +12,7 @@ Most recent releases are shown at the top. Each release shows:
 - N/A
 
 ### Changed
-- N/A
+- refactored `QA` and `SimpleQA` for better extensibility
 
 ### Fixed:
 - N/A
