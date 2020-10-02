@@ -13,6 +13,7 @@ Most recent releases are shown at the top. Each release shows:
 
 ### Changed
 - refactored `QA` and `SimpleQA` for better extensibility
+- added `breakup_docs` argument to `index_from_list` that can potentially speed up `ask` method
 
 ### Fixed:
 - N/A
