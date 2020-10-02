@@ -117,134 +117,6 @@ class QA(ABC):
         return ''.join(new_list)
 
 
-
-class SimpleQA(QA):
-    """
-    SimpleQA: Question-Answering on a list of texts
-    """
-    def __init__(self, index_dir, 
-                 bert_squad_model='bert-large-uncased-whole-word-masking-finetuned-squad',
-                 bert_emb_model='bert-base-uncased'):
-        """
-        SimpleQA constructor
-        Args:
-          index_dir(str):  path to index directory created by SimpleQA.initialze_index
-          bert_squad_model(str): name of BERT SQUAD model to use
-          bert_emb_model(str): BERT model to use to generate embeddings for semantic similarity
-
-        """
-
-        self.index_dir = index_dir
-        try:
-            ix = index.open_dir(self.index_dir)
-        except:
-            raise ValueError('index_dir has not yet been created - please call SimpleQA.initialize_index("%s")' % (self.index_dir))
-        super().__init__(bert_squad_model=bert_squad_model, bert_emb_model=bert_emb_model)
-
-
-    def _open_ix(self):
-        return index.open_dir(self.index_dir)
-
-
-    @classmethod
-    def initialize_index(cls, index_dir):
-        schema = Schema(reference=ID(stored=True), content=TEXT, rawtext=TEXT(stored=True))
-        if not os.path.exists(index_dir):
-            os.makedirs(index_dir)
-        else:
-            raise ValueError('There is already an existing directory or file with path %s' % (index_dir))
-        ix = index.create_in(index_dir, schema)
-        return ix
-
-    @classmethod
-    def index_from_list(cls, docs, index_dir, commit_every=1024,
-                        procs=1, limitmb=256, multisegment=False):
-        """
-        index documents from list.
-        The procs, limitmb, and especially multisegment arguments can be used to 
-        speed up indexing, if it is too slow.  Please see the whoosh documentation
-        for more information on these parameters:  https://whoosh.readthedocs.io/en/latest/batch.html
-        Args:
-          docs(list): list of strings representing documents
-          commit_every(int): commet after adding this many documents
-          procs(int): number of processors
-          limitmb(int): memory limit in MB for each process
-          multisegment(bool): new segments written instead of merging
-        """
-        if not isinstance(docs, (np.ndarray, list)): raise ValueError('docs must be a list of strings')
-        ix = index.open_dir(index_dir)
-        writer = ix.writer(procs=procs, limitmb=limitmb, multisegment=multisegment)
-        mb = master_bar(range(1))
-        for i in mb:
-            for idx, doc in enumerate(progress_bar(docs, parent=mb)):
-                reference = "%s" % (idx)
-                content = doc 
-                writer.add_document(reference=reference, content=content, rawtext=content)
-                idx +=1
-                if idx % commit_every == 0:
-                    writer.commit()
-                    #writer = ix.writer()
-                    writer = ix.writer(procs=procs, limitmb=limitmb, multisegment=multisegment)
-            writer.commit()
-        return
-
-
-    @classmethod
-    def index_from_folder(cls, folder_path, index_dir,  commit_every=1024, verbose=1, encoding='utf-8',
-                          procs=1, limitmb=256, multisegment=False):
-        """
-        index all plain text documents within a folder.
-        The procs, limitmb, and especially multisegment arguments can be used to 
-        speed up indexing, if it is too slow.  Please see the whoosh documentation
-        for more information on these parameters:  https://whoosh.readthedocs.io/en/latest/batch.html
-
-        Args:
-          folder_path(str): path to folder containing plain text documents
-          commit_every(int): commet after adding this many documents
-          procs(int): number of processors
-          limitmb(int): memory limit in MB for each process
-          multisegment(bool): new segments written instead of merging
-
-        """
-        if not os.path.isdir(folder_path): raise ValueError('folder_path is not a valid folder')
-        if folder_path[-1] != os.sep: folder_path += os.sep
-        ix = index.open_dir(index_dir)
-        writer = ix.writer(procs=procs, limitmb=limitmb, multisegment=multisegment)
-        for idx, fpath in enumerate(TU.extract_filenames(folder_path)):
-            if not TU.is_txt(fpath): continue
-            reference = "%s" % (fpath.join(fpath.split(folder_path)[1:]))
-            with open(fpath, 'r', encoding=encoding) as f:
-                doc = f.read()
-            content = doc
-            writer.add_document(reference=reference, content=content, rawtext=content)
-            idx +=1
-            if idx % commit_every == 0:
-                writer.commit()
-                #writer = ix.writer()
-                writer = ix.writer(procs=procs, limitmb=limitmb, multisegment=multisegment)
-                if verbose: print("%s docs indexed" % (idx))
-        writer.commit()
-        return
-
-
-    def search(self, query, limit=10):
-        """
-        search index for query
-        Args:
-          query(str): search query
-          limit(int):  number of top search results to return
-        Returns:
-          list of dicts with keys: reference, rawtext
-        """
-        ix = self._open_ix()
-        with ix.searcher() as searcher:
-            query_obj = QueryParser("content", ix.schema, group=qparser.OrGroup).parse(query)
-            results = searcher.search(query_obj, limit=limit)
-            docs = []
-            output = [dict(r) for r in results]
-            return output
-
-
     def _expand_answer(self, answer):
         """
         expand answer to include more of the context
@@ -376,5 +248,134 @@ class SimpleQA(QA):
         df = self.answers2df(answers)
         from IPython.core.display import display, HTML
         display(HTML(df.to_html(render_links=True, escape=False)))
+
+
+
+class SimpleQA(QA):
+    """
+    SimpleQA: Question-Answering on a list of texts
+    """
+    def __init__(self, index_dir, 
+                 bert_squad_model='bert-large-uncased-whole-word-masking-finetuned-squad',
+                 bert_emb_model='bert-base-uncased'):
+        """
+        SimpleQA constructor
+        Args:
+          index_dir(str):  path to index directory created by SimpleQA.initialze_index
+          bert_squad_model(str): name of BERT SQUAD model to use
+          bert_emb_model(str): BERT model to use to generate embeddings for semantic similarity
+
+        """
+
+        self.index_dir = index_dir
+        try:
+            ix = index.open_dir(self.index_dir)
+        except:
+            raise ValueError('index_dir has not yet been created - please call SimpleQA.initialize_index("%s")' % (self.index_dir))
+        super().__init__(bert_squad_model=bert_squad_model, bert_emb_model=bert_emb_model)
+
+
+    def _open_ix(self):
+        return index.open_dir(self.index_dir)
+
+
+    @classmethod
+    def initialize_index(cls, index_dir):
+        schema = Schema(reference=ID(stored=True), content=TEXT, rawtext=TEXT(stored=True))
+        if not os.path.exists(index_dir):
+            os.makedirs(index_dir)
+        else:
+            raise ValueError('There is already an existing directory or file with path %s' % (index_dir))
+        ix = index.create_in(index_dir, schema)
+        return ix
+
+    @classmethod
+    def index_from_list(cls, docs, index_dir, commit_every=1024,
+                        procs=1, limitmb=256, multisegment=False):
+        """
+        index documents from list.
+        The procs, limitmb, and especially multisegment arguments can be used to 
+        speed up indexing, if it is too slow.  Please see the whoosh documentation
+        for more information on these parameters:  https://whoosh.readthedocs.io/en/latest/batch.html
+        Args:
+          docs(list): list of strings representing documents
+          commit_every(int): commet after adding this many documents
+          procs(int): number of processors
+          limitmb(int): memory limit in MB for each process
+          multisegment(bool): new segments written instead of merging
+        """
+        if not isinstance(docs, (np.ndarray, list)): raise ValueError('docs must be a list of strings')
+        ix = index.open_dir(index_dir)
+        writer = ix.writer(procs=procs, limitmb=limitmb, multisegment=multisegment)
+        mb = master_bar(range(1))
+        for i in mb:
+            for idx, doc in enumerate(progress_bar(docs, parent=mb)):
+                reference = "%s" % (idx)
+                content = doc 
+                writer.add_document(reference=reference, content=content, rawtext=content)
+                idx +=1
+                if idx % commit_every == 0:
+                    writer.commit()
+                    #writer = ix.writer()
+                    writer = ix.writer(procs=procs, limitmb=limitmb, multisegment=multisegment)
+            writer.commit()
+        return
+
+
+    @classmethod
+    def index_from_folder(cls, folder_path, index_dir,  commit_every=1024, verbose=1, encoding='utf-8',
+                          procs=1, limitmb=256, multisegment=False):
+        """
+        index all plain text documents within a folder.
+        The procs, limitmb, and especially multisegment arguments can be used to 
+        speed up indexing, if it is too slow.  Please see the whoosh documentation
+        for more information on these parameters:  https://whoosh.readthedocs.io/en/latest/batch.html
+
+        Args:
+          folder_path(str): path to folder containing plain text documents
+          commit_every(int): commet after adding this many documents
+          procs(int): number of processors
+          limitmb(int): memory limit in MB for each process
+          multisegment(bool): new segments written instead of merging
+
+        """
+        if not os.path.isdir(folder_path): raise ValueError('folder_path is not a valid folder')
+        if folder_path[-1] != os.sep: folder_path += os.sep
+        ix = index.open_dir(index_dir)
+        writer = ix.writer(procs=procs, limitmb=limitmb, multisegment=multisegment)
+        for idx, fpath in enumerate(TU.extract_filenames(folder_path)):
+            if not TU.is_txt(fpath): continue
+            reference = "%s" % (fpath.join(fpath.split(folder_path)[1:]))
+            with open(fpath, 'r', encoding=encoding) as f:
+                doc = f.read()
+            content = doc
+            writer.add_document(reference=reference, content=content, rawtext=content)
+            idx +=1
+            if idx % commit_every == 0:
+                writer.commit()
+                #writer = ix.writer()
+                writer = ix.writer(procs=procs, limitmb=limitmb, multisegment=multisegment)
+                if verbose: print("%s docs indexed" % (idx))
+        writer.commit()
+        return
+
+
+    def search(self, query, limit=10):
+        """
+        search index for query
+        Args:
+          query(str): search query
+          limit(int):  number of top search results to return
+        Returns:
+          list of dicts with keys: reference, rawtext
+        """
+        ix = self._open_ix()
+        with ix.searcher() as searcher:
+            query_obj = QueryParser("content", ix.schema, group=qparser.OrGroup).parse(query)
+            results = searcher.search(query_obj, limit=limit)
+            docs = []
+            output = [dict(r) for r in results]
+            return output
+
 
 
