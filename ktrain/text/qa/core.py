@@ -299,6 +299,7 @@ class SimpleQA(QA):
         for more information on these parameters:  https://whoosh.readthedocs.io/en/latest/batch.html
         Args:
           docs(list): list of strings representing documents
+          index_dir(str): path to index directory (see initialize_index)
           commit_every(int): commet after adding this many documents
           breakup_docs(bool): break up documents into smaller paragraphs and treat those as the documents.
                               This can potentially improve the speed at which answers are returned by the ask method
@@ -310,28 +311,23 @@ class SimpleQA(QA):
         if not isinstance(docs, (np.ndarray, list)): raise ValueError('docs must be a list of strings')
         ix = index.open_dir(index_dir)
         writer = ix.writer(procs=procs, limitmb=limitmb, multisegment=multisegment)
-        if breakup_docs:
-            refs = []
-            small_docs = []
-            mb = master_bar(range(1))
-            for i in mb:
-                for idx, doc in enumerate(progress_bar(docs, parent=mb)):
-                    paragraphs = TU.paragraph_tokenize(doc, join_sentences=True)
-                    small_docs.extend(paragraphs)
-                    refs.extend([idx] * len(paragraphs))
-                    mb.child.comment = f'breaking up documents'
-                mb.write(f'Finished breaking up documents')
-            docs = small_docs
-        else:
-            refs = [idx for idx, doc in enumerate(docs)]
-
 
         mb = master_bar(range(1))
         for i in mb:
             for idx, doc in enumerate(progress_bar(docs, parent=mb)):
-                reference = "%s" % (refs[idx])
-                content = doc 
-                writer.add_document(reference=reference, content=content, rawtext=content)
+                reference = "%s" % (idx)
+
+                if breakup_docs:
+                    small_docs = TU.paragraph_tokenize(doc, join_sentences=True, lang='en')
+                    refs = [reference] * len(small_docs)
+                    for i, small_doc in enumerate(small_docs):
+                        content = small_doc
+                        reference = refs[i]
+                        writer.add_document(reference=reference, content=content, rawtext=content)
+                else:
+                    content = doc 
+                    writer.add_document(reference=reference, content=content, rawtext=content)
+
                 idx +=1
                 if idx % commit_every == 0:
                     writer.commit()
@@ -344,8 +340,8 @@ class SimpleQA(QA):
 
 
     @classmethod
-    def index_from_folder(cls, folder_path, index_dir,  commit_every=1024, verbose=1, encoding='utf-8',
-                          procs=1, limitmb=256, multisegment=False):
+    def index_from_folder(cls, folder_path, index_dir,  commit_every=1024, breakup_docs=False, 
+                          encoding='utf-8', procs=1, limitmb=256, multisegment=False, verbose=1):
         """
         index all plain text documents within a folder.
         The procs, limitmb, and especially multisegment arguments can be used to 
@@ -353,11 +349,17 @@ class SimpleQA(QA):
         for more information on these parameters:  https://whoosh.readthedocs.io/en/latest/batch.html
 
         Args:
-          folder_path(str): path to folder containing plain text documents
+          folder_path(str): path to folder containing plain text documents (e.g., .txt files)
+          index_dir(str): path to index directory (see initialize_index)
           commit_every(int): commet after adding this many documents
+          breakup_docs(bool): break up documents into smaller paragraphs and treat those as the documents.
+                              This can potentially improve the speed at which answers are returned by the ask method
+                              when documents being searched are longer.
+          encoding(str): encoding to use when reading document files from disk
           procs(int): number of processors
           limitmb(int): memory limit in MB for each process
           multisegment(bool): new segments written instead of merging
+          verbose(bool): verbosity
 
         """
         if not os.path.isdir(folder_path): raise ValueError('folder_path is not a valid folder')
@@ -369,12 +371,21 @@ class SimpleQA(QA):
             reference = "%s" % (fpath.join(fpath.split(folder_path)[1:]))
             with open(fpath, 'r', encoding=encoding) as f:
                 doc = f.read()
-            content = doc
-            writer.add_document(reference=reference, content=content, rawtext=content)
+
+            if breakup_docs:
+                small_docs = TU.paragraph_tokenize(doc, join_sentences=True, lang='en')
+                refs = [reference] * len(small_docs)
+                for i, small_doc in enumerate(small_docs):
+                    content = small_doc
+                    reference = refs[i]
+                    writer.add_document(reference=reference, content=content, rawtext=content)
+            else:
+                content = doc
+                writer.add_document(reference=reference, content=content, rawtext=content)
+
             idx +=1
             if idx % commit_every == 0:
                 writer.commit()
-                #writer = ix.writer()
                 writer = ix.writer(procs=procs, limitmb=limitmb, multisegment=multisegment)
                 if verbose: print("%s docs indexed" % (idx))
         writer.commit()
