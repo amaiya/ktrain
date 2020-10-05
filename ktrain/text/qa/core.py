@@ -38,7 +38,51 @@ class QA(ABC):
     def search(self, query):
         pass
 
-    def predict_squad(self, document, question):
+    def predict_squad(self, documents, question):
+        if isinstance(documents, str): documents = [documents]
+        sequences = [[question, d] for d in documents]
+        batch = self.tokenizer.batch_encode_plus(sequences, return_tensors='tf', max_length=512, truncation='only_second', padding=True)
+        tokens_batch = list( map(self.tokenizer.convert_ids_to_tokens, batch['input_ids']))
+
+        # Added from: https://github.com/huggingface/transformers/commit/16ce15ed4bd0865d24a94aa839a44cf0f400ef50
+        if U.get_hf_model_name(self.model_name) in  ['xlm', 'roberta', 'distilbert']:
+           start_scores, end_scores = self.model(batch['input_ids'], attention_mask=batch['attention_mask'])
+        else:
+           start_scores, end_scores = self.model(batch['input_ids'], attention_mask=batch['attention_mask'], 
+                                                 token_type_ids=batch['token_type_ids'])
+        start_scores = start_scores[:,1:-1]
+        end_scores = end_scores[:,1:-1]
+        answer_starts = np.argmax(start_scores, axis=1)
+        answer_ends = np.argmax(end_scores, axis=1)
+
+        answers = []
+        for i, tokens in enumerate(tokens_batch):
+            answer_start = answer_starts[i]
+            answer_end = answer_ends[i]
+            answer = self._reconstruct_text(tokens, answer_start, answer_end+2)
+            if answer.startswith('. ') or answer.startswith(', '):
+                answer = answer[2:]  
+            sep_index = tokens.index('[SEP]')
+            full_txt_tokens = tokens[sep_index+1:]
+            paragraph_bert = self._reconstruct_text(full_txt_tokens)
+
+            ans={}
+            ans['answer'] = answer
+            if answer.startswith('[CLS]') or answer_end < sep_index or answer.endswith('[SEP]'):
+                ans['confidence'] = LOWCONF
+            else:
+                #confidence = torch.max(start_scores) + torch.max(end_scores)
+                #confidence = np.log(confidence.item())
+                ans['confidence'] = start_scores[0,answer_start]+end_scores[0,answer_end]
+            ans['start'] = answer_start
+            ans['end'] = answer_end
+            ans['context'] = paragraph_bert
+            answers.append(ans)
+        if len(answers) == 1: answers = answers[0]
+        return answers
+
+
+        document = documents[0]
         encoded_dict = self.tokenizer.encode_plus(question, document)
         input_ids = encoded_dict['input_ids']
         segment_ids = encoded_dict['token_type_ids']
@@ -57,6 +101,8 @@ class QA(ABC):
             start_scores, end_scores = self.model(input_ids)
         else:
             start_scores, end_scores = self.model(input_ids, token_type_ids=token_type_ids)
+
+        return (start_scores, end_scores)
 
         start_scores = start_scores[:,1:-1]
         end_scores = end_scores[:,1:-1]
@@ -192,6 +238,7 @@ class QA(ABC):
             #plist = TU.paragraph_tokenize(rawtext, join_sentences=True)
             #paragraphs.extend(plist)
             #refs.extend([reference]*len(plist))
+
 
         # locate candidate answers
         answers = []
