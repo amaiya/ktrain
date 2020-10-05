@@ -39,14 +39,11 @@ class QA(ABC):
         pass
 
     def predict_squad(self, document, question):
-        input_ids = self.tokenizer.encode(question, document)
+        encoded_dict = self.tokenizer.encode_plus(question, document)
+        input_ids = encoded_dict['input_ids']
+        segment_ids = encoded_dict['token_type_ids']
         tokens = self.tokenizer.convert_ids_to_tokens(input_ids)
-        sep_index = input_ids.index(self.tokenizer.sep_token_id)
-        num_seg_a = sep_index + 1
-        num_seg_b = len(input_ids) - num_seg_a
-        segment_ids = [0]*num_seg_a + [1]*num_seg_b
-        assert len(segment_ids) == len(input_ids)
-        n_ids = len(segment_ids)
+        n_ids = len(input_ids)
         if n_ids < self.maxlen:
             input_ids = np.array([input_ids])
             token_type_ids = np.array([segment_ids])
@@ -170,23 +167,38 @@ class QA(ABC):
         if not doc_results: 
             warnings.warn('No documents matched words in question')
             return []
+        # extract paragraphs as contexts
+        contexts = []
+        refs = []
         for doc_result in doc_results:
             rawtext = doc_result.get('rawtext', '')
             reference = doc_result.get('reference', '')
             if len(self.tokenizer.tokenize(rawtext)) < self.maxlen:
-                paragraphs.append(rawtext)
+                contexts.append(rawtext)
                 refs.append(reference)
-                continue
-            plist = TU.paragraph_tokenize(rawtext, join_sentences=True)
-            paragraphs.extend(plist)
-            refs.extend([reference]*len(plist))
+            else:
+                paragraphs = TU.paragraph_tokenize(rawtext, join_sentences=True)
+                contexts.extend(paragraphs)
+                refs.extend([reference] * len(paragraphs))
+
+
+        #for doc_result in doc_results:
+            #rawtext = doc_result.get('rawtext', '')
+            #reference = doc_result.get('reference', '')
+            #if len(self.tokenizer.tokenize(rawtext)) < self.maxlen:
+                #paragraphs.append(rawtext)
+                #refs.append(reference)
+                #continue
+            #plist = TU.paragraph_tokenize(rawtext, join_sentences=True)
+            #paragraphs.extend(plist)
+            #refs.extend([reference]*len(plist))
 
         # locate candidate answers
         answers = []
         mb = master_bar(range(1))
         for i in mb:
-            for idx, paragraph in enumerate(progress_bar(paragraphs, parent=mb)):
-                answer = self.predict_squad(paragraph, question)
+            for idx, context in enumerate(progress_bar(contexts, parent=mb)):
+                answer = self.predict_squad(context, question)
                 if not answer['answer'] or answer['confidence'] <0: continue
                 answer['confidence'] = answer['confidence'].numpy()
                 answer['reference'] = refs[idx]
