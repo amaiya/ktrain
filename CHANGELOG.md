@@ -17,7 +17,7 @@ Most recent releases are shown at the top. Each release shows:
 
 
 ### Fixed:
-- N/A
+- Ensure `save_path` is correctyl processed in `Learner.evaluate`
 
 
 
