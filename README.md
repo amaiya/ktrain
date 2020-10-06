@@ -13,7 +13,7 @@
 - **2020-10-06:**
   - ***ktrain*** **v0.22.x is released** and includes enhancements to **open-domain question-answering** such as significantly faster answer-retrieval.  See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/question_answering_with_bert.ipynb) for more information.
 ```python
-# Open-Domain Question-Answering in ktrain
+# End-to-End Open-Domain Question-Answering in ktrain
 
 from ktrain import text
 INDEXDIR = '/tmp/myindex'
