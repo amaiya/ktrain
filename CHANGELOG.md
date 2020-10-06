@@ -6,14 +6,15 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
-## 0.21.5 (TBD)
+## 0.22.0 (2020-10-06)
 
 ### New:
-- N/A
+- added `breakup_docs` argument to `index_from_list` and `index_from_folder` that potentially speeds up `ask` method substantially
+- added `batch_size` argument to `ask` and set default at 8 for faster answer-retrieval
 
 ### Changed
 - refactored `QA` and `SimpleQA` for better extensibility
-- added `breakup_docs` argument to `index_from_list` and `index_from_folder` that potentially speeds up `ask` method substantially
+
 
 ### Fixed:
 - N/A
