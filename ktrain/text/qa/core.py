@@ -38,60 +38,63 @@ class QA(ABC):
     def search(self, query):
         pass
 
-    def predict_squad(self, document, question):
-        input_ids = self.tokenizer.encode(question, document)
-        tokens = self.tokenizer.convert_ids_to_tokens(input_ids)
-        sep_index = input_ids.index(self.tokenizer.sep_token_id)
-        num_seg_a = sep_index + 1
-        num_seg_b = len(input_ids) - num_seg_a
-        segment_ids = [0]*num_seg_a + [1]*num_seg_b
-        assert len(segment_ids) == len(input_ids)
-        n_ids = len(segment_ids)
-        if n_ids < self.maxlen:
-            input_ids = np.array([input_ids])
-            token_type_ids = np.array([segment_ids])
-        else:
-            #TODO: use different truncation strategies or run multiple inferences
-            input_ids = np.array([input_ids[:self.maxlen]])
-            token_type_ids = np.array([segment_ids[:self.maxlen]])
+    def predict_squad(self, documents, question):
+        if isinstance(documents, str): documents = [documents]
+        sequences = [[question, d] for d in documents]
+        batch = self.tokenizer.batch_encode_plus(sequences, return_tensors='tf', max_length=512, truncation='only_second', padding=True)
+        tokens_batch = list( map(self.tokenizer.convert_ids_to_tokens, batch['input_ids']))
 
         # Added from: https://github.com/huggingface/transformers/commit/16ce15ed4bd0865d24a94aa839a44cf0f400ef50
         if U.get_hf_model_name(self.model_name) in  ['xlm', 'roberta', 'distilbert']:
-            start_scores, end_scores = self.model(input_ids)
+           start_scores, end_scores = self.model(batch['input_ids'], attention_mask=batch['attention_mask'])
         else:
-            start_scores, end_scores = self.model(input_ids, token_type_ids=token_type_ids)
-
+           start_scores, end_scores = self.model(batch['input_ids'], attention_mask=batch['attention_mask'], 
+                                                 token_type_ids=batch['token_type_ids'])
         start_scores = start_scores[:,1:-1]
         end_scores = end_scores[:,1:-1]
-        answer_start = np.argmax(start_scores)
-        answer_end = np.argmax(end_scores)
-        answer = self._reconstruct_text(tokens, answer_start, answer_end+2)
-        if answer.startswith('. ') or answer.startswith(', '):
-            answer = answer[2:]  
-        sep_index = tokens.index('[SEP]')
-        full_txt_tokens = tokens[sep_index+1:]
-        paragraph_bert = self._reconstruct_text(full_txt_tokens)
+        answer_starts = np.argmax(start_scores, axis=1)
+        answer_ends = np.argmax(end_scores, axis=1)
 
-        ans={}
-        ans['answer'] = answer
-        if answer.startswith('[CLS]') or answer_end < sep_index or answer.endswith('[SEP]'):
-            ans['confidence'] = LOWCONF
-        else:
-            #confidence = torch.max(start_scores) + torch.max(end_scores)
-            #confidence = np.log(confidence.item())
-            ans['confidence'] = start_scores[0,answer_start]+end_scores[0,answer_end]
-        ans['start'] = answer_start
-        ans['end'] = answer_end
-        ans['context'] = paragraph_bert
-        return ans
+        answers = []
+        for i, tokens in enumerate(tokens_batch):
+            answer_start = answer_starts[i]
+            answer_end = answer_ends[i]
+            answer = self._reconstruct_text(tokens, answer_start, answer_end+2)
+            if answer.startswith('. ') or answer.startswith(', '):
+                answer = answer[2:]  
+            sep_index = tokens.index('[SEP]')
+            full_txt_tokens = tokens[sep_index+1:]
+            paragraph_bert = self._reconstruct_text(full_txt_tokens)
+
+            ans={}
+            ans['answer'] = answer
+            if answer.startswith('[CLS]') or answer_end < sep_index or answer.endswith('[SEP]'):
+                ans['confidence'] = LOWCONF
+            else:
+                #confidence = torch.max(start_scores) + torch.max(end_scores)
+                #confidence = np.log(confidence.item())
+                ans['confidence'] = start_scores[i,answer_start]+end_scores[i,answer_end]
+            ans['start'] = answer_start
+            ans['end'] = answer_end
+            ans['context'] = paragraph_bert
+            answers.append(ans)
+        #if len(answers) == 1: answers = answers[0]
+        return answers
+
+
 
 
     def _reconstruct_text(self, tokens, start=0, stop=-1):
+        """
+        Reconstruct text of *either* question or answer
+        """
         tokens = tokens[start: stop]
-        if '[SEP]' in tokens:
-            sepind = tokens.index('[SEP]')
-            tokens = tokens[sepind+1:]
+        #if '[SEP]' in tokens:
+            #sepind = tokens.index('[SEP]')
+            #tokens = tokens[sepind+1:]
         txt = ' '.join(tokens)
+        txt = txt.replace('[SEP]', '') # added for batch_encode_plus - removes [SEP] before [PAD]
+        txt = txt.replace('[PAD]', '') # added for batch_encode_plus - removes [PAD]
         txt = txt.replace(' ##', '')
         txt = txt.replace('##', '')
         txt = txt.strip()
@@ -115,134 +118,6 @@ class QA(ABC):
             else:
                 new_list += [t]
         return ''.join(new_list)
-
-
-
-class SimpleQA(QA):
-    """
-    SimpleQA: Question-Answering on a list of texts
-    """
-    def __init__(self, index_dir, 
-                 bert_squad_model='bert-large-uncased-whole-word-masking-finetuned-squad',
-                 bert_emb_model='bert-base-uncased'):
-        """
-        SimpleQA constructor
-        Args:
-          index_dir(str):  path to index directory created by SimpleQA.initialze_index
-          bert_squad_model(str): name of BERT SQUAD model to use
-          bert_emb_model(str): BERT model to use to generate embeddings for semantic similarity
-
-        """
-
-        self.index_dir = index_dir
-        try:
-            ix = index.open_dir(self.index_dir)
-        except:
-            raise ValueError('index_dir has not yet been created - please call SimpleQA.initialize_index("%s")' % (self.index_dir))
-        super().__init__(bert_squad_model=bert_squad_model, bert_emb_model=bert_emb_model)
-
-
-    def _open_ix(self):
-        return index.open_dir(self.index_dir)
-
-
-    @classmethod
-    def initialize_index(cls, index_dir):
-        schema = Schema(reference=ID(stored=True), content=TEXT, rawtext=TEXT(stored=True))
-        if not os.path.exists(index_dir):
-            os.makedirs(index_dir)
-        else:
-            raise ValueError('There is already an existing directory or file with path %s' % (index_dir))
-        ix = index.create_in(index_dir, schema)
-        return ix
-
-    @classmethod
-    def index_from_list(cls, docs, index_dir, commit_every=1024,
-                        procs=1, limitmb=256, multisegment=False):
-        """
-        index documents from list.
-        The procs, limitmb, and especially multisegment arguments can be used to 
-        speed up indexing, if it is too slow.  Please see the whoosh documentation
-        for more information on these parameters:  https://whoosh.readthedocs.io/en/latest/batch.html
-        Args:
-          docs(list): list of strings representing documents
-          commit_every(int): commet after adding this many documents
-          procs(int): number of processors
-          limitmb(int): memory limit in MB for each process
-          multisegment(bool): new segments written instead of merging
-        """
-        if not isinstance(docs, (np.ndarray, list)): raise ValueError('docs must be a list of strings')
-        ix = index.open_dir(index_dir)
-        writer = ix.writer(procs=procs, limitmb=limitmb, multisegment=multisegment)
-        mb = master_bar(range(1))
-        for i in mb:
-            for idx, doc in enumerate(progress_bar(docs, parent=mb)):
-                reference = "%s" % (idx)
-                content = doc 
-                writer.add_document(reference=reference, content=content, rawtext=content)
-                idx +=1
-                if idx % commit_every == 0:
-                    writer.commit()
-                    #writer = ix.writer()
-                    writer = ix.writer(procs=procs, limitmb=limitmb, multisegment=multisegment)
-            writer.commit()
-        return
-
-
-    @classmethod
-    def index_from_folder(cls, folder_path, index_dir,  commit_every=1024, verbose=1, encoding='utf-8',
-                          procs=1, limitmb=256, multisegment=False):
-        """
-        index all plain text documents within a folder.
-        The procs, limitmb, and especially multisegment arguments can be used to 
-        speed up indexing, if it is too slow.  Please see the whoosh documentation
-        for more information on these parameters:  https://whoosh.readthedocs.io/en/latest/batch.html
-
-        Args:
-          folder_path(str): path to folder containing plain text documents
-          commit_every(int): commet after adding this many documents
-          procs(int): number of processors
-          limitmb(int): memory limit in MB for each process
-          multisegment(bool): new segments written instead of merging
-
-        """
-        if not os.path.isdir(folder_path): raise ValueError('folder_path is not a valid folder')
-        if folder_path[-1] != os.sep: folder_path += os.sep
-        ix = index.open_dir(index_dir)
-        writer = ix.writer(procs=procs, limitmb=limitmb, multisegment=multisegment)
-        for idx, fpath in enumerate(TU.extract_filenames(folder_path)):
-            if not TU.is_txt(fpath): continue
-            reference = "%s" % (fpath.join(fpath.split(folder_path)[1:]))
-            with open(fpath, 'r', encoding=encoding) as f:
-                doc = f.read()
-            content = doc
-            writer.add_document(reference=reference, content=content, rawtext=content)
-            idx +=1
-            if idx % commit_every == 0:
-                writer.commit()
-                #writer = ix.writer()
-                writer = ix.writer(procs=procs, limitmb=limitmb, multisegment=multisegment)
-                if verbose: print("%s docs indexed" % (idx))
-        writer.commit()
-        return
-
-
-    def search(self, query, limit=10):
-        """
-        search index for query
-        Args:
-          query(str): search query
-          limit(int):  number of top search results to return
-        Returns:
-          list of dicts with keys: reference, rawtext
-        """
-        ix = self._open_ix()
-        with ix.searcher() as searcher:
-            query_obj = QueryParser("content", ix.schema, group=qparser.OrGroup).parse(query)
-            results = searcher.search(query_obj, limit=limit)
-            docs = []
-            output = [dict(r) for r in results]
-            return output
 
 
     def _expand_answer(self, answer):
@@ -271,12 +146,16 @@ class SimpleQA(QA):
 
 
 
-    def ask(self, question, n_docs_considered=10, n_answers=50, rerank_threshold=0.015):
+    def ask(self, question, batch_size=8, n_docs_considered=10, n_answers=50, rerank_threshold=0.015):
         """
         submit question to obtain candidate answers
 
         Args:
           question(str): question in the form of a string
+          batch_size(int):  number of question-context pairs fed to model at each iteration
+                            Default:8
+                            Increase for faster answer-retrieval.
+                            Decrease to reduce memory (if out-of-memory errors occur).
           n_docs_considered(int): number of top search results that will
                                   be searched for answer
                                   default:10
@@ -298,28 +177,58 @@ class SimpleQA(QA):
         if not doc_results: 
             warnings.warn('No documents matched words in question')
             return []
+        # extract paragraphs as contexts
+        contexts = []
+        refs = []
         for doc_result in doc_results:
             rawtext = doc_result.get('rawtext', '')
             reference = doc_result.get('reference', '')
             if len(self.tokenizer.tokenize(rawtext)) < self.maxlen:
-                paragraphs.append(rawtext)
+                contexts.append(rawtext)
                 refs.append(reference)
-                continue
-            plist = TU.paragraph_tokenize(rawtext, join_sentences=True)
-            paragraphs.extend(plist)
-            refs.extend([reference]*len(plist))
+            else:
+                paragraphs = TU.paragraph_tokenize(rawtext, join_sentences=True)
+                contexts.extend(paragraphs)
+                refs.extend([reference] * len(paragraphs))
+
+
+        #for doc_result in doc_results:
+            #rawtext = doc_result.get('rawtext', '')
+            #reference = doc_result.get('reference', '')
+            #if len(self.tokenizer.tokenize(rawtext)) < self.maxlen:
+                #paragraphs.append(rawtext)
+                #refs.append(reference)
+                #continue
+            #plist = TU.paragraph_tokenize(rawtext, join_sentences=True)
+            #paragraphs.extend(plist)
+            #refs.extend([reference]*len(plist))
+
+
+        # batchify contexts
+        #return contexts
+        if batch_size  > len(contexts): batch_size = len(contexts)
+        #if len(contexts) >= 100 and batch_size==8:
+            #warnings.warn('TIP: Try increasing batch_size to speedup ask predictions')
+        num_chunks = math.ceil(len(contexts)/batch_size)
+        context_batches = list( U.list2chunks(contexts, n=num_chunks) )
+
 
         # locate candidate answers
         answers = []
         mb = master_bar(range(1))
+        answer_batches = []
         for i in mb:
-            for idx, paragraph in enumerate(progress_bar(paragraphs, parent=mb)):
-                answer = self.predict_squad(paragraph, question)
-                if not answer['answer'] or answer['confidence'] <0: continue
-                answer['confidence'] = answer['confidence'].numpy()
-                answer['reference'] = refs[idx]
-                answer = self._expand_answer(answer)
-                answers.append(answer)
+            idx = 0
+            for batch_id, contexts in enumerate(progress_bar(context_batches, parent=mb)):
+                answer_batch = self.predict_squad(contexts, question)
+                answer_batches.extend(answer_batch)
+                for answer in answer_batch:
+                    idx+=1
+                    if not answer['answer'] or answer['confidence'] <-100: continue
+                    answer['confidence'] = answer['confidence'].numpy()
+                    answer['reference'] = refs[idx-1]
+                    answer = self._expand_answer(answer)
+                    answers.append(answer)
         answers = sorted(answers, key = lambda k:k['confidence'], reverse=True)
         if n_answers is not None:
             answers = answers[:n_answers]
@@ -376,5 +285,166 @@ class SimpleQA(QA):
         df = self.answers2df(answers)
         from IPython.core.display import display, HTML
         display(HTML(df.to_html(render_links=True, escape=False)))
+
+
+
+class SimpleQA(QA):
+    """
+    SimpleQA: Question-Answering on a list of texts
+    """
+    def __init__(self, index_dir, 
+                 bert_squad_model='bert-large-uncased-whole-word-masking-finetuned-squad',
+                 bert_emb_model='bert-base-uncased'):
+        """
+        SimpleQA constructor
+        Args:
+          index_dir(str):  path to index directory created by SimpleQA.initialze_index
+          bert_squad_model(str): name of BERT SQUAD model to use
+          bert_emb_model(str): BERT model to use to generate embeddings for semantic similarity
+
+        """
+
+        self.index_dir = index_dir
+        try:
+            ix = index.open_dir(self.index_dir)
+        except:
+            raise ValueError('index_dir has not yet been created - please call SimpleQA.initialize_index("%s")' % (self.index_dir))
+        super().__init__(bert_squad_model=bert_squad_model, bert_emb_model=bert_emb_model)
+
+
+    def _open_ix(self):
+        return index.open_dir(self.index_dir)
+
+
+    @classmethod
+    def initialize_index(cls, index_dir):
+        schema = Schema(reference=ID(stored=True), content=TEXT, rawtext=TEXT(stored=True))
+        if not os.path.exists(index_dir):
+            os.makedirs(index_dir)
+        else:
+            raise ValueError('There is already an existing directory or file with path %s' % (index_dir))
+        ix = index.create_in(index_dir, schema)
+        return ix
+
+    @classmethod
+    def index_from_list(cls, docs, index_dir, commit_every=1024, breakup_docs=False,
+                        procs=1, limitmb=256, multisegment=False):
+        """
+        index documents from list.
+        The procs, limitmb, and especially multisegment arguments can be used to 
+        speed up indexing, if it is too slow.  Please see the whoosh documentation
+        for more information on these parameters:  https://whoosh.readthedocs.io/en/latest/batch.html
+        Args:
+          docs(list): list of strings representing documents
+          index_dir(str): path to index directory (see initialize_index)
+          commit_every(int): commet after adding this many documents
+          breakup_docs(bool): break up documents into smaller paragraphs and treat those as the documents.
+                              This can potentially improve the speed at which answers are returned by the ask method
+                              when documents being searched are longer.
+          procs(int): number of processors
+          limitmb(int): memory limit in MB for each process
+          multisegment(bool): new segments written instead of merging
+        """
+        if not isinstance(docs, (np.ndarray, list)): raise ValueError('docs must be a list of strings')
+        ix = index.open_dir(index_dir)
+        writer = ix.writer(procs=procs, limitmb=limitmb, multisegment=multisegment)
+
+        mb = master_bar(range(1))
+        for i in mb:
+            for idx, doc in enumerate(progress_bar(docs, parent=mb)):
+                reference = "%s" % (idx)
+
+                if breakup_docs:
+                    small_docs = TU.paragraph_tokenize(doc, join_sentences=True, lang='en')
+                    refs = [reference] * len(small_docs)
+                    for i, small_doc in enumerate(small_docs):
+                        content = small_doc
+                        reference = refs[i]
+                        writer.add_document(reference=reference, content=content, rawtext=content)
+                else:
+                    content = doc 
+                    writer.add_document(reference=reference, content=content, rawtext=content)
+
+                idx +=1
+                if idx % commit_every == 0:
+                    writer.commit()
+                    #writer = ix.writer()
+                    writer = ix.writer(procs=procs, limitmb=limitmb, multisegment=multisegment)
+                mb.child.comment = f'indexing documents'
+            writer.commit()
+            mb.write(f'Finished indexing documents')
+        return
+
+
+    @classmethod
+    def index_from_folder(cls, folder_path, index_dir,  commit_every=1024, breakup_docs=False, 
+                          encoding='utf-8', procs=1, limitmb=256, multisegment=False, verbose=1):
+        """
+        index all plain text documents within a folder.
+        The procs, limitmb, and especially multisegment arguments can be used to 
+        speed up indexing, if it is too slow.  Please see the whoosh documentation
+        for more information on these parameters:  https://whoosh.readthedocs.io/en/latest/batch.html
+
+        Args:
+          folder_path(str): path to folder containing plain text documents (e.g., .txt files)
+          index_dir(str): path to index directory (see initialize_index)
+          commit_every(int): commet after adding this many documents
+          breakup_docs(bool): break up documents into smaller paragraphs and treat those as the documents.
+                              This can potentially improve the speed at which answers are returned by the ask method
+                              when documents being searched are longer.
+          encoding(str): encoding to use when reading document files from disk
+          procs(int): number of processors
+          limitmb(int): memory limit in MB for each process
+          multisegment(bool): new segments written instead of merging
+          verbose(bool): verbosity
+
+        """
+        if not os.path.isdir(folder_path): raise ValueError('folder_path is not a valid folder')
+        if folder_path[-1] != os.sep: folder_path += os.sep
+        ix = index.open_dir(index_dir)
+        writer = ix.writer(procs=procs, limitmb=limitmb, multisegment=multisegment)
+        for idx, fpath in enumerate(TU.extract_filenames(folder_path)):
+            if not TU.is_txt(fpath): continue
+            reference = "%s" % (fpath.join(fpath.split(folder_path)[1:]))
+            with open(fpath, 'r', encoding=encoding) as f:
+                doc = f.read()
+
+            if breakup_docs:
+                small_docs = TU.paragraph_tokenize(doc, join_sentences=True, lang='en')
+                refs = [reference] * len(small_docs)
+                for i, small_doc in enumerate(small_docs):
+                    content = small_doc
+                    reference = refs[i]
+                    writer.add_document(reference=reference, content=content, rawtext=content)
+            else:
+                content = doc
+                writer.add_document(reference=reference, content=content, rawtext=content)
+
+            idx +=1
+            if idx % commit_every == 0:
+                writer.commit()
+                writer = ix.writer(procs=procs, limitmb=limitmb, multisegment=multisegment)
+                if verbose: print("%s docs indexed" % (idx))
+        writer.commit()
+        return
+
+
+    def search(self, query, limit=10):
+        """
+        search index for query
+        Args:
+          query(str): search query
+          limit(int):  number of top search results to return
+        Returns:
+          list of dicts with keys: reference, rawtext
+        """
+        ix = self._open_ix()
+        with ix.searcher() as searcher:
+            query_obj = QueryParser("content", ix.schema, group=qparser.OrGroup).parse(query)
+            results = searcher.search(query_obj, limit=limit)
+            docs = []
+            output = [dict(r) for r in results]
+            return output
+
 
 

@@ -10,33 +10,25 @@
 
 
 ### News and Announcements
-- **2020-09-03:**
-  - As of v0.21.x, *ktrain* no longer installs TensorFlow 2 automatically, which allows *ktrain* to be used with any version of TensorFlow 2 installed by the user. See the [installation instructions](https://github.com/amaiya/ktrain#installation) for more details. (Note that, if using `tensorflow<=2.1`, you must also downgrade the **transformers** library to `transformers==3.1`.)
-- **2020-08-24:**
-  - ***ktrain*** **v0.20.x is released** and includes updates to `ZeroShotClassifier`. The `ZeroShotClassifier` allows documents to be classified into user-provided categories **without** training examples.  Updates include the ability to predict large sequences of documents (and topics) and the ability to customize inferences for different settings.  See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/zero_shot_learning_with_nli.ipynb) for more information.
+- **2020-10-06:**
+  - ***ktrain*** **v0.22.x is released** and includes enhancements to **open-domain question-answering** such as significantly faster answer-retrieval.  See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/question_answering_with_bert.ipynb) for more information.
 ```python
-# Zero-Shot Sentiment Analysis (NOTE: Zero-Shot Learning uses PyTorch instead of TensorFlow)
+# End-to-End Open-Domain Question-Answering in ktrain
 
 from ktrain import text
-zsl = text.ZeroShotClassifier()
-docs = ['I will definitely not be seeing this movie again, but the acting was good.', 
-        'This flick was riveting.', ...]
-zsl.predict(docs, labels=['negative', 'positive'], include_labels=True, 
-            nli_template='The sentiment of this movie review is {}.', multilabel=False)
-# output:
-[[('negative', 0.6576018333435059), ('positive', 0.34239819645881653)],
- [('negative', 0.004729847423732281), ('positive', 0.9952701330184937)], ...]
-```
+INDEXDIR = '/tmp/myindex'
+text.SimpleQA.initialize_index(INDEXDIR)
+text.SimpleQA.index_from_list(docs, INDEXDIR, commit_every=len(docs),
+                              multisegment=True, procs=4, # these args speed up indexing
+                              breakup_docs=True         # this slows indexing but speeds up answer retrieval
+                              )
+qa = text.SimpleQA(INDEXDIR)
+# supplying higher batch size to ask further speeds up answer retreival
+answers = qa.ask('What causes computer images to be too dark?', batch_size=8)
 
-- **2020-07-29:**  
-  - ***ktrain*** **v0.19.x is released** and now includes support for "traditional" **tabular data** and **explainable AI for tabular predictions**.  See the [tutorial notebook on tabular models](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-08-tabular_classification_and_regression.ipynb) for both:
-    - a classification example (using the Kaggle Titanic passenger survival prediction dataset) 
-    - a regression example (using the UCI Adults census dataset for age prediction)
-- **2020-07-07:**  
-  - ***ktrain*** **v0.18.x is released** and now includes support for TensorFlow `>=2.2.0`. Due to various TensorFlow 2.2.0/2.3.0 bugs, TF `>=2.2.0` is only installed if Python 3.8 is being used. 
-    Otherwise,  TensorFlow 2.1.0 is always installed (i.e., on Python 3.6 and 3.7 systems).
-- **2020-06-28:**  
-  - Hamiz Ahmed published his Medium article: [Finetuning BERT using ktrain for Disaster Tweets Classification](https://medium.com/analytics-vidhya/finetuning-bert-using-ktrain-for-disaster-tweets-classification-18f64a50910b) 
+# top answer snippet:
+#   "if your viewer does not do gamma correction , then linear images will look too dark"
+```
 ----
 
 ### Overview
@@ -328,7 +320,7 @@ pip install git+https://github.com/amaiya/eli5@tfkeras_0_10_1
 pip install git+https://github.com/amaiya/stellargraph@no_tf_dep_082
 ```
 
-This code was tested on Ubuntu 18.04 LTS using TensorFlow 2.3.0 and Python 3.6.9.
+This code was tested on Ubuntu 18.04 LTS using TensorFlow 2.3.1 and Python 3.6.9.
 
 
 ### How to Cite

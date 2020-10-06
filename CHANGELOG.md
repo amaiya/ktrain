@@ -6,6 +6,21 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.22.0 (2020-10-06)
+
+### New:
+- added `breakup_docs` argument to `index_from_list` and `index_from_folder` that potentially speeds up `ask` method substantially
+- added `batch_size` argument to `ask` and set default at 8 for faster answer-retrieval
+
+### Changed
+- refactored `QA` and `SimpleQA` for better extensibility
+
+
+### Fixed:
+- Ensure `save_path` is correctyl processed in `Learner.evaluate`
+
+
+
 ## 0.21.4 (2020-09-24)
 
 ### New:

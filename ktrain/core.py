@@ -105,7 +105,7 @@ class Learner(ABC):
           class_names(list): list of class names to be used in classification report instead of 
                              class integer IDs.
         """
-        return self.validate(val_data=test_data, print_report=print_report, class_names=class_names)
+        return self.validate(val_data=test_data, print_report=print_report, save_path=save_path, class_names=class_names)
 
 
 
