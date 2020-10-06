@@ -320,7 +320,7 @@ pip install git+https://github.com/amaiya/eli5@tfkeras_0_10_1
 pip install git+https://github.com/amaiya/stellargraph@no_tf_dep_082
 ```
 
-This code was tested on Ubuntu 18.04 LTS using TensorFlow 2.3.0 and Python 3.6.9.
+This code was tested on Ubuntu 18.04 LTS using TensorFlow 2.3.1 and Python 3.6.9.
 
 
 ### How to Cite
