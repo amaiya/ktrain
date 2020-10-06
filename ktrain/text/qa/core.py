@@ -38,57 +38,63 @@ class QA(ABC):
     def search(self, query):
         pass
 
-    def predict_squad(self, document, question):
-        encoded_dict = self.tokenizer.encode_plus(question, document)
-        input_ids = encoded_dict['input_ids']
-        segment_ids = encoded_dict['token_type_ids']
-        tokens = self.tokenizer.convert_ids_to_tokens(input_ids)
-        n_ids = len(input_ids)
-        if n_ids < self.maxlen:
-            input_ids = np.array([input_ids])
-            token_type_ids = np.array([segment_ids])
-        else:
-            #TODO: use different truncation strategies or run multiple inferences
-            input_ids = np.array([input_ids[:self.maxlen]])
-            token_type_ids = np.array([segment_ids[:self.maxlen]])
+    def predict_squad(self, documents, question):
+        if isinstance(documents, str): documents = [documents]
+        sequences = [[question, d] for d in documents]
+        batch = self.tokenizer.batch_encode_plus(sequences, return_tensors='tf', max_length=512, truncation='only_second', padding=True)
+        tokens_batch = list( map(self.tokenizer.convert_ids_to_tokens, batch['input_ids']))
 
         # Added from: https://github.com/huggingface/transformers/commit/16ce15ed4bd0865d24a94aa839a44cf0f400ef50
         if U.get_hf_model_name(self.model_name) in  ['xlm', 'roberta', 'distilbert']:
-            start_scores, end_scores = self.model(input_ids)
+           start_scores, end_scores = self.model(batch['input_ids'], attention_mask=batch['attention_mask'])
         else:
-            start_scores, end_scores = self.model(input_ids, token_type_ids=token_type_ids)
-
+           start_scores, end_scores = self.model(batch['input_ids'], attention_mask=batch['attention_mask'], 
+                                                 token_type_ids=batch['token_type_ids'])
         start_scores = start_scores[:,1:-1]
         end_scores = end_scores[:,1:-1]
-        answer_start = np.argmax(start_scores)
-        answer_end = np.argmax(end_scores)
-        answer = self._reconstruct_text(tokens, answer_start, answer_end+2)
-        if answer.startswith('. ') or answer.startswith(', '):
-            answer = answer[2:]  
-        sep_index = tokens.index('[SEP]')
-        full_txt_tokens = tokens[sep_index+1:]
-        paragraph_bert = self._reconstruct_text(full_txt_tokens)
+        answer_starts = np.argmax(start_scores, axis=1)
+        answer_ends = np.argmax(end_scores, axis=1)
 
-        ans={}
-        ans['answer'] = answer
-        if answer.startswith('[CLS]') or answer_end < sep_index or answer.endswith('[SEP]'):
-            ans['confidence'] = LOWCONF
-        else:
-            #confidence = torch.max(start_scores) + torch.max(end_scores)
-            #confidence = np.log(confidence.item())
-            ans['confidence'] = start_scores[0,answer_start]+end_scores[0,answer_end]
-        ans['start'] = answer_start
-        ans['end'] = answer_end
-        ans['context'] = paragraph_bert
-        return ans
+        answers = []
+        for i, tokens in enumerate(tokens_batch):
+            answer_start = answer_starts[i]
+            answer_end = answer_ends[i]
+            answer = self._reconstruct_text(tokens, answer_start, answer_end+2)
+            if answer.startswith('. ') or answer.startswith(', '):
+                answer = answer[2:]  
+            sep_index = tokens.index('[SEP]')
+            full_txt_tokens = tokens[sep_index+1:]
+            paragraph_bert = self._reconstruct_text(full_txt_tokens)
+
+            ans={}
+            ans['answer'] = answer
+            if answer.startswith('[CLS]') or answer_end < sep_index or answer.endswith('[SEP]'):
+                ans['confidence'] = LOWCONF
+            else:
+                #confidence = torch.max(start_scores) + torch.max(end_scores)
+                #confidence = np.log(confidence.item())
+                ans['confidence'] = start_scores[i,answer_start]+end_scores[i,answer_end]
+            ans['start'] = answer_start
+            ans['end'] = answer_end
+            ans['context'] = paragraph_bert
+            answers.append(ans)
+        #if len(answers) == 1: answers = answers[0]
+        return answers
+
+
 
 
     def _reconstruct_text(self, tokens, start=0, stop=-1):
+        """
+        Reconstruct text of *either* question or answer
+        """
         tokens = tokens[start: stop]
-        if '[SEP]' in tokens:
-            sepind = tokens.index('[SEP]')
-            tokens = tokens[sepind+1:]
+        #if '[SEP]' in tokens:
+            #sepind = tokens.index('[SEP]')
+            #tokens = tokens[sepind+1:]
         txt = ' '.join(tokens)
+        txt = txt.replace('[SEP]', '') # added for batch_encode_plus - removes [SEP] before [PAD]
+        txt = txt.replace('[PAD]', '') # added for batch_encode_plus - removes [PAD]
         txt = txt.replace(' ##', '')
         txt = txt.replace('##', '')
         txt = txt.strip()
@@ -140,12 +146,16 @@ class QA(ABC):
 
 
 
-    def ask(self, question, n_docs_considered=10, n_answers=50, rerank_threshold=0.015):
+    def ask(self, question, batch_size=8, n_docs_considered=10, n_answers=50, rerank_threshold=0.015):
         """
         submit question to obtain candidate answers
 
         Args:
           question(str): question in the form of a string
+          batch_size(int):  number of question-context pairs fed to model at each iteration
+                            Default:8
+                            Increase for faster answer-retrieval.
+                            Decrease to reduce memory (if out-of-memory errors occur).
           n_docs_considered(int): number of top search results that will
                                   be searched for answer
                                   default:10
@@ -193,17 +203,32 @@ class QA(ABC):
             #paragraphs.extend(plist)
             #refs.extend([reference]*len(plist))
 
+
+        # batchify contexts
+        #return contexts
+        if batch_size  > len(contexts): batch_size = len(contexts)
+        #if len(contexts) >= 100 and batch_size==8:
+            #warnings.warn('TIP: Try increasing batch_size to speedup ask predictions')
+        num_chunks = math.ceil(len(contexts)/batch_size)
+        context_batches = list( U.list2chunks(contexts, n=num_chunks) )
+
+
         # locate candidate answers
         answers = []
         mb = master_bar(range(1))
+        answer_batches = []
         for i in mb:
-            for idx, context in enumerate(progress_bar(contexts, parent=mb)):
-                answer = self.predict_squad(context, question)
-                if not answer['answer'] or answer['confidence'] <0: continue
-                answer['confidence'] = answer['confidence'].numpy()
-                answer['reference'] = refs[idx]
-                answer = self._expand_answer(answer)
-                answers.append(answer)
+            idx = 0
+            for batch_id, contexts in enumerate(progress_bar(context_batches, parent=mb)):
+                answer_batch = self.predict_squad(contexts, question)
+                answer_batches.extend(answer_batch)
+                for answer in answer_batch:
+                    idx+=1
+                    if not answer['answer'] or answer['confidence'] <-100: continue
+                    answer['confidence'] = answer['confidence'].numpy()
+                    answer['reference'] = refs[idx-1]
+                    answer = self._expand_answer(answer)
+                    answers.append(answer)
         answers = sorted(answers, key = lambda k:k['confidence'], reverse=True)
         if n_answers is not None:
             answers = answers[:n_answers]
