@@ -29,11 +29,11 @@ def _answers2df(answers):
     return df
 
 
-def display_answers(self, answers):
+def display_answers(answers):
     if not answers: return
     df = _answers2df(answers)
     from IPython.core.display import display, HTML
-    display(HTML(df.to_html(render_links=True, escape=False)))
+    return display(HTML(df.to_html(render_links=True, escape=False)))
 
 
 class QA(ABC):
