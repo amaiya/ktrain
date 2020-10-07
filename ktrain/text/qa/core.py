@@ -381,7 +381,7 @@ class SimpleQA(QA):
                     writer = ix.writer(procs=procs, limitmb=limitmb, multisegment=multisegment)
                 mb.child.comment = f'indexing documents'
             writer.commit()
-            mb.write(f'Finished indexing documents')
+            #mb.write(f'Finished indexing documents')
         return
 
 
