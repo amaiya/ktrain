@@ -146,7 +146,8 @@ class QA(ABC):
 
 
 
-    def ask(self, question, batch_size=8, n_docs_considered=10, n_answers=50, rerank_threshold=0.015):
+    def ask(self, question, batch_size=8, n_docs_considered=10, n_answers=50, 
+            rerank_threshold=0.015, min_context_length=20):
         """
         submit question to obtain candidate answers
 
@@ -166,6 +167,8 @@ class QA(ABC):
                                  This can help bump the correct answer closer to the top.
                                  default:0.015.
                                  If None, no re-ranking is performed.
+          min_context_length(int): minimum number of words for context to be inspected for
+                                   candidate answers.  default:20
         Returns:
           list
         """
@@ -184,10 +187,12 @@ class QA(ABC):
             rawtext = doc_result.get('rawtext', '')
             reference = doc_result.get('reference', '')
             if len(self.tokenizer.tokenize(rawtext)) < self.maxlen:
+                if len(rawtext.split()) < min_context_length: continue
                 contexts.append(rawtext)
                 refs.append(reference)
             else:
                 paragraphs = TU.paragraph_tokenize(rawtext, join_sentences=True)
+                paragraphs = [p for p in paragraphs if len(p.split()) > min_context_length]
                 contexts.extend(paragraphs)
                 refs.extend([reference] * len(paragraphs))
 
