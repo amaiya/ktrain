@@ -365,12 +365,12 @@ class SimpleQA(QA):
                     small_docs = TU.paragraph_tokenize(doc, join_sentences=True, lang='en')
                     refs = [reference] * len(small_docs)
                     for i, small_doc in enumerate(small_docs):
-                        if len(small_docs.split()) < min_words: continue
+                        if len(small_doc.split()) < min_words: continue
                         content = small_doc
                         reference = refs[i]
                         writer.add_document(reference=reference, content=content, rawtext=content)
                 else:
-                    if len(docs.split()) < min_words: continue
+                    if len(doc.split()) < min_words: continue
                     content = doc 
                     writer.add_document(reference=reference, content=content, rawtext=content)
 
@@ -424,12 +424,12 @@ class SimpleQA(QA):
                 small_docs = TU.paragraph_tokenize(doc, join_sentences=True, lang='en')
                 refs = [reference] * len(small_docs)
                 for i, small_doc in enumerate(small_docs):
-                    if len(small_docs.split()) < min_words: continue
+                    if len(small_doc.split()) < min_words: continue
                     content = small_doc
                     reference = refs[i]
                     writer.add_document(reference=reference, content=content, rawtext=content)
             else:
-                if len(docs.split()) < min_words: continue
+                if len(doc.split()) < min_words: continue
                 content = doc
                 writer.add_document(reference=reference, content=content, rawtext=content)
 
