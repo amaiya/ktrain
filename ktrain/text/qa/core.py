@@ -328,7 +328,7 @@ class SimpleQA(QA):
 
     @classmethod
     def index_from_list(cls, docs, index_dir, commit_every=1024, breakup_docs=False,
-                        procs=1, limitmb=256, multisegment=False):
+                        procs=1, limitmb=256, multisegment=False, references=None):
         """
         index documents from list.
         The procs, limitmb, and especially multisegment arguments can be used to 
@@ -344,15 +344,20 @@ class SimpleQA(QA):
           procs(int): number of processors
           limitmb(int): memory limit in MB for each process
           multisegment(bool): new segments written instead of merging
+          references(list): list of strings containing a reference (e.g., file name) for each document in docs.
+                            If None, the index of element in docs is used as reference.
         """
         if not isinstance(docs, (np.ndarray, list)): raise ValueError('docs must be a list of strings')
+        if references is not None and not isinstance(references, (np.ndarray, list)): raise ValueError('references must be a list of strings')
+        if references is not None and len(references) != len(docs): raise ValueError('lengths of docs and references must be equal')
+
         ix = index.open_dir(index_dir)
         writer = ix.writer(procs=procs, limitmb=limitmb, multisegment=multisegment)
 
         mb = master_bar(range(1))
         for i in mb:
             for idx, doc in enumerate(progress_bar(docs, parent=mb)):
-                reference = "%s" % (idx)
+                reference = "%s" % (idx) if references is None else references[idx]
 
                 if breakup_docs:
                     small_docs = TU.paragraph_tokenize(doc, join_sentences=True, lang='en')
