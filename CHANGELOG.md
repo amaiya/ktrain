@@ -13,6 +13,7 @@ Most recent releases are shown at the top. Each release shows:
 
 ### Changed
 - added optional `references` argument to `SimpleQA.index_from_list` 
+- added `min_context_length` argument to `SimpleQA.ask` to prune small paragraphs that are unlikely to include good answers
 
 
 ### Fixed:
