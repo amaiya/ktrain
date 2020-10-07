@@ -17,6 +17,25 @@ from transformers import AutoTokenizer
 LOWCONF = -10000
 
 
+def _answers2df(answers):
+    dfdata = []
+    for a in answers:
+        answer_text = a['answer']
+        snippet_html = '<div>' +a['sentence_beginning'] + " <font color='red'>"+a['answer']+"</font> "+a['sentence_end']+'</div>'
+        confidence = a['confidence']
+        doc_key = a['reference']
+        dfdata.append([answer_text, snippet_html, confidence, doc_key])
+    df = pd.DataFrame(dfdata, columns = ['Candidate Answer', 'Context',  'Confidence', 'Document Reference'])
+    return df
+
+
+def display_answers(self, answers):
+    if not answers: return
+    df = _answers2df(answers)
+    from IPython.core.display import display, HTML
+    display(HTML(df.to_html(render_links=True, escape=False)))
+
+
 class QA(ABC):
     """
     Base class for QA
@@ -272,23 +291,8 @@ class QA(ABC):
         return answers
 
 
-    def answers2df(self, answers):
-        dfdata = []
-        for a in answers:
-            answer_text = a['answer']
-            snippet_html = '<div>' +a['sentence_beginning'] + " <font color='red'>"+a['answer']+"</font> "+a['sentence_end']+'</div>'
-            confidence = a['confidence']
-            doc_key = a['reference']
-            dfdata.append([answer_text, snippet_html, confidence, doc_key])
-        df = pd.DataFrame(dfdata, columns = ['Candidate Answer', 'Context',  'Confidence', 'Document Reference'])
-        return df
-
-
     def display_answers(self, answers):
-        if not answers: return
-        df = self.answers2df(answers)
-        from IPython.core.display import display, HTML
-        display(HTML(df.to_html(render_links=True, escape=False)))
+        return display_answers(answers)
 
 
 
