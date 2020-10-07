@@ -146,8 +146,7 @@ class QA(ABC):
 
 
 
-    def ask(self, question, batch_size=8, n_docs_considered=10, n_answers=50, 
-            rerank_threshold=0.015, min_context_length=20):
+    def ask(self, question, batch_size=8, n_docs_considered=10, n_answers=50, rerank_threshold=0.015):
         """
         submit question to obtain candidate answers
 
@@ -167,8 +166,6 @@ class QA(ABC):
                                  This can help bump the correct answer closer to the top.
                                  default:0.015.
                                  If None, no re-ranking is performed.
-          min_context_length(int): minimum number of words for context to be inspected for
-                                   candidate answers.  default:20
         Returns:
           list
         """
@@ -187,12 +184,10 @@ class QA(ABC):
             rawtext = doc_result.get('rawtext', '')
             reference = doc_result.get('reference', '')
             if len(self.tokenizer.tokenize(rawtext)) < self.maxlen:
-                if len(rawtext.split()) < min_context_length: continue
                 contexts.append(rawtext)
                 refs.append(reference)
             else:
                 paragraphs = TU.paragraph_tokenize(rawtext, join_sentences=True)
-                paragraphs = [p for p in paragraphs if len(p.split()) > min_context_length]
                 contexts.extend(paragraphs)
                 refs.extend([reference] * len(paragraphs))
 
@@ -333,7 +328,7 @@ class SimpleQA(QA):
 
     @classmethod
     def index_from_list(cls, docs, index_dir, commit_every=1024, breakup_docs=False,
-                        procs=1, limitmb=256, multisegment=False, references=None):
+                        procs=1, limitmb=256, multisegment=False, min_words=20, references=None):
         """
         index documents from list.
         The procs, limitmb, and especially multisegment arguments can be used to 
@@ -349,6 +344,8 @@ class SimpleQA(QA):
           procs(int): number of processors
           limitmb(int): memory limit in MB for each process
           multisegment(bool): new segments written instead of merging
+          min_words(int):  minimum words for a document (or paragraph extracted from document when breakup_docs=True) to be included in index.
+                           Useful for pruning contexts that are unlikely to contain useful answers
           references(list): list of strings containing a reference (e.g., file name) for each document in docs.
                             If None, the index of element in docs is used as reference.
         """
@@ -368,10 +365,12 @@ class SimpleQA(QA):
                     small_docs = TU.paragraph_tokenize(doc, join_sentences=True, lang='en')
                     refs = [reference] * len(small_docs)
                     for i, small_doc in enumerate(small_docs):
+                        if len(small_docs.split()) < min_words: continue
                         content = small_doc
                         reference = refs[i]
                         writer.add_document(reference=reference, content=content, rawtext=content)
                 else:
+                    if len(docs.split()) < min_words: continue
                     content = doc 
                     writer.add_document(reference=reference, content=content, rawtext=content)
 
@@ -387,7 +386,7 @@ class SimpleQA(QA):
 
 
     @classmethod
-    def index_from_folder(cls, folder_path, index_dir,  commit_every=1024, breakup_docs=False, 
+    def index_from_folder(cls, folder_path, index_dir,  commit_every=1024, breakup_docs=False, min_words=20,
                           encoding='utf-8', procs=1, limitmb=256, multisegment=False, verbose=1):
         """
         index all plain text documents within a folder.
@@ -402,6 +401,8 @@ class SimpleQA(QA):
           breakup_docs(bool): break up documents into smaller paragraphs and treat those as the documents.
                               This can potentially improve the speed at which answers are returned by the ask method
                               when documents being searched are longer.
+          min_words(int):  minimum words for a document (or paragraph extracted from document when breakup_docs=True) to be included in index.
+                           Useful for pruning contexts that are unlikely to contain useful answers
           encoding(str): encoding to use when reading document files from disk
           procs(int): number of processors
           limitmb(int): memory limit in MB for each process
@@ -423,10 +424,12 @@ class SimpleQA(QA):
                 small_docs = TU.paragraph_tokenize(doc, join_sentences=True, lang='en')
                 refs = [reference] * len(small_docs)
                 for i, small_doc in enumerate(small_docs):
+                    if len(small_docs.split()) < min_words: continue
                     content = small_doc
                     reference = refs[i]
                     writer.add_document(reference=reference, content=content, rawtext=content)
             else:
+                if len(docs.split()) < min_words: continue
                 content = doc
                 writer.add_document(reference=reference, content=content, rawtext=content)
 
