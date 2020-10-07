@@ -23,7 +23,7 @@ text.SimpleQA.index_from_list(docs, INDEXDIR, commit_every=len(docs),
                               breakup_docs=True         # this slows indexing but speeds up answer retrieval
                               )
 qa = text.SimpleQA(INDEXDIR)
-# supplying higher batch size to ask further speeds up answer retreival
+# supplying higher batch size further speeds up answer retreival
 answers = qa.ask('What causes computer images to be too dark?', batch_size=8)
 
 # top answer snippet:
