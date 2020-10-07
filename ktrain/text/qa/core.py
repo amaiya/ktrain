@@ -229,6 +229,10 @@ class QA(ABC):
                     answer['reference'] = refs[idx-1]
                     answer = self._expand_answer(answer)
                     answers.append(answer)
+
+                mb.child.comment = f'generating candidate answers'
+
+
         answers = sorted(answers, key = lambda k:k['confidence'], reverse=True)
         if n_answers is not None:
             answers = answers[:n_answers]
