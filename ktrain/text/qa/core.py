@@ -16,6 +16,27 @@ from transformers import TFAutoModelForQuestionAnswering
 from transformers import AutoTokenizer
 LOWCONF = -10000
 
+def _answers2df(answers):
+    dfdata = []
+    for a in answers:
+        answer_text = a['answer']
+        snippet_html = '<div>' +a['sentence_beginning'] + " <font color='red'>"+a['answer']+"</font> "+a['sentence_end']+'</div>'
+        confidence = a['confidence']
+        doc_key = a['reference']
+        dfdata.append([answer_text, snippet_html, confidence, doc_key])
+    df = pd.DataFrame(dfdata, columns = ['Candidate Answer', 'Context',  'Confidence', 'Document Reference'])
+    if "\t" in answers[0]['reference']:
+        df['Document Reference'] = df['Document Reference'].apply(lambda x: '<a href="{}">{}</a>'.format(x.split('\t')[1], x.split('\t')[0]))
+    return df
+
+
+
+def display_answers(answers):
+    if not answers: return
+    df = _answers2df(answers)
+    from IPython.core.display import display, HTML
+    return display(HTML(df.to_html(render_links=True, escape=False)))
+
 
 class QA(ABC):
     """
@@ -229,6 +250,10 @@ class QA(ABC):
                     answer['reference'] = refs[idx-1]
                     answer = self._expand_answer(answer)
                     answers.append(answer)
+
+                mb.child.comment = f'generating candidate answers'
+
+
         answers = sorted(answers, key = lambda k:k['confidence'], reverse=True)
         if n_answers is not None:
             answers = answers[:n_answers]
@@ -268,23 +293,8 @@ class QA(ABC):
         return answers
 
 
-    def answers2df(self, answers):
-        dfdata = []
-        for a in answers:
-            answer_text = a['answer']
-            snippet_html = '<div>' +a['sentence_beginning'] + " <font color='red'>"+a['answer']+"</font> "+a['sentence_end']+'</div>'
-            confidence = a['confidence']
-            doc_key = a['reference']
-            dfdata.append([answer_text, snippet_html, confidence, doc_key])
-        df = pd.DataFrame(dfdata, columns = ['Candidate Answer', 'Context',  'Confidence', 'Document Reference'])
-        return df
-
-
     def display_answers(self, answers):
-        if not answers: return
-        df = self.answers2df(answers)
-        from IPython.core.display import display, HTML
-        display(HTML(df.to_html(render_links=True, escape=False)))
+        return display_answers(answers)
 
 
 
@@ -328,7 +338,7 @@ class SimpleQA(QA):
 
     @classmethod
     def index_from_list(cls, docs, index_dir, commit_every=1024, breakup_docs=False,
-                        procs=1, limitmb=256, multisegment=False):
+                        procs=1, limitmb=256, multisegment=False, min_words=20, references=None):
         """
         index documents from list.
         The procs, limitmb, and especially multisegment arguments can be used to 
@@ -344,24 +354,42 @@ class SimpleQA(QA):
           procs(int): number of processors
           limitmb(int): memory limit in MB for each process
           multisegment(bool): new segments written instead of merging
+          min_words(int):  minimum words for a document (or paragraph extracted from document when breakup_docs=True) to be included in index.
+                           Useful for pruning contexts that are unlikely to contain useful answers
+          references(list): List of strings containing a reference (e.g., file name) for each document in docs.
+                            Each string is treated as a label for the document (e.g., file name, MD5 hash, etc.):
+                               Example:  ['some_file.pdf', 'some_other_file,pdf', ...]
+                            Strings can also be hyperlinks in which case the label and URL should be separated by a single tab character:
+                               Example: ['ktrain_article\thttps://arxiv.org/pdf/2004.10703v4.pdf', ...]
+
+                            These references will be returned in the output of the ask method.
+                            If strings are  hyperlinks, then they will automatically be made clickable when the display_answers function
+                            displays candidate answers in a pandas DataFRame.
+
+                            If references is None, the index of element in docs is used as reference.
         """
         if not isinstance(docs, (np.ndarray, list)): raise ValueError('docs must be a list of strings')
+        if references is not None and not isinstance(references, (np.ndarray, list)): raise ValueError('references must be a list of strings')
+        if references is not None and len(references) != len(docs): raise ValueError('lengths of docs and references must be equal')
+
         ix = index.open_dir(index_dir)
         writer = ix.writer(procs=procs, limitmb=limitmb, multisegment=multisegment)
 
         mb = master_bar(range(1))
         for i in mb:
             for idx, doc in enumerate(progress_bar(docs, parent=mb)):
-                reference = "%s" % (idx)
+                reference = "%s" % (idx) if references is None else references[idx]
 
                 if breakup_docs:
                     small_docs = TU.paragraph_tokenize(doc, join_sentences=True, lang='en')
                     refs = [reference] * len(small_docs)
                     for i, small_doc in enumerate(small_docs):
+                        if len(small_doc.split()) < min_words: continue
                         content = small_doc
                         reference = refs[i]
                         writer.add_document(reference=reference, content=content, rawtext=content)
                 else:
+                    if len(doc.split()) < min_words: continue
                     content = doc 
                     writer.add_document(reference=reference, content=content, rawtext=content)
 
@@ -372,12 +400,12 @@ class SimpleQA(QA):
                     writer = ix.writer(procs=procs, limitmb=limitmb, multisegment=multisegment)
                 mb.child.comment = f'indexing documents'
             writer.commit()
-            mb.write(f'Finished indexing documents')
+            #mb.write(f'Finished indexing documents')
         return
 
 
     @classmethod
-    def index_from_folder(cls, folder_path, index_dir,  commit_every=1024, breakup_docs=False, 
+    def index_from_folder(cls, folder_path, index_dir,  commit_every=1024, breakup_docs=False, min_words=20,
                           encoding='utf-8', procs=1, limitmb=256, multisegment=False, verbose=1):
         """
         index all plain text documents within a folder.
@@ -392,6 +420,8 @@ class SimpleQA(QA):
           breakup_docs(bool): break up documents into smaller paragraphs and treat those as the documents.
                               This can potentially improve the speed at which answers are returned by the ask method
                               when documents being searched are longer.
+          min_words(int):  minimum words for a document (or paragraph extracted from document when breakup_docs=True) to be included in index.
+                           Useful for pruning contexts that are unlikely to contain useful answers
           encoding(str): encoding to use when reading document files from disk
           procs(int): number of processors
           limitmb(int): memory limit in MB for each process
@@ -413,10 +443,12 @@ class SimpleQA(QA):
                 small_docs = TU.paragraph_tokenize(doc, join_sentences=True, lang='en')
                 refs = [reference] * len(small_docs)
                 for i, small_doc in enumerate(small_docs):
+                    if len(small_doc.split()) < min_words: continue
                     content = small_doc
                     reference = refs[i]
                     writer.add_document(reference=reference, content=content, rawtext=content)
             else:
+                if len(doc.split()) < min_words: continue
                 content = doc
                 writer.add_document(reference=reference, content=content, rawtext=content)
 
