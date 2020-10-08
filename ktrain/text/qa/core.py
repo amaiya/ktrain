@@ -16,7 +16,6 @@ from transformers import TFAutoModelForQuestionAnswering
 from transformers import AutoTokenizer
 LOWCONF = -10000
 
-
 def _answers2df(answers):
     dfdata = []
     for a in answers:
@@ -24,12 +23,12 @@ def _answers2df(answers):
         snippet_html = '<div>' +a['sentence_beginning'] + " <font color='red'>"+a['answer']+"</font> "+a['sentence_end']+'</div>'
         confidence = a['confidence']
         doc_key = a['reference']
-        ref = doc_key = "\t".join(doc_key) if isinstance(doc_key, tuple) else doc_key
-        dfdata.append([answer_text, snippet_html, confidence, ref])
+        dfdata.append([answer_text, snippet_html, confidence, doc_key])
     df = pd.DataFrame(dfdata, columns = ['Candidate Answer', 'Context',  'Confidence', 'Document Reference'])
-    if isinstance(answers[0]['reference'], tuple):
+    if "\t" in answers[0]['reference']:
         df['Document Reference'] = df['Document Reference'].apply(lambda x: '<a href="{}">{}</a>'.format(x.split('\t')[1], x.split('\t')[0]))
     return df
+
 
 
 def display_answers(answers):
@@ -357,8 +356,17 @@ class SimpleQA(QA):
           multisegment(bool): new segments written instead of merging
           min_words(int):  minimum words for a document (or paragraph extracted from document when breakup_docs=True) to be included in index.
                            Useful for pruning contexts that are unlikely to contain useful answers
-          references(list): list of strings containing a reference (e.g., file name) for each document in docs.
-                            If None, the index of element in docs is used as reference.
+          references(list): List of strings containing a reference (e.g., file name) for each document in docs.
+                            Each string is treated as a label for the document (e.g., file name, MD5 hash, etc.):
+                               Example:  ['some_file.pdf', 'some_other_file,pdf', ...]
+                            Strings can also be hyperlinks in which case the label and URL should be separated by a single tab character:
+                               Example: ['ktrain_article\thttps://arxiv.org/pdf/2004.10703v4.pdf', ...]
+
+                            These references will be returned in the output of the ask method.
+                            If strings are  hyperlinks, then they will automatically be made clickable when the display_answers function
+                            displays candidate answers in a pandas DataFRame.
+
+                            If references is None, the index of element in docs is used as reference.
         """
         if not isinstance(docs, (np.ndarray, list)): raise ValueError('docs must be a list of strings')
         if references is not None and not isinstance(references, (np.ndarray, list)): raise ValueError('references must be a list of strings')
