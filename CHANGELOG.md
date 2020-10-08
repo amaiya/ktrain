@@ -15,6 +15,7 @@ Most recent releases are shown at the top. Each release shows:
 - added optional `references` argument to `SimpleQA.index_from_list` 
 - added `min_words` argument to `SimpleQA.index_from_list` and `SimpleQA.index_from_folder` to prune small documents or paragraphs 
   that are unlikely to include good answers
+- `qa.display_answers` now supports hyperlinks for document references
 
 
 ### Fixed:

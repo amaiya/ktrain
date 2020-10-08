@@ -24,8 +24,11 @@ def _answers2df(answers):
         snippet_html = '<div>' +a['sentence_beginning'] + " <font color='red'>"+a['answer']+"</font> "+a['sentence_end']+'</div>'
         confidence = a['confidence']
         doc_key = a['reference']
-        dfdata.append([answer_text, snippet_html, confidence, doc_key])
+        ref = doc_key = "\t".join(doc_key) if isinstance(doc_key, tuple) else doc_key
+        dfdata.append([answer_text, snippet_html, confidence, ref])
     df = pd.DataFrame(dfdata, columns = ['Candidate Answer', 'Context',  'Confidence', 'Document Reference'])
+    if isinstance(answers[0]['reference'], tuple):
+        df['Document Reference'] = df['Document Reference'].apply(lambda x: '<a href="{}">{}</a>'.format(x.split('\t')[1], x.split('\t')[0]))
     return df
 
 
