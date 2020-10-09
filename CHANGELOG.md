@@ -17,6 +17,7 @@ Most recent releases are shown at the top. Each release shows:
 
 ### Fixed:
 - fixed issue with missing noun phrase at end of sentence in `extract_noun_phrases`
+- fixed TensorFlow versioning issues with `utils.metrics_from_model`
 
 
 ## 0.22.2 (2020-10-09)
