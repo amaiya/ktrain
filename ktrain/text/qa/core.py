@@ -38,6 +38,24 @@ def display_answers(answers):
     return display(HTML(df.to_html(render_links=True, escape=False)))
 
 
+def _process_question(question, include_np=False):
+    if include_np:
+        try:
+            # attempt to use extract_noun_phrases first if textblob is installed
+            np_list = ['"%s"' % (np) for np in TU.extract_noun_phrases(question) if len(np.split()) > 1]
+            q_tokens = TU.tokenize(question, join_tokens=False)
+            q_tokens.extend(np_list)
+            return " ".join(q_tokens)
+        except:
+            import warnings
+            warnings.warn('TextBlob is not currently installed, so falling back to np=False with no extra question processing. '+\
+                          'To install: pip install textblob')
+            return TU.tokenize(question, join_tokens=True)
+    else:
+        return TU.tokenize(question, join_tokens=True)
+
+
+
 class QA(ABC):
     """
     Base class for QA
@@ -167,7 +185,8 @@ class QA(ABC):
 
 
 
-    def ask(self, question, batch_size=8, n_docs_considered=10, n_answers=50, rerank_threshold=0.015):
+    def ask(self, question, batch_size=8, n_docs_considered=10, n_answers=50, 
+            rerank_threshold=0.015, include_np=False):
         """
         submit question to obtain candidate answers
 
@@ -187,6 +206,12 @@ class QA(ABC):
                                  This can help bump the correct answer closer to the top.
                                  default:0.015.
                                  If None, no re-ranking is performed.
+          include_np(bool):  If True, noun phrases will be extracted from question and included
+                             in query that retrieves documents likely to contain candidate answers.
+                             This may be useful if you ask a question about artificial intelligence
+                             and the answers returned pertain just to intelligence, for example.
+                             Note: include_np=True requires textblob be installed.
+                             Default:False
         Returns:
           list
         """
@@ -194,7 +219,7 @@ class QA(ABC):
         paragraphs = []
         refs = []
         #doc_results = self.search(question, limit=n_docs_considered)
-        doc_results = self.search(TU.tokenize(question, join_tokens=True), limit=n_docs_considered)
+        doc_results = self.search(_process_question(question, include_np=include_np), limit=n_docs_considered)
         if not doc_results: 
             warnings.warn('No documents matched words in question')
             return []

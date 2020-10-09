@@ -344,3 +344,29 @@ def paragraph_tokenize(text, join_sentences=False, lang=None):
         if join_sentences: sents = ' '.join(sents)
         paragraphs.append(sents)
     return paragraphs
+
+
+def extract_noun_phrases(text):
+    """
+    extracts noun phrases
+    """
+    try:
+        from textblob import TextBlob
+    except:
+        raise Exception('extract_noun_phrases require TextBlob: pip install textblob')
+    blob = TextBlob(text)
+    stop_words = ['which', 'what']
+    curr_phrase = []
+    np_list = []
+    start = False
+    for token in blob.tags:
+        if token[1].startswith('J') or token[1].startswith('N'):
+            if not start: start = True
+            if token[0].lower() not in stop_words: curr_phrase.append(token[0])
+        else:
+            if start:
+                np_list.append(" ".join(curr_phrase))
+                curr_phrase = []
+                start = False
+    return np_list
+

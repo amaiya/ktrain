@@ -50,6 +50,7 @@ setup(
           #'eli5 >= 0.10.0', # forked version used by TextPredictor.explain and ImagePredictor.explain
           #'stellargraph>=0.8.2', # forked version used by graph module
           #'allennlp', # required for Elmo embeddings since TF2 TF_HUB does not work
+          #'textblob', # used by textutils.extract_noun_phrases
       ],
   classifiers=[  # Optional
     # How mature is this project? Common values are

@@ -6,6 +6,21 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.22.2 (2020-10-09)
+
+### New:
+- added `extract_noun_phrases` to `textutils`
+
+### Changed
+- `SimpleQA.ask` now includes an `include_np` parameter.  When True, noun phrases will be used to retrieve documents 
+   containing candidate answers.
+
+
+### Fixed:
+- N/A
+
+
+
 ## 0.22.1 (2020-10-08)
 
 ### New:
