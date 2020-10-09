@@ -25,8 +25,6 @@ setup(
   url = 'https://github.com/amaiya/ktrain',
   keywords = ['tensorflow', 'keras', 'deep learning', 'machine learning'],
   install_requires=[
-          #'scipy==1.4.1', # removed due to https://github.com/tensorflow/tensorflow/commit/78026d6a66f7f0fc
-          #'pillow'
           'scikit-learn>=0.21.3', # previously pinned to 0.21.3 due to TextPredictor.explain, but no longer needed as of 0.19.7
           'matplotlib >= 3.0.0',
           'pandas >= 1.0.1',

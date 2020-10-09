@@ -50,11 +50,26 @@ def loss_fn_from_model(model):
         return model.compiled_loss._get_loss_object(model.compiled_loss._losses[0].name).fn
 
 def metrics_from_model(model):
+    msg = 'Could not retrieve metrics list from compiled model'
+
     # dep_fix
     if version.parse(tf.__version__) < version.parse('2.2') or DISABLE_V2_BEHAVIOR:
-        return [m.name for m in model.metrics] if is_tf_keras() else model.metrics
-    else: # TF 2.2.0
-        return model.compiled_metrics._metrics
+        return model._compile_metrics
+        #return [m.name for m in model.metrics] if is_tf_keras() else model.metrics
+    else: # TF >= 2.2.0
+        mlist =  model.compiled_metrics._metrics
+        if isinstance(mlist, list) and isinstance(mlist[0], str): # metrics are strings prior to training
+            return mlist
+        elif isinstance(mlist, list) and isinstance(mlist[0], list):
+            try:
+                return [m.name for m in mlist[0]]
+            except:
+                warnings.warn(msg)
+                return []
+        else:
+            warnings.warn(msg)
+            return []
+
 
 
 def is_classifier(model):

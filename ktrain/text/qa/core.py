@@ -48,7 +48,7 @@ def _process_question(question, include_np=False):
             return " ".join(q_tokens)
         except:
             import warnings
-            warnings.warn('TextBlob is not currently installed, so falling back to np=False with no extra question processing. '+\
+            warnings.warn('TextBlob is not currently installed, so falling back to include_np=False with no extra question processing. '+\
                           'To install: pip install textblob')
             return TU.tokenize(question, join_tokens=True)
     else:
