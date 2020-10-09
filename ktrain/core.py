@@ -157,7 +157,6 @@ class Learner(ABC):
             from sklearn.metrics import mean_absolute_error, mean_squared_error
             regout = []
             metrics = U.metrics_from_model(self.model)
-            print(metrics)
             for m in metrics:
                 if m in ['mae', 'mean_absolute_error']:
                     regout.append( (m, mean_absolute_error(y_true,  y_pred)) )
