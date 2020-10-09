@@ -12,7 +12,8 @@ Most recent releases are shown at the top. Each release shows:
 - added `extract_noun_phrases` to `textutils`
 
 ### Changed
-- N/A
+- `SimpleQA.ask` now includes an `include_np` parameter.  When True, noun phrases will be used to retrieve documents 
+   containing candidate answers.
 
 
 ### Fixed:
