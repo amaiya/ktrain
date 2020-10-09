@@ -368,5 +368,6 @@ def extract_noun_phrases(text):
                 np_list.append(" ".join(curr_phrase))
                 curr_phrase = []
                 start = False
+    if start: np_list.append(" ".join(curr_phrase))
     return np_list
 
