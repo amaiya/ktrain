@@ -19,7 +19,7 @@
 from ktrain import text
 INDEXDIR = '/tmp/myindex'
 text.SimpleQA.initialize_index(INDEXDIR)
-text.SimpleQA.index_from_list(docs, INDEXDIR, commit_every=len(docs),  # docs is a Python list of strings
+text.SimpleQA.index_from_list(docs, INDEXDIR, commit_every=len(docs),  # docs is a list of strings
                               multisegment=True, procs=4, # these args speed up indexing
                               breakup_docs=True)          # this slows indexing but speeds up answer retrieval
 
