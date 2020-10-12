@@ -26,7 +26,7 @@ def _answers2df(answers):
         dfdata.append([answer_text, snippet_html, confidence, doc_key])
     df = pd.DataFrame(dfdata, columns = ['Candidate Answer', 'Context',  'Confidence', 'Document Reference'])
     if "\t" in answers[0]['reference']:
-        df['Document Reference'] = df['Document Reference'].apply(lambda x: '<a href="{}">{}</a>'.format(x.split('\t')[1], x.split('\t')[0]))
+        df['Document Reference'] = df['Document Reference'].apply(lambda x: '<a href="{}" target="_blank">{}</a>'.format(x.split('\t')[1], x.split('\t')[0]))
     return df
 
 

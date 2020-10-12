@@ -15,15 +15,16 @@
 ```python
 # End-to-End Open-Domain Question-Answering in ktrain
 
+# index some documents into a built-in search engin
 from ktrain import text
 INDEXDIR = '/tmp/myindex'
 text.SimpleQA.initialize_index(INDEXDIR)
-text.SimpleQA.index_from_list(docs, INDEXDIR, commit_every=len(docs),
+text.SimpleQA.index_from_list(docs, INDEXDIR, commit_every=len(docs),  # docs is a list of strings
                               multisegment=True, procs=4, # these args speed up indexing
                               breakup_docs=True)          # this slows indexing but speeds up answer retrieval
-qa = text.SimpleQA(INDEXDIR)
 
-# setting higher batch size can further speed up answer retreival
+# ask questions (setting higher batch size can further speed up answer retrieval)
+qa = text.SimpleQA(INDEXDIR)
 answers = qa.ask('What causes computer images to be too dark?', batch_size=8)
 
 # top answer snippet:

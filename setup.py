@@ -37,7 +37,7 @@ setup(
           'cchardet',  # previously pinned to 2.1.5 (due to this issue: https://github.com/PyYoshi/cChardet/issues/61) but no longer needed
           'networkx>=2.3',
           'bokeh',
-          'seqeval',
+          'seqeval==0.0.19', # pin to 0.0.19 due to numpy version incompatibility with TensorFlow 2.3
           'packaging',
           'transformers>=3.1.0', # due to breaking change in v3.1.0
           'ipython',
