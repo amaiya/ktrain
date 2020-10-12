@@ -6,6 +6,19 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.22.4 (TBD)
+
+### New:
+- N/A
+
+### Changed
+- N/A
+
+
+### Fixed:
+- pin to `seqeval==0.0.19` due to `numpy` version incompatibility with latest TensorFlow and to suppress errors during installatio
+
+
 ## 0.22.3 (2020-10-09)
 
 ### New:
