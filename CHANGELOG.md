@@ -6,17 +6,17 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
-## 0.22.4 (TBD)
+## 0.22.4 (2020-10-12)
 
 ### New:
 - N/A
 
 ### Changed
-- changed `display_answers` to make URLs open in new tab
+- changed `qa.core.display_answers` to make URLs open in new tab
 
 
 ### Fixed:
-- pin to `seqeval==0.0.19` due to `numpy` version incompatibility with latest TensorFlow and to suppress errors during installatio
+- pin to `seqeval==0.0.19` due to `numpy` version incompatibility with latest TensorFlow and to suppress errors during installation
 
 
 ## 0.22.3 (2020-10-09)
