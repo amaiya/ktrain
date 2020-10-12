@@ -12,7 +12,7 @@ Most recent releases are shown at the top. Each release shows:
 - N/A
 
 ### Changed
-- N/A
+- changed `display_answers` to make URLs open in new tab
 
 
 ### Fixed:
