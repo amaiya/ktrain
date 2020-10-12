@@ -15,7 +15,7 @@
 ```python
 # End-to-End Open-Domain Question-Answering in ktrain
 
-# index some documents into a built-in search engin
+# index some documents into a built-in search engine
 from ktrain import text
 INDEXDIR = '/tmp/myindex'
 text.SimpleQA.initialize_index(INDEXDIR)
