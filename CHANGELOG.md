@@ -16,7 +16,7 @@ Most recent releases are shown at the top. Each release shows:
 
 
 ### Fixed:
-- N/A
+- Changed version check warning in `lr_find` to a raised Exception to avoid confusion when warnings from **ktrain** are suppressed
 
 
 ## 0.22.4 (2020-10-12)

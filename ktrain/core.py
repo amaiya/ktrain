@@ -520,9 +520,9 @@ class Learner(ABC):
         # dep_fix: bug in TF 2.2 and 2.3
         if version.parse(tf.__version__) > version.parse('2.1') and version.parse(tf.__version__) < version.parse('2.4'):
             if max_epochs is None:
-                warnings.warn('Due to a bug in TensorFlow 2.2 and 2.3, the max_epochs argument is temporarily required. Please re-run with max_epochs. \n' +\
-                              'More info: https://github.com/tensorflow/tensorflow/issues/41174#issuecomment-656330268')
-                return
+                raise ValueError('Due to a bug in TensorFlow 2.2 and 2.3, the max_epochs argument is temporarily required. ' +\
+                                 'Please re-run with max_epochs (e.g., max_epochs=5). \n' +\
+                                'More info: https://github.com/tensorflow/tensorflow/issues/41174#issuecomment-656330268')
 
 
         U.vprint('simulating training for different learning rates... this may take a few moments...',
