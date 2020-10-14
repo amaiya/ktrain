@@ -17,7 +17,7 @@ __all__ = ['get_learner', 'get_predictor', 'load_predictor', 'release_gpu_memory
 
 def get_learner(model, train_data=None, val_data=None, 
                 batch_size=U.DEFAULT_BS, eval_batch_size=U.DEFAULT_BS,
-                workers=1, use_multiprocessing=False, multigpu=False):
+                workers=1, use_multiprocessing=False):
     """
     Returns a Learner instance that can be used to tune and train Keras models.
 
@@ -42,10 +42,6 @@ def get_learner(model, train_data=None, val_data=None,
     use_multiprocessing(bool):  whether or not to use multiprocessing for workers
                                This is ignored unless train_data/val_data is an instance of 
                                tf.keras.preprocessing.image.DirectoryIterator or tf.keras.preprocessing.image.DataFrameIterator. 
-    multigpu(bool):             Lets the Learner know that the model has been 
-                                replicated on more than 1 GPU.
-                                Only supported for models from vision.image_classifiers
-                                at this time.
     """
 
     # check arguments
@@ -115,7 +111,7 @@ def get_learner(model, train_data=None, val_data=None,
             learner = ArrayLearner
     return learner(model, train_data=train_data, val_data=val_data, 
                    batch_size=batch_size, eval_batch_size=eval_batch_size, 
-                   workers=workers, use_multiprocessing=use_multiprocessing, multigpu=multigpu)
+                   workers=workers, use_multiprocessing=use_multiprocessing)
 
 
 # keys
