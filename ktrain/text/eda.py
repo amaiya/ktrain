@@ -217,7 +217,11 @@ class TopicModel():
     def print_topics(self, n_words=10, show_counts=False):
         """
         print topics
+        n_words(int): number of words to describe each topic
+        show_counts(bool): If True, print topics with document counts, where
+                           the count is the number of documents with that topic as primary.
         """
+
         topics = self.get_topics(n_words=n_words, as_string=True)
         if show_counts:
             self._check_build()
