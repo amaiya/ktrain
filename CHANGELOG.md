@@ -12,7 +12,7 @@ Most recent releases are shown at the top. Each release shows:
 - N/A
 
 ### Changed
-- N/A
+- removed all references to obsolute `multi_gpu_model`, as this has been removed from TF 2.4
 
 
 ### Fixed:

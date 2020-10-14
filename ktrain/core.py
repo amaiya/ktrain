@@ -24,14 +24,13 @@ class Learner(ABC):
     an abstract method and must be implemented by subclasses.
 
     """
-    def __init__(self, model, workers=1, use_multiprocessing=False, multigpu=False):
+    def __init__(self, model, workers=1, use_multiprocessing=False):
         if not isinstance(model, Model):
             raise ValueError('model must be of instance Model')
         self.model = model
         self.lr_finder = LRFinder(self.model)
         self.workers = workers
         self.use_multiprocessing = use_multiprocessing
-        self.multigpu=multigpu
         self.history = None
 
         # save original weights of model
@@ -353,22 +352,6 @@ class Learner(ABC):
 
 
     def _recompile(self, wd=None):
-        # ISSUE: recompile does not work correctly with multigpu models
-        if self.multigpu:
-            err_msg = """
-                   IMPORTANT: freeze and unfreeze methods do not currently work with 
-                   multi-GPU models.  If you are using the load_imagemodel method to
-                   define your model, please reload your model and use the freeze_layers 
-                   argument of load_imagemodel to selectively freeze layers.
-                   """
-            raise Exception(err_msg)
-        
-        #if self.multigpu:
-            #with tf.device("/cpu:0"):
-                #metrics = [m.name for m in self.model.metrics] if U.is_tf_keras() else self.model.metrics
-                #self.model.compile(optimizer=self.model.optimizer,
-                                   #loss=self.model.loss,
-                                   #metrics=metrics)
         metrics = U.metrics_from_model(self.model)
         if wd is not None and wd > 0 and type(self.model.optimizer).__name__ != 'AdamWeightDecay':
             warnings.warn('recompiling model to use AdamWeightDecay as opimizer with weight decay of %s' % (wd) )
@@ -1062,8 +1045,8 @@ class ArrayLearner(Learner):
 
     def __init__(self, model, train_data=None, val_data=None, 
                  batch_size=U.DEFAULT_BS, eval_batch_size=U.DEFAULT_BS, 
-                 workers=1, use_multiprocessing=False, multigpu=False):
-        super().__init__(model, workers=workers, use_multiprocessing=use_multiprocessing, multigpu=multigpu)
+                 workers=1, use_multiprocessing=False):
+        super().__init__(model, workers=workers, use_multiprocessing=use_multiprocessing)
         self.train_data = train_data
         self.val_data = val_data
         self.batch_size = batch_size
@@ -1235,8 +1218,8 @@ class GenLearner(Learner):
 
     def __init__(self, model, train_data=None, val_data=None, 
                  batch_size=U.DEFAULT_BS, eval_batch_size=U.DEFAULT_BS,
-                 workers=1, use_multiprocessing=False, multigpu=False):
-        super().__init__(model, workers=workers, use_multiprocessing=use_multiprocessing, multigpu=multigpu)
+                 workers=1, use_multiprocessing=False):
+        super().__init__(model, workers=workers, use_multiprocessing=use_multiprocessing)
         self.train_data = train_data
         self.val_data = val_data
         self.batch_size = batch_size
