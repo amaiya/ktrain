@@ -56,7 +56,7 @@ class TestLDA(TestCase):
         # recommender
         tm.train_recommender()
         results = tm.recommend(text=rawtext, n=1)
-        self.assertTrue(results[0][0].startswith('Archive-name'))
+        self.assertTrue(results[0]['text'].startswith('Archive-name'))
 
 
 if __name__ == "__main__":
