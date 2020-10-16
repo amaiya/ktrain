@@ -177,6 +177,30 @@ class TopicModel():
         return self.get_topics()
 
 
+    def get_document_topic_distribution(self):
+        """
+        Gets the document-topic distribution.
+        Each row is a document and each column is a topic
+        """
+        self._check_build()
+        return self.doc_topics
+
+
+    def get_sorted_docs(self, topic_id):
+        """
+        Returns all docs sorted by relevance to <topic_id>.
+        Unlike get_docs, this ranks documents by the supplied topic_id rather
+        than the topic_id to which document is most relevant.
+        """
+        docs = self.get_docs()
+        d = {}
+        for doc in docs: d[doc['doc_id']] = doc
+        m = self.get_document_topic_distribution()
+        doc_ids = (-m[:,topic_id]).argsort()
+        return [d[doc_id] for doc_id in doc_ids]
+
+
+
     def get_word_weights(self, topic_id, n_words=100):
         """
         Returns a list tuples of the form: (word, weight) for given topic_id.
@@ -217,6 +241,9 @@ class TopicModel():
     def print_topics(self, n_words=10, show_counts=False):
         """
         print topics
+        n_words(int): number of words to describe each topic
+        show_counts(bool): If True, print topics with document counts, where
+                           the count is the number of documents with that topic as primary.
         """
         topics = self.get_topics(n_words=n_words, as_string=True)
         if show_counts:
@@ -270,7 +297,8 @@ class TopicModel():
     
     def get_docs(self, topic_ids=[], doc_ids=[], rank=False):
         """
-        Returns document entries for supplied topic_ids
+        Returns document entries for supplied topic_ids.
+        Documents returned are those whose primary topic is topic with given topic_id
         Args:
             topic_ids(list of ints): list of topid IDs where each id is in the range
                                      of range(self.n_topics).
@@ -282,8 +310,11 @@ class TopicModel():
                         of texts supplied to self.build (which is the order of self.doc_topics).
 
         Returns:
-            list of tuples:  list of tuples where each tuple is of the form 
-                             (text, doc_id, topic_probability, topic_id).
+            list of dicts:  list of dicts with keys:
+                            'text': text of document
+                            'doc_id': ID of document
+                            'topic_proba': topic probability (or score)
+                            'topic_id': ID of topic
             
         """
         self._check_build()
@@ -292,11 +323,11 @@ class TopicModel():
         result_texts = []
         for topic_id in topic_ids:
             if topic_id not in self.topic_dict: continue
-            texts = [tup + (topic_id,) for tup in self.topic_dict[topic_id] 
-                                           if not doc_ids or tup[1] in doc_ids]
+            texts = [{'text':tup[0], 'doc_id':tup[1], 'topic_proba':tup[2], 'topic_id':topic_id} for tup in self.topic_dict[topic_id] 
+                                                                                                     if not doc_ids or tup[1] in doc_ids]
             result_texts.extend(texts)
         if not rank:
-            result_texts = sorted(result_texts, key=lambda x:x[1])
+            result_texts = sorted(result_texts, key=lambda x:x['doc_id'])
         return result_texts
 
 
@@ -315,7 +346,7 @@ class TopicModel():
                         
         """
         docs = self.get_docs(topic_ids=topic_ids, doc_ids=doc_ids)
-        return np.array([self.doc_topics[idx] for idx in [x[1] for x in docs]])
+        return np.array([self.doc_topics[idx] for idx in [x['doc_id'] for x in docs]])
 
 
     def get_texts(self,  topic_ids=[]):
@@ -631,7 +662,7 @@ class TopicModel():
         results = []
         for i in mb:
             for doc in progress_bar(docs, parent=mb):
-                text = doc[0]
+                text = doc['text']
                 if not case_sensitive: text = text.lower()
                 matches = pattern.findall(text)
                 if matches: results.append(doc)

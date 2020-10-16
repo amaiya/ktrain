@@ -89,7 +89,7 @@ class TestMultilabel(TestCase):
                                      train_data=(X, Y),
                                      val_data=(X, Y),
                                      batch_size=1)
-        learner.lr_find()
+        learner.lr_find(max_epochs=5) # use max_epochs until TF 2.4
 
 
         # use loss instead of accuracy due to: https://github.com/tensorflow/tensorflow/issues/41114

@@ -16,7 +16,7 @@ def bostonhousing():
     model.add(Dense(1, input_shape=(x_train.shape[1],), activation='linear'))
     model.compile(optimizer='adam', loss='mse', metrics=['mse', 'mae'])
     learner = ktrain.get_learner(model, train_data=(x_train, y_train), val_data=(x_test, y_test))
-    learner.lr_find()
+    learner.lr_find(max_epochs=5) # use max_epochs until TF 2.4
     hist = learner.fit(0.05, 8, cycle_len=1, cycle_mult=2)
     learner.view_top_losses(n=5)
     learner.validate()

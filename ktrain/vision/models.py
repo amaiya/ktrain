@@ -77,7 +77,6 @@ def image_classifier(name,
                      metrics=['accuracy'],
                      optimizer_name = U.DEFAULT_OPT,
                      multilabel=None,
-                     multigpu_number=None, 
                      pt_fc = [],
                      pt_ps = [],
                      verbose=1):
@@ -101,10 +100,6 @@ def image_classifier(name,
                            multilabel classificaiton (labels are not mutually exclusive).
                            If False, binary/multiclassification model will be returned.
                            If None, multilabel status will be inferred from data.
-        multigpu_number (int): Repicate model on this many GPUS.
-                               Must either be None or greater than 1.
-                               If greater than 1, must meet system specifications.
-                               If None, model is not replicated on multiple GPUS.
         pt_fc (list of ints): number of hidden units in extra Dense layers
                                 before final Dense layer of pretrained model.
                                 Only takes effect if name in PRETRAINED_MODELS
@@ -119,7 +114,6 @@ def image_classifier(name,
     """
     return image_model(name, train_data, val_data=val_data, freeze_layers=freeze_layers,
                        metrics=metrics, optimizer_name=optimizer_name, multilabel=multilabel,
-                       multigpu_number=multigpu_number,
                        pt_fc=pt_fc, pt_ps=pt_ps, verbose=verbose)
 
 
@@ -131,7 +125,6 @@ def image_regression_model(name,
                           freeze_layers=None, 
                           metrics=['mae'],
                           optimizer_name = U.DEFAULT_OPT,
-                          multigpu_number=None, 
                           pt_fc = [],
                           pt_ps = [],
                           verbose=1):
@@ -155,10 +148,6 @@ def image_regression_model(name,
                            multilabel classificaiton (labels are not mutually exclusive).
                            If False, binary/multiclassification model will be returned.
                            If None, multilabel status will be inferred from data.
-        multigpu_number (int): Repicate model on this many GPUS.
-                               Must either be None or greater than 1.
-                               If greater than 1, must meet system specifications.
-                               If None, model is not replicated on multiple GPUS.
         pt_fc (list of ints): number of hidden units in extra Dense layers
                                 before final Dense layer of pretrained model.
                                 Only takes effect if name in PRETRAINED_MODELS
@@ -175,7 +164,6 @@ def image_regression_model(name,
 
     return image_model(name, train_data, val_data=val_data, freeze_layers=freeze_layers,
                        metrics=metrics, optimizer_name=optimizer_name, multilabel=False,
-                       multigpu_number=multigpu_number,
                        pt_fc=pt_fc, pt_ps=pt_ps, verbose=verbose)
 
 
@@ -187,7 +175,6 @@ def image_model( name,
                  metrics=['accuracy'],
                  optimizer_name = U.DEFAULT_OPT,
                  multilabel=None,
-                 multigpu_number=None, 
                  pt_fc = [],
                  pt_ps = [],
                  verbose=1):
@@ -211,10 +198,6 @@ def image_model( name,
                            multilabel classificaiton (labels are not mutually exclusive).
                            If False, binary/multiclassification model will be returned.
                            If None, multilabel status will be inferred from data.
-        multigpu_number (int): Repicate model on this many GPUS.
-                               Must either be None or greater than 1.
-                               If greater than 1, must meet system specifications.
-                               If None, model is not replicated on multiple GPUS.
         pt_fc (list of ints): number of hidden units in extra Dense layers
                                 before final Dense layer of pretrained model.
                                 Only takes effect if name in PRETRAINED_MODELS
@@ -288,36 +271,18 @@ def image_model( name,
     num_classes = 1 if is_regression else U.nclasses_from_data(train_data)
     input_shape = U.shape_from_data(train_data)
 
-
-
     #------------
     # build model
     #------------
-    if type(multigpu_number) == type(1) and multigpu_number < 2:
-        raise ValuError('multigpu_number must either be None or > 1')
-    if multigpu_number is not None and multigpu_number >1:
-        with tf.device("/cpu:0"):
-            model = build_visionmodel(name,
-                                      num_classes,
-                                      input_shape=input_shape,
-                                      freeze_layers=freeze_layers,
-                                      activation=activation,
-                                      pt_fc = pt_fc,
-                                      pt_ps = pt_ps)
-        parallel_model = multi_gpu_model(model, gpus=multigpu_number)
-        parallel_model.compile(optimizer=optimizer_name, 
-                               loss='categorical_crossentropy', metrics=metrics)
-        return parallel_model
-    else:
-        model = build_visionmodel(name,
-                                  num_classes,
-                                  input_shape=input_shape,
-                                  freeze_layers=freeze_layers,
-                                  activation=activation,
-                                  pt_fc = pt_fc,
-                                  pt_ps = pt_ps)
-        model.compile(optimizer=optimizer_name, loss=loss_func, metrics=metrics)
-        return model
+    model = build_visionmodel(name,
+                              num_classes,
+                              input_shape=input_shape,
+                              freeze_layers=freeze_layers,
+                              activation=activation,
+                              pt_fc = pt_fc,
+                              pt_ps = pt_ps)
+    model.compile(optimizer=optimizer_name, loss=loss_func, metrics=metrics)
+    return model
 
 
 def build_visionmodel(name,
