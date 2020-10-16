@@ -182,7 +182,7 @@ class TopicModel():
         Gets the document-topic distribution.
         Each row is a document and each column is a topic
         """
-        if not self.doc_topics: raise Exception('Must call build first.')
+        self._check_build()
         return self.doc_topics
 
 
@@ -282,7 +282,8 @@ class TopicModel():
     
     def get_docs(self, topic_ids=[], doc_ids=[], rank=False):
         """
-        Returns document entries for supplied topic_ids
+        Returns document entries for supplied topic_ids.
+        Documents returned are those whose primary topic is topic with given topic_id
         Args:
             topic_ids(list of ints): list of topid IDs where each id is in the range
                                      of range(self.n_topics).
