@@ -6,15 +6,15 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
-## 0.22.5 (TBD)
+## 0.23.0 (TBD)
 
 ### New:
 - N/A
 
 ### Changed
-- removed all references to obsolute `multi_gpu_model`, as this has been removed from TF 2.4
+- removed all references to obsolete `multi_gpu_model`, as this has been removed from TF 2.4
 - added `TopicModel.get_document_topic_distribution` 
-- `get_docs` now returns a list of dicts instead of a list of tuples.  Each dict has keys: `text`, `doc_id`, `topic_proba`, `topic_id`.
+- `TopicModel.get_docs` now returns a list of dicts instead of a list of tuples.  Each dict has keys: `text`, `doc_id`, `topic_proba`, `topic_id`.
 
 
 ### Fixed:
