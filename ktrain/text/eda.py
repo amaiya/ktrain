@@ -186,6 +186,21 @@ class TopicModel():
         return self.doc_topics
 
 
+    def get_sorted_docs(self, topic_id):
+        """
+        Returns all docs sorted by relevance to <topic_id>.
+        Unlike get_docs, this ranks documents by the supplied topic_id rather
+        than the topic_id to which document is most relevant.
+        """
+        docs = self.get_docs()
+        d = {}
+        for doc in docs: d[doc['doc_id']] = doc
+        m = self.get_document_topic_distribution()
+        doc_ids = (-m[:,topic_id]).argsort()
+        return [d[doc_id] for doc_id in doc_ids]
+
+
+
     def get_word_weights(self, topic_id, n_words=100):
         """
         Returns a list tuples of the form: (word, weight) for given topic_id.
