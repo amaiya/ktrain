@@ -724,7 +724,7 @@ Then, using *ktrain*, you can use `ktrain.text.texts_from_df` (or `ktrain.text.t
 This may be an issue with TensorFlow installation or its dependency. Try uninstalling and reinstalling **ktrain** and its dependencies from scratch. Or, you can just create a new
 virtual environement for **ktrain**:
 
-`
+```
 python3 -m venv new_ktrain_venv
 cd new_ktrain_venv
 source bin/activate
@@ -732,7 +732,7 @@ pip install tensorflow
 pip install ktrain
 pip install git+https://github.com/amaiya/eli5@tfkeras_0_10_1
 pip install git+https://github.com/amaiya/stellargraph@no_tf_dep_082
-`
+```
 
 After re-installing everything, try loading the predictor again:
 
