@@ -246,7 +246,7 @@ class TestTextClassification(TestCase):
         self.assertEqual(type(p.explain(TEST_DOC)), IPython.core.display.HTML)
 
 
-    @skip('temporarily disabled')
+    #@skip('temporarily disabled')
     def test_bert(self):
         trn, val, preproc = txt.texts_from_array(x_train=self.trn[0], 
                                                  y_train=self.trn[1],
