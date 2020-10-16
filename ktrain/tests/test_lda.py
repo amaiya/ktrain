@@ -42,7 +42,7 @@ class TestLDA(TestCase):
         # document similarity
         tech_topics = [51, 85, 94, 22]
         tech_probs = tm.get_doctopics(topic_ids=tech_topics)
-        doc_ids = [doc['doc_ids'] for doc in tm.get_docs(topic_ids=tech_topics)]
+        doc_ids = [doc['doc_id'] for doc in tm.get_docs(topic_ids=tech_topics)]
         tm.train_scorer(topic_ids=tech_topics)
         other_topics = [i for i in range(tm.n_topics) if i not in tech_topics]
         other_texts = [d['text'] for d in tm.get_docs(topic_ids=other_topics)]
