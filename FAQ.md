@@ -721,8 +721,8 @@ Then, using *ktrain*, you can use `ktrain.text.texts_from_df` (or `ktrain.text.t
 
 ### Why am I getting a *"model must be of instance Model"* error with `load_predictor`?]
 
-This may be an issue with the TensorFlow installation or dependencies. Try uninstalling and reinstalling **ktrain** and its dependencies from scratch. Or, you can just create a new
-virtual environement for **ktrain**:
+This may be an issue with the TensorFlow installation or dependencies. Users have reported that uninstalling and reinstalling **ktrain** and its dependencies from scratch can
+resolve the issue. Or, you can just create a new virtual environement for **ktrain**:
 
 ```
 python3 -m venv new_ktrain_venv
