@@ -17,6 +17,8 @@
 
 - [How do I deploy a model using Flask?](#how-do-i-deploy-a-model-using-flask)
 
+- [Why am I getting a *"model must be of instance Model"* error with `load_predictor`?](#why-am-i-getting-a-model-must-be-of-instance-model-error-with-load_predictor)
+
 
 ## Training
 
@@ -713,6 +715,31 @@ Alternatively, you can read the data in yourself as a *pandas* DataFrame using o
 `
 
 Then, using *ktrain*, you can use `ktrain.text.texts_from_df` (or `ktrain.text.texts_from_array`) to load and preprocess your data.
+
+
+[[Back to Top](#frequently-asked-questions-about-ktrain)]
+
+### Why am I getting a *"model must be of instance Model"* error with `load_predictor`?]
+
+This may be an issue with TensorFlow or its dependency. Try uninstalling and reinstalling **ktrain** and its dependencies from scratch. Or, you can just create a new
+virtual environement for **ktrain**:
+
+`
+python3 -m venv new_ktrain_venv
+cd new_ktrain_venv
+source bin/activate
+pip install tensorflow
+pip install ktrain
+pip install git+https://github.com/amaiya/eli5@tfkeras_0_10_1
+pip install git+https://github.com/amaiya/stellargraph@no_tf_dep_082
+`
+
+After re-installing everything, try loading the predictor again:
+
+```python
+import ktrain
+predictor = ktrain.load_predictor('/path/to/folder')
+```
 
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
