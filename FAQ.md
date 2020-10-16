@@ -728,6 +728,7 @@ resolve the issue. Or, you can just create a new virtual environement for **ktra
 python3 -m venv new_ktrain_venv
 cd new_ktrain_venv
 source bin/activate
+pip install -U pip
 pip install tensorflow
 pip install ktrain
 pip install git+https://github.com/amaiya/eli5@tfkeras_0_10_1
