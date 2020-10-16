@@ -6,7 +6,7 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
-## 0.23.0 (TBD)
+## 0.23.0 (2020-10-16)
 
 ### New:
 - Support for upcoming release of TensorFlow 2.4 such as removal of references to obsolete `multi_gpu_model`
