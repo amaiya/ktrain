@@ -9,7 +9,7 @@ Most recent releases are shown at the top. Each release shows:
 ## 0.23.0 (TBD)
 
 ### New:
-- Support for upcoming release of TensorFlow 2.4 such as removal of references to obsolete `multi_gpu_model`, as this has been removed from TF 2.4
+- Support for upcoming release of TensorFlow 2.4 such as removal of references to obsolete `multi_gpu_model`
 
 ### Changed
 - added `TopicModel.get_document_topic_distribution` 
