@@ -181,6 +181,7 @@ class TopicModel():
         """
         Gets the document-topic distribution.
         Each row is a document and each column is a topic
+        The output of this method is equivalent to invoking get_doctopics with no arguments.
         """
         self._check_build()
         return self.doc_topics
