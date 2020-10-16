@@ -9,12 +9,12 @@ Most recent releases are shown at the top. Each release shows:
 ## 0.23.0 (TBD)
 
 ### New:
-- N/A
+- Support for upcoming release of TensorFlow 2.4 such as removal of references to obsolete `multi_gpu_model`, as this has been removed from TF 2.4
 
 ### Changed
-- removed all references to obsolete `multi_gpu_model`, as this has been removed from TF 2.4
 - added `TopicModel.get_document_topic_distribution` 
 - `TopicModel.get_docs` now returns a list of dicts instead of a list of tuples.  Each dict has keys: `text`, `doc_id`, `topic_proba`, `topic_id`.
+- added `TopicModel.get_sorted_docs` method to return all documents sorted by relevance to a given `topic_id`
 
 
 ### Fixed:
