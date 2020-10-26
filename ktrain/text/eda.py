@@ -181,6 +181,7 @@ class TopicModel():
         """
         Gets the document-topic distribution.
         Each row is a document and each column is a topic
+        The output of this method is equivalent to invoking get_doctopics with no arguments.
         """
         self._check_build()
         return self.doc_topics
@@ -334,7 +335,11 @@ class TopicModel():
     def get_doctopics(self,  topic_ids=[], doc_ids=[]):
         """
         Returns a topic probability distribution for documents
-        with primary topic that is one of <topic_ids>
+        with primary topic that is one of <topic_ids> and with doc_id in <doc_ids>.
+
+        If no topic_ids or doc_ids are provided, then topic distributions for all documents
+        are returned (which equivalent to the output of get_document_topic_distribution).
+
         Args:
             topic_ids(list of ints): list of topid IDs where each id is in the range
                                      of range(self.n_topics).

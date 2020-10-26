@@ -44,6 +44,7 @@ def texts_from_folder(datadir, classes=None,
                         This is simply supplied as the categories argument
                         to sklearn's load_files function.
         max_features (int):  maximum number of unigrams to consider
+                             Note: This is only used for preprocess_mode='standard'.
         maxlen (int):  maximum length of tokens in document
         ngram_range (int):  If > 1, will include 2=bigrams, 3=trigrams and bigrams
         train_test_names (list):  list of strings represnting the subfolder
@@ -160,6 +161,7 @@ def texts_from_csv(train_filepath,
                                10% of documents in training CSV will be
                                used for testing/validation.
         max_features(int): max num of words to consider in vocabulary
+                           Note: This is only used for preprocess_mode='standard'.
         maxlen(int): each document can be of most <maxlen> words. 0 is used as padding ID.
         ngram_range(int): size of multi-word phrases to consider
                           e.g., 2 will consider both 1-word phrases and 2-word phrases
@@ -237,7 +239,8 @@ def texts_from_df(train_df,
         val_df(dataframe): file path to test dataframe.  If not supplied,
                                10% of documents in training df will be
                                used for testing/validation.
-        max_features(int): max num of words to consider in vocabulary
+        max_features(int): max num of words to consider in vocabulary.
+                           Note: This is only used for preprocess_mode='standard'.
         maxlen(int): each document can be of most <maxlen> words. 0 is used as padding ID.
         ngram_range(int): size of multi-word phrases to consider
                           e.g., 2 will consider both 1-word phrases and 2-word phrases
@@ -315,6 +318,7 @@ def texts_from_array(x_train, y_train, x_test=None, y_test=None,
         class_names (list): list of strings representing class labels
                             shape should be (num_examples,1) or (num_examples,)
         max_features(int): max num of words to consider in vocabulary
+                           Note: This is only used for preprocess_mode='standard'.
         maxlen(int): each document can be of most <maxlen> words. 0 is used as padding ID.
         ngram_range(int): size of multi-word phrases to consider
                           e.g., 2 will consider both 1-word phrases and 2-word phrases

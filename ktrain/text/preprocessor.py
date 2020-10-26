@@ -1217,13 +1217,14 @@ class TransformerEmbedding():
 
 
 
-    def embed(self, texts, word_level=True):
+    def embed(self, texts, word_level=True, max_length=512):
         """
         get embedding for word, phrase, or sentence
         Args:
           text(str|list): word, phrase, or sentence or list of them representing a batch
           word_level(bool): If True, returns embedding for each token in supplied texts.
                             If False, returns embedding for each text in texts
+          max_length(int): max length of tokens
         Returns:
             np.ndarray : embeddings
         """
@@ -1234,12 +1235,16 @@ class TransformerEmbedding():
         for text in texts:
             sentences.append(self.tokenizer.tokenize(text))
         maxlen = len(max([tokens for tokens in sentences], key=len,)) + 2
+        if maxlen > max_length: maxlen = max_length # added due to issue #270
+        sentences = []
+
         all_input_ids = []
         all_input_masks = []
         for text in texts:
             tokens = self.tokenizer.tokenize(text)
             if len(tokens) > maxlen - 2:
                 tokens = tokens[0 : (maxlen - 2)]
+            sentences.append(tokens)
             tokens = [self.tokenizer.cls_token] + tokens + [self.tokenizer.sep_token]
             input_ids = self.tokenizer.convert_tokens_to_ids(tokens)
             input_mask = [1] * len(input_ids)
