@@ -16,7 +16,7 @@ Most recent releases are shown at the top. Each release shows:
 
 
 ### Fixed:
-- Resolved issue in `qa.ask` method occuring with embedding computations when full answer sentences exceeding 512 tokens.
+- Resolved issue in `qa.ask` method occuring with embedding computations when full answer sentences exceed 512 tokens.
 
 
 ## 0.23.0 (2020-10-16)
