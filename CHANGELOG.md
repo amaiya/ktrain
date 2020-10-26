@@ -6,6 +6,19 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.23.1 (2020-10-26)
+
+### New:
+- N/A
+
+### Changed
+- N/A
+
+
+### Fixed:
+- Resolved issue in `qa.ask` method with the computations of embeddings of full answers when `rerank_threshold` is not None.
+
+
 ## 0.23.0 (2020-10-16)
 
 ### New:
