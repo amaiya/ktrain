@@ -78,6 +78,9 @@ class QA(ABC):
         pass
 
     def predict_squad(self, documents, question):
+        """ 
+        Generates candidate answers to the <question> provided given <documents> as contexts.
+        """
         if isinstance(documents, str): documents = [documents]
         sequences = [[question, d] for d in documents]
         batch = self.tokenizer.batch_encode_plus(sequences, return_tensors='tf', max_length=512, truncation='only_second', padding=True)
