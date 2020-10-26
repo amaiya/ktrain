@@ -16,7 +16,7 @@ Most recent releases are shown at the top. Each release shows:
 
 
 ### Fixed:
-- Resolved issue in `qa.ask` method with the computations of embeddings of full answers when `rerank_threshold` is not None.
+- Resolved issue in `qa.ask` method occuring with embedding computations when full answer sentences exceeding 512 tokens.
 
 
 ## 0.23.0 (2020-10-16)
