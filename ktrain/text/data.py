@@ -325,9 +325,9 @@ def texts_from_array(x_train, y_train, x_test=None, y_test=None,
                                limited by max_features
         val_pct(float): Proportion of training to use for validation.
                         Has no effect if x_val and  y_val is supplied.
-        preprocess_mode (str):  Either 'standard' (normal tokenization) or 'bert'
+        preprocess_mode (str):  Either 'standard' (normal tokenization) or one of {'bert', 'distilbert'}
                                 tokenization and preprocessing for use with 
-                                BERT text classification model.
+                                BERT/DistilBert text classification model.
         lang (str):            language.  Auto-detected if None.
         random_state(int):      If integer is supplied, train/test split is reproducible.
                                 If None, train/test split will be random.

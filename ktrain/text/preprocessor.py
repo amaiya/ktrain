@@ -834,7 +834,7 @@ class TransformersPreprocessor(TextPreprocessor):
         model_name = self.model_name if fpath is None else fpath
         if self.tok is None:
             # use fast tokenizer if possible
-            if self.name == 'bert':
+            if self.name == 'bert' and 'japanese' not in model_name:
                 from transformers import BertTokenizerFast
                 self.tok = BertTokenizerFast.from_pretrained(model_name)
             elif self.name == 'distilbert':
