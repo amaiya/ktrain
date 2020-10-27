@@ -833,7 +833,18 @@ class TransformersPreprocessor(TextPreprocessor):
     def get_tokenizer(self, fpath=None):
         model_name = self.model_name if fpath is None else fpath
         if self.tok is None:
-            self.tok = self.tokenizer_type.from_pretrained(model_name)
+            # use fast tokenizer if possible
+            if self.name == 'bert' and 'japanese' not in model_name:
+                from transformers import BertTokenizerFast
+                self.tok = BertTokenizerFast.from_pretrained(model_name)
+            elif self.name == 'distilbert':
+                from transformers import DistilBertTokenizerFast
+                self.tok = DistilBertTokenizerFast.from_pretrained(model_name)
+            elif self.name == 'roberta':
+                from transformers import RobertaTokenizerFast
+                self.tok = RobertaTokenizerFast.from_pretrained(model_name)
+            else:
+                self.tok = self.tokenizer_type.from_pretrained(model_name)
         return self.tok
 
 
@@ -1235,7 +1246,7 @@ class TransformerEmbedding():
         for text in texts:
             sentences.append(self.tokenizer.tokenize(text))
         maxlen = len(max([tokens for tokens in sentences], key=len,)) + 2
-        if maxlen > max_length: maxlen = max_length # added due to issue #270
+        if max_length is not None and maxlen > max_length: maxlen = max_length # added due to issue #270
         sentences = []
 
         all_input_ids = []
