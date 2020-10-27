@@ -18,8 +18,8 @@ TEXT_CLASSIFIERS = {
                     NBSVM:  "NBSVM model [http://www.aclweb.org/anthology/P12-2018]",
                     BIGRU:  'Bidirectional GRU with pretrained fasttext word vectors [https://fasttext.cc/docs/en/crawl-vectors.html]',
                     STANDARD_GRU: 'simple 2-layer GRU with randomly initialized embeddings',
-                    BERT:  'Bidirectional Encoder Representations from Transformers (BERT) [https://arxiv.org/abs/1810.04805]',
-                    DISTILBERT:  'distilled, smaller, and faster BERT from Hugging Face [https://arxiv.org/abs/1910.01108]',
+                    BERT:  'Bidirectional Encoder Representations from Transformers (BERT) - keras_bert implementation [https://arxiv.org/abs/1810.04805]',
+                    DISTILBERT:  'distilled, smaller, and faster BERT from Hugging Face transformers [https://arxiv.org/abs/1910.01108]',
                     } 
 
 TEXT_REGRESSION_MODELS = {
@@ -27,8 +27,8 @@ TEXT_REGRESSION_MODELS = {
                     LINREG:  "linear text regression using a trainable Embedding layer",
                     BIGRU:  'Bidirectional GRU with pretrained English word vectors [https://arxiv.org/abs/1712.09405]',
                     STANDARD_GRU: 'simple 2-layer GRU with randomly initialized embeddings',
-                    BERT:  'Bidirectional Encoder Representations from Transformers (BERT) [https://arxiv.org/abs/1810.04805]',
-                    DISTILBERT:  'distilled, smaller, and faster BERT from Hugging Face [https://arxiv.org/abs/1910.01108]',
+                    BERT:  'Bidirectional Encoder Representations from Transformers (BERT) - keras_bert implementation [https://arxiv.org/abs/1810.04805]',
+                    DISTILBERT:  'distilled, smaller, and faster BERT from Hugging Face transformers [https://arxiv.org/abs/1910.01108]',
                     }
 
 
