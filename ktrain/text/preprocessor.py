@@ -845,7 +845,6 @@ class TransformersPreprocessor(TextPreprocessor):
                 self.tok = RobertaTokenizerFast.from_pretrained(model_name)
             else:
                 self.tok = self.tokenizer_type.from_pretrained(model_name)
-        print(self.tok)
         return self.tok
 
 
