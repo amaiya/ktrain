@@ -6,6 +6,20 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.23.2 (TBD)
+
+### New:
+- N/A
+
+### Changed
+- Use fast tokenizers for the following **transformers**  models: BERT, DistilBERT, and RoBERTa models. This change speeds up predictions from these models
+  when `predictor.predict` is supplied with a list of documents.
+
+
+### Fixed:
+- Resolved issue in `qa.ask` method occuring with embedding computations when full answer sentences exceed 512 tokens.
+
+
 ## 0.23.1 (2020-10-26)
 
 ### New:
