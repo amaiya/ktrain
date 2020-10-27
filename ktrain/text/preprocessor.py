@@ -1246,7 +1246,7 @@ class TransformerEmbedding():
         for text in texts:
             sentences.append(self.tokenizer.tokenize(text))
         maxlen = len(max([tokens for tokens in sentences], key=len,)) + 2
-        if maxlen > max_length: maxlen = max_length # added due to issue #270
+        if max_length is not None and maxlen > max_length: maxlen = max_length # added due to issue #270
         sentences = []
 
         all_input_ids = []
