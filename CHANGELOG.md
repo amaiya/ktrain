@@ -12,9 +12,7 @@ Most recent releases are shown at the top. Each release shows:
 - N/A
 
 ### Changed
-- Use fast tokenizers for the following Hugging Face **transformers**  models: BERT, DistilBERT, and RoBERTa models. This change speeds up predictions from these models
-  when `predictor.predict` is supplied with a list of documents. This change speeds up tokenization for models created with either `text.Transformer(...` 
-  or `text.text_clasifier('distilbert',..')`.  BERT models created with `text_classifier('bert',..`, which uses `keras_bert`,, are not affected by this change.
+- Use fast tokenizers for the following Hugging Face **transformers**  models: BERT, DistilBERT, and RoBERTa models. This change affects models created with either `text.Transformer(...` or `text.text_clasifier('distilbert',..')`.  BERT models created with `text_classifier('bert',..`, which uses `keras_bert` instead of `transformers`, are not affected by this change.
 
 
 ### Fixed:
