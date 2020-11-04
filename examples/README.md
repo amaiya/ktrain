@@ -66,6 +66,7 @@ These examples show the results of training on a relatively small training set.
 - [20newsgroups-NBVSM.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text):  NBSVM model using unigram features only.
 - [20newsgroups-BERT.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text):  BERT text classification in a multiclass setting.
 - [20newsgroups-distilbert.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text): a faster, smaller version of BERT called DistilBert for multiclass text classification
+- [ktrain-ONNX-TFLite-examples.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text): text classification using ONNX and TensorFlow Lite
 
 
 #### [Toxic Comments](https://www.kaggle.com/c/jigsaw-toxic-comment-classification-challenge):  Multi-Label Text Classification
