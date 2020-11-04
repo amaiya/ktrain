@@ -223,6 +223,9 @@ class TextPredictor(Predictor):
             raise Exception('This method requires ONNX libraries to be installed: '+\
                             'pip install -q --upgrade onnxruntime==1.5.1 onnxruntime-tools onnx keras2onnx')
         from pathlib import Path
+        if type(self.preproc).__name__ == 'BERTPreprocessor':
+            raise Exception('currently_unsupported:  BERT models created with text_classifier("bert",...) are not supported (i.e., keras_bert models). ' +\
+                            'Only BERT models created with Transformer(...) are supported.')
 
         if verbose: print('converting to ONNX format ... this may take a few moments...')
         if U.is_huggingface(model=self.model):
