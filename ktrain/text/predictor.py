@@ -167,3 +167,115 @@ class TextPredictor(Predictor):
             super()._save_model(fpath)
         return
 
+
+    def export_model_to_tflite(self, fpath, verbose=1):
+        """
+        Export model to TFLite
+        Args:
+          fpath(str): String representing full path to model file where TFLite model will be saved.
+                      Example: '/tmp/my_model.tflite'
+          verbose(bool): verbosity
+        """
+        if verbose: print('converting to TFLite format ... this may take a few moments...')
+        if U.is_huggingface(model=self.model):
+            tokenizer = self.preproc.get_tokenizer()
+            maxlen = self.preproc.maxlen
+            input_dict = tokenizer('Name', return_tensors='tf',
+                                   padding='max_length', max_length=maxlen)
+
+            if version.parse(tf.__version__) < version.parse('2.2'):
+                raise Exception('export_model_to_tflite requires tensorflow>=2.2')
+                #self.model._set_inputs(input_spec, training=False) # for tf < 2.2
+            self.model._saved_model_inputs_spec = None # for tf > 2.2
+            self.model._set_save_spec(input_dict) # for tf > 2.2
+            self.model._get_save_spec()
+
+        converter = tf.lite.TFLiteConverter.from_keras_model(self.model)
+
+        # normal conversion
+        converter.target_spec.supported_ops = [tf.lite.OpsSet.SELECT_TF_OPS]
+        tflite_model = converter.convert()
+        open(fpath, "wb").write(tflite_model)
+        if verbose: print('done.')
+        return
+
+
+
+    def export_model_to_onnx(self, fpath, quantize=False, target_opset=None, verbose=1):
+        """
+        Export model to onnx
+        Args:
+          fpath(str): String representing full path to model file where ONNX model will be saved.
+                      Example: '/tmp/my_model.onnx'
+          quantize(str): If True, will create a total of three model files will be created using transformers.convert_graph_to_onnx: 
+                         1) ONNX model  (created directly using keras2onnx
+                         2) an optimized ONNX model (created by transformers library)
+                         3) a quantized version of optimized ONNX model (created by transformers library)
+                         All files will be created in the parent folder of fpath:
+                         Example: 
+                           If fpath='/tmp/model.onnx', then both /tmp/model-optimized.onnx and
+                           /tmp/model-optimized-quantized.onnx will also be created.
+          verbose(bool): verbosity
+        """
+        try:
+            import onnxruntime, onnxruntime_tools, onnx, keras2onnx
+        except ImportError:
+            raise Exception('This method requires ONNX libraries to be installed: '+\
+                            'pip install -q --upgrade onnxruntime==1.5.1 onnxruntime-tools onnx keras2onnx')
+        from pathlib import Path
+
+        if verbose: print('converting to ONNX format ... this may take a few moments...')
+        if U.is_huggingface(model=self.model):
+            tokenizer = self.preproc.get_tokenizer()
+            maxlen = self.preproc.maxlen
+            input_dict = tokenizer('Name', return_tensors='tf',
+                                   padding='max_length', max_length=maxlen)
+
+            if version.parse(tf.__version__) < version.parse('2.2'):
+                raise Exception('export_model_to_tflite requires tensorflow>=2.2')
+                #self.model._set_inputs(input_spec, training=False) # for tf < 2.2
+            self.model._saved_model_inputs_spec = None # for tf > 2.2
+            self.model._set_save_spec(input_dict) # for tf > 2.2
+            self.model._get_save_spec()
+
+        onnx_model = keras2onnx.convert_keras(self.model, self.model.name, target_opset=target_opset)
+        keras2onnx.save_model(onnx_model, fpath)
+
+        if quantize:
+             from transformers.convert_graph_to_onnx import optimize, quantize
+             opt_path = optimize(Path(model_path))
+             quantize_path = quantize(opt_path)
+        if verbose: print('done.')
+        return
+
+
+    def create_onnx_session(self, onnx_model_path, provider='CPUExecutionProvider'):
+        """
+        Creates ONNX inference session from provided onnx_model_path
+        """
+      
+        from onnxruntime import GraphOptimizationLevel, InferenceSession, SessionOptions, get_all_providers
+        assert provider in get_all_providers(), f"provider {provider} not found, {get_all_providers()}"
+
+        # Few properties that might have an impact on performances (provided by MS)
+        options = SessionOptions()
+        options.intra_op_num_threads = 1
+        options.graph_optimization_level = GraphOptimizationLevel.ORT_ENABLE_ALL
+
+        # Load the model as a graph and prepare the CPU backend 
+        session = InferenceSession(onnx_model_path, options, providers=[provider])
+        session.disable_fallback()
+
+        #if 'OMP_NUM_THREADS' not in os.environ or 'OMP_WAIT_POLICY' not in os.environ:
+            #warnings.warn('''We recommend adding the following at top of script for CPU inference:
+
+                            #from psutil import cpu_count
+                            ##Constants from the performance optimization available in onnxruntime
+                            ##It needs to be done before importing onnxruntime
+                            #os.environ["OMP_NUM_THREADS"] = str(cpu_count(logical=True))
+                            #os.environ["OMP_WAIT_POLICY"] = 'ACTIVE'
+                            #''')
+        return session
+
+
+
