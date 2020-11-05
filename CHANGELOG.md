@@ -9,7 +9,7 @@ Most recent releases are shown at the top. Each release shows:
 ## 0.24.0 (TBD)
 
 ### New:
-- `TextPredictor` instances (i.e, text classification predictors) now provide built-in support for exporting to TensorFlow Lite and ONNX.
+- `Predictor` instances now provide built-in support for exporting to TensorFlow Lite and ONNX.
 
 ### Changed
 - N/A
