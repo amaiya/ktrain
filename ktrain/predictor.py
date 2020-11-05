@@ -65,6 +65,8 @@ class Predictor(ABC):
           fpath(str): String representing full path to model file where TFLite model will be saved.
                       Example: '/tmp/my_model.tflite'
           verbose(bool): verbosity
+        Returns:
+          str: fpath is returned back
         """
         if verbose: print('converting to TFLite format ... this may take a few moments...')
         if U.is_huggingface(model=self.model):
@@ -87,7 +89,7 @@ class Predictor(ABC):
         tflite_model = converter.convert()
         open(fpath, "wb").write(tflite_model)
         if verbose: print('done.')
-        return
+        return fpath
 
 
 
@@ -106,6 +108,8 @@ class Predictor(ABC):
                            If fpath='/tmp/model.onnx', then both /tmp/model-optimized.onnx and
                            /tmp/model-optimized-quantized.onnx will also be created.
           verbose(bool): verbosity
+        Returns:
+          str: string representing fpath.  If quantize=True, returned fpath will be different than supplied fpath
         """
         try:
             import onnxruntime, onnxruntime_tools, onnx, keras2onnx
@@ -133,13 +137,15 @@ class Predictor(ABC):
 
         onnx_model = keras2onnx.convert_keras(self.model, self.model.name, target_opset=target_opset)
         keras2onnx.save_model(onnx_model, fpath)
+        return_fpath = fpath
 
         if quantize:
              from transformers.convert_graph_to_onnx import optimize, quantize
-             opt_path = optimize(Path(model_path))
+             opt_path = optimize(Path(fpath))
              quantize_path = quantize(opt_path)
+             return_fpath = quantize_path.as_posix()
         if verbose: print('done.')
-        return
+        return return_fpath
 
 
     def create_onnx_session(self, onnx_model_path, provider='CPUExecutionProvider'):
