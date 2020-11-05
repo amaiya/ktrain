@@ -17,7 +17,7 @@
 onnx_model_path = '/tmp/model.onnx'
 p.export_model_to_onnx(onnx_model_path)
 
-# load ONNX inference session
+# establish ONNX inference session
 sess = p.create_onnx_session(onnx_model_path)
 
 # make predictions OUTSIDE of ktrain and TensorFlow
