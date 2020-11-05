@@ -140,10 +140,29 @@ class Predictor(ABC):
         return_fpath = fpath
 
         if quantize:
-             from transformers.convert_graph_to_onnx import optimize, quantize
-             opt_path = optimize(Path(fpath))
-             quantize_path = quantize(opt_path)
-             return_fpath = quantize_path.as_posix()
+            from transformers.convert_graph_to_onnx import optimize, quantize
+            #opt_path = optimize(Path(fpath))
+
+            if U.is_huggingface(model=self.model) and\
+               type(self.model).__name__ in ['TFDistilBertForSequenceClassification', 'TFBertForSequenceClassification']:
+                try:
+                    from onnxruntime_tools import optimizer
+                    from onnxruntime_tools.transformers.onnx_model_bert import BertOptimizationOptions
+                    # disable embedding layer norm optimization for better model size reduction
+                    opt_options = BertOptimizationOptions('bert')
+                    opt_options.enable_embed_layer_norm = False
+                    opt_model = optimizer.optimize_model(
+                        fpath,
+                       'bert',  # bert_keras causes error with transformers
+                        num_heads=12,
+                        hidden_size=768,
+                        optimization_options=opt_options)
+                    opt_model.save_model_to_file(fpath)
+                except:
+                    warnings.warn('Could not run BERT-specific optimizations')
+                    pass
+            quantize_path = quantize(Path(fpath))
+            return_fpath = quantize_path.as_posix()
         if verbose: print('done.')
         return return_fpath
 
