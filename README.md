@@ -13,6 +13,10 @@
 - **2020-11-04**
   - ***ktrain*** **v0.24.x is released** and now includes out-of-the-box support for exporting models to [ONNX](https://onnx.ai/) and  [TensorFlow Lite](https://www.tensorflow.org/lite).    See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/ktrain-ONNX-TFLite-examples.ipynb) for more information.
 ```python
+
+import ktrain
+p = ktrain.load_predictor('/tmp/my_saved_predictor')
+
 # export ONNX model
 onnx_model_path = '/tmp/model.onnx'
 p.export_model_to_onnx(onnx_model_path)
