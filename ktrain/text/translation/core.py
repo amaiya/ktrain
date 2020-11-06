@@ -19,7 +19,7 @@ class Translator():
           half(bool): If True, use half precision.
         """
         if 'Helsinki-NLP' not in model_name:
-            raise ValueError('Translator requires a Helsinki-NLP model: https://huggingface.co/Helsinki-NLP')
+            warnings.warn('Translator requires a Helsinki-NLP model: https://huggingface.co/Helsinki-NLP')
         try:
             import torch
         except ImportError:
