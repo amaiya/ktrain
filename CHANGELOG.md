@@ -6,6 +6,19 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.24.1 (2020-11-06)
+
+### New:
+- N/A
+
+### Changed
+- N/A
+
+
+### Fixed:
+- Change exception in model ID check in `Translator` to warning to better allow offline language translations
+
+
 ## 0.24.0 (2020-11-05)
 
 ### New:
