@@ -10,10 +10,12 @@
 
 
 ### News and Announcements
+- **2020-11-04**
+  - ***ktrain*** **v0.24.x is released** and now includes built-in support for exporting models to [ONNX](https://onnx.ai/) and  [TensorFlow Lite](https://www.tensorflow.org/lite).    See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/ktrain-ONNX-TFLite-examples.ipynb) for more information.
 - **2020-10-16:**
   - ***ktrain*** **v0.23.x is released** with updates for compatibility with upcoming release of TensorFlow 2.4.
 - **2020-10-06:**
-  - ***ktrain*** **v0.22.x is released** and includes enhancements to **end-to-end question-answering** such as significantly faster answer-retrieval.  See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/question_answering_with_bert.ipynb) for more information.
+  - ***ktrain*** **v0.22.x is released** and includes enhancements to **end-to-end question-answering** such as significantly faster answer-retrieval.  See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/question_answering_with_bert.ipynb) for more information.
 ```python
 # End-to-End Question-Answering in ktrain
 
