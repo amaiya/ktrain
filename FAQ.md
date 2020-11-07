@@ -6,6 +6,9 @@
 
 - [What kinds of applications have been built with *ktrain*?](#what-kinds-of-applications-have-been-built-with-ktrain)
 
+- [How do I use ktrain with documents in PDF, DOC, or PPT format?](#how-do-i-use-ktrain-with-documents-in-pdf-doc-or-ppt-format)
+
+
 ## Installation/Deployment Issues
 - [How do I install ktrain on a Windows machine?](#how-do-i-install-ktrain-on-a-windows-machine)
 
@@ -19,7 +22,6 @@
 
 - [Why am I getting a *"model must be of instance Model"* error with `load_predictor`?](#why-am-i-getting-a-model-must-be-of-instance-model-error-with-load_predictor)
 
-- [How do I use ktrain with documents in PDF, DOC, or PPT format?](#how-do-i-use-ktrain-with-documents-in-pdf-doc-or-ppt-format)
 
 ## Training
 
