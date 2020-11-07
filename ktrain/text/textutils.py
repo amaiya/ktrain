@@ -9,14 +9,20 @@ DEFAULT_TOKEN_PATTERN = (r"\b[a-zA-Z][a-zA-Z0-9]*(?:[_/&-][a-zA-Z0-9]+)+\b|"
 
 def extract_copy(corpus_path, output_path):
     """
-    Crawl <corpus_path>, extract or read plain text from application/pdf
-    and text/plain files and then copy them to output_path.
+    Crawl <corpus_path>, extract plain text from documents
+    and then copy them to output_path.
+    Requires textract package
     Args:
         corpus_path(str):  root folder containing documents
         output_path(str):  root folder of output directory
     Returns:
         list: list of skipped filenames
     """
+    try:
+        import textract
+    except ImportError:
+        raise Exception('extract_copy requires textract: pip install textract')
+
     skipped = set()
     num_skipped = 0
     corpus_path = os.path.normpath(corpus_path)
@@ -24,25 +30,26 @@ def extract_copy(corpus_path, output_path):
     for idx, filename in enumerate(extract_filenames(corpus_path)):
         if idx %1000 == 0: print('processed %s doc(s)' % (idx+1))
         mtype = get_mimetype(filename)
-        if mtype == 'application/pdf':
-            text = pdftotext(filename)
-            text = text.strip()
-        elif mtype and mtype.split('/')[0] == 'text':
-            with open(filename, 'r') as f:
-                text = f.read()
-                text = str.encode(text)
-        else:
+        try:
+            if mtype and mtype.split('/')[0] == 'text':
+                with open(filename, 'r') as f:
+                    text = f.read()
+                    text = str.encode(text)
+            else:
+                text = textract.process(filename)
+        except:
             num_skipped += 1
             if not mtype:
                 mtype =  os.path.splitext(filename)[1]
                 if not mtype: mtype == 'unknown'
             skipped.add(mtype)
             continue
+
         if not text: 
             num_skipped += 1
             continue
         fpath, fname = os.path.split(filename)
-        if mtype == 'application/pdf': fname = fname+'.txt'
+        if mtype and mtype.split('/')[0] != 'text': fname = fname+'.txt'
         relfpath = fpath.replace(corpus_path, '')
         relfpath = relfpath[1:] if relfpath and relfpath[0] == os.sep else relfpath
         opath = os.path.join(output_path, relfpath)
