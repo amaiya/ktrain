@@ -72,7 +72,7 @@ def is_txt(filepath, strict=False):
         return mimetypes.guess_type(filepath)[0] == 'text/plain'
     else:
         mtype = get_mimetype(filepath)
-        return mtype and mtype.split('/')[0] == 'text'
+        return mtype is not None and mtype.split('/')[0] == 'text'
 
 
 def is_pdf(filepath):
