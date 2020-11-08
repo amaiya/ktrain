@@ -67,8 +67,13 @@ def extract_copy(corpus_path, output_path):
 def get_mimetype(filepath):
     return mimetypes.guess_type(filepath)[0]
 
-def is_txt(filepath):
-    return mimetypes.guess_type(filepath)[0] == 'text/plain'
+def is_txt(filepath, strict=False):
+    if strict:
+        return mimetypes.guess_type(filepath)[0] == 'text/plain'
+    else:
+        mtype = get_mimetype(filepath)
+        return mtype and mtype.split('/')[0] == 'text'
+
 
 def is_pdf(filepath):
     return mimetypes.guess_type(filepath)[0] == 'application/pdf'
