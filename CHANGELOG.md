@@ -6,6 +6,20 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.24.2 (2020-11-07)
+
+### New:
+- N/A
+
+### Changed
+- `ktrain.text.textutils.extract_copy` now uses `textract` to extract text from many file types (e.g., PDF, DOC, PPT)
+  instead of just PDFs,
+
+### Fixed:
+- N/A
+
+
+
 ## 0.24.1 (2020-11-06)
 
 ### New:
@@ -13,7 +27,6 @@ Most recent releases are shown at the top. Each release shows:
 
 ### Changed
 - N/A
-
 
 ### Fixed:
 - Change exception in model ID check in `Translator` to warning to better allow offline language translations

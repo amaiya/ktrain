@@ -6,6 +6,9 @@
 
 - [What kinds of applications have been built with *ktrain*?](#what-kinds-of-applications-have-been-built-with-ktrain)
 
+- [How do I use ktrain with documents in PDF, DOC, or PPT formats?](#how-do-i-use-ktrain-with-documents-in-pdf-doc-or-ppt-formats)
+
+
 ## Installation/Deployment Issues
 - [How do I install ktrain on a Windows machine?](#how-do-i-install-ktrain-on-a-windows-machine)
 
@@ -744,6 +747,17 @@ predictor = ktrain.load_predictor('/path/to/folder')
 
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
+
+
+### How do I use ktrain with documents in PDF, DOC, or PPT formats?
+
+If you have documents in formats like `.pdf`, `.docx`, or `.pptx` formats and want to use them in a training set or with various **ktrain** features 
+like question-answering  or zero-shot-learning, they will need to be converted to plain text format first (i.e., `.txt` files).  You can use the
+`ktrain.text.textutils.extract_copy` function to automatically do this. Alternatively, you can use other tools like [Apache Tika](https://tika.apache.org/) to do the conversion.
+
+[[Back to Top](#frequently-asked-questions-about-ktrain)]
+
+
 
 ### What kinds of applications have been built with *ktrain*?
 
