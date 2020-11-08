@@ -10,30 +10,32 @@
 
 
 ### News and Announcements
-- **2020-11-04**
-  - ***ktrain*** **v0.24.x is released** and now includes built-in support for exporting models to [ONNX](https://onnx.ai/) and  [TensorFlow Lite](https://www.tensorflow.org/lite).    See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/ktrain-ONNX-TFLite-examples.ipynb) for more information.
-- **2020-10-16:**
-  - ***ktrain*** **v0.23.x is released** with updates for compatibility with upcoming release of TensorFlow 2.4.
-- **2020-10-06:**
-  - ***ktrain*** **v0.22.x is released** and includes enhancements to **end-to-end question-answering** such as significantly faster answer-retrieval.  See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/question_answering_with_bert.ipynb) for more information.
+- **2020-11-08:**
+  - ***ktrain*** **v0.25.x is released** and includes out-of-the-box support for text extraction via the [textract](https://pypi.org/project/textract/) package . This, for example,
+can be used in the `SimpleQA.index_from_folder` method to perform Question-Answering on large collections of PDFs, MS Word documents, or PowerPoint files.   See the [Question-Answering example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/question_answering_with_bert.ipynb) for more information.
 ```python
 # End-to-End Question-Answering in ktrain
 
-# index some documents into a built-in search engine
+# index documents of different types into a built-in search engine
 from ktrain import text
 INDEXDIR = '/tmp/myindex'
 text.SimpleQA.initialize_index(INDEXDIR)
-text.SimpleQA.index_from_list(docs, INDEXDIR, commit_every=len(docs),  # docs is a list of strings
+corpus_path = '/my/folder/of/documents' # contains .pdf, .docx, .pptx files in addition to .txt files
+text.SimpleQA.index_from_folder(corpus_path, INDEXDIR, use_text_extraction=True, # enable text extraction
                               multisegment=True, procs=4, # these args speed up indexing
                               breakup_docs=True)          # this slows indexing but speeds up answer retrieval
 
 # ask questions (setting higher batch size can further speed up answer retrieval)
 qa = text.SimpleQA(INDEXDIR)
-answers = qa.ask('What causes computer images to be too dark?', batch_size=8)
+answers = qa.ask('What is ktrain?', batch_size=8)
 
-# top answer snippet:
-#   "if your viewer does not do gamma correction , then linear images will look too dark"
+# top answer snippet extracted from https://arxiv.org/abs/2004.10703:
+#   "ktrain is a low-code platform for machine learning"
 ```
+- **2020-11-04**
+  - ***ktrain*** **v0.24.x is released** and now includes built-in support for exporting models to [ONNX](https://onnx.ai/) and  [TensorFlow Lite](https://www.tensorflow.org/lite).    See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/ktrain-ONNX-TFLite-examples.ipynb) for more information.
+- **2020-10-16:**
+  - ***ktrain*** **v0.23.x is released** with updates for compatibility with upcoming release of TensorFlow 2.4.
 ----
 
 ### Overview
@@ -52,6 +54,7 @@ answers = qa.ask('What causes computer images to be too dark?', batch_size=8)
      - **Document Recommendation Engines and Semantic Searches**:  given a text snippet from a sample document, recommend documents that are semantically-related from a larger corpus  <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/20newsgroups-recommendation_engine.ipynb)]</sup></sub>
      - **Text Summarization**:  summarize long documents with a pretrained BART model - no training required <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/text_summarization_with_bart.ipynb)]</sup></sub>
      - **End-to-End Question-Answering**:  ask a large text corpus questions and receive exact answers <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/question_answering_with_bert.ipynb)]</sup></sub>
+     - **Easy-to-Use Built-In Search Engine**:  perform keyword searches on large collections of documents <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/question_answering_with_bert.ipynb)]</sup></sub>
      - **Zero-Shot Learning**:  classify documents into user-provided topics **without** training examples <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/zero_shot_learning_with_nli.ipynb)]</sup></sub>
      - **Language Translation**:  translate text from one language to another <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/language_translation_example.ipynb)]</sup></sub>
   - `vision` data:

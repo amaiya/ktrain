@@ -365,7 +365,7 @@ class SimpleQA(QA):
         return ix
 
     @classmethod
-    def index_from_list(cls, docs, index_dir, commit_every=1024, breakup_docs=False,
+    def index_from_list(cls, docs, index_dir, commit_every=1024, breakup_docs=True,
                         procs=1, limitmb=256, multisegment=False, min_words=20, references=None):
         """
         index documents from list.
@@ -433,8 +433,8 @@ class SimpleQA(QA):
 
 
     @classmethod
-    def index_from_folder(cls, folder_path, index_dir,  commit_every=1024, breakup_docs=False, min_words=20,
-                          encoding='utf-8', procs=1, limitmb=256, multisegment=False, verbose=1):
+    def index_from_folder(cls, folder_path, index_dir,  use_text_extraction=False, commit_every=1024, breakup_docs=True, 
+                          min_words=20, encoding='utf-8', procs=1, limitmb=256, multisegment=False, verbose=1):
         """
         index all plain text documents within a folder.
         The procs, limitmb, and especially multisegment arguments can be used to 
@@ -444,6 +444,9 @@ class SimpleQA(QA):
         Args:
           folder_path(str): path to folder containing plain text documents (e.g., .txt files)
           index_dir(str): path to index directory (see initialize_index)
+          use_text_extraction(bool): If True, the  `textract` package will be used to index text from various
+                                     file types including PDF, MS Word, and MS PowerPoint (in addition to plain text files).
+                                     If False, only plain text files will be indexed.
           commit_every(int): commet after adding this many documents
           breakup_docs(bool): break up documents into smaller paragraphs and treat those as the documents.
                               This can potentially improve the speed at which answers are returned by the ask method
@@ -457,15 +460,33 @@ class SimpleQA(QA):
           verbose(bool): verbosity
 
         """
+        if use_text_extraction:
+            try:
+                import textract
+            except ImportError:
+                raise Exception('use_text_extraction=True requires textract:   pip install textract')
+
+
         if not os.path.isdir(folder_path): raise ValueError('folder_path is not a valid folder')
         if folder_path[-1] != os.sep: folder_path += os.sep
         ix = index.open_dir(index_dir)
         writer = ix.writer(procs=procs, limitmb=limitmb, multisegment=multisegment)
         for idx, fpath in enumerate(TU.extract_filenames(folder_path)):
-            if not TU.is_txt(fpath): continue
             reference = "%s" % (fpath.join(fpath.split(folder_path)[1:]))
-            with open(fpath, 'r', encoding=encoding) as f:
-                doc = f.read()
+            if TU.is_txt(fpath):
+                with open(fpath, 'r', encoding=encoding) as f:
+                    doc = f.read()
+            else:
+                if use_text_extraction:
+                    try:
+                        doc = textract.process(fpath)
+                        doc = doc.decode('utf-8', 'ignore')
+                    except:
+                        if verbose:
+                            warnings.warn('Could not extract text from %s' % (fpath))
+                        continue
+                else:
+                    continue
 
             if breakup_docs:
                 small_docs = TU.paragraph_tokenize(doc, join_sentences=True, lang='en')
