@@ -364,7 +364,7 @@ qa = text.SimpleQA(INDEXDIR,
                     bert_emb_model='/path/to/bert-base-uncased/folder')
 ```
 
-You can use simlar steps for other models that use the `transformers` library like `bilstm-bert` for NER.
+You can use simlar steps for other models that use the `transformers` library like `bilstm-bert` for NER or offline language translation.
 
 
 
