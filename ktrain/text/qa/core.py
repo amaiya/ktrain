@@ -365,7 +365,7 @@ class SimpleQA(QA):
         return ix
 
     @classmethod
-    def index_from_list(cls, docs, index_dir, commit_every=1024, breakup_docs=False,
+    def index_from_list(cls, docs, index_dir, commit_every=1024, breakup_docs=True,
                         procs=1, limitmb=256, multisegment=False, min_words=20, references=None):
         """
         index documents from list.
@@ -433,7 +433,7 @@ class SimpleQA(QA):
 
 
     @classmethod
-    def index_from_folder(cls, folder_path, index_dir,  use_text_extraction=False, commit_every=1024, breakup_docs=False, 
+    def index_from_folder(cls, folder_path, index_dir,  use_text_extraction=False, commit_every=1024, breakup_docs=True, 
                           min_words=20, encoding='utf-8', procs=1, limitmb=256, multisegment=False, verbose=1):
         """
         index all plain text documents within a folder.
