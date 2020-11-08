@@ -21,7 +21,7 @@ from ktrain import text
 INDEXDIR = '/tmp/myindex'
 text.SimpleQA.initialize_index(INDEXDIR)
 corpus_path = '/my/folder/of/documents' # contains .pdf, .docx, .pptx files in addition to .txt files
-text.SimpleQA.index_from_folder(corpus_path, INDEXDIR, use_text_extraction=True, # enable text extraction from non-txt files
+text.SimpleQA.index_from_folder(corpus_path, INDEXDIR, use_text_extraction=True, # enable text extraction
                               multisegment=True, procs=4, # these args speed up indexing
                               breakup_docs=True)          # this slows indexing but speeds up answer retrieval
 
