@@ -11,7 +11,7 @@
 
 ### News and Announcements
 - **2020-11-08:**
-  - ***ktrain*** **v0.25.x is released** and includes out-of-the-box support for text extraction via the [textract](https://pypi.org/project/textract/) . This, for example,
+  - ***ktrain*** **v0.25.x is released** and includes out-of-the-box support for text extraction via the [textract](https://pypi.org/project/textract/) package . This, for example,
 can be used in the `SimpleQA.index_folder` method to perform Question-Answering on large collections of PDFs, MS Word documents, or PowerPoint files.   See the [Question-Answering example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/question_answering_with_bert.ipynb) for more information.
 ```python
 # End-to-End Question-Answering in ktrain
