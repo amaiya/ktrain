@@ -6,6 +6,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.25.0 (2020-11-08)
+
+### New:
+- The `SimpleQA.index_from_folder` method now supports text extraction from many file types including PDFs, MS Word documents, and MS PowerPoint files.
+
+### Changed
+- N/A
+
+### Fixed:
+- N/A
+
+
 ## 0.24.2 (2020-11-07)
 
 ### New:

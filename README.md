@@ -10,30 +10,33 @@
 
 
 ### News and Announcements
-- **2020-11-04**
-  - ***ktrain*** **v0.24.x is released** and now includes built-in support for exporting models to [ONNX](https://onnx.ai/) and  [TensorFlow Lite](https://www.tensorflow.org/lite).    See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/ktrain-ONNX-TFLite-examples.ipynb) for more information.
-- **2020-10-16:**
-  - ***ktrain*** **v0.23.x is released** with updates for compatibility with upcoming release of TensorFlow 2.4.
-- **2020-10-06:**
-  - ***ktrain*** **v0.22.x is released** and includes enhancements to **end-to-end question-answering** such as significantly faster answer-retrieval.  See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/question_answering_with_bert.ipynb) for more information.
+- **2020-11-08:**
+  - ***ktrain*** **v0.25.x is released** and includes out-of-the-box support for text extraction via the [textract](https://pypi.org/project/textract/) . This, for example,
+can be used in the `SimpleQA.index_folder` method to perform Question-Answering on large collections of PDFs, MS Word documents, or PowerPoint files.   
+See the [Question-Answering example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/question_answering_with_bert.ipynb) for more information.
 ```python
 # End-to-End Question-Answering in ktrain
 
-# index some documents into a built-in search engine
+# index documents of different types into a built-in search engine
 from ktrain import text
 INDEXDIR = '/tmp/myindex'
 text.SimpleQA.initialize_index(INDEXDIR)
-text.SimpleQA.index_from_list(docs, INDEXDIR, commit_every=len(docs),  # docs is a list of strings
+corpus_path = '/my/folder/of/documents' # contains .pdf, .docx, .pptx files in addition to .txt files
+text.SimpleQA.index_from_folder(corpus_path, INDEXDIR, commit_every=len(docs),  # docs is a list of strings
                               multisegment=True, procs=4, # these args speed up indexing
                               breakup_docs=True)          # this slows indexing but speeds up answer retrieval
 
 # ask questions (setting higher batch size can further speed up answer retrieval)
 qa = text.SimpleQA(INDEXDIR)
-answers = qa.ask('What causes computer images to be too dark?', batch_size=8)
+answers = qa.ask('What is ktrain', batch_size=8)
 
-# top answer snippet:
-#   "if your viewer does not do gamma correction , then linear images will look too dark"
+# top answer snippet extracted from https://arxiv.org/abs/2004.10703:
+#   "ktrain is a low-code platform for machine learning"
 ```
+- **2020-11-04**
+  - ***ktrain*** **v0.24.x is released** and now includes built-in support for exporting models to [ONNX](https://onnx.ai/) and  [TensorFlow Lite](https://www.tensorflow.org/lite).    See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/ktrain-ONNX-TFLite-examples.ipynb) for more information.
+- **2020-10-16:**
+  - ***ktrain*** **v0.23.x is released** with updates for compatibility with upcoming release of TensorFlow 2.4.
 ----
 
 ### Overview
