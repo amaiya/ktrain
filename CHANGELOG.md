@@ -12,7 +12,7 @@ Most recent releases are shown at the top. Each release shows:
 - The `SimpleQA.index_from_folder` method now supports text extraction from many file types including PDFs, MS Word documents, and MS PowerPoint files.
 
 ### Changed
-- N/A
+- The default in `SimpleQA.index_from_list` and `SimpleQA.index_from_folder` has been changed to `breakup_docs=True`.
 
 ### Fixed:
 - N/A
