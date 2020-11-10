@@ -8,6 +8,8 @@
 
 - [How do I use ktrain with documents in PDF, DOC, or PPT formats?](#how-do-i-use-ktrain-with-documents-in-pdf-doc-or-ppt-formats)
 
+- [Can I use ktrain without a GPU?](#can-i-use-ktrain-without-a-gpu)
+
 
 ## Installation/Deployment Issues
 - [How do I install ktrain on a Windows machine?](#how-do-i-install-ktrain-on-a-windows-machine)
@@ -760,6 +762,17 @@ comprised of many different file types. More information on this is included in 
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
 
+
+### Can I use ktrain without a GPU?
+
+Each task in **ktrain** offers different model choices.  Large models (e.g., fine-tuning BERT for text classification) definitely do require a GPU (unless you have the patience for an unbearably slow training process).  However, smaller models (which can often yield very good accuracy scores), can be trained on a laptop CPU.   Examples of CPU-friendly models include the `nbsvm` model for text classification,  the `pretrained_mobilenet` model for image classification, [topic modeling](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-05-learning_from_unlabeled_text_data.ipynb), and models in the [ShallowNLP module](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/shallownlp-examples.ipynb).
+
+
+A number of models in **ktrain** can be used on a CPU-based laptop out-of-the-box with no training required such as [question-answering](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/question_answering_with_bert.ipynb), [language translation](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/language_translation_example.ipynb), and [zero-shot topic classification](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/zero_shot_learning_with_nli.ipynb).
+
+
+
+[[Back to Top](#frequently-asked-questions-about-ktrain)]
 
 
 ### What kinds of applications have been built with *ktrain*?
