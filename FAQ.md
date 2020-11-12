@@ -59,6 +59,7 @@
 
 - [Running `predictor.explain` for text classification is slow.  How can I speed it up?](#running-predictorexplain-for-text-classification-is-slow--how-can-i-speed-it-up)
 
+- [How can I speed up BERT and DistilBERT predictions?](#how-can-i-speed-up-bert-and-distilbert-predictions)
 
 
 ---
@@ -773,6 +774,28 @@ A number of models in **ktrain** can be used out-of-the-box on a CPU-based lapto
 
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
+
+
+### How can I speed up BERT and DistilBERT predictions?
+
+If you are using a `transformers` model (e.g., BERT, DistilBERT), predictions made one at a time will be faster than supplying a list of inputs to the `predict` method. 
+ For instance, in the example below, supplying a single document to `predictor.predict` in a loop will be faster than supplying `list_of_docs` as direct input to `predictor.predict`:
+
+```python
+for doc in list_of_docs:
+    pred = predictor.predict(doc)
+```
+
+The reason for this is that, when supplying single inputs to `predictor.predict`, no padding is needed, which results in smaller inputs and, therefore, faster predictions.  
+The basic idea is from [this blog post](https://blog.roblox.com/2020/05/scaled-bert-serve-1-billion-daily-requests-cpus/).
+
+Note that this does **not** currently apply to BERT models created with `text_classifier('bert',...`, which uses `keras_bert` instead of `transformers`.  The speed up will be seen only when creating a model using either the two API calls:
+- `Transformer(...)`, where `...` can be any `transformers` model like `bert-base-cased`,`distilbert-base-uncased`, etc.
+- `text_classifier('distilbert', ...)`
+
+
+[[Back to Top](#frequently-asked-questions-about-ktrain)]
+
 
 
 ### What kinds of applications have been built with *ktrain*?
