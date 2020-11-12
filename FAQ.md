@@ -792,7 +792,7 @@ from transformers import *
 import ktrain
 predictor = ktrain.load_predictor('/tmp/mypredictor')
 model_pt = AutoModelForSequenceClassification.from_pretrained('/tmp/mypredictor', from_tf=True)
-tokenizer = AutoTokenizer.from_pretrained(predictor.preproc.model_name)
+tokenizer = predictor.preproc.get_tokenizer() # You can also use AutoTokenizer.from_pretrained(predictor.preproc.model_name)
 maxlen = predictor.preproc.maxlen
 device = 'cpu'
 class_names = predictor.preproc.get_classes()
