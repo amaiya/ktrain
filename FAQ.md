@@ -59,7 +59,7 @@
 
 - [Running `predictor.explain` for text classification is slow.  How can I speed it up?](#running-predictorexplain-for-text-classification-is-slow--how-can-i-speed-it-up)
 
-- [How do I make quantized predictions with transformers models?](#how-do-i-make-quantized-predictions-with-transformers)
+- [How do I make quantized predictions with transformers models?](#how-do-i-make-quantized-predictions-with-transformers-models)
 
 
 ---
