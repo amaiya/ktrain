@@ -778,8 +778,7 @@ A number of models in **ktrain** can be used out-of-the-box on a CPU-based lapto
 
 ### How can I speed up BERT and DistilBERT predictions on CPUs?
 
-If you are using a Hugging Face `transformers` model (e.g., BERT, DistilBERT), predictions made one at a time may be faster than supplying a list of inputs to the `predict` method. 
- For instance, in the example below, supplying a single document to `predictor.predict` in a loop may be faster than supplying `list_of_docs` as direct input to `predictor.predict`:
+If you are using a Hugging Face `transformers` model (e.g., BERT, DistilBERT), predictions made one at a time may be faster than supplying a list of inputs to the `predict` method (as of v0.25.1 of **ktrain**).  For instance, in the example below, supplying a single document to `predictor.predict` in a loop may be faster than supplying `list_of_docs` as direct input to `predictor.predict`:
 
 ```python
 
