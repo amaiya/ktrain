@@ -314,7 +314,7 @@ def hf_convert_examples(texts, y=None, tokenizer=None,
             and by ``0`` for padded values. If set to ``False``, inverts it (``1`` for padded values, ``0`` for
             actual values)
         use_dynamic_shape(bool):  If True, supplied max_length will be ignored and will be computed
-                                  based on provided texts.
+                                  based on provided texts instead.
         verbose(bool): verbosity
     Returns:
         If the ``examples`` input is a ``tf.data.Dataset``, will return a ``tf.data.Dataset``
