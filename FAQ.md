@@ -784,7 +784,7 @@ TensorFlow has built-in support for quantization.  Unfortunately, as of this wri
 
 As a workaround, you can convert your saved TensorFlow model to PyTorch, quantize, and make predictions directly in PyTorch. 
 
-This code example assumes you've trained a DistilBERT model with **ktrain** and saved a `Predictor` in a folder called `'/tmp/mypredictor'`:
+This code example assumes you've trained a DistilBERT model with **ktrain** ,saved a `Predictor` in a folder called `'/tmp/mypredictor'`, and need to make predictions on CPU:
 ```python
 
 # load the predictor, model, and tokenizer
@@ -793,16 +793,18 @@ import ktrain
 predictor = ktrain.load_predictor('/tmp/mypredictor')
 model_pt = AutoModelForSequenceClassification.from_pretrained('/tmp/mypredictor', from_tf=True)
 tokenizer = AutoTokenizer.from_pretrained(predictor.preproc.model_name)
+maxlen = predictor.preproc.maxlen
+device = 'cpu'
 
 # quantize model (INT8 quantization)
 import torch
 model_pt_quantized = torch.quantization.quantize_dynamic(
-    model_pt.to("cpu"), {torch.nn.Linear}, dtype=torch.qint8)
+    model_pt.to(device), {torch.nn.Linear}, dtype=torch.qint8)
 
 # make quantized predictions
 preds = []
 for doc in x_test:
-    model_inputs = tokenizer(doc, return_tensors="pt", max_length=500, truncation=True)
+    model_inputs = tokenizer(doc, return_tensors="pt", max_length=maxlen, truncation=True)
     model_inputs_on_device = { arg_name: tensor.to(device) 
                               for arg_name, tensor in model_inputs.items()}
     pred = model_pt_quantized(**model_inputs)
