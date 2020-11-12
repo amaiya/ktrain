@@ -780,7 +780,7 @@ A number of models in **ktrain** can be used out-of-the-box on a CPU-based lapto
 
 Quantization can improve the efficiency of neural network computations by reducing the size of the weights.  For instance, when making predictions, representing weights with 8-bit integers instead of 32-bit floats can speed up inferences.
 
-TensorFlow has built-in support for quantization.  Unfortunately, as of this writing, it only works for sequential and functional `tf.keras` models, which means it cannot be used with Hugging Face `transformers` models.
+TensorFlow has built-in support for quantization.  Unfortunately, as of this writing, it [only works for sequential and functional](https://github.com/tensorflow/tensorflow/issues/40699) `tf.keras` models, which means it cannot be used with Hugging Face `transformers` models.
 
 As a workaround, you can convert your saved TensorFlow model to PyTorch, quantize, and make predictions directly in PyTorch. 
 
