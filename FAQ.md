@@ -795,6 +795,7 @@ model_pt = AutoModelForSequenceClassification.from_pretrained('/tmp/mypredictor'
 tokenizer = AutoTokenizer.from_pretrained(predictor.preproc.model_name)
 maxlen = predictor.preproc.maxlen
 device = 'cpu'
+class_names = predictor.preproc.get_classes()
 
 # quantize model (INT8 quantization)
 import torch
@@ -807,7 +808,7 @@ for doc in x_test:
     model_inputs = tokenizer(doc, return_tensors="pt", max_length=maxlen, truncation=True)
     model_inputs_on_device = { arg_name: tensor.to(device) 
                               for arg_name, tensor in model_inputs.items()}
-    pred = model_pt_quantized(**model_inputs)
+    pred = model_pt_quantized(**model_inputs_on_device)
     preds.append(class_names[ np.argmax( np.squeeze( pred[0].cpu().detach().numpy() ) ) ]) 
 
 ```
