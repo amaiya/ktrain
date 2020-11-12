@@ -812,7 +812,7 @@ for doc in x_test:
 
 ```
 
-Note that the above example employs smaller inputs by eliminating padding in addition to using a quantized model.  As discussed in [this blog post](https://blog.roblox.com/2020/05/scaled-bert-serve-1-billion-daily-requests-cpus/), both of these steps can speed up predictions in deployment scenarios.
+Note that the above example employs smaller inputs by eliminating padding in addition to using a quantized model.  As discussed in [this blog post](https://blog.roblox.com/2020/05/scaled-bert-serve-1-billion-daily-requests-cpus/), both of these steps can speed up predictions in CPU deployment scenarios.
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
 
