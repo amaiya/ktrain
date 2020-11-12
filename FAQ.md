@@ -59,7 +59,7 @@
 
 - [Running `predictor.explain` for text classification is slow.  How can I speed it up?](#running-predictorexplain-for-text-classification-is-slow--how-can-i-speed-it-up)
 
-- [How can I speed up BERT and DistilBERT predictions on CPUs?](#how-can-i-speed-up-bert-and-distilbert-predictions-on-cpus)
+- [How do I make quantized predictions with transformers models?](#how-do-i-make-quantized-predictions-with-transformers)
 
 
 ---
@@ -776,30 +776,41 @@ A number of models in **ktrain** can be used out-of-the-box on a CPU-based lapto
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
 
 
-### How can I speed up BERT and DistilBERT predictions on CPUs?
+### How do I make quantized predictions with transformers models?
 
-If you are using a Hugging Face `transformers` model (e.g., BERT, DistilBERT), predictions made one at a time may be faster than supplying a list of inputs to the `predict` method (as of v0.25.1 of **ktrain**).  For instance, in the example below, supplying a single document to `predictor.predict` in a loop may be faster than supplying `list_of_docs` as direct input to `predictor.predict`:
+Quantization can improve the efficiency of neural network computations by reducing the size of the weights.  For instance, when making predictions, representing weights with 8-bit integers instead of 32-bit floats can speed up inferences.
 
+TensorFlow has built-in support for quantization.  Unfortunately, as of this writing, it only works for sequential and functional `tf.keras` models, which means it cannot be used with Hugging Face `transformers` models.
+
+As a workaround, you can convert your saved TensorFlow model to PyTorch, quantize, and make predictions directly in PyTorch. 
+
+This code example assumes you've trained a DistilBERT model with **ktrain** and saved a `Predictor` in a folder called `'/tmp/mypredictor'`:
 ```python
 
-# this may be faster for Hugging Face transformers models
-preds = []
-for doc in list_of_docs:
-    preds.append(predictor.predict(doc))
+# load the predictor, model, and tokenizer
+from transformers import *
+import ktrain
+predictor = ktrain.load_predictor('/tmp/mypredictor')
+model_pt = AutoModelForSequenceClassification.from_pretrained('/tmp/mypredictor', from_tf=True)
+tokenizer = AutoTokenizer.from_pretrained(predictor.preproc.model_name)
 
-# this may be less fast for Hugging Face transformers models
-preds = predictor.predict(list_of_docs)
+# quantize model (INT8 quantization)
+import torch
+model_pt_quantized = torch.quantization.quantize_dynamic(
+    model_pt.to("cpu"), {torch.nn.Linear}, dtype=torch.qint8)
+
+# make quantized predictions
+preds = []
+for doc in x_test:
+    model_inputs = tokenizer(doc, return_tensors="pt", max_length=500, truncation=True)
+    model_inputs_on_device = { arg_name: tensor.to(device) 
+                              for arg_name, tensor in model_inputs.items()}
+    pred = model_pt_quantized(**model_inputs)
+    preds.append(class_names[ np.argmax( np.squeeze( pred[0].cpu().detach().numpy() ) ) ]) 
+
 ```
 
-You are encouraged to experiment with the above yourself using your own dataset of interest to verify.
-
-
-The reason for the speedup is that, when supplying single inputs to `predictor.predict`, no padding is needed, which results in smaller inputs and, therefore, faster predictions.  The basic idea is from [this blog post](https://blog.roblox.com/2020/05/scaled-bert-serve-1-billion-daily-requests-cpus/).
-
-Note that this only applies to Hugging Face `transformers` models.  Thus, it  does **not** currently apply to BERT models created with `text_classifier('bert',...`, which uses `keras_bert` instead of `transformers`.  The speed up will be seen only when creating a model using either the two API calls which are wrappers to `transformers`:
-- `Transformer(...)`, where `...` can be any `transformers` model like `bert-base-cased`,`distilbert-base-uncased`, etc.
-- `text_classifier('distilbert', ...)`
-
+Note that the above example employs smaller inputs by eliminating padding in addition to using a quantized model.  As discussed in [this blog post](https://blog.roblox.com/2020/05/scaled-bert-serve-1-billion-daily-requests-cpus/), both of these steps can speed up predictions in deployment scenarios.
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
 
