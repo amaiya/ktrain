@@ -778,8 +778,8 @@ A number of models in **ktrain** can be used out-of-the-box on a CPU-based lapto
 
 ### How can I speed up BERT and DistilBERT predictions on CPUs?
 
-If you are using a Hugging Face `transformers` model (e.g., BERT, DistilBERT), predictions made one at a time will be faster than supplying a list of inputs to the `predict` method. 
- For instance, in the example below, supplying a single document to `predictor.predict` in a loop will be faster than supplying `list_of_docs` as direct input to `predictor.predict`:
+If you are using a Hugging Face `transformers` model (e.g., BERT, DistilBERT), predictions made one at a time may be faster than supplying a list of inputs to the `predict` method. 
+ For instance, in the example below, supplying a single document to `predictor.predict` in a loop may be faster than supplying `list_of_docs` as direct input to `predictor.predict`:
 
 ```python
 
@@ -792,10 +792,10 @@ for doc in list_of_docs:
 preds = predictor.predict(list_of_docs)
 ```
 
-You are encouraged to experiment with the above yourself to verify, of course.
+You are encouraged to experiment with the above yourself using your own dataset of interest to verify.
 
 
-The reason for speedup is that, when supplying single inputs to `predictor.predict`, no padding is needed, which results in smaller inputs and, therefore, faster predictions.  The basic idea is from [this blog post](https://blog.roblox.com/2020/05/scaled-bert-serve-1-billion-daily-requests-cpus/).
+The reason for the speedup is that, when supplying single inputs to `predictor.predict`, no padding is needed, which results in smaller inputs and, therefore, faster predictions.  The basic idea is from [this blog post](https://blog.roblox.com/2020/05/scaled-bert-serve-1-billion-daily-requests-cpus/).
 
 Note that this only applies to Hugging Face `transformers` models.  Thus, it  does **not** currently apply to BERT models created with `text_classifier('bert',...`, which uses `keras_bert` instead of `transformers`.  The speed up will be seen only when creating a model using either the two API calls which are wrappers to `transformers`:
 - `Transformer(...)`, where `...` can be any `transformers` model like `bert-base-cased`,`distilbert-base-uncased`, etc.
