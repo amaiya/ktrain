@@ -151,12 +151,21 @@ def get_bert_path(lang='en'):
 
 
 
-def bert_tokenize(docs, tokenizer, maxlen, verbose=1):
+def bert_tokenize(docs, tokenizer, max_length, use_dynamic_shape=False ,verbose=1):
+    # tokenizer is slower that Hugging Face tokenizers, so only use dynamic shape on smaller batches
+    if use_dynamic_shape and len(docs) < 128:
+        sentences = []
+        for doc in docs:
+            ids, segments = tokenizer.encode(doc)
+            sentences.append(ids)
+        maxlen = len(max([tokens for tokens in sentences], key=len,)) + 2
+        if maxlen < max_length: max_length = maxlen
+
     indices = []
     mb = master_bar(range(1))
     for i in mb:
         for doc in progress_bar(docs, parent=mb):
-            ids, segments = tokenizer.encode(doc, max_len=maxlen)
+            ids, segments = tokenizer.encode(doc, max_len=max_length)
             indices.append(ids)
         if verbose: mb.write('done.')
     zeros = np.zeros_like(indices)
@@ -775,7 +784,9 @@ class BERTPreprocessor(TextPreprocessor):
         U.vprint('preprocessing %s...' % (mode), verbose=verbose)
         U.vprint('language: %s' % (self.lang), verbose=verbose)
 
-        x = bert_tokenize(texts, self.tok, self.maxlen, verbose=verbose)
+        x = bert_tokenize(texts, self.tok, self.maxlen, 
+                          use_dynamic_shape=False if mode == 'train' else True, 
+                          verbose=verbose)
 
         # transform y
         y = self._transform_y(y, train=mode=='train', verbose=verbose)
