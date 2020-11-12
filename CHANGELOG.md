@@ -6,6 +6,20 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.25.1 (2020-11-12)
+
+### New:
+- N/A
+
+### Changed
+- Added `use_dynamic_shape` parameter to `text.preprocessor.hf_convert_examples` which is set to `True` when running predictions.  This speeds up predictions
+of `transformers` models like BERT and DistilBERT when inferences are made on one input at a time.  This is because  smaller inputs are used instead of padding all inputs
+to the `maxlen` parameter supplied during training set preprocessing. The idea is from [this blog post](https://blog.roblox.com/2020/05/scaled-bert-serve-1-billion-daily-requests-cpus/).
+
+### Fixed:
+- N/A
+
+
 ## 0.25.0 (2020-11-08)
 
 ### New:
