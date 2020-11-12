@@ -59,7 +59,7 @@
 
 - [Running `predictor.explain` for text classification is slow.  How can I speed it up?](#running-predictorexplain-for-text-classification-is-slow--how-can-i-speed-it-up)
 
-- [How do I make quantized predictions with transformers models?](#how-do-i-make-quantized-predictions-with-transformers-models)
+- [How do I make quantized predictions with `transformers` models?](#how-do-i-make-quantized-predictions-with-transformers-models)
 
 
 ---
@@ -776,7 +776,7 @@ A number of models in **ktrain** can be used out-of-the-box on a CPU-based lapto
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
 
 
-### How do I make quantized predictions with transformers models?
+### How do I make quantized predictions with `transformers` models?
 
 Quantization can improve the efficiency of neural network computations by reducing the size of the weights.  For instance, when making predictions, representing weights with 8-bit integers instead of 32-bit floats can speed up inferences.
 
