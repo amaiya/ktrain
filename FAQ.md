@@ -802,7 +802,7 @@ import torch
 model_pt_quantized = torch.quantization.quantize_dynamic(
     model_pt.to(device), {torch.nn.Linear}, dtype=torch.qint8)
 
-# make quantized predictions
+# make quantized predictions (x_test is a list of strings representing documents)
 preds = []
 for doc in x_test:
     model_inputs = tokenizer(doc, return_tensors="pt", max_length=maxlen, truncation=True)
