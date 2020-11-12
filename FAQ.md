@@ -784,7 +784,7 @@ TensorFlow has built-in support for quantization.  Unfortunately, as of this wri
 
 As a workaround, you can convert your saved TensorFlow model to PyTorch, quantize, and make predictions directly in PyTorch. 
 
-This code example assumes you've trained a DistilBERT model with **ktrain** ,saved a `Predictor` in a folder called `'/tmp/mypredictor'`, and need to make predictions on CPU:
+This code example assumes you've trained a DistilBERT model with **ktrain** ,saved a `Predictor` in a folder called `'/tmp/mypredictor'`, and need to make quantized predictions on CPU:
 ```python
 
 # load the predictor, model, and tokenizer
