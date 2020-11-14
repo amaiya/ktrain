@@ -850,8 +850,7 @@ print(p.get_classes()[np.argmax(sess.run(None, tokens)[0])])
 
 The example above assumes the model saved at `predictor_path` was trained on a subset of the 20 Newsgroup corpus as was done in [this tutorial](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-A3-hugging_face_transformers.ipynb).
 
-You can also use **ktrain** to [create ONNX models directly from TensorFlow](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/ktrain-ONNX-TFLite-examples.ipynb).
-Note, that conversions to ONNX from TensorFlow models appear to [require a hard-coded input size](https://github.com/huggingface/transformers/issues/8227) (i.e., padding is used), whereas conversions to ONNX from PyTorch models do not appear to have this requirement.
+You can also use **ktrain** to [create ONNX models directly from TensorFlow](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/ktrain-ONNX-TFLite-examples.ipynb) with optional quantization.  Note, that conversions to ONNX from TensorFlow models appear to [require a hard-coded input size](https://github.com/huggingface/transformers/issues/8227) (i.e., padding is used), whereas conversions to ONNX from PyTorch models do not appear to have this requirement.
 
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
