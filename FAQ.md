@@ -815,14 +815,43 @@ for doc in x_test:
 
 Note that the above example employs smaller inputs by eliminating padding in addition to using a quantized model.  As discussed in [this blog post](https://blog.roblox.com/2020/05/scaled-bert-serve-1-billion-daily-requests-cpus/), both of these steps can speed up predictions in CPU deployment scenarios.
 
-Alternatively, you might also consider quantizing your `transformers` model with the [convert_graph_to_onnx.py](https://github.com/huggingface/transformers/blob/master/src/transformers/convert_graph_to_onnx.py) script included with the `transformers` library:
+Alternatively, you might also consider quantizing your `transformers` model with the [convert_graph_to_onnx.py](https://github.com/huggingface/transformers/blob/master/src/transformers/convert_graph_to_onnx.py) script included with the `transformers` library, which can also be used as a module, as shown below.
 
 ```python
-# Example:
-python -m transformers.convert_graph_to_onnx --framework pt --model bert-base-uncased --quantize bert-base-uncased.onnx
+# imports
+import numpy as np
+from transformers.convert_graph_to_onnx import convert, optimize, quantize
+from transformers import *
+from pathlib import Path
+
+# paths
+predictor_path = '/tmp/mypredictor'
+pt_path = predictor_path+'_pt'
+pt_onnx_path = pt_path +'_onnx/model.onnx'
+
+# convert to ONNX
+p = ktrain.load_predictor(predictor_path)
+AutoModelForSequenceClassification.from_pretrained(predictor_path, 
+                                                   from_tf=True).save_pretrained(pt_path)
+convert(framework='pt', model=pt_path,output=Path(pt_onnx_path), opset=11, 
+        tokenizer=p.preproc.model_name, pipeline_name='sentiment-analysis')
+pt_onnx_quantized_path = quantize(optimize(Path(pt_onnx_path)))
+
+# create ONNX session and make predictions
+sess = p.create_onnx_session(pt_onnx_quant_name.as_posix())
+tokenizer = p.preproc.get_tokenizer()
+tokens = tokenizer.encode_plus('My computer monitor is blurry.')
+tokens = {name: np.atleast_2d(value) for name, value in tokens.items()}
+print(p.get_classes()[np.argmax(sess.run(None, tokens)[0])])
+
+# output:
+# comp.graphics
 ```
 
-Although you can use this script to convert a TensorFlow `transformers` model, you may get better performance if you convert your model to PyTorch first before running the script.  One reason for this is that ONNX models converted from TensorFlow seem to require a hard-coded input size (i.e., `max_length`), which means smaller inputs will have to be padded resulting in longer inference times.
+The example above assumes the model saved at `predictor_path` was trained on a subset of the 20 Newsgroup corpus as was done in [this tutorial](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-A3-hugging_face_transformers.ipynb).
+
+You can also use **ktrain** to [create ONNX models directly from TensorFlow](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/ktrain-ONNX-TFLite-examples.ipynb).
+Note, that conversions to ONNX from TensorFlow models appear to [require a hard-coded input size](https://github.com/huggingface/transformers/issues/8227) (i.e., padding is used), whereas conversions to ONNX from PyTorch models do not appear to have this requirement.
 
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
