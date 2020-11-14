@@ -815,6 +815,14 @@ for doc in x_test:
 
 Note that the above example employs smaller inputs by eliminating padding in addition to using a quantized model.  As discussed in [this blog post](https://blog.roblox.com/2020/05/scaled-bert-serve-1-billion-daily-requests-cpus/), both of these steps can speed up predictions in CPU deployment scenarios.
 
+You might also consider quantizing your 'transformers` model with the `convert_graph_to_onnx.py` script included with the `transformers` library:
+```python
+python -m transformers.convert_graph_to_onnx --framework pt --model bert-base-uncased --quantize bert-base-uncased.onnx
+```
+
+Although you can use this script to convert a TensorFlow `transformers` model, you may get better performance if you convert your model to PyTorch first before running the script.  One reason for this is that ONNX models converted from TensorFlow seem to require a hard-coded input size (i.e., `max_length`), which means smaller inputs will have to be padded resulting in longer inference times.
+
+
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
 
 
