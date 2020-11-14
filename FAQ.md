@@ -786,6 +786,7 @@ As a workaround, you can convert your saved TensorFlow model to PyTorch, quantiz
 
 This code example assumes you've trained a DistilBERT model with **ktrain** ,saved a `Predictor` in a folder called `'/tmp/mypredictor'`, and need to make quantized predictions on CPU:
 ```python
+# Quantization Using PyTorch
 
 # load the predictor, model, and tokenizer
 from transformers import *
@@ -818,6 +819,7 @@ Note that the above example employs smaller inputs by eliminating padding in add
 Alternatively, you might also consider quantizing your `transformers` model with the [convert_graph_to_onnx.py](https://github.com/huggingface/transformers/blob/master/src/transformers/convert_graph_to_onnx.py) script included with the `transformers` library, which can also be used as a module, as shown below.
 
 ```python
+# Converting to ONNX (from PyTorch-converted model)
 # imports
 import numpy as np
 from transformers.convert_graph_to_onnx import convert, optimize, quantize
