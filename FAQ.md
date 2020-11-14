@@ -820,6 +820,7 @@ Alternatively, you might also consider quantizing your `transformers` model with
 
 ```python
 # Converting to ONNX (from PyTorch-converted model)
+
 # imports
 import numpy as np
 from transformers.convert_graph_to_onnx import convert, optimize, quantize
