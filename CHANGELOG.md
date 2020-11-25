@@ -16,6 +16,7 @@ Most recent releases are shown at the top. Each release shows:
 
 ### Fixed:
 - Suppress progress bar in `predictor.predict` for `keras_bert` models
+- Fixed typo causing problems when loading predictor for Inception models
 
 
 ## 0.25.0 (2020-11-08)
