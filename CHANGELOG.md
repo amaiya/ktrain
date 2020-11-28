@@ -13,6 +13,7 @@ Most recent releases are shown at the top. Each release shows:
 
 ### Changed
 - Added `use_dynamic_shape` parameter to `text.preprocessor.hf_convert_examples` which is set to `True` when running predictions.  This reduces the input length when making predictions, if possible..
+- Added warnings to some imports in `imports.py` to allow for slightly lighter-weight deployments
 
 ### Fixed:
 - Suppress progress bar in `predictor.predict` for `keras_bert` models
