@@ -29,21 +29,21 @@ setup(
           'matplotlib >= 3.0.0',
           'pandas >= 1.0.1',
           'fastprogress >= 0.1.21',
-          'keras_bert>=0.86.0', # support for TF 2.3
           'requests',
           'joblib',
+          'packaging',
+          'ipython',
           'langdetect',
           'jieba',
           'cchardet',  # previously pinned to 2.1.5 (due to this issue: https://github.com/PyYoshi/cChardet/issues/61) but no longer needed
-          'networkx>=2.3',
-          'bokeh',
           'seqeval==0.0.19', # pin to 0.0.19 due to numpy version incompatibility with TensorFlow 2.3
-          'packaging',
           'transformers>=3.1.0', # due to breaking change in v3.1.0
-          'ipython',
           'syntok',
-          'whoosh',
-          # these libraries are manually installed on-the-fly when required by an invoked method
+          'keras_bert>=0.86.0', # support for TF 2.3
+          'bokeh', # imported by text.eda module
+          'networkx>=2.3', # imported by graph module
+          'whoosh', # imported by text.qa module
+          # these libraries are manually installed on-the-fly when required by an invoked method with appropriate warnings
           # 'shap',  # used by TabularPredictor.explain
           #'eli5 >= 0.10.0', # forked version used by TextPredictor.explain and ImagePredictor.explain
           #'stellargraph>=0.8.2', # forked version used by graph module

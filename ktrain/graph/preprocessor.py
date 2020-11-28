@@ -1,6 +1,7 @@
 from ..imports import *
 from .. import utils as U
 from ..preprocessor import Preprocessor
+import networkx as nx
 
 
 class NodePreprocessor(Preprocessor):

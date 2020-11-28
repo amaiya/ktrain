@@ -212,12 +212,6 @@ try:
 except ImportError:
     warnings.warn("keras_bert is not installed - needed only for 'bert' text classification model")
 
-# graph module
-try:
-    import networkx as nx
-except ImportError:
-    warnings.warn('networkx is not installed - needed only for the `graph` module')
-#from sklearn import preprocessing, feature_extraction, model_selection
 
 # text.ner module
 try:
