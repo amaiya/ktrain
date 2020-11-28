@@ -40,7 +40,6 @@ setup(
           'transformers>=3.1.0', # due to breaking change in v3.1.0
           'syntok',
           'keras_bert>=0.86.0', # support for TF 2.3
-          'bokeh', # imported by text.eda module
           'networkx>=2.3', # imported by graph module
           'whoosh', # imported by text.qa module
           # these libraries are manually installed on-the-fly when required by an invoked method with appropriate warnings
@@ -50,6 +49,7 @@ setup(
           #'allennlp', # required for Elmo embeddings since TF2 TF_HUB does not work
           #'textblob', # used by textutils.extract_noun_phrases
           #'textract', # used by textutils.extract_copy and text.qa.core.SimpleQA
+          #'bokeh', # imported by visualze_documents text.eda module
       ],
   classifiers=[  # Optional
     # How mature is this project? Common values are
