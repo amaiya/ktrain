@@ -190,33 +190,51 @@ try:
 except:
     # fastprogress < v0.2.0
     from fastprogress import master_bar, progress_bar 
-import keras_bert
-from keras_bert import Tokenizer as BERT_Tokenizer
+
+
 import requests
 # verify=False added to avoid headaches from some corporate networks
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-# multilingual
+# text processing
+import syntok.segmenter as segmenter
+
+# multilingual text processing
 import langdetect
 import jieba
 import cchardet as chardet
 
-# graphs
-import networkx as nx
+# 'bert' text classification model
+try:
+    import keras_bert
+    from keras_bert import Tokenizer as BERT_Tokenizer
+except ImportError:
+    warnings.warn("keras_bert is not installed - needed only for 'bert' text classification model")
+
+# graph module
+try:
+    import networkx as nx
+except ImportError:
+    warnings.warn('networkx is not installed - needed only for the `graph` module')
 #from sklearn import preprocessing, feature_extraction, model_selection
 
-# ner
-from seqeval.metrics import classification_report as ner_classification_report
-from seqeval.metrics import f1_score as ner_f1_score
-from seqeval.metrics import accuracy_score as ner_accuracy_score
-from seqeval.metrics.sequence_labeling import get_entities
-import syntok.segmenter as segmenter
+# text.ner module
+try:
+    from seqeval.metrics import classification_report as ner_classification_report
+    from seqeval.metrics import f1_score as ner_f1_score
+    from seqeval.metrics import accuracy_score as ner_accuracy_score
+    from seqeval.metrics.sequence_labeling import get_entities
+except ImportError:
+    warnings.warn("seqeval is not installed - needed only by 'text.ner' module")
 
 
-# transformers
+# transformers for models in 'text' module
 logging.getLogger("transformers").setLevel(logging.ERROR)
-import transformers
+try:
+    import transformers
+except ImportError:
+    warnings.warn("transformers not installed - needed by various models in 'text' module")
 
 
 try:
