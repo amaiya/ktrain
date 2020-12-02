@@ -39,7 +39,7 @@ setup(
           'bokeh',
           'seqeval==0.0.19', # pin to 0.0.19 due to numpy version incompatibility with TensorFlow 2.3
           'packaging',
-          'transformers>=3.1.0', # due to breaking change in v3.1.0
+          'transformers==3.1.0', # due to breaking change in v3.1.0
           'ipython',
           'syntok',
           'whoosh',
