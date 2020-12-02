@@ -79,7 +79,7 @@ class Translator():
         """
         import torch
         with torch.no_grad():
-            translated = self.model.generate(**self.tokenizer.prepare_seq2seq_batch(sentences).to(self.torch_device), 
+            translated = self.model.generate(**self.tokenizer.prepare_seq2seq_batch(sentences, return_tensors='pt').to(self.torch_device), 
                                              num_beams=num_beams, early_stopping=early_stopping)
             tgt_sentences = [self.tokenizer.decode(t, skip_special_tokens=True) for t in translated]
         return tgt_sentences

@@ -88,10 +88,10 @@ class QA(ABC):
 
         # Added from: https://github.com/huggingface/transformers/commit/16ce15ed4bd0865d24a94aa839a44cf0f400ef50
         if U.get_hf_model_name(self.model_name) in  ['xlm', 'roberta', 'distilbert']:
-           start_scores, end_scores = self.model(batch['input_ids'], attention_mask=batch['attention_mask'])
+           start_scores, end_scores = self.model(batch['input_ids'], attention_mask=batch['attention_mask'], return_dict=False)
         else:
            start_scores, end_scores = self.model(batch['input_ids'], attention_mask=batch['attention_mask'], 
-                                                 token_type_ids=batch['token_type_ids'])
+                                                 token_type_ids=batch['token_type_ids'], return_dict=False)
         start_scores = start_scores[:,1:-1]
         end_scores = end_scores[:,1:-1]
         answer_starts = np.argmax(start_scores, axis=1)

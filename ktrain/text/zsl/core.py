@@ -89,7 +89,7 @@ class ZeroShotClassifier():
             outputs = []
             for sequences in sequence_chunks:
                 batch = self.tokenizer.batch_encode_plus(sequences, return_tensors='pt', max_length=max_length, truncation='only_first', padding=True).to(self.torch_device)
-                logits = self.model(batch['input_ids'], attention_mask=batch['attention_mask'])[0]
+                logits = self.model(batch['input_ids'], attention_mask=batch['attention_mask'], return_dict=False)[0]
                 outputs.extend(logits.cpu().detach().numpy())
                 #entail_contradiction_logits = logits[:,[0,2]]
 

@@ -280,7 +280,7 @@ predictor.predict_filename('C:/temp/cats_and_dogs_filtered/validation/cats/cat.2
 ### How do I use ktrain without an internet connection?
 
 When using pretrained models or pretrained word embeddings in *ktrain*, files are automatically downloaded.  For instance,
-pretrained models and vocabulary files from the `transformers` library are downloaded to `<home_directory>/.cache/torch/transformers`
+pretrained models and vocabulary files from the `transformers` library are downloaded to `<home_directory>/.cache/huggingface/transformers` (or `<home_directory>/.cache/torch/transformers` in older versions)
 by default.  Other data like pretrained word vectors are downloaded to the `<home_directory>/ktrain_data` folder.
 
 In some settings, it is necessary to either train models or make predictions in environments with no internet 
