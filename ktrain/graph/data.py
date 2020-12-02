@@ -1,6 +1,7 @@
 from ..imports import *
 from .. import utils as U
 from .preprocessor import NodePreprocessor, LinkPreprocessor
+import networkx as nx
 
 
 def graph_nodes_from_csv(nodes_filepath, 

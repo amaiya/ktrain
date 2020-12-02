@@ -59,6 +59,7 @@
 
 - [Running `predictor.explain` for text classification is slow.  How can I speed it up?](#running-predictorexplain-for-text-classification-is-slow--how-can-i-speed-it-up)
 
+- [How do I make quantized predictions with `transformers` models?](#how-do-i-make-quantized-predictions-with-transformers-models)
 
 
 ---
@@ -129,7 +130,7 @@ model = ktrain.load_predictor('/tmp/my_predictor').model
 learner = ktrain.get_learner(model, train_data=trn, val_data=val)
 learner.fit_onecycle(2e-5, 1)
 ```
-Note that `preproc` here is a *Preprocessor* instance.  If using a data-loading function like `texts_from_csv` or `images_from_folder`, it will be the third return value from the function. Or, if using the [Transformer API](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-A3-hugging_face_transformers.ipynb) for text classification, it will be the output of invoking `text.Transformer` (i.e., `preproc = text.Transformer('bert-base-uncased', ...)`).
+Note that `preproc` here is a *Preprocessor* instance.  If using a data-loading function like `texts_from_csv` or `images_from_folder`, it will be the third return value from the function. Or, if using the [Transformer API](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-A3-hugging_face_transformers.ipynb) for text classification, it will be the output of invoking `text.Transformer` (i.e., `preproc = text.Transformer('bert-base-uncased', ...)`).  Also, `trn` and `val` are typically the result of invoking `preproc.preprocess_train` and `preproc.preprocess_test`, respectively.
 
 
 #### Method 2: Using `transformers` library (if training Hugging Face Transformers model)
@@ -279,7 +280,7 @@ predictor.predict_filename('C:/temp/cats_and_dogs_filtered/validation/cats/cat.2
 ### How do I use ktrain without an internet connection?
 
 When using pretrained models or pretrained word embeddings in *ktrain*, files are automatically downloaded.  For instance,
-pretrained models and vocabulary files from the `transformers` library are downloaded to `<home_directory>/.cache/torch/transformers`
+pretrained models and vocabulary files from the `transformers` library are downloaded to `<home_directory>/.cache/huggingface/transformers` (or `<home_directory>/.cache/torch/transformers` in older versions)
 by default.  Other data like pretrained word vectors are downloaded to the `<home_directory>/ktrain_data` folder.
 
 In some settings, it is necessary to either train models or make predictions in environments with no internet 
@@ -773,6 +774,90 @@ A number of models in **ktrain** can be used out-of-the-box on a CPU-based lapto
 
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
+
+
+### How do I make quantized predictions with `transformers` models?
+
+Quantization can improve the efficiency of neural network computations by reducing the size of the weights.  For instance, when making predictions, representing weights with 8-bit integers instead of 32-bit floats can speed up inferences.
+
+TensorFlow has built-in support for quantization.  Unfortunately, as of this writing, it [only works for sequential and functional](https://github.com/tensorflow/tensorflow/issues/40699) `tf.keras` models, which means it cannot be used with Hugging Face `transformers` models.
+
+As a workaround, you can convert your saved TensorFlow model to PyTorch, quantize, and make predictions directly in PyTorch. 
+
+This code example assumes you've trained a DistilBERT model with **ktrain** ,saved a `Predictor` in a folder called `'/tmp/mypredictor'`, and need to make quantized predictions on CPU:
+```python
+# Quantization Using PyTorch
+
+# load the predictor, model, and tokenizer
+from transformers import *
+import ktrain
+predictor = ktrain.load_predictor('/tmp/mypredictor')
+model_pt = AutoModelForSequenceClassification.from_pretrained('/tmp/mypredictor', from_tf=True)
+tokenizer = predictor.preproc.get_tokenizer() # or use AutoTokenizer.from_pretrained(predictor.preproc.model_name)
+maxlen = predictor.preproc.maxlen
+device = 'cpu'
+class_names = predictor.preproc.get_classes()
+
+# quantize model (INT8 quantization)
+import torch
+model_pt_quantized = torch.quantization.quantize_dynamic(
+    model_pt.to(device), {torch.nn.Linear}, dtype=torch.qint8)
+
+# make quantized predictions (x_test is a list of strings representing documents)
+preds = []
+for doc in x_test:
+    model_inputs = tokenizer(doc, return_tensors="pt", max_length=maxlen, truncation=True)
+    model_inputs_on_device = { arg_name: tensor.to(device) 
+                              for arg_name, tensor in model_inputs.items()}
+    pred = model_pt_quantized(**model_inputs_on_device)
+    preds.append(class_names[ np.argmax( np.squeeze( pred[0].cpu().detach().numpy() ) ) ]) 
+
+```
+
+Note that the above example employs smaller inputs by eliminating padding in addition to using a quantized model.  As discussed in [this blog post](https://blog.roblox.com/2020/05/scaled-bert-serve-1-billion-daily-requests-cpus/), both of these steps can speed up predictions in CPU deployment scenarios.
+
+Alternatively, you might also consider quantizing your `transformers` model with the [convert_graph_to_onnx.py](https://github.com/huggingface/transformers/blob/master/src/transformers/convert_graph_to_onnx.py) script included with the `transformers` library, which can also be used as a module, as shown below.
+
+```python
+# Converting to ONNX (from PyTorch-converted model)
+
+# imports
+import numpy as np
+from transformers.convert_graph_to_onnx import convert, optimize, quantize
+from transformers import *
+from pathlib import Path
+
+# paths
+predictor_path = '/tmp/mypredictor'
+pt_path = predictor_path+'_pt'
+pt_onnx_path = pt_path +'_onnx/model.onnx'
+
+# convert to ONNX
+p = ktrain.load_predictor(predictor_path)
+AutoModelForSequenceClassification.from_pretrained(predictor_path, 
+                                                   from_tf=True).save_pretrained(pt_path)
+convert(framework='pt', model=pt_path,output=Path(pt_onnx_path), opset=11, 
+        tokenizer=p.preproc.model_name, pipeline_name='sentiment-analysis')
+pt_onnx_quantized_path = quantize(optimize(Path(pt_onnx_path)))
+
+# create ONNX session and make predictions
+sess = p.create_onnx_session(pt_onnx_quant_name.as_posix())
+tokenizer = p.preproc.get_tokenizer()
+tokens = tokenizer.encode_plus('My computer monitor is blurry.', max_length=p.preproc.maxlen, truncation=True)
+tokens = {name: np.atleast_2d(value) for name, value in tokens.items()}
+print(p.get_classes()[np.argmax(sess.run(None, tokens)[0])])
+
+# output:
+# comp.graphics
+```
+
+The example above assumes the model saved at `predictor_path` was trained on a subset of the 20 Newsgroup corpus as was done in [this tutorial](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-A3-hugging_face_transformers.ipynb).
+
+You can also use **ktrain** to [create ONNX models directly from TensorFlow](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/ktrain-ONNX-TFLite-examples.ipynb) with optional quantization.  Note, that conversions to ONNX from TensorFlow models appear to [require a hard-coded input size](https://github.com/huggingface/transformers/issues/8227) (i.e., padding is used), whereas conversions to ONNX from PyTorch models do not appear to have this requirement.
+
+
+[[Back to Top](#frequently-asked-questions-about-ktrain)]
+
 
 
 ### What kinds of applications have been built with *ktrain*?

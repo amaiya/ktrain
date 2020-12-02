@@ -29,27 +29,32 @@ setup(
           'matplotlib >= 3.0.0',
           'pandas >= 1.0.1',
           'fastprogress >= 0.1.21',
-          'keras_bert>=0.86.0', # support for TF 2.3
           'requests',
           'joblib',
+          'packaging',
+          'ipython',
           'langdetect',
           'jieba',
           'cchardet',  # previously pinned to 2.1.5 (due to this issue: https://github.com/PyYoshi/cChardet/issues/61) but no longer needed
-          'networkx>=2.3',
-          'bokeh',
-          'seqeval==0.0.19', # pin to 0.0.19 due to numpy version incompatibility with TensorFlow 2.3
-          'packaging',
-          'transformers>=3.1.0', # due to breaking change in v3.1.0
-          'ipython',
           'syntok',
-          'whoosh',
-          # these libraries are manually installed on-the-fly when required by an invoked method
-          # 'shap',  # used by TabularPredictor.explain
+
+          # NOTE: these modules can be optionally omitted from deployment if not being used to yield lighter-weight footprint
+          'seqeval==0.0.19', # imported in imports with warning and used in 'ktrain.text.ner' ; pin to 0.0.19 due to numpy version incompatibility with TensorFlow 2.3
+          'transformers>=3.1.0,<4.0',  # imported in imports with warning and used in 'ktrain.text' ; temporarily pin due to breaking change in v3.1.0 and v4.1
+          'sentencepiece', #  Added due to breaking change in transformers>=4.0
+          'keras_bert>=0.86.0', # imported in imports with warning and used in 'ktrain.text' ; support for TF 2.3
+          'networkx>=2.3', # imported by graph module
+          'whoosh', # imported by text.qa module
+
+          # NOTE: these libraries below are manually installed on-the-fly when required by an invoked method with appropriate warnings
           #'eli5 >= 0.10.0', # forked version used by TextPredictor.explain and ImagePredictor.explain
           #'stellargraph>=0.8.2', # forked version used by graph module
-          #'allennlp', # required for Elmo embeddings since TF2 TF_HUB does not work
+          # 'shap',  # used by TabularPredictor.explain
           #'textblob', # used by textutils.extract_noun_phrases
           #'textract', # used by textutils.extract_copy and text.qa.core.SimpleQA
+          #'bokeh', # used by visualze_documents text.eda module
+          #'allennlp', # required for NER Elmo embeddings since TF2 TF_HUB does not work
+          # 'torch', # used by text.translation, text.zsl,  and text.summarization
       ],
   classifiers=[  # Optional
     # How mature is this project? Common values are

@@ -150,6 +150,8 @@ class TransformerTextClassLearner(GenLearner):
         if hasattr(val, 'reset'): val.reset()
         classification, multilabel = U.is_classifier(self.model)
         preds = self.model.predict(self._prepare(val, train=False))
+        if type(preds).__name__ == 'TFSequenceClassifierOutput': # dep_fix: undocumented breaking change in transformers==4.0.0
+            preds = preds.logits
 
         # dep_fix: transformers in TF 2.2.0 returns a tuple insead of NumPy array for some reason
         if isinstance(preds, tuple) and len(preds) == 1: preds = preds[0] 

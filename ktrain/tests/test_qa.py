@@ -27,7 +27,7 @@ class TestQA(TestCase):
         tmp_folder = tempfile.mkdtemp()
         shutil.rmtree(tmp_folder)
         text.SimpleQA.initialize_index(tmp_folder)
-        text.SimpleQA.index_from_list(docs, tmp_folder, commit_every=len(docs))
+        text.SimpleQA.index_from_list(docs, tmp_folder, commit_every=len(docs),  multisegment=True)
         qa = text.SimpleQA(tmp_folder)
 
         answers = qa.ask('When did Cassini launch?')

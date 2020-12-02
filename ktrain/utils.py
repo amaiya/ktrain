@@ -129,7 +129,8 @@ def is_huggingface(model=None, data=None):
 
 
 def is_huggingface_from_model(model):
-    return 'transformers.modeling_tf' in str(type(model))
+    # 20201202: support both transformers<4.0 and transformers>=4.0
+    return 'transformers.modeling_tf' in str(type(model)) or 'transformers.models' in str(type(model))
 
 
 def is_huggingface_from_data(data):

@@ -1474,7 +1474,7 @@ def load_predictor(fpath, batch_size=U.DEFAULT_BS):
         elif preproc_name == 'mobilenet':
             preproc.datagen.preprocessing_function = pre_mobilenet
         elif preproc_name == 'inception':
-            preproc.datagen.preprocessing_function = pre_incpeption
+            preproc.datagen.preprocessing_function = pre_inception
         else:
             raise Exception('Uknown preprocessing_function name: %s' % (preproc_name))
     

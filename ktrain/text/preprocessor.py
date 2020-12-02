@@ -151,12 +151,19 @@ def get_bert_path(lang='en'):
 
 
 
-def bert_tokenize(docs, tokenizer, maxlen, verbose=1):
+def bert_tokenize(docs, tokenizer, max_length, verbose=1):
+    if verbose:
+        mb = master_bar(range(1))
+        pb = progress_bar(docs, parent=mb)
+    else:
+        mb = range(1)
+        pb = docs
+
+
     indices = []
-    mb = master_bar(range(1))
     for i in mb:
-        for doc in progress_bar(docs, parent=mb):
-            ids, segments = tokenizer.encode(doc, max_len=maxlen)
+        for doc in pb:
+            ids, segments = tokenizer.encode(doc, max_len=max_length)
             indices.append(ids)
         if verbose: mb.write('done.')
     zeros = np.zeros_like(indices)
@@ -274,7 +281,6 @@ def hf_convert_example(text_a, text_b=None, tokenizer=None,
         input_ids = input_ids + ([pad_token] * padding_length)
         attention_mask = attention_mask + ([0 if mask_padding_with_zero else 1] * padding_length)
         token_type_ids = token_type_ids + ([pad_token_segment_id] * padding_length)
-
     assert len(input_ids) == max_length, "Error with input length {} vs {}".format(len(input_ids), max_length)
     assert len(attention_mask) == max_length, "Error with input length {} vs {}".format(len(attention_mask), max_length)
     assert len(token_type_ids) == max_length, "Error with input length {} vs {}".format(len(token_type_ids), max_length)
@@ -299,6 +305,7 @@ def hf_convert_examples(texts, y=None, tokenizer=None,
                         pad_token=0,
                         pad_token_segment_id=0,
                         mask_padding_with_zero=True,
+                        use_dynamic_shape=False,
                         verbose=1):
     """
     Loads a data file into a list of ``InputFeatures``
@@ -313,6 +320,8 @@ def hf_convert_examples(texts, y=None, tokenizer=None,
         mask_padding_with_zero: If set to ``True``, the attention mask will be filled by ``1`` for actual values
             and by ``0`` for padded values. If set to ``False``, inverts it (``1`` for padded values, ``0`` for
             actual values)
+        use_dynamic_shape(bool):  If True, supplied max_length will be ignored and will be computed
+                                  based on provided texts instead.
         verbose(bool): verbosity
     Returns:
         If the ``examples`` input is a ``tf.data.Dataset``, will return a ``tf.data.Dataset``
@@ -321,6 +330,21 @@ def hf_convert_examples(texts, y=None, tokenizer=None,
     """
 
     is_array, is_pair = detect_text_format(texts)
+
+    if use_dynamic_shape:
+        sentences = []
+        for text in texts:
+            if is_pair:
+                text_a = text[0]
+                text_b = text[1]
+            else:
+                text_a = text
+                text_b = None
+            sentences.append(tokenizer.tokenize(text_a, text_b))
+        maxlen = len(max([tokens for tokens in sentences], key=len,)) + 2
+        if maxlen < max_length: max_length = maxlen
+
+
     data = []
     features_list = []
     labels = []
@@ -915,6 +939,7 @@ class TransformersPreprocessor(TextPreprocessor):
                                       pad_on_left=bool(self.name in ['xlnet']),
                                       pad_token=tok.convert_tokens_to_ids([tok.pad_token][0]),
                                       pad_token_segment_id=4 if self.name in ['xlnet'] else 0,
+                                      use_dynamic_shape=False if mode == 'train' else True,
                                       verbose=verbose)
         self.set_multilabel(dataset, mode, verbose=verbose)
         if mode == 'train':  self.preprocess_train_called = True
