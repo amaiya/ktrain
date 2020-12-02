@@ -14,12 +14,12 @@ Most recent releases are shown at the top. Each release shows:
 ### Changed
 - Added `use_dynamic_shape` parameter to `text.preprocessor.hf_convert_examples` which is set to `True` when running predictions.  This reduces the input length when making predictions, if possible..
 - Added warnings to some imports in `imports.py` to allow for slightly lighter-weight deployments
-- Temporarily pinning to `transformers==3.1` due to breaking changes in v4.0.
+- Temporarily pinning to `transformers>=3.1,<4.0` due to breaking changes in v4.0.
 
 ### Fixed:
 - Suppress progress bar in `predictor.predict` for `keras_bert` models
 - Fixed typo causing problems when loading predictor for Inception models
-- Fixes to address documented/undocumented breaking changes in `transformers>=4.0`. But, temporarily pinning to `transformers==3.1` for backwards compatibility.
+- Fixes to address documented/undocumented breaking changes in `transformers>=4.0`. But, temporarily pinning to `transformers>=3.1,<4.0` for backwards compatibility.
 
 
 ## 0.25.0 (2020-11-08)
