@@ -1438,7 +1438,7 @@ def get_predictor(model, preproc, batch_size=U.DEFAULT_BS):
         raise Exception('preproc of type %s not currently supported' % (type(preproc)))
 
 
-def load_predictor(fpath, batch_size=U.DEFAULT_BS):
+def load_predictor(fpath, batch_size=U.DEFAULT_BS, custom_objects=None):
     """
     Loads a previously saved Predictor instance
     Args
@@ -1446,6 +1446,10 @@ def load_predictor(fpath, batch_size=U.DEFAULT_BS):
                   From v0.16.x, this is always the path to a folder.
                   Pre-v0.16.x, this is the base name used to save model and .preproc instance.
       batch_size(int): batch size to use for predictions. default:32
+      custom_objects(dict): custom objects required to load model.
+                            This is useful if you compiled the model with a custom loss function, for example.
+                            For models included with ktrain as is, this is populated automatically
+                            and can be disregarded.  
     """
 
     # load the preprocessor
@@ -1462,7 +1466,7 @@ def load_predictor(fpath, batch_size=U.DEFAULT_BS):
             raise Exception('Could not find a .preproc file in either the post v0.16.x loction (%s) or pre v0.16.x location (%s)' % (os.path.join(fpath, U.PREPROC_NAME), fpath+'.preproc'))
 
     # load the model
-    model = _load_model(fpath, preproc=preproc)
+    model = _load_model(fpath, preproc=preproc, custom_objects=custom_objects)
 
 
     # preprocessing functions in ImageDataGenerators are not pickable
@@ -1537,7 +1541,10 @@ def _load_model(fpath, preproc=None, train_data=None, custom_objects=None):
        train_data and U.bert_data_tuple(train_data):
         # custom BERT model
         from keras_bert import get_custom_objects
-        custom_objects = get_custom_objects()
+        if isinstance(custom_objects, dict):
+            custom_objects.update(get_custom_objects())
+        else:
+            custom_objects = get_custom_objects()
     elif (preproc and (isinstance(preproc, NERPreprocessor) or \
                     type(preproc).__name__ == 'NERPreprocessor')) or \
         train_data and U.is_ner(data=train_data):
@@ -1556,6 +1563,7 @@ def _load_model(fpath, preproc=None, train_data=None, custom_objects=None):
         custom_objects={'MeanAggregator': MeanAggregator}
     custom_objects = {} if custom_objects is None else custom_objects
     custom_objects['AdamWeightDecay'] = AdamWeightDecay
+    model = load_model(os.path.join(fpath, U.MODEL_NAME), custom_objects=custom_objects)
     try:
         try:
             model = load_model(os.path.join(fpath, U.MODEL_NAME), custom_objects=custom_objects)
