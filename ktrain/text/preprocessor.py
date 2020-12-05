@@ -340,8 +340,10 @@ def hf_convert_examples(texts, y=None, tokenizer=None,
             else:
                 text_a = text
                 text_b = None
-            sentences.append(tokenizer.tokenize(text_a, text_b))
+            sentences.append( tokenizer.convert_ids_to_tokens(tokenizer.encode(text_a, text_b)) )
+            #sentences.append(tokenizer.tokenize(text_a, text_b)) # only works for Fast tokenizers
         maxlen = len(max([tokens for tokens in sentences], key=len,)) + 2
+
         if maxlen < max_length: max_length = maxlen
 
 
