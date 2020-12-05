@@ -6,7 +6,7 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
-## 0.25.2 (TBD)
+## 0.25.2 (2020-12-05)
 
 ### New:
 - N/A
@@ -16,6 +16,7 @@ Most recent releases are shown at the top. Each release shows:
 
 ### Fixed:
 - Added `custom_objects` argument to `load_predictor` to load models with custom loss functions, etc.
+- Fixed bug #286 related to length computation when `use_dynamic_shape=True`
 
 
 ## 0.25.1 (2020-12-02)
