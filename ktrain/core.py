@@ -1575,7 +1575,7 @@ def _load_model(fpath, preproc=None, train_data=None, custom_objects=None):
                 # for bilstm models without CRF layer on TF2 where CRF is not supported 
                 model = load_model(fpath, custom_objects={'AdamWeightDecay':AdamWeightDecay})
     except Exception as e:
-        print('Call to keras.models.load_model failed. Try invoking manually to investigate and report issue if necessary. ')
+        print('Call to keras.models.load_model failed. Try manually invoking this function to investigate error and report issue if necessary.')
         raise Exception('Error detected: %s' % (e))
 
     # see issue https://github.com/amaiya/ktrain/issues/21
