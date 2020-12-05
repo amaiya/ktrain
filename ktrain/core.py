@@ -1563,7 +1563,6 @@ def _load_model(fpath, preproc=None, train_data=None, custom_objects=None):
         custom_objects={'MeanAggregator': MeanAggregator}
     custom_objects = {} if custom_objects is None else custom_objects
     custom_objects['AdamWeightDecay'] = AdamWeightDecay
-    model = load_model(os.path.join(fpath, U.MODEL_NAME), custom_objects=custom_objects)
     try:
         try:
             model = load_model(os.path.join(fpath, U.MODEL_NAME), custom_objects=custom_objects)
