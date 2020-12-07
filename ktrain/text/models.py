@@ -278,13 +278,6 @@ def _build_transformer(num_classes,
     if not isinstance(preproc, tpp.TransformersPreprocessor): 
         raise ValueError('preproc must be instance of %s' % (str(tpp.TransformersPreprocessor)))
 
-    #model = preproc.model_type.from_pretrained(preproc.model_name, num_labels=num_classes)
-    #loss_map =  {'categorical_crossentropy': keras.losses.CategoricalCrossentropy(from_logits=True),
-                 #'binary_crossentropy': keras.losses.BinaryCrossentropy(from_logits=True), 
-                 #'mse': 'mse'}
-    #model.compile(loss=loss_map[loss_func],
-                  #optimizer=keras.optimizers.Adam(learning_rate=3e-5, epsilon=1e-08),
-                  #metrics=metrics)
     if loss_func == 'mse':
         if preproc.get_classes(): 
             raise Exception('This is supposed to be regression problem, but preproc.get_classes() is not empty. ' +\
@@ -296,7 +289,7 @@ def _build_transformer(num_classes,
         if not preproc.get_classes():
             raise Exception('This is supposed to be a classification problem, but preproc.get_classes() is empty. ' +\
                             'Something went wrong.  Please open a GitHub issue.')
-    return preproc.get_model()
+    return preproc.get_regression_model(metrics=metrics) if loss_func == 'mse' else preproc.get_classifier(metrics=metrics)
 
 
 
