@@ -469,6 +469,10 @@ http://0.0.0.0:8888/predict?text=text%20you%20want%20to%20classify
 
 In this toy example, we are supplying the text data to classify in the URL as a GET request.
 
+Note that the above example requires both **ktrain** and TensorFlow to be installed on the deployment machine.  If this footprint is too large,
+you can [convert the model to ONNX](#how-do-i-make-quantized-predictions-with-transformers-models).  This allows you to deploy the model
+and make predictions **without** having  **TensorFlow**, **ktrain**, and their many dependencies installed.  This is particurly well-suited to Heroku deployments, which restrict slug sizes to 500MB.
+
 
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
