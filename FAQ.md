@@ -843,9 +843,10 @@ convert(framework='pt', model=pt_path,output=Path(pt_onnx_path), opset=11,
         tokenizer=p.preproc.model_name, pipeline_name='sentiment-analysis')
 pt_onnx_quantized_path = quantize(optimize(Path(pt_onnx_path)))
 
-# create ONNX session and make predictions
-sess = p.create_onnx_session(pt_onnx_quant_name.as_posix()) # create session manually to avoid ktrain/Tensorflow dependencies
-tokenizer = p.preproc.get_tokenizer()                       # create tokenizer manually to avoid ktrain/TensorFlow/dependencies
+# create ONNX session (or create session manually if wanting to avoid ktrain/TensorFlow dependencies)
+sess = p.create_onnx_session(pt_onnx_quant_name.as_posix())
+# create tokenizer (or create tokenizer manually if wanting to avoid ktrain/TensorFlow dependencies)
+tokenizer = p.preproc.get_tokenizer()
 tokens = tokenizer.encode_plus('My computer monitor is blurry.', max_length=p.preproc.maxlen, truncation=True)
 tokens = {name: np.atleast_2d(value) for name, value in tokens.items()}
 print(p.get_classes()[np.argmax(sess.run(None, tokens)[0])])

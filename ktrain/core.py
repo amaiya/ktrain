@@ -1463,7 +1463,7 @@ def load_predictor(fpath, batch_size=U.DEFAULT_BS, custom_objects=None):
             #warnings.warn('could not load .preproc file as %s - attempting to load as %s' % (os.path.join(fpath, U.PREPROC_NAME), preproc_name))
             with open(preproc_name, 'rb') as f: preproc = pickle.load(f)
         except:
-            raise Exception('Could not find a .preproc file in either the post v0.16.x loction (%s) or pre v0.16.x location (%s)' % (os.path.join(fpath, U.PREPROC_NAME), fpath+'.preproc'))
+            raise Exception('Failed to load .preproc file in either the post v0.16.x loction (%s) or pre v0.16.x location (%s)' % (os.path.join(fpath, U.PREPROC_NAME), fpath+'.preproc'))
 
     # load the model
     model = _load_model(fpath, preproc=preproc, custom_objects=custom_objects)
