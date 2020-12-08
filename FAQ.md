@@ -841,8 +841,8 @@ convert(framework='pt', model=pt_path,output=Path(pt_onnx_path), opset=11,
 pt_onnx_quantized_path = quantize(optimize(Path(pt_onnx_path)))
 
 # create ONNX session and make predictions
-sess = p.create_onnx_session(pt_onnx_quant_name.as_posix())
-tokenizer = p.preproc.get_tokenizer()
+sess = p.create_onnx_session(pt_onnx_quant_name.as_posix()) # create session manually to avoid ktrain/Tensorflow dependencies
+tokenizer = p.preproc.get_tokenizer()                       # create tokenizer manually to avoid ktrain/TensorFlow/dependencies
 tokens = tokenizer.encode_plus('My computer monitor is blurry.', max_length=p.preproc.maxlen, truncation=True)
 tokens = {name: np.atleast_2d(value) for name, value in tokens.items()}
 print(p.get_classes()[np.argmax(sess.run(None, tokens)[0])])
