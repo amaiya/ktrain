@@ -793,7 +793,7 @@ class Learner(ABC):
 
     def fit_onecycle(self, lr, epochs, checkpoint_folder=None, 
                      cycle_momentum=True, max_momentum=0.95, min_momentum=0.85,
-                     verbose=1, class_weight=None, callbacks=[], steps_per_epoch=None):
+                     class_weight=None, callbacks=[], steps_per_epoch=None, verbose=1):
         """
         Train model using a version of Leslie Smith's 1cycle policy.
         This method can be used with any optimizer. Thus,
@@ -870,8 +870,8 @@ class Learner(ABC):
     def autofit(self, lr, epochs=None, 
                 early_stopping=None, reduce_on_plateau=None, reduce_factor=2, 
                 cycle_momentum=True, max_momentum=0.95, min_momentum=0.85,
-                monitor='val_loss', checkpoint_folder=None, verbose=1, 
-                class_weight=None, callbacks=[], steps_per_epoch=None):
+                monitor='val_loss', checkpoint_folder=None,
+                class_weight=None, callbacks=[], steps_per_epoch=None, verbose=1):
         """
         Automatically train model using a default learning rate schedule shown to work well
         in practice.  By default, this method currently employs a triangular learning 
