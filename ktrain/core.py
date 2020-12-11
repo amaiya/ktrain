@@ -1241,7 +1241,7 @@ class GenLearner(Learner):
     
     def fit(self, lr, n_cycles, cycle_len=None, cycle_mult=1,
             lr_decay=1.0, checkpoint_folder=None, early_stopping=None, 
-            class_weight=None, callbacks=[], verbose=1):
+            class_weight=None, callbacks=[], steps_per_epoch=None, verbose=1):
         """
         Trains the model. By default, fit is simply a wrapper for model.fit (for generators/sequences).
         When cycle_len parameter is supplied, an SGDR learning rate schedule is used.
@@ -1277,7 +1277,8 @@ class GenLearner(Learner):
         # handle callbacks
         num_samples = U.nsamples_from_data(self.train_data)
         train_bs = self.train_data.batch_size if hasattr(self.train_data, 'batch_size') else self.batch_size
-        steps_per_epoch = math.ceil(num_samples/train_bs)
+        if steps_per_epoch is None:
+            steps_per_epoch = math.ceil(num_samples/train_bs)
         validation_steps = None
         if self.val_data is not None:
             val_bs = self.val_data.batch_size if hasattr(self.val_data, 'batch_size') else self.batch_size
