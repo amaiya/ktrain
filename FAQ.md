@@ -881,7 +881,7 @@ This is useful, for example, if you first [fine-tune a language model](https://g
 
 However, when supplying a local path to `Transformer`, **ktrain** will also look for the tokenizer files in that directory. So, you just need to ensure tokenizer files like the `vocab` file (which are quite small), exist in the local folder (in addition to the folder created by `predictor.save_predictor`.
 
-See [this issue](https://github.com/amaiya/ktrain/issues/295#issuecomment-744509996) for more details.
+See [this post](https://github.com/amaiya/ktrain/issues/295#issuecomment-744509996) for more details.
 
 
 
