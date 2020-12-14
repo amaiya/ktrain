@@ -48,6 +48,9 @@
 
 - [Why am I seeing a "list index out of range" error when calling predict?](#why-am-i-seeing-a-list-index-out-of-range-error-when-calling-predict)
 
+- [How do I train a transformers model from a saved checkpoint folder?](#how-do-i-train-a-transformers-model-from-a-saved-checkpoint-folder)
+
+
 
 
 ## Evaluation, Inspection, and Prediction
@@ -862,6 +865,24 @@ print(p.get_classes()[np.argmax(sess.run(None, tokens)[0])])
 The example above assumes the model saved at `predictor_path` was trained on a subset of the 20 Newsgroup corpus as was done in [this tutorial](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-A3-hugging_face_transformers.ipynb).
 
 You can also use **ktrain** to [create ONNX models directly from TensorFlow](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/ktrain-ONNX-TFLite-examples.ipynb) with optional quantization.  Note, that conversions to ONNX from TensorFlow models appear to [require a hard-coded input size](https://github.com/huggingface/transformers/issues/8227) (i.e., padding is used), whereas conversions to ONNX from PyTorch models do not appear to have this requirement.
+
+
+[[Back to Top](#frequently-asked-questions-about-ktrain)]
+
+
+### How do I train a transformers model from a saved checkpoint folder?
+
+In the **ktrain** `Transformer` API, you can fine-tune a model form a local path:
+```python
+t = text.Transformer(MODEL_LOCAL_PATH, maxlen=50, class_names=class_names)
+```
+
+This is useful, for example, if you [fine-tune a language model](https://github.com/huggingface/transformers/tree/master/examples/language-modeling) using Hugging-Face **Trainer**.
+
+However, when supplying a local path to `Transformer`, **ktrain** will also look for the tokenizer files in that directory. So, you just need to ensure tokenizer files like the `vocab` file (which are quite small), exist in the local folder.
+
+See [this issue](https://github.com/amaiya/ktrain/issues/295#issuecomment-744509996) for more details.
+
 
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
