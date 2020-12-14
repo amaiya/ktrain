@@ -872,14 +872,14 @@ You can also use **ktrain** to [create ONNX models directly from TensorFlow](htt
 
 ### How do I train a transformers model from a saved checkpoint folder?
 
-In the **ktrain** `Transformer` API, you can fine-tune a model form a local path:
+In the **ktrain** `Transformer` API, you can train/fine-tune a text classification model from a local path:
 ```python
 t = text.Transformer(MODEL_LOCAL_PATH, maxlen=50, class_names=class_names)
 ```
 
-This is useful, for example, if you [fine-tune a language model](https://github.com/huggingface/transformers/tree/master/examples/language-modeling) using Hugging-Face **Trainer**.
+This is useful, for example, if you first [fine-tune a language model](https://github.com/huggingface/transformers/tree/master/examples/language-modeling) using Hugging-Face **Trainer** **prior** to fine-tuning your text classifier.
 
-However, when supplying a local path to `Transformer`, **ktrain** will also look for the tokenizer files in that directory. So, you just need to ensure tokenizer files like the `vocab` file (which are quite small), exist in the local folder.
+However, when supplying a local path to `Transformer`, **ktrain** will also look for the tokenizer files in that directory. So, you just need to ensure tokenizer files like the `vocab` file (which are quite small), exist in the local folder (in addition to the folder created by `predictor.save_predictor`.
 
 See [this issue](https://github.com/amaiya/ktrain/issues/295#issuecomment-744509996) for more details.
 
