@@ -13,6 +13,7 @@ Most recent releases are shown at the top. Each release shows:
 
 ### Changed
 - A `steps_per_epoch` argument has been added to all `*fit*` methods that operate on generators
+- Added `get_tokenizer` methods to all instances of `TextPreprocessor`
 
 ### Fixed:
 - propogate custom metrics to model when `distilbert` is chosen in `text_classifier` and `text_regression_model` functions
