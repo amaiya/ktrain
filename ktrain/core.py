@@ -1064,7 +1064,7 @@ class ArrayLearner(Learner):
     
     def fit(self, lr, n_cycles, cycle_len=None, cycle_mult=1, 
             lr_decay=1, checkpoint_folder = None, early_stopping=None,
-            verbose=1, class_weight=None, callbacks=[]):
+            verbose=1, class_weight=None, callbacks=[], steps_per_epoch=None):
         """
         Trains the model. By default, fit is simply a wrapper for model.fit.
         When cycle_len parameter is supplied, an SGDR learning rate schedule is used.
@@ -1089,6 +1089,8 @@ class ArrayLearner(Learner):
                                   with lowest validation loss.
         callbacks (list):         list of Callback instances to employ during training
         class_weight (dict):       Optional dictionary mapping class indices (integers) to a weight (float) 
+        steps_per_epoch(int):    Steps per epoch. If None, then, math.ceil(num_samples/batch_size) is used.
+                                 Ignored unless training dataset is generator (and in ArrayLearner instances).
         verbose (bool):           whether or not to show progress bar
         """
 
