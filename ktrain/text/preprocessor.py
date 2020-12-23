@@ -415,6 +415,8 @@ class TextPreprocessor(Preprocessor):
         return class_names
 
 
+    def get_tokenizer(self):
+        raise NotImplementedError('This method was not overridden in subclass')
 
     def check_trained(self):
         if not self.preprocess_train_called:
@@ -535,6 +537,9 @@ class StandardTextPreprocessor(TextPreprocessor):
         self.tok_dct = {}
         self.max_features = max_features
         self.ngram_range = ngram_range
+
+    def get_tokenizer(self):
+        return self.tok
 
 
     def __getstate__(self):
@@ -740,6 +745,10 @@ class BERTPreprocessor(TextPreprocessor):
         self.tok_dct = dict((v,k) for k,v in token_dict.items())
         self.max_features = max_features # ignored
         self.ngram_range = 1 # ignored
+
+
+    def get_tokenizer(self):
+        return self.tok
 
 
     def __getstate__(self):

@@ -6,16 +6,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
-## 0.25.3 (TBD)
+## 0.25.3 (2020-12-23)
 
 ### New:
 - N/A
 
 ### Changed
-- N/A
+- A `steps_per_epoch` argument has been added to all `*fit*` methods that operate on generators
+- Added `get_tokenizer` methods to all instances of `TextPreprocessor`
 
 ### Fixed:
 - propogate custom metrics to model when `distilbert` is chosen in `text_classifier` and `text_regression_model` functions
+- pin `scikit-learn` to 0.24.0 sue to breaking change
 
 
 ## 0.25.2 (2020-12-05)

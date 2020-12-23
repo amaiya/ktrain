@@ -793,7 +793,7 @@ class Learner(ABC):
 
     def fit_onecycle(self, lr, epochs, checkpoint_folder=None, 
                      cycle_momentum=True, max_momentum=0.95, min_momentum=0.85,
-                     verbose=1, class_weight=None, callbacks=[]):
+                     class_weight=None, callbacks=[], steps_per_epoch=None, verbose=1):
         """
         Train model using a version of Leslie Smith's 1cycle policy.
         This method can be used with any optimizer. Thus,
@@ -817,6 +817,8 @@ class Learner(ABC):
             min_momentum(float): minimum momentum to use if cycle_momentum=True
             class_weight (dict):       Optional dictionary mapping class indices (integers) to a weight (float) 
             callbacks (list): list of Callback instances to employ during training
+            steps_per_epoch(int):    Steps per epoch. If None, then, math.ceil(num_samples/batch_size) is used.
+                                     Ignored unless training dataset is generator.
             verbose (bool):  verbose mode
         """
         if not self._is_adamlike() and cycle_momentum:
@@ -826,7 +828,8 @@ class Learner(ABC):
 
 
         num_samples = U.nsamples_from_data(self.train_data)
-        steps_per_epoch = math.ceil(num_samples/self.batch_size)
+        if steps_per_epoch is None:
+            steps_per_epoch = math.ceil(num_samples/self.batch_size)
 
         # setup callbacks for learning rates and early stopping
         if not callbacks: kcallbacks = []
@@ -853,7 +856,8 @@ class Learner(ABC):
                 verbose=verbose)
         hist = self.fit(lr, epochs, early_stopping=None,
                         checkpoint_folder=checkpoint_folder,
-                        verbose=verbose, class_weight=class_weight, callbacks=kcallbacks)
+                        verbose=verbose, class_weight=class_weight, callbacks=kcallbacks, 
+                        steps_per_epoch=steps_per_epoch)
         hist.history['lr'] = clr.history['lr']
         hist.history['iterations'] = clr.history['iterations']
         if cycle_momentum:
@@ -866,8 +870,8 @@ class Learner(ABC):
     def autofit(self, lr, epochs=None, 
                 early_stopping=None, reduce_on_plateau=None, reduce_factor=2, 
                 cycle_momentum=True, max_momentum=0.95, min_momentum=0.85,
-                monitor='val_loss', checkpoint_folder=None, verbose=1, 
-                class_weight=None, callbacks=[]):
+                monitor='val_loss', checkpoint_folder=None,
+                class_weight=None, callbacks=[], steps_per_epoch=None, verbose=1):
         """
         Automatically train model using a default learning rate schedule shown to work well
         in practice.  By default, this method currently employs a triangular learning 
@@ -916,6 +920,8 @@ class Learner(ABC):
                                         is enabled.
             class_weight (dict):       Optional dictionary mapping class indices (integers) to a weight (float) 
             callbacks (list): list of Callback instances to employ during training
+            steps_per_epoch(int):    Steps per epoch. If None, then, math.ceil(num_samples/batch_size) is used.
+                                     Ignored unless training dataset is generator.
             verbose (bool):  verbose mode
         """
         # check optimizer
@@ -927,7 +933,8 @@ class Learner(ABC):
 
         # setup learning rate policy 
         num_samples = U.nsamples_from_data(self.train_data)
-        steps_per_epoch = math.ceil(num_samples/self.batch_size)
+        if steps_per_epoch is None:
+            steps_per_epoch = math.ceil(num_samples/self.batch_size)
         step_size = math.ceil(steps_per_epoch/2)
 
         # handle missing epochs
@@ -987,7 +994,8 @@ class Learner(ABC):
                 verbose=verbose)
         hist = self.fit(lr, epochs, early_stopping=early_stopping,
                         checkpoint_folder=checkpoint_folder,
-                        verbose=verbose, class_weight=class_weight, callbacks=kcallbacks)
+                        verbose=verbose, class_weight=class_weight, callbacks=kcallbacks, 
+                        steps_per_epoch=steps_per_epoch)
         hist.history['lr'] = clr.history['lr']
         hist.history['iterations'] = clr.history['iterations']
         if cycle_momentum:
@@ -1056,7 +1064,7 @@ class ArrayLearner(Learner):
     
     def fit(self, lr, n_cycles, cycle_len=None, cycle_mult=1, 
             lr_decay=1, checkpoint_folder = None, early_stopping=None,
-            verbose=1, class_weight=None, callbacks=[]):
+            verbose=1, class_weight=None, callbacks=[], steps_per_epoch=None):
         """
         Trains the model. By default, fit is simply a wrapper for model.fit.
         When cycle_len parameter is supplied, an SGDR learning rate schedule is used.
@@ -1081,6 +1089,8 @@ class ArrayLearner(Learner):
                                   with lowest validation loss.
         callbacks (list):         list of Callback instances to employ during training
         class_weight (dict):       Optional dictionary mapping class indices (integers) to a weight (float) 
+        steps_per_epoch(int):    Steps per epoch. If None, then, math.ceil(num_samples/batch_size) is used.
+                                 Ignored unless training dataset is generator (and in ArrayLearner instances).
         verbose (bool):           whether or not to show progress bar
         """
 
@@ -1233,7 +1243,7 @@ class GenLearner(Learner):
     
     def fit(self, lr, n_cycles, cycle_len=None, cycle_mult=1,
             lr_decay=1.0, checkpoint_folder=None, early_stopping=None, 
-            class_weight=None, callbacks=[], verbose=1):
+            class_weight=None, callbacks=[], steps_per_epoch=None, verbose=1):
         """
         Trains the model. By default, fit is simply a wrapper for model.fit (for generators/sequences).
         When cycle_len parameter is supplied, an SGDR learning rate schedule is used.
@@ -1258,6 +1268,7 @@ class GenLearner(Learner):
                                   with lowest validation loss.
         class_weight (dict):       Optional dictionary mapping class indices (integers) to a weight (float) 
         callbacks (list):         list of Callback instances to employ during training
+        steps_per_epoch(int):    Steps per epoch. If None, then, math.ceil(num_samples/batch_size) is used.
         verbose (boolean):       whether or not to print progress bar
         """
         # check early_stopping
@@ -1268,7 +1279,8 @@ class GenLearner(Learner):
         # handle callbacks
         num_samples = U.nsamples_from_data(self.train_data)
         train_bs = self.train_data.batch_size if hasattr(self.train_data, 'batch_size') else self.batch_size
-        steps_per_epoch = math.ceil(num_samples/train_bs)
+        if steps_per_epoch is None:
+            steps_per_epoch = math.ceil(num_samples/train_bs)
         validation_steps = None
         if self.val_data is not None:
             val_bs = self.val_data.batch_size if hasattr(self.val_data, 'batch_size') else self.batch_size

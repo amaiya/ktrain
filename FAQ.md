@@ -48,6 +48,9 @@
 
 - [Why am I seeing a "list index out of range" error when calling predict?](#why-am-i-seeing-a-list-index-out-of-range-error-when-calling-predict)
 
+- [How do I train a transformers model from a saved checkpoint folder?](#how-do-i-train-a-transformers-model-from-a-saved-checkpoint-folder)
+
+
 
 
 ## Evaluation, Inspection, and Prediction
@@ -469,6 +472,10 @@ http://0.0.0.0:8888/predict?text=text%20you%20want%20to%20classify
 
 In this toy example, we are supplying the text data to classify in the URL as a GET request.
 
+Note that the above example requires both **ktrain** and TensorFlow to be installed on the deployment machine.  If this footprint is too large,
+you can [convert the model to ONNX](#how-do-i-make-quantized-predictions-with-transformers-models).  This allows you to deploy the model
+and make predictions **without** having  **TensorFlow**, **ktrain**, and their many dependencies installed.  This is particurly well-suited to Heroku deployments, which restrict slug sizes to 500MB.
+
 
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
@@ -844,7 +851,7 @@ convert(framework='pt', model=pt_path,output=Path(pt_onnx_path), opset=11,
 pt_onnx_quantized_path = quantize(optimize(Path(pt_onnx_path)))
 
 # create ONNX session (or create session manually if wanting to avoid ktrain/TensorFlow dependencies)
-sess = p.create_onnx_session(pt_onnx_quant_name.as_posix())
+sess = p.create_onnx_session(pt_onnx_quantized_path.as_posix())
 # create tokenizer (or create tokenizer manually if wanting to avoid ktrain/TensorFlow dependencies)
 tokenizer = p.preproc.get_tokenizer()
 tokens = tokenizer.encode_plus('My computer monitor is blurry.', max_length=p.preproc.maxlen, truncation=True)
@@ -858,6 +865,24 @@ print(p.get_classes()[np.argmax(sess.run(None, tokens)[0])])
 The example above assumes the model saved at `predictor_path` was trained on a subset of the 20 Newsgroup corpus as was done in [this tutorial](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-A3-hugging_face_transformers.ipynb).
 
 You can also use **ktrain** to [create ONNX models directly from TensorFlow](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/ktrain-ONNX-TFLite-examples.ipynb) with optional quantization.  Note, that conversions to ONNX from TensorFlow models appear to [require a hard-coded input size](https://github.com/huggingface/transformers/issues/8227) (i.e., padding is used), whereas conversions to ONNX from PyTorch models do not appear to have this requirement.
+
+
+[[Back to Top](#frequently-asked-questions-about-ktrain)]
+
+
+### How do I train a transformers model from a saved checkpoint folder?
+
+In the **ktrain** `Transformer` API, you can train/fine-tune a text classification model from a local path:
+```python
+t = text.Transformer(MODEL_LOCAL_PATH, maxlen=50, class_names=class_names)
+```
+
+This is useful, for example, if you first [fine-tune a language model](https://github.com/huggingface/transformers/tree/master/examples/language-modeling) using Hugging-Face **Trainer** **prior** to fine-tuning your text classifier.
+
+However, when supplying a local path to `Transformer`, **ktrain** will also look for the tokenizer files in that directory. So, you just need to ensure tokenizer files like the `vocab` file (which are quite small), exist in the local folder (in addition to the folder created by `predictor.save_predictor`.
+
+See [this post](https://github.com/amaiya/ktrain/issues/295#issuecomment-744509996) for more details.
+
 
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
