@@ -892,9 +892,9 @@ See [this post](https://github.com/amaiya/ktrain/issues/295#issuecomment-7445099
 
 ### How do I pretrain a language model for use with ktrain?
 
-It is very easy to pretrain a `transformer` language model (either fine-tuning the language model or training from scratch) using [one of these scripts](https://github.com/huggingface/transformers/tree/master/examples/language-modeling).  This can sometimes boost performance especiallyl if your dataset has highly specialized terminology.
+It is very easy to pretrain a `transformer` language model (either fine-tuning the language model or training from scratch) using [this Hugging Face script](https://github.com/huggingface/transformers/tree/master/examples/language-modeling).  This can sometimes boost performance especiallyl if your dataset has highly specialized terminology.
 
-These scripts will save the pretrained language model to a folder.  One can then simply point **ktrain** to this folder to fine-tune a text-classifier using this fine-tuned/pretrained language model using either of the following two approaches:
+These Hugging Face scripts will save the fine-tuned pretrained language model to a folder.  One can then simply point **ktrain** to this folder to fine-tune a text-classifier using this fine-tuned/pretrained language model using either of the following two approaches:
 
 
 #### Approach 1 
