@@ -50,6 +50,8 @@
 
 - [How do I train a transformers model from a saved checkpoint folder?](#how-do-i-train-a-transformers-model-from-a-saved-checkpoint-folder)
 
+- [How do pretrain a language model for use with ktrain?](#how-do-i-pretrain-a-language-model-for-use-with-ktrain)
+
 
 
 
@@ -888,6 +890,38 @@ See [this post](https://github.com/amaiya/ktrain/issues/295#issuecomment-7445099
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
 
 
+### How do I pretrain a language model for use with ktrain?
+
+It is very easy to pretrain a `transformer` language model (either fine-tuning the language model or training from scratch) using [one of these scripts](https://github.com/huggingface/transformers/tree/master/examples/language-modeling).  This can sometimes boost performance especiallyl if your dataset has highly specialized terminology.
+
+These scripts will save the pretrained language model to a folder.  One can then simply point **ktrain** to this folder to fine-tune a text-classifier using this fine-tuned/pretrained language model using either of the following two approaches:
+
+
+#### Approach 1 
+You need to copy tokenizer files (which are very small) to the path of the saved language model.    This is also required when loading models without an internet connection, as described in [this FAQ entry](https://github.com/amaiya/ktrain/blob/master/FAQ.md#how-do-i-use-ktrain-without-an-internet-connection).
+
+Note that, when you save the `Predictor` to a folder,  you'll again need to make sure that folder  has the tokenizer files.  Otherwise, `predictor.predict` will yield the same error.
+
+
+#### Approach 2 
+Alternatively, you could try loading the tokenizer yourself with **transformers** and  manually setting the `t.tok=tokenizer` prior to calling `preprocess_train`:
+
+```python
+t = text.Transformer(MODEL_LOCAL_PATH, maxlen=50, class_names=class_names)
+from transformers import *
+tokenizer = AutoTokenizer.from_pretrained('roberta-base')
+t.tok = tokenizer
+t.preprocess_train(...
+```
+When loading a predictor, you'll also need to reset tokenizer manually:
+```python
+p = ktrain.load_predictor('/tmp/mypred')
+p.preproc.tok = tokenizer
+p.predict('Some text to predict')
+```
+
+
+[[Back to Top](#frequently-asked-questions-about-ktrain)]
 
 ### What kinds of applications have been built with *ktrain*?
 
