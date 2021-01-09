@@ -291,6 +291,8 @@ def texts_from_df(train_df,
                            lang=lang, ngram_range=ngram_range)
     trn = preproc.preprocess_train(x_train, y_train, verbose=verbose)
     val = preproc.preprocess_test(x_test,  y_test, verbose=verbose)
+    # QUICKFIX for #314
+    preproc.ytransform.le = ytransdf.le
     return (trn, val, preproc)
 
 
