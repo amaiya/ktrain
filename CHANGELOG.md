@@ -6,6 +6,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.25.4 (TBD)
+
+### New:
+- N/A
+
+### Changed
+- N/A
+
+### Fixed:
+- fixed problem with `LabelEncoder` not properly being stored when `texts_from_df` is invoked
+
+
 ## 0.25.3 (2020-12-23)
 
 ### New:
