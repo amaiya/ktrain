@@ -281,7 +281,7 @@ class QA(ABC):
 
                 mb.child.comment = f'generating candidate answers'
 
-
+        if not answers: return answers # fix for #307
         answers = sorted(answers, key = lambda k:k['confidence'], reverse=True)
         if n_answers is not None:
             answers = answers[:n_answers]
