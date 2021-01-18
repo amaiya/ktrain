@@ -17,6 +17,7 @@ Most recent releases are shown at the top. Each release shows:
 ### Fixed:
 - fixed problem with `LabelEncoder` not properly being stored when `texts_from_df` is invoked
 - refrain from invoking  `max` on empty sequence (#307)
+- corrected issue with `return_proba=True` in NER predictions (#316)
 
 
 ## 0.25.3 (2020-12-23)
