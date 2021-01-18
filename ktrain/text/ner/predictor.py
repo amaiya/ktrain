@@ -55,9 +55,11 @@ class NERPredictor(Predictor):
         y_labels = self.preproc.p.inverse_transform(y_pred, lengths)
         y_labels = y_labels[0]
         if return_proba:
-            #probs = np.max(y_pred, axis=2)[0]
-            y_pred = y_pred[0].numpy().tolist()
-            return list(zip(nerseq.x[0], y_labels, y_pred))
+            try:
+                probs = np.max(y_pred, axis=2)[0]
+            except:
+                probs = y_pred[0].numpy().tolist() # TODO: remove after confirmation (#316)
+            return list(zip(nerseq.x[0], y_labels, probs))
         else:
             result =  list(zip(nerseq.x[0], y_labels))
             if merge_tokens:
