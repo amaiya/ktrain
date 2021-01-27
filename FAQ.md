@@ -881,7 +881,7 @@ t = text.Transformer(MODEL_LOCAL_PATH, maxlen=50, class_names=class_names)
 
 This is useful, for example, if you first [fine-tune a language model](https://github.com/huggingface/transformers/tree/master/examples/language-modeling) using Hugging-Face **Trainer** **prior** to fine-tuning your text classifier.
 
-However, when supplying a local path to `Transformer`, **ktrain** will also look for the tokenizer files in that directory. So, you just need to ensure tokenizer files like the `vocab` file (which are quite small), exist in the local folder (in addition to the folder created by `predictor.save_predictor`.
+However, when supplying a local path to `Transformer`, **ktrain** will also look for the tokenizer files in that directory. So, you just need to ensure tokenizer and config files like the `vocab` and `config.json` files (which are both quite small), exist in the local folder (in addition to the folder created by `predictor.save_predictor`.  Such files can be downloaded from the Hugging Face model hub.
 
 See [this post](https://github.com/amaiya/ktrain/issues/295#issuecomment-744509996) for more details.
 
@@ -898,16 +898,16 @@ These Hugging Face scripts will save the fine-tuned pretrained language model to
 
 
 #### Approach 1 
-You need to copy tokenizer files (which are very small) to the path of the saved language model.    This is also required when loading models without an internet connection, as described in [this FAQ entry](https://github.com/amaiya/ktrain/blob/master/FAQ.md#how-do-i-use-ktrain-without-an-internet-connection).
+You need to copy tokenizer files (which are very small) to the path of the saved language model. A `config.json` file may also be needed.  These files can be obtained from the Hugging Face model hub. This is also required when loading models without an internet connection, as described in [this FAQ entry](https://github.com/amaiya/ktrain/blob/master/FAQ.md#how-do-i-use-ktrain-without-an-internet-connection).
 
-Note that, when you save the `Predictor` to a folder,  you'll again need to make sure that folder  has the tokenizer files.  Otherwise, `predictor.predict` will yield the same error.
+Note that, when you save the `Predictor` to a folder,  you'll again need to make sure that folder  has the tokenizer files.  Otherwise, `predictor.predict` will yield the same errors.
 
 
 #### Approach 2 
 Alternatively, you could try loading the tokenizer yourself with **transformers** and  manually setting the `t.tok=tokenizer` prior to calling `preprocess_train`:
 
 ```python
-t = text.Transformer(MODEL_LOCAL_PATH, maxlen=50, class_names=class_names)
+t = text.Transformer(MODEL_LOCAL_PATH, maxlen=50, class_names=class_names) # config.json may need to be present
 from transformers import *
 tokenizer = AutoTokenizer.from_pretrained('roberta-base')
 t.tok = tokenizer
