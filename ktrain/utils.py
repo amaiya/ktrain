@@ -604,9 +604,8 @@ class YTransform:
             if np.issubdtype(type(max(targets)), np.floating):
                 warnings.warn('class_names implies classification but targets array contains float(s) instead of integers or strings')
 
-            # TODO check logic
-            if train and ( len(set(targets)) != len(list(range(int(max(targets)+1)))) ):
-                raise ValueError('len(set(targets) is %s but len(list(range(int(max(targets)+1))) is  %s' % (len(list(set(targets))), len(list(range(int(max(targets))+1)))))
+            if train and ( len(set(targets)) != int(max(targets)+1) ):
+                raise ValueError('len(set(targets) is %s but max(targets)+1 is  %s' % ( len(set(targets)), int(max(targets)+1) ))
             targets = to_categorical(targets, num_classes=len(self.get_classes()))
         if train: self.train_called=True
         return targets
