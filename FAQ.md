@@ -881,9 +881,7 @@ t = text.Transformer(MODEL_LOCAL_PATH, maxlen=50, class_names=class_names)
 
 This is useful, for example, if you first [fine-tune a language model](https://github.com/huggingface/transformers/tree/master/examples/language-modeling) using Hugging-Face **Trainer** **prior** to fine-tuning your text classifier.
 
-However, when supplying a local path to `Transformer`, **ktrain** will also look for the tokenizer files in that directory. So, you just need to ensure tokenizer and config files like the `vocab` and `config.json` files (which are both quite small), exist in the local folder (in addition to the folder created by `predictor.save_predictor`.  Such files can be downloaded from the Hugging Face model hub.
-
-See [this post](https://github.com/amaiya/ktrain/issues/295#issuecomment-744509996) for more details.
+However, when supplying a local path to `Transformer`, **ktrain** will also look for the tokenizer and config files in that directory. So, you just need to ensure tokenizer and config files like the `vocab` and `config.json` files (which are both quite small), exist in the local folder (in addition to the folder created by `predictor.save_predictor`.  Such files can be downloaded from the Hugging Face model hub.  See [this FAQ entry](https://github.com/amaiya/ktrain/blob/master/FAQ.md#how-do-i-use-ktrain-without-an-internet-connection) and [this post](https://github.com/amaiya/ktrain/issues/295#issuecomment-744509996) for more details.
 
 
 
