@@ -864,6 +864,10 @@ class TransformersPreprocessor(TextPreprocessor):
             le = self.label_encoder if hasattr(self, 'label_encoder') else None
             self.ytransform = U.YTransform(class_names=self.get_classes(), label_encoder=le)
 
+    def set_config(self, config):
+        self.config = config
+    def get_config(self):
+        return self.config
 
     def get_tokenizer(self, fpath=None):
         model_name = self.model_name if fpath is None else fpath
