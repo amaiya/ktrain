@@ -923,7 +923,7 @@ p.preproc.tok = tokenizer
 p.predict('Some text to predict')
 ```
 
-Note that the local path you supply to `Transformer` is stored in `t.model_name`, where `t` is a `Preprocessor` instance.  If creating a `Predictor` and transferring it to another machine, you may need tomanually update this path:
+Note that the local path you supply to `Transformer` is stored in `t.model_name`, where `t` is a `Preprocessor` instance.  If creating a `Predictor` and transferring it to another machine, you may need to manually update this path:
 ```python
 predictor.preproc.model_name = 'path/to/predictor/on/new/machine'
 ```
