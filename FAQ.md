@@ -884,7 +884,7 @@ This is useful, for example, if you first [fine-tune a language model](https://g
 However, when supplying a local path to `Transformer`, **ktrain** will also look for the tokenizer files in that directory. So, you just need to ensure tokenizer files like the `vocab.txt` (which are quite small), exist in the local folder (and also exist in the folder created by `predictor.save_predictor`.  Such files can be downloaded from the Hugging Face model hub.  See [this post](https://github.com/amaiya/ktrain/issues/295#issuecomment-744509996) and [this FAQ entry](https://github.com/amaiya/ktrain/blob/master/FAQ.md#how-do-i-use-ktrain-without-an-internet-connection) for more details.
 
 Note that the local path you supply to `Transformer` is stored in `t.model_name`, where `t` is a `Preprocessor` instance.  If creating a `Predictor` and transferring it to another machine, you may need to update this path:
-``python
+```python
 predictor.preproc.model_name = 'path/to/predictor/on/new/machine'
 ```
 
@@ -924,7 +924,7 @@ p.predict('Some text to predict')
 ```
 
 Note that the local path you supply to `Transformer` is stored in `t.model_name`, where `t` is a `Preprocessor` instance.  If creating a `Predictor` and transferring it to another machine, you may need tomanually update this path:
-``python
+```python
 predictor.preproc.model_name = 'path/to/predictor/on/new/machine'
 ```
 
