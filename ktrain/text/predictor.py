@@ -120,10 +120,9 @@ class TextPredictor(Predictor):
             warnings.warn(msg)
             return
 
-
+        if not isinstance(doc, str): raise TypeError('text must of type str')
         prediction = [self.predict(doc)] if not all_targets else None
 
-        if not isinstance(doc, str): raise Exception('text must of type str')
         if self.preproc.is_nospace_lang():
             doc = self.preproc.process_chinese([doc])
             doc = doc[0]
