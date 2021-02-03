@@ -866,8 +866,12 @@ class TransformersPreprocessor(TextPreprocessor):
 
     def set_config(self, config):
         self.config = config
+
     def get_config(self):
         return self.config
+
+    def set_tokenizer(self, tokenizer):
+        self.tok = tokenizer
 
     def get_tokenizer(self, fpath=None):
         model_name = self.model_name if fpath is None else fpath
