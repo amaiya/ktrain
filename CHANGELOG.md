@@ -13,6 +13,7 @@ Most recent releases are shown at the top. Each release shows:
 
 ### Changed
 - added `set_tokenizer to `TransformerPreprocessor`
+- show error message when original weights cannot be saved (for `reset_weights` method)
 
 ### Fixed:
 - N/A
