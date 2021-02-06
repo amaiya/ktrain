@@ -429,14 +429,14 @@ class TopicModel():
         """
 
         # error-checking
-        if texts is not None: length = len(texts)
-        else: length = doc_topics.shape[0]
-        if colors is not None and len(colors) != length:
-            raise ValueError('length of colors is not consistent with length of texts or doctopics')
         if texts is not None and doc_topics is not None:
             raise ValueError('texts is mutually-exclusive with doc_topics')
         if texts is None and doc_topics is None:
             raise ValueError('One of texts or doc_topics is required.')
+        if texts is not None: length = len(texts)
+        else: length = doc_topics.shape[0]
+        if colors is not None and len(colors) != length:
+            raise ValueError('length of colors is not consistent with length of texts or doctopics')
         if extra_info:
             invalid_keys = ['x', 'y', 'topic', 'fill_color']
             for k in extra_info.keys():
