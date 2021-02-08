@@ -978,14 +978,15 @@ class TransformersPreprocessor(TextPreprocessor):
         """
         is_regression = U.is_regression_from_data(transformer_ds)
         multilabel = U.is_multilabel(transformer_ds)
+        nclasses = U.nclasses_from_data(transformer_ds)
         model = TFAutoModelForSequenceClassification.from_pretrained(fpath)
         if is_regression:
             metrics = ['mae']
             loss_fn = 'mse'
         else:
             metrics = ['accuracy']
-            if multilabel:
-                loss_fn =  keras.losses.BinaryCrossentropy(from_logits=True)
+            if multilabel or nclasses == 2:
+                loss_fn = keras.losses.BinaryCrossentropy(from_logits=True)
             else:
                 loss_fn = keras.losses.CategoricalCrossentropy(from_logits=True)
         model.compile(loss=loss_fn,
@@ -1043,8 +1044,8 @@ class TransformersPreprocessor(TextPreprocessor):
         num_labels = len(self.get_classes())
         mname = fpath if fpath is not None else self.model_name
         model = self._load_pretrained(mname, num_labels)
-        if multilabel:
-            loss_fn =  keras.losses.BinaryCrossentropy(from_logits=True)
+        if multilabel or num_labels == 2:
+            loss_fn = keras.losses.BinaryCrossentropy(from_logits=True)
         else:
             loss_fn = keras.losses.CategoricalCrossentropy(from_logits=True)
         model.compile(loss=loss_fn,
