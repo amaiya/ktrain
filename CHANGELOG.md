@@ -16,7 +16,7 @@ Most recent releases are shown at the top. Each release shows:
 - show error message when original weights cannot be saved (for `reset_weights` method)
 
 ### Fixed:
-- N/A
+- cast filename to string before concatenating with suffix in `images_from_csv` and `images_from_df` (addresses issue #330)
 
 
 ## 0.25.4 (2021-01-26)
