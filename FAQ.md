@@ -937,9 +937,9 @@ predictor.preproc.model_name = 'path/to/predictor/on/new/machine'
 
 ### How do I get reproducible results?
 
-In regard to train-test splits, the data-loading functions (e.g., `texts_from_folder`, `images_from_csv`) have a `random_state` parameter that will ensure dataset split.
+In regard to train-test splits, the data-loading functions (e.g., `texts_from_folder`, `images_from_csv`) have a `random_state` parameter that will ensure the same dataset split across runs.
 
-In regards to training, please see [this post](https://github.com/amaiya/ktrain/issues/334#issuecomment-788893119), which includes some sugguestions for `tf.keras` in TensorFlow 2.
+In regards to training, please see [this post](https://github.com/amaiya/ktrain/issues/334#issuecomment-788893119), which includes some suggestions for reproducible results in `tf.keras` and TensorFlow 2.
 
 For instance, invoking the function below before each training run can help generate more consistent results.
 
