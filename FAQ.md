@@ -52,6 +52,8 @@
 
 - [How do pretrain a language model for use with ktrain?](#how-do-i-pretrain-a-language-model-for-use-with-ktrain)
 
+- [How do I get reproducible results?](#how-do-i-get-reproducible-results)
+
 
 
 
@@ -785,6 +787,7 @@ A number of models in **ktrain** can be used out-of-the-box on a CPU-based lapto
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
 
 
+
 ### How do I make quantized predictions with `transformers` models?
 
 Quantization can improve the efficiency of neural network computations by reducing the size of the weights.  For instance, when making predictions, representing weights with 8-bit integers instead of 32-bit floats can speed up inferences.
@@ -929,11 +932,32 @@ predictor.preproc.model_name = 'path/to/predictor/on/new/machine'
 ```
 
 
+[[Back to Top](#frequently-asked-questions-about-ktrain)]
 
 
+### How do I get reproducible results?
+
+In regard to train-test splits, the data-loading functions (e.g., `texts_from_folder`, `images_from_csv`) have a `random_state` parameter that will ensure dataset split.
+
+In regards to training, please see [this post](https://github.com/amaiya/ktrain/issues/334#issuecomment-788893119), which includes some sugguestions for `tf.keras` in TensorFlow 2.
+
+For instance, invoking the function below before each training run can help generate more consistent results.
+
+```python
+import tensorflow as tf
+import numpy as np
+import os
+import random
+def reset_random_seeds(seed=2):
+    os.environ['PYTHONHASHSEED']=str(seed)
+    tf.random.set_seed(seed)
+    np.random.seed(seed)
+    random.seed(seed)
+```
 
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
+
 
 ### What kinds of applications have been built with *ktrain*?
 
