@@ -941,7 +941,7 @@ In regard to train-test splits, the data-loading functions (e.g., `texts_from_fo
 
 In regards to training, please see [this post](https://github.com/amaiya/ktrain/issues/334#issuecomment-788893119), which includes some suggestions for reproducible results in `tf.keras` and TensorFlow 2.
 
-For instance, invoking the function below before each training run can help generate more consistent results.
+For instance, invoking the function below before each training run can help generate more consistent results across runs.
 
 ```python
 import tensorflow as tf
