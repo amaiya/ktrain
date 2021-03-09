@@ -847,7 +847,7 @@ from transformers import AutoModelForSequenceClassification
 from pathlib import Path
 
 # paths
-predictor_path = '/tmp/my_distilbert_predictor'
+predictor_path = '/tmp/mypredictor'
 pt_path = predictor_path+'_pt'
 pt_onnx_path = pt_path +'_onnx/model.onnx'
 
@@ -878,7 +878,7 @@ def create_onnx_session(onnx_model_path, provider='CPUExecutionProvider'):
     return session
 sess = create_onnx_session(pt_onnx_quantized_path.as_posix())
 
-# create tokenizer (or create tokenizer manually if wanting to avoid ktrain/TensorFlow dependencies)
+#  tokenize document and make prediction
 tokens = tokenizer.encode_plus('My computer monitor is blurry.', max_length=maxlen, truncation=True)
 tokens = {name: np.atleast_2d(value) for name, value in tokens.items()}
 print()
