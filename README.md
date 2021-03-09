@@ -17,7 +17,7 @@ For instance, suppose you trained a DistilBERT model and saved the resultant pre
     - change `transformers.configuration_distilbert` to `transformers.models.distilbert.configuration_distilbert`
     - change `transformers.modeling_tf_auto` to `transformers.models.auto.modeling_tf_auto`
     - change `transformers.tokenization_auto` to `transformers.models.auto.tokenization_auto`
-  - If you're using PyTorch 1.8 or above, you will need to upgrade to `ktrain>=0.26.0`. If you're using `ktrain<0.26.0`, then you will have to downgrade PyTorch with: `pip install torch==1.7.1`.
+  - If you're using PyTorch 1.8 or above with **ktrain**, you will need to upgrade to `ktrain>=0.26.0`. If you're using `ktrain<0.26.0`, then you will have to downgrade PyTorch with: `pip install torch==1.7.1`.
 - **2020-11-08:**
   - ***ktrain*** **v0.25.x is released** and includes out-of-the-box support for text extraction via the [textract](https://pypi.org/project/textract/) package . This, for example,
 can be used in the `SimpleQA.index_from_folder` method to perform Question-Answering on large collections of PDFs, MS Word documents, or PowerPoint files.   See the [Question-Answering example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/question_answering_with_bert.ipynb) for more information.
