@@ -6,14 +6,15 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
-## 0.25.5 (TBD)
+## 0.26.0 (2021-03-10)
 
 ### New:
-- N/A
+- Support for **transformers** 4.0 and above.
 
 ### Changed
 - added `set_tokenizer to `TransformerPreprocessor`
 - show error message when original weights cannot be saved (for `reset_weights` method)
+- added support and resolved import error for `sklearn>=0.24.0`
 
 ### Fixed:
 - cast filename to string before concatenating with suffix in `images_from_csv` and `images_from_df` (addresses issue #330)
