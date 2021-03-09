@@ -13,7 +13,7 @@
 - **2021-03-10:**
   - ***ktrain*** **v0.26.x is released** and now supports `transformers>=4.0.0`.  
 Note that, `transformers>=4.0.0` included a complete reogranization of the module's structure. This means that, if you saved a **transformers**-based `Predictor` (e.g., DistilBERT) in an older version of **ktrain** and **transformers**, you will need to manually edit the `tf_model.preproc` file before loading the `predictor` in the latest versions of **ktrain** and **transformers**.  
-For instance, suppose you trained a DistilBERT model and saved the resultant predictor using an older version of **ktrain** with: `predictor.save('/tmp/my_predictor/')`.  After upgrading to the newest version of **ktrain**,  you will find that `ktrain.load_predictor('/tmp/my_predictor`) will throw an error unless you edit the file **/tmp/mypredictor/tf_model.preproc** as follows to conform to the latest **transformers** structure:
+For instance, suppose you trained a DistilBERT model and saved the resultant predictor using an older version of **ktrain** with: `predictor.save('/tmp/my_predictor/')`.  After upgrading to the newest version of **ktrain**,  you will find that `ktrain.load_predictor('/tmp/my_predictor`) will throw an error unless you edit the file **/tmp/mypredictor/tf_model.preproc** to conform to the new **transformers** structure as follows:
     - change `transformers.configuration_distilbert` to `transformers.models.distilbert.configuration_distilbert`
     - change `transformers.modeling_tf_auto` to `transformers.models.auto.modeling_tf_auto`
     - change `transformers.tokenization_auto` to `transformers.models.auto.tokenization_auto`
