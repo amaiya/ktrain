@@ -893,7 +893,7 @@ The example above assumes the model saved at `predictor_path` was trained on a s
 
 You can also use **ktrain** to create ONNX models directly from TensorFlow with: 
 ```python
-onnx_model_path = predictor.export_model_to_onnx(onnx_model_path)
+predictor.export_model_to_onnx(onnx_model_path)
 ```
 
 Note, that conversions to ONNX from TensorFlow models appear to [require a hard-coded input size](https://github.com/huggingface/transformers/issues/8227) (i.e., padding is used), whereas conversions to ONNX from PyTorch models do not appear to have this requirement.
