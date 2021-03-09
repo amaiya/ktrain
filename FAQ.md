@@ -68,6 +68,8 @@
 
 - [How do I make quantized predictions with `transformers` models?](#how-do-i-make-quantized-predictions-with-transformers-models)
 
+- [How do I convert a model to ONNX?](#how-do-i-make-quantized-predictions-with-transformers-models)
+
 
 ---
 
