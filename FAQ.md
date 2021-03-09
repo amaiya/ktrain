@@ -832,6 +832,8 @@ Alternatively, you might also consider quantizing your `transformers` model with
 
 ```python
 # Converting to ONNX (from PyTorch-converted model)
+
+
 # set maxlen, class_names, and tokenizer (use settings employed when training the model - see above)
 model_name = 'distilbert-base-uncased'
 maxlen = 500                                                                       # from above
