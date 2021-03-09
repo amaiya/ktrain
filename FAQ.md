@@ -860,7 +860,7 @@ convert(framework='pt', model=pt_path,output=Path(pt_onnx_path), opset=11,
         tokenizer=model_name, pipeline_name='sentiment-analysis')
 pt_onnx_quantized_path = quantize(optimize(Path(pt_onnx_path)))
 
-# create ONNX session (or create session manually if wanting to avoid ktrain/TensorFlow dependencies)
+# create ONNX session
 def create_onnx_session(onnx_model_path, provider='CPUExecutionProvider'):
     """
     Creates ONNX inference session from provided onnx_model_path
