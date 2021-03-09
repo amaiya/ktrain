@@ -14,10 +14,10 @@ Most recent releases are shown at the top. Each release shows:
 ### Changed
 - added `set_tokenizer to `TransformerPreprocessor`
 - show error message when original weights cannot be saved (for `reset_weights` method)
-- added support and resolved import error for `sklearn>=0.24.0`
 
 ### Fixed:
 - cast filename to string before concatenating with suffix in `images_from_csv` and `images_from_df` (addresses issue #330)
+-  resolved import error for `sklearn>=0.24.0`, but `eli5` still requires `sklearn<0.24.0`.
 
 
 ## 0.25.4 (2021-01-26)
