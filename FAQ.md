@@ -900,7 +900,7 @@ You can also use **ktrain** to create ONNX models directly from TensorFlow with:
 predictor.export_model_to_onnx(onnx_model_path)
 ```
 
-Note, that conversions to ONNX from TensorFlow models appear to [require a hard-coded input size](https://github.com/huggingface/transformers/issues/8227) (i.e., padding is used), whereas conversions to ONNX from PyTorch models do not appear to have this requirement.
+However, note that conversions to ONNX from TensorFlow models appear to [require a hard-coded input size](https://github.com/huggingface/transformers/issues/8227) (i.e., padding is used), whereas conversions to ONNX from PyTorch models do not appear to have this requirement.
 
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
