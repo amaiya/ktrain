@@ -836,8 +836,8 @@ Alternatively, you might also consider quantizing your `transformers` model with
 
 # set maxlen, class_names, and tokenizer (use settings employed when training the model - see above)
 model_name = 'distilbert-base-uncased'
-maxlen = 500                                                                       # from above
-class_names = ['alt.atheism', 'soc.religion.christian','comp.graphics', 'sci.med'] # from above
+maxlen = 500
+class_names = ['alt.atheism', 'soc.religion.christian','comp.graphics', 'sci.med']
 from transformers import AutoTokenizer
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 
