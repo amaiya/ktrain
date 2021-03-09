@@ -510,8 +510,8 @@ def images_from_df(train_df,
     if suffix:
         train_df = train_df.copy()
         val_df = val_df.copy()
-        train_df[image_column] = train_df.copy()[image_column].apply(lambda x : x+suffix)
-        val_df[image_column] = val_df.copy()[image_column].apply(lambda x : x+suffix)
+        train_df[image_column] = train_df.copy()[image_column].apply(lambda x : str(x)+suffix)
+        val_df[image_column] = val_df.copy()[image_column].apply(lambda x : str(x)+suffix)
 
 
     # get generators

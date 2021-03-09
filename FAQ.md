@@ -52,6 +52,8 @@
 
 - [How do pretrain a language model for use with ktrain?](#how-do-i-pretrain-a-language-model-for-use-with-ktrain)
 
+- [How do I get reproducible results?](#how-do-i-get-reproducible-results)
+
 
 
 
@@ -65,6 +67,8 @@
 - [Running `predictor.explain` for text classification is slow.  How can I speed it up?](#running-predictorexplain-for-text-classification-is-slow--how-can-i-speed-it-up)
 
 - [How do I make quantized predictions with `transformers` models?](#how-do-i-make-quantized-predictions-with-transformers-models)
+
+- [How do I convert a model to ONNX?](#how-do-i-make-quantized-predictions-with-transformers-models)
 
 
 ---
@@ -785,6 +789,7 @@ A number of models in **ktrain** can be used out-of-the-box on a CPU-based lapto
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
 
 
+
 ### How do I make quantized predictions with `transformers` models?
 
 Quantization can improve the efficiency of neural network computations by reducing the size of the weights.  For instance, when making predictions, representing weights with 8-bit integers instead of 32-bit floats can speed up inferences.
@@ -830,13 +835,19 @@ Alternatively, you might also consider quantizing your `transformers` model with
 ```python
 # Converting to ONNX (from PyTorch-converted model)
 
-# install onnx libraries
-!pip install --upgrade onnxruntime==1.5.1 onnxruntime-tools onnx
+
+# set maxlen, class_names, and tokenizer (use settings employed when training the model - see above)
+model_name = 'distilbert-base-uncased'
+maxlen = 500
+class_names = ['alt.atheism', 'soc.religion.christian','comp.graphics', 'sci.med']
+from transformers import AutoTokenizer
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+
 
 # imports
 import numpy as np
 from transformers.convert_graph_to_onnx import convert, optimize, quantize
-from transformers import *
+from transformers import AutoModelForSequenceClassification
 from pathlib import Path
 
 # paths
@@ -845,28 +856,51 @@ pt_path = predictor_path+'_pt'
 pt_onnx_path = pt_path +'_onnx/model.onnx'
 
 # convert to ONNX
-p = ktrain.load_predictor(predictor_path)
 AutoModelForSequenceClassification.from_pretrained(predictor_path, 
                                                    from_tf=True).save_pretrained(pt_path)
 convert(framework='pt', model=pt_path,output=Path(pt_onnx_path), opset=11, 
-        tokenizer=p.preproc.model_name, pipeline_name='sentiment-analysis')
+        tokenizer=model_name, pipeline_name='sentiment-analysis')
 pt_onnx_quantized_path = quantize(optimize(Path(pt_onnx_path)))
 
-# create ONNX session (or create session manually if wanting to avoid ktrain/TensorFlow dependencies)
-sess = p.create_onnx_session(pt_onnx_quantized_path.as_posix())
-# create tokenizer (or create tokenizer manually if wanting to avoid ktrain/TensorFlow dependencies)
-tokenizer = p.preproc.get_tokenizer()
-tokens = tokenizer.encode_plus('My computer monitor is blurry.', max_length=p.preproc.maxlen, truncation=True)
+# create ONNX session
+def create_onnx_session(onnx_model_path, provider='CPUExecutionProvider'):
+    """
+    Creates ONNX inference session from provided onnx_model_path
+    """
+
+    from onnxruntime import GraphOptimizationLevel, InferenceSession, SessionOptions, get_all_providers
+    assert provider in get_all_providers(), f"provider {provider} not found, {get_all_providers()}"
+
+    # Few properties that might have an impact on performances (provided by MS)
+    options = SessionOptions()
+    options.intra_op_num_threads = 0
+    options.graph_optimization_level = GraphOptimizationLevel.ORT_ENABLE_ALL
+
+    # Load the model as a graph and prepare the CPU backend 
+    session = InferenceSession(onnx_model_path, options, providers=[provider])
+    session.disable_fallback()
+    return session
+sess = create_onnx_session(pt_onnx_quantized_path.as_posix())
+
+#  tokenize document and make prediction
+tokens = tokenizer.encode_plus('My computer monitor is blurry.', max_length=maxlen, truncation=True)
 tokens = {name: np.atleast_2d(value) for name, value in tokens.items()}
-print(p.get_classes()[np.argmax(sess.run(None, tokens)[0])])
+print()
+print()
+print("predicted class: %s" % (class_names[np.argmax(sess.run(None, tokens)[0])]))
 
 # output:
-# comp.graphics
+# predicted class: comp.graphics
 ```
 
 The example above assumes the model saved at `predictor_path` was trained on a subset of the 20 Newsgroup corpus as was done in [this tutorial](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-A3-hugging_face_transformers.ipynb).
 
-You can also use **ktrain** to [create ONNX models directly from TensorFlow](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/ktrain-ONNX-TFLite-examples.ipynb) with optional quantization.  Note, that conversions to ONNX from TensorFlow models appear to [require a hard-coded input size](https://github.com/huggingface/transformers/issues/8227) (i.e., padding is used), whereas conversions to ONNX from PyTorch models do not appear to have this requirement.
+You can also use **ktrain** to create ONNX models directly from TensorFlow with: 
+```python
+predictor.export_model_to_onnx(onnx_model_path)
+```
+
+However, note that conversions to ONNX from TensorFlow models appear to [require a hard-coded input size](https://github.com/huggingface/transformers/issues/8227) (i.e., padding is used), whereas conversions to ONNX from PyTorch models do not appear to have this requirement.
 
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
@@ -929,11 +963,32 @@ predictor.preproc.model_name = 'path/to/predictor/on/new/machine'
 ```
 
 
+[[Back to Top](#frequently-asked-questions-about-ktrain)]
 
 
+### How do I get reproducible results?
+
+In regard to train-test splits, the data-loading functions (e.g., `texts_from_folder`, `images_from_csv`) have a `random_state` parameter that will ensure the same dataset split across runs.
+
+In regards to training, please see [this post](https://github.com/amaiya/ktrain/issues/334#issuecomment-788893119), which includes some suggestions for reproducible results in `tf.keras` and TensorFlow 2.
+
+For instance, invoking the function below before each training run can help generate more consistent results across runs.
+
+```python
+import tensorflow as tf
+import numpy as np
+import os
+import random
+def reset_random_seeds(seed=2):
+    os.environ['PYTHONHASHSEED']=str(seed)
+    tf.random.set_seed(seed)
+    np.random.seed(seed)
+    random.seed(seed)
+```
 
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
+
 
 ### What kinds of applications have been built with *ktrain*?
 

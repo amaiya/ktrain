@@ -25,7 +25,7 @@ setup(
   url = 'https://github.com/amaiya/ktrain',
   keywords = ['tensorflow', 'keras', 'deep learning', 'machine learning'],
   install_requires=[
-          'scikit-learn==0.23.2', # pinned to 0.23.2 due breaking change in 0.24.x
+          'scikit-learn==0.23.2', # due to change in 0.24.x that breaks eli5
           'matplotlib >= 3.0.0',
           'pandas >= 1.0.1',
           'fastprogress >= 0.1.21',
@@ -40,7 +40,7 @@ setup(
 
           # NOTE: these modules can be optionally omitted from deployment if not being used to yield lighter-weight footprint
           'seqeval==0.0.19', # imported in imports with warning and used in 'ktrain.text.ner' ; pin to 0.0.19 due to numpy version incompatibility with TensorFlow 2.3
-          'transformers>=3.1.0,<4.0',  # imported in imports with warning and used in 'ktrain.text' ; temporarily pin due to breaking change in v3.1.0 and v4.1
+          'transformers>=4.0.0,<=4.3.3',  # imported in imports with warning and used in 'ktrain.text' ; pin to transformers>4.0 due to breaking changes
           'sentencepiece', #  Added due to breaking change in transformers>=4.0
           'keras_bert>=0.86.0', # imported in imports with warning and used in 'ktrain.text' ; support for TF 2.3
           'networkx>=2.3', # imported by graph module

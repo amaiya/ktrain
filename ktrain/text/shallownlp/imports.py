@@ -24,7 +24,10 @@ import os.path
 import numpy as np
 from scipy.sparse import spmatrix, coo_matrix
 from sklearn.base import BaseEstimator
-from sklearn.linear_model.base import LinearClassifierMixin, SparseCoefMixin
+try: # sklearn<0.24.x
+    from sklearn.linear_model.base import LinearClassifierMixin, SparseCoefMixin
+except ImportError: # sklearn>=0.24.x
+    from sklearn.linear_model._base import LinearClassifierMixin, SparseCoefMixin
 from sklearn.svm import LinearSVC
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import GridSearchCV

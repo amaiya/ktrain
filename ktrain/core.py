@@ -38,8 +38,8 @@ class Learner(ABC):
             new_file, weightfile = tempfile.mkstemp()
             self.model.save_weights(weightfile)
             self._original_weights = weightfile
-        except:
-            warnings.warn('Could not save original model weights')
+        except Exception as e:
+            warnings.warn('Could not save original model weights: %s' % (e))
             self._original_weights = None
 
     @property
