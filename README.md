@@ -19,23 +19,23 @@ Open `tf_model.preproc` with an editor like **vim** and edit it as follows:
     - change `transformers.configuration_distilbert` to `transformers.models.distilbert.configuration_distilbert`
     - change `transformers.modeling_tf_auto` to `transformers.models.auto.modeling_tf_auto`
     - change `transformers.tokenization_auto` to `transformers.models.auto.tokenization_auto`  
-**Approach 2: Re-generate `tf_model.preproc` file**:  
-```python
-# Step 1: preprocess the original training set (e.g., by invoking Transformer, texts_from_folder, etc.)
-# NOTE:
-# 1. if training set is large, you can use a sample containing at least one example for each class
-# 2. labels must be in same format as you originally used
-preproc = text.Transformer(MODEL_NAME, maxlen=500, class_names=class_names)
-trn = preproc.preprocess_train(x_train, y_train)
+**Approach 2: Re-generate `tf_model.preproc` file**: 
+	```python
+	# Step 1: preprocess the original training set (e.g., by invoking Transformer, texts_from_folder, etc.)
+	# NOTE:
+	# 1. if training set is large, you can use a sample containing at least one example for each class
+	# 2. labels must be in same format as you originally used
+	preproc = text.Transformer(MODEL_NAME, maxlen=500, class_names=class_names)
+	trn = preproc.preprocess_train(x_train, y_train)
 
-# Step 2: load the transformers model from predictor folder
-from transformers import *
-model = TFAutoModelForSequenceClassification.from_pretrained('/tmp/my_predictor/')
+	# Step 2: load the transformers model from predictor folder
+	from transformers import *
+	model = TFAutoModelForSequenceClassification.from_pretrained('/tmp/my_predictor/')
 
-# Step 3: re-create/re-save Predictor
-predictor = ktrain.get_predictor(model, preproc)
-predictor.save('/tmp/my_new_predictor')
-```
+	# Step 3: re-create/re-save Predictor
+	predictor = ktrain.get_predictor(model, preproc)
+	predictor.save('/tmp/my_new_predictor')
+	```
   - If you're using PyTorch 1.8 or above with **ktrain**, you will need to upgrade to `ktrain>=0.26.0`. If you're using `ktrain<0.26.0`, then you will have to downgrade PyTorch with: `pip install torch==1.7.1`.
 - **2020-11-08:**
   - ***ktrain*** **v0.25.x is released** and includes out-of-the-box support for text extraction via the [textract](https://pypi.org/project/textract/) package . This, for example,
