@@ -24,6 +24,8 @@
 
 - [Why am I getting a *"model must be of instance Model"* error with `load_predictor`?](#why-am-i-getting-a-model-must-be-of-instance-model-error-with-load_predictor)
 
+- [How do I convert a model to ONNX for deployment?](#how-do-i-make-quantized-predictions-with-transformers-models)
+
 
 ## Training
 
@@ -68,7 +70,6 @@
 
 - [How do I make quantized predictions with `transformers` models?](#how-do-i-make-quantized-predictions-with-transformers-models)
 
-- [How do I convert a model to ONNX?](#how-do-i-make-quantized-predictions-with-transformers-models)
 
 
 ---
