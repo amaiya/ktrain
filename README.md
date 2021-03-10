@@ -14,15 +14,15 @@
   - ***ktrain*** **v0.26.x is released** and now supports `transformers>=4.0.0`.  
 Note that, `transformers>=4.0.0` included a complete reogranization of the module's structure. This means that, if you saved a **transformers**-based `Predictor` (e.g., DistilBERT) in an older version of **ktrain** and **transformers**, you will need to either generate a new `tf_model.preproc` file or manually edit the existing `tf_model.preproc` file before loading the `predictor` in the latest versions of **ktrain** and **transformers**.  
 For instance, suppose you trained a DistilBERT model and saved the resultant predictor using an older version of **ktrain** with: `predictor.save('/tmp/my_predictor/')`.  After upgrading to the newest version of **ktrain**,  you will find that `ktrain.load_predictor('/tmp/my_predictor`) will throw an error unless you follow one of the two approaches below:  
-**Approach 1: Manually edit `tf_model.preproc` file**  
-Open `tf_model.preproc` with an editor like **vim** and edit it as follows:  
+    **Approach 1: Manually edit `tf_model.preproc` file**  
+    Open `tf_model.preproc` with an editor like **vim** and edit it as follows:  
     ```python
     # change `transformers.configuration_distilbert` to `transformers.models.distilbert.configuration_distilbert`
     # change `transformers.modeling_tf_auto` to `transformers.models.auto.modeling_tf_auto`
     # change `transformers.tokenization_auto` to `transformers.models.auto.tokenization_auto`  
     ```
-The above was confirmed to work using the **vim** editor on Linux.   
-**Approach 2: Re-generate `tf_model.preproc` file**:  
+    The above was confirmed to work using the **vim** editor on Linux.   
+    **Approach 2: Re-generate `tf_model.preproc` file**:  
 	```python
 	# Step 1: preprocess the original training set (e.g., by invoking Transformer, texts_from_folder, etc.)
 	# NOTE:
