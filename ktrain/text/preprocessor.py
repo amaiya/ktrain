@@ -420,7 +420,8 @@ class TextPreprocessor(Preprocessor):
 
     def check_trained(self):
         if not self.preprocess_train_called:
-            raise Exception('preprocess_train must be called')
+            warnings.warn('The method preprocess_train was never called. You can disable this warning by setting preprocess_train_called=True.')
+            #raise Exception('preprocess_train must be called')
 
 
     def get_preprocessor(self):
