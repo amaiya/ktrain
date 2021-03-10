@@ -1011,7 +1011,9 @@ class TransformersPreprocessor(TextPreprocessor):
                 try:
                     model = self.model_type.from_pretrained(mname, config=self.config, from_pt=True)
                 except:
-                    raise ValueError('could not load pretrained model %s using both from_pt=False and from_pt=True' % (mname))
+                    # load model as normal to expose error to user
+                    model = self.model_type.from_pretrained(mname, config=self.config)
+                    #raise ValueError('could not load pretrained model %s using both from_pt=False and from_pt=True' % (mname))
         else:
             model = self.model_type.from_pretrained(mname, num_labels=num_labels)
         return model
