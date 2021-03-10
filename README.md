@@ -26,7 +26,7 @@ For instance, suppose you trained a DistilBERT model and saved the resultant pre
 
     **Approach 2: Re-generate `tf_model.preproc` file**:  
 	```python
-	# Step 1: preprocess the original training set (e.g., by invoking Transformer, texts_from_folder, etc.)
+	# Step 1: Re-create a Preprocessor instance
 	# NOTES:
 	# 1. If training set is large, you can use a sample containing at least one example for each class
 	# 2. Labels must be in same format as you originally used
@@ -35,7 +35,6 @@ For instance, suppose you trained a DistilBERT model and saved the resultant pre
 
 	preproc = text.Transformer(MODEL_NAME, maxlen=500, class_names=class_names)
 	trn = preproc.preprocess_train(x_train, y_train)
-        #preproc.preprocess_train_called=True
 
 	# Step 2: load the transformers model from predictor folder
 	from transformers import *
