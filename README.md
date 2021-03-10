@@ -18,9 +18,9 @@ For instance, suppose you trained a DistilBERT model and saved the resultant pre
     **Approach 1: Manually edit `tf_model.preproc` file:**  
     Open `tf_model.preproc` with an editor like **vim** and edit it as follows:  
     ```python
-    # change `transformers.configuration_distilbert` to `transformers.models.distilbert.configuration_distilbert`
-    # change `transformers.modeling_tf_auto` to `transformers.models.auto.modeling_tf_auto`
-    # change `transformers.tokenization_auto` to `transformers.models.auto.tokenization_auto`  
+    # change transformers.configuration_distilbert to transformers.models.distilbert.configuration_distilbert
+    # change transformers.modeling_tf_auto to transformers.models.auto.modeling_tf_auto
+    # change transformers.tokenization_auto to transformers.models.auto.tokenization_auto  
     ```
     The above was confirmed to work using the **vim** editor on Linux.   
 
