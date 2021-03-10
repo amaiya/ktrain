@@ -16,7 +16,7 @@ Note that, `transformers>=4.0.0` included a complete reogranization of the modul
 For instance, suppose you trained a DistilBERT model and saved the resultant predictor using an older version of **ktrain** with: `predictor.save('/tmp/my_predictor/')`.  After upgrading to the newest version of **ktrain**,  you will find that `ktrain.load_predictor('/tmp/my_predictor`) will throw an error unless you follow one of the two approaches below:  
 
     **Approach 1: Manually edit `tf_model.preproc` file:**  
-    Open `tf_model.preproc` with an editor like **vim** and edit it to replace old module locations with new module locations:  
+    Open `tf_model.preproc` with an editor like **vim** and edit it to replace old module locations with new module locations (changes below show example changes for a DistilBERT model):  
     ```python
     # change transformers.configuration_distilbert to transformers.models.distilbert.configuration_distilbert
     # change transformers.modeling_tf_auto to transformers.models.auto.modeling_tf_auto
