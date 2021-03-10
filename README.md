@@ -16,7 +16,7 @@ Note that, `transformers>=4.0.0` included a complete reogranization of the modul
 For instance, suppose you trained a DistilBERT model and saved the resultant predictor using an older version of **ktrain** with: `predictor.save('/tmp/my_predictor/')`.  After upgrading to the newest version of **ktrain**,  you will find that `ktrain.load_predictor('/tmp/my_predictor`) will throw an error unless you follow one of the two approaches below:  
 
     **Approach 1: Manually edit `tf_model.preproc` file:**  
-    Open `tf_model.preproc` with an editor like **vim** and edit it as follows:  
+    Open `tf_model.preproc` with an editor like **vim** and edit it to replace old module locations with new module locations:  
     ```python
     # change transformers.configuration_distilbert to transformers.models.distilbert.configuration_distilbert
     # change transformers.modeling_tf_auto to transformers.models.auto.modeling_tf_auto
@@ -27,11 +27,15 @@ For instance, suppose you trained a DistilBERT model and saved the resultant pre
     **Approach 2: Re-generate `tf_model.preproc` file**:  
 	```python
 	# Step 1: preprocess the original training set (e.g., by invoking Transformer, texts_from_folder, etc.)
-	# NOTE:
-	# 1. if training set is large, you can use a sample containing at least one example for each class
-	# 2. labels must be in same format as you originally used
+	# NOTES:
+	# 1. If training set is large, you can use a sample containing at least one example for each class
+	# 2. Labels must be in same format as you originally used
+        # 3. If original training set is not easily accessible, set preproc.preprocess_train_called=True 
+        #    below instead of invoking preproc.preprocess_train(x_train, y_train)
+
 	preproc = text.Transformer(MODEL_NAME, maxlen=500, class_names=class_names)
 	trn = preproc.preprocess_train(x_train, y_train)
+        #preproc.preprocess_train_called=True
 
 	# Step 2: load the transformers model from predictor folder
 	from transformers import *
