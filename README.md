@@ -30,8 +30,8 @@ For instance, suppose you trained a DistilBERT model and saved the resultant pre
 	# NOTES:
 	# 1. If training set is large, you can use a sample containing at least one example for each class
 	# 2. Labels must be in same format as you originally used
-        # 3. If original training set is not easily accessible, set preproc.preprocess_train_called=True 
-        #    below instead of invoking preproc.preprocess_train(x_train, y_train)
+	# 3. If original training set is not easily accessible, set preproc.preprocess_train_called=True 
+	#    below instead of invoking preproc.preprocess_train(x_train, y_train)
 
 	preproc = text.Transformer(MODEL_NAME, maxlen=500, class_names=class_names)
 	trn = preproc.preprocess_train(x_train, y_train)
