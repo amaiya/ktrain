@@ -20,7 +20,7 @@ Open `tf_model.preproc` with an editor like **vim** and edit it as follows:
     - change `transformers.modeling_tf_auto` to `transformers.models.auto.modeling_tf_auto`
     - change `transformers.tokenization_auto` to `transformers.models.auto.tokenization_auto`
   
-**Approach 2: Re-generate `tf_model.preproc` file**: 
+**Approach 2: Re-generate `tf_model.preproc` file**:  
 	```python
 	# Step 1: preprocess the original training set (e.g., by invoking Transformer, texts_from_folder, etc.)
 	# NOTE:
