@@ -896,7 +896,7 @@ print("predicted class: %s" % (class_names[np.argmax(sess.run(None, tokens)[0])]
 
 The example above assumes the model saved at `predictor_path` was trained on a subset of the 20 Newsgroup corpus as was done in [this tutorial](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-A3-hugging_face_transformers.ipynb).
 
-You can also use **ktrain** to create ONNX models directly from TensorFlow with: 
+You can also use **ktrain** to create ONNX models directly from TensorFlow with (which can be used for non-transformers TensorFlow models): 
 ```python
 predictor.export_model_to_onnx(onnx_model_path)
 ```
