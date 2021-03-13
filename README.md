@@ -68,7 +68,7 @@ answers = qa.ask('What is ktrain?', batch_size=8)
 #   "ktrain is a low-code platform for machine learning"
 ```
 - **2020-11-04**
-  - ***ktrain*** **v0.24.x is released** and now includes built-in support for exporting models to [ONNX](https://onnx.ai/) and  [TensorFlow Lite](https://www.tensorflow.org/lite).    See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/ktrain-ONNX-TFLite-examples.ipynb) for more information.
+  - ***ktrain*** **v0.24.x is released** and now includes built-in support for exporting models to [ONNX](https://onnx.ai/) and  [TensorFlow Lite](https://www.tensorflow.org/lite).    See the [example notebook](https://github.com/amaiya/ktrain/blob/develop/examples/text/ktrain-ONNX-TFLite-examples.ipynb) for more information.
 ----
 
 ### Overview
