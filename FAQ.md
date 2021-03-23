@@ -1007,6 +1007,7 @@ Examples include:
 - **local government:**: auto-categorizing citizen complaints to local governments
 - **federal government:** extracting insights from documents about government programs and policies
 
+
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
 
 
