@@ -52,7 +52,6 @@ class NERPredictor(Predictor):
         x_true, _ = nerseq[0]
         lengths = nerseq.get_lengths(0)
         y_pred = self.model.predict_on_batch(x_true)
-        print(y_pred.shape)
         y_labels = self.preproc.p.inverse_transform(y_pred, lengths)
         y_labels = y_labels[0]
         if return_proba:
