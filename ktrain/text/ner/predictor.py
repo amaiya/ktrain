@@ -52,8 +52,9 @@ class NERPredictor(Predictor):
         batches = U.list2chunks(sentences, n=num_chunks)
 
         # process batches
+        results = []
         for batch in batches:
-            nerseq = self.preproc.preprocess(sentences, lang=lang, custom_tokenizer=custom_tokenizer)
+            nerseq = self.preproc.preprocess(batch, lang=lang, custom_tokenizer=custom_tokenizer)
             if not nerseq.prepare_called:
                 nerseq.prepare()
             nerseq.batch_size = len(batch)
@@ -66,19 +67,16 @@ class NERPredictor(Predictor):
                     probs = np.max(y_pred, axis=2)
                 except:
                     probs = y_pred[0].numpy().tolist() # TODO: remove after confirmation (#316)
-                results = []
                 for x, y, prob in zip(nerseq.x, y_labels, probs):
                     result = [(x[i], y[i], prob[i]) for i in range(len(x))]
                     results.append(result)
-                return results
             else:
-                results = []
                 for x,y in zip(nerseq.x, y_labels):
                     result =  list(zip(x,y))
                     if merge_tokens:
                         result = self.merge_tokens(result, lang)
                     results.append(result)
-                return results
+        return results
 
 
 
