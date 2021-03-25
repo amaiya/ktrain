@@ -26,11 +26,11 @@ class NERPredictor(Predictor):
         return self.c
 
 
-    def predict(self, sentence, return_proba=False, merge_tokens=False, custom_tokenizer=None):
+    def predict(self, sentences, return_proba=False, merge_tokens=False, custom_tokenizer=None):
         """
         Makes predictions for a string-representation of a sentence
         Args:
-          sentence(str): sentence of text
+          sentences(list|str): either a single sentence as a string or a list of sentences
           return_proba(bool): If return_proba is True, returns probability distribution for each token
           merge_tokens(bool):  If True, tokens will be merged together by the entity
                                to which they are associated:
@@ -38,33 +38,48 @@ class NERPredictor(Predictor):
           custom_tokenizer(Callable): If specified, sentence will be tokenized based on custom tokenizer
 
         Returns:
-          list: list of tuples representing each token.
+          list: a list  of lists:  Each inner list represents a sentence and contains a tuple for each token in sentence
         """
-        if not isinstance(sentence, str):
-            raise ValueError('Param sentence must be a string-representation of a sentence')
+        if not isinstance(sentences, (str, list)):
+            raise ValueError('Param sentence must be either string-representation of a sentence or a list of sentence strings.')
         if return_proba and merge_tokens:
             raise ValueError('return_proba and merge_tokens are mutually exclusive with one another.')
-        lang = TU.detect_lang([sentence])
-        nerseq = self.preproc.preprocess([sentence], lang=lang, custom_tokenizer=custom_tokenizer)
-        if not nerseq.prepare_called:
-            nerseq.prepare()
-        nerseq.batch_size = self.batch_size
-        x_true, _ = nerseq[0]
-        lengths = nerseq.get_lengths(0)
-        y_pred = self.model.predict_on_batch(x_true)
-        y_labels = self.preproc.p.inverse_transform(y_pred, lengths)
-        y_labels = y_labels[0]
-        if return_proba:
-            try:
-                probs = np.max(y_pred, axis=2)[0]
-            except:
-                probs = y_pred[0].numpy().tolist() # TODO: remove after confirmation (#316)
-            return list(zip(nerseq.x[0], y_labels, probs))
-        else:
-            result =  list(zip(nerseq.x[0], y_labels))
-            if merge_tokens:
-                result = self.merge_tokens(result, lang)
-            return result
+        if isinstance(sentences, str): sentences = [sentences]
+        lang = TU.detect_lang(sentences)
+
+        # batchify
+        num_chunks = math.ceil(len(sentences)/self.batch_size)
+        batches = U.list2chunks(sentences, n=num_chunks)
+
+        # process batches
+        for batch in batches:
+            nerseq = self.preproc.preprocess(sentences, lang=lang, custom_tokenizer=custom_tokenizer)
+            if not nerseq.prepare_called:
+                nerseq.prepare()
+            nerseq.batch_size = len(batch)
+            x_true, _ = nerseq[0]
+            lengths = nerseq.get_lengths(0)
+            y_pred = self.model.predict_on_batch(x_true)
+            y_labels = self.preproc.p.inverse_transform(y_pred, lengths)
+            if return_proba:
+                try:
+                    probs = np.max(y_pred, axis=2)
+                except:
+                    probs = y_pred[0].numpy().tolist() # TODO: remove after confirmation (#316)
+                results = []
+                for x, y, prob in zip(nerseq.x, y_labels, probs):
+                    result = [(x[i], y[i], prob[i]) for i in range(len(x))]
+                    results.append(result)
+                return results
+            else:
+                results = []
+                for x,y in zip(nerseq.x, y_labels):
+                    result =  list(zip(x,y))
+                    if merge_tokens:
+                        result = self.merge_tokens(result, lang)
+                    results.append(result)
+                return results
+
 
 
     def merge_tokens(self, annotated_sentence, lang):
@@ -105,5 +120,7 @@ class NERPredictor(Predictor):
             elif tag and current_token:  #  prefix I
                 current_token = current_token + sep + token
                 current_tag = tag
+        if current_token and current_tag:
+            entities.append((current_token, current_tag))
         return entities
 
