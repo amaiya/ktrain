@@ -70,6 +70,8 @@
 
 - [How do I make quantized predictions with `transformers` models?](#how-do-i-make-quantized-predictions-with-transformers-models)
 
+- [How do increase batch size for predictions?](#how-do-i-increase-batch-size-for-predictions)
+
 
 
 ---
@@ -989,6 +991,23 @@ def reset_random_seeds(seed=2):
 
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
+
+
+### How do increase batch size for predictions?
+
+The `get_predictor` and `load_predictor` functions both accept a `batch_size` argument that will be used when making predictions on lists of examples. The default is 32.  The `batch_size` for `Predictor` instances can also be set manually:
+```python
+predictor = ktrain.load_predictor('/tmp/my_predictor')
+predictor.batch_size = 128
+predictor.predict(list_of_examples)
+```
+
+The `get_learner` function accepts an `eval_batch_size` argument that will be used by the `Learner` instance when evaluating a validation or test dataset (e.g., `learner.predict`).
+
+
+[[Back to Top](#frequently-asked-questions-about-ktrain)]
+
+
 
 
 ### What kinds of applications have been built with *ktrain*?
