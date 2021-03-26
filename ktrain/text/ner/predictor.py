@@ -38,7 +38,7 @@ class NERPredictor(Predictor):
           custom_tokenizer(Callable): If specified, sentence will be tokenized based on custom tokenizer
 
         Returns:
-          list: If sentences is a string representation of sentence:
+          list: If sentences is a string representation of single sentence:
                      list containing a tuple for each token in sentence
                 IF sentences is a list of sentences:
                      list  of lists:  Each inner list represents a sentence and contains a tuple for each token in sentence
