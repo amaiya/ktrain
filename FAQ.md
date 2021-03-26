@@ -1002,7 +1002,7 @@ predictor.batch_size = 128
 predictor.predict(list_of_examples)
 ```
 
-The `get_learner` function accepts an `eval_batch_size` argument that will be used by the `Learner` instance when evaluating a validation or test dataset (e.g., `learner.predict`).
+The `get_learner` function accepts an `eval_batch_size` argument that will be used by the `Learner` instance when evaluating a validation dataset (e.g., `learner.predict`).
 
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
