@@ -38,8 +38,12 @@ class NERPredictor(Predictor):
           custom_tokenizer(Callable): If specified, sentence will be tokenized based on custom tokenizer
 
         Returns:
-          list: a list  of lists:  Each inner list represents a sentence and contains a tuple for each token in sentence
+          list: If sentences is a string representation of sentence:
+                     list containing a tuple for each token in sentence
+                IF sentences is a list of sentences:
+                     list  of lists:  Each inner list represents a sentence and contains a tuple for each token in sentence
         """
+        is_array = not isinstance(sentences, str)
         if not isinstance(sentences, (str, list)):
             raise ValueError('Param sentence must be either string-representation of a sentence or a list of sentence strings.')
         if return_proba and merge_tokens:
@@ -76,6 +80,7 @@ class NERPredictor(Predictor):
                     if merge_tokens:
                         result = self.merge_tokens(result, lang)
                     results.append(result)
+        if not is_array: results = results[0]
         return results
 
 
