@@ -72,6 +72,8 @@
 
 - [How do I increase batch size for predictions?](#how-do-i-increase-batch-size-for-predictions)
 
+- [How do I speed up predictions?](#how-do-i-increase-batch-size-for-predictions)
+
 
 
 ---
@@ -994,6 +996,8 @@ def reset_random_seeds(seed=2):
 
 
 ### How do I increase batch size for predictions?
+
+Increasing the batch size used for inference and predictions can potentially speed up predictions on lists of examples.
 
 The `get_predictor` and `load_predictor` functions both accept a `batch_size` argument that will be used when making predictions on lists of examples. The default is 32.  The `batch_size` for `Predictor` instances can also be set manually:
 ```python
