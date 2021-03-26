@@ -70,7 +70,7 @@
 
 - [How do I make quantized predictions with `transformers` models?](#how-do-i-make-quantized-predictions-with-transformers-models)
 
-- [How do increase batch size for predictions?](#how-do-i-increase-batch-size-for-predictions)
+- [How do increase batch size for predictions?](#how-do-increase-batch-size-for-predictions)
 
 
 
