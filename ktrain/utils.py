@@ -704,6 +704,8 @@ class YTransformDataFrame(YTransform):
         for i, col in enumerate(new_lab_cols):
             df[col] = targets[:,i]
         df[new_lab_cols] = targets
+        print(new_lab_cols)
+        print(df[new_lab_cols].head())
         df[new_lab_cols] = df[new_lab_cols].astype('float32')
 
         return df

@@ -49,8 +49,8 @@ class TextPredictor(Predictor):
         if U.is_huggingface(model=self.model):
             tseq = self.preproc.preprocess_test(texts, verbose=0)
             tseq.batch_size = self.batch_size
-            texts = tseq.to_tfdataset(train=False)
-            preds = self.model.predict(texts)
+            tfd = tseq.to_tfdataset(train=False)
+            preds = self.model.predict(tfd)
             if type(preds).__name__ == 'TFSequenceClassifierOutput': # dep_fix: undocumented breaking change in transformers==4.0.0
                 preds = preds.logits
             
