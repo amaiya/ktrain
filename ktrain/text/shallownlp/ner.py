@@ -68,15 +68,10 @@ class NER:
                                ('Paul', 'B-PER'), ('Newman', 'I-PER') becomes ('Paul Newman', 'PER')
         """
         if isinstance(texts, str): texts = [texts]
-        results = []
-        for text in texts:
-            text = text.strip()
-            result = self.predictor.predict(text, merge_tokens=merge_tokens)
-            #if merge_tokens:
-                #result = self.merge_tokens(result)
-            results.append(result)
-        if len(result) == 1: result = result[0]
-        return result
+        texts = [t.strip() for t in texts]
+        results = self.predictor.predict(texts, merge_tokens=merge_tokens)
+        if len(results) == 1: results = results[0]
+        return results
 
 
     # 2020-04-30: moved to text.ner.predictor
