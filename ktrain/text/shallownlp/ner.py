@@ -57,7 +57,7 @@ class NER:
         self.predictor = ktrain.load_predictor(fpath)
 
 
-    def predict(self, texts, merge_tokens=True):
+    def predict(self, texts, merge_tokens=True, batch_size=32):
         """
         Extract named entities from supplied text
 
@@ -66,8 +66,10 @@ class NER:
           merge_tokens(bool):  If True, tokens will be merged together by the entity
                                to which they are associated:
                                ('Paul', 'B-PER'), ('Newman', 'I-PER') becomes ('Paul Newman', 'PER')
+          batch_size(int):    Batch size to use for predictions (default:32)
         """
         if isinstance(texts, str): texts = [texts]
+        self.predictor.batch_size = batch_size
         texts = [t.strip() for t in texts]
         results = self.predictor.predict(texts, merge_tokens=merge_tokens)
         if len(results) == 1: results = results[0]
