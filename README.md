@@ -107,6 +107,8 @@ answers = qa.ask('What is ktrain?', batch_size=8)
 - load and preprocess text and image data from a variety of formats 
 - inspect data points that were misclassified and [provide explanations](https://eli5.readthedocs.io/en/latest/) to help improve your model
 - leverage a simple prediction API for saving and deploying both models and data-preprocessing steps to make predictions on new raw data
+- built-in support for exporting models to [ONNX](https://onnx.ai/) and  [TensorFlow Lite](https://www.tensorflow.org/lite) allowing for deployments with small memory/storage footprints (see example notebook](https://github.com/amaiya/ktrain/blob/develop/examples/text/ktrain-ONNX-TFLite-examples.ipynb) for more information)
+
 
 
 ### Tutorials
