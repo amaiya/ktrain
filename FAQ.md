@@ -68,6 +68,8 @@
 
 - [Running `predictor.explain` for text classification is slow.  How can I speed it up?](#running-predictorexplain-for-text-classification-is-slow--how-can-i-speed-it-up)
 
+- [Running `preprocess_train` for Transformer models is slow.  How can I speed it up?](#running-preprocess_train-for-transformers-models-is-slow--how-can-i-speed-it-up)
+
 - [How do I make quantized predictions with `transformers` models?](#how-do-i-make-quantized-predictions-with-transformers-models)
 
 - [How do I increase batch size for predictions?](#how-do-i-increase-batch-size-for-predictions)
@@ -726,6 +728,47 @@ The `TextPredictor.explain` method accepts a parameter called `n_samples`, which
 If you pass `n_samples=500` to `explain`, results are returned in ~5 seconds on Google Colab.  In theory, higher sample sizes  yield better explanations. In practice,
 smaller sample sizes (e.g., 500, 1000) may be sufficient for your use case.
 
+
+[[Back to Top](#frequently-asked-questions-about-ktrain)]
+
+
+### Running `preprocess_train` for Transformer models is slow.  How can I speed it up?
+
+Preprocessing data for `transformers` text classification models using the `Transformer` API typically looks something like this:
+```python
+from ktrain import text
+MODEL_NAME = 'distilbert-base-uncased'
+t = text.Transformer(MODEL_NAME, maxlen=500, class_names=label_names)
+trn = t.preprocess_train(x_train, y_train)
+val = t.preprocess_test(x_test, y_test)
+```
+The `preprocess_train` and `preprocess_test` methods are not currently parallelized to use multiple CPU cores.  Some users have used [dask](https://github.com/dask/dask) to parallelize the preprocessing using something like this:
+
+```python
+import dask
+def preproc(x, labels = labels):
+    MODEL_NAME = 'distilbert-base-uncased'
+    t = text.Transformer(MODEL_NAME, maxlen=80, class_names = labels, multilabel=True)
+    res = t.preprocess_train(x['text_a'].values.tolist(),x['label'].values.tolist(), verbose=0)
+    return(res)
+
+results = []
+partitions = train.to_delayed()
+for part in partitions:
+    results.append(dask.delayed(preproc)(part))
+
+results = client.compute(results)
+
+trn = results[0].result()
+x = [r.result().x for r in results]
+y = [r.result().y for r in results]
+numlabels = np.max([yy.shape[1] for yy in y])
+y = [np.pad(yy,[0,numlabels - yy.shape[1]], 'constant', constant_values = 0) for yy in y]
+trn.x  = np.concatenate(x, axis = 0)
+trn.y  = np.concatenate(y, axis = 0)
+```
+
+Note, however, that the power of transfer learning is being able to use smaller training sets to fine-tune your model. So, perhaps make sure you really need an extremely large training set before you try parallelizing the preprocessing.
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
 
