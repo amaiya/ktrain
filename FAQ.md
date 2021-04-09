@@ -68,7 +68,7 @@
 
 - [Running `predictor.explain` for text classification is slow.  How can I speed it up?](#running-predictorexplain-for-text-classification-is-slow--how-can-i-speed-it-up)
 
-- [Running `preprocess_train` for Transformer models is slow.  How can I speed it up?](#running-preprocess_train-for-transformers-models-is-slow--how-can-i-speed-it-up)
+- [Running `preprocess_train` for Transformer models is slow.  How can I speed it up?](#running-preprocess_train-for-transformer-models-is-slow--how-can-i-speed-it-up)
 
 - [How do I make quantized predictions with `transformers` models?](#how-do-i-make-quantized-predictions-with-transformers-models)
 
