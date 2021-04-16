@@ -164,7 +164,7 @@ model.compile(loss='categorical_crossentropy',optimizer='adam', metrics=['accura
 learner = ktrain.get_learner(model, train_data=trn, val_data=val)
 learner.fit_onecycle(2e-5, 1)
 ```
-Note that the above assumes 2 classes.  If you have more than two classes, you'll need to supply this as an argument to `TFAutoModelForSequenceClassification.from_pretrained`.  See the `transformers` documentation for more detail.
+**Note:**  You may need to supply the number of classes as an argument to `TFAutoModelForSequenceClassification.from_pretrained`.  See the `transformers` documentation for more detail.  **Method 1** does this automatically for you.
 
 #### Method 3: Using `checkpoint_folder` argument to save model weights
 
