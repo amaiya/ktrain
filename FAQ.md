@@ -143,7 +143,7 @@ ktrain.get_predictor(model, preproc).save('/tmp/my_predictor')
 model = ktrain.load_predictor('/tmp/my_predictor').model
 
 # re-instantiate Learner and continue training
-learner = ktrain.get_learner(model, train_data=trn, val_data=val)
+learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=8)
 learner.fit_onecycle(2e-5, 1)
 ```
 Note that `preproc` here is a *Preprocessor* instance.  If using a data-loading function like `texts_from_csv` or `images_from_folder`, it will be the third return value from the function. Or, if using the [Transformer API](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-A3-hugging_face_transformers.ipynb) for text classification, it will be the output of invoking `text.Transformer` (i.e., `preproc = text.Transformer('bert-base-uncased', ...)`).  Also, `trn` and `val` are typically the result of invoking `preproc.preprocess_train` and `preproc.preprocess_test`, respectively.
@@ -161,7 +161,7 @@ model = TFAutoModelForSequenceClassification.from_pretrained('/tmp/my_model')
 model.compile(loss='categorical_crossentropy',optimizer='adam', metrics=['accuracy'])
 
 # re-instantiate Learner and continue training
-learner = ktrain.get_learner(model, train_data=trn, val_data=val)
+learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=8)
 learner.fit_onecycle(2e-5, 1)
 ```
 **Note:**  You may need to supply the number of classes as an argument to `TFAutoModelForSequenceClassification.from_pretrained`.  See the `transformers` documentation for more detail.  **Method 1** does this automatically for you.
