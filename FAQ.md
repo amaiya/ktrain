@@ -134,7 +134,7 @@ type a question mark before the method and press ENTER in a Google Colab or Jupy
 
 This answer shows different ways to save/reload a model and resume training.
 
-#### Method 1: Using Predictor API (works for any model)
+#### Method 1: Using Predictor API (RECOMMENDED - works for any model)
 ```python
 # save Predictor (i.e., model and Preprocessor instance) after partially training
 ktrain.get_predictor(model, preproc).save('/tmp/my_predictor')
@@ -164,6 +164,7 @@ model.compile(loss='categorical_crossentropy',optimizer='adam', metrics=['accura
 learner = ktrain.get_learner(model, train_data=trn, val_data=val)
 learner.fit_onecycle(2e-5, 1)
 ```
+Note that the above assumes 2 classes.  If you have more than two classes, you'll need to supply this as an argument to `TFAutoModelForSequenceClassification.from_pretrained`.  See the `transformers` documentation for more detail.
 
 #### Method 3: Using `checkpoint_folder` argument to save model weights
 
