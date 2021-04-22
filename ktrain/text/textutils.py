@@ -7,7 +7,7 @@ DEFAULT_TOKEN_PATTERN = (r"\b[a-zA-Z][a-zA-Z0-9]*(?:[_/&-][a-zA-Z0-9]+)+\b|"
 
 
 
-def extract_copy(corpus_path, output_path):
+def extract_copy(corpus_path, output_path, verbose=0):
     """
     Crawl <corpus_path>, extract plain text from documents
     and then copy them to output_path.
@@ -15,6 +15,7 @@ def extract_copy(corpus_path, output_path):
     Args:
         corpus_path(str):  root folder containing documents
         output_path(str):  root folder of output directory
+        verbose(bool):  Default:0.  Set to 1 (or True) to see error details on why each skipped document was skipped.
     Returns:
         list: list of skipped filenames
     """
@@ -37,7 +38,9 @@ def extract_copy(corpus_path, output_path):
                     text = str.encode(text)
             else:
                 text = textract.process(filename)
-        except:
+        except Exception as e:
+            if verbose:
+                print('ERROR on %s:\n%s' % (filename, e))
             num_skipped += 1
             if not mtype:
                 mtype =  os.path.splitext(filename)[1]
