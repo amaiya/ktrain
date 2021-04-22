@@ -14,6 +14,7 @@ Most recent releases are shown at the top. Each release shows:
 ### Changed
 - `shallownlp.ner.NER.predict` processes lists of sentences in batches resulting in faster predictions
 - `batch_size` argument added to `shallownlp.ner.NER.predict`
+- added `verbose` parameter to `ktrain.text.textutils.extract_copy` to optionally see why each skipped document was skipped
 
 ### Fixed:
 - N/A
