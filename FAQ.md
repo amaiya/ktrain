@@ -367,6 +367,12 @@ provided the cache folder (i.e. `<home_directory>/.cache/torch/transformers`), c
 needs to be present in the cache for these scenarios.
 
 
+Note also that the local path you supply to `Transformer` is stored in `t.model_name`, where `t` is a `Preprocessor` instance.  If creating a `Predictor` and transferring it to another machine, you may need to update this path:
+```python
+predictor.preproc.model_name = 'path/to/predictor/on/new/machine'
+```
+
+
 
 #### Example 2: Open-Domain QA (with no internet)
 
