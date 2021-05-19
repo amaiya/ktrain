@@ -1545,6 +1545,18 @@ def _load_model(fpath, preproc=None, train_data=None, custom_objects=None):
        (train_data and U.is_huggingface(data=train_data)):
         if preproc:
             model = preproc.get_model(fpath=fpath)
+            # Perform check in get_tokenizer
+            ##--------------------------------------------
+            ## try both model_name and fpath for tokenizer
+            #try:
+            #    tok = preproc.get_tokenizer()
+            #except:
+            #    print('failed %s'% (preproc.model_name))
+            #    try:
+            #        tok = preproc.get_tokenizer(fpath=fpath)
+            #    except:
+            #        raise Exception('Could not load tokenizer from either %s or %s.  Please copy tokenizer files to one of these paths.' % (fpath, preproc.model_name))
+            ##--------------------------------------------
         else:
             model = TransformersPreprocessor.load_model_and_configure_from_data(fpath, train_data)
         return model

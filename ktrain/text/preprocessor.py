@@ -877,18 +877,24 @@ class TransformersPreprocessor(TextPreprocessor):
     def get_tokenizer(self, fpath=None):
         model_name = self.model_name if fpath is None else fpath
         if self.tok is None:
-            # use fast tokenizer if possible
-            if self.name == 'bert' and 'japanese' not in model_name:
-                from transformers import BertTokenizerFast
-                self.tok = BertTokenizerFast.from_pretrained(model_name)
-            elif self.name == 'distilbert':
-                from transformers import DistilBertTokenizerFast
-                self.tok = DistilBertTokenizerFast.from_pretrained(model_name)
-            elif self.name == 'roberta':
-                from transformers import RobertaTokenizerFast
-                self.tok = RobertaTokenizerFast.from_pretrained(model_name)
-            else:
-                self.tok = self.tokenizer_type.from_pretrained(model_name)
+            try:
+                # use fast tokenizer if possible
+                if self.name == 'bert' and 'japanese' not in model_name:
+                    from transformers import BertTokenizerFast
+                    self.tok = BertTokenizerFast.from_pretrained(model_name)
+                elif self.name == 'distilbert':
+                    from transformers import DistilBertTokenizerFast
+                    self.tok = DistilBertTokenizerFast.from_pretrained(model_name)
+                elif self.name == 'roberta':
+                    from transformers import RobertaTokenizerFast
+                    self.tok = RobertaTokenizerFast.from_pretrained(model_name)
+                else:
+                    self.tok = self.tokenizer_type.from_pretrained(model_name)
+            except:
+                error_msg = f"Could not load tokenizer from model_name: {model_name}. " +\
+                            f"If {model_name} is a local path, please make sure it exists and contains tokenizer files from Hugging Face. " +\
+                            f"You can also reset model_name with preproc.model_name = '/your/new/path'."
+                raise ValueError(error_msg)
         return self.tok
 
 

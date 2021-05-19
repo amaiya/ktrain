@@ -165,6 +165,9 @@ class TextPredictor(Predictor):
     def _save_model(self, fpath):
         if isinstance(self.preproc, TransformersPreprocessor):
             self.model.save_pretrained(fpath)
+            # As of 0.26.3, make sure we save tokenizer in predictor folder
+            tok = self.preproc.get_tokenizer()
+            tok.save_pretrained(fpath)
         else:
             super()._save_model(fpath)
         return
