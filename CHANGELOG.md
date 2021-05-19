@@ -18,6 +18,8 @@ Most recent releases are shown at the top. Each release shows:
 
 ### Fixed:
 - Changed `TextPredictor.save` to save Hugging Face tokenizer files locally to ensure they can be easily reloaded when `text.Transformer` is supplied with local path.
+- For `transformers` models, the `predictor.preproc.model_name` variable is automatically updated to be new `Predictor` folder to avoid having users manually update `model_name`.  Applies
+  when a local path is supplied to `text.Transformer` and resultant `Predictor` is moved to new machine.
 
 
 ## 0.26.2 (2021-03-26)
