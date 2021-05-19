@@ -6,7 +6,7 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
-## 0.26.3 (TBD)
+## 0.26.3 (2021-05-19)
 
 ### New:
 - N/A
@@ -17,7 +17,7 @@ Most recent releases are shown at the top. Each release shows:
 - added `verbose` parameter to `ktrain.text.textutils.extract_copy` to optionally see why each skipped document was skipped
 
 ### Fixed:
-- N/A
+- Changed `TextPredictor.save` to save Hugging Face tokenizer files locally to ensure they can be easily reloaded when `text.Transformer` is supplied with local path.
 
 
 ## 0.26.2 (2021-03-26)
