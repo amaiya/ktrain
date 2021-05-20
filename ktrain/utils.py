@@ -66,6 +66,13 @@ def metrics_from_model(model):
             except:
                 warnings.warn(msg)
                 return []
+        elif isinstance(mlist, list) and hasattr(mlist[0], 'name'): # tf.keras.metrics.AUC()
+            try:
+                return [m.name for m in mlist]
+            except:
+                warnings.warn(msg)
+                return []
+
         else:
             warnings.warn(msg)
             return []
@@ -97,6 +104,8 @@ def is_classifier(model):
     else:
         mlist = metrics_from_model(model)
         if isinstance(mlist, (list, np.ndarray)) and any(['accuracy' in m for m in mlist]):
+            is_classifier = True
+        elif isinstance(mlist, (list, np.ndarray)) and any(['auc' in m for m in mlist]):
             is_classifier = True
 
     # check for multilabel
