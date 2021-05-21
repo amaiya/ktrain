@@ -1015,6 +1015,7 @@ class TransformersPreprocessor(TextPreprocessor):
             try:
                 model = self.model_type.from_pretrained(mname, config=self.config)
             except:
+                warnings.warn('Could not find Tensorflow version of model.  Attempting to download/load PyTorch version as TensorFlow model using from_pt=True')
                 try:
                     model = self.model_type.from_pretrained(mname, config=self.config, from_pt=True)
                 except:
@@ -1271,6 +1272,7 @@ class TransformerEmbedding():
             try:
                 model = self.model_type.from_pretrained(model_name, config=self.config)
             except:
+                warnings.warn('Could not find Tensorflow version of model.  Attempting to download/load PyTorch version as TensorFlow model using from_pt=True')
                 try:
                     model = self.model_type.from_pretrained(model_name, config=self.config, from_pt=True)
                 except:
