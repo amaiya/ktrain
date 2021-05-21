@@ -22,7 +22,7 @@
 
 - [How do I deploy a model using Flask?](#how-do-i-deploy-a-model-using-flask)
 
-- [Why am I getting a *"model must be of instance Model"* error with `load_predictor`?](#why-am-i-getting-a-model-must-be-of-instance-model-error-with-load_predictor)
+- [Why am I getting a 404 client error?](#why-am-i-getting-a-404-client-error)
 
 - [How do I convert a model to ONNX for deployment?](#how-do-i-make-quantized-predictions-with-transformers-models)
 
@@ -793,29 +793,9 @@ Then, using *ktrain*, you can use `ktrain.text.texts_from_df` (or `ktrain.text.t
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
 
-### Why am I getting a *"model must be of instance Model"* error with `load_predictor`?
+### Why am I getting a 404 client error?
 
-This may be an issue with the TensorFlow installation or dependencies. Users have reported that uninstalling and reinstalling **ktrain**, TensorFlow, and its dependencies from scratch can
-resolve the issue. Or, you can just create a new virtual environement for **ktrain**:
-
-```
-python3 -m venv new_ktrain_venv
-cd new_ktrain_venv
-source bin/activate
-pip install -U pip
-pip install tensorflow
-pip install ktrain
-pip install git+https://github.com/amaiya/eli5@tfkeras_0_10_1
-pip install git+https://github.com/amaiya/stellargraph@no_tf_dep_082
-```
-
-After re-installing everything, try loading the predictor again:
-
-```python
-import ktrain
-predictor = ktrain.load_predictor('/path/to/folder')
-```
-
+You can safely ignore the error, if it arises from downloading Hugging Face **transformers** models.  The 404 error simply means that **ktrain** was not able to find a Tensorflow version of this particular model. In this case, the PyTorch version of the  model checkpoint will be downloaded  and then be loaded by **ktrain** as a Tensorflow model for training/fine-tuning. If you type `model.summary()`, it should show that the model was loaded successfully.
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
 
