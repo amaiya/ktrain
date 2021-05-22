@@ -12,7 +12,7 @@ Most recent releases are shown at the top. Each release shows:
 - N/A
 
 ### Changed
-- N/A
+- Added warning when a TensorFlow version of selected `transformers` model is not available and the PyTorch version is being downloaded and converted instead using `from_pt=True`.
 
 ### Fixed:
 - Fixed `utils.metrics_from_model` to support alternative metrics
