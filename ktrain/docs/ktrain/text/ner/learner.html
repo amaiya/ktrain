@@ -1,0 +1,665 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.9.2" />
+<title>ktrain.text.ner.learner API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>ktrain.text.ner.learner</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">from ...imports import *
+from ... import utils as U
+from ...core import GenLearner
+
+
+class NERLearner(GenLearner):
+    &#34;&#34;&#34;
+    Learner for Sequence Taggers.
+    &#34;&#34;&#34;
+
+
+    def __init__(self, model, train_data=None, val_data=None, 
+                 batch_size=U.DEFAULT_BS, eval_batch_size=U.DEFAULT_BS,
+                 workers=1, use_multiprocessing=False):
+        super().__init__(model, train_data=train_data, val_data=val_data, 
+                         batch_size=batch_size, eval_batch_size=eval_batch_size,
+                         workers=workers, use_multiprocessing=use_multiprocessing)
+        return
+
+
+
+    def validate(self, val_data=None, print_report=True, class_names=[]):
+        &#34;&#34;&#34;
+        Validate text sequence taggers
+        &#34;&#34;&#34;
+        val = self._check_val(val_data)
+
+        if not val.prepare_called:
+            val.prepare()
+
+        if not U.is_ner(model=self.model, data=val):
+            warnings.warn(&#39;learner.validate_ner is only for sequence taggers.&#39;)
+            return
+
+        label_true = []
+        label_pred = []
+        for i in range(len(val)):
+            x_true, y_true = val[i]
+            #lengths = self.ner_lengths(y_true)
+            lengths = val.get_lengths(i)
+            y_pred = self.model.predict_on_batch(x_true)
+
+            y_true = val.p.inverse_transform(y_true, lengths)
+            y_pred = val.p.inverse_transform(y_pred, lengths)
+
+            label_true.extend(y_true)
+            label_pred.extend(y_pred)
+
+        score = ner_f1_score(label_true, label_pred)
+        #acc = ner_accuracy_score(label_true, label_pred)
+        if print_report:
+            print(&#39;   F1:  {:04.2f}&#39;.format(score * 100))
+            #print(&#39;   ACC: {:04.2f}&#39;.format(acc * 100))
+            print(ner_classification_report(label_true, label_pred))
+
+        return score
+
+    def top_losses(self, n=4, val_data=None, preproc=None):
+        &#34;&#34;&#34;
+        Computes losses on validation set sorted by examples with top losses
+        Args:
+          n(int or tuple): a range to select in form of int or tuple
+                          e.g., n=8 is treated as n=(0,8)
+          val_data:  optional val_data to use instead of self.val_data
+        Returns:
+            list of n tuples where first element is either 
+            filepath or id of validation example and second element
+            is loss.
+
+        &#34;&#34;&#34;
+        val = self._check_val(val_data)
+        if type(n) == type(42):
+            n = (0, n)
+
+        # get predicictions and ground truth
+        y_pred = self.predict(val_data=val)
+        y_true = self.ground_truth(val_data=val)
+
+        # compute losses and sort
+        losses = []
+        for idx, y_t in enumerate(y_true):
+            y_p = y_pred[idx]
+            #err = 1- sum(1 for x,y in zip(y_t,y_p) if x == y) / len(y_t)
+            err = sum(1 for x,y in zip(y_t,y_p) if x != y) 
+            losses.append(err)
+        tups = [(i,x, y_true[i], y_pred[i]) for i, x in enumerate(losses) if x &gt; 0]
+        tups.sort(key=operator.itemgetter(1), reverse=True)
+
+        # prune by given range
+        tups = tups[n[0]:n[1]] if n is not None else tups
+        return tups
+
+
+    def view_top_losses(self, n=4, preproc=None, val_data=None):
+        &#34;&#34;&#34;
+        Views observations with top losses in validation set.
+        Args:
+         n(int or tuple): a range to select in form of int or tuple
+                          e.g., n=8 is treated as n=(0,8)
+         preproc (Preprocessor): A TextPreprocessor or ImagePreprocessor.
+                                 For some data like text data, a preprocessor
+                                 is required to undo the pre-processing
+                                 to correctly view raw data.
+          val_data:  optional val_data to use instead of self.val_data
+        Returns:
+            list of n tuples where first element is either 
+            filepath or id of validation example and second element
+            is loss.
+
+        &#34;&#34;&#34;
+
+        # check validation data and arguments
+        val = self._check_val(val_data)
+
+        tups = self.top_losses(n=n, val_data=val)
+
+        # get multilabel status and class names
+        classes = preproc.get_classes() if preproc is not None else None
+
+        # iterate through losses
+        for tup in tups:
+
+            # get data
+            idx = tup[0]
+            loss = tup[1]
+            truth = tup[2]
+            pred = tup[3]
+
+            seq = val.x[idx]
+            print(&#39;total incorrect: %s&#39; % (loss))
+            print(&#34;{:15} {:5}: ({})&#34;.format(&#34;Word&#34;, &#34;True&#34;, &#34;Pred&#34;))
+            print(&#34;=&#34;*30)
+            for w, true_tag, pred_tag in zip(seq, truth, pred):
+                print(&#34;{:15}:{:5} ({})&#34;.format(w, true_tag, pred_tag))
+            print(&#39;\n&#39;)
+        return
+
+
+    def save_model(self, fpath):
+        &#34;&#34;&#34;
+        a wrapper to model.save
+        &#34;&#34;&#34;
+        self._make_model_folder(fpath)
+        if U.is_crf(self.model):
+            from .anago.layers import crf_loss
+            self.model.compile(loss=crf_loss, optimizer=U.DEFAULT_OPT)
+        self.model.save(os.path.join(fpath, U.MODEL_NAME), save_format=&#39;h5&#39;)
+        return
+
+
+    def predict(self, val_data=None):
+        &#34;&#34;&#34;
+        Makes predictions on validation set
+        &#34;&#34;&#34;
+        if val_data is not None:
+            val = val_data
+        else:
+            val = self.val_data
+        if val is None: raise Exception(&#39;val_data must be supplied to get_learner or predict&#39;)
+        steps = np.ceil(U.nsamples_from_data(val)/val.batch_size)
+        results = []
+        for idx, (X, y) in enumerate(val):
+            y_pred = self.model.predict_on_batch(X)
+            lengths = val.get_lengths(idx)
+            y_pred = val.p.inverse_transform(y_pred, lengths)
+            results.extend(y_pred)
+        return results
+
+
+    def _prepare(self, data, train=True):
+        &#34;&#34;&#34;
+        prepare NERSequence for training
+        &#34;&#34;&#34;
+        if data is None: return None
+        mode = &#39;training&#39; if train else &#39;validation&#39;
+        if not data.prepare_called:
+            print(&#39;preparing %s data ...&#39; % (mode), end=&#39;&#39;)
+            data.prepare()
+            print(&#39;done.&#39;)
+        return data</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="ktrain.text.ner.learner.NERLearner"><code class="flex name class">
+<span>class <span class="ident">NERLearner</span></span>
+<span>(</span><span>model, train_data=None, val_data=None, batch_size=32, eval_batch_size=32, workers=1, use_multiprocessing=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Learner for Sequence Taggers.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class NERLearner(GenLearner):
+    &#34;&#34;&#34;
+    Learner for Sequence Taggers.
+    &#34;&#34;&#34;
+
+
+    def __init__(self, model, train_data=None, val_data=None, 
+                 batch_size=U.DEFAULT_BS, eval_batch_size=U.DEFAULT_BS,
+                 workers=1, use_multiprocessing=False):
+        super().__init__(model, train_data=train_data, val_data=val_data, 
+                         batch_size=batch_size, eval_batch_size=eval_batch_size,
+                         workers=workers, use_multiprocessing=use_multiprocessing)
+        return
+
+
+
+    def validate(self, val_data=None, print_report=True, class_names=[]):
+        &#34;&#34;&#34;
+        Validate text sequence taggers
+        &#34;&#34;&#34;
+        val = self._check_val(val_data)
+
+        if not val.prepare_called:
+            val.prepare()
+
+        if not U.is_ner(model=self.model, data=val):
+            warnings.warn(&#39;learner.validate_ner is only for sequence taggers.&#39;)
+            return
+
+        label_true = []
+        label_pred = []
+        for i in range(len(val)):
+            x_true, y_true = val[i]
+            #lengths = self.ner_lengths(y_true)
+            lengths = val.get_lengths(i)
+            y_pred = self.model.predict_on_batch(x_true)
+
+            y_true = val.p.inverse_transform(y_true, lengths)
+            y_pred = val.p.inverse_transform(y_pred, lengths)
+
+            label_true.extend(y_true)
+            label_pred.extend(y_pred)
+
+        score = ner_f1_score(label_true, label_pred)
+        #acc = ner_accuracy_score(label_true, label_pred)
+        if print_report:
+            print(&#39;   F1:  {:04.2f}&#39;.format(score * 100))
+            #print(&#39;   ACC: {:04.2f}&#39;.format(acc * 100))
+            print(ner_classification_report(label_true, label_pred))
+
+        return score
+
+    def top_losses(self, n=4, val_data=None, preproc=None):
+        &#34;&#34;&#34;
+        Computes losses on validation set sorted by examples with top losses
+        Args:
+          n(int or tuple): a range to select in form of int or tuple
+                          e.g., n=8 is treated as n=(0,8)
+          val_data:  optional val_data to use instead of self.val_data
+        Returns:
+            list of n tuples where first element is either 
+            filepath or id of validation example and second element
+            is loss.
+
+        &#34;&#34;&#34;
+        val = self._check_val(val_data)
+        if type(n) == type(42):
+            n = (0, n)
+
+        # get predicictions and ground truth
+        y_pred = self.predict(val_data=val)
+        y_true = self.ground_truth(val_data=val)
+
+        # compute losses and sort
+        losses = []
+        for idx, y_t in enumerate(y_true):
+            y_p = y_pred[idx]
+            #err = 1- sum(1 for x,y in zip(y_t,y_p) if x == y) / len(y_t)
+            err = sum(1 for x,y in zip(y_t,y_p) if x != y) 
+            losses.append(err)
+        tups = [(i,x, y_true[i], y_pred[i]) for i, x in enumerate(losses) if x &gt; 0]
+        tups.sort(key=operator.itemgetter(1), reverse=True)
+
+        # prune by given range
+        tups = tups[n[0]:n[1]] if n is not None else tups
+        return tups
+
+
+    def view_top_losses(self, n=4, preproc=None, val_data=None):
+        &#34;&#34;&#34;
+        Views observations with top losses in validation set.
+        Args:
+         n(int or tuple): a range to select in form of int or tuple
+                          e.g., n=8 is treated as n=(0,8)
+         preproc (Preprocessor): A TextPreprocessor or ImagePreprocessor.
+                                 For some data like text data, a preprocessor
+                                 is required to undo the pre-processing
+                                 to correctly view raw data.
+          val_data:  optional val_data to use instead of self.val_data
+        Returns:
+            list of n tuples where first element is either 
+            filepath or id of validation example and second element
+            is loss.
+
+        &#34;&#34;&#34;
+
+        # check validation data and arguments
+        val = self._check_val(val_data)
+
+        tups = self.top_losses(n=n, val_data=val)
+
+        # get multilabel status and class names
+        classes = preproc.get_classes() if preproc is not None else None
+
+        # iterate through losses
+        for tup in tups:
+
+            # get data
+            idx = tup[0]
+            loss = tup[1]
+            truth = tup[2]
+            pred = tup[3]
+
+            seq = val.x[idx]
+            print(&#39;total incorrect: %s&#39; % (loss))
+            print(&#34;{:15} {:5}: ({})&#34;.format(&#34;Word&#34;, &#34;True&#34;, &#34;Pred&#34;))
+            print(&#34;=&#34;*30)
+            for w, true_tag, pred_tag in zip(seq, truth, pred):
+                print(&#34;{:15}:{:5} ({})&#34;.format(w, true_tag, pred_tag))
+            print(&#39;\n&#39;)
+        return
+
+
+    def save_model(self, fpath):
+        &#34;&#34;&#34;
+        a wrapper to model.save
+        &#34;&#34;&#34;
+        self._make_model_folder(fpath)
+        if U.is_crf(self.model):
+            from .anago.layers import crf_loss
+            self.model.compile(loss=crf_loss, optimizer=U.DEFAULT_OPT)
+        self.model.save(os.path.join(fpath, U.MODEL_NAME), save_format=&#39;h5&#39;)
+        return
+
+
+    def predict(self, val_data=None):
+        &#34;&#34;&#34;
+        Makes predictions on validation set
+        &#34;&#34;&#34;
+        if val_data is not None:
+            val = val_data
+        else:
+            val = self.val_data
+        if val is None: raise Exception(&#39;val_data must be supplied to get_learner or predict&#39;)
+        steps = np.ceil(U.nsamples_from_data(val)/val.batch_size)
+        results = []
+        for idx, (X, y) in enumerate(val):
+            y_pred = self.model.predict_on_batch(X)
+            lengths = val.get_lengths(idx)
+            y_pred = val.p.inverse_transform(y_pred, lengths)
+            results.extend(y_pred)
+        return results
+
+
+    def _prepare(self, data, train=True):
+        &#34;&#34;&#34;
+        prepare NERSequence for training
+        &#34;&#34;&#34;
+        if data is None: return None
+        mode = &#39;training&#39; if train else &#39;validation&#39;
+        if not data.prepare_called:
+            print(&#39;preparing %s data ...&#39; % (mode), end=&#39;&#39;)
+            data.prepare()
+            print(&#39;done.&#39;)
+        return data</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="ktrain.core.GenLearner" href="../../core.html#ktrain.core.GenLearner">GenLearner</a></li>
+<li><a title="ktrain.core.Learner" href="../../core.html#ktrain.core.Learner">Learner</a></li>
+<li>abc.ABC</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="ktrain.text.ner.learner.NERLearner.save_model"><code class="name flex">
+<span>def <span class="ident">save_model</span></span>(<span>self, fpath)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>a wrapper to model.save</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def save_model(self, fpath):
+    &#34;&#34;&#34;
+    a wrapper to model.save
+    &#34;&#34;&#34;
+    self._make_model_folder(fpath)
+    if U.is_crf(self.model):
+        from .anago.layers import crf_loss
+        self.model.compile(loss=crf_loss, optimizer=U.DEFAULT_OPT)
+    self.model.save(os.path.join(fpath, U.MODEL_NAME), save_format=&#39;h5&#39;)
+    return</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.ner.learner.NERLearner.top_losses"><code class="name flex">
+<span>def <span class="ident">top_losses</span></span>(<span>self, n=4, val_data=None, preproc=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Computes losses on validation set sorted by examples with top losses</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt>n(int or tuple): a range to select in form of int or tuple</dt>
+<dt>e.g., n=8 is treated as n=(0,8)</dt>
+<dt><strong><code>val_data</code></strong></dt>
+<dd>optional val_data to use instead of self.val_data</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>list of n tuples where first element is either
+filepath or id of validation example and second element
+is loss.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def top_losses(self, n=4, val_data=None, preproc=None):
+    &#34;&#34;&#34;
+    Computes losses on validation set sorted by examples with top losses
+    Args:
+      n(int or tuple): a range to select in form of int or tuple
+                      e.g., n=8 is treated as n=(0,8)
+      val_data:  optional val_data to use instead of self.val_data
+    Returns:
+        list of n tuples where first element is either 
+        filepath or id of validation example and second element
+        is loss.
+
+    &#34;&#34;&#34;
+    val = self._check_val(val_data)
+    if type(n) == type(42):
+        n = (0, n)
+
+    # get predicictions and ground truth
+    y_pred = self.predict(val_data=val)
+    y_true = self.ground_truth(val_data=val)
+
+    # compute losses and sort
+    losses = []
+    for idx, y_t in enumerate(y_true):
+        y_p = y_pred[idx]
+        #err = 1- sum(1 for x,y in zip(y_t,y_p) if x == y) / len(y_t)
+        err = sum(1 for x,y in zip(y_t,y_p) if x != y) 
+        losses.append(err)
+    tups = [(i,x, y_true[i], y_pred[i]) for i, x in enumerate(losses) if x &gt; 0]
+    tups.sort(key=operator.itemgetter(1), reverse=True)
+
+    # prune by given range
+    tups = tups[n[0]:n[1]] if n is not None else tups
+    return tups</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.ner.learner.NERLearner.validate"><code class="name flex">
+<span>def <span class="ident">validate</span></span>(<span>self, val_data=None, print_report=True, class_names=[])</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Validate text sequence taggers</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def validate(self, val_data=None, print_report=True, class_names=[]):
+    &#34;&#34;&#34;
+    Validate text sequence taggers
+    &#34;&#34;&#34;
+    val = self._check_val(val_data)
+
+    if not val.prepare_called:
+        val.prepare()
+
+    if not U.is_ner(model=self.model, data=val):
+        warnings.warn(&#39;learner.validate_ner is only for sequence taggers.&#39;)
+        return
+
+    label_true = []
+    label_pred = []
+    for i in range(len(val)):
+        x_true, y_true = val[i]
+        #lengths = self.ner_lengths(y_true)
+        lengths = val.get_lengths(i)
+        y_pred = self.model.predict_on_batch(x_true)
+
+        y_true = val.p.inverse_transform(y_true, lengths)
+        y_pred = val.p.inverse_transform(y_pred, lengths)
+
+        label_true.extend(y_true)
+        label_pred.extend(y_pred)
+
+    score = ner_f1_score(label_true, label_pred)
+    #acc = ner_accuracy_score(label_true, label_pred)
+    if print_report:
+        print(&#39;   F1:  {:04.2f}&#39;.format(score * 100))
+        #print(&#39;   ACC: {:04.2f}&#39;.format(acc * 100))
+        print(ner_classification_report(label_true, label_pred))
+
+    return score</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.ner.learner.NERLearner.view_top_losses"><code class="name flex">
+<span>def <span class="ident">view_top_losses</span></span>(<span>self, n=4, preproc=None, val_data=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Views observations with top losses in validation set.
+Args:
+n(int or tuple): a range to select in form of int or tuple
+e.g., n=8 is treated as n=(0,8)
+preproc (Preprocessor): A TextPreprocessor or ImagePreprocessor.
+For some data like text data, a preprocessor
+is required to undo the pre-processing
+to correctly view raw data.
+val_data:
+optional val_data to use instead of self.val_data</p>
+<h2 id="returns">Returns</h2>
+<p>list of n tuples where first element is either
+filepath or id of validation example and second element
+is loss.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def view_top_losses(self, n=4, preproc=None, val_data=None):
+    &#34;&#34;&#34;
+    Views observations with top losses in validation set.
+    Args:
+     n(int or tuple): a range to select in form of int or tuple
+                      e.g., n=8 is treated as n=(0,8)
+     preproc (Preprocessor): A TextPreprocessor or ImagePreprocessor.
+                             For some data like text data, a preprocessor
+                             is required to undo the pre-processing
+                             to correctly view raw data.
+      val_data:  optional val_data to use instead of self.val_data
+    Returns:
+        list of n tuples where first element is either 
+        filepath or id of validation example and second element
+        is loss.
+
+    &#34;&#34;&#34;
+
+    # check validation data and arguments
+    val = self._check_val(val_data)
+
+    tups = self.top_losses(n=n, val_data=val)
+
+    # get multilabel status and class names
+    classes = preproc.get_classes() if preproc is not None else None
+
+    # iterate through losses
+    for tup in tups:
+
+        # get data
+        idx = tup[0]
+        loss = tup[1]
+        truth = tup[2]
+        pred = tup[3]
+
+        seq = val.x[idx]
+        print(&#39;total incorrect: %s&#39; % (loss))
+        print(&#34;{:15} {:5}: ({})&#34;.format(&#34;Word&#34;, &#34;True&#34;, &#34;Pred&#34;))
+        print(&#34;=&#34;*30)
+        for w, true_tag, pred_tag in zip(seq, truth, pred):
+            print(&#34;{:15}:{:5} ({})&#34;.format(w, true_tag, pred_tag))
+        print(&#39;\n&#39;)
+    return</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="ktrain.core.GenLearner" href="../../core.html#ktrain.core.GenLearner">GenLearner</a></b></code>:
+<ul class="hlist">
+<li><code><a title="ktrain.core.GenLearner.autofit" href="../../core.html#ktrain.core.Learner.autofit">autofit</a></code></li>
+<li><code><a title="ktrain.core.GenLearner.evaluate" href="../../core.html#ktrain.core.Learner.evaluate">evaluate</a></code></li>
+<li><code><a title="ktrain.core.GenLearner.fit" href="../../core.html#ktrain.core.GenLearner.fit">fit</a></code></li>
+<li><code><a title="ktrain.core.GenLearner.fit_onecycle" href="../../core.html#ktrain.core.Learner.fit_onecycle">fit_onecycle</a></code></li>
+<li><code><a title="ktrain.core.GenLearner.freeze" href="../../core.html#ktrain.core.Learner.freeze">freeze</a></code></li>
+<li><code><a title="ktrain.core.GenLearner.get_weight_decay" href="../../core.html#ktrain.core.Learner.get_weight_decay">get_weight_decay</a></code></li>
+<li><code><a title="ktrain.core.GenLearner.layer_output" href="../../core.html#ktrain.core.GenLearner.layer_output">layer_output</a></code></li>
+<li><code><a title="ktrain.core.GenLearner.load_model" href="../../core.html#ktrain.core.Learner.load_model">load_model</a></code></li>
+<li><code><a title="ktrain.core.GenLearner.lr_estimate" href="../../core.html#ktrain.core.Learner.lr_estimate">lr_estimate</a></code></li>
+<li><code><a title="ktrain.core.GenLearner.lr_find" href="../../core.html#ktrain.core.Learner.lr_find">lr_find</a></code></li>
+<li><code><a title="ktrain.core.GenLearner.lr_plot" href="../../core.html#ktrain.core.Learner.lr_plot">lr_plot</a></code></li>
+<li><code><a title="ktrain.core.GenLearner.plot" href="../../core.html#ktrain.core.Learner.plot">plot</a></code></li>
+<li><code><a title="ktrain.core.GenLearner.predict" href="../../core.html#ktrain.core.Learner.predict">predict</a></code></li>
+<li><code><a title="ktrain.core.GenLearner.print_layers" href="../../core.html#ktrain.core.Learner.print_layers">print_layers</a></code></li>
+<li><code><a title="ktrain.core.GenLearner.reset_weights" href="../../core.html#ktrain.core.Learner.reset_weights">reset_weights</a></code></li>
+<li><code><a title="ktrain.core.GenLearner.set_model" href="../../core.html#ktrain.core.Learner.set_model">set_model</a></code></li>
+<li><code><a title="ktrain.core.GenLearner.set_weight_decay" href="../../core.html#ktrain.core.Learner.set_weight_decay">set_weight_decay</a></code></li>
+<li><code><a title="ktrain.core.GenLearner.unfreeze" href="../../core.html#ktrain.core.Learner.unfreeze">unfreeze</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="ktrain.text.ner" href="index.html">ktrain.text.ner</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="ktrain.text.ner.learner.NERLearner" href="#ktrain.text.ner.learner.NERLearner">NERLearner</a></code></h4>
+<ul class="">
+<li><code><a title="ktrain.text.ner.learner.NERLearner.save_model" href="#ktrain.text.ner.learner.NERLearner.save_model">save_model</a></code></li>
+<li><code><a title="ktrain.text.ner.learner.NERLearner.top_losses" href="#ktrain.text.ner.learner.NERLearner.top_losses">top_losses</a></code></li>
+<li><code><a title="ktrain.text.ner.learner.NERLearner.validate" href="#ktrain.text.ner.learner.NERLearner.validate">validate</a></code></li>
+<li><code><a title="ktrain.text.ner.learner.NERLearner.view_top_losses" href="#ktrain.text.ner.learner.NERLearner.view_top_losses">view_top_losses</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+</footer>
+</body>
+</html>
