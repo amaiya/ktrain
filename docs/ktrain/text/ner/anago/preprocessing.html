@@ -1,0 +1,1173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.9.2" />
+<title>ktrain.text.ner.anago.preprocessing API documentation</title>
+<meta name="description" content="Preprocessors." />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>ktrain.text.ner.anago.preprocessing</code></h1>
+</header>
+<section id="section-intro">
+<p>Preprocessors.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python"># -*- coding: utf-8 -*-
+&#34;&#34;&#34;
+Preprocessors.
+&#34;&#34;&#34;
+
+from ....imports import *
+from .... import utils as U
+from .utils import Vocabulary
+
+
+try:
+    from allennlp.modules.elmo import Elmo, batch_to_ids
+    ALLENNLP_INSTALLED = True
+except:
+    ALLENNLP_INSTALLED = False
+
+
+options_file = &#39;https://s3-us-west-2.amazonaws.com/allennlp/models/elmo/2x4096_512_2048cnn_2xhighway/elmo_2x4096_512_2048cnn_2xhighway_options.json&#39;
+weight_file = &#39;https://s3-us-west-2.amazonaws.com/allennlp/models/elmo/2x4096_512_2048cnn_2xhighway/elmo_2x4096_512_2048cnn_2xhighway_weights.hdf5&#39;
+
+
+
+def normalize_number(text):
+    return re.sub(r&#39;[0-9０１２３４５６７８９]&#39;, r&#39;0&#39;, text)
+
+
+class IndexTransformer(BaseEstimator, TransformerMixin):
+    &#34;&#34;&#34;Convert a collection of raw documents to a document id matrix.
+
+    Attributes:
+        _use_char: boolean. Whether to use char feature.
+        _num_norm: boolean. Whether to normalize text.
+        _word_vocab: dict. A mapping of words to feature indices.
+        _char_vocab: dict. A mapping of chars to feature indices.
+        _label_vocab: dict. A mapping of labels to feature indices.
+    &#34;&#34;&#34;
+
+    def __init__(self, lower=True, num_norm=True,
+                 use_char=True, initial_vocab=None,
+                 use_elmo=False):
+        &#34;&#34;&#34;Create a preprocessor object.
+
+        Args:
+            lower: boolean. Whether to convert the texts to lowercase.
+            use_char: boolean. Whether to use char feature.
+            num_norm: boolean. Whether to normalize text.
+            initial_vocab: Iterable. Initial vocabulary for expanding word_vocab.
+            use_elmo: If True, will generate contextual English Elmo embeddings
+        &#34;&#34;&#34;
+        self._num_norm = num_norm
+        self._use_char = use_char
+        self._word_vocab = Vocabulary(lower=lower)
+        self._char_vocab = Vocabulary(lower=False)
+        self._label_vocab = Vocabulary(lower=False, unk_token=False)
+
+        if initial_vocab:
+            self._word_vocab.add_documents([initial_vocab])
+            self._char_vocab.add_documents(initial_vocab)
+
+        self.elmo = None  # elmo embedding model
+        self.use_elmo = False
+        self.te = None    # transformer embedding model
+        self.te_layers = U.DEFAULT_TRANSFORMER_LAYERS
+        self.te_model = None
+        self._blacklist = [&#39;te&#39;, &#39;elmo&#39;]
+
+    def __getstate__(self):
+        return {k: v for k, v in self.__dict__.items() if k not in self._blacklist}
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        if not hasattr(self, &#39;te_model&#39;): self.te_model = None
+        if not hasattr(self, &#39;use_elmo&#39;): self.use_elmo = False
+        if not hasattr(self, &#39;te_layers&#39;): self.te_layers = U.DEFAULT_TRANSFORMER_LAYERS
+
+        if self.te_model is not None: self.activate_transformer(self.te_model, layers=self.te_layers)
+        else:
+            self.te = None
+        if self.use_elmo:  
+            self.activate_elmo()
+        else:
+            self.elmo = None
+
+
+    def activate_elmo(self):
+        if not ALLENNLP_INSTALLED:
+            raise Exception(ALLENNLP_ERRMSG)
+
+        if not hasattr(self, &#39;elmo&#39;): self.elmo=None
+        if self.elmo is None:
+            self.elmo = Elmo(options_file, weight_file, 2, dropout=0)
+        self.use_elmo = True
+
+    def activate_transformer(self, model_name, layers=U.DEFAULT_TRANSFORMER_LAYERS, 
+                              force=False):
+        from ...preprocessor import TransformerEmbedding
+        if not hasattr(self, &#39;te&#39;): self.te = None
+        if self.te is None or self.te_model != model_name or force:
+            self.te_model = model_name
+            self.te = TransformerEmbedding(model_name, layers=layers)
+        self.te_layers = layers
+
+    def get_transformer_dim(self):
+        if not self.transformer_is_activated(): 
+            return None
+        else:
+            return self.te.embsize
+
+
+    def elmo_is_activated(self):
+        return self.elmo is not None
+
+
+    def transformer_is_activated(self):
+        return self.te is not None
+
+            
+    def fix_tokenization(self, X, Y, maxlen=U.DEFAULT_TRANSFORMER_MAXLEN, num_special=U.DEFAULT_TRANSFORMER_NUM_SPECIAL):
+        &#34;&#34;&#34;
+        Should be called prior training
+        &#34;&#34;&#34;
+        if not self.transformer_is_activated():
+            return X, Y
+        ids2tok = self.te.tokenizer.convert_ids_to_tokens
+        encode = self.te.tokenizer.encode
+        new_X = []
+        new_Y = []
+        for i, x in enumerate(X):
+            new_x = []
+            new_y =[]
+            seq_len = 0
+            for j,s in enumerate(x):
+                subtokens = ids2tok(encode(s, add_special_tokens=False))
+                token_len = len(subtokens)
+                if seq_len + token_len &gt; (maxlen - num_special):
+                    break
+                seq_len += token_len
+                hf_s = &#39; &#39;.join(subtokens).replace(&#39; ##&#39;, &#39;&#39;).split()
+                new_x.extend(hf_s)
+                if Y is not None:
+                    tag = Y[i][j]
+                    new_y.extend([tag])
+                    if len(hf_s) &gt; 1:
+                        new_tag = tag
+                        if tag.startswith(&#39;B-&#39;): new_tag = &#39;I-&#39;+tag[2:]
+                        new_y.extend([new_tag]*(len(hf_s)-1) )
+                    #if tag.startswith(&#39;B-&#39;): tag = &#39;I-&#39;+tag[2:]
+
+            new_X.append(new_x)
+            new_Y.append(new_y)
+        new_Y = None if Y is None else new_Y
+        return new_X, new_Y
+
+
+    def fit(self, X, y):
+        &#34;&#34;&#34;Learn vocabulary from training set.
+
+        Args:
+            X : iterable. An iterable which yields either str, unicode or file objects.
+
+        Returns:
+            self : IndexTransformer.
+        &#34;&#34;&#34;
+        self._word_vocab.add_documents(X)
+        self._label_vocab.add_documents(y)
+        if self._use_char:
+            for doc in X:
+                self._char_vocab.add_documents(doc)
+
+        self._word_vocab.build()
+        self._char_vocab.build()
+        self._label_vocab.build()
+
+        return self
+
+
+    def transform(self, X, y=None):
+        &#34;&#34;&#34;Transform documents to document ids.
+
+        Uses the vocabulary learned by fit.
+
+        Args:
+            X : iterable
+            an iterable which yields either str, unicode or file objects.
+            y : iterabl, label strings.
+
+        Returns:
+            features: document id matrix.
+            y: label id matrix.
+        &#34;&#34;&#34;
+        # re-instantiate TransformerEmbedding/Elmo if necessary since it is excluded from pickling
+        if self.te_model is not None: self.activate_transformer(self.te_model, layers=self.te_layers)
+        if self.use_elmo: self.activate_elmo()
+
+
+        features = []
+
+        word_ids = [self._word_vocab.doc2id(doc) for doc in X]
+        word_ids = sequence.pad_sequences(word_ids, padding=&#39;post&#39;)
+        features.append(word_ids)
+
+        if self._use_char:
+            char_ids = [[self._char_vocab.doc2id(w) for w in doc] for doc in X]
+            char_ids = pad_nested_sequences(char_ids)
+            features.append(char_ids)
+
+        if self.elmo is not None:
+            if not ALLENNLP_INSTALLED:        
+                raise Exception(ALLENNLP_ERRMSG)
+
+            character_ids = batch_to_ids(X)
+            elmo_embeddings = self.elmo(character_ids)[&#39;elmo_representations&#39;][1]
+            elmo_embeddings = elmo_embeddings.detach().numpy()
+            features.append(elmo_embeddings)
+
+        if self.te is not None:
+            transformer_embeddings = self.te.embed(X, word_level=True)
+            features.append(transformer_embeddings)
+
+
+        if y is not None:
+            y = [self._label_vocab.doc2id(doc) for doc in y]
+            y = sequence.pad_sequences(y, padding=&#39;post&#39;)
+            y = to_categorical(y, self.label_size).astype(int)
+            # In 2018/06/01, to_categorical is a bit strange.
+            # &gt;&gt;&gt; to_categorical([[1,3]], num_classes=4).shape
+            # (1, 2, 4)
+            # &gt;&gt;&gt; to_categorical([[1]], num_classes=4).shape
+            # (1, 4)
+            # So, I expand dimensions when len(y.shape) == 2.
+            y = y if len(y.shape) == 3 else np.expand_dims(y, axis=0)
+            return features, y
+        else:
+            return features
+
+
+    def fit_transform(self, X, y=None, **params):
+        &#34;&#34;&#34;Learn vocabulary and return document id matrix.
+
+        This is equivalent to fit followed by transform.
+
+        Args:
+            X : iterable
+            an iterable which yields either str, unicode or file objects.
+
+        Returns:
+            list : document id matrix.
+            list: label id matrix.
+        &#34;&#34;&#34;
+        return self.fit(X, y).transform(X, y)
+
+    def inverse_transform(self, y, lengths=None):
+        &#34;&#34;&#34;Return label strings.
+
+        Args:
+            y: label id matrix.
+            lengths: sentences length.
+
+        Returns:
+            list: list of list of strings.
+        &#34;&#34;&#34;
+        y = np.argmax(y, -1)
+        inverse_y = [self._label_vocab.id2doc(ids) for ids in y]
+        if lengths is not None:
+            inverse_y = [iy[:l] for iy, l in zip(inverse_y, lengths)]
+
+        return inverse_y
+
+    @property
+    def word_vocab_size(self):
+        return len(self._word_vocab)
+
+    @property
+    def char_vocab_size(self):
+        return len(self._char_vocab)
+
+    @property
+    def label_size(self):
+        return len(self._label_vocab)
+
+    def save(self, file_path):
+        joblib.dump(self, file_path)
+
+    @classmethod
+    def load(cls, file_path):
+        p = joblib.load(file_path)
+
+        return p
+
+
+def pad_nested_sequences(sequences, dtype=&#39;int32&#39;):
+    &#34;&#34;&#34;Pads nested sequences to the same length.
+
+    This function transforms a list of list sequences
+    into a 3D Numpy array of shape `(num_samples, max_sent_len, max_word_len)`.
+
+    Args:
+        sequences: List of lists of lists.
+        dtype: Type of the output sequences.
+
+    # Returns
+        x: Numpy array.
+    &#34;&#34;&#34;
+    max_sent_len = 0
+    max_word_len = 0
+    for sent in sequences:
+        max_sent_len = max(len(sent), max_sent_len)
+        for word in sent:
+            max_word_len = max(len(word), max_word_len)
+
+    x = np.zeros((len(sequences), max_sent_len, max_word_len)).astype(dtype)
+    for i, sent in enumerate(sequences):
+        for j, word in enumerate(sent):
+            x[i, j, :len(word)] = word
+
+    return x</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="ktrain.text.ner.anago.preprocessing.normalize_number"><code class="name flex">
+<span>def <span class="ident">normalize_number</span></span>(<span>text)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def normalize_number(text):
+    return re.sub(r&#39;[0-9０１２３４５６７８９]&#39;, r&#39;0&#39;, text)</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.ner.anago.preprocessing.pad_nested_sequences"><code class="name flex">
+<span>def <span class="ident">pad_nested_sequences</span></span>(<span>sequences, dtype='int32')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Pads nested sequences to the same length.</p>
+<p>This function transforms a list of list sequences
+into a 3D Numpy array of shape <code>(num_samples, max_sent_len, max_word_len)</code>.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>sequences</code></strong></dt>
+<dd>List of lists of lists.</dd>
+<dt><strong><code>dtype</code></strong></dt>
+<dd>Type of the output sequences.</dd>
+</dl>
+<h1 id="returns">Returns</h1>
+<pre><code>x: Numpy array.
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def pad_nested_sequences(sequences, dtype=&#39;int32&#39;):
+    &#34;&#34;&#34;Pads nested sequences to the same length.
+
+    This function transforms a list of list sequences
+    into a 3D Numpy array of shape `(num_samples, max_sent_len, max_word_len)`.
+
+    Args:
+        sequences: List of lists of lists.
+        dtype: Type of the output sequences.
+
+    # Returns
+        x: Numpy array.
+    &#34;&#34;&#34;
+    max_sent_len = 0
+    max_word_len = 0
+    for sent in sequences:
+        max_sent_len = max(len(sent), max_sent_len)
+        for word in sent:
+            max_word_len = max(len(word), max_word_len)
+
+    x = np.zeros((len(sequences), max_sent_len, max_word_len)).astype(dtype)
+    for i, sent in enumerate(sequences):
+        for j, word in enumerate(sent):
+            x[i, j, :len(word)] = word
+
+    return x</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="ktrain.text.ner.anago.preprocessing.IndexTransformer"><code class="flex name class">
+<span>class <span class="ident">IndexTransformer</span></span>
+<span>(</span><span>lower=True, num_norm=True, use_char=True, initial_vocab=None, use_elmo=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Convert a collection of raw documents to a document id matrix.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>_use_char</code></strong></dt>
+<dd>boolean. Whether to use char feature.</dd>
+<dt><strong><code>_num_norm</code></strong></dt>
+<dd>boolean. Whether to normalize text.</dd>
+<dt><strong><code>_word_vocab</code></strong></dt>
+<dd>dict. A mapping of words to feature indices.</dd>
+<dt><strong><code>_char_vocab</code></strong></dt>
+<dd>dict. A mapping of chars to feature indices.</dd>
+<dt><strong><code>_label_vocab</code></strong></dt>
+<dd>dict. A mapping of labels to feature indices.</dd>
+</dl>
+<p>Create a preprocessor object.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>lower</code></strong></dt>
+<dd>boolean. Whether to convert the texts to lowercase.</dd>
+<dt><strong><code>use_char</code></strong></dt>
+<dd>boolean. Whether to use char feature.</dd>
+<dt><strong><code>num_norm</code></strong></dt>
+<dd>boolean. Whether to normalize text.</dd>
+<dt><strong><code>initial_vocab</code></strong></dt>
+<dd>Iterable. Initial vocabulary for expanding word_vocab.</dd>
+<dt><strong><code>use_elmo</code></strong></dt>
+<dd>If True, will generate contextual English Elmo embeddings</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class IndexTransformer(BaseEstimator, TransformerMixin):
+    &#34;&#34;&#34;Convert a collection of raw documents to a document id matrix.
+
+    Attributes:
+        _use_char: boolean. Whether to use char feature.
+        _num_norm: boolean. Whether to normalize text.
+        _word_vocab: dict. A mapping of words to feature indices.
+        _char_vocab: dict. A mapping of chars to feature indices.
+        _label_vocab: dict. A mapping of labels to feature indices.
+    &#34;&#34;&#34;
+
+    def __init__(self, lower=True, num_norm=True,
+                 use_char=True, initial_vocab=None,
+                 use_elmo=False):
+        &#34;&#34;&#34;Create a preprocessor object.
+
+        Args:
+            lower: boolean. Whether to convert the texts to lowercase.
+            use_char: boolean. Whether to use char feature.
+            num_norm: boolean. Whether to normalize text.
+            initial_vocab: Iterable. Initial vocabulary for expanding word_vocab.
+            use_elmo: If True, will generate contextual English Elmo embeddings
+        &#34;&#34;&#34;
+        self._num_norm = num_norm
+        self._use_char = use_char
+        self._word_vocab = Vocabulary(lower=lower)
+        self._char_vocab = Vocabulary(lower=False)
+        self._label_vocab = Vocabulary(lower=False, unk_token=False)
+
+        if initial_vocab:
+            self._word_vocab.add_documents([initial_vocab])
+            self._char_vocab.add_documents(initial_vocab)
+
+        self.elmo = None  # elmo embedding model
+        self.use_elmo = False
+        self.te = None    # transformer embedding model
+        self.te_layers = U.DEFAULT_TRANSFORMER_LAYERS
+        self.te_model = None
+        self._blacklist = [&#39;te&#39;, &#39;elmo&#39;]
+
+    def __getstate__(self):
+        return {k: v for k, v in self.__dict__.items() if k not in self._blacklist}
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        if not hasattr(self, &#39;te_model&#39;): self.te_model = None
+        if not hasattr(self, &#39;use_elmo&#39;): self.use_elmo = False
+        if not hasattr(self, &#39;te_layers&#39;): self.te_layers = U.DEFAULT_TRANSFORMER_LAYERS
+
+        if self.te_model is not None: self.activate_transformer(self.te_model, layers=self.te_layers)
+        else:
+            self.te = None
+        if self.use_elmo:  
+            self.activate_elmo()
+        else:
+            self.elmo = None
+
+
+    def activate_elmo(self):
+        if not ALLENNLP_INSTALLED:
+            raise Exception(ALLENNLP_ERRMSG)
+
+        if not hasattr(self, &#39;elmo&#39;): self.elmo=None
+        if self.elmo is None:
+            self.elmo = Elmo(options_file, weight_file, 2, dropout=0)
+        self.use_elmo = True
+
+    def activate_transformer(self, model_name, layers=U.DEFAULT_TRANSFORMER_LAYERS, 
+                              force=False):
+        from ...preprocessor import TransformerEmbedding
+        if not hasattr(self, &#39;te&#39;): self.te = None
+        if self.te is None or self.te_model != model_name or force:
+            self.te_model = model_name
+            self.te = TransformerEmbedding(model_name, layers=layers)
+        self.te_layers = layers
+
+    def get_transformer_dim(self):
+        if not self.transformer_is_activated(): 
+            return None
+        else:
+            return self.te.embsize
+
+
+    def elmo_is_activated(self):
+        return self.elmo is not None
+
+
+    def transformer_is_activated(self):
+        return self.te is not None
+
+            
+    def fix_tokenization(self, X, Y, maxlen=U.DEFAULT_TRANSFORMER_MAXLEN, num_special=U.DEFAULT_TRANSFORMER_NUM_SPECIAL):
+        &#34;&#34;&#34;
+        Should be called prior training
+        &#34;&#34;&#34;
+        if not self.transformer_is_activated():
+            return X, Y
+        ids2tok = self.te.tokenizer.convert_ids_to_tokens
+        encode = self.te.tokenizer.encode
+        new_X = []
+        new_Y = []
+        for i, x in enumerate(X):
+            new_x = []
+            new_y =[]
+            seq_len = 0
+            for j,s in enumerate(x):
+                subtokens = ids2tok(encode(s, add_special_tokens=False))
+                token_len = len(subtokens)
+                if seq_len + token_len &gt; (maxlen - num_special):
+                    break
+                seq_len += token_len
+                hf_s = &#39; &#39;.join(subtokens).replace(&#39; ##&#39;, &#39;&#39;).split()
+                new_x.extend(hf_s)
+                if Y is not None:
+                    tag = Y[i][j]
+                    new_y.extend([tag])
+                    if len(hf_s) &gt; 1:
+                        new_tag = tag
+                        if tag.startswith(&#39;B-&#39;): new_tag = &#39;I-&#39;+tag[2:]
+                        new_y.extend([new_tag]*(len(hf_s)-1) )
+                    #if tag.startswith(&#39;B-&#39;): tag = &#39;I-&#39;+tag[2:]
+
+            new_X.append(new_x)
+            new_Y.append(new_y)
+        new_Y = None if Y is None else new_Y
+        return new_X, new_Y
+
+
+    def fit(self, X, y):
+        &#34;&#34;&#34;Learn vocabulary from training set.
+
+        Args:
+            X : iterable. An iterable which yields either str, unicode or file objects.
+
+        Returns:
+            self : IndexTransformer.
+        &#34;&#34;&#34;
+        self._word_vocab.add_documents(X)
+        self._label_vocab.add_documents(y)
+        if self._use_char:
+            for doc in X:
+                self._char_vocab.add_documents(doc)
+
+        self._word_vocab.build()
+        self._char_vocab.build()
+        self._label_vocab.build()
+
+        return self
+
+
+    def transform(self, X, y=None):
+        &#34;&#34;&#34;Transform documents to document ids.
+
+        Uses the vocabulary learned by fit.
+
+        Args:
+            X : iterable
+            an iterable which yields either str, unicode or file objects.
+            y : iterabl, label strings.
+
+        Returns:
+            features: document id matrix.
+            y: label id matrix.
+        &#34;&#34;&#34;
+        # re-instantiate TransformerEmbedding/Elmo if necessary since it is excluded from pickling
+        if self.te_model is not None: self.activate_transformer(self.te_model, layers=self.te_layers)
+        if self.use_elmo: self.activate_elmo()
+
+
+        features = []
+
+        word_ids = [self._word_vocab.doc2id(doc) for doc in X]
+        word_ids = sequence.pad_sequences(word_ids, padding=&#39;post&#39;)
+        features.append(word_ids)
+
+        if self._use_char:
+            char_ids = [[self._char_vocab.doc2id(w) for w in doc] for doc in X]
+            char_ids = pad_nested_sequences(char_ids)
+            features.append(char_ids)
+
+        if self.elmo is not None:
+            if not ALLENNLP_INSTALLED:        
+                raise Exception(ALLENNLP_ERRMSG)
+
+            character_ids = batch_to_ids(X)
+            elmo_embeddings = self.elmo(character_ids)[&#39;elmo_representations&#39;][1]
+            elmo_embeddings = elmo_embeddings.detach().numpy()
+            features.append(elmo_embeddings)
+
+        if self.te is not None:
+            transformer_embeddings = self.te.embed(X, word_level=True)
+            features.append(transformer_embeddings)
+
+
+        if y is not None:
+            y = [self._label_vocab.doc2id(doc) for doc in y]
+            y = sequence.pad_sequences(y, padding=&#39;post&#39;)
+            y = to_categorical(y, self.label_size).astype(int)
+            # In 2018/06/01, to_categorical is a bit strange.
+            # &gt;&gt;&gt; to_categorical([[1,3]], num_classes=4).shape
+            # (1, 2, 4)
+            # &gt;&gt;&gt; to_categorical([[1]], num_classes=4).shape
+            # (1, 4)
+            # So, I expand dimensions when len(y.shape) == 2.
+            y = y if len(y.shape) == 3 else np.expand_dims(y, axis=0)
+            return features, y
+        else:
+            return features
+
+
+    def fit_transform(self, X, y=None, **params):
+        &#34;&#34;&#34;Learn vocabulary and return document id matrix.
+
+        This is equivalent to fit followed by transform.
+
+        Args:
+            X : iterable
+            an iterable which yields either str, unicode or file objects.
+
+        Returns:
+            list : document id matrix.
+            list: label id matrix.
+        &#34;&#34;&#34;
+        return self.fit(X, y).transform(X, y)
+
+    def inverse_transform(self, y, lengths=None):
+        &#34;&#34;&#34;Return label strings.
+
+        Args:
+            y: label id matrix.
+            lengths: sentences length.
+
+        Returns:
+            list: list of list of strings.
+        &#34;&#34;&#34;
+        y = np.argmax(y, -1)
+        inverse_y = [self._label_vocab.id2doc(ids) for ids in y]
+        if lengths is not None:
+            inverse_y = [iy[:l] for iy, l in zip(inverse_y, lengths)]
+
+        return inverse_y
+
+    @property
+    def word_vocab_size(self):
+        return len(self._word_vocab)
+
+    @property
+    def char_vocab_size(self):
+        return len(self._char_vocab)
+
+    @property
+    def label_size(self):
+        return len(self._label_vocab)
+
+    def save(self, file_path):
+        joblib.dump(self, file_path)
+
+    @classmethod
+    def load(cls, file_path):
+        p = joblib.load(file_path)
+
+        return p</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>sklearn.base.BaseEstimator</li>
+<li>sklearn.base.TransformerMixin</li>
+</ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="ktrain.text.ner.anago.preprocessing.IndexTransformer.load"><code class="name flex">
+<span>def <span class="ident">load</span></span>(<span>file_path)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def load(cls, file_path):
+    p = joblib.load(file_path)
+
+    return p</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="ktrain.text.ner.anago.preprocessing.IndexTransformer.char_vocab_size"><code class="name">var <span class="ident">char_vocab_size</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def char_vocab_size(self):
+    return len(self._char_vocab)</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.ner.anago.preprocessing.IndexTransformer.label_size"><code class="name">var <span class="ident">label_size</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def label_size(self):
+    return len(self._label_vocab)</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.ner.anago.preprocessing.IndexTransformer.word_vocab_size"><code class="name">var <span class="ident">word_vocab_size</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def word_vocab_size(self):
+    return len(self._word_vocab)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="ktrain.text.ner.anago.preprocessing.IndexTransformer.activate_elmo"><code class="name flex">
+<span>def <span class="ident">activate_elmo</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def activate_elmo(self):
+    if not ALLENNLP_INSTALLED:
+        raise Exception(ALLENNLP_ERRMSG)
+
+    if not hasattr(self, &#39;elmo&#39;): self.elmo=None
+    if self.elmo is None:
+        self.elmo = Elmo(options_file, weight_file, 2, dropout=0)
+    self.use_elmo = True</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.ner.anago.preprocessing.IndexTransformer.activate_transformer"><code class="name flex">
+<span>def <span class="ident">activate_transformer</span></span>(<span>self, model_name, layers=[-2], force=False)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def activate_transformer(self, model_name, layers=U.DEFAULT_TRANSFORMER_LAYERS, 
+                          force=False):
+    from ...preprocessor import TransformerEmbedding
+    if not hasattr(self, &#39;te&#39;): self.te = None
+    if self.te is None or self.te_model != model_name or force:
+        self.te_model = model_name
+        self.te = TransformerEmbedding(model_name, layers=layers)
+    self.te_layers = layers</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.ner.anago.preprocessing.IndexTransformer.elmo_is_activated"><code class="name flex">
+<span>def <span class="ident">elmo_is_activated</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def elmo_is_activated(self):
+    return self.elmo is not None</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.ner.anago.preprocessing.IndexTransformer.fit"><code class="name flex">
+<span>def <span class="ident">fit</span></span>(<span>self, X, y)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Learn vocabulary from training set.</p>
+<h2 id="args">Args</h2>
+<p>X : iterable. An iterable which yields either str, unicode or file objects.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>self </code></dt>
+<dd>IndexTransformer.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def fit(self, X, y):
+    &#34;&#34;&#34;Learn vocabulary from training set.
+
+    Args:
+        X : iterable. An iterable which yields either str, unicode or file objects.
+
+    Returns:
+        self : IndexTransformer.
+    &#34;&#34;&#34;
+    self._word_vocab.add_documents(X)
+    self._label_vocab.add_documents(y)
+    if self._use_char:
+        for doc in X:
+            self._char_vocab.add_documents(doc)
+
+    self._word_vocab.build()
+    self._char_vocab.build()
+    self._label_vocab.build()
+
+    return self</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.ner.anago.preprocessing.IndexTransformer.fit_transform"><code class="name flex">
+<span>def <span class="ident">fit_transform</span></span>(<span>self, X, y=None, **params)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Learn vocabulary and return document id matrix.</p>
+<p>This is equivalent to fit followed by transform.</p>
+<h2 id="args">Args</h2>
+<p>X : iterable
+an iterable which yields either str, unicode or file objects.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list </code></dt>
+<dd>document id matrix.</dd>
+<dt><code>list</code></dt>
+<dd>label id matrix.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def fit_transform(self, X, y=None, **params):
+    &#34;&#34;&#34;Learn vocabulary and return document id matrix.
+
+    This is equivalent to fit followed by transform.
+
+    Args:
+        X : iterable
+        an iterable which yields either str, unicode or file objects.
+
+    Returns:
+        list : document id matrix.
+        list: label id matrix.
+    &#34;&#34;&#34;
+    return self.fit(X, y).transform(X, y)</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.ner.anago.preprocessing.IndexTransformer.fix_tokenization"><code class="name flex">
+<span>def <span class="ident">fix_tokenization</span></span>(<span>self, X, Y, maxlen=512, num_special=2)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Should be called prior training</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def fix_tokenization(self, X, Y, maxlen=U.DEFAULT_TRANSFORMER_MAXLEN, num_special=U.DEFAULT_TRANSFORMER_NUM_SPECIAL):
+    &#34;&#34;&#34;
+    Should be called prior training
+    &#34;&#34;&#34;
+    if not self.transformer_is_activated():
+        return X, Y
+    ids2tok = self.te.tokenizer.convert_ids_to_tokens
+    encode = self.te.tokenizer.encode
+    new_X = []
+    new_Y = []
+    for i, x in enumerate(X):
+        new_x = []
+        new_y =[]
+        seq_len = 0
+        for j,s in enumerate(x):
+            subtokens = ids2tok(encode(s, add_special_tokens=False))
+            token_len = len(subtokens)
+            if seq_len + token_len &gt; (maxlen - num_special):
+                break
+            seq_len += token_len
+            hf_s = &#39; &#39;.join(subtokens).replace(&#39; ##&#39;, &#39;&#39;).split()
+            new_x.extend(hf_s)
+            if Y is not None:
+                tag = Y[i][j]
+                new_y.extend([tag])
+                if len(hf_s) &gt; 1:
+                    new_tag = tag
+                    if tag.startswith(&#39;B-&#39;): new_tag = &#39;I-&#39;+tag[2:]
+                    new_y.extend([new_tag]*(len(hf_s)-1) )
+                #if tag.startswith(&#39;B-&#39;): tag = &#39;I-&#39;+tag[2:]
+
+        new_X.append(new_x)
+        new_Y.append(new_y)
+    new_Y = None if Y is None else new_Y
+    return new_X, new_Y</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.ner.anago.preprocessing.IndexTransformer.get_transformer_dim"><code class="name flex">
+<span>def <span class="ident">get_transformer_dim</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_transformer_dim(self):
+    if not self.transformer_is_activated(): 
+        return None
+    else:
+        return self.te.embsize</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.ner.anago.preprocessing.IndexTransformer.inverse_transform"><code class="name flex">
+<span>def <span class="ident">inverse_transform</span></span>(<span>self, y, lengths=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return label strings.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>y</code></strong></dt>
+<dd>label id matrix.</dd>
+<dt><strong><code>lengths</code></strong></dt>
+<dd>sentences length.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list</code></dt>
+<dd>list of list of strings.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def inverse_transform(self, y, lengths=None):
+    &#34;&#34;&#34;Return label strings.
+
+    Args:
+        y: label id matrix.
+        lengths: sentences length.
+
+    Returns:
+        list: list of list of strings.
+    &#34;&#34;&#34;
+    y = np.argmax(y, -1)
+    inverse_y = [self._label_vocab.id2doc(ids) for ids in y]
+    if lengths is not None:
+        inverse_y = [iy[:l] for iy, l in zip(inverse_y, lengths)]
+
+    return inverse_y</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.ner.anago.preprocessing.IndexTransformer.save"><code class="name flex">
+<span>def <span class="ident">save</span></span>(<span>self, file_path)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def save(self, file_path):
+    joblib.dump(self, file_path)</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.ner.anago.preprocessing.IndexTransformer.transform"><code class="name flex">
+<span>def <span class="ident">transform</span></span>(<span>self, X, y=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Transform documents to document ids.</p>
+<p>Uses the vocabulary learned by fit.</p>
+<h2 id="args">Args</h2>
+<p>X : iterable
+an iterable which yields either str, unicode or file objects.
+y : iterabl, label strings.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>features</code></dt>
+<dd>document id matrix.</dd>
+<dt><code>y</code></dt>
+<dd>label id matrix.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def transform(self, X, y=None):
+    &#34;&#34;&#34;Transform documents to document ids.
+
+    Uses the vocabulary learned by fit.
+
+    Args:
+        X : iterable
+        an iterable which yields either str, unicode or file objects.
+        y : iterabl, label strings.
+
+    Returns:
+        features: document id matrix.
+        y: label id matrix.
+    &#34;&#34;&#34;
+    # re-instantiate TransformerEmbedding/Elmo if necessary since it is excluded from pickling
+    if self.te_model is not None: self.activate_transformer(self.te_model, layers=self.te_layers)
+    if self.use_elmo: self.activate_elmo()
+
+
+    features = []
+
+    word_ids = [self._word_vocab.doc2id(doc) for doc in X]
+    word_ids = sequence.pad_sequences(word_ids, padding=&#39;post&#39;)
+    features.append(word_ids)
+
+    if self._use_char:
+        char_ids = [[self._char_vocab.doc2id(w) for w in doc] for doc in X]
+        char_ids = pad_nested_sequences(char_ids)
+        features.append(char_ids)
+
+    if self.elmo is not None:
+        if not ALLENNLP_INSTALLED:        
+            raise Exception(ALLENNLP_ERRMSG)
+
+        character_ids = batch_to_ids(X)
+        elmo_embeddings = self.elmo(character_ids)[&#39;elmo_representations&#39;][1]
+        elmo_embeddings = elmo_embeddings.detach().numpy()
+        features.append(elmo_embeddings)
+
+    if self.te is not None:
+        transformer_embeddings = self.te.embed(X, word_level=True)
+        features.append(transformer_embeddings)
+
+
+    if y is not None:
+        y = [self._label_vocab.doc2id(doc) for doc in y]
+        y = sequence.pad_sequences(y, padding=&#39;post&#39;)
+        y = to_categorical(y, self.label_size).astype(int)
+        # In 2018/06/01, to_categorical is a bit strange.
+        # &gt;&gt;&gt; to_categorical([[1,3]], num_classes=4).shape
+        # (1, 2, 4)
+        # &gt;&gt;&gt; to_categorical([[1]], num_classes=4).shape
+        # (1, 4)
+        # So, I expand dimensions when len(y.shape) == 2.
+        y = y if len(y.shape) == 3 else np.expand_dims(y, axis=0)
+        return features, y
+    else:
+        return features</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.ner.anago.preprocessing.IndexTransformer.transformer_is_activated"><code class="name flex">
+<span>def <span class="ident">transformer_is_activated</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def transformer_is_activated(self):
+    return self.te is not None</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="ktrain.text.ner.anago" href="index.html">ktrain.text.ner.anago</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="ktrain.text.ner.anago.preprocessing.normalize_number" href="#ktrain.text.ner.anago.preprocessing.normalize_number">normalize_number</a></code></li>
+<li><code><a title="ktrain.text.ner.anago.preprocessing.pad_nested_sequences" href="#ktrain.text.ner.anago.preprocessing.pad_nested_sequences">pad_nested_sequences</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="ktrain.text.ner.anago.preprocessing.IndexTransformer" href="#ktrain.text.ner.anago.preprocessing.IndexTransformer">IndexTransformer</a></code></h4>
+<ul class="">
+<li><code><a title="ktrain.text.ner.anago.preprocessing.IndexTransformer.activate_elmo" href="#ktrain.text.ner.anago.preprocessing.IndexTransformer.activate_elmo">activate_elmo</a></code></li>
+<li><code><a title="ktrain.text.ner.anago.preprocessing.IndexTransformer.activate_transformer" href="#ktrain.text.ner.anago.preprocessing.IndexTransformer.activate_transformer">activate_transformer</a></code></li>
+<li><code><a title="ktrain.text.ner.anago.preprocessing.IndexTransformer.char_vocab_size" href="#ktrain.text.ner.anago.preprocessing.IndexTransformer.char_vocab_size">char_vocab_size</a></code></li>
+<li><code><a title="ktrain.text.ner.anago.preprocessing.IndexTransformer.elmo_is_activated" href="#ktrain.text.ner.anago.preprocessing.IndexTransformer.elmo_is_activated">elmo_is_activated</a></code></li>
+<li><code><a title="ktrain.text.ner.anago.preprocessing.IndexTransformer.fit" href="#ktrain.text.ner.anago.preprocessing.IndexTransformer.fit">fit</a></code></li>
+<li><code><a title="ktrain.text.ner.anago.preprocessing.IndexTransformer.fit_transform" href="#ktrain.text.ner.anago.preprocessing.IndexTransformer.fit_transform">fit_transform</a></code></li>
+<li><code><a title="ktrain.text.ner.anago.preprocessing.IndexTransformer.fix_tokenization" href="#ktrain.text.ner.anago.preprocessing.IndexTransformer.fix_tokenization">fix_tokenization</a></code></li>
+<li><code><a title="ktrain.text.ner.anago.preprocessing.IndexTransformer.get_transformer_dim" href="#ktrain.text.ner.anago.preprocessing.IndexTransformer.get_transformer_dim">get_transformer_dim</a></code></li>
+<li><code><a title="ktrain.text.ner.anago.preprocessing.IndexTransformer.inverse_transform" href="#ktrain.text.ner.anago.preprocessing.IndexTransformer.inverse_transform">inverse_transform</a></code></li>
+<li><code><a title="ktrain.text.ner.anago.preprocessing.IndexTransformer.label_size" href="#ktrain.text.ner.anago.preprocessing.IndexTransformer.label_size">label_size</a></code></li>
+<li><code><a title="ktrain.text.ner.anago.preprocessing.IndexTransformer.load" href="#ktrain.text.ner.anago.preprocessing.IndexTransformer.load">load</a></code></li>
+<li><code><a title="ktrain.text.ner.anago.preprocessing.IndexTransformer.save" href="#ktrain.text.ner.anago.preprocessing.IndexTransformer.save">save</a></code></li>
+<li><code><a title="ktrain.text.ner.anago.preprocessing.IndexTransformer.transform" href="#ktrain.text.ner.anago.preprocessing.IndexTransformer.transform">transform</a></code></li>
+<li><code><a title="ktrain.text.ner.anago.preprocessing.IndexTransformer.transformer_is_activated" href="#ktrain.text.ner.anago.preprocessing.IndexTransformer.transformer_is_activated">transformer_is_activated</a></code></li>
+<li><code><a title="ktrain.text.ner.anago.preprocessing.IndexTransformer.word_vocab_size" href="#ktrain.text.ner.anago.preprocessing.IndexTransformer.word_vocab_size">word_vocab_size</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+</footer>
+</body>
+</html>
