@@ -4,11 +4,13 @@ from .imports import *
 class NER:
     def __init__(self, lang='en', predictor_path=None):
         """
+        ```
         pretrained NER.
         Only English and Chinese are currenty supported.
 
         Args:
           lang(str): Currently, one of {'en', 'zh', 'ru'}: en=English , zh=Chinese, or ru=Russian
+        ```
         """
         if lang is None:
             raise ValueError('lang is required (e.g., "en" for English, "zh" for Chinese, "ru" for Russian, etc.')
@@ -59,6 +61,7 @@ class NER:
 
     def predict(self, texts, merge_tokens=True, batch_size=32):
         """
+        ```
         Extract named entities from supplied text
 
         Args:
@@ -67,6 +70,7 @@ class NER:
                                to which they are associated:
                                ('Paul', 'B-PER'), ('Newman', 'I-PER') becomes ('Paul Newman', 'PER')
           batch_size(int):    Batch size to use for predictions (default:32)
+        ```
         """
         if isinstance(texts, str): texts = [texts]
         self.predictor.batch_size = batch_size

@@ -5,7 +5,9 @@ from .preprocessor import TabularPreprocessor
 
 class TabularPredictor(Predictor):
     """
+    ```
     predictions for tabular data
+    ```
     """
 
     def __init__(self, model, preproc, batch_size=U.DEFAULT_BS):
@@ -26,10 +28,12 @@ class TabularPredictor(Predictor):
 
     def predict(self, df, return_proba=False):
         """
+        ```
         Makes predictions for a test dataframe
         Args:
           df(pd.DataFrame):  a pandas DataFrame in same format as DataFrame used for training model
           return_proba(bool): If True, return probabilities instead of predicted class labels
+        ```
         """
         if not isinstance(df, pd.DataFrame):
             raise ValueError('df must be a pd.DataFrame')
@@ -58,6 +62,7 @@ class TabularPredictor(Predictor):
 
     def explain(self, test_df, row_index=None, row_num=None, class_id=None, background_size=50, nsamples=500):
         """
+        ```
         Explain the prediction of an example using SHAP.
         Args:
           df(pd.DataFrame): a pd.DataFrame of test data is same format as original training data DataFrame
@@ -72,6 +77,7 @@ class TabularPredictor(Predictor):
           class_id(int): Only required for classification
           background_size(int): size of background data (SHAP parameter)
           nsamples(int): number of samples (SHAP parameter)
+        ```
         """
         try:
             import shap

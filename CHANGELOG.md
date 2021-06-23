@@ -6,6 +6,19 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.26.4 (2021-06-23)
+
+### New:
+- API documenation index
+
+### Changed
+- Added warning when a TensorFlow version of selected `transformers` model is not available and the PyTorch version is being downloaded and converted instead using `from_pt=True`.
+
+### Fixed:
+- Fixed `utils.metrics_from_model` to support alternative metrics
+- Check for AUC `ktrain.utils` "inspect" function
+
+
 ## 0.26.3 (2021-05-19)
 
 ### New:

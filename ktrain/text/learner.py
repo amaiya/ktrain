@@ -8,7 +8,9 @@ from .preprocessor import TransformersPreprocessor
 
 class BERTTextClassLearner(ArrayLearner):
     """
+    ```
     Main class used to tune and train Keras models for text classification using Array data.
+    ```
     """
 
 
@@ -23,6 +25,7 @@ class BERTTextClassLearner(ArrayLearner):
 
     def view_top_losses(self, n=4, preproc=None, val_data=None):
         """
+        ```
         Views observations with top losses in validation set.
         Args:
          n(int or tuple): a range to select in form of int or tuple
@@ -36,7 +39,7 @@ class BERTTextClassLearner(ArrayLearner):
             list of n tuples where first element is either 
             filepath or id of validation example and second element
             is loss.
-
+        ```
         """
         val = self._check_val(val_data)
 
@@ -72,7 +75,9 @@ class BERTTextClassLearner(ArrayLearner):
 
 class TransformerTextClassLearner(GenLearner):
     """
+    ```
     Main class used to tune and train Keras models for text classification using Array data.
+    ```
     """
 
 
@@ -87,6 +92,7 @@ class TransformerTextClassLearner(GenLearner):
 
     def view_top_losses(self, n=4, preproc=None, val_data=None):
         """
+        ```
         Views observations with top losses in validation set.
         Args:
          n(int or tuple): a range to select in form of int or tuple
@@ -100,7 +106,7 @@ class TransformerTextClassLearner(GenLearner):
             list of n tuples where first element is either 
             filepath or id of validation example and second element
             is loss.
-
+        ```
         """
         val = self._check_val(val_data)
 
@@ -129,7 +135,9 @@ class TransformerTextClassLearner(GenLearner):
 
     def _prepare(self, data, train=True):
         """
+        ```
         prepare data as tf.Dataset
+        ```
         """
         # HF_EXCEPTION
         # convert arrays to TF dataset (iterator) on-the-fly
@@ -140,7 +148,9 @@ class TransformerTextClassLearner(GenLearner):
 
     def predict(self, val_data=None):
         """
+        ```
         Makes predictions on validation set
+        ```
         """
         if val_data is not None:
             val = val_data
@@ -167,7 +177,9 @@ class TransformerTextClassLearner(GenLearner):
 
     def save_model(self, fpath):
         """
+        ```
         save Transformers model
+        ```
         """
         self._make_model_folder(fpath)
         self.model.save_pretrained(fpath)

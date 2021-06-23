@@ -3,7 +3,9 @@ from ..preprocessor import Preprocessor
 from .. import utils as U
 class ImagePreprocessor(Preprocessor):
     """
+    ```
     Image preprocessing
+    ```
     """
 
     def __init__(self, datagen, classes, target_size=(224,224), color_mode='rgb'):
@@ -25,16 +27,20 @@ class ImagePreprocessor(Preprocessor):
 
     def preprocess_test(self, data, batch_size=U.DEFAULT_BS):
         """
+        ```
         Alias for preprocess
+        ```
         """
         return self.preprocess(data, batch_size=batch_size)
 
 
     def preprocess(self, data, batch_size=U.DEFAULT_BS):
         """
+        ```
         Receives raw data and returns 
         tuple containing the generator and steps
         argument for model.predict.
+        ```
         """
         # input is an array of pixel values
         if isinstance(data, np.ndarray):

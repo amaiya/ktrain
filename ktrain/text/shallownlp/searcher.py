@@ -14,9 +14,11 @@ class Searcher:
     """
     def __init__(self, queries, lang=None):
         """
+        ```
         Args:
           queries(list of str): list of chinese text queries
           lang(str): language of queries.  default:None --> auto-detected
+        ```
         """
         self.queries = queries
         if isinstance(self.queries, str): self.queries = [self.queries]
@@ -29,6 +31,7 @@ class Searcher:
 
     def search(self, docs, case_sensitive=False, keys=[], min_matches=1, progress=True):
         """
+        ```
         executes self.queries on supplied list of documents
         Args:
           docs(list of str): list of chinese texts
@@ -41,7 +44,7 @@ class Searcher:
           list of tuples of results of the form:
             (key, query, no. of matches)
           For Chinese, no. of matches will be number of unique Jieba-extracted character sequences that match
-
+        ```
         """
         if isinstance(docs, str): 
             docs = [docs]
@@ -73,6 +76,7 @@ class Searcher:
                 case_sensitive=False, substrings_on=False, 
                 min_matches=1, progress=True):
         """
+        ```
         search documents for query string.
         Args:
             query(str or list):  the word or phrase to search (or list of them)
@@ -83,6 +87,7 @@ class Searcher:
                                  If True, will find substrings
         returns:
             list or tuple:  Returns list of results if len(docs) > 1.  Otherwise, returns tuple of results
+        ```
         """
         if not isinstance(query, (list, tuple, str)): raise ValueError('query must be str or list of str')
         if isinstance(query, str): query = [query]
@@ -153,6 +158,7 @@ def build_ngrams(s, n=2):
 
 def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, length = 50, fill = '█', printEnd = "\r"):
     """
+    ```
     Call in a loop to create terminal progress bar
     @params:
         iteration   - Required  : current iteration (Int)
@@ -163,6 +169,7 @@ def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, 
         length      - Optional  : character length of bar (Int)
         fill        - Optional  : bar fill character (Str)
         printEnd    - Optional  : end character (e.g. "\r", "\r\n") (Str)
+    ```
     """
     percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
     filledLength = int(length * iteration // total)

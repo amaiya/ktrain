@@ -11,12 +11,14 @@ class Translator():
 
     def __init__(self, model_name=None, device=None, half=False):
         """
+        ```
         basic wrapper around MarianMT model for language translation
 
         Args:
           model_name(str): Helsinki-NLP model
           device(str): device to use (e.g., 'cuda', 'cpu')
           half(bool): If True, use half precision.
+        ```
         """
         if 'Helsinki-NLP' not in model_name:
             warnings.warn('Translator requires a Helsinki-NLP model: https://huggingface.co/Helsinki-NLP')
@@ -34,6 +36,7 @@ class Translator():
 
     def translate(self, src_text, join_with='\n', num_beams=None, early_stopping=None):
         """
+        ```
         Translate document (src_text).
         To speed up translations, you can set num_beams and early_stopping (e.g., num_beams=4, early_stopping=True).
         Args:
@@ -53,6 +56,7 @@ class Translator():
                                  sets this to False.
         Returns:
           str: translated text
+        ```
         """
         sentences = TU.sent_tokenize(src_text)
         tgt_sentences = self.translate_sentences(sentences, num_beams=num_beams, early_stopping=early_stopping)
@@ -61,6 +65,7 @@ class Translator():
 
     def translate_sentences(self, sentences, num_beams=None, early_stopping=None):
         """
+        ```
         Translate sentences using model_name as model.
         To speed up translations, you can set num_beams and early_stopping (e.g., num_beams=4, early_stopping=True).
         Args:
@@ -76,6 +81,7 @@ class Translator():
                                  sets this to False.
         Returns:
           str: translated sentences
+        ```
         """
         import torch
         with torch.no_grad():
@@ -93,6 +99,7 @@ class EnglishTranslator():
 
     def __init__(self, src_lang=None, device=None):
         """
+        ```
         Constructor for English translator
 
         Args:
@@ -108,6 +115,7 @@ class EnglishTranslator():
                            'it': Italian
                            'pt': Portuguese
           device(str): device to use (e.g., 'cuda', 'cpu')
+        ```
         """
 
         if src_lang is None or src_lang not in SUPPORTED_SRC_LANGS:
@@ -135,6 +143,7 @@ class EnglishTranslator():
 
     def translate(self, src_text, join_with='\n', num_beams=None, early_stopping=None):
         """
+        ```
         Translate source document to English.
         To speed up translations, you can set num_beams and early_stopping (e.g., num_beams=4, early_stopping=True).
 
@@ -155,6 +164,7 @@ class EnglishTranslator():
                                  sets this to False.
         Returns:
           str: translated text
+        ```
         """
         text = src_text
         for t in self.translators:

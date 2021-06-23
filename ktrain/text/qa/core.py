@@ -191,6 +191,7 @@ class QA(ABC):
     def ask(self, question, batch_size=8, n_docs_considered=10, n_answers=50, 
             rerank_threshold=0.015, include_np=False):
         """
+        ```
         submit question to obtain candidate answers
 
         Args:
@@ -217,6 +218,7 @@ class QA(ABC):
                              Default:False
         Returns:
           list
+        ```
         """
         # locate candidate document contexts
         paragraphs = []
@@ -334,12 +336,13 @@ class SimpleQA(QA):
                  bert_squad_model='bert-large-uncased-whole-word-masking-finetuned-squad',
                  bert_emb_model='bert-base-uncased'):
         """
+        ```
         SimpleQA constructor
         Args:
           index_dir(str):  path to index directory created by SimpleQA.initialze_index
           bert_squad_model(str): name of BERT SQUAD model to use
           bert_emb_model(str): BERT model to use to generate embeddings for semantic similarity
-
+        ```
         """
 
         self.index_dir = index_dir
@@ -368,6 +371,7 @@ class SimpleQA(QA):
     def index_from_list(cls, docs, index_dir, commit_every=1024, breakup_docs=True,
                         procs=1, limitmb=256, multisegment=False, min_words=20, references=None):
         """
+        ```
         index documents from list.
         The procs, limitmb, and especially multisegment arguments can be used to 
         speed up indexing, if it is too slow.  Please see the whoosh documentation
@@ -395,6 +399,7 @@ class SimpleQA(QA):
                             displays candidate answers in a pandas DataFRame.
 
                             If references is None, the index of element in docs is used as reference.
+        ```
         """
         if not isinstance(docs, (np.ndarray, list)): raise ValueError('docs must be a list of strings')
         if references is not None and not isinstance(references, (np.ndarray, list)): raise ValueError('references must be a list of strings')
@@ -436,6 +441,7 @@ class SimpleQA(QA):
     def index_from_folder(cls, folder_path, index_dir,  use_text_extraction=False, commit_every=1024, breakup_docs=True, 
                           min_words=20, encoding='utf-8', procs=1, limitmb=256, multisegment=False, verbose=1):
         """
+        ```
         index all plain text documents within a folder.
         The procs, limitmb, and especially multisegment arguments can be used to 
         speed up indexing, if it is too slow.  Please see the whoosh documentation
@@ -458,7 +464,7 @@ class SimpleQA(QA):
           limitmb(int): memory limit in MB for each process
           multisegment(bool): new segments written instead of merging
           verbose(bool): verbosity
-
+        ```
         """
         if use_text_extraction:
             try:
@@ -512,12 +518,14 @@ class SimpleQA(QA):
 
     def search(self, query, limit=10):
         """
+        ```
         search index for query
         Args:
           query(str): search query
           limit(int):  number of top search results to return
         Returns:
           list of dicts with keys: reference, rawtext
+        ```
         """
         ix = self._open_ix()
         with ix.searcher() as searcher:

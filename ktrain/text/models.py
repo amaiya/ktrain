@@ -54,6 +54,7 @@ def calc_r(y_i, x, y):
 
 def _text_model(name, train_data, preproc=None, multilabel=None, classification=True, metrics=['accuracy'], verbose=1):
     """
+    ```
     Build and return a text classification or text regression model.
 
     Args:
@@ -77,6 +78,7 @@ def _text_model(name, train_data, preproc=None, multilabel=None, classification=
         verbose (boolean): verbosity of output
     Return:
         model (Model): A Keras Model instance
+    ```
     """
     # check arguments
     if not isinstance(train_data, tuple) and not U.is_huggingface_from_data(train_data):
@@ -432,6 +434,7 @@ def _build_bigru(num_classes,
 
 def text_classifier(name, train_data, preproc=None, multilabel=None, metrics=['accuracy'], verbose=1):
     """
+    ```
     Build and return a text classification model.
 
     Args:
@@ -454,6 +457,7 @@ def text_classifier(name, train_data, preproc=None, multilabel=None, metrics=['a
         verbose (boolean): verbosity of output
     Return:
         model (Model): A Keras Model instance
+    ```
     """
     if name not in TEXT_CLASSIFIERS:
         raise ValueError('invalid name for text classification: %s' % (name)) 
@@ -465,6 +469,7 @@ def text_classifier(name, train_data, preproc=None, multilabel=None, metrics=['a
 
 def text_regression_model(name, train_data, preproc=None, metrics=['mae'],  verbose=1):
     """
+    ```
     Build and return a text regression model.
 
     Args:
@@ -483,6 +488,7 @@ def text_regression_model(name, train_data, preproc=None, metrics=['mae'],  verb
         verbose (boolean): verbosity of output
     Return:
         model (Model): A Keras Model instance
+    ```
     """
     if name not in TEXT_REGRESSION_MODELS:
         raise ValueError('invalid name for text classification: %s' % (name) )

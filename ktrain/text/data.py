@@ -20,6 +20,7 @@ def texts_from_folder(datadir, classes=None,
                       val_pct=0.1, random_state=None,
                       verbose=1):
     """
+    ```
     Returns corpus as sequence of word IDs.
     Assumes corpus is in the following folder structure:
     ├── datadir
@@ -61,6 +62,7 @@ def texts_from_folder(datadir, classes=None,
                                 IF None, train/test split will be random
         verbose (bool):         verbosity
         
+    ```
     """
 
     # check train_test_names
@@ -133,6 +135,7 @@ def texts_from_csv(train_filepath,
                    random_state=None,       
                    verbose=1):
     """
+    ```
     Loads text data from CSV or TSV file. Class labels are assumed to be
     one of the following formats:
         1. one-hot-encoded or multi-hot-encoded arrays representing classes:
@@ -178,6 +181,7 @@ def texts_from_csv(train_filepath,
         random_state(int):      If integer is supplied, train/test split is reproducible.
                                 If None, train/test split will be random
         verbose (boolean): verbosity
+    ```
     """
     if encoding is None:
         with open(train_filepath, 'rb') as f:
@@ -212,6 +216,7 @@ def texts_from_df(train_df,
                    random_state=None,
                    verbose=1):
     """
+    ```
     Loads text data from Pandas dataframe file. Class labels are assumed to be
     one of the following formats:
         1. one-hot-encoded or multi-hot-encoded arrays representing classes:
@@ -255,6 +260,7 @@ def texts_from_df(train_df,
         random_state(int):      If integer is supplied, train/test split is reproducible.
                                 If None, train/test split will be random
         verbose (boolean): verbosity
+    ```
     """
 
     # read in train and test data
@@ -305,6 +311,7 @@ def texts_from_array(x_train, y_train, x_test=None, y_test=None,
                    random_state=None,
                    verbose=1):
     """
+    ```
     Loads and preprocesses text data from arrays.
     texts_from_array can handle data for both text classification
     and text regression.  If class_names is empty, a regression task is assumed.
@@ -338,6 +345,7 @@ def texts_from_array(x_train, y_train, x_test=None, y_test=None,
         random_state(int):      If integer is supplied, train/test split is reproducible.
                                 If None, train/test split will be random.
         verbose (boolean): verbosity
+    ```
     """
     U.check_array(x_train,  y=y_train, X_name='x_train', y_name='y_train')
 
@@ -382,7 +390,9 @@ def texts_from_array(x_train, y_train, x_test=None, y_test=None,
 
 def check_unsupported_lang(lang, preprocess_mode):
     """
+    ```
     check for unsupported language (e.g., nospace langs not supported by Jieba)
+    ```
     """
     unsupported = preprocess_mode=='standard' and TU.is_nospace_lang(lang) and not TU.is_chinese(lang)
     if unsupported:

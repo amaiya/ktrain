@@ -7,12 +7,14 @@ from ..core import GenLearner
 
 class NodeClassLearner(GenLearner):
     """
+    ```
     Main class used to tune and train Keras models for node classification
     Main parameters are:
 
     model (Model): A compiled instance of keras.engine.training.Model
     train_data (Iterator): a Iterator instance for training set
     val_data (Iterator):   A Iterator instance for validation set
+    ```
     """
 
 
@@ -27,6 +29,7 @@ class NodeClassLearner(GenLearner):
     
     def view_top_losses(self, n=4, preproc=None, val_data=None):
         """
+        ```
         Views observations with top losses in validation set.
         Typically over-ridden by Learner subclasses.
         Args:
@@ -41,7 +44,7 @@ class NodeClassLearner(GenLearner):
             list of n tuples where first element is either 
             filepath or id of validation example and second element
             is loss.
-
+        ```
         """
         val = self._check_val(val_data)
 
@@ -69,8 +72,10 @@ class NodeClassLearner(GenLearner):
 
     def layer_output(self, layer_id, example_id=0, batch_id=0, use_val=False):
         """
+        ```
         Prints output of layer with index <layer_id> to help debug models.
         Uses first example (example_id=0) from training set, by default.
+        ```
         """
         raise Exception('currently_unsupported: layer_output method is not yet supported for ' +
                       'graph neural networks in ktrain')
@@ -78,12 +83,14 @@ class NodeClassLearner(GenLearner):
 
 class LinkPredLearner(GenLearner):
     """
+    ```
     Main class used to tune and train Keras models for link prediction
     Main parameters are:
 
     model (Model): A compiled instance of keras.engine.training.Model
     train_data (Iterator): a Iterator instance for training set
     val_data (Iterator):   A Iterator instance for validation set
+    ```
     """
 
 
@@ -98,6 +105,7 @@ class LinkPredLearner(GenLearner):
     
     def view_top_losses(self, n=4, preproc=None, val_data=None):
         """
+        ```
         Views observations with top losses in validation set.
         Typically over-ridden by Learner subclasses.
         Args:
@@ -112,7 +120,7 @@ class LinkPredLearner(GenLearner):
             list of n tuples where first element is either 
             filepath or id of validation example and second element
             is loss.
-
+        ```
         """
         val = self._check_val(val_data)
 
@@ -140,8 +148,10 @@ class LinkPredLearner(GenLearner):
 
     def layer_output(self, layer_id, example_id=0, batch_id=0, use_val=False):
         """
+        ```
         Prints output of layer with index <layer_id> to help debug models.
         Uses first example (example_id=0) from training set, by default.
+        ```
         """
         raise Exception('currently_unsupported: layer_output method is not yet supported for ' +
                       'graph neural networks in ktrain')

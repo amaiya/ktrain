@@ -16,6 +16,7 @@ class Classifier:
 
     def create_model(self, ctype, texts, hp_dict={}, ngram_range=(1,3), binary=True):
         """
+        ```
         create a model
         Args:
           ctype(str): one of {'nbsvm', 'logreg', 'sgdclassifier'}
@@ -26,7 +27,7 @@ class Classifier:
                               overridden if 'ngram_range' in hp_dict
           binary(bool): default value for binary argument to CountVectorizer.
                         overridden if 'binary' key in hp_dict
-
+        ```
         """
         lang = U.detect_lang(texts)
         if U.is_chinese(lang):
@@ -97,6 +98,7 @@ class Classifier:
                               shuffle=True,
                               encoding=None):
         """
+        ```
         load text files from folder
 
         Args:
@@ -111,6 +113,7 @@ class Classifier:
           encoding(str): encoding to use.  default:None (auto-detected)
         Returns:
           tuple: (texts, labels, label_names)
+        ```
         """
         bunch = load_files(folder_path, categories=subfolders, shuffle=shuffle)
         texts = bunch.data
@@ -140,6 +143,7 @@ class Classifier:
     def load_texts_from_csv(cls, csv_filepath, text_column='text', label_column='label',
                             sep=',', encoding=None):
         """
+        ```
         load text files from csv file
         CSV should have at least two columns.
         Example:
@@ -157,6 +161,7 @@ class Classifier:
           encoding(str): encoding to use. default:None (auto-detected)
         Returns:
           tuple: (texts, labels, label_names)
+        ```
         """
         if encoding is None:
             with open(csv_filepath, 'rb') as f:
@@ -175,11 +180,13 @@ class Classifier:
 
     def fit(self, x_train, y_train, ctype='logreg'):
         """
+        ```
         train a classifier
         Args:
           x_train(list or np.ndarray):  training texts
           y_train(np.ndarray):  training labels
           ctype(str):  One of {'logreg', 'nbsvm', 'sgdclassifier'}.  default:nbsvm
+        ```
         """
         lang = U.detect_lang(x_train)
         if U.is_chinese(lang):
@@ -193,9 +200,11 @@ class Classifier:
 
     def predict(self, x_test, return_proba=False):
         """
+        ```
         make predictions on text data
         Args:
           x_test(list or np.ndarray or str): array of texts on which to make predictions or a string representing text
+        ```
         """
         if return_proba and not hasattr(self.model['clf'], 'predict_proba'): 
             raise ValueError('%s does not support predict_proba' % (type(self.model['clf']).__name__))
@@ -220,10 +229,12 @@ class Classifier:
 
     def evaluate(self, x_test, y_test):
         """
+        ```
         evaluate
         Args:
           x_test(list or np.ndarray):  training texts
           y_test(np.ndarray):  training labels
+        ```
         """
         predicted = self.predict(x_test)
         return np.mean(predicted == y_test)
@@ -244,6 +255,7 @@ class Classifier:
 
     def grid_search(self, params, x_train, y_train, n_jobs=-1):
         """
+        ```
         Performs grid search to find optimal set of hyperparameters
         Args:
           params (dict):  A dictionary defining the space of the search.
@@ -255,6 +267,7 @@ class Classifier:
                                       #'clf__beta' : (0.1, 0.25, 0.5, 0.9) 
                                       }
           n_jobs(int): number of jobs to run in parallel.  default:-1 (use all processors)
+        ```
         """
         gs_clf = GridSearchCV(self.model, params, n_jobs=n_jobs)
         gs_clf = gs_clf.fit(x_train, y_train)
