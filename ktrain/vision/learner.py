@@ -8,12 +8,14 @@ from .data import show_image
 
 class ImageClassLearner(GenLearner):
     """
+    ```
     Main class used to tune and train Keras models for image classification.
     Main parameters are:
 
     model (Model): A compiled instance of keras.engine.training.Model
     train_data (Iterator): a Iterator instance for training set
     val_data (Iterator):   A Iterator instance for validation set
+    ```
     """
 
 
@@ -28,6 +30,7 @@ class ImageClassLearner(GenLearner):
     
     def view_top_losses(self, n=4, preproc=None, val_data=None):
         """
+        ```
         Views observations with top losses in validation set.
         Args:
          n(int or tuple): a range to select in form of int or tuple
@@ -41,7 +44,7 @@ class ImageClassLearner(GenLearner):
             list of n tuples where first element is either 
             filepath or id of validation example and second element
             is loss.
-
+        ```
         """
         val = self._check_val(val_data)
 
