@@ -24,6 +24,7 @@ author = 'Arun S. Maiya'
 # The full version, including alpha/beta/rc tags
 release = 'v0.26.3'
 
+master_doc = 'index'
 
 # -- General configuration ---------------------------------------------------
 
