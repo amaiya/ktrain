@@ -15,6 +15,7 @@ def graph_nodes_from_csv(nodes_filepath,
                          random_state=None,
                          verbose=1):
     """
+    ```
     Loads graph data from CSV files. 
     Returns generators for nodes in graph for use with GraphSAGE model.
     Args:
@@ -51,6 +52,7 @@ def graph_nodes_from_csv(nodes_filepath,
         If holdout_pct is not None or number of nodes with missing labels is non-zero, 
         fourth and fifth return values are pd.DataFrame and nx.Graph
         comprising the held out nodes.
+    ```
     """
 
     #----------------------------------------------------------------
@@ -194,6 +196,7 @@ def graph_links_from_csv(nodes_filepath,
                          random_state=None,
                          verbose=1):
     """
+    ```
     Loads graph data from CSV files. 
     Returns generators for links in graph for use with GraphSAGE model.
     Args:
@@ -209,6 +212,7 @@ def graph_links_from_csv(nodes_filepath,
         verbose (boolean): verbosity
     Return:
         tuple of EdgeSequenceWrapper objects for train and validation sets and LinkPreprocessor
+    ```
     """
 
     # import stellargraph

@@ -26,6 +26,7 @@ def print_link_predictors():
 
 def graph_node_classifier(name, train_data, layer_sizes=[32,32], verbose=1):
     """
+    ```
     Build and return a neural node classification model.
     Notes: Only mutually-exclusive class labels are supported.
 
@@ -38,6 +39,7 @@ def graph_node_classifier(name, train_data, layer_sizes=[32,32], verbose=1):
         verbose (boolean): verbosity of output
     Return:
         model (Model): A Keras Model instance
+    ```
     """
     from .sg_wrappers import NodeSequenceWrapper
 
@@ -96,6 +98,7 @@ def graph_node_classifier(name, train_data, layer_sizes=[32,32], verbose=1):
 
 def graph_link_predictor(name, train_data, preproc, layer_sizes=[20,20], verbose=1):
     """
+    ```
     Build and return a neural link prediction model.
 
     Args:
@@ -108,6 +111,7 @@ def graph_link_predictor(name, train_data, preproc, layer_sizes=[20,20], verbose
         verbose (boolean): verbosity of output
     Return:
         model (Model): A Keras Model instance
+    ```
     """
     from .sg_wrappers import LinkSequenceWrapper
 
