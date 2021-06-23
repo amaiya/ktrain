@@ -9,6 +9,7 @@ DEFAULT_TOKEN_PATTERN = (r"\b[a-zA-Z][a-zA-Z0-9]*(?:[_/&-][a-zA-Z0-9]+)+\b|"
 
 def extract_copy(corpus_path, output_path, verbose=0):
     """
+    ```
     Crawl <corpus_path>, extract plain text from documents
     and then copy them to output_path.
     Requires textract package
@@ -18,6 +19,7 @@ def extract_copy(corpus_path, output_path, verbose=0):
         verbose(bool):  Default:0.  Set to 1 (or True) to see error details on why each skipped document was skipped.
     Returns:
         list: list of skipped filenames
+    ```
     """
     try:
         import textract
@@ -85,9 +87,11 @@ def is_pdf(filepath):
 
 def pdftotext(filename):
     """
+    ```
     Use pdftotext program to convert PDF to text string.
     :param filename: of PDF file
     :return: text from file, or empty string if failure
+    ```
     """
     output = Popen(['pdftotext', '-q', filename, '-'],
                    stdout=PIPE).communicate()[0]
@@ -98,10 +102,12 @@ def pdftotext(filename):
 
 def requires_ocr(filename):
     """
+    ```
     Uses pdffonts program to determine if the PDF requires OCR, i.e., it
     doesn't contain any fonts.
     :param filename: of PDF file
     :return: True if requires OCR, False if not
+    ```
     """
     output = Popen(['pdffonts', filename], stdout=PIPE,
                    stderr=DEVNULL).communicate()[0]
@@ -166,7 +172,9 @@ def to_ascii(data):
 def load_text_files(corpus_path, truncate_len=None, 
                     clean=True, return_fnames=False):
     """
+    ```
     load text files
+    ```
     """
     
     texts = []
@@ -192,7 +200,9 @@ def load_text_files(corpus_path, truncate_len=None,
 
 def filter_by_id(lst, ids=[]):
     """
+    ```
     filter list by supplied IDs
+    ```
     """
     return [x for i,x in enumerate(lst) if i in ids]
 
@@ -204,7 +214,9 @@ def filter_by_id(lst, ids=[]):
 
 def detect_lang(texts, sample_size=32):
     """
+    ```
     detect language
+    ```
     """
 
     # convert sentence pairs
@@ -237,9 +249,11 @@ def detect_lang(texts, sample_size=32):
 
 def is_chinese(lang, strict=True):
     """
+    ```
     Args:
       lang(str): language code (e.g., en)
       strict(bool):  If False, include additional languages due to mistakes on short texts by langdetect
+    ```
     """
     if strict:
         extra_clause = False
@@ -268,7 +282,9 @@ def is_nospace_lang(lang):
 
 def decode_by_line(texts, encoding='utf-8', verbose=1):
     """
+    ```
     Decode text line by line and skip over errors.
+    ```
     """
 
     if isinstance(texts, str): texts = [texts]
@@ -328,7 +344,9 @@ def tokenize(s, join_tokens=False, join_char=' '):
 
 def sent_tokenize(text, lang=None):
     """
+    ```
     segment text into sentences
+    ```
     """
     lang = detect_lang(text) if lang is None else lang
     sents = []
@@ -345,7 +363,9 @@ def sent_tokenize(text, lang=None):
 
 def paragraph_tokenize(text, join_sentences=False, lang=None):
     """
-    segment text into sentences
+    ```
+    segment text into paragraphs
+    ```
     """
     lang = detect_lang(text) if lang is None else lang
     if is_chinese(lang):
@@ -363,7 +383,9 @@ def paragraph_tokenize(text, join_sentences=False, lang=None):
 
 def extract_noun_phrases(text):
     """
+    ```
     extracts noun phrases
+    ```
     """
     try:
         from textblob import TextBlob

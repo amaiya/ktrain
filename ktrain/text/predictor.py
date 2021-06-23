@@ -5,7 +5,9 @@ from .. import utils as U
 
 class TextPredictor(Predictor):
     """
+    ```
     predicts text classes
+    ```
     """
 
     def __init__(self, model, preproc, batch_size=U.DEFAULT_BS):
@@ -27,6 +29,8 @@ class TextPredictor(Predictor):
 
     def predict(self, texts, return_proba=False):
         """
+        ```
+
         Makes predictions for a list of strings where each string is a document
         or text snippet.
         If return_proba is True, returns probabilities of each class.
@@ -38,6 +42,7 @@ class TextPredictor(Predictor):
                            A single tuple of the form (str, str) is automatically treated as sentence pair classification, so
                            please refrain from using tuples for text classification tasks.
           return_proba(bool): If True, return probabilities instead of predicted class labels
+        ```
         """
 
         is_array, is_pair = detect_text_format(texts)
@@ -80,9 +85,11 @@ class TextPredictor(Predictor):
 
     def predict_proba(self, texts):
         """
+        ```
         Makes predictions for a list of strings where each string is a document
         or text snippet.
         Returns probabilities of each class.
+        ```
         """
         return self.predict(texts, return_proba=True)
 
@@ -134,6 +141,7 @@ class TextPredictor(Predictor):
 
     def analyze_valid(self, val_tup, print_report=True, multilabel=None):
         """
+        ```
         Makes predictions on validation set and returns the confusion matrix.
         Accepts as input the validation set in the standard form of a tuple of
         two arrays: (X_test, y_test), wehre X_test is a Numpy array of strings
@@ -142,6 +150,7 @@ class TextPredictor(Predictor):
         Optionally prints a classification report.
         Currently, this method is only supported for binary and multiclass 
         problems, not multilabel classification problems.
+        ```
         """
         U.data_arg_check(val_data=val_tup, val_required=True, ndarray_only=True)
         if multilabel is None:
@@ -175,6 +184,7 @@ class TextPredictor(Predictor):
 
     def export_model_to_onnx(self, fpath, quantize=False, target_opset=None, verbose=1):
         """
+        ```
         Export model to onnx
         Args:
           fpath(str): String representing full path to model file where ONNX model will be saved.
@@ -190,6 +200,7 @@ class TextPredictor(Predictor):
           verbose(bool): verbosity
         Returns:
           str: string representing fpath.  If quantize=True, returned fpath will be different than supplied fpath
+        ```
         """
         try:
             import onnxruntime, onnxruntime_tools, onnx, keras2onnx
