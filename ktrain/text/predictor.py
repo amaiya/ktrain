@@ -139,38 +139,6 @@ class TextPredictor(Predictor):
         return te.show_prediction(target_names=self.preproc.get_classes(), targets=prediction)
 
 
-    def analyze_valid(self, val_tup, print_report=True, multilabel=None):
-        """
-        ```
-        Makes predictions on validation set and returns the confusion matrix.
-        Accepts as input the validation set in the standard form of a tuple of
-        two arrays: (X_test, y_test), wehre X_test is a Numpy array of strings
-        where each string is a document or text snippet in the validation set.
-
-        Optionally prints a classification report.
-        Currently, this method is only supported for binary and multiclass 
-        problems, not multilabel classification problems.
-        ```
-        """
-        U.data_arg_check(val_data=val_tup, val_required=True, ndarray_only=True)
-        if multilabel is None:
-            multilabel = U.is_multilabel(val_tup)
-        if multilabel:
-            warnings.warn('multilabel_confusion_matrix not yet supported')
-            return
-
-        y_true = val_tup[1]
-        y_true = np.argmax(y_true, axis=1)
-        y_pred = self.model.predict(val_tup[0])
-        y_pred = np.argmax(y_pred, axis=1)
-        
-        if print_report:
-            print(classification_report(y_true, y_pred, target_names=self.c))
-            cm_func = confusion_matrix
-        cm =  confusion_matrix(y_true,  y_pred)
-        return cm
-
-
     def _save_model(self, fpath):
         if isinstance(self.preproc, TransformersPreprocessor):
             self.model.save_pretrained(fpath)
