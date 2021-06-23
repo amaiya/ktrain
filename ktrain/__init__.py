@@ -19,6 +19,7 @@ def get_learner(model, train_data=None, val_data=None,
                 batch_size=U.DEFAULT_BS, eval_batch_size=U.DEFAULT_BS,
                 workers=1, use_multiprocessing=False):
     """
+    ```
     Returns a Learner instance that can be used to tune and train Keras models.  
 
     model (Model):        A compiled instance of keras.engine.training.Model  
@@ -42,6 +43,7 @@ def get_learner(model, train_data=None, val_data=None,
     use_multiprocessing(bool):  whether or not to use multiprocessing for workers  
                                This is ignored unless train_data/val_data is an instance of   
                                tf.keras.preprocessing.image.DirectoryIterator or tf.keras.preprocessing.image.DataFrameIterator.   
+    ```
     """
 
     # check arguments
