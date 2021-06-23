@@ -20,6 +20,7 @@ def print_tabular_regression_models():
 def _tabular_model(name, train_data, multilabel=None, is_regression=False, metrics=['accuracy'], 
                    hidden_layers=[1000, 500], hidden_dropouts=[0., 0.5], bn=False, verbose=1):
     """
+    ```
     Build and return a classification or regression model for tabular data
 
     Args:
@@ -36,6 +37,7 @@ def _tabular_model(name, train_data, multilabel=None, is_regression=False, metri
         verbose (boolean): verbosity of output
     Return:
         model (Model): A Keras Model instance
+    ```
     """
 
     # check arguments
@@ -122,6 +124,7 @@ def _tabular_model(name, train_data, multilabel=None, is_regression=False, metri
 def tabular_classifier(name, train_data, multilabel=None, metrics=['accuracy'], 
                        hidden_layers=[1000, 500], hidden_dropouts=[0., 0.5], bn=False, verbose=1):
     """
+    ```
     Build and return a classification model for tabular data
 
     Args:
@@ -137,6 +140,7 @@ def tabular_classifier(name, train_data, multilabel=None, metrics=['accuracy'],
         verbose (boolean): verbosity of output
     Return:
         model (Model): A Keras Model instance
+    ```
     """
 
 
@@ -148,6 +152,7 @@ def tabular_classifier(name, train_data, multilabel=None, metrics=['accuracy'],
 def tabular_regression_model(name, train_data,  metrics=['mae'], 
                              hidden_layers=[1000, 500], hidden_dropouts=[0., 0.5], bn=False, verbose=1):
     """
+    ```
     Build and return a regression model for tabular data
 
     Args:
@@ -160,6 +165,7 @@ def tabular_regression_model(name, train_data,  metrics=['mae'],
         verbose (boolean): verbosity of output
     Return:
         model (Model): A Keras Model instance
+    ```
     """
 
 
