@@ -18,11 +18,13 @@ class ZeroShotClassifier():
 
     def __init__(self, model_name='facebook/bart-large-mnli', device=None):
         """
+        ```
         ZeroShotClassifier constructor
 
         Args:
           model_name(str): name of a BART NLI model
           device(str): device to use (e.g., 'cuda', 'cpu')
+        ```
         """
         if 'mnli' not in model_name and 'xnli' not in model_name:
             raise ValueError('ZeroShotClasifier requires an MNLI or XNLI model')
@@ -40,6 +42,7 @@ class ZeroShotClassifier():
     def predict(self, docs, labels=[], include_labels=False, multilabel=True,
                max_length=512, batch_size=8, nli_template='This text is about {}.',  topic_strings=[]):
         """
+        ```
         This method performs zero-shot text classification using Natural Language Inference (NLI).
         Args:
           docs(list|str): text of document or list of texts
@@ -57,6 +60,7 @@ class ZeroShotClassifier():
           topic_strings(list): alias for labels parameter for backwards compatibility
         Returns:
           inferred probabilities or list of inferred probabilities if doc is list
+        ```
         """
 
         # error checks
