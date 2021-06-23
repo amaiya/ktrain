@@ -544,6 +544,7 @@ def get_hf_model_name(model_id):
 class YTransform:
     def __init__(self, class_names=[], label_encoder=None):
         """
+        ```
         Cheks and transforms array of targets. Targets are transformed in place.
         Args:
           class_names(list):  labels associated with targets (e.g., ['negative', 'positive'])
@@ -555,6 +556,7 @@ class YTransform:
                          2. targets are strings and task is classification (class_names are populated automatically)
           label_encoder(LabelEncoder): a prior instance of LabelEncoder.  
                                        If None, will be created when train=True
+        ```
         """
         if type(class_names) != list:
             if isinstance(class_names, (pd.Series, np.ndarray)): class_names = class_names.tolist()
@@ -630,11 +632,13 @@ class YTransform:
 class YTransformDataFrame(YTransform):
     def __init__(self, label_columns=[], is_regression=False):
         """
+        ```
         Checks and transforms label columns in DataFrame. DataFrame is modified in place
         Args:
           label_columns(list): list of columns storing labels 
           is_regression(bool): If True, task is regression and integer targets are treated as numeric dependent variable.
                                IF False, task is classification and integer targets are treated as class IDs.
+        ```
         """
         self.is_regression = is_regression
         if isinstance(label_columns, str): label_columns = [label_columns]

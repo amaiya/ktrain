@@ -3,6 +3,7 @@ from .imports import *
 
 class Dataset:
     """
+    ```
     Base class for custom datasets in ktrain.
 
     If subclass of Dataset implements a method to to_tfdataset
@@ -17,6 +18,7 @@ class Dataset:
     def to_tfdataset(self, train=True)
 
     See ktrain.text.preprocess.TransformerDataset as an example.
+    ```
     """
 
     # required: used by ktrain.core.Learner instances
@@ -34,40 +36,50 @@ class Dataset:
     # optional
     def ondisk(self):
         """
+        ```
         Is data being read from disk like with DirectoryIterators?
+        ```
         """
         return False
 
     # optional: used only if invoking *_classifier functions
     def xshape(self):
         """
+        ```
         shape of X
         Examples:
             for images: input_shape
             for text: (n_example, sequence_length)
+        ```
         """
         raise NotImplemented
     
     # optional: used only if invoking *_classifier functions
     def nclasses(self):
         """
+        ```
         Number of classes
         For classification problems: this is the number of labels
         Not used for regression problems
+        ```
         """
         raise NotImplemented
 
 
 class TFDataset(Dataset):
     """
+    ```
     Wrapper for tf.data.Datasets
+    ```
     """
     def __init__(self, tfdataset, n, y):
         """
+        ```
         Args:
           tfdataset(tf.data.Dataset):  a tf.Dataset instance
           n(int): number of examples in dataset (cardinality, which can't reliably be extracted from tf.data.Datasets)
           y(np.ndarray): y values for each example - should be in the format expected by your moddel (e.g., 1-hot-encoded)
+        ```
         """
         if not isinstance(tfdataset, tf.data.Dataset):
             raise ValueError('tfdataset must be a fully-configured tf.data.Dataset with batch_size, etc. set appropriately')
@@ -98,6 +110,7 @@ class TFDataset(Dataset):
 
 class SequenceDataset(Dataset, Sequence):
     """
+    ```
     Base class for custom datasets in ktrain.
 
     If subclass of Dataset implements a method to to_tfdataset
@@ -112,6 +125,7 @@ class SequenceDataset(Dataset, Sequence):
     def to_tfdataset(self, training=True)
 
     See ktrain.text.preprocess.TransformerDataset as an example.
+    ```
     """
     def __init__(self, batch_size=32):
         self.batch_size = batch_size
