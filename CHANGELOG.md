@@ -6,10 +6,10 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
-## 0.26.4 (TBD)
+## 0.26.4 (2021-06-23)
 
 ### New:
-- N/A
+- API documenation index
 
 ### Changed
 - Added warning when a TensorFlow version of selected `transformers` model is not available and the PyTorch version is being downloaded and converted instead using `from_pt=True`.
