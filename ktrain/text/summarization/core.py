@@ -9,11 +9,13 @@ class TransformerSummarizer():
 
     def __init__(self, model_name='facebook/bart-large-cnn', device=None):
         """
+        ```
         interface to BART-based text summarization using transformers library
 
         Args:
           model_name(str): name of BART model for summarization
           device(str): device to use (e.g., 'cuda', 'cpu')
+        ```
         """
         if 'bart' not in model_name:
             raise ValueError('TransformerSummarizer currently only accepts BART models')
@@ -30,11 +32,13 @@ class TransformerSummarizer():
 
     def summarize(self, doc):
         """
+        ```
         summarize document text
         Args:
           doc(str): text of document
         Returns:
           str: summary text
+        ```
         """
         import torch
         with torch.no_grad():

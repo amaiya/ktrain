@@ -1,4 +1,4 @@
-### [Overview](#overview) | [Tutorials](#tutorials) | [Examples](#examples) |  [Installation](#installation) | [FAQ](https://github.com/amaiya/ktrain/blob/master/FAQ.md) | [How to Cite](#how-to-cite)
+### [Overview](#overview) | [Tutorials](#tutorials) | [Examples](#examples) |  [Installation](#installation) | [FAQ](https://github.com/amaiya/ktrain/blob/master/FAQ.md) | [API Docs](https://amaiya.github.io/ktrain/index.html) |  [How to Cite](#how-to-cite)
 [![PyPI Status](https://badge.fury.io/py/ktrain.svg)](https://badge.fury.io/py/ktrain) [![ktrain python compatibility](https://img.shields.io/pypi/pyversions/ktrain.svg)](https://pypi.python.org/pypi/ktrain) [![license](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/amaiya/ktrain/blob/master/LICENSE) [![Downloads](https://pepy.tech/badge/ktrain)](https://pepy.tech/project/ktrain)
 
 <p align="center">
@@ -10,6 +10,41 @@
 
 
 ### News and Announcements
+- **2021-03-10:**
+  - ***ktrain*** **v0.26.x is released** and now supports `transformers>=4.0.0`.  
+Note that, `transformers>=4.0.0` included a complete reogranization of the module's structure. This means that, if you saved a **transformers**-based `Predictor` (e.g., DistilBERT) in an older version of **ktrain** and **transformers**, you will need to either generate a new `tf_model.preproc` file or manually edit the existing `tf_model.preproc` file before loading the `predictor` in the latest versions of **ktrain** and **transformers**.  
+For instance, suppose you trained a DistilBERT model and saved the resultant predictor using an older version of **ktrain** with: `predictor.save('/tmp/my_predictor/')`.  After upgrading to the newest version of **ktrain**,  you will find that `ktrain.load_predictor('/tmp/my_predictor`) will throw an error unless you follow one of the two approaches below:  
+
+    **Approach 1: Manually edit `tf_model.preproc` file:**  
+    Open `tf_model.preproc` with an editor like **vim** and edit it to replace old module locations with new module locations (example changes for a DistilBERT model shown below):  
+    ```python
+    # change transformers.configuration_distilbert to transformers.models.distilbert.configuration_distilbert
+    # change transformers.modeling_tf_auto to transformers.models.auto.modeling_tf_auto
+    # change transformers.tokenization_auto to transformers.models.auto.tokenization_auto  
+    ```
+    The above was confirmed to work using the **vim** editor on Linux.   
+
+    **Approach 2: Re-generate `tf_model.preproc` file**:  
+	```python
+	# Step 1: Re-create a Preprocessor instance
+	# NOTES:
+	# 1. If training set is large, you can use a sample containing at least one example for each class
+	# 2. Labels must be in same format as you originally used
+	# 3. If original training set is not easily accessible, set preproc.preprocess_train_called=True 
+	#    below instead of invoking preproc.preprocess_train(x_train, y_train)
+
+	preproc = text.Transformer(MODEL_NAME, maxlen=500, class_names=class_names)
+	trn = preproc.preprocess_train(x_train, y_train)
+
+	# Step 2: load the transformers model from predictor folder
+	from transformers import *
+	model = TFAutoModelForSequenceClassification.from_pretrained('/tmp/my_predictor/')
+
+	# Step 3: re-create/re-save Predictor
+	predictor = ktrain.get_predictor(model, preproc)
+	predictor.save('/tmp/my_new_predictor')
+	```
+  - If you're using PyTorch 1.8 or above with **ktrain**, you will need to upgrade to `ktrain>=0.26.0`. If you're using `ktrain<0.26.0`, then you will have to downgrade PyTorch with: `pip install torch==1.7.1`.
 - **2020-11-08:**
   - ***ktrain*** **v0.25.x is released** and includes out-of-the-box support for text extraction via the [textract](https://pypi.org/project/textract/) package . This, for example,
 can be used in the `SimpleQA.index_from_folder` method to perform Question-Answering on large collections of PDFs, MS Word documents, or PowerPoint files.   See the [Question-Answering example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/question_answering_with_bert.ipynb) for more information.
@@ -33,9 +68,7 @@ answers = qa.ask('What is ktrain?', batch_size=8)
 #   "ktrain is a low-code platform for machine learning"
 ```
 - **2020-11-04**
-  - ***ktrain*** **v0.24.x is released** and now includes built-in support for exporting models to [ONNX](https://onnx.ai/) and  [TensorFlow Lite](https://www.tensorflow.org/lite).    See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/ktrain-ONNX-TFLite-examples.ipynb) for more information.
-- **2020-10-16:**
-  - ***ktrain*** **v0.23.x is released** with updates for compatibility with upcoming release of TensorFlow 2.4.
+  - ***ktrain*** **v0.24.x is released** and now includes built-in support for exporting models to [ONNX](https://onnx.ai/) and  [TensorFlow Lite](https://www.tensorflow.org/lite).    See the [example notebook](https://github.com/amaiya/ktrain/blob/develop/examples/text/ktrain-ONNX-TFLite-examples.ipynb) for more information.
 ----
 
 ### Overview
@@ -74,6 +107,8 @@ answers = qa.ask('What is ktrain?', batch_size=8)
 - load and preprocess text and image data from a variety of formats 
 - inspect data points that were misclassified and [provide explanations](https://eli5.readthedocs.io/en/latest/) to help improve your model
 - leverage a simple prediction API for saving and deploying both models and data-preprocessing steps to make predictions on new raw data
+- built-in support for exporting models to [ONNX](https://onnx.ai/) and  [TensorFlow Lite](https://www.tensorflow.org/lite) (see [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/ktrain-ONNX-TFLite-examples.ipynb) for more information)
+
 
 
 ### Tutorials
@@ -88,7 +123,7 @@ Please see the following tutorial notebooks for a guide on how to use **ktrain**
 * Tutorial 8: [Tabular Classification and Regression](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-08-tabular_classification_and_regression.ipynb) 
 * Tutorial A1: [Additional tricks](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-A1-additional-tricks.ipynb), which covers topics such as previewing data augmentation schemes, inspecting intermediate output of Keras models for debugging, setting global weight decay, and use of built-in and custom callbacks.
 * Tutorial A2: [Explaining Predictions and Misclassifications](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-A2-explaining-predictions.ipynb)
-* Tutorial A3: [Text Classification with Hugging Face Transformers](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-A3-hugging_face_transformers.ipynb)
+* Tutorial A3: [Text Classification with Hugging Face Transformers](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/tutorials/tutorial-A3-hugging_face_transformers.ipynb)
 * Tutorial A4: [Using Custom Data Formats and Models: Text Regression with Extra Regressors](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-A4-customdata-text_regression_with_extra_regressors.ipynb)
 
 
@@ -319,13 +354,14 @@ The above should be all you need on Linux systems and cloud computing environmen
 
 **Some important things to note about installation:**
 - If using **ktrain** with `tensorflow<=2.1`, you must also downgrade the **transformers** library to `transformers==3.1`.
+- If `load_predictor` fails with the error "`AttributeError: 'str' object has no attribute 'decode'`", then downgrade **h5py**: `pip install h5py==2.10.0`
 - As of v0.21.x, **ktrain** no longer installs TensorFlow 2 automatically.  As indicated above, you should install TensorFlow 2 yourself before installing and using **ktrain**.  On Google Colab, TensorFlow 2 should be already installed.  You should be able to use **ktrain**  with any version of [TensorFlow 2](https://www.tensorflow.org/install/pip?lang=python3). Note, however, that there is a bug in TensorFlow 2.2 and 2.3 that affects the *Learning-Rate-Finder* [that will not be fixed until TensorFlow 2.4](https://github.com/tensorflow/tensorflow/issues/41174#issuecomment-656330268).  The bug causes the learning-rate-finder to complete all epochs even after loss has diverged (i.e., no automatic-stopping).
 - If using **ktrain** on a local machine with a GPU (versus Google Colab, for example), you'll need to [install GPU support for TensorFlow 2](https://www.tensorflow.org/install/gpu).
 - Since some **ktrain** dependencies have not yet been migrated to `tf.keras` in TensorFlow 2 (or may have other issues), 
   **ktrain** is temporarily using forked versions of some libraries. Specifically, **ktrain** uses forked versions of the `eli5` and `stellargraph` libraries.  If not installed, **ktrain** will complain  when a method or function needing either of these libraries is invoked.  To install these forked versions, you can do the following:
 ```
-pip install git+https://github.com/amaiya/eli5@tfkeras_0_10_1
-pip install git+https://github.com/amaiya/stellargraph@no_tf_dep_082
+pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip
+pip install https://github.com/amaiya/stellargraph/archive/refs/heads/no_tf_dep_082.zip
 ```
 
 This code was tested on Ubuntu 18.04 LTS using TensorFlow 2.3.1 and Python 3.6.9.

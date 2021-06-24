@@ -2,7 +2,9 @@ from .imports import *
 from . import utils as U
 class Predictor(ABC):
     """
+    ```
     Abstract class to preprocess data
+    ```
     """
     @abstractmethod
     def predict(self, data):
@@ -46,11 +48,13 @@ class Predictor(ABC):
 
     def save(self, fpath):
         """
+        ```
         saves both model and Preprocessor instance associated with Predictor 
         Args:
           fpath(str): path to folder to store model and Preprocessor instance (.preproc file)
         Returns:
           None
+        ```
         """
         self._make_predictor_folder(fpath)
         self._save_model(fpath)
@@ -60,6 +64,7 @@ class Predictor(ABC):
 
     def export_model_to_tflite(self, fpath, verbose=1):
         """
+        ```
         Export model to TFLite
         Args:
           fpath(str): String representing full path to model file where TFLite model will be saved.
@@ -67,6 +72,7 @@ class Predictor(ABC):
           verbose(bool): verbosity
         Returns:
           str: fpath is returned back
+        ```
         """
         if verbose: print('converting to TFLite format ... this may take a few moments...')
         if U.is_huggingface(model=self.model):
@@ -95,6 +101,7 @@ class Predictor(ABC):
 
     def export_model_to_onnx(self, fpath, quantize=False, target_opset=None, verbose=1):
         """
+        ```
         Export model to onnx
         Args:
           fpath(str): String representing full path to model file where ONNX model will be saved.
@@ -110,6 +117,7 @@ class Predictor(ABC):
           verbose(bool): verbosity
         Returns:
           str: string representing fpath.  If quantize=True, returned fpath will be different than supplied fpath
+        ```
         """
         try:
             import onnxruntime, onnxruntime_tools, onnx, keras2onnx
@@ -169,7 +177,9 @@ class Predictor(ABC):
 
     def create_onnx_session(self, onnx_model_path, provider='CPUExecutionProvider'):
         """
+        ```
         Creates ONNX inference session from provided onnx_model_path
+        ```
         """
       
         from onnxruntime import GraphOptimizationLevel, InferenceSession, SessionOptions, get_all_providers

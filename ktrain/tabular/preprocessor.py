@@ -6,7 +6,9 @@ from ..data import SequenceDataset
 
 class TabularPreprocessor(Preprocessor):
     """
+    ```
     Tabular preprocessing base class
+    ```
     """
 
     def __init__(self, predictor_columns, label_columns, date_columns=[], 
@@ -70,7 +72,9 @@ class TabularPreprocessor(Preprocessor):
 
     def preprocess_train(self, df, mode='train', verbose=1):
         """
+        ```
         preprocess training set
+        ```
         """
         df = df.copy()
 
@@ -115,7 +119,9 @@ class TabularPreprocessor(Preprocessor):
 
     def preprocess_valid(self, df, verbose=1):
         """
+        ```
         preprocess validation set
+        ```
         """
         return self.preprocess_train(df, mode='valid', verbose=verbose)
 
@@ -123,7 +129,9 @@ class TabularPreprocessor(Preprocessor):
 
     def preprocess_test(self, df, verbose=1):
         """
+        ```
         preprocess test set
+        ```
         """
         return self.preprocess_train(df, mode='test', verbose=verbose)
 
@@ -183,11 +191,13 @@ class TabularDataset(SequenceDataset):
 
 def pd_data_types(df, return_df=False):
     """
+    ```
     infers data type of each column in Pandas DataFrame
     Args:
       df(pd.DataFrame): pandas DataFrame
       return_df(bool): If True, returns columns and types in DataFrame. 
                        Otherwise, a dictionary is returned.
+    ```
     """
 
     infer_type = lambda x: pd.api.types.infer_dtype(x, skipna=True)

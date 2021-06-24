@@ -7,7 +7,9 @@ from .. import utils as U
 
 class ImagePredictor(Predictor):
     """
+    ```
     predicts image classes
+    ```
     """
 
     def __init__(self, model, preproc, batch_size=U.DEFAULT_BS):
@@ -29,7 +31,9 @@ class ImagePredictor(Predictor):
 
     def explain(self, img_fpath):
         """
+        ```
         Highlights image to explain prediction
+        ```
         """
         #if U.is_tf_keras():
             #warnings.warn("currently_unsupported: explain() method is not available because tf.keras is "+\
@@ -76,8 +80,10 @@ class ImagePredictor(Predictor):
 
     def predict(self, data, return_proba=False):
         """
+        ```
         Predicts class from image in array format.
         If return_proba is True, returns probabilities of each class.
+        ```
         """
         if not isinstance(data, np.ndarray):
             raise ValueError('data must be numpy.ndarray')
@@ -87,8 +93,10 @@ class ImagePredictor(Predictor):
 
     def predict_filename(self, img_path, return_proba=False):
         """
+        ```
         Predicts class from filepath to single image file.
         If return_proba is True, returns probabilities of each class.
+        ```
         """
         if not os.path.isfile(img_path): raise ValueError('img_path must be valid file')
         (generator, steps) = self.preproc.preprocess(img_path, batch_size=self.batch_size)
@@ -97,8 +105,10 @@ class ImagePredictor(Predictor):
 
     def predict_folder(self, folder, return_proba=False):
         """
+        ```
         Predicts the classes of all images in a folder.
         If return_proba is True, returns probabilities of each class.
+        ```
 
         """
         if not os.path.isdir(folder): raise ValueError('folder must be valid directory')
@@ -149,6 +159,7 @@ class ImagePredictor(Predictor):
 
     def analyze_valid(self, generator, print_report=True, multilabel=None):
         """
+        ```
         Makes predictions on validation set and returns the confusion matrix.
         Accepts as input a genrator (e.g., DirectoryIterator, DataframeIterator)
         representing the validation set.
@@ -157,7 +168,7 @@ class ImagePredictor(Predictor):
         Optionally prints a classification report.
         Currently, this method is only supported for binary and multiclass
         problems, not multilabel classification problems.
-
+        ```
         """
         if multilabel is None:
             multilabel = U.is_multilabel(generator)

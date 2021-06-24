@@ -19,29 +19,31 @@ def get_learner(model, train_data=None, val_data=None,
                 batch_size=U.DEFAULT_BS, eval_batch_size=U.DEFAULT_BS,
                 workers=1, use_multiprocessing=False):
     """
-    Returns a Learner instance that can be used to tune and train Keras models.
+    ```
+    Returns a Learner instance that can be used to tune and train Keras models.  
 
-    model (Model):        A compiled instance of keras.engine.training.Model
-    train_data (tuple or generator): Either a: 
-                                   1) tuple of (x_train, y_train), where x_train and 
-                                      y_train are numpy.ndarrays or 
-                                   2) Iterator
-    val_data (tuple or generator): Either a: 
-                                   1) tuple of (x_test, y_test), where x_testand 
-                                      y_test are numpy.ndarrays or 
-                                   2) Iterator
-                                   Note: Should be same type as train_data.
-    batch_size (int):              Batch size to use in training. default:32
-    eval_batch_size(int):  batch size used by learner.predict
-                           only applies to validaton data during training if
-                           val_data is instance of utils.Sequence.
-                           default:32
-    workers (int): number of cpu processes used to load data.
-                   This is ignored unless train_data/val_data is an instance of 
-                   tf.keras.preprocessing.image.DirectoryIterator or tf.keras.preprocessing.image.DataFrameIterator. 
-    use_multiprocessing(bool):  whether or not to use multiprocessing for workers
-                               This is ignored unless train_data/val_data is an instance of 
-                               tf.keras.preprocessing.image.DirectoryIterator or tf.keras.preprocessing.image.DataFrameIterator. 
+    model (Model):        A compiled instance of keras.engine.training.Model  
+    train_data (tuple or generator): Either a:   
+                                   1) tuple of (x_train, y_train), where x_train and   
+                                      y_train are numpy.ndarrays or   
+                                   2) Iterator  
+    val_data (tuple or generator): Either a:   
+                                   1) tuple of (x_test, y_test), where x_testand   
+                                      y_test are numpy.ndarrays or    
+                                   2) Iterator  
+                                   Note: Should be same type as train_data.  
+    batch_size (int):              Batch size to use in training. default:32  
+    eval_batch_size(int):  batch size used by learner.predict  
+                           only applies to validaton data during training if  
+                           val_data is instance of utils.Sequence.  
+                           default:32  
+    workers (int): number of cpu processes used to load data.  
+                   This is ignored unless train_data/val_data is an instance of   
+                   tf.keras.preprocessing.image.DirectoryIterator or tf.keras.preprocessing.image.DataFrameIterator.   
+    use_multiprocessing(bool):  whether or not to use multiprocessing for workers  
+                               This is ignored unless train_data/val_data is an instance of   
+                               tf.keras.preprocessing.image.DirectoryIterator or tf.keras.preprocessing.image.DataFrameIterator.   
+    ```
     """
 
     # check arguments

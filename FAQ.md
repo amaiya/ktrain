@@ -22,7 +22,9 @@
 
 - [How do I deploy a model using Flask?](#how-do-i-deploy-a-model-using-flask)
 
-- [Why am I getting a *"model must be of instance Model"* error with `load_predictor`?](#why-am-i-getting-a-model-must-be-of-instance-model-error-with-load_predictor)
+- [Why am I getting a 404 client error?](#why-am-i-getting-a-404-client-error)
+
+- [How do I convert a model to ONNX for deployment?](#how-do-i-make-quantized-predictions-with-transformers-models)
 
 
 ## Training
@@ -52,6 +54,8 @@
 
 - [How do pretrain a language model for use with ktrain?](#how-do-i-pretrain-a-language-model-for-use-with-ktrain)
 
+- [How do I get reproducible results?](#how-do-i-get-reproducible-results)
+
 
 
 
@@ -64,7 +68,14 @@
 
 - [Running `predictor.explain` for text classification is slow.  How can I speed it up?](#running-predictorexplain-for-text-classification-is-slow--how-can-i-speed-it-up)
 
+- [Running `preprocess_train` for Transformer models is slow.  How can I speed it up?](#running-preprocess_train-for-transformer-models-is-slow--how-can-i-speed-it-up)
+
 - [How do I make quantized predictions with `transformers` models?](#how-do-i-make-quantized-predictions-with-transformers-models)
+
+- [How do I increase batch size for predictions?](#how-do-i-increase-batch-size-for-predictions)
+
+- [How do I speed up predictions?](#how-do-i-increase-batch-size-for-predictions)
+
 
 
 ---
@@ -123,7 +134,7 @@ type a question mark before the method and press ENTER in a Google Colab or Jupy
 
 This answer shows different ways to save/reload a model and resume training.
 
-#### Method 1: Using Predictor API (works for any model)
+#### Method 1: Using Predictor API (RECOMMENDED - works for any model)
 ```python
 # save Predictor (i.e., model and Preprocessor instance) after partially training
 ktrain.get_predictor(model, preproc).save('/tmp/my_predictor')
@@ -132,7 +143,7 @@ ktrain.get_predictor(model, preproc).save('/tmp/my_predictor')
 model = ktrain.load_predictor('/tmp/my_predictor').model
 
 # re-instantiate Learner and continue training
-learner = ktrain.get_learner(model, train_data=trn, val_data=val)
+learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=8)
 learner.fit_onecycle(2e-5, 1)
 ```
 Note that `preproc` here is a *Preprocessor* instance.  If using a data-loading function like `texts_from_csv` or `images_from_folder`, it will be the third return value from the function. Or, if using the [Transformer API](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-A3-hugging_face_transformers.ipynb) for text classification, it will be the output of invoking `text.Transformer` (i.e., `preproc = text.Transformer('bert-base-uncased', ...)`).  Also, `trn` and `val` are typically the result of invoking `preproc.preprocess_train` and `preproc.preprocess_test`, respectively.
@@ -150,9 +161,10 @@ model = TFAutoModelForSequenceClassification.from_pretrained('/tmp/my_model')
 model.compile(loss='categorical_crossentropy',optimizer='adam', metrics=['accuracy'])
 
 # re-instantiate Learner and continue training
-learner = ktrain.get_learner(model, train_data=trn, val_data=val)
+learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=8)
 learner.fit_onecycle(2e-5, 1)
 ```
+**Note:**  You may need to [supply the number of classes](https://stackoverflow.com/a/62328920/13550699) as an argument to `TFAutoModelForSequenceClassification.from_pretrained`.  See the [transformers documentation](https://huggingface.co/transformers/quicktour.html) for more detail.  **Method 1** does this automatically for you.
 
 #### Method 3: Using `checkpoint_folder` argument to save model weights
 
@@ -353,6 +365,12 @@ The [bug](https://github.com/huggingface/transformers/issues/5016) does not affe
 That is, if all you're doing is making the predictions on the machine with no internet connectivity, doing `p = ktrain.load_predictor('/tmp/path_to_predictor')` is sufficient
 provided the cache folder (i.e. `<home_directory>/.cache/torch/transformers`), contains the required model files. The vocab file is typically the only thing that
 needs to be present in the cache for these scenarios.
+
+
+Note also that the local path you supply to `Transformer` is stored in `t.model_name`, where `t` is a `Preprocessor` instance.  If creating a `Predictor` and transferring it to another machine, you may need to update this path:
+```python
+predictor.preproc.model_name = 'path/to/predictor/on/new/machine'
+```
 
 
 
@@ -721,6 +739,47 @@ smaller sample sizes (e.g., 500, 1000) may be sufficient for your use case.
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
 
 
+### Running `preprocess_train` for Transformer models is slow.  How can I speed it up?
+
+Preprocessing data for `transformers` text classification models using the `Transformer` API typically looks something like this:
+```python
+from ktrain import text
+MODEL_NAME = 'distilbert-base-uncased'
+t = text.Transformer(MODEL_NAME, maxlen=500, class_names=label_names)
+trn = t.preprocess_train(x_train, y_train)
+val = t.preprocess_test(x_test, y_test)
+```
+The `preprocess_train` and `preprocess_test` methods are not currently parallelized to use multiple CPU cores.  Some users have used [dask](https://github.com/dask/dask) to parallelize the preprocessing using something like this:
+
+```python
+import dask
+def preproc(x, labels = labels):
+    MODEL_NAME = 'distilbert-base-uncased'
+    t = text.Transformer(MODEL_NAME, maxlen=80, class_names = labels, multilabel=True)
+    res = t.preprocess_train(x['text_a'].values.tolist(),x['label'].values.tolist(), verbose=0)
+    return(res)
+
+results = []
+partitions = train.to_delayed()
+for part in partitions:
+    results.append(dask.delayed(preproc)(part))
+
+results = client.compute(results)
+
+trn = results[0].result()
+x = [r.result().x for r in results]
+y = [r.result().y for r in results]
+numlabels = np.max([yy.shape[1] for yy in y])
+y = [np.pad(yy,[0,numlabels - yy.shape[1]], 'constant', constant_values = 0) for yy in y]
+trn.x  = np.concatenate(x, axis = 0)
+trn.y  = np.concatenate(y, axis = 0)
+```
+
+Note, however, that the power of transfer learning is being able to use smaller training sets to fine-tune your model. So, perhaps make sure you really need an extremely large training set before you try parallelizing the preprocessing.
+
+[[Back to Top](#frequently-asked-questions-about-ktrain)]
+
+
 ### Why does `texts_from_csv` throw an error on Google Cloud Storage?
 
 The error is probably happening because *ktrain* tries to auto-detect the character encoding using `open(train_filepath, 'rb')` which may be problematic with Google Cloud Storage. 
@@ -734,29 +793,9 @@ Then, using *ktrain*, you can use `ktrain.text.texts_from_df` (or `ktrain.text.t
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
 
-### Why am I getting a *"model must be of instance Model"* error with `load_predictor`?
+### Why am I getting a 404 client error?
 
-This may be an issue with the TensorFlow installation or dependencies. Users have reported that uninstalling and reinstalling **ktrain**, TensorFlow, and its dependencies from scratch can
-resolve the issue. Or, you can just create a new virtual environement for **ktrain**:
-
-```
-python3 -m venv new_ktrain_venv
-cd new_ktrain_venv
-source bin/activate
-pip install -U pip
-pip install tensorflow
-pip install ktrain
-pip install git+https://github.com/amaiya/eli5@tfkeras_0_10_1
-pip install git+https://github.com/amaiya/stellargraph@no_tf_dep_082
-```
-
-After re-installing everything, try loading the predictor again:
-
-```python
-import ktrain
-predictor = ktrain.load_predictor('/path/to/folder')
-```
-
+You can safely ignore the error, if it arises from downloading Hugging Face **transformers** models.  The 404 error simply means that **ktrain** was not able to find a Tensorflow version of this particular model. In this case, the PyTorch version of the  model checkpoint will be downloaded  and then be loaded by **ktrain** as a Tensorflow model for training/fine-tuning. If you type `model.summary()`, it should show that the model was loaded successfully.
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
 
@@ -783,6 +822,7 @@ A number of models in **ktrain** can be used out-of-the-box on a CPU-based lapto
 
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
+
 
 
 ### How do I make quantized predictions with `transformers` models?
@@ -830,13 +870,19 @@ Alternatively, you might also consider quantizing your `transformers` model with
 ```python
 # Converting to ONNX (from PyTorch-converted model)
 
-# install onnx libraries
-!pip install --upgrade onnxruntime==1.5.1 onnxruntime-tools onnx
+
+# set maxlen, class_names, and tokenizer (use settings employed when training the model - see above)
+model_name = 'distilbert-base-uncased'
+maxlen = 500
+class_names = ['alt.atheism', 'soc.religion.christian','comp.graphics', 'sci.med']
+from transformers import AutoTokenizer
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+
 
 # imports
 import numpy as np
 from transformers.convert_graph_to_onnx import convert, optimize, quantize
-from transformers import *
+from transformers import AutoModelForSequenceClassification
 from pathlib import Path
 
 # paths
@@ -845,28 +891,51 @@ pt_path = predictor_path+'_pt'
 pt_onnx_path = pt_path +'_onnx/model.onnx'
 
 # convert to ONNX
-p = ktrain.load_predictor(predictor_path)
 AutoModelForSequenceClassification.from_pretrained(predictor_path, 
                                                    from_tf=True).save_pretrained(pt_path)
 convert(framework='pt', model=pt_path,output=Path(pt_onnx_path), opset=11, 
-        tokenizer=p.preproc.model_name, pipeline_name='sentiment-analysis')
+        tokenizer=model_name, pipeline_name='sentiment-analysis')
 pt_onnx_quantized_path = quantize(optimize(Path(pt_onnx_path)))
 
-# create ONNX session (or create session manually if wanting to avoid ktrain/TensorFlow dependencies)
-sess = p.create_onnx_session(pt_onnx_quantized_path.as_posix())
-# create tokenizer (or create tokenizer manually if wanting to avoid ktrain/TensorFlow dependencies)
-tokenizer = p.preproc.get_tokenizer()
-tokens = tokenizer.encode_plus('My computer monitor is blurry.', max_length=p.preproc.maxlen, truncation=True)
+# create ONNX session
+def create_onnx_session(onnx_model_path, provider='CPUExecutionProvider'):
+    """
+    Creates ONNX inference session from provided onnx_model_path
+    """
+
+    from onnxruntime import GraphOptimizationLevel, InferenceSession, SessionOptions, get_all_providers
+    assert provider in get_all_providers(), f"provider {provider} not found, {get_all_providers()}"
+
+    # Few properties that might have an impact on performances (provided by MS)
+    options = SessionOptions()
+    options.intra_op_num_threads = 0
+    options.graph_optimization_level = GraphOptimizationLevel.ORT_ENABLE_ALL
+
+    # Load the model as a graph and prepare the CPU backend 
+    session = InferenceSession(onnx_model_path, options, providers=[provider])
+    session.disable_fallback()
+    return session
+sess = create_onnx_session(pt_onnx_quantized_path.as_posix())
+
+#  tokenize document and make prediction
+tokens = tokenizer.encode_plus('My computer monitor is blurry.', max_length=maxlen, truncation=True)
 tokens = {name: np.atleast_2d(value) for name, value in tokens.items()}
-print(p.get_classes()[np.argmax(sess.run(None, tokens)[0])])
+print()
+print()
+print("predicted class: %s" % (class_names[np.argmax(sess.run(None, tokens)[0])]))
 
 # output:
-# comp.graphics
+# predicted class: comp.graphics
 ```
 
 The example above assumes the model saved at `predictor_path` was trained on a subset of the 20 Newsgroup corpus as was done in [this tutorial](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-A3-hugging_face_transformers.ipynb).
 
-You can also use **ktrain** to [create ONNX models directly from TensorFlow](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/ktrain-ONNX-TFLite-examples.ipynb) with optional quantization.  Note, that conversions to ONNX from TensorFlow models appear to [require a hard-coded input size](https://github.com/huggingface/transformers/issues/8227) (i.e., padding is used), whereas conversions to ONNX from PyTorch models do not appear to have this requirement.
+You can also use **ktrain** to create ONNX models directly from TensorFlow with (which can be used for non-transformers TensorFlow models): 
+```python
+predictor.export_model_to_onnx(onnx_model_path)
+```
+
+However, note that conversions to ONNX from TensorFlow models appear to [require a hard-coded input size](https://github.com/huggingface/transformers/issues/8227) (i.e., padding is used), whereas conversions to ONNX from PyTorch models do not appear to have this requirement.
 
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
@@ -929,11 +998,51 @@ predictor.preproc.model_name = 'path/to/predictor/on/new/machine'
 ```
 
 
+[[Back to Top](#frequently-asked-questions-about-ktrain)]
 
 
+### How do I get reproducible results?
+
+In regard to train-test splits, the data-loading functions (e.g., `texts_from_folder`, `images_from_csv`) have a `random_state` parameter that will ensure the same dataset split across runs.
+
+In regards to training, please see [this post](https://github.com/amaiya/ktrain/issues/334#issuecomment-788893119), which includes some suggestions for reproducible results in `tf.keras` and TensorFlow 2.
+
+For instance, invoking the function below before each training run can help generate more consistent results across runs.
+
+```python
+import tensorflow as tf
+import numpy as np
+import os
+import random
+def reset_random_seeds(seed=2):
+    os.environ['PYTHONHASHSEED']=str(seed)
+    tf.random.set_seed(seed)
+    np.random.seed(seed)
+    random.seed(seed)
+```
 
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
+
+
+### How do I increase batch size for predictions?
+
+Increasing the batch size used for inference and predictions can potentially speed up predictions on lists of examples.
+
+The `get_predictor` and `load_predictor` functions both accept a `batch_size` argument that will be used when making predictions on lists of examples. The default is 32.  The `batch_size` for `Predictor` instances can also be set manually:
+```python
+predictor = ktrain.load_predictor('/tmp/my_predictor')
+predictor.batch_size = 128
+predictor.predict(list_of_examples)
+```
+
+The `get_learner` function accepts an `eval_batch_size` argument that will be used by the `Learner` instance when evaluating a validation dataset (e.g., `learner.predict`).
+
+
+[[Back to Top](#frequently-asked-questions-about-ktrain)]
+
+
+
 
 ### What kinds of applications have been built with *ktrain*?
 

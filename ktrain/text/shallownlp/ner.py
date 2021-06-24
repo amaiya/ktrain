@@ -4,11 +4,13 @@ from .imports import *
 class NER:
     def __init__(self, lang='en', predictor_path=None):
         """
+        ```
         pretrained NER.
         Only English and Chinese are currenty supported.
 
         Args:
           lang(str): Currently, one of {'en', 'zh', 'ru'}: en=English , zh=Chinese, or ru=Russian
+        ```
         """
         if lang is None:
             raise ValueError('lang is required (e.g., "en" for English, "zh" for Chinese, "ru" for Russian, etc.')
@@ -57,8 +59,9 @@ class NER:
         self.predictor = ktrain.load_predictor(fpath)
 
 
-    def predict(self, texts, merge_tokens=True):
+    def predict(self, texts, merge_tokens=True, batch_size=32):
         """
+        ```
         Extract named entities from supplied text
 
         Args:
@@ -66,17 +69,15 @@ class NER:
           merge_tokens(bool):  If True, tokens will be merged together by the entity
                                to which they are associated:
                                ('Paul', 'B-PER'), ('Newman', 'I-PER') becomes ('Paul Newman', 'PER')
+          batch_size(int):    Batch size to use for predictions (default:32)
+        ```
         """
         if isinstance(texts, str): texts = [texts]
-        results = []
-        for text in texts:
-            text = text.strip()
-            result = self.predictor.predict(text, merge_tokens=merge_tokens)
-            #if merge_tokens:
-                #result = self.merge_tokens(result)
-            results.append(result)
-        if len(result) == 1: result = result[0]
-        return result
+        self.predictor.batch_size = batch_size
+        texts = [t.strip() for t in texts]
+        results = self.predictor.predict(texts, merge_tokens=merge_tokens)
+        if len(results) == 1: results = results[0]
+        return results
 
 
     # 2020-04-30: moved to text.ner.predictor

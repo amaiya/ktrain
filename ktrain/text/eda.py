@@ -27,10 +27,11 @@ class TopicModel():
             max_df (float): words in more than max_df proportion of docs discarded
             stop_words (str or list): either 'english' for built-in stop words or
                                       a list of stop words to ignore
+            model_type(str): type of topic model to fit. One of {'lda', 'nmf'}.  Default:'lda'
             lda_max_iter (int): maximum iterations for 'lda'.  5 is default if using lda_mode='online'.
                                 If lda_mode='batch', this should be increased (e.g., 1500).
                                 Ignored if model_type != 'lda'
-            lda_mode (str):  one of {'online', 'batch'}. Ignored of model_type !='lda'
+            lda_mode (str):  one of {'online', 'batch'}. Ignored if model_type !='lda'
             token_pattern(str): regex pattern to use to tokenize documents. 
             verbose(bool): verbosity
 

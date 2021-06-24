@@ -254,7 +254,9 @@ def hf_convert_example(text_a, text_b=None, tokenizer=None,
                        pad_token_segment_id=0,
                        mask_padding_with_zero=True):
     """
+    ```
     convert InputExample to InputFeature for Hugging Face transformer
+    ```
     """
     if tokenizer is None: raise ValueError('tokenizer is required')
     inputs = tokenizer.encode_plus(
@@ -308,6 +310,7 @@ def hf_convert_examples(texts, y=None, tokenizer=None,
                         use_dynamic_shape=False,
                         verbose=1):
     """
+    ```
     Loads a data file into a list of ``InputFeatures``
     Args:
         texts: texts of documents or sentence pairs
@@ -327,6 +330,7 @@ def hf_convert_examples(texts, y=None, tokenizer=None,
         If the ``examples`` input is a ``tf.data.Dataset``, will return a ``tf.data.Dataset``
         containing the task-specific features. If the input is a list of ``InputExamples``, will return
         a list of task-specific ``InputFeatures`` which can be fed to the model.
+    ```
     """
 
     is_array, is_pair = detect_text_format(texts)
@@ -388,7 +392,9 @@ def hf_convert_examples(texts, y=None, tokenizer=None,
 
 class TextPreprocessor(Preprocessor):
     """
+    ```
     Text preprocessing base class
+    ```
     """
 
     def __init__(self, maxlen, class_names, lang='en', multilabel=None):
@@ -420,7 +426,8 @@ class TextPreprocessor(Preprocessor):
 
     def check_trained(self):
         if not self.preprocess_train_called:
-            raise Exception('preprocess_train must be called')
+            warnings.warn('The method preprocess_train was never called. You can disable this warning by setting preprocess_train_called=True.')
+            #raise Exception('preprocess_train must be called')
 
 
     def get_preprocessor(self):
@@ -456,8 +463,10 @@ class TextPreprocessor(Preprocessor):
 
     def undo(self, doc):
         """
+        ```
         undoes preprocessing and returns raw data by:
         converting a list or array of Word IDs back to words
+        ```
         """
         raise NotImplementedError
 
@@ -480,12 +489,14 @@ class TextPreprocessor(Preprocessor):
     @classmethod
     def seqlen_stats(cls, list_of_texts):
         """
+        ```
         compute sequence length stats from
         list of texts in any spaces-segmented language
         Args:
             list_of_texts: list of strings
         Returns:
             dict: dictionary with keys: mean, 95percentile, 99percentile
+        ```
         """
         counts = []
         for text in list_of_texts:
@@ -502,7 +513,9 @@ class TextPreprocessor(Preprocessor):
 
     def print_seqlen_stats(self, texts, mode, verbose=1):
         """
+        ```
         prints stats about sequence lengths
+        ```
         """
         if verbose and not self.is_nospace_lang():
             stat_dict = TextPreprocessor.seqlen_stats(texts)
@@ -513,9 +526,11 @@ class TextPreprocessor(Preprocessor):
 
     def _transform_y(self, y_data, train=False, verbose=1):
         """
+        ```
         preprocess y
         If shape of y is 1, then task is considered classification if self.c exists
         or regression if not.
+        ```
         """
         if self.ytransform is None:
             self.ytransform = U.YTransform(class_names=self.get_classes())
@@ -526,7 +541,9 @@ class TextPreprocessor(Preprocessor):
 
 class StandardTextPreprocessor(TextPreprocessor):
     """
+    ```
     Standard text preprocessing
+    ```
     """
 
     def __init__(self, maxlen, max_features, class_names=[], classes=[], 
@@ -548,7 +565,9 @@ class StandardTextPreprocessor(TextPreprocessor):
 
     def __setstate__(self, state):
         """
+        ```
         For backwards compatibility with pre-ytransform versions
+        ```
         """
         self.__dict__.update(state)
         if not hasattr(self, 'ytransform'):
@@ -567,8 +586,10 @@ class StandardTextPreprocessor(TextPreprocessor):
 
     def undo(self, doc):
         """
+        ```
         undoes preprocessing and returns raw data by:
         converting a list or array of Word IDs back to words
+        ```
         """
         dct = self.tok.index_word
         return " ".join([dct[wid] for wid in doc if wid != 0 and wid in dct])
@@ -576,7 +597,9 @@ class StandardTextPreprocessor(TextPreprocessor):
 
     def preprocess_train(self, train_text, y_train, verbose=1):
         """
+        ```
         preprocess training set
+        ```
         """
         if self.lang is None: self.lang = TU.detect_lang(train_text)
 
@@ -618,7 +641,9 @@ class StandardTextPreprocessor(TextPreprocessor):
 
     def preprocess_test(self, test_text, y_test=None, verbose=1):
         """
+        ```
         preprocess validation or test dataset
+        ```
         """
         self.check_trained()
         if self.tok is None or self.lang is None:
@@ -681,8 +706,10 @@ class StandardTextPreprocessor(TextPreprocessor):
 
     def _add_ngrams(self, sequences, verbose=1, mode='test'):
         """
+        ```
         Augment the input list of list (sequences) by appending n-grams values.
         Example: adding bi-gram
+        ```
         """
         token_indice = self.tok_dct
         if self.ngram_range < 2: return sequences
@@ -704,11 +731,14 @@ class StandardTextPreprocessor(TextPreprocessor):
 
     def _create_ngram_set(self, input_list, ngram_value=2):
         """
+        ```
         Extract a set of n-grams from a list of integers.
         >>> create_ngram_set([1, 4, 9, 4, 1, 4], ngram_value=2)
         {(4, 9), (4, 1), (1, 4), (9, 4)}
         >>> create_ngram_set([1, 4, 9, 4, 1, 4], ngram_value=3)
         [(1, 4, 9), (4, 9, 4), (9, 4, 1), (4, 1, 4)]
+
+        ```
         """
         return set(zip(*[input_list[i:] for i in range(ngram_value)]))
 
@@ -723,7 +753,9 @@ class StandardTextPreprocessor(TextPreprocessor):
 
 class BERTPreprocessor(TextPreprocessor):
     """
+    ```
     text preprocessing for BERT model
+    ```
     """
 
     def __init__(self, maxlen, max_features, class_names=[], classes=[], 
@@ -757,7 +789,9 @@ class BERTPreprocessor(TextPreprocessor):
 
     def __setstate__(self, state):
         """
+        ```
         For backwards compatibility with pre-ytransform versions
+        ```
         """
         self.__dict__.update(state)
         if not hasattr(self, 'ytransform'):
@@ -776,8 +810,10 @@ class BERTPreprocessor(TextPreprocessor):
 
     def undo(self, doc):
         """
+        ```
         undoes preprocessing and returns raw data by:
         converting a list or array of Word IDs back to words
+        ```
         """
         dct = self.tok_dct
         return " ".join([dct[wid] for wid in doc if wid != 0 and wid in dct])
@@ -785,7 +821,9 @@ class BERTPreprocessor(TextPreprocessor):
 
     def preprocess_train(self, texts, y=None, mode='train', verbose=1):
         """
+        ```
         preprocess training set
+        ```
         """
         if mode == 'train' and y is None:
             raise ValueError('y is required when mode=train')
@@ -811,7 +849,9 @@ class BERTPreprocessor(TextPreprocessor):
 
 class TransformersPreprocessor(TextPreprocessor):
     """
+    ```
     text preprocessing for Hugging Face Transformer models
+    ```
     """
 
     def __init__(self,  model_name,
@@ -855,8 +895,10 @@ class TransformersPreprocessor(TextPreprocessor):
 
     def __setstate__(self, state):
         """
+        ```
         For backwards compatibility with previous versions of ktrain
         that saved tokenizer and did not use ytransform
+        ```
         """
         self.__dict__.update(state)
         if not hasattr(self, 'tok'): self.tok = None
@@ -866,24 +908,34 @@ class TransformersPreprocessor(TextPreprocessor):
 
     def set_config(self, config):
         self.config = config
+
     def get_config(self):
         return self.config
+
+    def set_tokenizer(self, tokenizer):
+        self.tok = tokenizer
 
     def get_tokenizer(self, fpath=None):
         model_name = self.model_name if fpath is None else fpath
         if self.tok is None:
-            # use fast tokenizer if possible
-            if self.name == 'bert' and 'japanese' not in model_name:
-                from transformers import BertTokenizerFast
-                self.tok = BertTokenizerFast.from_pretrained(model_name)
-            elif self.name == 'distilbert':
-                from transformers import DistilBertTokenizerFast
-                self.tok = DistilBertTokenizerFast.from_pretrained(model_name)
-            elif self.name == 'roberta':
-                from transformers import RobertaTokenizerFast
-                self.tok = RobertaTokenizerFast.from_pretrained(model_name)
-            else:
-                self.tok = self.tokenizer_type.from_pretrained(model_name)
+            try:
+                # use fast tokenizer if possible
+                if self.name == 'bert' and 'japanese' not in model_name:
+                    from transformers import BertTokenizerFast
+                    self.tok = BertTokenizerFast.from_pretrained(model_name)
+                elif self.name == 'distilbert':
+                    from transformers import DistilBertTokenizerFast
+                    self.tok = DistilBertTokenizerFast.from_pretrained(model_name)
+                elif self.name == 'roberta':
+                    from transformers import RobertaTokenizerFast
+                    self.tok = RobertaTokenizerFast.from_pretrained(model_name)
+                else:
+                    self.tok = self.tokenizer_type.from_pretrained(model_name)
+            except:
+                error_msg = f"Could not load tokenizer from model_name: {model_name}. " +\
+                            f"If {model_name} is a local path, please make sure it exists and contains tokenizer files from Hugging Face. " +\
+                            f"You can also reset model_name with preproc.model_name = '/your/new/path'."
+                raise ValueError(error_msg)
         return self.tok
 
 
@@ -913,8 +965,10 @@ class TransformersPreprocessor(TextPreprocessor):
 
     def undo(self, doc):
         """
+        ```
         undoes preprocessing and returns raw data by:
         converting a list or array of Word IDs back to words
+        ```
         """
         tok, _ = self.get_preprocessor()
         return self.tok.convert_ids_to_tokens(doc)
@@ -923,7 +977,9 @@ class TransformersPreprocessor(TextPreprocessor):
 
     def preprocess_train(self, texts, y=None, mode='train', verbose=1):
         """
+        ```
         preprocess training set
+        ```
         """
 
         U.vprint('preprocessing %s...' % (mode), verbose=verbose)
@@ -970,11 +1026,13 @@ class TransformersPreprocessor(TextPreprocessor):
     @classmethod
     def load_model_and_configure_from_data(cls, fpath, transformer_ds):
         """
+        ```
         loads model from file path and configures loss function and metrics automatically
         based on inspecting data
         Args:
           fpath(str): path to model folder
           transformer_ds(TransformerDataset): an instance of TransformerDataset
+        ```
         """
         is_regression = U.is_regression_from_data(transformer_ds)
         multilabel = U.is_multilabel(transformer_ds)
@@ -997,17 +1055,23 @@ class TransformersPreprocessor(TextPreprocessor):
 
     def _load_pretrained(self, mname, num_labels):
         """
+        ```
         load pretrained model
+        ```
         """
         if self.config is not None:
             self.config.num_labels = num_labels
             try:
                 model = self.model_type.from_pretrained(mname, config=self.config)
             except:
+                warnings.warn('Could not find Tensorflow version of model.  Attempting to download/load PyTorch version as TensorFlow model using from_pt=True. ' +\
+                              'You will need PyTorch installed for this.')
                 try:
                     model = self.model_type.from_pretrained(mname, config=self.config, from_pt=True)
                 except:
-                    raise ValueError('could not load pretrained model %s using both from_pt=False and from_pt=True' % (mname))
+                    # load model as normal to expose error to user
+                    model = self.model_type.from_pretrained(mname, config=self.config)
+                    #raise ValueError('could not load pretrained model %s using both from_pt=False and from_pt=True' % (mname))
         else:
             model = self.model_type.from_pretrained(mname, num_labels=num_labels)
         return model
@@ -1016,6 +1080,7 @@ class TransformersPreprocessor(TextPreprocessor):
 
     def get_classifier(self, fpath=None, multilabel=None, metrics=['accuracy']):
         """
+        ```
         creates a model for text classification
         Args:
           fpath(str): optional path to saved pretrained model. Typically left as None.
@@ -1024,6 +1089,7 @@ class TransformersPreprocessor(TextPreprocessor):
                             If False, model will be forcibly configured for non-multilabel task.
                             It is recommended to leave this as None.
           metrics(list): metrics to use
+        ```
         """
         self.check_trained()
         if not self.get_classes():
@@ -1055,10 +1121,12 @@ class TransformersPreprocessor(TextPreprocessor):
 
     def get_regression_model(self, fpath=None, metrics=['mae']):
         """
+        ```
         creates a model for text regression
         Args:
           fpath(str): optional path to saved pretrained model. Typically left as None.
           metrics(list): metrics to use
+        ```
         """
         self.check_trained()
         if self.get_classes():
@@ -1085,7 +1153,9 @@ class TransformersPreprocessor(TextPreprocessor):
 
 class DistilBertPreprocessor(TransformersPreprocessor):
     """
+    ```
     text preprocessing for Hugging Face DistlBert model
+    ```
     """
 
     def __init__(self, maxlen, max_features, class_names=[], classes=[], 
@@ -1104,17 +1174,20 @@ class DistilBertPreprocessor(TransformersPreprocessor):
 
 class Transformer(TransformersPreprocessor):
     """
+    ```
     convenience class for text classification Hugging Face transformers 
     Usage:
        t = Transformer('distilbert-base-uncased', maxlen=128, classes=['neg', 'pos'], batch_size=16)
        train_dataset = t.preprocess_train(train_texts, train_labels)
        model = t.get_classifier()
        model.fit(train_dataset)
+    ```
     """
 
     def __init__(self, model_name, maxlen=128, class_names=[], classes=[],
                  batch_size=None, use_with_learner=True):
         """
+        ```
         Args:
             model_name (str):  name of Hugging Face pretrained model
             maxlen (int):  sequence length
@@ -1139,7 +1212,7 @@ class Transformer(TransformersPreprocessor):
 
 
 
-
+        ```
         """
         multilabel = None # force discovery of multilabel task from data in preprocess_train->set_multilabel
         class_names = self.migrate_classes(class_names, classes)
@@ -1156,6 +1229,7 @@ class Transformer(TransformersPreprocessor):
 
     def preprocess_train(self, texts, y=None, mode='train', verbose=1):
         """
+        ```
         Preprocess training set for A Transformer model
 
         Y values can be in one of the following forms:
@@ -1179,6 +1253,7 @@ class Transformer(TransformersPreprocessor):
             verbose(bool): verbosity
         Returns:
           TransformerDataset if self.use_with_learner = True else tf.Dataset
+        ```
         """
         tseq = super().preprocess_train(texts, y=y, mode=mode, verbose=verbose)
         if self.use_with_learner: return tseq
@@ -1189,6 +1264,7 @@ class Transformer(TransformersPreprocessor):
 
     def preprocess_test(self, texts, y=None,  verbose=1):
         """
+        ```
         Preprocess the validation or test set for a Transformer model
         Y values can be in one of the following forms:
         1) integers representing the class (index into array returned by get_classes)
@@ -1208,6 +1284,7 @@ class Transformer(TransformersPreprocessor):
             verbose(bool): verbosity
         Returns:
             TransformerDataset if self.use_with_learner = True else tf.Dataset
+        ```
         """
         self.check_trained()
         return self.preprocess_train(texts, y=y, mode='test', verbose=verbose)
@@ -1216,12 +1293,14 @@ class Transformer(TransformersPreprocessor):
 class TransformerEmbedding():
     def __init__(self, model_name, layers=U.DEFAULT_TRANSFORMER_LAYERS):
         """
+        ```
         Args:
             model_name (str):  name of Hugging Face pretrained model.
                                Choose from here: https://huggingface.co/transformers/pretrained_models.html
             layers(list): list of indexes indicating which hidden layers to use when
                           constructing the embedding (e.g., last=[-1])
                                
+        ```
         """
         self.layers = layers
         self.model_name = model_name
@@ -1251,13 +1330,17 @@ class TransformerEmbedding():
 
     def _load_pretrained(self, model_name):
         """
+        ```
         load pretrained model
+        ```
         """
         if self.config is not None:
             self.config.output_hidden_states = True
             try:
                 model = self.model_type.from_pretrained(model_name, config=self.config)
             except:
+                warnings.warn('Could not find Tensorflow version of model.  Attempting to download/load PyTorch version as TensorFlow model using from_pt=True. ' +\
+                              'You will need PyTorch installed for this.')
                 try:
                     model = self.model_type.from_pretrained(model_name, config=self.config, from_pt=True)
                 except:
@@ -1270,6 +1353,7 @@ class TransformerEmbedding():
 
     def embed(self, texts, word_level=True, max_length=512):
         """
+        ```
         get embedding for word, phrase, or sentence
         Args:
           text(str|list): word, phrase, or sentence or list of them representing a batch
@@ -1278,6 +1362,7 @@ class TransformerEmbedding():
           max_length(int): max length of tokens
         Returns:
             np.ndarray : embeddings
+        ```
         """
         if isinstance(texts, str): texts = [texts]
         if not isinstance(texts[0], str): texts = [" ".join(text) for text in texts]
@@ -1352,7 +1437,9 @@ class TransformerEmbedding():
 
 class TransformerDataset(SequenceDataset):
     """
+    ```
     Wrapper for Transformer datasets.
+    ```
     """
 
     def __init__(self, x, y, batch_size=1):
@@ -1377,7 +1464,9 @@ class TransformerDataset(SequenceDataset):
 
     def to_tfdataset(self, train=True):
         """
+        ```
         convert transformer features to tf.Dataset
+        ```
         """
         if train:
             shuffle=True

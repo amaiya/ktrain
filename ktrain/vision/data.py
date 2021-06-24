@@ -5,7 +5,9 @@ from .preprocessor import ImagePreprocessor
 
 def show_image(img_path):
     """
+    ```
     Given file path to image, show it in Jupyter notebook
+    ```
     """
     if not os.path.isfile(img_path):
         raise ValueError('%s is not valid file' % (img_path))
@@ -16,7 +18,9 @@ def show_image(img_path):
 
 def show_random_images(img_folder, n=4, rows=1):
     """
+    ```
     display random images from a img_folder
+    ```
     """
     fnames = []
     for ext in ('*.gif', '*.png', '*.jpg'):
@@ -34,8 +38,10 @@ def show_random_images(img_folder, n=4, rows=1):
 
 def preview_data_aug(img_path, data_aug, rows=1, n=4):
     """
+    ```
     Preview data augmentation (ImageDatagenerator)
     on a supplied image.
+    ```
     """
     if type(img_path) != type('') or not os.path.isfile(img_path):
         raise ValueError('img_path must be valid file path to image')
@@ -64,8 +70,10 @@ def preview_data_aug(img_path, data_aug, rows=1, n=4):
 
 def preview_data_aug_OLD(img_path, data_aug, n=4):
     """
+    ```
     Preview data augmentation (ImageDatagenerator)
     on a supplied image.
+    ```
     """
     if type(img_path) != type('') or not os.path.isfile(img_path):
         raise ValueError('img_path must be valid file path to image')
@@ -106,6 +114,7 @@ def get_data_aug(
                  rescale=None,
                  **kwargs):
     """
+    ```
     This function is simply a wrapper around ImageDataGenerator
     with some reasonable defaults for data augmentation.
     Returns the default image_data_generator to support
@@ -113,6 +122,7 @@ def get_data_aug(
     Parameters can be adjusted by caller.
     Note that the ktrain.vision.model.image_classifier
     function may adjust these as needed.
+    ```
     """
 
     data_aug = image.ImageDataGenerator(
@@ -180,7 +190,9 @@ def fit_datagens(train_datagen, test_datagen,
                  target_size=None,
                  color_mode='rgb', flat_dir=False):
     """
+    ```
     computes stats of images for normalization
+    ```
     """
     if not datagen_needs_fit(train_datagen): return
     if bool(train_array is not None) == bool(train_directory):
@@ -257,6 +269,7 @@ def detect_color_mode(train_directory,
 def preprocess_csv(csv_in, csv_out, x_col='filename', y_col=None,
                    sep=',', label_sep=' ', suffix='', split_by=None):
     """
+    ```
     Takes a CSV where the one column contains a file name and a column
     containing a string representations of the class(es) like here:
     image_name,tags
@@ -283,6 +296,7 @@ def preprocess_csv(csv_in, csv_out, x_col='filename', y_col=None,
                        contains 'train' or 'valid'.
     Return:
         list :  the list of clases (and csv_out will be new CSV file)
+    ```
     """
     if not y_col and not suffix:
         raise ValueError('one or both of y_col and suffix should be supplied')
@@ -329,6 +343,7 @@ def images_from_folder(datadir, target_size=(224,224),
                        data_aug=None, verbose=1):
 
     """
+    ```
     Returns image generator (Iterator instance).
     Assumes output will be 2D one-hot-encoded labels for categorization.
     Note: This function preprocesses the input in preparation
@@ -359,7 +374,7 @@ def images_from_folder(datadir, target_size=(224,224),
 
     Returns:
     batches: a tuple of two Iterators - one for train and one for test
-
+    ```
     """
 
     # train/test names
@@ -419,6 +434,7 @@ def images_from_df(train_df,
                     val_pct=0.1, random_state=None):
 
     """
+    ```
     Returns image generator (Iterator instance).
     Assumes output will be 2D one-hot-encoded labels for categorization.
     Note: This function preprocesses the input in preparation
@@ -475,7 +491,7 @@ def images_from_df(train_df,
 
     Returns:
     batches: a tuple of two Iterators - one for train and one for test
-
+    ```
     """
 
 
@@ -510,8 +526,8 @@ def images_from_df(train_df,
     if suffix:
         train_df = train_df.copy()
         val_df = val_df.copy()
-        train_df[image_column] = train_df.copy()[image_column].apply(lambda x : x+suffix)
-        val_df[image_column] = val_df.copy()[image_column].apply(lambda x : x+suffix)
+        train_df[image_column] = train_df.copy()[image_column].apply(lambda x : str(x)+suffix)
+        val_df[image_column] = val_df.copy()[image_column].apply(lambda x : str(x)+suffix)
 
 
     # get generators
@@ -561,6 +577,7 @@ def images_from_csv(train_filepath,
                     val_pct=0.1, random_state=None):
 
     """
+    ```
     Returns image generator (Iterator instance).
     Assumes output will be 2D one-hot-encoded labels for categorization.
     Note: This function preprocesses the input in preparation
@@ -615,7 +632,7 @@ def images_from_csv(train_filepath,
 
     Returns:
     batches: a tuple of two Iterators - one for train and one for test
-
+    ```
     """
 
     # convert to dataframes
@@ -651,6 +668,7 @@ def images_from_fname( train_folder,
                      verbose=1):
 
     """
+    ```
     Returns image generator (Iterator instance).
 
     Args:
@@ -674,7 +692,7 @@ def images_from_fname( train_folder,
 
     Returns:
     batches: a tuple of two Iterators - one for train and one for test
-
+    ```
     """
 
     image_column = 'image_name'
@@ -747,6 +765,7 @@ def images_from_array(x_train, y_train,
                       is_regression=False):
 
     """
+    ```
     Returns image generator (Iterator instance) from training
     and validation data in the form of NumPy arrays.
     This function only supports image classification.
@@ -769,6 +788,7 @@ def images_from_array(x_train, y_train,
                            numeric values should be treated as numeric targets as opposed to class labels
     Returns:
       batches: a tuple of two image.Iterator - one for train and one for test and ImagePreprocessor instance
+    ```
     """
     if classes is not None: raise ValueError('Please use class_names argument instead of "classes".')
     if class_names and is_regression:

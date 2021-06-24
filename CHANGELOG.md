@@ -6,6 +6,74 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.26.4 (2021-06-23)
+
+### New:
+- API documenation index
+
+### Changed
+- Added warning when a TensorFlow version of selected `transformers` model is not available and the PyTorch version is being downloaded and converted instead using `from_pt=True`.
+
+### Fixed:
+- Fixed `utils.metrics_from_model` to support alternative metrics
+- Check for AUC `ktrain.utils` "inspect" function
+
+
+## 0.26.3 (2021-05-19)
+
+### New:
+- N/A
+
+### Changed
+- `shallownlp.ner.NER.predict` processes lists of sentences in batches resulting in faster predictions
+- `batch_size` argument added to `shallownlp.ner.NER.predict`
+- added `verbose` parameter to `ktrain.text.textutils.extract_copy` to optionally see why each skipped document was skipped
+
+### Fixed:
+- Changed `TextPredictor.save` to save Hugging Face tokenizer files locally to ensure they can be easily reloaded when `text.Transformer` is supplied with local path.
+- For `transformers` models, the `predictor.preproc.model_name` variable is automatically updated to be new `Predictor` folder to avoid having users manually update `model_name`.  Applies
+  when a local path is supplied to `text.Transformer` and resultant `Predictor` is moved to new machine.
+
+
+## 0.26.2 (2021-03-26)
+
+### New:
+- N/A
+
+### Changed
+- `NERPredictor.predict` now optionally accepts lists of sentences to make sequence-labeling predictions in batches (as all other `Predictor` instances already do).
+
+### Fixed:
+- N/A
+
+
+## 0.26.1 (2021-03-11)
+
+### New:
+- N/A
+
+### Changed
+- expose errors from `transformers` in `_load_pretrained`
+- Changed `TextPreprocessor.check_trained` to be a warning instead of Exception
+
+### Fixed:
+- N/A
+
+
+## 0.26.0 (2021-03-10)
+
+### New:
+- Support for **transformers** 4.0 and above.
+
+### Changed
+- added `set_tokenizer to `TransformerPreprocessor`
+- show error message when original weights cannot be saved (for `reset_weights` method)
+
+### Fixed:
+- cast filename to string before concatenating with suffix in `images_from_csv` and `images_from_df` (addresses issue #330)
+-  resolved import error for `sklearn>=0.24.0`, but `eli5` still requires `sklearn<0.24.0`.
+
+
 ## 0.25.4 (2021-01-26)
 
 ### New:

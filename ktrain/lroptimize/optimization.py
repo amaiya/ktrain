@@ -22,6 +22,7 @@ import tensorflow as tf
 
 class WarmUp(tf.keras.optimizers.schedules.LearningRateSchedule):
     """
+    ```
     Applies a warmup schedule on a given learning rate decay schedule.
     Args:
         initial_learning_rate (:obj:`float`):
@@ -35,6 +36,7 @@ class WarmUp(tf.keras.optimizers.schedules.LearningRateSchedule):
             The power to use for the polynomial warmup (defaults is a linear warmup).
         name (:obj:`str`, `optional`):
             Optional name prefix for the returned tensors during the schedule.
+    ```
     """
 
     def __init__(
@@ -87,6 +89,7 @@ def create_optimizer(
     include_in_weight_decay: Optional[List[str]] = None,
 ):
     """
+    ```
     Creates an optimizer with a learning rate schedule using a warmup phase followed by a linear decay.
     Args:
         init_lr (:obj:`float`):
@@ -104,6 +107,7 @@ def create_optimizer(
         include_in_weight_decay (:obj:`List[str]`, `optional`):
             List of the parameter names (or re patterns) to apply weight decay to. If none is passed, weight decay is
             applied to all parameters except bias and layer norm parameters.
+    ```
     """
     # Implements linear decay of the learning rate.
     lr_schedule = tf.keras.optimizers.schedules.PolynomialDecay(
@@ -134,6 +138,7 @@ def create_optimizer(
 
 class AdamWeightDecay(tf.keras.optimizers.Adam):
     """
+    ```
     Adam enables L2 weight decay and clip_by_global_norm on gradients. Just adding the square of the weights to the
     loss function is *not* the correct way of using L2 regularization/weight decay with Adam, since that will interact
     with the m and v parameters in strange ways as shown in
@@ -167,6 +172,7 @@ class AdamWeightDecay(tf.keras.optimizers.Adam):
             gradients by norm; ``clipvalue`` is clip gradients by value, ``decay`` is included for backward
             compatibility to allow time inverse decay of learning rate. ``lr`` is included for backward compatibility,
             recommended to use ``learning_rate`` instead.
+    ```
     """
 
     def __init__(

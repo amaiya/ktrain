@@ -4,10 +4,12 @@ from .. import utils as U
 
 class LRFinder:
     """
+    ```
     Tracks (and plots) the change in loss of a Keras model as learning rate is gradually increased.
     Used to visually identify a good learning rate, given model and data.
     Reference:
         Original Paper: https://arxiv.org/abs/1506.01186
+    ```
     """
     def __init__(self, model, stop_factor=4):
         self.model = model
@@ -62,8 +64,10 @@ class LRFinder:
              start_lr=1e-7, lr_mult=1.01, max_epochs=None, 
              batch_size=U.DEFAULT_BS, workers=1, use_multiprocessing=False, verbose=1):
         """
+        ```
         Track loss as learning rate is increased.
         NOTE: batch_size is ignored when train_data is instance of Iterator.
+        ```
         """
 
         # check arguments and initialize
@@ -140,6 +144,7 @@ class LRFinder:
 
     def plot_loss(self, n_skip_beginning=10, n_skip_end=1, suggest=False, return_fig=False):
         """
+        ```
         Plots the loss.
         Args:
             n_skip_beginning(int): number of batches to skip on the left.
@@ -149,6 +154,7 @@ class LRFinder:
             return_fig(bool):  If True, return matplotlib.figure.Figure
         Returns:
           matplotlib.figure.Figure if return_fig else None
+        ```
         """
         if not self.find_called: raise ValueError('Please call find first.')
         
@@ -179,9 +185,11 @@ class LRFinder:
 
     def _compute_stats(self):
         """
+        ```
         generates the index associated with minum numerical gradient and the 
         index associated with minum loss.
         Stored as mg and ml respectively
+        ```
         """
         # this code was adapted from fastai: https://github.com/fastai/fastai
         self.ml = np.argmin(self.losses)
@@ -194,6 +202,7 @@ class LRFinder:
 
     def estimate_lr(self):
         """
+        ```
         Generates two numerical estimates of lr: 
           1. lr associated with minum numerical gradient (None if gradient computation fails)
           2. lr associated with minimum loss divided by 10
@@ -201,6 +210,7 @@ class LRFinder:
           tuple: (float, float)
 
           If gradient computation fails, first element of tuple will be None.
+        ```
         """
         if not self.find_called(): raise ValueError('Please call find first.')
         lr1 = None
@@ -218,12 +228,14 @@ class LRFinder:
         
     def plot_loss_change(self, sma=1, n_skip_beginning=10, n_skip_end=5, y_lim=(-0.01, 0.01)):
         """
+        ```
         Plots rate of change of the loss function.
         Parameters:
             sma - number of batches for simple moving average to smooth out the curve.
             n_skip_beginning - number of batches to skip on the left.
             n_skip_end - number of batches to skip on the right.
             y_lim - limits for the y axis.
+        ```
         """
         assert sma >= 1
         derivatives = [0] * sma

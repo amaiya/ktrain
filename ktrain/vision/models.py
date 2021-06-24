@@ -82,6 +82,7 @@ def image_classifier(name,
                      verbose=1):
 
     """
+    ```
     Returns a pre-trained ResNet50 model ready to be fine-tuned
     for multi-class classification. By default, all layers are
     trainable/unfrozen.
@@ -110,7 +111,7 @@ def image_classifier(name,
     Return:
         model(Model):  the compiled model ready to be fine-tuned/trained
 
-        
+    ```
     """
     return image_model(name, train_data, val_data=val_data, freeze_layers=freeze_layers,
                        metrics=metrics, optimizer_name=optimizer_name, multilabel=multilabel,
@@ -130,6 +131,7 @@ def image_regression_model(name,
                           verbose=1):
 
     """
+    ```
     Returns a pre-trained ResNet50 model ready to be fine-tuned
     for multi-class classification. By default, all layers are
     trainable/unfrozen.
@@ -158,7 +160,7 @@ def image_regression_model(name,
     Return:
         model(Model):  the compiled model ready to be fine-tuned/trained
 
-        
+    ```   
     """
 
 
@@ -180,6 +182,7 @@ def image_model( name,
                  verbose=1):
 
     """
+    ```
     Returns a pre-trained ResNet50 model ready to be fine-tuned
     for multi-class classification or regression. By default, all layers are
     trainable/unfrozen.
@@ -208,7 +211,7 @@ def image_model( name,
     Return:
         model(Model):  the compiled model ready to be fine-tuned/trained
 
-        
+    ```   
     """
     # arg check
     U.data_arg_check(train_data=train_data, train_required=True)
@@ -352,6 +355,7 @@ def build_predefined(
                    pt_fc=[],
                    pt_ps=[]):
     """
+    ```
     Builds a pre-defined architecture supported in Keras.
 
     Args:
@@ -368,7 +372,7 @@ def build_predefined(
                                 before final Dense layer of pretrained model
         pt_ps (list of floats): dropout probabilities to use before
                                       each extra Dense layer in pretrained model
-
+    ```
     """
 
     # default parameters

@@ -20,8 +20,10 @@ from .tabular.preprocessor import TabularPreprocessor
 
 class Learner(ABC):
     """
+    ```
     Abstract class used to tune and train Keras models. The fit method is
     an abstract method and must be implemented by subclasses.
+    ```
 
     """
     def __init__(self, model, workers=1, use_multiprocessing=False):
@@ -38,14 +40,16 @@ class Learner(ABC):
             new_file, weightfile = tempfile.mkstemp()
             self.model.save_weights(weightfile)
             self._original_weights = weightfile
-        except:
-            warnings.warn('Could not save original model weights')
+        except Exception as e:
+            warnings.warn('Could not save original model weights: %s' % (e))
             self._original_weights = None
 
     @property
     def _monitor_metrics(self):
         """
+        ```
         monitor metrics
+        ```
         """
         metrics = ['loss']
         try:
@@ -61,7 +65,9 @@ class Learner(ABC):
 
     def get_weight_decay(self):
         """
+        ```
         Get current weight decay rate
+        ```
         """
         if type(self.model.optimizer).__name__ == 'AdamWeightDecay':
             return self.model.optimizer.weight_decay_rate
@@ -71,12 +77,13 @@ class Learner(ABC):
 
     def set_weight_decay(self, wd=U.DEFAULT_WD):
         """
+        ```
         Sets global weight decay via AdamWeightDecay optimizer
         Args:
           wd(float): weight decay
         Returns:
           None
-              
+        ```
         """
         self._recompile(wd=wd)
         return
@@ -85,6 +92,7 @@ class Learner(ABC):
 
     def evaluate(self, test_data=None, print_report=True, save_path='ktrain_classification_report.csv', class_names=[]):
         """
+        ```
         alias for self.validate().
         Returns confusion matrix and optionally prints
         a classification report.
@@ -103,6 +111,7 @@ class Learner(ABC):
                           Not applicable to regression models.
           class_names(list): list of class names to be used in classification report instead of 
                              class integer IDs.
+        ```
         """
         return self.validate(val_data=test_data, print_report=print_report, save_path=save_path, class_names=class_names)
 
@@ -113,6 +122,7 @@ class Learner(ABC):
                  save_path='ktrain_classification_report.csv', 
                  class_names=[]):
         """
+        ```
         Returns confusion matrix and optionally prints
         a classification report.
         This is currently only supported for binary and multiclass
@@ -128,6 +138,7 @@ class Learner(ABC):
           save_path(str): Classification report will be saved to this file path/name if print_report=False
           class_names(list): list of class names to be used in classification report instead of 
                              class integer IDs.
+        ```
         """
         if val_data is not None:
             val = val_data
@@ -204,6 +215,7 @@ class Learner(ABC):
 
     def top_losses(self, n=4, val_data=None, preproc=None):
         """
+        ```
         Computes losses on validation set sorted by examples with top losses
         Args:
           n(int or tuple): a range to select in form of int or tuple
@@ -217,7 +229,7 @@ class Learner(ABC):
             list of n tuples where first element is either 
             filepath or id of validation example and second element
             is loss.
-
+        ```
         """
 
 
@@ -299,8 +311,10 @@ class Learner(ABC):
 
     def view_top_losses(self, n=4, preproc=None, val_data=None):
         """
+        ```
         View observations with top losses in validation set.
         Musta be overridden by Learner subclasses.
+        ```
         """
         raise NotImplementedError('view_top_losses must be overriden by Learner subclass')
 
@@ -318,11 +332,13 @@ class Learner(ABC):
 
     def save_model(self, fpath):
         """
+        ```
         a wrapper to model.save
         Args:
           fpath(str): path to folder in which to save model
         Returns:
           None
+        ```
         """
         self._make_model_folder(fpath)
         self.model.save(os.path.join(fpath, U.MODEL_NAME), save_format='h5')
@@ -331,6 +347,7 @@ class Learner(ABC):
 
     def load_model(self, fpath, custom_objects=None, **kwargs):
         """
+        ```
         loads model from folder.
         Note: **kwargs included for backwards compatibility only, as TransformerTextClassLearner.load_model was removed in v0.18.0.
         Args:
@@ -339,14 +356,17 @@ class Learner(ABC):
                                 For models included with ktrain, this is populated automatically
                                 and can be disregarded.
         
+        ```
         """
         self.model = _load_model(fpath, train_data=self.train_data, custom_objects=custom_objects)
         return
 
     def _is_adamlike(self):
         """
+        ```
         checks whether optimizer attached to model is an 
         "Adam-like" optimizer with beta_1 parameter.
+        ```
         """
         return self.model is not None and hasattr(self.model.optimizer, 'beta_1')
 
@@ -371,7 +391,9 @@ class Learner(ABC):
 
     def set_model(self, model):
         """
+        ```
         replace model in this Learner instance
+        ```
         """
         if not isinstance(model, Model):
             raise ValueError('model must be of instance Model')
@@ -382,6 +404,7 @@ class Learner(ABC):
 
     def freeze(self, freeze_range=None):
         """
+        ```
         If freeze_range is None, makes all layers trainable=False except last Dense layer.
         If freeze_range is given, freezes the first <freeze_range> layers and
         unfrezes all remaining layers.
@@ -393,6 +416,7 @@ class Learner(ABC):
             freeze_range(int): number of layers to freeze
         Returns:
             None
+        ```
         """
 
         if freeze_range is None:
@@ -424,12 +448,14 @@ class Learner(ABC):
 
     def unfreeze(self, exclude_range=None):
         """
+        ```
         Make every layer trainable except those in exclude_range.
         unfreeze is simply a proxy method to freeze.
         NOTE:      Unfreeze method does not currently work with 
                    multi-GPU models.  If you are using the load_imagemodel method,
                    please use the freeze_layers argument of load_imagemodel
                    to freeze layers.
+        ```
         """
         # make all layers trainable
         for i, layer in enumerate(self.model.layers):
@@ -443,7 +469,9 @@ class Learner(ABC):
 
     def reset_weights(self, verbose=1):
         """
+        ```
         Re-initializes network with original weights
+        ```
         """
 
         if os.path.isfile(self._original_weights):
@@ -460,6 +488,7 @@ class Learner(ABC):
     def lr_find(self, start_lr=1e-7, lr_mult=1.01, max_epochs=None, class_weight=None,
                 stop_factor=4, show_plot=False, suggest=False, restore_weights_only=False, verbose=1):
         """
+        ```
         Plots loss as learning rate is increased.  Highest learning rate 
         corresponding to a still falling loss should be chosen.
 
@@ -499,6 +528,7 @@ class Learner(ABC):
             verbose (bool): specifies how much output to print
         Returns:
             None
+        ```
         """
         # dep_fix: bug in TF 2.2 and 2.3
         if version.parse(tf.__version__) > version.parse('2.1') and version.parse(tf.__version__) < version.parse('2.4'):
@@ -579,6 +609,7 @@ class Learner(ABC):
 
     def lr_estimate(self):
         """
+        ```
         Return numerical estimates of lr using two different methods:
             1. learning rate associated with minimum numerical gradient
             2. learning rate associated with minimum loss divided by 10
@@ -589,6 +620,7 @@ class Learner(ABC):
           tuple: tuple of the form (float, float), where 
             First element is lr associated with minimum numerical gradient (None if gradient computation fails).
             Second element is lr associated with minimum loss divided by 10.
+        ```
         """
         if self.lr_finder is None or not self.lr_finder.find_called(): raise ValueError('Please call lr_find first.')
         return self.lr_finder.estimate_lr()
@@ -597,6 +629,7 @@ class Learner(ABC):
 
     def lr_plot(self, n_skip_beginning=10, n_skip_end=5, suggest=False, return_fig=False):
         """
+        ```
         Plots the loss vs. learning rate to help identify
         The maximal learning rate associated with a falling loss.
         The nskip_beginning and n_skip_end arguments can be used
@@ -609,7 +642,7 @@ class Learner(ABC):
             return_fig(bool): If True, return matplotlib.figure.Figure
         Returns:
           matplotlib.figure.Figure if return_fig else None
-          
+        ```
         """
         # dep_fix: bug in TF 2.2 and 2.3
         if version.parse(tf.__version__) > version.parse('2.1') and version.parse(tf.__version__) < version.parse('2.4'):
@@ -622,12 +655,14 @@ class Learner(ABC):
 
     def plot(self, plot_type='loss', return_fig=False):
         """
+        ```
         plots training history
         Args:
           plot_type (str):  one of {'loss', 'lr', 'momentum'}
           return_fig(bool):  If True, return matplotlib.figure.Figure
         Return:
           matplotlib.figure.Figure if return_fig else None
+        ```
         """
         if self.history is None:
             raise Exception('No training history - did you train the model yet?')
@@ -668,7 +703,9 @@ class Learner(ABC):
 
     def print_layers(self, show_wd=False):
         """
+        ```
         prints the layers of the model along with indices
+        ```
         """
         if show_wd: warnings.warn('set_weight_decay now uses AdamWeightDecay instead of kernel_regularizers.')
         for i, layer in enumerate(self.model.layers):
@@ -772,11 +809,13 @@ class Learner(ABC):
 
     def _prepare(self, data, train=True):
         """
+        ```
         Subclasses can override this method if data
         needs to be specially-prepared prior to invoking fit methods
         Args:
           data:  dataset
           train(bool):  If True, prepare for training. Otherwise, prepare for evaluation.
+        ```
         """
         if data is None: return None
 
@@ -795,6 +834,7 @@ class Learner(ABC):
                      cycle_momentum=True, max_momentum=0.95, min_momentum=0.85,
                      class_weight=None, callbacks=[], steps_per_epoch=None, verbose=1):
         """
+        ```
         Train model using a version of Leslie Smith's 1cycle policy.
         This method can be used with any optimizer. Thus,
         cyclical momentum is not currently implemented.
@@ -820,6 +860,7 @@ class Learner(ABC):
             steps_per_epoch(int):    Steps per epoch. If None, then, math.ceil(num_samples/batch_size) is used.
                                      Ignored unless training dataset is generator.
             verbose (bool):  verbose mode
+        ```
         """
         if not self._is_adamlike() and cycle_momentum:
             warnings.warn('cyclical momentum has been disabled because '+\
@@ -873,6 +914,7 @@ class Learner(ABC):
                 monitor='val_loss', checkpoint_folder=None,
                 class_weight=None, callbacks=[], steps_per_epoch=None, verbose=1):
         """
+        ```
         Automatically train model using a default learning rate schedule shown to work well
         in practice.  By default, this method currently employs a triangular learning 
         rate policy (https://arxiv.org/abs/1506.01186).  
@@ -923,6 +965,7 @@ class Learner(ABC):
             steps_per_epoch(int):    Steps per epoch. If None, then, math.ceil(num_samples/batch_size) is used.
                                      Ignored unless training dataset is generator.
             verbose (bool):  verbose mode
+        ```
         """
         # check optimizer
         if not self._is_adamlike() and cycle_momentum:
@@ -1015,7 +1058,9 @@ class Learner(ABC):
 
     def predict(self, val_data=None):
         """
+        ```
         Makes predictions on validation set
+        ```
         """
         if val_data is not None:
             val = val_data
@@ -1037,6 +1082,7 @@ class Learner(ABC):
 
 class ArrayLearner(Learner):
     """
+    ```
     Main class used to tune and train Keras models
     using Array data.  An objects of this class should be instantiated
     via the ktrain.get_learner method instead of directly.
@@ -1048,6 +1094,7 @@ class ArrayLearner(Learner):
                           y_train are numpy.ndarrays.
     val_data (ndarray):   A tuple of (x_test, y_test), where x_test and 
                           y_test are numpy.ndarrays.
+    ```
     """
 
 
@@ -1066,6 +1113,7 @@ class ArrayLearner(Learner):
             lr_decay=1, checkpoint_folder = None, early_stopping=None,
             verbose=1, class_weight=None, callbacks=[], steps_per_epoch=None):
         """
+        ```
         Trains the model. By default, fit is simply a wrapper for model.fit.
         When cycle_len parameter is supplied, an SGDR learning rate schedule is used.
         Trains the model.
@@ -1092,6 +1140,7 @@ class ArrayLearner(Learner):
         steps_per_epoch(int):    Steps per epoch. If None, then, math.ceil(num_samples/batch_size) is used.
                                  Ignored unless training dataset is generator (and in ArrayLearner instances).
         verbose (bool):           whether or not to show progress bar
+        ```
         """
 
         # check early_stopping
@@ -1147,8 +1196,10 @@ class ArrayLearner(Learner):
 
     def layer_output(self, layer_id, example_id=0, use_val=False):
         """
+        ```
         Prints output of layer with index <layer_id> to help debug models.
         Uses first example (example_id=0) from training set, by default.
+        ```
         """
                                                                                 
         inp = self.model.layers[0].input
@@ -1164,6 +1215,7 @@ class ArrayLearner(Learner):
 
     def view_top_losses(self, n=4, preproc=None, val_data=None):
         """
+        ```
         Views observations with top losses in validation set.
         Typically over-ridden by Learner subclasses.
         Args:
@@ -1178,7 +1230,7 @@ class ArrayLearner(Learner):
             list of n tuples where first element is either 
             filepath or id of validation example and second element
             is loss.
-
+        ```
         """
         val = self._check_val(val_data)
 
@@ -1213,6 +1265,7 @@ class ArrayLearner(Learner):
 
 class GenLearner(Learner):
     """
+    ```
     Main class used to tune and train Keras models
     using a Keras generator (e.g., DirectoryIterator).
     Objects of this class should be instantiated using the
@@ -1223,6 +1276,7 @@ class GenLearner(Learner):
     model (Model): A compiled instance of keras.engine.training.Model
     train_data (Iterator): a Iterator instance for training set
     val_data (Iterator):   A Iterator instance for validation set
+    ```
     """
 
 
@@ -1245,6 +1299,7 @@ class GenLearner(Learner):
             lr_decay=1.0, checkpoint_folder=None, early_stopping=None, 
             class_weight=None, callbacks=[], steps_per_epoch=None, verbose=1):
         """
+        ```
         Trains the model. By default, fit is simply a wrapper for model.fit (for generators/sequences).
         When cycle_len parameter is supplied, an SGDR learning rate schedule is used.
 
@@ -1270,6 +1325,7 @@ class GenLearner(Learner):
         callbacks (list):         list of Callback instances to employ during training
         steps_per_epoch(int):    Steps per epoch. If None, then, math.ceil(num_samples/batch_size) is used.
         verbose (boolean):       whether or not to print progress bar
+        ```
         """
         # check early_stopping
         if self.val_data is None and early_stopping is not None:
@@ -1339,8 +1395,10 @@ class GenLearner(Learner):
 
     def layer_output(self, layer_id, example_id=0, batch_id=0, use_val=False):
         """
+        ```
         Prints output of layer with index <layer_id> to help debug models.
         Uses first example (example_id=0) from first batch from training set, by default.
+        ```
         """
                                                                                 
         inp = self.model.layers[0].input
@@ -1362,6 +1420,7 @@ class GenLearner(Learner):
     #    raise NotImplementedError('view_top_losses must be overriden by GenLearner subclass')
     def view_top_losses(self, n=4, preproc=None, val_data=None):
         """
+        ```
         Views observations with top losses in validation set.
         Typically over-ridden by Learner subclasses.
         Args:
@@ -1376,7 +1435,7 @@ class GenLearner(Learner):
             list of n tuples where first element is either 
             filepath or id of validation example and second element
             is loss.
-
+        ```
         """
         val = self._check_val(val_data)
 
@@ -1407,6 +1466,7 @@ class GenLearner(Learner):
 
 def get_predictor(model, preproc, batch_size=U.DEFAULT_BS):
     """
+    ```
     Returns a Predictor instance that can be used to make predictions on
     unlabeled examples.  Can be saved to disk and reloaded as part of a 
     larger application.
@@ -1425,6 +1485,7 @@ def get_predictor(model, preproc, batch_size=U.DEFAULT_BS):
                                  ktrain.text.texts_from_csv
                                  ktrain.text.ner.entities_from_csv
         batch_size(int):    batch size to use.  default:32
+    ```
     """
 
     # check arguments
@@ -1452,6 +1513,7 @@ def get_predictor(model, preproc, batch_size=U.DEFAULT_BS):
 
 def load_predictor(fpath, batch_size=U.DEFAULT_BS, custom_objects=None):
     """
+    ```
     Loads a previously saved Predictor instance
     Args
       fpath(str): predictor path name (value supplied to predictor.save)
@@ -1462,6 +1524,7 @@ def load_predictor(fpath, batch_size=U.DEFAULT_BS, custom_objects=None):
                             This is useful if you compiled the model with a custom loss function, for example.
                             For models included with ktrain as is, this is populated automatically
                             and can be disregarded.  
+    ```
     """
 
     # load the preprocessor
@@ -1527,9 +1590,11 @@ def load_predictor(fpath, batch_size=U.DEFAULT_BS, custom_objects=None):
 
 def release_gpu_memory(device=0):
     """
+    ```
     Relase GPU memory allocated by Tensorflow
     Source: 
     https://stackoverflow.com/questions/51005147/keras-release-memory-after-finish-training-process
+    ```
     """
     from numba import cuda
     K.clear_session()
@@ -1545,6 +1610,10 @@ def _load_model(fpath, preproc=None, train_data=None, custom_objects=None):
        (train_data and U.is_huggingface(data=train_data)):
         if preproc:
             model = preproc.get_model(fpath=fpath)
+            # if model_name is local_path, update it to reflect current predictor folder
+            # in case learner was trained with local path on different machine
+            # TODO: support this for Windows paths
+            if preproc.model_name.startswith(os.sep): preproc.model_name = fpath
         else:
             model = TransformersPreprocessor.load_model_and_configure_from_data(fpath, train_data)
         return model
