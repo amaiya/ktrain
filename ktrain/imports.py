@@ -239,7 +239,7 @@ except:
 
 SG_ERRMSG = 'ktrain currently uses a forked version of stellargraph v0.8.2. '+\
             'Please install with: '+\
-            'pip install git+https://github.com/amaiya/stellargraph@no_tf_dep_082'
+            'pip install https://github.com/amaiya/stellargraph/archive/refs/heads/no_tf_dep_082.zip'
 
 ALLENNLP_ERRMSG  = 'To use ELMo embedings, please install allenlp:\n' +\
                    'pip install allennlp'
