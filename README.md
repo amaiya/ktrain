@@ -360,8 +360,8 @@ The above should be all you need on Linux systems and cloud computing environmen
 - Since some **ktrain** dependencies have not yet been migrated to `tf.keras` in TensorFlow 2 (or may have other issues), 
   **ktrain** is temporarily using forked versions of some libraries. Specifically, **ktrain** uses forked versions of the `eli5` and `stellargraph` libraries.  If not installed, **ktrain** will complain  when a method or function needing either of these libraries is invoked.  To install these forked versions, you can do the following:
 ```
-pip install git+https://github.com/amaiya/eli5@tfkeras_0_10_1
-pip install git+https://github.com/amaiya/stellargraph@no_tf_dep_082
+pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip
+pip install https://github.com/amaiya/stellargraph/archive/refs/heads/no_tf_dep_082.zip
 ```
 
 This code was tested on Ubuntu 18.04 LTS using TensorFlow 2.3.1 and Python 3.6.9.
