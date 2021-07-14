@@ -397,10 +397,11 @@ class TopicModel():
             _idx = np.array(_idx)
             X_topics = X_topics[_idx]
         if harden: X_topics = self._harden_topics(X_topics)
-        if threshold is not None:
-            return (X_topics, _idx)
-        else:
-            return X_topics
+        return (X_topics, _idx)
+        #if threshold is not None:
+            #return (X_topics, _idx)
+        #else:
+            #return X_topics, np.array([True] * len(texts))
 
 
     def visualize_documents(self, texts=None, doc_topics=None, 
