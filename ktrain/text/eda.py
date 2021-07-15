@@ -269,7 +269,12 @@ class TopicModel():
             threshold (float): If not None, documents with whose highest topic probability
                                is less than threshold are filtered out.
         """
-        doc_topics, bool_array = self.predict(texts, threshold=threshold)
+        if threshold is not None:
+            doc_topics, bool_array = self.predict(texts, threshold=threshold)
+        else:
+            doc_topics = self.predict(texts)
+            bool_array = np.array([True] * len(texts))
+
         self.doc_topics = doc_topics
         self.bool_array = bool_array
 
@@ -397,11 +402,10 @@ class TopicModel():
             _idx = np.array(_idx)
             X_topics = X_topics[_idx]
         if harden: X_topics = self._harden_topics(X_topics)
-        return (X_topics, _idx)
-        #if threshold is not None:
-            #return (X_topics, _idx)
-        #else:
-            #return X_topics, np.array([True] * len(texts))
+        if threshold is not None:
+            return (X_topics, _idx)
+        else:
+            return X_topics
 
 
     def visualize_documents(self, texts=None, doc_topics=None, 
