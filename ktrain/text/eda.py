@@ -269,7 +269,12 @@ class TopicModel():
             threshold (float): If not None, documents with whose highest topic probability
                                is less than threshold are filtered out.
         """
-        doc_topics, bool_array = self.predict(texts, threshold=threshold)
+        if threshold is not None:
+            doc_topics, bool_array = self.predict(texts, threshold=threshold)
+        else:
+            doc_topics = self.predict(texts)
+            bool_array = np.array([True] * len(texts))
+
         self.doc_topics = doc_topics
         self.bool_array = bool_array
 

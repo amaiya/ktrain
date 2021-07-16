@@ -36,6 +36,7 @@ setup(
           'langdetect',
           'jieba',
           'cchardet',  # previously pinned to 2.1.5 (due to this issue: https://github.com/PyYoshi/cChardet/issues/61) but no longer needed
+          'chardet', # required by stellargraph and no longer installed by other dependencies as of July 2021
           'syntok',
 
           # NOTE: these modules can be optionally omitted from deployment if not being used to yield lighter-weight footprint

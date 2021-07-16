@@ -146,12 +146,12 @@ class TextPredictor(Predictor):
             from eli5.lime import TextExplainer
         except:
             msg = &#39;ktrain requires a forked version of eli5 to support tf.keras. &#39;+\
-                  &#39;Install with: pip install git+https://github.com/amaiya/eli5@tfkeras_0_10_1&#39;
+                  &#39;Install with: pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip&#39;
             warnings.warn(msg)
             return
         if not hasattr(eli5, &#39;KTRAIN_ELI5_TAG&#39;) or eli5.KTRAIN_ELI5_TAG != KTRAIN_ELI5_TAG:
             msg = &#39;ktrain requires a forked version of eli5 to support tf.keras. It is either missing or not up-to-date. &#39;+\
-                  &#39;Uninstall the current version and install/re-install the fork with: pip install git+https://github.com/amaiya/eli5@tfkeras_0_10_1&#39;
+                  &#39;Uninstall the current version and install/re-install the fork with: pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip&#39;
             warnings.warn(msg)
             return
 
@@ -389,12 +389,12 @@ class TextPredictor(Predictor):
             from eli5.lime import TextExplainer
         except:
             msg = &#39;ktrain requires a forked version of eli5 to support tf.keras. &#39;+\
-                  &#39;Install with: pip install git+https://github.com/amaiya/eli5@tfkeras_0_10_1&#39;
+                  &#39;Install with: pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip&#39;
             warnings.warn(msg)
             return
         if not hasattr(eli5, &#39;KTRAIN_ELI5_TAG&#39;) or eli5.KTRAIN_ELI5_TAG != KTRAIN_ELI5_TAG:
             msg = &#39;ktrain requires a forked version of eli5 to support tf.keras. It is either missing or not up-to-date. &#39;+\
-                  &#39;Uninstall the current version and install/re-install the fork with: pip install git+https://github.com/amaiya/eli5@tfkeras_0_10_1&#39;
+                  &#39;Uninstall the current version and install/re-install the fork with: pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip&#39;
             warnings.warn(msg)
             return
 
@@ -548,12 +548,12 @@ Lower this value if explain is taking too long.</p></div>
         from eli5.lime import TextExplainer
     except:
         msg = &#39;ktrain requires a forked version of eli5 to support tf.keras. &#39;+\
-              &#39;Install with: pip install git+https://github.com/amaiya/eli5@tfkeras_0_10_1&#39;
+              &#39;Install with: pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip&#39;
         warnings.warn(msg)
         return
     if not hasattr(eli5, &#39;KTRAIN_ELI5_TAG&#39;) or eli5.KTRAIN_ELI5_TAG != KTRAIN_ELI5_TAG:
         msg = &#39;ktrain requires a forked version of eli5 to support tf.keras. It is either missing or not up-to-date. &#39;+\
-              &#39;Uninstall the current version and install/re-install the fork with: pip install git+https://github.com/amaiya/eli5@tfkeras_0_10_1&#39;
+              &#39;Uninstall the current version and install/re-install the fork with: pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip&#39;
         warnings.warn(msg)
         return
 

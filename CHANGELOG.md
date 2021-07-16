@@ -6,6 +6,19 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.26.5 (2021-07-15)
+
+### New:
+- N/A
+
+### Changed
+- added `query` parameter to `SimpleQA.ask` so that an alternative query can be used to retrieve contexts from corpus
+- added `chardet` as dependency for `stellargraph`
+
+### Fixed:
+- fixed issue with `TopicModel.build` when `threshold=None`
+
+
 ## 0.26.4 (2021-06-23)
 
 ### New:

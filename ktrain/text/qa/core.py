@@ -188,7 +188,7 @@ class QA(ABC):
 
 
 
-    def ask(self, question, batch_size=8, n_docs_considered=10, n_answers=50, 
+    def ask(self, question, query=None, batch_size=8, n_docs_considered=10, n_answers=50, 
             rerank_threshold=0.015, include_np=False):
         """
         ```
@@ -196,6 +196,7 @@ class QA(ABC):
 
         Args:
           question(str): question in the form of a string
+          query(str): Optional. If not None, words in query will be used to retrieve contexts instead of words in question
           batch_size(int):  number of question-context pairs fed to model at each iteration
                             Default:8
                             Increase for faster answer-retrieval.
@@ -224,9 +225,9 @@ class QA(ABC):
         paragraphs = []
         refs = []
         #doc_results = self.search(question, limit=n_docs_considered)
-        doc_results = self.search(_process_question(question, include_np=include_np), limit=n_docs_considered)
+        doc_results = self.search(_process_question(query if query is not None else question, include_np=include_np), limit=n_docs_considered)
         if not doc_results: 
-            warnings.warn('No documents matched words in question')
+            warnings.warn('No documents matched words in question (or query if supplied)')
             return []
         # extract paragraphs as contexts
         contexts = []

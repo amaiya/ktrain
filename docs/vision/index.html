@@ -1065,7 +1065,7 @@ on a supplied image.
             import eli5
         except:
             msg = &#39;ktrain requires a forked version of eli5 to support tf.keras. &#39;+\
-                  &#39;Install with: pip install git+https://github.com/amaiya/eli5@tfkeras_0_10_1&#39;
+                  &#39;Install with: pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip&#39;
             warnings.warn(msg)
             return
 
@@ -1075,7 +1075,7 @@ on a supplied image.
                            &#34;We do not detect this forked version (or it is out-of-date), so predictor.explain may not work.  &#34; +\
                            &#34;It will work if you uninstall the current version of eli5 and install &#34;+\
                            &#34;the forked version:  &#34; +\
-                           &#34;pip install git+https://github.com/amaiya/eli5@tfkeras_0_10_1&#34;)
+                           &#34;pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip&#34;)
             return
 
         if not DISABLE_V2_BEHAVIOR:
@@ -1305,7 +1305,7 @@ problems, not multilabel classification problems.
         import eli5
     except:
         msg = &#39;ktrain requires a forked version of eli5 to support tf.keras. &#39;+\
-              &#39;Install with: pip install git+https://github.com/amaiya/eli5@tfkeras_0_10_1&#39;
+              &#39;Install with: pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip&#39;
         warnings.warn(msg)
         return
 
@@ -1315,7 +1315,7 @@ problems, not multilabel classification problems.
                        &#34;We do not detect this forked version (or it is out-of-date), so predictor.explain may not work.  &#34; +\
                        &#34;It will work if you uninstall the current version of eli5 and install &#34;+\
                        &#34;the forked version:  &#34; +\
-                       &#34;pip install git+https://github.com/amaiya/eli5@tfkeras_0_10_1&#34;)
+                       &#34;pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip&#34;)
         return
 
     if not DISABLE_V2_BEHAVIOR:

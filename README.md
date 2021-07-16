@@ -10,65 +10,8 @@
 
 
 ### News and Announcements
-- **2021-03-10:**
-  - ***ktrain*** **v0.26.x is released** and now supports `transformers>=4.0.0`.  
-Note that, `transformers>=4.0.0` included a complete reogranization of the module's structure. This means that, if you saved a **transformers**-based `Predictor` (e.g., DistilBERT) in an older version of **ktrain** and **transformers**, you will need to either generate a new `tf_model.preproc` file or manually edit the existing `tf_model.preproc` file before loading the `predictor` in the latest versions of **ktrain** and **transformers**.  
-For instance, suppose you trained a DistilBERT model and saved the resultant predictor using an older version of **ktrain** with: `predictor.save('/tmp/my_predictor/')`.  After upgrading to the newest version of **ktrain**,  you will find that `ktrain.load_predictor('/tmp/my_predictor`) will throw an error unless you follow one of the two approaches below:  
-
-    **Approach 1: Manually edit `tf_model.preproc` file:**  
-    Open `tf_model.preproc` with an editor like **vim** and edit it to replace old module locations with new module locations (example changes for a DistilBERT model shown below):  
-    ```python
-    # change transformers.configuration_distilbert to transformers.models.distilbert.configuration_distilbert
-    # change transformers.modeling_tf_auto to transformers.models.auto.modeling_tf_auto
-    # change transformers.tokenization_auto to transformers.models.auto.tokenization_auto  
-    ```
-    The above was confirmed to work using the **vim** editor on Linux.   
-
-    **Approach 2: Re-generate `tf_model.preproc` file**:  
-	```python
-	# Step 1: Re-create a Preprocessor instance
-	# NOTES:
-	# 1. If training set is large, you can use a sample containing at least one example for each class
-	# 2. Labels must be in same format as you originally used
-	# 3. If original training set is not easily accessible, set preproc.preprocess_train_called=True 
-	#    below instead of invoking preproc.preprocess_train(x_train, y_train)
-
-	preproc = text.Transformer(MODEL_NAME, maxlen=500, class_names=class_names)
-	trn = preproc.preprocess_train(x_train, y_train)
-
-	# Step 2: load the transformers model from predictor folder
-	from transformers import *
-	model = TFAutoModelForSequenceClassification.from_pretrained('/tmp/my_predictor/')
-
-	# Step 3: re-create/re-save Predictor
-	predictor = ktrain.get_predictor(model, preproc)
-	predictor.save('/tmp/my_new_predictor')
-	```
-  - If you're using PyTorch 1.8 or above with **ktrain**, you will need to upgrade to `ktrain>=0.26.0`. If you're using `ktrain<0.26.0`, then you will have to downgrade PyTorch with: `pip install torch==1.7.1`.
-- **2020-11-08:**
-  - ***ktrain*** **v0.25.x is released** and includes out-of-the-box support for text extraction via the [textract](https://pypi.org/project/textract/) package . This, for example,
-can be used in the `SimpleQA.index_from_folder` method to perform Question-Answering on large collections of PDFs, MS Word documents, or PowerPoint files.   See the [Question-Answering example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/question_answering_with_bert.ipynb) for more information.
-```python
-# End-to-End Question-Answering in ktrain
-
-# index documents of different types into a built-in search engine
-from ktrain import text
-INDEXDIR = '/tmp/myindex'
-text.SimpleQA.initialize_index(INDEXDIR)
-corpus_path = '/my/folder/of/documents' # contains .pdf, .docx, .pptx files in addition to .txt files
-text.SimpleQA.index_from_folder(corpus_path, INDEXDIR, use_text_extraction=True, # enable text extraction
-                              multisegment=True, procs=4, # these args speed up indexing
-                              breakup_docs=True)          # this slows indexing but speeds up answer retrieval
-
-# ask questions (setting higher batch size can further speed up answer retrieval)
-qa = text.SimpleQA(INDEXDIR)
-answers = qa.ask('What is ktrain?', batch_size=8)
-
-# top answer snippet extracted from https://arxiv.org/abs/2004.10703:
-#   "ktrain is a low-code platform for machine learning"
-```
-- **2020-11-04**
-  - ***ktrain*** **v0.24.x is released** and now includes built-in support for exporting models to [ONNX](https://onnx.ai/) and  [TensorFlow Lite](https://www.tensorflow.org/lite).    See the [example notebook](https://github.com/amaiya/ktrain/blob/develop/examples/text/ktrain-ONNX-TFLite-examples.ipynb) for more information.
+- **2021-07-15**
+  - **ktrain** was used to train machine learning models for [CoronaCentral.ai](https://coronacentral.ai/), a machine-learning-enhanced search engine for COVID publications at Stanford University. The CoronaCentral document classifier, **CoronaBERT**, is [available on the Hugging Face model hub](https://huggingface.co/jakelever/coronabert).  CoronaCentral.ai was developed by Jake Lever and Russ Altman and funded by the Chan Zuckerberg Biohub. Check out [their paper](https://www.biorxiv.org/content/10.1101/2020.12.21.423860v1).
 ----
 
 ### Overview
@@ -360,8 +303,8 @@ The above should be all you need on Linux systems and cloud computing environmen
 - Since some **ktrain** dependencies have not yet been migrated to `tf.keras` in TensorFlow 2 (or may have other issues), 
   **ktrain** is temporarily using forked versions of some libraries. Specifically, **ktrain** uses forked versions of the `eli5` and `stellargraph` libraries.  If not installed, **ktrain** will complain  when a method or function needing either of these libraries is invoked.  To install these forked versions, you can do the following:
 ```
-pip install git+https://github.com/amaiya/eli5@tfkeras_0_10_1
-pip install git+https://github.com/amaiya/stellargraph@no_tf_dep_082
+pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip
+pip install https://github.com/amaiya/stellargraph/archive/refs/heads/no_tf_dep_082.zip
 ```
 
 This code was tested on Ubuntu 18.04 LTS using TensorFlow 2.3.1 and Python 3.6.9.
