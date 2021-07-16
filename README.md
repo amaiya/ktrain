@@ -307,6 +307,12 @@ pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip
 pip install https://github.com/amaiya/stellargraph/archive/refs/heads/no_tf_dep_082.zip
 ```
 
+OPTIONAL: Additional libraries to install:
+```
+pip install torch     # for ktrain.text.ZeroShotClassifier, ktrain.text.TransformerSummarizer, ktrain.text.Translator
+pip install shap      # for TabularPredictor.explain
+pip install causalnlp # for tabular.causal_inference_model
+
 This code was tested on Ubuntu 18.04 LTS using TensorFlow 2.3.1 and Python 3.6.9.
 
 
