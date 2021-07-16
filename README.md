@@ -311,7 +311,7 @@ Some optional, additional libraries to install if needed:
 ```python
 # for ktrain.text.ZeroShotClassifier, ktrain.text.TransformerSummarizer, ktrain.text.Translator
 pip install torch
-# for TabularPredictor.explain
+# for ktrain.tabular.TabularPredictor.explain
 pip install shap
 # for tabular.causal_inference_model
 pip install causalnlp
