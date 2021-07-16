@@ -309,7 +309,7 @@ pip install https://github.com/amaiya/stellargraph/archive/refs/heads/no_tf_dep_
 pip install torch
 # for ktrain.tabular.TabularPredictor.explain
 pip install shap
-# for tabular.causal_inference_model
+# for ktrain.tabular.causal_inference_model
 pip install causalnlp
 ```
 If the above libaries are not installed, **ktrain** will complain  when a method or function needing either any of the above is invoked.
