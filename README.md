@@ -307,7 +307,7 @@ pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip
 pip install https://github.com/amaiya/stellargraph/archive/refs/heads/no_tf_dep_082.zip
 ```
 
-Some additional, optional libraries to install if needed:
+Some optional, additional libraries to install if needed:
 ```python
 # for ktrain.text.ZeroShotClassifier, ktrain.text.TransformerSummarizer, ktrain.text.Translator
 pip install torch
