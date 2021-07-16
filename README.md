@@ -9,10 +9,10 @@
 
 
 
-<!--### News and Announcements-->
-<!--- **Coming Soon**-->
-  <!--- TBD-->
-<!-------->
+### News and Announcements
+- **2021-07-15**
+  - **ktrain** was used to train machine learning models for [CoronaCentral.ai](https://coronacentral.ai/), a machine-learning-enhanced search engine for COVID publications at Stanford University. The CoronaCentral document classifier, **CoronaBERT**, is [available on the Hugging Face model hub](https://huggingface.co/jakelever/coronabert).  CoronaCentral.ai was developed by Jake Lever and funded by the Chan-Zuckerberg Foundation.
+----
 
 ### Overview
 
