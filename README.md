@@ -296,19 +296,15 @@ The above should be all you need on Linux systems and cloud computing environmen
 [more detailed instructions](https://github.com/amaiya/ktrain/blob/master/FAQ.md#how-do-i-install-ktrain-on-a-windows-machine) that include some extra steps.
 
 **Some important things to note about installation:**
-- If using **ktrain** with `tensorflow<=2.1`, you must also downgrade the **transformers** library to `transformers==3.1`.
 - If `load_predictor` fails with the error "`AttributeError: 'str' object has no attribute 'decode'`", then downgrade **h5py**: `pip install h5py==2.10.0`
-- As of v0.21.x, **ktrain** no longer installs TensorFlow 2 automatically.  As indicated above, you should install TensorFlow 2 yourself before installing and using **ktrain**.  On Google Colab, TensorFlow 2 should be already installed.  You should be able to use **ktrain**  with any version of [TensorFlow 2](https://www.tensorflow.org/install/pip?lang=python3). Note, however, that there is a bug in TensorFlow 2.2 and 2.3 that affects the *Learning-Rate-Finder* [that will not be fixed until TensorFlow 2.4](https://github.com/tensorflow/tensorflow/issues/41174#issuecomment-656330268).  The bug causes the learning-rate-finder to complete all epochs even after loss has diverged (i.e., no automatic-stopping).
+- There is a bug in TensorFlow 2.2 and 2.3 that affects the *Learning-Rate-Finder* [that was not fixed until TensorFlow 2.4](https://github.com/tensorflow/tensorflow/issues/41174#issuecomment-656330268).  The bug causes the learning-rate-finder to complete all epochs even after loss has diverged (i.e., no automatic-stopping).
 - If using **ktrain** on a local machine with a GPU (versus Google Colab, for example), you'll need to [install GPU support for TensorFlow 2](https://www.tensorflow.org/install/gpu).
-- Since some **ktrain** dependencies have not yet been migrated to `tf.keras` in TensorFlow 2 (or may have other issues), 
-  **ktrain** is temporarily using forked versions of some libraries. Specifically, **ktrain** uses forked versions of the `eli5` and `stellargraph` libraries.  If not installed, **ktrain** will complain  when a method or function needing either of these libraries is invoked.  To install these forked versions, you can do the following:
-```
-pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip
-pip install https://github.com/amaiya/stellargraph/archive/refs/heads/no_tf_dep_082.zip
-```
-
-Some optional, additional libraries to install if needed:
+- Some optional, aditional libraries to install if needed are:
 ```python
+# for ktrain.text.TextPredictor.explain and ktrain.vision.ImagePredictor.explain
+pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip # this specific fork of eli5 needed
+# for ktrain.graph
+pip install https://github.com/amaiya/stellargraph/archive/refs/heads/no_tf_dep_082.zip
 # for ktrain.text.ZeroShotClassifier, ktrain.text.TransformerSummarizer, ktrain.text.Translator
 pip install torch
 # for ktrain.tabular.TabularPredictor.explain
@@ -316,6 +312,8 @@ pip install shap
 # for tabular.causal_inference_model
 pip install causalnlp
 ```
+If the above libaries are not installed, **ktrain** will complain  when a method or function needing either any of the above is invoked.
+Notice that **ktrain** is using forked versions of the `eli5` and `stellargraph` libraries above in order to support TensorFlow2.
 
 This code was tested on Ubuntu 18.04 LTS using TensorFlow 2.3.1 and Python 3.6.9.
 
