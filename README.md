@@ -302,7 +302,7 @@ The above should be all you need on Linux systems and cloud computing environmen
 - Some optional, aditional libraries to install if needed are:
 ```python
 # for ktrain.text.TextPredictor.explain and ktrain.vision.ImagePredictor.explain
-pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip # this specific fork of eli5 needed
+pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip
 # for ktrain.graph
 pip install https://github.com/amaiya/stellargraph/archive/refs/heads/no_tf_dep_082.zip
 # for ktrain.text.ZeroShotClassifier, ktrain.text.TransformerSummarizer, ktrain.text.Translator
