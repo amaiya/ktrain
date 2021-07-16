@@ -23,6 +23,7 @@ This directory contains various example notebooks using *ktrain*.  The directory
 - `tabular`: 
   - [classification](#-tabular-classification-datasets): classification for tabular data
   - [regression](#-tabular-regression-datasets): regression for tabular data
+  - [causal inference](#-tabular-causal-inference): causal inference using meta-learners
 
 
 ## Text Data
@@ -251,7 +252,7 @@ and predict the Age attribute for each individual.  This is the same dataset use
 - [HousePricePrediction-MLP.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/tabular): MLP for tabular regression
 
 
-### <a name="#tabularci"></a> Tabular Causal Inference Datasets
+### <a name="#tabularci"></a> Tabular Causal Inference
 
 
 #### [Adults Census Dataset](http://archive.ics.uci.edu/ml/datasets/Adult):  Tabular Causal Inference
