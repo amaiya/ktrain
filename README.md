@@ -10,7 +10,7 @@
 
 
 ### News and Announcements
-- **2021-07-16**
+- **2021-07-20**
   - **ktrain v0.27.x** is released and now supports causal inference using [meta-learners](https://arxiv.org/abs/1706.03461). See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/tabular/causal_inference_example.ipynb) for more information.
 - **2021-07-15**
   - **ktrain** was used to train machine learning models for [CoronaCentral.ai](https://coronacentral.ai/), a machine-learning-enhanced search engine for COVID publications at Stanford University. The CoronaCentral document classifier, **CoronaBERT**, is [available on the Hugging Face model hub](https://huggingface.co/jakelever/coronabert).  CoronaCentral.ai was developed by Jake Lever and Russ Altman and funded by the Chan Zuckerberg Biohub. Check out [their paper](https://www.biorxiv.org/content/10.1101/2020.12.21.423860v1).
