@@ -43,19 +43,19 @@
                              stop_words=&#39;english&#39;,
                              verbose=1):
     &#34;&#34;&#34;
+    ```
     Infers causality from the data contained in `df` using a metalearner.
     This function is a wrapper to the CausalNLP.CausalInferenceModel class.
     For more details on methods and capabilities of the returned `CausalInferenceModel` object, 
     see the [CausalNLP documentation](https://amaiya.github.io/causalnlp/causalinference.html).
 
     Usage:
-    ```python
     &gt;&gt;&gt; cm = causal_inference_model(df,
                                     treatment_col=&#39;Is_Male?&#39;,
                                     outcome_col=&#39;Post_Shared?&#39;, text_col=&#39;Post_Text&#39;,
                                     ignore_cols=[&#39;id&#39;, &#39;email&#39;])
         cm.fit()
-    ```
+
     **Parameters:**
     * **df** : pandas.DataFrame containing dataset
     * **metalearner_type** : metalearner model to use. One of {&#39;t-learner&#39;, &#39;s-learner&#39;, &#39;x-learner&#39;, &#39;r-learner&#39;} (Default: &#39;t-learner&#39;)
@@ -77,6 +77,7 @@
 
     **Returns:**
     `CausalNLP.CausalInferenceModel` object
+    ```
     &#34;&#34;&#34;
     try:
         import causalnlp
@@ -112,41 +113,40 @@
 <span>def <span class="ident">causal_inference_model</span></span>(<span>df, metalearner_type='t-learner', treatment_col='treatment', outcome_col='outcome', text_col=None, ignore_cols=[], include_cols=[], treatment_effect_col='treatment_effect', learner=None, effect_learner=None, min_df=0.05, max_df=0.5, ngram_range=(1, 1), stop_words='english', verbose=1)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Infers causality from the data contained in <code>df</code> using a metalearner.
+<div class="desc"><pre><code>Infers causality from the data contained in `df` using a metalearner.
 This function is a wrapper to the CausalNLP.CausalInferenceModel class.
-For more details on methods and capabilities of the returned <code>CausalInferenceModel</code> object,
-see the <a href="https://amaiya.github.io/causalnlp/causalinference.html">CausalNLP documentation</a>.</p>
-<p>Usage:</p>
-<pre><code class="language-python">&gt;&gt;&gt; cm = causal_inference_model(df,
+For more details on methods and capabilities of the returned `CausalInferenceModel` object, 
+see the [CausalNLP documentation](https://amaiya.github.io/causalnlp/causalinference.html).
+
+Usage:
+&gt;&gt;&gt; cm = causal_inference_model(df,
                                 treatment_col='Is_Male?',
                                 outcome_col='Post_Shared?', text_col='Post_Text',
                                 ignore_cols=['id', 'email'])
     cm.fit()
-</code></pre>
-<p><strong>Parameters:</strong>
-* <strong>df</strong> : pandas.DataFrame containing dataset
-* <strong>metalearner_type</strong> : metalearner model to use. One of {'t-learner', 's-learner', 'x-learner', 'r-learner'} (Default: 't-learner')
-* <strong>treatment_col</strong> : treatment variable; column should contain binary values: 1 for treated, 0 for untreated.
-* <strong>outcome_col</strong> : outcome variable; column should contain the categorical or numeric outcome values
-* <strong>text_col</strong> : (optional) text column containing the strings (e.g., articles, reviews, emails).
-* <strong>ignore_cols</strong> : columns to ignore in the analysis
-* <strong>include_cols</strong> : columns to include as covariates (e.g., possible confounders)
-* <strong>treatment_effect_col</strong> : name of column to hold causal effect estimations.
-Does not need to exist.
-Created by CausalNLP.
-* <strong>learner</strong> : an instance of a custom learner.
-If None, a default LightGBM will be used.
-# Example
-learner = LGBMClassifier(num_leaves=1000)
-* <strong>effect_learner</strong>: used for x-learner/r-learner and must be regression model
-* <strong>min_df</strong> : min_df parameter used for text processing using sklearn
-* <strong>max_df</strong> : max_df parameter used for text procesing using sklearn
-* <strong>ngram_range</strong>: ngrams used for text vectorization. default: (1,1)
-* <strong>stop_words</strong> : stop words used for text processing (from sklearn)
-* <strong>verbose</strong> : If 1, print informational messages.
-If 0, suppress.</p>
-<p><strong>Returns:</strong>
-<code>CausalNLP.CausalInferenceModel</code> object</p></div>
+
+**Parameters:**
+* **df** : pandas.DataFrame containing dataset
+* **metalearner_type** : metalearner model to use. One of {'t-learner', 's-learner', 'x-learner', 'r-learner'} (Default: 't-learner')
+* **treatment_col** : treatment variable; column should contain binary values: 1 for treated, 0 for untreated.
+* **outcome_col** : outcome variable; column should contain the categorical or numeric outcome values
+* **text_col** : (optional) text column containing the strings (e.g., articles, reviews, emails).
+* **ignore_cols** : columns to ignore in the analysis
+* **include_cols** : columns to include as covariates (e.g., possible confounders)
+* **treatment_effect_col** : name of column to hold causal effect estimations.  Does not need to exist.  Created by CausalNLP.
+* **learner** : an instance of a custom learner.  If None, a default LightGBM will be used.
+    # Example
+     learner = LGBMClassifier(num_leaves=1000)
+* **effect_learner**: used for x-learner/r-learner and must be regression model
+* **min_df** : min_df parameter used for text processing using sklearn
+* **max_df** : max_df parameter used for text procesing using sklearn
+* **ngram_range**: ngrams used for text vectorization. default: (1,1)
+* **stop_words** : stop words used for text processing (from sklearn)
+* **verbose** : If 1, print informational messages.  If 0, suppress.
+
+**Returns:**
+`CausalNLP.CausalInferenceModel` object
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -168,19 +168,19 @@ If 0, suppress.</p>
                              stop_words=&#39;english&#39;,
                              verbose=1):
     &#34;&#34;&#34;
+    ```
     Infers causality from the data contained in `df` using a metalearner.
     This function is a wrapper to the CausalNLP.CausalInferenceModel class.
     For more details on methods and capabilities of the returned `CausalInferenceModel` object, 
     see the [CausalNLP documentation](https://amaiya.github.io/causalnlp/causalinference.html).
 
     Usage:
-    ```python
     &gt;&gt;&gt; cm = causal_inference_model(df,
                                     treatment_col=&#39;Is_Male?&#39;,
                                     outcome_col=&#39;Post_Shared?&#39;, text_col=&#39;Post_Text&#39;,
                                     ignore_cols=[&#39;id&#39;, &#39;email&#39;])
         cm.fit()
-    ```
+
     **Parameters:**
     * **df** : pandas.DataFrame containing dataset
     * **metalearner_type** : metalearner model to use. One of {&#39;t-learner&#39;, &#39;s-learner&#39;, &#39;x-learner&#39;, &#39;r-learner&#39;} (Default: &#39;t-learner&#39;)
@@ -202,6 +202,7 @@ If 0, suppress.</p>
 
     **Returns:**
     `CausalNLP.CausalInferenceModel` object
+    ```
     &#34;&#34;&#34;
     try:
         import causalnlp
