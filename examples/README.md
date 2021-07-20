@@ -23,6 +23,7 @@ This directory contains various example notebooks using *ktrain*.  The directory
 - `tabular`: 
   - [classification](#-tabular-classification-datasets): classification for tabular data
   - [regression](#-tabular-regression-datasets): regression for tabular data
+  - [causal inference](#-tabular-causal-inference): causal inference using meta-learners
 
 
 ## Text Data
@@ -249,3 +250,15 @@ and predict the Age attribute for each individual.  This is the same dataset use
 #### [House Price Prediction](https://www.kaggle.com/c/house-prices-advanced-regression-techniques):  Tabular Regression
 
 - [HousePricePrediction-MLP.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/tabular): MLP for tabular regression
+
+
+### <a name="#tabularci"></a> Tabular Causal Inference
+
+
+#### [Adults Census Dataset](http://archive.ics.uci.edu/ml/datasets/Adult):  Tabular Causal Inference
+
+The original goal of this dataset is to predict the individuals that make over $50K in this Census dataset. Here, we will use causal inference to estimate
+the causal impact of having a PhD on earning over $50K.  
+
+- [causal_inference_example.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/tabular): use meta-learners for causal inference and uplift modeling
+
