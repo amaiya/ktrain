@@ -15,19 +15,19 @@ def causal_inference_model(
                              stop_words='english',
                              verbose=1):
     """
+    ```
     Infers causality from the data contained in `df` using a metalearner.
     This function is a wrapper to the CausalNLP.CausalInferenceModel class.
     For more details on methods and capabilities of the returned `CausalInferenceModel` object, 
     see the [CausalNLP documentation](https://amaiya.github.io/causalnlp/causalinference.html).
 
     Usage:
-    ```python
     >>> cm = causal_inference_model(df,
                                     treatment_col='Is_Male?',
                                     outcome_col='Post_Shared?', text_col='Post_Text',
                                     ignore_cols=['id', 'email'])
         cm.fit()
-    ```
+
     **Parameters:**
     * **df** : pandas.DataFrame containing dataset
     * **metalearner_type** : metalearner model to use. One of {'t-learner', 's-learner', 'x-learner', 'r-learner'} (Default: 't-learner')
@@ -49,6 +49,7 @@ def causal_inference_model(
 
     **Returns:**
     `CausalNLP.CausalInferenceModel` object
+    ```
     """
     try:
         import causalnlp
