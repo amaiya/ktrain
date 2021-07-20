@@ -1,6 +1,7 @@
 def causal_inference_model(
                              df,
-                             metalearner_type='t-learner',
+                             method='t-learner',
+                             metalearner_type=None,
                              treatment_col='treatment',
                              outcome_col='outcome',
                              text_col=None,
@@ -30,7 +31,8 @@ def causal_inference_model(
 
     **Parameters:**
     * **df** : pandas.DataFrame containing dataset
-    * **metalearner_type** : metalearner model to use. One of {'t-learner', 's-learner', 'x-learner', 'r-learner'} (Default: 't-learner')
+    * **method** : metalearner model to use. One of {'t-learner', 's-learner', 'x-learner', 'r-learner'} (Default: 't-learner')
+    * **metalearner_type** : Alias of **method** parameter for backwards compatibility.  If not None, overrides method.
     * **treatment_col** : treatment variable; column should contain binary values: 1 for treated, 0 for untreated.
     * **outcome_col** : outcome variable; column should contain the categorical or numeric outcome values
     * **text_col** : (optional) text column containing the strings (e.g., articles, reviews, emails).
@@ -58,6 +60,7 @@ def causal_inference_model(
     from causalnlp.causalinference import CausalInferenceModel
     return CausalInferenceModel(
                              df,
+                             method=method,
                              metalearner_type=metalearner_type,
                              treatment_col=treatment_col,
                              outcome_col=outcome_col,
