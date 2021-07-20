@@ -28,7 +28,8 @@
 </summary>
 <pre><code class="python">def causal_inference_model(
                              df,
-                             metalearner_type=&#39;t-learner&#39;,
+                             method=&#39;t-learner&#39;,
+                             metalearner_type=None,
                              treatment_col=&#39;treatment&#39;,
                              outcome_col=&#39;outcome&#39;,
                              text_col=None,
@@ -58,7 +59,8 @@
 
     **Parameters:**
     * **df** : pandas.DataFrame containing dataset
-    * **metalearner_type** : metalearner model to use. One of {&#39;t-learner&#39;, &#39;s-learner&#39;, &#39;x-learner&#39;, &#39;r-learner&#39;} (Default: &#39;t-learner&#39;)
+    * **method** : metalearner model to use. One of {&#39;t-learner&#39;, &#39;s-learner&#39;, &#39;x-learner&#39;, &#39;r-learner&#39;} (Default: &#39;t-learner&#39;)
+    * **metalearner_type** : Alias of **method** parameter for backwards compatibility.  If not None, overrides method.
     * **treatment_col** : treatment variable; column should contain binary values: 1 for treated, 0 for untreated.
     * **outcome_col** : outcome variable; column should contain the categorical or numeric outcome values
     * **text_col** : (optional) text column containing the strings (e.g., articles, reviews, emails).
@@ -86,6 +88,7 @@
     from causalnlp.causalinference import CausalInferenceModel
     return CausalInferenceModel(
                              df,
+                             method=method,
                              metalearner_type=metalearner_type,
                              treatment_col=treatment_col,
                              outcome_col=outcome_col,
@@ -110,7 +113,7 @@
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="ktrain.tabular.causalinference.causal_inference_model"><code class="name flex">
-<span>def <span class="ident">causal_inference_model</span></span>(<span>df, metalearner_type='t-learner', treatment_col='treatment', outcome_col='outcome', text_col=None, ignore_cols=[], include_cols=[], treatment_effect_col='treatment_effect', learner=None, effect_learner=None, min_df=0.05, max_df=0.5, ngram_range=(1, 1), stop_words='english', verbose=1)</span>
+<span>def <span class="ident">causal_inference_model</span></span>(<span>df, method='t-learner', metalearner_type=None, treatment_col='treatment', outcome_col='outcome', text_col=None, ignore_cols=[], include_cols=[], treatment_effect_col='treatment_effect', learner=None, effect_learner=None, min_df=0.05, max_df=0.5, ngram_range=(1, 1), stop_words='english', verbose=1)</span>
 </code></dt>
 <dd>
 <div class="desc"><pre><code>Infers causality from the data contained in `df` using a metalearner.
@@ -127,7 +130,8 @@ Usage:
 
 **Parameters:**
 * **df** : pandas.DataFrame containing dataset
-* **metalearner_type** : metalearner model to use. One of {'t-learner', 's-learner', 'x-learner', 'r-learner'} (Default: 't-learner')
+* **method** : metalearner model to use. One of {'t-learner', 's-learner', 'x-learner', 'r-learner'} (Default: 't-learner')
+* **metalearner_type** : Alias of **method** parameter for backwards compatibility.  If not None, overrides method.
 * **treatment_col** : treatment variable; column should contain binary values: 1 for treated, 0 for untreated.
 * **outcome_col** : outcome variable; column should contain the categorical or numeric outcome values
 * **text_col** : (optional) text column containing the strings (e.g., articles, reviews, emails).
@@ -153,7 +157,8 @@ Usage:
 </summary>
 <pre><code class="python">def causal_inference_model(
                              df,
-                             metalearner_type=&#39;t-learner&#39;,
+                             method=&#39;t-learner&#39;,
+                             metalearner_type=None,
                              treatment_col=&#39;treatment&#39;,
                              outcome_col=&#39;outcome&#39;,
                              text_col=None,
@@ -183,7 +188,8 @@ Usage:
 
     **Parameters:**
     * **df** : pandas.DataFrame containing dataset
-    * **metalearner_type** : metalearner model to use. One of {&#39;t-learner&#39;, &#39;s-learner&#39;, &#39;x-learner&#39;, &#39;r-learner&#39;} (Default: &#39;t-learner&#39;)
+    * **method** : metalearner model to use. One of {&#39;t-learner&#39;, &#39;s-learner&#39;, &#39;x-learner&#39;, &#39;r-learner&#39;} (Default: &#39;t-learner&#39;)
+    * **metalearner_type** : Alias of **method** parameter for backwards compatibility.  If not None, overrides method.
     * **treatment_col** : treatment variable; column should contain binary values: 1 for treated, 0 for untreated.
     * **outcome_col** : outcome variable; column should contain the categorical or numeric outcome values
     * **text_col** : (optional) text column containing the strings (e.g., articles, reviews, emails).
@@ -211,6 +217,7 @@ Usage:
     from causalnlp.causalinference import CausalInferenceModel
     return CausalInferenceModel(
                              df,
+                             method=method,
                              metalearner_type=metalearner_type,
                              treatment_col=treatment_col,
                              outcome_col=outcome_col,
