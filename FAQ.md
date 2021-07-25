@@ -76,6 +76,8 @@
 
 - [How do I speed up predictions?](#how-do-i-increase-batch-size-for-predictions)
 
+- [How do I do cross validation with transformers?](#how-do-i-do-cross-validation-with-transformers)
+
 
 
 ---
@@ -1043,6 +1045,61 @@ The `get_learner` function accepts an `eval_batch_size` argument that will be us
 
 
 
+### How do I do cross validation with transformers?
+
+Here is a quick self-contained example:
+
+```python
+from ktrain import text
+import ktrain
+import pandas as pd
+from sklearn.model_selection import train_test_split,KFold
+from sklearn.metrics import accuracy_score
+from sklearn.datasets import fetch_20newsgroups
+
+# load text data
+categories = ['alt.atheism', 'soc.religion.christian','comp.graphics', 'sci.med']
+train_b = fetch_20newsgroups(subset='train', categories=categories, shuffle=True)
+test_b = fetch_20newsgroups(subset='test',categories=categories, shuffle=True)
+(x_train, y_train) = (train_b.data, train_b.target)
+(x_test, y_test) = (test_b.data, test_b.target)
+df = pd.DataFrame({'text':x_train, 'target': [train_b.target_names[y] for y in y_train]})
+
+# CV with transformers
+N_FOLDS = 2
+EPOCHS = 3
+LR = 5e-5
+def transformer_cv(MODEL_NAME):
+    preproc  = text.Transformer(MODEL_NAME, maxlen=500)
+    predictions,accs=[],[]
+    data = df[['text', 'target']]
+    for train_index, val_index in KFold(N_FOLDS).split(data):
+        preproc  = text.Transformer(MODEL_NAME, maxlen=500)
+        train,val=data.iloc[train_index],data.iloc[val_index]
+        x_train=train.text.values
+        x_val=val.text.values
+
+        y_train=train.target.values
+        y_val=val.target.values
+
+        trn = preproc.preprocess_train(x_train, y_train)
+        model = preproc.get_classifier()
+        learner = ktrain.get_learner(model, train_data=trn, batch_size=16)
+        learner.fit_onecycle(LR, EPOCHS)
+        predictor = ktrain.get_predictor(learner.model, preproc)
+        pred=predictor.predict(x_val)
+        acc=accuracy_score(y_val,pred)
+        print('acc',acc)
+        accs.append(acc)
+    return accs
+print( transformer_cv('distilbert-base-uncased') )
+```
+
+
+[[Back to Top](#frequently-asked-questions-about-ktrain)]
+
+
+
 
 ### What kinds of applications have been built with *ktrain*?
 
@@ -1061,5 +1118,6 @@ Examples include:
 - **federal government:** extracting insights from documents about government programs and policies
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
+
 
 
