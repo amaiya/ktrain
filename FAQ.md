@@ -1078,10 +1078,8 @@ def transformer_cv(MODEL_NAME):
         train,val=data.iloc[train_index],data.iloc[val_index]
         x_train=train.text.values
         x_val=val.text.values
-
         y_train=train.target.values
         y_val=val.target.values
-
         trn = preproc.preprocess_train(x_train, y_train)
         model = preproc.get_classifier()
         learner = ktrain.get_learner(model, train_data=trn, batch_size=16)
