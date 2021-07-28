@@ -160,7 +160,7 @@ class TransformerTextClassLearner(GenLearner):
         if hasattr(val, 'reset'): val.reset()
         classification, multilabel = U.is_classifier(self.model)
         preds = self.model.predict(self._prepare(val, train=False))
-        if has_attr(preds, 'logits'): # dep_fix: breaking change in transformers==4.0.0 - also needed for Longformer
+        if hasattr(preds, 'logits'): # dep_fix: breaking change in transformers==4.0.0 - also needed for Longformer
         #if type(preds).__name__ == 'TFSequenceClassifierOutput': # dep_fix: undocumented breaking change in transformers==4.0.0
             # REFERENCE: https://discuss.huggingface.co/t/new-model-output-types/195
             preds = preds.logits
