@@ -15,7 +15,7 @@ Most recent releases are shown at the top. Each release shows:
 - N/A
 
 ### Fixed:
-- check for `logits` attribute when predicting
+- check for `logits` attribute when predicting using `transformers`
 
 
 ## 0.27.1 (2021-07-20)
