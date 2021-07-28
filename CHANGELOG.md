@@ -6,6 +6,19 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.27.2 (2021-07-28)
+
+### New:
+- N/A
+
+### Changed
+- N/A
+
+### Fixed:
+- check for `logits` attribute when predicting using `transformers`
+- change raised Exception to warning for longer sequence lengths for `transformers`
+
+
 ## 0.27.1 (2021-07-20)
 
 ### New:

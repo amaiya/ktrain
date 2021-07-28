@@ -56,7 +56,9 @@ class TextPredictor(Predictor):
             tseq.batch_size = self.batch_size
             tfd = tseq.to_tfdataset(train=False)
             preds = self.model.predict(tfd)
-            if type(preds).__name__ == 'TFSequenceClassifierOutput': # dep_fix: undocumented breaking change in transformers==4.0.0
+            if hasattr(preds, 'logits'): # dep_fix: breaking change - also needed for LongFormer
+            #if type(preds).__name__ == 'TFSequenceClassifierOutput': # dep_fix: undocumented breaking change in transformers==4.0.0
+                # REFERENCE: https://discuss.huggingface.co/t/new-model-output-types/195
                 preds = preds.logits
             
             # dep_fix: transformers in TF 2.2.0 returns a tuple insead of NumPy array for some reason
