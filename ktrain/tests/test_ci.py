@@ -19,7 +19,7 @@ def adult_census():
 
 
 
-class TestMultilabel(TestCase):
+class TestCausalInference(TestCase):
 
     def test_multilabel(self):
         df  = adult_census()

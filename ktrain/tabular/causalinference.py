@@ -57,7 +57,7 @@ def causal_inference_model(
         import causalnlp
     except ImportError:
         raise Exception('CausalNLP must be installed: pip install causalnlp')
-    from causalnlp.causalinference import CausalInferenceModel
+    from causalnlp import CausalInferenceModel
     return CausalInferenceModel(
                              df,
                              method=method,
