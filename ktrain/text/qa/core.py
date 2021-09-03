@@ -67,6 +67,7 @@ class QA(ABC):
         try:
             self.model = TFAutoModelForQuestionAnswering.from_pretrained(self.model_name)
         except:
+            warnings.warn('Could not load supplied model as TensorFlow checkpoint - attempting to load using from_pt=True')
             self.model = TFAutoModelForQuestionAnswering.from_pretrained(self.model_name, from_pt=True)
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
         self.maxlen = 512
