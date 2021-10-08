@@ -563,15 +563,6 @@ class _QAExtractor(QA):
         raise NotImplemented('This method is not used or needed for extraction QA-based extraction.')
 
 
-
-
-
-
-
-
-
-
-
     def ask(self, question, batch_size=8, **kwargs):
 
         # locate candidate document contexts
@@ -629,11 +620,22 @@ class AnswerExtractor:
         Extracts answers
         ```
         """
-        doc_results = [{'rawtext':rawtext, 'ref':row} for row, rawtext in enumerate(contexts)]
+        num_rows = len(contexts)
+        doc_results = [{'rawtext':rawtext, 'reference':row} for row, rawtext in enumerate(contexts)]
         cols = []
         for q in questions: 
+            result_dict = {}
             answers = self.qa.ask(q, doc_results=doc_results)
-            cols.append([d['answer'] if d['confidence'] > min_conf else None for d in answers])
+            for a in answers:
+                answer = a['answer'] if a['confidence'] > min_conf else None
+                lst = result_dict.get(a['reference'], [])
+                lst.append(answer)
+                result_dict[a['reference']] = lst
+            results = []
+            for i in range(num_rows):
+                ans = [a for a in result_dict[i] if a is not None]
+                results.append( None if not ans else ' | '.join(ans) )
+            cols.append(results)
         return cols
 
 
@@ -641,6 +643,18 @@ class AnswerExtractor:
         """
         ```
         Extracts answers from texts
+
+        Args:
+          texts(list): list of strings
+          df(pd.DataFrame): original DataFrame to which columns need to be added
+          question_label_pairs(list):  A list of tuples of the form (question, label).
+                                     Extracted ansewrs to the question will be added as new columns with the 
+                                     specified labels.
+                                     Example: ('What are the risk factors?', 'Risk Factors')
+          min_conf(float):  Answers at or below this confidence value will be set to None in the results
+                            Default: 8.0
+                            Lower this value to reduce false negatives.
+                            Raise this value to reduce false positives.
         ```
         """
         questions = [q for q,l in question_label_pairs]
