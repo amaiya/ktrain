@@ -16,6 +16,9 @@ from transformers import TFAutoModelForQuestionAnswering
 from transformers import AutoTokenizer
 LOWCONF = -10000
 
+DEFAULT_MODEL = 'bert-large-uncased-whole-word-masking-finetuned-squad'
+DEFAULT_MIN_CONF = 8
+
 def _answers2df(answers):
     dfdata = []
     for a in answers:
@@ -61,7 +64,7 @@ class QA(ABC):
     Base class for QA
     """
 
-    def __init__(self, bert_squad_model='bert-large-uncased-whole-word-masking-finetuned-squad',
+    def __init__(self, bert_squad_model=DEFAULT_MODEL,
                  bert_emb_model='bert-base-uncased'):
         self.model_name = bert_squad_model
         try:
@@ -71,7 +74,7 @@ class QA(ABC):
             self.model = TFAutoModelForQuestionAnswering.from_pretrained(self.model_name, from_pt=True)
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
         self.maxlen = 512
-        self.te = tpp.TransformerEmbedding(bert_emb_model, layers=[-2])
+        self.te = tpp.TransformerEmbedding(bert_emb_model, layers=[-2]) if bert_emb_model is not None else None
 
 
     @abstractmethod
@@ -124,7 +127,13 @@ class QA(ABC):
         #if len(answers) == 1: answers = answers[0]
         return answers
 
-
+    def _clean_answer(self, answer):
+        if not answer: return answer
+        remove_list = ['is ', 'are ', 'was ', 'were ', 'of ', 'include ', 'in ']
+        for w in remove_list:
+            if answer.startswith(w): 
+                answer = answer.replace(w, '', 1)
+        return answer
 
 
     def _reconstruct_text(self, tokens, start=0, stop=-1):
@@ -188,6 +197,38 @@ class QA(ABC):
         return answer
 
 
+    def _batchify(self, contexts, batch_size=8):
+        """
+        batchify contexts
+        """
+        if batch_size  > len(contexts): batch_size = len(contexts)
+        num_chunks = math.ceil(len(contexts)/batch_size)
+        return list( U.list2chunks(contexts, n=num_chunks) )
+
+
+    def _split_contexts(self, doc_results):
+        """
+        ```
+        splitup contexts into a manageable size
+        Args:
+          doc_results(list):  list of dicts with keys: rawtext and reference
+        ```
+        """
+        # extract paragraphs as contexts
+        contexts = []
+        refs = []
+        for doc_result in doc_results:
+            rawtext = doc_result.get('rawtext', '')
+            reference = doc_result.get('reference', '')
+            if len(self.tokenizer.tokenize(rawtext)) < self.maxlen:
+                contexts.append(rawtext)
+                refs.append(reference)
+            else:
+                paragraphs = TU.paragraph_tokenize(rawtext, join_sentences=True)
+                contexts.extend(paragraphs)
+                refs.extend([reference] * len(paragraphs))
+        return (contexts, refs)
+
 
     def ask(self, question, query=None, batch_size=8, n_docs_considered=10, n_answers=50, 
             rerank_threshold=0.015, include_np=False):
@@ -223,47 +264,16 @@ class QA(ABC):
         ```
         """
         # locate candidate document contexts
-        paragraphs = []
-        refs = []
-        #doc_results = self.search(question, limit=n_docs_considered)
         doc_results = self.search(_process_question(query if query is not None else question, include_np=include_np), limit=n_docs_considered)
         if not doc_results: 
             warnings.warn('No documents matched words in question (or query if supplied)')
             return []
+
         # extract paragraphs as contexts
-        contexts = []
-        refs = []
-        for doc_result in doc_results:
-            rawtext = doc_result.get('rawtext', '')
-            reference = doc_result.get('reference', '')
-            if len(self.tokenizer.tokenize(rawtext)) < self.maxlen:
-                contexts.append(rawtext)
-                refs.append(reference)
-            else:
-                paragraphs = TU.paragraph_tokenize(rawtext, join_sentences=True)
-                contexts.extend(paragraphs)
-                refs.extend([reference] * len(paragraphs))
-
-
-        #for doc_result in doc_results:
-            #rawtext = doc_result.get('rawtext', '')
-            #reference = doc_result.get('reference', '')
-            #if len(self.tokenizer.tokenize(rawtext)) < self.maxlen:
-                #paragraphs.append(rawtext)
-                #refs.append(reference)
-                #continue
-            #plist = TU.paragraph_tokenize(rawtext, join_sentences=True)
-            #paragraphs.extend(plist)
-            #refs.extend([reference]*len(plist))
-
+        contexts, refs = self._split_contexts(doc_results)
 
         # batchify contexts
-        #return contexts
-        if batch_size  > len(contexts): batch_size = len(contexts)
-        #if len(contexts) >= 100 and batch_size==8:
-            #warnings.warn('TIP: Try increasing batch_size to speedup ask predictions')
-        num_chunks = math.ceil(len(contexts)/batch_size)
-        context_batches = list( U.list2chunks(contexts, n=num_chunks) )
+        context_batches = self._batchify(contexts, batch_size=batch_size)
 
 
         # locate candidate answers
@@ -335,7 +345,7 @@ class SimpleQA(QA):
     SimpleQA: Question-Answering on a list of texts
     """
     def __init__(self, index_dir, 
-                 bert_squad_model='bert-large-uncased-whole-word-masking-finetuned-squad',
+                 bert_squad_model=DEFAULT_MODEL,
                  bert_emb_model='bert-base-uncased'):
         """
         ```
@@ -538,4 +548,104 @@ class SimpleQA(QA):
             return output
 
 
+class _QAExtractor(QA):
+    def __init__(self, bert_squad_model=DEFAULT_MODEL):
+        """
+        ```
+        QAExtractor is a convenience class for extract answers from contexts
+        Args:
+          bert_squad_model(str): name of BERT SQUAD model to use
+        ```
+        """
+        super().__init__(bert_squad_model=bert_squad_model)
 
+    def search(self, query):
+        raise NotImplemented('This method is not used or needed for extraction QA-based extraction.')
+
+
+
+
+
+
+
+
+
+
+
+    def ask(self, question, batch_size=8, **kwargs):
+
+        # locate candidate document contexts
+        doc_results = kwargs.get('doc_results', [])
+        if not doc_results: return []
+
+        # extract paragraphs as contexts
+        contexts, refs = self._split_contexts(doc_results)
+
+        # batchify contexts
+        context_batches = self._batchify(contexts, batch_size=batch_size)
+
+
+        # locate candidate answers
+        answers = []
+        mb = master_bar(range(1))
+        answer_batches = []
+        for i in mb:
+            idx = 0
+            for batch_id, contexts in enumerate(progress_bar(context_batches, parent=mb)):
+                answer_batch = self.predict_squad(contexts, question)
+                answer_batches.extend(answer_batch)
+                for answer in answer_batch:
+                    idx+=1
+                    if not answer['answer']: answer['answer'] = None
+                    answer['confidence'] = answer['confidence'] if isinstance(answer['confidence'], (int,float)) else  answer['confidence'].numpy()
+                    answer['reference'] = refs[idx-1]
+                    answer['answer'] = self._clean_answer(answer['answer'])
+                    answers.append(answer)
+                mb.child.comment = f'extracting information'
+        return answers
+
+
+
+class AnswerExtractor:
+    """
+    Question-Answering-based Information Extraction
+    """
+    def __init__(self, bert_squad_model=DEFAULT_MODEL):
+        self.qa = _QAExtractor(bert_squad_model=bert_squad_model)
+        return
+
+
+    def _check_columns(self, labels, df):
+        """check columns"""
+        cols = df.columns.values
+        for l in labels:
+            if l in cols:
+                raise ValueError('There is already a column named %s in your DataFrame.' % (l))
+
+
+    def _extract(self, questions, contexts, min_conf=DEFAULT_MIN_CONF):
+        """
+        ```
+        Extracts answers
+        ```
+        """
+        doc_results = [{'rawtext':rawtext, 'ref':row} for row, rawtext in enumerate(contexts)]
+        cols = []
+        for q in questions: 
+            answers = self.qa.ask(q, doc_results=doc_results)
+            cols.append([d['answer'] if d['confidence'] > min_conf else None for d in answers])
+        return cols
+
+
+    def extract(self, texts, df, question_label_pairs, min_conf=DEFAULT_MIN_CONF):
+        """
+        ```
+        Extracts answers from texts
+        ```
+        """
+        questions = [q for q,l in question_label_pairs]
+        labels = [l for q,l in question_label_pairs]
+        self._check_columns(labels, df)
+        cols = self._extract(questions, texts, min_conf=min_conf)
+        data = list(zip(cols)) if len(cols) > 1 else cols[0]
+        return df.join(pd.DataFrame(data, columns=labels, index=df.index))
