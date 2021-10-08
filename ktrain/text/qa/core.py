@@ -17,7 +17,7 @@ from transformers import AutoTokenizer
 LOWCONF = -10000
 
 DEFAULT_MODEL = 'bert-large-uncased-whole-word-masking-finetuned-squad'
-DEFAULT_MIN_CONF = 8
+DEFAULT_MIN_CONF = 5
 
 def _answers2df(answers):
     dfdata = []
@@ -652,7 +652,7 @@ class AnswerExtractor:
                                      specified labels.
                                      Example: ('What are the risk factors?', 'Risk Factors')
           min_conf(float):  Answers at or below this confidence value will be set to None in the results
-                            Default: 8.0
+                            Default: 5.0
                             Lower this value to reduce false negatives.
                             Raise this value to reduce false positives.
         ```
