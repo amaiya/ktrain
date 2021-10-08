@@ -87,7 +87,7 @@ class QA(ABC):
         """
         if isinstance(documents, str): documents = [documents]
         sequences = [[question, d] for d in documents]
-        batch = self.tokenizer.batch_encode_plus(sequences, return_tensors='tf', max_length=512, truncation='only_second', padding=True)
+        batch = self.tokenizer.batch_encode_plus(sequences, return_tensors='tf', max_length=self.maxlen, truncation='only_second', padding=True)
         tokens_batch = list( map(self.tokenizer.convert_ids_to_tokens, batch['input_ids']))
 
         # Added from: https://github.com/huggingface/transformers/commit/16ce15ed4bd0865d24a94aa839a44cf0f400ef50
