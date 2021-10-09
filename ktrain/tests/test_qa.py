@@ -72,7 +72,7 @@ class TestQA(TestCase):
         import pandas as pd
         pd.set_option("display.max_colwidth", None)
         df = pd.DataFrame(data, columns=['Text'])
-        df = ae.extract(df.Text.values, df, [('What are the risk factors?', 'Risk Factors'), ('How many patients in sample?', 'Sample Size')], min_conf=5)
+        df = ae.extract(df.Text.values, df, [('What are the risk factors?', 'Risk Factors'), ('How many individuals in sample?', 'Sample Size')], min_conf=5)
         print(df.head())
         answers = df['Risk Factors'].values
         self.assertEqual(answers[0].startswith('sex'), True)
