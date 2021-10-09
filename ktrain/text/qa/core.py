@@ -17,7 +17,7 @@ from transformers import AutoTokenizer
 LOWCONF = -10000
 
 DEFAULT_MODEL = 'bert-large-uncased-whole-word-masking-finetuned-squad'
-DEFAULT_MIN_CONF = 5
+DEFAULT_MIN_CONF = 6
 
 def _answers2df(answers):
     dfdata = []
@@ -129,7 +129,7 @@ class QA(ABC):
 
     def _clean_answer(self, answer):
         if not answer: return answer
-        remove_list = ['is ', 'are ', 'was ', 'were ', 'of ', 'include ', 'in ']
+        remove_list = ['is ', 'are ', 'was ', 'were ', 'of ', 'include ', 'including ', 'in ']
         for w in remove_list:
             if answer.startswith(w): 
                 answer = answer.replace(w, '', 1)
@@ -661,5 +661,5 @@ class AnswerExtractor:
         labels = [l for q,l in question_label_pairs]
         self._check_columns(labels, df)
         cols = self._extract(questions, texts, min_conf=min_conf)
-        data = list(zip(cols)) if len(cols) > 1 else cols[0]
+        data = list(zip(*cols)) if len(cols) > 1 else cols[0]
         return df.join(pd.DataFrame(data, columns=labels, index=df.index))
