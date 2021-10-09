@@ -19,6 +19,11 @@ LOWCONF = -10000
 DEFAULT_MODEL = 'bert-large-uncased-whole-word-masking-finetuned-squad'
 DEFAULT_MIN_CONF = 6
 
+from itertools import chain, zip_longest
+def twolists(l1, l2):
+    return [x for x in chain(*zip_longest(l1, l2)) if x is not None]
+
+
 def _answers2df(answers):
     dfdata = []
     for a in answers:
@@ -614,7 +619,7 @@ class AnswerExtractor:
                 raise ValueError('There is already a column named %s in your DataFrame.' % (l))
 
 
-    def _extract(self, questions, contexts, min_conf=DEFAULT_MIN_CONF):
+    def _extract(self, questions, contexts, min_conf=DEFAULT_MIN_CONF, return_conf=False):
         """
         ```
         Extracts answers
@@ -625,21 +630,32 @@ class AnswerExtractor:
         cols = []
         for q in questions: 
             result_dict = {}
+            conf_dict = {}
             answers = self.qa.ask(q, doc_results=doc_results)
             for a in answers:
                 answer = a['answer'] if a['confidence'] > min_conf else None
                 lst = result_dict.get(a['reference'], [])
                 lst.append(answer)
                 result_dict[a['reference']] = lst
+                lst = conf_dict.get(a['reference'], [])
+                lst.append(a['confidence'])
+                conf_dict[a['reference']] = lst
+
             results = []
             for i in range(num_rows):
                 ans = [a for a in result_dict[i] if a is not None]
                 results.append( None if not ans else ' | '.join(ans) )
             cols.append(results)
+            if return_conf:
+                confs = []
+                for i in range(num_rows):
+                    conf = [str(round(c,2)) for c in conf_dict[i] if c is not None]
+                    confs.append( None if not conf else ' | '.join(conf) )
+                cols.append(confs)
         return cols
 
 
-    def extract(self, texts, df, question_label_pairs, min_conf=DEFAULT_MIN_CONF):
+    def extract(self, texts, df, question_label_pairs, min_conf=DEFAULT_MIN_CONF, return_conf=False):
         """
         ```
         Extracts answers from texts
@@ -655,6 +671,7 @@ class AnswerExtractor:
                             Default: 5.0
                             Lower this value to reduce false negatives.
                             Raise this value to reduce false positives.
+          return_conf(bool): If True, confidence score of each extraction is included in results
         ```
         """
         if not isinstance(df, pd.DataFrame): raise ValueError('df must be a pandas DataFrame.')
@@ -663,6 +680,7 @@ class AnswerExtractor:
         questions = [q for q,l in question_label_pairs]
         labels = [l for q,l in question_label_pairs]
         self._check_columns(labels, df)
-        cols = self._extract(questions, texts, min_conf=min_conf)
+        cols = self._extract(questions, texts, min_conf=min_conf, return_conf=return_conf)
         data = list(zip(*cols)) if len(cols) > 1 else cols[0]
+        if return_conf: labels = twolists(labels, [l+' CONF' for l in labels])
         return df.join(pd.DataFrame(data, columns=labels, index=df.index))
