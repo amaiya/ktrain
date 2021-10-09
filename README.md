@@ -20,7 +20,7 @@ df.head()
 #His speciality is medical risk assessments and is 30 years old.
 #A total of nine studies including 356 patients were included in this study.
 
-
+# AnswerExtractor will create two new columns:  'Risk Factors' and 'Sample Size'
 from ktrain.text import AnswerExtractor
 ae = AnswerExtractor()
 df = ae.extract(df.Text.values, df, [('What are the risk factors?', 'Risk Factors'),
