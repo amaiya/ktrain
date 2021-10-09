@@ -13,7 +13,7 @@
 - **2021-10-15**
   - **ktrain v0.28.x** is released and now includes the `AnswerExtractor`, which allows you to extract any information of interest from documents using a QA model. A short example is shown here, but see the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/qa_information_extraction.ipynb) for more information.
 ```python
-# BEFORE
+# DataFrame BEFORE
 df.head()
 #Text
 #Three major risk factors for COVID-19 were sex (male), age (≥60), and severe pneumonia.
@@ -26,8 +26,8 @@ ae = AnswerExtractor()
 df = ae.extract(df.Text.values, df, [('What are the risk factors?', 'Risk Factors'),
                                      ('How many individuals in sample?', 'Sample Size')])
 
-# AFTER
-df[['Risk FActors', 'Sample Size']].head()
+# DataFrame AFTER
+df[['Risk Fctors', 'Sample Size']].head()
 Risk Factors                                       Sample Size
 sex (male), age (≥60), and severe pneumonia        None
 None                                               None
