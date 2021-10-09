@@ -27,11 +27,11 @@ df = ae.extract(df.Text.values, df, [('What are the risk factors?', 'Risk Factor
                                      ('How many individuals in sample?', 'Sample Size')])
 
 # AFTER
-df.head()
-#Text                                                                                     Risk Factors                                       Sample Size
-#Three major risk factors for COVID-19 were sex (male), age (≥60), and severe pneumonia.  sex (male), age (≥60), and severe pneumonia        None
-#His speciality is medical risk assessments and is 30 years old.                          None                                               None
-#A total of nine studies including 356 patients were included in this study.              None                                               356
+df[['Risk FActors', 'Sample Size']].head()
+Risk Factors                                       Sample Size
+sex (male), age (≥60), and severe pneumonia        None
+None                                               None
+None                                               356
 ```
 - **2021-07-20**
   - **ktrain v0.27.x** is released and now supports causal inference using [meta-learners](https://arxiv.org/abs/1706.03461). See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/tabular/causal_inference_example.ipynb) for more information.
