@@ -65,7 +65,7 @@ class TestQA(TestCase):
 
         data = [
        'Three major risk factors for COVID-19 were sex (male), age (≥60), and severe pneumonia.',
-       'His speciality is medical risk assessments and is 30 years old.',
+       'His speciality is medical risk assessments, and he is 30 years old.',
        'Results: A total of nine studies including 356 patients were included in this study, the mean age was 52.4 years and 221 (62.1%) were male.']
         from ktrain.text import AnswerExtractor
         ae = AnswerExtractor()
