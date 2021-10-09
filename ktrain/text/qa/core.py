@@ -312,7 +312,7 @@ class QA(ABC):
         for idx,c in enumerate(confidences):
             answers[idx]['confidence'] = exp_scores[idx]/total
 
-        if rerank_threshold is None:
+        if rerank_threshold is None or self.te is None:
             return answers
 
         # re-rank
@@ -657,6 +657,9 @@ class AnswerExtractor:
                             Raise this value to reduce false positives.
         ```
         """
+        if not isinstance(df, pd.DataFrame): raise ValueError('df must be a pandas DataFrame.')
+        if len(texts) != df.shape[0]:
+            raise ValueError('Number of texts is not equal to the number of rows in the DataFrame.')
         questions = [q for q,l in question_label_pairs]
         labels = [l for q,l in question_label_pairs]
         self._check_columns(labels, df)
