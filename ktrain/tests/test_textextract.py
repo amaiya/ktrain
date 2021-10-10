@@ -21,8 +21,5 @@ class TestQA(TestCase):
         rawtext = rawtext.decode(errors='ignore')
         self.assertTrue(rawtext.startswith('ktrain'))
 
-        #self.assertEqual(top_answer, 'in october of 1997')
-
-
 if __name__ == "__main__":
     main()
