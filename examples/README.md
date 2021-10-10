@@ -14,6 +14,7 @@ This directory contains various example notebooks using *ktrain*.  The directory
   - [Open-Domain Question-Answering](#textqa):  ask questions to a large text corpus and receive exact candidate answers
   - [Zero-Shot Learning](#zsl):  classify documents by user-supplied topics **without** any training examples
   - [Language Translation](#translation): an example of language translation using pretrained MarianMT models
+  - [Text Extraction](#textextraction): extract text from PDFs, Word documents, etc.
   - [Universal Information Extraction](#extraction): an example of using a Question-Answering model for information extraction
 - `vision`:  
   - [image classification](#imageclass):  models for image datasetsimage classification examples using various models and datasets
@@ -143,6 +144,7 @@ The objective of the CoNLL2003 task is to classify sequences of words as belongi
 ### <a name="textqa"></a>Open-Domain Question-Answering: [question_answering_with_bert.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text)
 ### <a name="zsl"></a>Zero-Shot Learning: [zero_shot_learning_with_nli.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text)
 ### <a name="translation"></a>Language Translation: [language_translation_example.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text)
+### <a name="textextraction"></a>Text Extraction: [text_extraction_example.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text)
 ### <a name="extraction"></a>Universal Information Extraction: [qa_information_extraction.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text)
 
 

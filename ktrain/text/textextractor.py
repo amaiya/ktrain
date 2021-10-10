@@ -36,6 +36,10 @@ class TextExtractor:
         except Exception as e:
             if verbose:
                 print('ERROR on %s:\n%s' % (filename, e))
+        try:
+            text = text.decode(errors='ignore')
+        except:
+            pass
         if return_type == 'sentences':
             return TU.sent_tokenize(text, lang=lang)
         elif return_type == 'paragraphs':
