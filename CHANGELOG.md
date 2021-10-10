@@ -10,6 +10,7 @@ Most recent releases are shown at the top. Each release shows:
 
 ### New:
 - `text.AnswerExtractor` is a universal information extractor powered by a Question-Answering module and capable of extracting user-specfied information from texts.
+- `text.TextExtractor` is a  text extraction pipeline (e.g., convert PDFs to plain text)
 
 ### Changed
 -N/A
