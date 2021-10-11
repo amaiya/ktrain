@@ -239,7 +239,6 @@ class QA(ABC):
 
         words = []
         token_idx = char_start_idx = char_end_idx = chars_idx = 0
-
         for i, word in enumerate(text.split(" ")):
             token = self.tokenizer.tokenize(word)
 
@@ -664,7 +663,8 @@ class _QAExtractor(QA):
                     answer['confidence'] = answer['confidence'] if isinstance(answer['confidence'], (int,float,np.float32)) else  answer['confidence'].numpy()
                     answer['reference'] = refs[idx-1]
                     if answer['answer'] is not None:
-                        answer['answer'] = self._span_to_answer(question, contexts[i], answer['start'], answer['end'])['answer']
+                        formatted_answer = self._span_to_answer(question, contexts[i], answer['start'], answer['end'])['answer'].strip()
+                        if formatted_answer: answer['answer'] = formatted_answer
                     answer['answer'] = self._clean_answer(answer['answer'])
                     answers.append(answer)
                 mb.child.comment = f'extracting information'
