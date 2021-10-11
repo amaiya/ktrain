@@ -139,6 +139,7 @@ class QA(ABC):
         return answers
 
     def _clean_answer(self, answer):
+        import string
         if not answer: return answer
         remove_list = ['is ', 'are ', 'was ', 'were ', 'of ', 'include ', 'including ', 'in ', 'of ', 'the ', 'for ', 'on ', 'to ', '-', ':', '/']
         for w in remove_list:
@@ -148,6 +149,8 @@ class QA(ABC):
         answer = answer.replace(' / ', '/')
         answer = answer.replace(' :// ', '://')
         answer = answer.strip()
+        if answer[0] in string.punctuation: answer=answer[1:]
+        if answer[-1] in string.punctuation: answer=answer[:-1]
         return answer
 
 
@@ -210,6 +213,61 @@ class QA(ABC):
         answer['sentence_beginning'] = sent_beginning
         answer['sentence_end'] = sent_end
         return answer
+
+
+    def _span_to_answer(self, question, text, start, end):
+        """
+        ```
+        This method maps token indexes to actual word in the initial context.
+
+        Args:
+            text (str): The actual context to extract the answer from.
+            start (int): The answer starting token index.
+            end (int): The answer end token index.
+
+        Returns:
+            dct:  `{'answer': str, 'start': int, 'end': int}`
+        ```
+        """
+        all_tokens = self.tokenizer.tokenize(text=question,
+                                             pair=text,
+                                             add_special_tokens=True)
+        sep_idxs= [i for i, x in enumerate(all_tokens) if x == "[SEP]"]
+        start = start - sep_idxs[0]
+        end = end - sep_idxs[0]
+
+
+        words = []
+        token_idx = char_start_idx = char_end_idx = chars_idx = 0
+
+        for i, word in enumerate(text.split(" ")):
+            token = self.tokenizer.tokenize(word)
+
+            # Append words if they are in the span
+            if start <= token_idx <= end:
+                if token_idx == start:
+                    char_start_idx = chars_idx
+
+                if token_idx == end:
+                    char_end_idx = chars_idx + len(word)
+
+                words += [word]
+
+            # Stop if we went over the end of the answer
+            if token_idx > end:
+                break
+
+            # Append the subtokenization length to the running index
+            token_idx += len(token)
+            chars_idx += len(word) + 1
+
+        # Join text with spaces
+        return {
+            "answer": " ".join(words),
+            "start": max(0, char_start_idx),
+            "end": min(len(text), char_end_idx),
+        }
+
 
 
     def _batchify(self, contexts, batch_size=8):
@@ -600,11 +658,13 @@ class _QAExtractor(QA):
             for batch_id, contexts in enumerate(progress_bar(context_batches, parent=mb)):
                 answer_batch = self.predict_squad(contexts, question)
                 answer_batches.extend(answer_batch)
-                for answer in answer_batch:
+                for i, answer in enumerate(answer_batch):
                     idx+=1
                     if not answer['answer']: answer['answer'] = None
                     answer['confidence'] = answer['confidence'] if isinstance(answer['confidence'], (int,float,np.float32)) else  answer['confidence'].numpy()
                     answer['reference'] = refs[idx-1]
+                    if answer['answer'] is not None:
+                        answer['answer'] = self._span_to_answer(question, contexts[i], answer['start'], answer['end'])['answer']
                     answer['answer'] = self._clean_answer(answer['answer'])
                     answers.append(answer)
                 mb.child.comment = f'extracting information'
@@ -629,7 +689,7 @@ class AnswerExtractor:
                 raise ValueError('There is already a column named %s in your DataFrame.' % (l))
 
 
-    def _extract(self, questions, contexts, min_conf=DEFAULT_MIN_CONF, return_conf=False):
+    def _extract(self, questions, contexts, min_conf=DEFAULT_MIN_CONF, return_conf=False, batch_size=8):
         """
         ```
         Extracts answers
@@ -641,7 +701,7 @@ class AnswerExtractor:
         for q in questions: 
             result_dict = {}
             conf_dict = {}
-            answers = self.qa.ask(q, doc_results=doc_results)
+            answers = self.qa.ask(q, doc_results=doc_results, batch_size=batch_size)
             for a in answers:
                 answer = a['answer'] if a['confidence'] > min_conf else None
                 lst = result_dict.get(a['reference'], [])
@@ -665,7 +725,7 @@ class AnswerExtractor:
         return cols
 
 
-    def extract(self, texts, df, question_label_pairs, min_conf=DEFAULT_MIN_CONF, return_conf=False):
+    def extract(self, texts, df, question_label_pairs, min_conf=DEFAULT_MIN_CONF, return_conf=False, batch_size=8):
         """
         ```
         Extracts answers from texts
@@ -682,15 +742,17 @@ class AnswerExtractor:
                             Lower this value to reduce false negatives.
                             Raise this value to reduce false positives.
           return_conf(bool): If True, confidence score of each extraction is included in results
+          batch_size(int): batch size. Default: 8
         ```
         """
         if not isinstance(df, pd.DataFrame): raise ValueError('df must be a pandas DataFrame.')
         if len(texts) != df.shape[0]:
             raise ValueError('Number of texts is not equal to the number of rows in the DataFrame.')
+        texts = [t.replace('\n', ' ').replace('\t', ' ') for t in texts]
         questions = [q for q,l in question_label_pairs]
         labels = [l for q,l in question_label_pairs]
         self._check_columns(labels, df)
-        cols = self._extract(questions, texts, min_conf=min_conf, return_conf=return_conf)
+        cols = self._extract(questions, texts, min_conf=min_conf, return_conf=return_conf, batch_size=batch_size)
         data = list(zip(*cols)) if len(cols) > 1 else cols[0]
         if return_conf: labels = twolists(labels, [l+' CONF' for l in labels])
         return df.join(pd.DataFrame(data, columns=labels, index=df.index))
