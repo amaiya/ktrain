@@ -17,7 +17,7 @@
 
 # DataFrame BEFORE
 df.head()
-#Text
+#     Text
 #0    Three major risk factors for COVID-19 were sex (male), age (≥60), and severe pneumonia.
 #1    His speciality is medical risk assessments, and he is 30 years old.
 #2    A total of nine studies including 356 patients were included in this study.
@@ -30,7 +30,7 @@ df = ae.extract(df.Text.values, df, [('What are the risk factors?', 'Risk Factor
 
 # DataFrame AFTER
 df[['Risk Fctors', 'Sample Size']].head()
-#Risk Factors                                       Sample Size
+#     Risk Factors                                       Sample Size
 #0    sex (male), age (≥60), and severe pneumonia        None
 #1    None                                               None
 #2    None                                               356
