@@ -141,7 +141,8 @@ class QA(ABC):
     def _clean_answer(self, answer):
         import string
         if not answer: return answer
-        remove_list = ['is ', 'are ', 'was ', 'were ', 'of ', 'include ', 'including ', 'in ', 'of ', 'the ', 'for ', 'on ', 'to ', '-', ':', '/']
+        remove_list = ['is ', 'are ', 'was ', 'were ', 'of ', 'include ', 'including ', 'in ',
+                        'of ', 'the ', 'for ', 'on ', 'to ', '-', ':', '/', 'and ']
         for w in remove_list:
             if answer.startswith(w): 
                 answer = answer.replace(w, '', 1)
