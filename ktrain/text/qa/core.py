@@ -103,6 +103,11 @@ class QA(ABC):
                                                  token_type_ids=batch['token_type_ids'], return_dict=False)
         start_scores = start_scores[:,1:-1]
         end_scores = end_scores[:,1:-1]
+
+
+        # normalize logits and spans to retrieve the answer
+        #start_scores = np.exp(start_scores - np.log(np.sum(np.exp(start_scores), axis=-1, keepdims=True))) # from HF pipeline
+        #end_scores = np.exp(end_scores - np.log(np.sum(np.exp(end_scores), axis=-1, keepdims=True)))             # from HF pipeline
         answer_starts = np.argmax(start_scores, axis=1)
         answer_ends = np.argmax(end_scores, axis=1)
 
@@ -124,6 +129,7 @@ class QA(ABC):
             else:
                 #confidence = torch.max(start_scores) + torch.max(end_scores)
                 #confidence = np.log(confidence.item())
+                #ans['confidence'] = start_scores[i,answer_start]*end_scores[i,answer_end]
                 ans['confidence'] = start_scores[i,answer_start]+end_scores[i,answer_end]
             ans['start'] = answer_start
             ans['end'] = answer_end
@@ -134,10 +140,14 @@ class QA(ABC):
 
     def _clean_answer(self, answer):
         if not answer: return answer
-        remove_list = ['is ', 'are ', 'was ', 'were ', 'of ', 'include ', 'including ', 'in ']
+        remove_list = ['is ', 'are ', 'was ', 'were ', 'of ', 'include ', 'including ', 'in ', 'of ', 'the ', 'for ', 'on ', 'to ', '-', ':', '/']
         for w in remove_list:
             if answer.startswith(w): 
                 answer = answer.replace(w, '', 1)
+        answer = answer.replace(' . ', '.')
+        answer = answer.replace(' / ', '/')
+        answer = answer.replace(' :// ', '://')
+        answer = answer.strip()
         return answer
 
 
@@ -593,7 +603,7 @@ class _QAExtractor(QA):
                 for answer in answer_batch:
                     idx+=1
                     if not answer['answer']: answer['answer'] = None
-                    answer['confidence'] = answer['confidence'] if isinstance(answer['confidence'], (int,float)) else  answer['confidence'].numpy()
+                    answer['confidence'] = answer['confidence'] if isinstance(answer['confidence'], (int,float,np.float32)) else  answer['confidence'].numpy()
                     answer['reference'] = refs[idx-1]
                     answer['answer'] = self._clean_answer(answer['answer'])
                     answers.append(answer)
