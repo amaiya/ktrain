@@ -806,7 +806,7 @@ You can safely ignore the error, if it arises from downloading Hugging Face **tr
 
 If you have documents in formats like `.pdf`, `.docx`, or `.pptx` formats and want to use them in a training set or with various **ktrain** features 
 like zero-shot-learning or text summarization, they will need to be converted to plain text format first (i.e., `.txt` files).  You can use the
-`ktrain.text.textutils.extract_copy` function to automatically do this. Alternatively, you can use other tools like [Apache Tika](https://tika.apache.org/) to do the conversion.
+`ktrain.text.textutils.extract_copy` function to automatically do this.  As of v0.28.x of ktrain, there is also the [TextExtractor](https://nbviewer.org/github/amaiya/ktrain/blob/develop/examples/text/text_extraction_example.ipynb) that can be used for conversion.  Alternatively, you can use other tools like [Apache Tika](https://tika.apache.org/) to do the conversion.
 
 With respect to Question-Answering, the `SimpleQA.index_from_folder` method includes a `use_text_extraction` argument.  When set to `True`, question-answering can be performed on document sets 
 comprised of many different file types. More information on this is included in the [question-answering example notebook](https://github.com/amaiya/ktrain/blob/master/examples/text/question_answering_with_bert.ipynb).
