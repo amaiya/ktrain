@@ -341,6 +341,8 @@ pip install torch
 pip install shap
 # for ktrain.tabular.causal_inference_model
 pip install causalnlp
+# for ktrain.text.TextExtractor
+pip install textract
 ```
 If the above libaries are not installed, **ktrain** will complain  when a method or function needing either any of the above is invoked.
 Notice that **ktrain** is using forked versions of the `eli5` and `stellargraph` libraries above in order to support TensorFlow2.
