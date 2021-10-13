@@ -757,3 +757,26 @@ class AnswerExtractor:
         data = list(zip(*cols)) if len(cols) > 1 else cols[0]
         if return_conf: labels = twolists(labels, [l+' CONF' for l in labels])
         return df.join(pd.DataFrame(data, columns=labels, index=df.index))
+
+
+    def finetune(self, data, epochs=3, learning_rate=2e-5, batch_size=8):
+        """
+        ```
+        Finetune a QA model.
+
+        Args:
+          data(list): list of dictionaries of the form: 
+                      [{'question': 'What is ktrain?'
+                       'context': 'ktrain is a low-code library for augmented machine learning.'
+                       'answer': 'ktrain'}]
+          epochs(int): number of epochs.  Default:3
+          learning_rate(float): learning rate.  Default: 2e-5
+        Returns:
+          None
+        ```
+        """
+        from .qa_finetuner import QAFineTuner
+        ft = QAFineTuner(self.qa.model, self.qa.tokenizer)
+        model =ft.finetune(data, epochs=epochs, learning_rate=learning_rate, batch_size=batch_size)
+        return
+
