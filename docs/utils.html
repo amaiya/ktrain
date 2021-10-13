@@ -505,6 +505,22 @@ def get_ktrain_data():
 #------------------------------------------------------------------------------
 # MISC UTILITIES
 #------------------------------------------------------------------------------
+
+def batchify(X, size):
+    &#34;&#34;&#34;
+    ```
+    Splits texts into separate batch sizes specified by size.
+    Args:
+        X(list): elements
+        size(int): batch size
+    Returns:
+        list of evenly sized batches with the last batch having the remaining elements
+    ```
+    &#34;&#34;&#34;
+
+    return [X[x : x + size] for x in range(0, len(X), size)]
+
+
 def check_array(X, y=None, X_name=&#39;X&#39;, y_name=&#39;targets&#39; ):
     if not isinstance(X, (list, np.ndarray)): raise ValueError(&#34;%s must be a list or NumPy array&#34; % X_name)
     if y is not None and not isinstance(y, (list, np.ndarray)): raise ValueError(&#34;%s must be a list or NumPy array&#34; % y_name)
@@ -805,6 +821,36 @@ class YTransformDataFrame(YTransform):
         return True
     else:
         return False</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.batchify"><code class="name flex">
+<span>def <span class="ident">batchify</span></span>(<span>X, size)</span>
+</code></dt>
+<dd>
+<div class="desc"><pre><code>Splits texts into separate batch sizes specified by size.
+Args:
+    X(list): elements
+    size(int): batch size
+Returns:
+    list of evenly sized batches with the last batch having the remaining elements
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def batchify(X, size):
+    &#34;&#34;&#34;
+    ```
+    Splits texts into separate batch sizes specified by size.
+    Args:
+        X(list): elements
+        size(int): batch size
+    Returns:
+        list of evenly sized batches with the last batch having the remaining elements
+    ```
+    &#34;&#34;&#34;
+
+    return [X[x : x + size] for x in range(0, len(X), size)]</code></pre>
 </details>
 </dd>
 <dt id="ktrain.utils.bert_data_tuple"><code class="name flex">
@@ -2061,6 +2107,7 @@ Args:
 <ul class="">
 <li><code><a title="ktrain.utils.add_headers_to_df" href="#ktrain.utils.add_headers_to_df">add_headers_to_df</a></code></li>
 <li><code><a title="ktrain.utils.bad_data_tuple" href="#ktrain.utils.bad_data_tuple">bad_data_tuple</a></code></li>
+<li><code><a title="ktrain.utils.batchify" href="#ktrain.utils.batchify">batchify</a></code></li>
 <li><code><a title="ktrain.utils.bert_data_tuple" href="#ktrain.utils.bert_data_tuple">bert_data_tuple</a></code></li>
 <li><code><a title="ktrain.utils.check_array" href="#ktrain.utils.check_array">check_array</a></code></li>
 <li><code><a title="ktrain.utils.data_arg_check" href="#ktrain.utils.data_arg_check">data_arg_check</a></code></li>

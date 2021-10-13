@@ -887,7 +887,7 @@ class TransformersPreprocessor(TextPreprocessor):
                 lang=&#39;en&#39;, ngram_range=1, multilabel=None):
         class_names = self.migrate_classes(class_names, classes)
 
-        if maxlen &gt; 512: raise ValueError(&#39;Transformer models only supports maxlen &lt;= 512&#39;)
+        if maxlen &gt; 512: warnings.warn(&#39;Transformer models typically only support maxlen &lt;= 512, unless you are using certain models like the Longformer.&#39;)
 
         super().__init__(maxlen, class_names, lang=lang, multilabel=multilabel)
 
@@ -3869,7 +3869,7 @@ Returns:
                 lang=&#39;en&#39;, ngram_range=1, multilabel=None):
         class_names = self.migrate_classes(class_names, classes)
 
-        if maxlen &gt; 512: raise ValueError(&#39;Transformer models only supports maxlen &lt;= 512&#39;)
+        if maxlen &gt; 512: warnings.warn(&#39;Transformer models typically only support maxlen &lt;= 512, unless you are using certain models like the Longformer.&#39;)
 
         super().__init__(maxlen, class_names, lang=lang, multilabel=multilabel)
 
