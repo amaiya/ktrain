@@ -37,7 +37,8 @@ from .summarization import TransformerSummarizer
 from .zsl import ZeroShotClassifier
 from .translation import EnglishTranslator, Translator
 from . import shallownlp
-from .qa import SimpleQA
+from .qa import SimpleQA, AnswerExtractor
+from .textextractor import TextExtractor
 from . import textutils
 import pickle
 
@@ -61,6 +62,8 @@ __all__ = [
            &#39;EnglishTranslator&#39;,
            &#39;Translator&#39;,
            &#39;SimpleQA&#39;,
+           &#39;AnswerExtractor&#39;,
+           &#39;TextExtractor&#39;,
            &#39;extract_filenames&#39;, 
            &#39;load_text_files&#39;,
            ]
@@ -130,6 +133,10 @@ seqlen_stats = Transformer.seqlen_stats</code></pre>
 <div class="desc"></div>
 </dd>
 <dt><code class="name"><a title="ktrain.text.summarization" href="summarization/index.html">ktrain.text.summarization</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt><code class="name"><a title="ktrain.text.textextractor" href="textextractor.html">ktrain.text.textextractor</a></code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -1563,6 +1570,232 @@ Args:
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
+<dt id="ktrain.text.AnswerExtractor"><code class="flex name class">
+<span>class <span class="ident">AnswerExtractor</span></span>
+<span>(</span><span>bert_squad_model='bert-large-uncased-whole-word-masking-finetuned-squad')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Question-Answering-based Information Extraction</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AnswerExtractor:
+    &#34;&#34;&#34;
+    Question-Answering-based Information Extraction
+    &#34;&#34;&#34;
+    def __init__(self, bert_squad_model=DEFAULT_MODEL):
+        self.qa = _QAExtractor(bert_squad_model=bert_squad_model)
+        return
+
+
+    def _check_columns(self, labels, df):
+        &#34;&#34;&#34;check columns&#34;&#34;&#34;
+        cols = df.columns.values
+        for l in labels:
+            if l in cols:
+                raise ValueError(&#39;There is already a column named %s in your DataFrame.&#39; % (l))
+
+
+    def _extract(self, questions, contexts, min_conf=DEFAULT_MIN_CONF, return_conf=False, batch_size=8):
+        &#34;&#34;&#34;
+        ```
+        Extracts answers
+        ```
+        &#34;&#34;&#34;
+        num_rows = len(contexts)
+        doc_results = [{&#39;rawtext&#39;:rawtext, &#39;reference&#39;:row} for row, rawtext in enumerate(contexts)]
+        cols = []
+        for q in questions: 
+            result_dict = {}
+            conf_dict = {}
+            answers = self.qa.ask(q, doc_results=doc_results, batch_size=batch_size)
+            for a in answers:
+                answer = a[&#39;answer&#39;] if a[&#39;confidence&#39;] &gt; min_conf else None
+                lst = result_dict.get(a[&#39;reference&#39;], [])
+                lst.append(answer)
+                result_dict[a[&#39;reference&#39;]] = lst
+                lst = conf_dict.get(a[&#39;reference&#39;], [])
+                lst.append(a[&#39;confidence&#39;])
+                conf_dict[a[&#39;reference&#39;]] = lst
+
+            results = []
+            for i in range(num_rows):
+                ans = [a for a in result_dict[i] if a is not None]
+                results.append( None if not ans else &#39; | &#39;.join(ans) )
+            cols.append(results)
+            if return_conf:
+                confs = []
+                for i in range(num_rows):
+                    conf = [str(round(c,2)) for c in conf_dict[i] if c is not None]
+                    confs.append( None if not conf else &#39; | &#39;.join(conf) )
+                cols.append(confs)
+        return cols
+
+
+    def extract(self, texts, df, question_label_pairs, min_conf=DEFAULT_MIN_CONF, return_conf=False, batch_size=8):
+        &#34;&#34;&#34;
+        ```
+        Extracts answers from texts
+
+        Args:
+          texts(list): list of strings
+          df(pd.DataFrame): original DataFrame to which columns need to be added
+          question_label_pairs(list):  A list of tuples of the form (question, label).
+                                     Extracted ansewrs to the question will be added as new columns with the 
+                                     specified labels.
+                                     Example: (&#39;What are the risk factors?&#39;, &#39;Risk Factors&#39;)
+          min_conf(float):  Answers at or below this confidence value will be set to None in the results
+                            Default: 5.0
+                            Lower this value to reduce false negatives.
+                            Raise this value to reduce false positives.
+          return_conf(bool): If True, confidence score of each extraction is included in results
+          batch_size(int): batch size. Default: 8
+        ```
+        &#34;&#34;&#34;
+        if not isinstance(df, pd.DataFrame): raise ValueError(&#39;df must be a pandas DataFrame.&#39;)
+        if len(texts) != df.shape[0]:
+            raise ValueError(&#39;Number of texts is not equal to the number of rows in the DataFrame.&#39;)
+        texts = [t.replace(&#39;\n&#39;, &#39; &#39;).replace(&#39;\t&#39;, &#39; &#39;) for t in texts]
+        questions = [q for q,l in question_label_pairs]
+        labels = [l for q,l in question_label_pairs]
+        self._check_columns(labels, df)
+        cols = self._extract(questions, texts, min_conf=min_conf, return_conf=return_conf, batch_size=batch_size)
+        data = list(zip(*cols)) if len(cols) &gt; 1 else cols[0]
+        if return_conf: labels = twolists(labels, [l+&#39; CONF&#39; for l in labels])
+        return df.join(pd.DataFrame(data, columns=labels, index=df.index))
+
+
+    def finetune(self, data, epochs=3, learning_rate=2e-5, batch_size=8, max_seq_length=512):
+        &#34;&#34;&#34;
+        ```
+        Finetune a QA model.
+
+        Args:
+          data(list): list of dictionaries of the form: 
+                      [{&#39;question&#39;: &#39;What is ktrain?&#39;
+                       &#39;context&#39;: &#39;ktrain is a low-code library for augmented machine learning.&#39;
+                       &#39;answer&#39;: &#39;ktrain&#39;}]
+          epochs(int): number of epochs.  Default:3
+          learning_rate(float): learning rate.  Default: 2e-5
+          batch_size(int): batch size. Default:8
+          max_seq_length(int): maximum sequence length.  Default:512
+        Returns:
+          None
+        ```
+        &#34;&#34;&#34;
+        from .qa_finetuner import QAFineTuner
+        ft = QAFineTuner(self.qa.model, self.qa.tokenizer)
+        model =ft.finetune(data, epochs=epochs, learning_rate=learning_rate, batch_size=batch_size)
+        return</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="ktrain.text.AnswerExtractor.extract"><code class="name flex">
+<span>def <span class="ident">extract</span></span>(<span>self, texts, df, question_label_pairs, min_conf=6, return_conf=False, batch_size=8)</span>
+</code></dt>
+<dd>
+<div class="desc"><pre><code>Extracts answers from texts
+
+Args:
+  texts(list): list of strings
+  df(pd.DataFrame): original DataFrame to which columns need to be added
+  question_label_pairs(list):  A list of tuples of the form (question, label).
+                             Extracted ansewrs to the question will be added as new columns with the 
+                             specified labels.
+                             Example: ('What are the risk factors?', 'Risk Factors')
+  min_conf(float):  Answers at or below this confidence value will be set to None in the results
+                    Default: 5.0
+                    Lower this value to reduce false negatives.
+                    Raise this value to reduce false positives.
+  return_conf(bool): If True, confidence score of each extraction is included in results
+  batch_size(int): batch size. Default: 8
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def extract(self, texts, df, question_label_pairs, min_conf=DEFAULT_MIN_CONF, return_conf=False, batch_size=8):
+    &#34;&#34;&#34;
+    ```
+    Extracts answers from texts
+
+    Args:
+      texts(list): list of strings
+      df(pd.DataFrame): original DataFrame to which columns need to be added
+      question_label_pairs(list):  A list of tuples of the form (question, label).
+                                 Extracted ansewrs to the question will be added as new columns with the 
+                                 specified labels.
+                                 Example: (&#39;What are the risk factors?&#39;, &#39;Risk Factors&#39;)
+      min_conf(float):  Answers at or below this confidence value will be set to None in the results
+                        Default: 5.0
+                        Lower this value to reduce false negatives.
+                        Raise this value to reduce false positives.
+      return_conf(bool): If True, confidence score of each extraction is included in results
+      batch_size(int): batch size. Default: 8
+    ```
+    &#34;&#34;&#34;
+    if not isinstance(df, pd.DataFrame): raise ValueError(&#39;df must be a pandas DataFrame.&#39;)
+    if len(texts) != df.shape[0]:
+        raise ValueError(&#39;Number of texts is not equal to the number of rows in the DataFrame.&#39;)
+    texts = [t.replace(&#39;\n&#39;, &#39; &#39;).replace(&#39;\t&#39;, &#39; &#39;) for t in texts]
+    questions = [q for q,l in question_label_pairs]
+    labels = [l for q,l in question_label_pairs]
+    self._check_columns(labels, df)
+    cols = self._extract(questions, texts, min_conf=min_conf, return_conf=return_conf, batch_size=batch_size)
+    data = list(zip(*cols)) if len(cols) &gt; 1 else cols[0]
+    if return_conf: labels = twolists(labels, [l+&#39; CONF&#39; for l in labels])
+    return df.join(pd.DataFrame(data, columns=labels, index=df.index))</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.AnswerExtractor.finetune"><code class="name flex">
+<span>def <span class="ident">finetune</span></span>(<span>self, data, epochs=3, learning_rate=2e-05, batch_size=8, max_seq_length=512)</span>
+</code></dt>
+<dd>
+<div class="desc"><pre><code>Finetune a QA model.
+
+Args:
+  data(list): list of dictionaries of the form: 
+              [{'question': 'What is ktrain?'
+               'context': 'ktrain is a low-code library for augmented machine learning.'
+               'answer': 'ktrain'}]
+  epochs(int): number of epochs.  Default:3
+  learning_rate(float): learning rate.  Default: 2e-5
+  batch_size(int): batch size. Default:8
+  max_seq_length(int): maximum sequence length.  Default:512
+Returns:
+  None
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def finetune(self, data, epochs=3, learning_rate=2e-5, batch_size=8, max_seq_length=512):
+    &#34;&#34;&#34;
+    ```
+    Finetune a QA model.
+
+    Args:
+      data(list): list of dictionaries of the form: 
+                  [{&#39;question&#39;: &#39;What is ktrain?&#39;
+                   &#39;context&#39;: &#39;ktrain is a low-code library for augmented machine learning.&#39;
+                   &#39;answer&#39;: &#39;ktrain&#39;}]
+      epochs(int): number of epochs.  Default:3
+      learning_rate(float): learning rate.  Default: 2e-5
+      batch_size(int): batch size. Default:8
+      max_seq_length(int): maximum sequence length.  Default:512
+    Returns:
+      None
+    ```
+    &#34;&#34;&#34;
+    from .qa_finetuner import QAFineTuner
+    ft = QAFineTuner(self.qa.model, self.qa.tokenizer)
+    model =ft.finetune(data, epochs=epochs, learning_rate=learning_rate, batch_size=batch_size)
+    return</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
 <dt id="ktrain.text.EnglishTranslator"><code class="flex name class">
 <span>class <span class="ident">EnglishTranslator</span></span>
 <span>(</span><span>src_lang=None, device=None)</span>
@@ -1753,7 +1986,7 @@ Args:
     SimpleQA: Question-Answering on a list of texts
     &#34;&#34;&#34;
     def __init__(self, index_dir, 
-                 bert_squad_model=&#39;bert-large-uncased-whole-word-masking-finetuned-squad&#39;,
+                 bert_squad_model=DEFAULT_MODEL,
                  bert_emb_model=&#39;bert-base-uncased&#39;):
         &#34;&#34;&#34;
         ```
@@ -1887,6 +2120,7 @@ Args:
         ```
         &#34;&#34;&#34;
         if use_text_extraction:
+            # TODO:  change this to use TextExtractor
             try:
                 import textract
             except ImportError:
@@ -2023,6 +2257,7 @@ def index_from_folder(cls, folder_path, index_dir,  use_text_extraction=False, c
     ```
     &#34;&#34;&#34;
     if use_text_extraction:
+        # TODO:  change this to use TextExtractor
         try:
             import textract
         except ImportError:
@@ -2246,6 +2481,135 @@ Returns:
 </ul>
 </li>
 </ul>
+</dd>
+<dt id="ktrain.text.TextExtractor"><code class="flex name class">
+<span>class <span class="ident">TextExtractor</span></span>
+</code></dt>
+<dd>
+<div class="desc"><pre><code>Text Extractor: a wrapper to textract package   
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TextExtractor:
+    &#34;&#34;&#34;
+    ```
+    Text Extractor: a wrapper to textract package   
+    ```
+    &#34;&#34;&#34;
+    def __init__(self):
+        try:
+            import textract
+        except ImportError:
+            raise Exception(&#39;TextExtractor requires textract: pip install textract&#39;)
+        self.process = textract.process
+
+    def extract(self, filename=None, text=None,return_format=&#39;document&#39;, lang=None):
+        &#34;&#34;&#34;
+        ```
+        Extracts text from supplied filename
+        filename(str): path to file,  Mutually-exclusive with text.
+        text(str): string to tokenize.  Mutually-exclusive with filename.
+        return_format(str): One of {&#39;document&#39;, &#39;paragraphs&#39;, &#39;sentences&#39;}
+                          &#39;document&#39;: returns text of document
+                          &#39;paragraphs&#39;: returns a list of paragraphs from document
+                          &#39;sentences&#39;: returns a list of sentences from document
+        lang(str): language code. If None, lang will be detected from extracted text
+        ```
+        &#34;&#34;&#34;
+        if filename is None and text is None:
+            raise ValueError(&#39;Either the filename parameter or the text parameter must be supplied&#39;)
+        if filename is not None and text is not None:
+            raise ValueError(&#39;The filename and text parameters are mutually-exclusive.&#39;)
+        if return_format not in [&#39;document&#39;, &#39;paragraphs&#39;, &#39;sentences&#39;]:
+            raise ValueError(&#39;return_format must be one of {&#34;document&#34;, &#34;paragraphs&#34;, &#34;sentences&#34;}&#39;)
+        if filename is not None:
+            mtype = TU.get_mimetype(filename)
+            try:
+                if mtype and mtype.split(&#39;/&#39;)[0] == &#39;text&#39;:
+                    with open(filename, &#39;r&#39;) as f:
+                        text = f.read()
+                        text = str.encode(text)
+                else:
+                    text = self.process(filename)
+            except Exception as e:
+                if verbose:
+                    print(&#39;ERROR on %s:\n%s&#39; % (filename, e))
+        try:
+            text = text.decode(errors=&#39;ignore&#39;)
+        except:
+            pass
+        if return_format == &#39;sentences&#39;:
+            return TU.sent_tokenize(text, lang=lang)
+        elif return_format == &#39;paragraphs&#39;:
+            return TU.paragraph_tokenize(text, join_sentences=True, lang=lang)
+        else:
+            return text</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="ktrain.text.TextExtractor.extract"><code class="name flex">
+<span>def <span class="ident">extract</span></span>(<span>self, filename=None, text=None, return_format='document', lang=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><pre><code>Extracts text from supplied filename
+filename(str): path to file,  Mutually-exclusive with text.
+text(str): string to tokenize.  Mutually-exclusive with filename.
+return_format(str): One of {'document', 'paragraphs', 'sentences'}
+                  'document': returns text of document
+                  'paragraphs': returns a list of paragraphs from document
+                  'sentences': returns a list of sentences from document
+lang(str): language code. If None, lang will be detected from extracted text
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def extract(self, filename=None, text=None,return_format=&#39;document&#39;, lang=None):
+    &#34;&#34;&#34;
+    ```
+    Extracts text from supplied filename
+    filename(str): path to file,  Mutually-exclusive with text.
+    text(str): string to tokenize.  Mutually-exclusive with filename.
+    return_format(str): One of {&#39;document&#39;, &#39;paragraphs&#39;, &#39;sentences&#39;}
+                      &#39;document&#39;: returns text of document
+                      &#39;paragraphs&#39;: returns a list of paragraphs from document
+                      &#39;sentences&#39;: returns a list of sentences from document
+    lang(str): language code. If None, lang will be detected from extracted text
+    ```
+    &#34;&#34;&#34;
+    if filename is None and text is None:
+        raise ValueError(&#39;Either the filename parameter or the text parameter must be supplied&#39;)
+    if filename is not None and text is not None:
+        raise ValueError(&#39;The filename and text parameters are mutually-exclusive.&#39;)
+    if return_format not in [&#39;document&#39;, &#39;paragraphs&#39;, &#39;sentences&#39;]:
+        raise ValueError(&#39;return_format must be one of {&#34;document&#34;, &#34;paragraphs&#34;, &#34;sentences&#34;}&#39;)
+    if filename is not None:
+        mtype = TU.get_mimetype(filename)
+        try:
+            if mtype and mtype.split(&#39;/&#39;)[0] == &#39;text&#39;:
+                with open(filename, &#39;r&#39;) as f:
+                    text = f.read()
+                    text = str.encode(text)
+            else:
+                text = self.process(filename)
+        except Exception as e:
+            if verbose:
+                print(&#39;ERROR on %s:\n%s&#39; % (filename, e))
+    try:
+        text = text.decode(errors=&#39;ignore&#39;)
+    except:
+        pass
+    if return_format == &#39;sentences&#39;:
+        return TU.sent_tokenize(text, lang=lang)
+    elif return_format == &#39;paragraphs&#39;:
+        return TU.paragraph_tokenize(text, join_sentences=True, lang=lang)
+    else:
+        return text</code></pre>
+</details>
+</dd>
+</dl>
 </dd>
 <dt id="ktrain.text.TopicModel"><code class="flex name class">
 <span>class <span class="ident">get_topic_model</span></span>
@@ -5259,6 +5623,7 @@ Returns:
 <li><code><a title="ktrain.text.qa" href="qa/index.html">ktrain.text.qa</a></code></li>
 <li><code><a title="ktrain.text.shallownlp" href="shallownlp/index.html">ktrain.text.shallownlp</a></code></li>
 <li><code><a title="ktrain.text.summarization" href="summarization/index.html">ktrain.text.summarization</a></code></li>
+<li><code><a title="ktrain.text.textextractor" href="textextractor.html">ktrain.text.textextractor</a></code></li>
 <li><code><a title="ktrain.text.textutils" href="textutils.html">ktrain.text.textutils</a></code></li>
 <li><code><a title="ktrain.text.translation" href="translation/index.html">ktrain.text.translation</a></code></li>
 <li><code><a title="ktrain.text.zsl" href="zsl/index.html">ktrain.text.zsl</a></code></li>
@@ -5288,6 +5653,13 @@ Returns:
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
+<h4><code><a title="ktrain.text.AnswerExtractor" href="#ktrain.text.AnswerExtractor">AnswerExtractor</a></code></h4>
+<ul class="">
+<li><code><a title="ktrain.text.AnswerExtractor.extract" href="#ktrain.text.AnswerExtractor.extract">extract</a></code></li>
+<li><code><a title="ktrain.text.AnswerExtractor.finetune" href="#ktrain.text.AnswerExtractor.finetune">finetune</a></code></li>
+</ul>
+</li>
+<li>
 <h4><code><a title="ktrain.text.EnglishTranslator" href="#ktrain.text.EnglishTranslator">EnglishTranslator</a></code></h4>
 <ul class="">
 <li><code><a title="ktrain.text.EnglishTranslator.translate" href="#ktrain.text.EnglishTranslator.translate">translate</a></code></li>
@@ -5300,6 +5672,12 @@ Returns:
 <li><code><a title="ktrain.text.SimpleQA.index_from_list" href="#ktrain.text.SimpleQA.index_from_list">index_from_list</a></code></li>
 <li><code><a title="ktrain.text.SimpleQA.initialize_index" href="#ktrain.text.SimpleQA.initialize_index">initialize_index</a></code></li>
 <li><code><a title="ktrain.text.SimpleQA.search" href="#ktrain.text.SimpleQA.search">search</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="ktrain.text.TextExtractor" href="#ktrain.text.TextExtractor">TextExtractor</a></code></h4>
+<ul class="">
+<li><code><a title="ktrain.text.TextExtractor.extract" href="#ktrain.text.TextExtractor.extract">extract</a></code></li>
 </ul>
 </li>
 <li>

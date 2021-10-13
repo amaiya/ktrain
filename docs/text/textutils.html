@@ -50,6 +50,7 @@ def extract_copy(corpus_path, output_path, verbose=0):
     ```
     &#34;&#34;&#34;
     try:
+        # TODO: change this to use TextExtractor
         import textract
     except ImportError:
         raise Exception(&#39;extract_copy requires textract: pip install textract&#39;)
@@ -579,6 +580,7 @@ Returns:
     ```
     &#34;&#34;&#34;
     try:
+        # TODO: change this to use TextExtractor
         import textract
     except ImportError:
         raise Exception(&#39;extract_copy requires textract: pip install textract&#39;)
