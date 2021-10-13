@@ -6,14 +6,14 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
-## 0.28.0 (TBD)
+## 0.28.0 (2021-10-13)
 
 ### New:
 - `text.AnswerExtractor` is a universal information extractor powered by a Question-Answering module and capable of extracting user-specfied information from texts.
 - `text.TextExtractor` is a  text extraction pipeline (e.g., convert PDFs to plain text)
 
 ### Changed
--N/A
+- changed transformers pin to  `transformers>=4.0.0,<=4.10.3`
 
 ### Fixed:
 - N/A
