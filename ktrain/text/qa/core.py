@@ -150,8 +150,8 @@ class QA(ABC):
         answer = answer.replace(' / ', '/')
         answer = answer.replace(' :// ', '://')
         answer = answer.strip()
-        if answer[0] in string.punctuation: answer=answer[1:]
-        if answer[-1] in string.punctuation: answer=answer[:-1]
+        if answer and answer[0] in string.punctuation: answer=answer[1:]
+        if answer and answer[-1] in string.punctuation: answer=answer[:-1]
         return answer
 
 
