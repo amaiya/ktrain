@@ -21,7 +21,7 @@ def adult_census():
 
 class TestCausalInference(TestCase):
 
-    def test_multilabel(self):
+    def test_ci(self):
         df  = adult_census()
         cm = tabular.causal_inference_model(df, metalearner_type='t-learner',
                                             treatment_col='treatment',
