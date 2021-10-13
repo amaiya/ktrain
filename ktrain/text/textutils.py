@@ -22,6 +22,7 @@ def extract_copy(corpus_path, output_path, verbose=0):
     ```
     """
     try:
+        # TODO: change this to use TextExtractor
         import textract
     except ImportError:
         raise Exception('extract_copy requires textract: pip install textract')

@@ -16,6 +16,14 @@ from transformers import TFAutoModelForQuestionAnswering
 from transformers import AutoTokenizer
 LOWCONF = -10000
 
+DEFAULT_MODEL = 'bert-large-uncased-whole-word-masking-finetuned-squad'
+DEFAULT_MIN_CONF = 6
+
+from itertools import chain, zip_longest
+def twolists(l1, l2):
+    return [x for x in chain(*zip_longest(l1, l2)) if x is not None]
+
+
 def _answers2df(answers):
     dfdata = []
     for a in answers:
@@ -61,7 +69,7 @@ class QA(ABC):
     Base class for QA
     """
 
-    def __init__(self, bert_squad_model='bert-large-uncased-whole-word-masking-finetuned-squad',
+    def __init__(self, bert_squad_model=DEFAULT_MODEL,
                  bert_emb_model='bert-base-uncased'):
         self.model_name = bert_squad_model
         try:
@@ -71,7 +79,7 @@ class QA(ABC):
             self.model = TFAutoModelForQuestionAnswering.from_pretrained(self.model_name, from_pt=True)
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
         self.maxlen = 512
-        self.te = tpp.TransformerEmbedding(bert_emb_model, layers=[-2])
+        self.te = tpp.TransformerEmbedding(bert_emb_model, layers=[-2]) if bert_emb_model is not None else None
 
 
     @abstractmethod
@@ -84,7 +92,7 @@ class QA(ABC):
         """
         if isinstance(documents, str): documents = [documents]
         sequences = [[question, d] for d in documents]
-        batch = self.tokenizer.batch_encode_plus(sequences, return_tensors='tf', max_length=512, truncation='only_second', padding=True)
+        batch = self.tokenizer.batch_encode_plus(sequences, return_tensors='tf', max_length=self.maxlen, truncation='only_second', padding=True)
         tokens_batch = list( map(self.tokenizer.convert_ids_to_tokens, batch['input_ids']))
 
         # Added from: https://github.com/huggingface/transformers/commit/16ce15ed4bd0865d24a94aa839a44cf0f400ef50
@@ -95,6 +103,11 @@ class QA(ABC):
                                                  token_type_ids=batch['token_type_ids'], return_dict=False)
         start_scores = start_scores[:,1:-1]
         end_scores = end_scores[:,1:-1]
+
+
+        # normalize logits and spans to retrieve the answer
+        #start_scores = np.exp(start_scores - np.log(np.sum(np.exp(start_scores), axis=-1, keepdims=True))) # from HF pipeline
+        #end_scores = np.exp(end_scores - np.log(np.sum(np.exp(end_scores), axis=-1, keepdims=True)))             # from HF pipeline
         answer_starts = np.argmax(start_scores, axis=1)
         answer_ends = np.argmax(end_scores, axis=1)
 
@@ -116,6 +129,7 @@ class QA(ABC):
             else:
                 #confidence = torch.max(start_scores) + torch.max(end_scores)
                 #confidence = np.log(confidence.item())
+                #ans['confidence'] = start_scores[i,answer_start]*end_scores[i,answer_end]
                 ans['confidence'] = start_scores[i,answer_start]+end_scores[i,answer_end]
             ans['start'] = answer_start
             ans['end'] = answer_end
@@ -124,7 +138,21 @@ class QA(ABC):
         #if len(answers) == 1: answers = answers[0]
         return answers
 
-
+    def _clean_answer(self, answer):
+        import string
+        if not answer: return answer
+        remove_list = ['is ', 'are ', 'was ', 'were ', 'of ', 'include ', 'including ', 'in ',
+                        'of ', 'the ', 'for ', 'on ', 'to ', '-', ':', '/', 'and ']
+        for w in remove_list:
+            if answer.startswith(w): 
+                answer = answer.replace(w, '', 1)
+        answer = answer.replace(' . ', '.')
+        answer = answer.replace(' / ', '/')
+        answer = answer.replace(' :// ', '://')
+        answer = answer.strip()
+        if answer and answer[0] in string.punctuation: answer=answer[1:]
+        if answer and answer[-1] in string.punctuation: answer=answer[:-1]
+        return answer
 
 
     def _reconstruct_text(self, tokens, start=0, stop=-1):
@@ -188,6 +216,92 @@ class QA(ABC):
         return answer
 
 
+    def _span_to_answer(self, question, text, start, end):
+        """
+        ```
+        This method maps token indexes to actual word in the initial context.
+
+        Args:
+            text (str): The actual context to extract the answer from.
+            start (int): The answer starting token index.
+            end (int): The answer end token index.
+
+        Returns:
+            dct:  `{'answer': str, 'start': int, 'end': int}`
+        ```
+        """
+        all_tokens = self.tokenizer.tokenize(text=question,
+                                             pair=text,
+                                             add_special_tokens=True)
+        sep_idxs= [i for i, x in enumerate(all_tokens) if x == "[SEP]"]
+        start = start - sep_idxs[0]
+        end = end - sep_idxs[0]
+
+
+        words = []
+        token_idx = char_start_idx = char_end_idx = chars_idx = 0
+        for i, word in enumerate(text.split(" ")):
+            token = self.tokenizer.tokenize(word)
+
+            # Append words if they are in the span
+            if start <= token_idx <= end:
+                if token_idx == start:
+                    char_start_idx = chars_idx
+
+                if token_idx == end:
+                    char_end_idx = chars_idx + len(word)
+
+                words += [word]
+
+            # Stop if we went over the end of the answer
+            if token_idx > end:
+                break
+
+            # Append the subtokenization length to the running index
+            token_idx += len(token)
+            chars_idx += len(word) + 1
+
+        # Join text with spaces
+        return {
+            "answer": " ".join(words),
+            "start": max(0, char_start_idx),
+            "end": min(len(text), char_end_idx),
+        }
+
+
+
+    def _batchify(self, contexts, batch_size=8):
+        """
+        batchify contexts
+        """
+        if batch_size  > len(contexts): batch_size = len(contexts)
+        num_chunks = math.ceil(len(contexts)/batch_size)
+        return list( U.list2chunks(contexts, n=num_chunks) )
+
+
+    def _split_contexts(self, doc_results):
+        """
+        ```
+        splitup contexts into a manageable size
+        Args:
+          doc_results(list):  list of dicts with keys: rawtext and reference
+        ```
+        """
+        # extract paragraphs as contexts
+        contexts = []
+        refs = []
+        for doc_result in doc_results:
+            rawtext = doc_result.get('rawtext', '')
+            reference = doc_result.get('reference', '')
+            if len(self.tokenizer.tokenize(rawtext)) < self.maxlen:
+                contexts.append(rawtext)
+                refs.append(reference)
+            else:
+                paragraphs = TU.paragraph_tokenize(rawtext, join_sentences=True)
+                contexts.extend(paragraphs)
+                refs.extend([reference] * len(paragraphs))
+        return (contexts, refs)
+
 
     def ask(self, question, query=None, batch_size=8, n_docs_considered=10, n_answers=50, 
             rerank_threshold=0.015, include_np=False):
@@ -223,47 +337,16 @@ class QA(ABC):
         ```
         """
         # locate candidate document contexts
-        paragraphs = []
-        refs = []
-        #doc_results = self.search(question, limit=n_docs_considered)
         doc_results = self.search(_process_question(query if query is not None else question, include_np=include_np), limit=n_docs_considered)
         if not doc_results: 
             warnings.warn('No documents matched words in question (or query if supplied)')
             return []
+
         # extract paragraphs as contexts
-        contexts = []
-        refs = []
-        for doc_result in doc_results:
-            rawtext = doc_result.get('rawtext', '')
-            reference = doc_result.get('reference', '')
-            if len(self.tokenizer.tokenize(rawtext)) < self.maxlen:
-                contexts.append(rawtext)
-                refs.append(reference)
-            else:
-                paragraphs = TU.paragraph_tokenize(rawtext, join_sentences=True)
-                contexts.extend(paragraphs)
-                refs.extend([reference] * len(paragraphs))
-
-
-        #for doc_result in doc_results:
-            #rawtext = doc_result.get('rawtext', '')
-            #reference = doc_result.get('reference', '')
-            #if len(self.tokenizer.tokenize(rawtext)) < self.maxlen:
-                #paragraphs.append(rawtext)
-                #refs.append(reference)
-                #continue
-            #plist = TU.paragraph_tokenize(rawtext, join_sentences=True)
-            #paragraphs.extend(plist)
-            #refs.extend([reference]*len(plist))
-
+        contexts, refs = self._split_contexts(doc_results)
 
         # batchify contexts
-        #return contexts
-        if batch_size  > len(contexts): batch_size = len(contexts)
-        #if len(contexts) >= 100 and batch_size==8:
-            #warnings.warn('TIP: Try increasing batch_size to speedup ask predictions')
-        num_chunks = math.ceil(len(contexts)/batch_size)
-        context_batches = list( U.list2chunks(contexts, n=num_chunks) )
+        context_batches = self._batchify(contexts, batch_size=batch_size)
 
 
         # locate candidate answers
@@ -302,7 +385,7 @@ class QA(ABC):
         for idx,c in enumerate(confidences):
             answers[idx]['confidence'] = exp_scores[idx]/total
 
-        if rerank_threshold is None:
+        if rerank_threshold is None or self.te is None:
             return answers
 
         # re-rank
@@ -335,7 +418,7 @@ class SimpleQA(QA):
     SimpleQA: Question-Answering on a list of texts
     """
     def __init__(self, index_dir, 
-                 bert_squad_model='bert-large-uncased-whole-word-masking-finetuned-squad',
+                 bert_squad_model=DEFAULT_MODEL,
                  bert_emb_model='bert-base-uncased'):
         """
         ```
@@ -469,6 +552,7 @@ class SimpleQA(QA):
         ```
         """
         if use_text_extraction:
+            # TODO:  change this to use TextExtractor
             try:
                 import textract
             except ImportError:
@@ -538,4 +622,164 @@ class SimpleQA(QA):
             return output
 
 
+class _QAExtractor(QA):
+    def __init__(self, bert_squad_model=DEFAULT_MODEL):
+        """
+        ```
+        QAExtractor is a convenience class for extract answers from contexts
+        Args:
+          bert_squad_model(str): name of BERT SQUAD model to use
+        ```
+        """
+        super().__init__(bert_squad_model=bert_squad_model)
+
+    def search(self, query):
+        raise NotImplemented('This method is not used or needed for extraction QA-based extraction.')
+
+
+    def ask(self, question, batch_size=8, **kwargs):
+
+        # locate candidate document contexts
+        doc_results = kwargs.get('doc_results', [])
+        if not doc_results: return []
+
+        # extract paragraphs as contexts
+        contexts, refs = self._split_contexts(doc_results)
+
+        # batchify contexts
+        context_batches = self._batchify(contexts, batch_size=batch_size)
+
+
+        # locate candidate answers
+        answers = []
+        mb = master_bar(range(1))
+        answer_batches = []
+        for i in mb:
+            idx = 0
+            for batch_id, contexts in enumerate(progress_bar(context_batches, parent=mb)):
+                answer_batch = self.predict_squad(contexts, question)
+                answer_batches.extend(answer_batch)
+                for i, answer in enumerate(answer_batch):
+                    idx+=1
+                    if not answer['answer']: answer['answer'] = None
+                    answer['confidence'] = answer['confidence'] if isinstance(answer['confidence'], (int,float,np.float32)) else  answer['confidence'].numpy()
+                    answer['reference'] = refs[idx-1]
+                    if answer['answer'] is not None:
+                        formatted_answer = self._span_to_answer(question, contexts[i], answer['start'], answer['end'])['answer'].strip()
+                        if formatted_answer: answer['answer'] = formatted_answer
+                    answer['answer'] = self._clean_answer(answer['answer'])
+                    answers.append(answer)
+                mb.child.comment = f'extracting information'
+        return answers
+
+
+
+class AnswerExtractor:
+    """
+    Question-Answering-based Information Extraction
+    """
+    def __init__(self, bert_squad_model=DEFAULT_MODEL):
+        self.qa = _QAExtractor(bert_squad_model=bert_squad_model)
+        return
+
+
+    def _check_columns(self, labels, df):
+        """check columns"""
+        cols = df.columns.values
+        for l in labels:
+            if l in cols:
+                raise ValueError('There is already a column named %s in your DataFrame.' % (l))
+
+
+    def _extract(self, questions, contexts, min_conf=DEFAULT_MIN_CONF, return_conf=False, batch_size=8):
+        """
+        ```
+        Extracts answers
+        ```
+        """
+        num_rows = len(contexts)
+        doc_results = [{'rawtext':rawtext, 'reference':row} for row, rawtext in enumerate(contexts)]
+        cols = []
+        for q in questions: 
+            result_dict = {}
+            conf_dict = {}
+            answers = self.qa.ask(q, doc_results=doc_results, batch_size=batch_size)
+            for a in answers:
+                answer = a['answer'] if a['confidence'] > min_conf else None
+                lst = result_dict.get(a['reference'], [])
+                lst.append(answer)
+                result_dict[a['reference']] = lst
+                lst = conf_dict.get(a['reference'], [])
+                lst.append(a['confidence'])
+                conf_dict[a['reference']] = lst
+
+            results = []
+            for i in range(num_rows):
+                ans = [a for a in result_dict[i] if a is not None]
+                results.append( None if not ans else ' | '.join(ans) )
+            cols.append(results)
+            if return_conf:
+                confs = []
+                for i in range(num_rows):
+                    conf = [str(round(c,2)) for c in conf_dict[i] if c is not None]
+                    confs.append( None if not conf else ' | '.join(conf) )
+                cols.append(confs)
+        return cols
+
+
+    def extract(self, texts, df, question_label_pairs, min_conf=DEFAULT_MIN_CONF, return_conf=False, batch_size=8):
+        """
+        ```
+        Extracts answers from texts
+
+        Args:
+          texts(list): list of strings
+          df(pd.DataFrame): original DataFrame to which columns need to be added
+          question_label_pairs(list):  A list of tuples of the form (question, label).
+                                     Extracted ansewrs to the question will be added as new columns with the 
+                                     specified labels.
+                                     Example: ('What are the risk factors?', 'Risk Factors')
+          min_conf(float):  Answers at or below this confidence value will be set to None in the results
+                            Default: 5.0
+                            Lower this value to reduce false negatives.
+                            Raise this value to reduce false positives.
+          return_conf(bool): If True, confidence score of each extraction is included in results
+          batch_size(int): batch size. Default: 8
+        ```
+        """
+        if not isinstance(df, pd.DataFrame): raise ValueError('df must be a pandas DataFrame.')
+        if len(texts) != df.shape[0]:
+            raise ValueError('Number of texts is not equal to the number of rows in the DataFrame.')
+        texts = [t.replace('\n', ' ').replace('\t', ' ') for t in texts]
+        questions = [q for q,l in question_label_pairs]
+        labels = [l for q,l in question_label_pairs]
+        self._check_columns(labels, df)
+        cols = self._extract(questions, texts, min_conf=min_conf, return_conf=return_conf, batch_size=batch_size)
+        data = list(zip(*cols)) if len(cols) > 1 else cols[0]
+        if return_conf: labels = twolists(labels, [l+' CONF' for l in labels])
+        return df.join(pd.DataFrame(data, columns=labels, index=df.index))
+
+
+    def finetune(self, data, epochs=3, learning_rate=2e-5, batch_size=8, max_seq_length=512):
+        """
+        ```
+        Finetune a QA model.
+
+        Args:
+          data(list): list of dictionaries of the form: 
+                      [{'question': 'What is ktrain?'
+                       'context': 'ktrain is a low-code library for augmented machine learning.'
+                       'answer': 'ktrain'}]
+          epochs(int): number of epochs.  Default:3
+          learning_rate(float): learning rate.  Default: 2e-5
+          batch_size(int): batch size. Default:8
+          max_seq_length(int): maximum sequence length.  Default:512
+        Returns:
+          None
+        ```
+        """
+        from .qa_finetuner import QAFineTuner
+        ft = QAFineTuner(self.qa.model, self.qa.tokenizer)
+        model =ft.finetune(data, epochs=epochs, learning_rate=learning_rate, batch_size=batch_size)
+        return
 

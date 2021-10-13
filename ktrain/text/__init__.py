@@ -9,7 +9,8 @@ from .summarization import TransformerSummarizer
 from .zsl import ZeroShotClassifier
 from .translation import EnglishTranslator, Translator
 from . import shallownlp
-from .qa import SimpleQA
+from .qa import SimpleQA, AnswerExtractor
+from .textextractor import TextExtractor
 from . import textutils
 import pickle
 
@@ -33,6 +34,8 @@ __all__ = [
            'EnglishTranslator',
            'Translator',
            'SimpleQA',
+           'AnswerExtractor',
+           'TextExtractor',
            'extract_filenames', 
            'load_text_files',
            ]

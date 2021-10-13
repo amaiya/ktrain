@@ -10,6 +10,31 @@
 
 
 ### News and Announcements
+- **2021-10-15**
+  - **ktrain v0.28.x** is released and now includes the `AnswerExtractor`, which allows you to extract any information of interest from documents by simply phrasing it in the form of a question. A short example is shown here, but see the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/qa_information_extraction.ipynb) for more information.
+```python
+# QA-Based Information Extraction
+
+# DataFrame BEFORE
+df.head()
+#     Text
+#0    Three major risk factors for COVID-19 were sex (male), age (≥60), and severe pneumonia.
+#1    His speciality is medical risk assessments, and he is 30 years old.
+#2    A total of nine studies including 356 patients were included in this study.
+
+# AnswerExtractor will create two new columns:  'Risk Factors' and 'Sample Size'
+from ktrain.text import AnswerExtractor
+ae = AnswerExtractor()
+df = ae.extract(df.Text.values, df, [('What are the risk factors?', 'Risk Factors'),
+                                     ('How many individuals in sample?', 'Sample Size')])
+
+# DataFrame AFTER
+df[['Risk Fctors', 'Sample Size']].head()
+#     Risk Factors                                       Sample Size
+#0    sex (male), age (≥60), and severe pneumonia        None
+#1    None                                               None
+#2    None                                               356
+```
 - **2021-07-20**
   - **ktrain v0.27.x** is released and now supports causal inference using [meta-learners](https://arxiv.org/abs/1706.03461). See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/tabular/causal_inference_example.ipynb) for more information.
 - **2021-07-15**
@@ -35,6 +60,8 @@
      - **Easy-to-Use Built-In Search Engine**:  perform keyword searches on large collections of documents <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/question_answering_with_bert.ipynb)]</sup></sub>
      - **Zero-Shot Learning**:  classify documents into user-provided topics **without** training examples <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/zero_shot_learning_with_nli.ipynb)]</sup></sub>
      - **Language Translation**:  translate text from one language to another <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/language_translation_example.ipynb)]</sup></sub>
+     - **Text Extraction**: Extract text from PDFs, Word documents, etc. <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/text_extraction_example.ipynb)]</sup></sub>
+     - **Universal Information Extraction**:  extract any kind of information from documents by simply phrasing it in the form of a question <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/qa_information_extraction.ipynb)]</sup></sub>
   - `vision` data:
     - **image classification** (e.g., [ResNet](https://arxiv.org/abs/1512.03385), [Wide ResNet](https://arxiv.org/abs/1605.07146), [Inception](https://www.cs.unc.edu/~wliu/papers/GoogLeNet.pdf)) <sub><sup>[[example notebook](https://colab.research.google.com/drive/1WipQJUPL7zqyvLT10yekxf_HNMXDDtyR)]</sup></sub>
     - **image regression** for predicting numerical targets from photos (e.g., age prediction) <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/vision/utk_faces_age_prediction-resnet50.ipynb)]</sup></sub>
@@ -314,6 +341,8 @@ pip install torch
 pip install shap
 # for ktrain.tabular.causal_inference_model
 pip install causalnlp
+# for ktrain.text.TextExtractor
+pip install textract
 ```
 If the above libaries are not installed, **ktrain** will complain  when a method or function needing either any of the above is invoked.
 Notice that **ktrain** is using forked versions of the `eli5` and `stellargraph` libraries above in order to support TensorFlow2.

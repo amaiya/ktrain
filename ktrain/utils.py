@@ -477,6 +477,22 @@ def get_ktrain_data():
 #------------------------------------------------------------------------------
 # MISC UTILITIES
 #------------------------------------------------------------------------------
+
+def batchify(X, size):
+    """
+    ```
+    Splits texts into separate batch sizes specified by size.
+    Args:
+        X(list): elements
+        size(int): batch size
+    Returns:
+        list of evenly sized batches with the last batch having the remaining elements
+    ```
+    """
+
+    return [X[x : x + size] for x in range(0, len(X), size)]
+
+
 def check_array(X, y=None, X_name='X', y_name='targets' ):
     if not isinstance(X, (list, np.ndarray)): raise ValueError("%s must be a list or NumPy array" % X_name)
     if y is not None and not isinstance(y, (list, np.ndarray)): raise ValueError("%s must be a list or NumPy array" % y_name)

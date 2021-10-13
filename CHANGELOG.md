@@ -6,6 +6,19 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.28.0 (2021-10-13)
+
+### New:
+- `text.AnswerExtractor` is a universal information extractor powered by a Question-Answering module and capable of extracting user-specfied information from texts.
+- `text.TextExtractor` is a  text extraction pipeline (e.g., convert PDFs to plain text)
+
+### Changed
+- changed transformers pin to  `transformers>=4.0.0,<=4.10.3`
+
+### Fixed:
+- N/A
+
+
 ## 0.27.3 (2021-09-03)
 
 ### New:
@@ -17,7 +30,6 @@ Most recent releases are shown at the top. Each release shows:
 ### Fixed:
 - `SimpleQA` now can load PyTorch question-answering checkpoints
 - change API call to support newest `causalnlp`
-
 
 
 ## 0.27.2 (2021-07-28)
