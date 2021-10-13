@@ -12,19 +12,23 @@ def convert_to_dataset(list_of_dicts):
             raise ValueError('All dictionaries in list must have the following keys: "question", "context", "answers"')
         q = d['question'].strip()
         c = d['context'].strip()
-        a = d['answers'].strip()
+        a = d['answers'].strip() if isinstance(d['answers'], str) else d['answers']
         ans = a
-        ans_start = c.index(a)
-        if ans_start < 0: raise ValueError('Could not locate answer in context: %s' % (d))
-        new_d = {'question': q, 'context': c, 'answers': {'text':[ans], 'answer_start': [ans_start]}}
+        if 'answer_start' in d:
+            ans_start = d['answer_start']
+        else:
+            ans_start = c.index(a)
+            if ans_start < 0: raise ValueError('Could not locate answer in context: %s' % (d))
+            ans_start = [ans_start]
+        new_d = {'question': q, 'context': c, 'answers': {'text':[ans], 'answer_start': ans_start}}
         new_list.append(new_d)
     dataset = Dataset.from_pandas(pd.DataFrame(new_list))
 
-    datasets = load_dataset('squad')
-    td = datasets['train']
-    td = Dataset.from_pandas(td.to_pandas().head(100))
-    #datasets['train'] = td
-    return td
+    # uncomment to test with squad sample
+    #datasets = load_dataset('squad')
+    #td = datasets['train']
+    #td = Dataset.from_pandas(td.to_pandas().head(100))
+    #return td
     return dataset
 
 
