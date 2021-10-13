@@ -18,7 +18,6 @@ class TestQA(TestCase):
         from ktrain.text import TextExtractor
         te = TextExtractor()
         rawtext = te.extract(path)
-        rawtext = rawtext.decode(errors='ignore')
         self.assertTrue(rawtext.startswith('ktrain'))
 
 if __name__ == "__main__":
