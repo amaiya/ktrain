@@ -552,6 +552,7 @@ class SimpleQA(QA):
         ```
         """
         if use_text_extraction:
+            # TODO:  change this to use TextExtractor
             try:
                 import textract
             except ImportError:
