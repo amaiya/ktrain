@@ -10,7 +10,7 @@
 
 
 ### News and Announcements
-- **2021-10-15**
+- **2021-10-13**
   - **ktrain v0.28.x** is released and now includes the `AnswerExtractor`, which allows you to extract any information of interest from documents by simply phrasing it in the form of a question. A short example is shown here, but see the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/qa_information_extraction.ipynb) for more information.
 ```python
 # QA-Based Information Extraction
