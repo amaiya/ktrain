@@ -13,14 +13,20 @@ def convert_to_dataset(list_of_dicts):
         q = d['question'].strip()
         c = d['context'].strip()
         a = d['answers'].strip() if isinstance(d['answers'], str) else d['answers']
-        ans = a
-        if 'answer_start' in d:
-            ans_start = d['answer_start']
-        else:
+        if a is None:
+            answers = {'text':[], 'answer_start':[]}
+        elif isinstance(a, dict):
+            ans_start = a['answer_start']
+            ans_text = a['text']
+            answers = {'text':ans_text, 'answer_start': ans_start}
+        elif isinstance(a, str):
             ans_start = c.index(a)
             if ans_start < 0: raise ValueError('Could not locate answer in context: %s' % (d))
             ans_start = [ans_start]
-        new_d = {'question': q, 'context': c, 'answers': {'text':[ans], 'answer_start': ans_start}}
+            answers = {'text':[a], 'answer_start':ans_start}
+        else:
+            raise ValueError('Value for "answers" key must be a string, dictionary, or None')
+        new_d = {'question': q, 'context': c, 'answers': answers}
         new_list.append(new_d)
     dataset = Dataset.from_pandas(pd.DataFrame(new_list))
 
@@ -84,7 +90,7 @@ class QAFineTuner:
         self.tokenizer = tokenizer
 
 
-    def finetune(self, data,  epochs=3, learning_rate=2e-5, batch_size=8):
+    def finetune(self, data,  epochs=3, learning_rate=2e-5, batch_size=8, max_seq_length=512):
         """
         ```
         Finetune a QA model.
@@ -113,7 +119,6 @@ class QAFineTuner:
         
         # Padding side determines if we do (question|context) or (context|question).
         pad_on_right = tokenizer.padding_side == "right"
-        max_seq_length = 512
 
         # Training preprocessing
         def prepare_train_features(examples):
@@ -130,7 +135,7 @@ class QAFineTuner:
                 examples[context_column_name if pad_on_right else question_column_name],
                 truncation="only_second" if pad_on_right else "only_first",
                 max_length=max_seq_length,
-                #stride=data_args.doc_stride,
+                stride=128,
                 return_overflowing_tokens=True,
                 return_offsets_mapping=True,
                 #padding="max_length" if data_args.pad_to_max_length else False,

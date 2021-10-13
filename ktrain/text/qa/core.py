@@ -759,7 +759,7 @@ class AnswerExtractor:
         return df.join(pd.DataFrame(data, columns=labels, index=df.index))
 
 
-    def finetune(self, data, epochs=3, learning_rate=2e-5, batch_size=8):
+    def finetune(self, data, epochs=3, learning_rate=2e-5, batch_size=8, max_seq_length=512):
         """
         ```
         Finetune a QA model.
@@ -771,6 +771,8 @@ class AnswerExtractor:
                        'answer': 'ktrain'}]
           epochs(int): number of epochs.  Default:3
           learning_rate(float): learning rate.  Default: 2e-5
+          batch_size(int): batch size. Default:8
+          max_seq_length(int): maximum sequence length.  Default:512
         Returns:
           None
         ```
