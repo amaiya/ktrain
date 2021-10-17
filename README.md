@@ -327,7 +327,9 @@ The above should be all you need on Linux systems and cloud computing environmen
 
 **Some important things to note about installation:**
 - Some optional, extra libraries required for some operations can be installed with: 
-```pip install ktrain[all]```
+```python
+pip install ktrain[all]
+```
 Alternatively, they can be installed individually:
 ```python
 # for ktrain.text.TextPredictor.explain and ktrain.vision.ImagePredictor.explain
