@@ -248,7 +248,7 @@ Here are detailed instructions for getting started with *ktrain* and TensorFlow 
 3. Click on **Anaconda Powershell Prompt** in the Start Menu.
 4. Create a conda environment for *ktrain*: `conda create -n kt python=3.7; conda activate kt`
 5. Type: `pip install -U pip setuptools_scm jupyter` (run twice if error or use `--user` option)
-6. [Install TensorFlow 2](https://www.tensorflow.org/install): `pip install tensorflow==2.3`
+6. [Install TensorFlow 2](https://www.tensorflow.org/install): `pip install tensorflow==2.6`
 6. Type: `pip install ktrain`
 
 If your machine has a GPU (which is needed for larger models), you'll need to perform [GPU setup for TensorFlow](https://www.tensorflow.org/install/gpu).
