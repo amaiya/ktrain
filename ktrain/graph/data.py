@@ -59,7 +59,7 @@ def graph_nodes_from_csv(nodes_filepath,
     #----------------------------------------------------------------
     try:
         import networkx as nx
-    except ImportError
+    except ImportError:
         raise ImportError('Please install networkx:  pip install networkx')
     nx_sep = None if sep in [' ', '\t'] else sep
     g_nx = nx.read_edgelist(path=links_filepath, delimiter=nx_sep)
@@ -219,7 +219,7 @@ def graph_links_from_csv(nodes_filepath,
     """
     try:
         import networkx as nx
-    except ImportError
+    except ImportError:
         raise ImportError('Please install networkx:  pip install networkx')
 
 

@@ -149,7 +149,7 @@ class NodePreprocessor(Preprocessor):
         """
         try:
             import networkx as nx
-        except ImportError
+        except ImportError:
             raise ImportError('Please install networkx:  pip install networkx')
 
 
