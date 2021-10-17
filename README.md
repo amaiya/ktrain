@@ -326,6 +326,7 @@ The above should be all you need on Linux systems and cloud computing environmen
 [more detailed instructions](https://github.com/amaiya/ktrain/blob/master/FAQ.md#how-do-i-install-ktrain-on-a-windows-machine) that include some extra steps.
 
 **Some important things to note about installation:**
+
 Some optional, extra libraries required for some operations can be installed with: 
 ```python
 pip install ktrain[all]
