@@ -54,7 +54,7 @@ setup(
                   'eli5 @ git+https://github@github.com/amaiya/eli5@tfkeras_0_10_1#egg=eli5',
                   'shap',
                   'causalnlp',
-                  'textract'
+                  'textract',
                   'datasets', 
                   ],
         # graph module
