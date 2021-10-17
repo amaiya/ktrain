@@ -50,8 +50,8 @@ setup(
         # NOTE: If missing, these libraries below are installed manually on-the-fly when required by an invoked method with appropriate warnings
         'all': [  'ipython', 
                   'torch==1.8.1',
-                  #'stellargraph @ git+https://github@github.com/amaiya/stellargraph@no_tf_dep_082#egg=stellargraph'
-                  #'eli5 @ git+https://github@github.com/amaiya/eli5@tfkeras_0_10_1#egg=eli5',
+                  'stellargraph @ git+https://github@github.com/amaiya/stellargraph@no_tf_dep_082#egg=stellargraph',
+                  'eli5 @ git+https://github@github.com/amaiya/eli5@tfkeras_0_10_1#egg=eli5',
                   'shap',
                   'causalnlp',
                   'textract'
@@ -59,11 +59,11 @@ setup(
                   ],
         # graph module
         'graph': [ 'networkx>=2.3',
-                   #'stellargraph @ git+https://github@github.com/amaiya/stellargraph@no_tf_dep_082#egg=stellargraph'
+                   'stellargraph @ git+https://github@github.com/amaiya/stellargraph@no_tf_dep_082#egg=stellargraph'
                    ],
         # text, vision, and tabular explain
         'explain': [ 'shap',
-                     #'eli5 @ https://files.pythonhosted.org/packages/05/dc/ae333ca238bf3809164f6dfef42f75d2199287f1db7c93425db6c1f4af7d/eli5-0.10.1.tar.gz'
+                     'eli5 @ https://files.pythonhosted.org/packages/05/dc/ae333ca238bf3809164f6dfef42f75d2199287f1db7c93425db6c1f4af7d/eli5-0.10.1.tar.gz'
                      ],
         # tabularl.causalinference
         'causal': [ 'causalnlp'],
