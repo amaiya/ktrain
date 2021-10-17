@@ -335,6 +335,7 @@ The above should be all you need on Linux systems and cloud computing environmen
 pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip
 # for ktrain.graph
 pip install https://github.com/amaiya/stellargraph/archive/refs/heads/no_tf_dep_082.zip
+pip install networkx>=2.3
 # for ktrain.text.ZeroShotClassifier, ktrain.text.TransformerSummarizer, ktrain.text.Translator
 pip install torch
 # for ktrain.tabular.TabularPredictor.explain
