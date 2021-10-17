@@ -13,6 +13,7 @@ Most recent releases are shown at the top. Each release shows:
 
 ### Changed
 - changed imports for summarization, translation, qa, and zsl in notebooks and tests
+- added `extra_requirements` to `setup.py`
 
 ### Fixed:
 - N/A
