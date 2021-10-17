@@ -23,7 +23,7 @@ df.head()
 #2    A total of nine studies including 356 patients were included in this study.
 
 # AnswerExtractor will create two new columns:  'Risk Factors' and 'Sample Size'
-from ktrain.text import AnswerExtractor
+from ktrain.text.qa import AnswerExtractor
 ae = AnswerExtractor()
 df = ae.extract(df.Text.values, df, [('What are the risk factors?', 'Risk Factors'),
                                      ('How many individuals in sample?', 'Sample Size')])
