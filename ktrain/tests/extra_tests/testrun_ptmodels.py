@@ -1,9 +1,7 @@
-import os
-os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID";
-os.environ["CUDA_VISIBLE_DEVICES"]="0" 
+import testenv
 
-from ktrain import text
-ts = text.TransformerSummarizer()
+from ktrain.text.summarization import TransformerSummarizer
+ts = TransformerSummarizer()
 
 
 sample_doc = """Archive-name: space/new_probes
@@ -252,15 +250,16 @@ print(ts.summarize(sample_doc))
 
 
 # zsl
-from ktrain import text 
-zsl = text.ZeroShotClassifier()
+from ktrain.text.zsl import ZeroShotClassifier
+zsl = ZeroShotClassifier()
 topic_strings=['politics', 'elections', 'sports', 'films', 'television']
 doc = 'I am unhappy with decisions of the government and will definitely vote in 2020.'
 print(zsl.predict(doc, topic_strings=topic_strings, include_labels=True))
 
 
 # translation
-translator = text.EnglishTranslator(src_lang='zh')
+from ktrain.text.translation import EnglishTranslator
+translator = EnglishTranslator(src_lang='zh')
 src_text = '''大流行对世界经济造成了严重破坏。但是，截至2020年6月，美国股票市场持续上涨。'''
 print(translator.translate(src_text))
 
