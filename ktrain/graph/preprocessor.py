@@ -1,7 +1,6 @@
 from ..imports import *
 from .. import utils as U
 from ..preprocessor import Preprocessor
-import networkx as nx
 
 
 class NodePreprocessor(Preprocessor):
@@ -148,6 +147,12 @@ class NodePreprocessor(Preprocessor):
         G_te (Graph):  a networkx Graph containing new nodes
         ```
         """
+        try:
+            import networkx as nx
+        except ImportError
+            raise ImportError('Please install networkx:  pip install networkx')
+
+
         if self.y_encoding is None:
             raise Exception('Unset parameters. Are you sure you called preprocess_train first?')
 
