@@ -23,7 +23,7 @@ class TestCausalInference(TestCase):
 
     def test_ci(self):
         df  = adult_census()
-        cm = tabular.causal_inference_model(df, metalearner_type='t-learner',
+        cm = tabular.causalinference.causal_inference_model(df, metalearner_type='t-learner',
                                             treatment_col='treatment',
                                             outcome_col='class',
                                             ignore_cols=['fnlwgt', 'education','education-num']).fit()
