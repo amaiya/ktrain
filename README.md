@@ -330,7 +330,7 @@ The above should be all you need on Linux systems and cloud computing environmen
 ```python
 pip install ktrain[all]
 ```
-Alternatively, they can be installed individually, as needed:
+Alternatively, these extra packages can be installed individually, as needed:
 ```python
 # for ktrain.text.TextPredictor.explain and ktrain.vision.ImagePredictor.explain
 pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip
