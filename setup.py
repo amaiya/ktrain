@@ -58,9 +58,7 @@ setup(
                   'datasets', 
                   ],
         # graph module
-        'graph': [ 'networkx>=2.3',
-                   'stellargraph @ git+https://github@github.com/amaiya/stellargraph@no_tf_dep_082#egg=stellargraph'
-                   ],
+        'graph': ['stellargraph @ git+https://github@github.com/amaiya/stellargraph@no_tf_dep_082#egg=stellargraph' ],
         # text, vision, and tabular explain
         'explain': [ 'shap',
                      'eli5 @ https://files.pythonhosted.org/packages/05/dc/ae333ca238bf3809164f6dfef42f75d2199287f1db7c93425db6c1f4af7d/eli5-0.10.1.tar.gz'
