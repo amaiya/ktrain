@@ -32,7 +32,6 @@ setup(
           'requests',
           'joblib',
           'packaging',
-          'ipython',
           'langdetect',
           'jieba',
           'cchardet',  # previously pinned to 2.1.5 (due to this issue: https://github.com/PyYoshi/cChardet/issues/61) but no longer needed
@@ -45,7 +44,6 @@ setup(
           'sentencepiece', #  Added due to breaking change in transformers>=4.0
           'datasets', #  Added for QA fine-tuning
           'keras_bert>=0.86.0', # imported in imports with warning and used in 'ktrain.text' ; support for TF 2.3
-          'networkx>=2.3', # imported by graph module
           'whoosh', # imported by text.qa module
 
           # NOTE: these libraries below are manually installed on-the-fly when required by an invoked method with appropriate warnings
@@ -58,6 +56,30 @@ setup(
           #'allennlp', # required for NER Elmo embeddings since TF2 TF_HUB does not work
           # 'torch', # used by text.translation, text.zsl,  and text.summarization
       ],
+    extras_require={
+        'tests': ['ipython',       # tests of explain
+                  'torch==1.8.1',  # ktrain.text: summarization, translation, zsl
+                  'textract',      # ktrain.text.TextExtractor
+                  'causalnlp',     # ktrain.tabular.causal_inference_model
+                  'datasets',      # QAFineTuner.finetune
+                  'shap',          # tabular.TabularPredictor.explain
+                  'eli5 @ git+https://github@github.com/amaiya/eli5@tfkeras_0_10_1#egg=eli5',   # text and vision explain
+                  'stellargraph @ git+https://github@github.com/amaiya/stellargraph@no_tf_dep_082#egg=stellargraph'  # graph
+                  ],
+        # FIX NETWORKX!!!!
+        # graph module
+        'graph': [ 'networkx>=2.3',
+                   'stellargraph @ git+https://github@github.com/amaiya/stellargraph@no_tf_dep_082#egg=stellargraph'],
+        #
+        'explain': [ 'shap',
+                     'eli5 @ https://files.pythonhosted.org/packages/05/dc/ae333ca238bf3809164f6dfef42f75d2199287f1db7c93425db6c1f4af7d/eli5-0.10.1.tar.gz'],
+                     #'eli5 @ git+https://github@github.com/amaiya/eli5@tfkeras_0_10_1#egg=eli5'],
+        'causal': [ 'causalnlp'],
+        'text_extraction': [ 'textract'],
+        # not included and checked within-code: 
+        # 1. bokeh: in TopicModel.visualize_docuemnts
+        # 2. datasets: in QAFineTuner.finetune
+    },
   classifiers=[  # Optional
     # How mature is this project? Common values are
     #   3 - Alpha

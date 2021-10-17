@@ -1,11 +1,15 @@
 import tensorflow as tf
 
 
-from datasets import Dataset, load_dataset
 import pandas as pd
 import warnings
 
 def convert_to_dataset(list_of_dicts):
+    try:
+        from datasets import Dataset, load_dataset
+    except ImportError:
+        raise ImportError('The datasets package is required for fine-tuning QA models: pip install datasets')
+
     new_list = []
     for d in list_of_dicts:
         if 'question' not in d or 'context' not in d or 'answers' not in d:
@@ -46,6 +50,11 @@ def convert_dataset_for_tensorflow(
     to the maximum sequence length, or whether we only pad to the maximum length within that batch. The former
     is most useful when training on TPU, as a new graph compilation is required for each sequence length.
     """
+    try:
+        from datasets import Dataset, load_dataset
+    except ImportError:
+        raise ImportError('The datasets package is required for fine-tuning QA models: pip install datasets')
+
 
     def densify_ragged_batch(features, label=None):
         features = {
