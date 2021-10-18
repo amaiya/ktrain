@@ -6,6 +6,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.28.2 (2021-10-17)
+
+### new:
+- n/a
+
+### changed
+- minor fix to installation due to pypi
+
+### fixed:
+- n/a
+
+
 ## 0.28.1 (2021-10-17)
 
 ### New:

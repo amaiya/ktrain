@@ -48,30 +48,19 @@ setup(
       ],
     extras_require={
         # NOTE: If missing, these libraries below are installed manually on-the-fly when required by an invoked method with appropriate warnings
-        'all': [  'ipython', 
-                  'torch==1.8.1',
-                  'stellargraph @ git+https://github@github.com/amaiya/stellargraph@no_tf_dep_082#egg=stellargraph',
-                  'eli5 @ git+https://github@github.com/amaiya/eli5@tfkeras_0_10_1#egg=eli5',
-                  'shap',
-                  'causalnlp',
-                  'textract',
-                  'datasets', 
+        'tests': [ 'ipython',        # for tests
+                  'torch==1.8.1',    # for qa, summarization, translation, zsl
+                  'shap',            # for tabular.TabularPredictor.explain
+                  'causalnlp',       # for tabular.causalinference
+                  'textract',        # for TextExtractor
+                  'datasets',        # for text.qa.AnswerExtractor.finetune
+                  'stellargraph @ git+https://github@github.com/amaiya/stellargraph@no_tf_dep_082#egg=stellargraph', # for graph module
+                  'eli5 @ git+https://github@github.com/amaiya/eli5@tfkeras_0_10_1#egg=eli5',                        # for explain in text/vision
                   ],
-        # graph module
-        'graph': ['stellargraph @ git+https://github@github.com/amaiya/stellargraph@no_tf_dep_082#egg=stellargraph' ],
-        # text, vision, and tabular explain
-        'explain': [ 'shap',
-                     'eli5 @ https://files.pythonhosted.org/packages/05/dc/ae333ca238bf3809164f6dfef42f75d2199287f1db7c93425db6c1f4af7d/eli5-0.10.1.tar.gz'
-                     ],
-        # tabularl.causalinference
-        'causal': [ 'causalnlp'],
-        # qa.SimpleQA text extraction
-        'text_extraction': ['textract'],
         # not included and checked/requested within-code: 
         # 1. bokeh: in TopicModel.visualize_docuemnts
-        # 2. datasets: in QAFineTuner.finetune
-        # 3. allennlp: for NETR Elmo embeddings since TF2 TF_HUB does not work
-        # 4. textblob: # used by textutils.extract_noun_phrases
+        # 2. allennlp: for NETR Elmo embeddings since TF2 TF_HUB does not work
+        # 3. textblob: # used by textutils.extract_noun_phrases
     },
   classifiers=[  # Optional
     # How mature is this project? Common values are
