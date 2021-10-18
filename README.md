@@ -327,7 +327,7 @@ The above should be all you need on Linux systems and cloud computing environmen
 
 **Some important things to note about installation:**
 
-Some extra libraries required for some operations can be installed as needed:
+Some optional, extra libraries used for some operations can be installed as needed:
 ```python
 # for ktrain.text.TextPredictor.explain and ktrain.vision.ImagePredictor.explain
 pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip
