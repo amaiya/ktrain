@@ -48,8 +48,8 @@ setup(
       ],
     extras_require={
         # NOTE: If missing, these libraries below are installed manually on-the-fly when required by an invoked method with appropriate warnings
-        'tests': [ 'ipython',          # for tests
-                  'torch==1.8.1',      # for qa, summarization, translation, zsl
+        'tests': [ 'ipython',         # for tests
+                  'torch==1.8.1',     # for qa, summarization, translation, zsl
                   'shap',             # for tabular.TabularPredictor.explain
                   'causalnlp',        # for tabular.causalinference
                   'textract',         # for TextExtractor
