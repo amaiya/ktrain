@@ -1,7 +1,6 @@
 from ..imports import *
 from .. import utils as U
 from .preprocessor import NodePreprocessor, LinkPreprocessor
-import networkx as nx
 
 
 def graph_nodes_from_csv(nodes_filepath, 
@@ -58,6 +57,10 @@ def graph_nodes_from_csv(nodes_filepath,
     #----------------------------------------------------------------
     # read graph structure
     #----------------------------------------------------------------
+    try:
+        import networkx as nx
+    except ImportError:
+        raise ImportError('Please install networkx:  pip install networkx')
     nx_sep = None if sep in [' ', '\t'] else sep
     g_nx = nx.read_edgelist(path=links_filepath, delimiter=nx_sep)
 
@@ -214,6 +217,11 @@ def graph_links_from_csv(nodes_filepath,
         tuple of EdgeSequenceWrapper objects for train and validation sets and LinkPreprocessor
     ```
     """
+    try:
+        import networkx as nx
+    except ImportError:
+        raise ImportError('Please install networkx:  pip install networkx')
+
 
     # import stellargraph
     try:

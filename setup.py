@@ -42,43 +42,36 @@ setup(
           'seqeval==0.0.19', # imported in imports with warning and used in 'ktrain.text.ner' ; pin to 0.0.19 due to numpy version incompatibility with TensorFlow 2.3
           'transformers>=4.0.0,<=4.10.3',  # imported in imports with warning and used in 'ktrain.text' ; pin to transformers>4.0 due to breaking changes;
           'sentencepiece', #  Added due to breaking change in transformers>=4.0
-          'datasets', #  Added for QA fine-tuning
           'keras_bert>=0.86.0', # imported in imports with warning and used in 'ktrain.text' ; support for TF 2.3
           'whoosh', # imported by text.qa module
 
-          # NOTE: these libraries below are manually installed on-the-fly when required by an invoked method with appropriate warnings
-          #'eli5 >= 0.10.0', # forked version used by TextPredictor.explain and ImagePredictor.explain
-          #'stellargraph>=0.8.2', # forked version used by graph module
-          # 'shap',  # used by TabularPredictor.explain
-          #'textblob', # used by textutils.extract_noun_phrases
-          #'textract', # used by textutils.extract_copy and text.qa.core.SimpleQA
-          #'bokeh', # used by visualze_documents text.eda module
-          #'allennlp', # required for NER Elmo embeddings since TF2 TF_HUB does not work
-          # 'torch', # used by text.translation, text.zsl,  and text.summarization
       ],
     extras_require={
-        'tests': ['ipython',       # tests of explain
-                  'torch==1.8.1',  # ktrain.text: summarization, translation, zsl
-                  'textract',      # ktrain.text.TextExtractor
-                  'causalnlp',     # ktrain.tabular.causal_inference_model
-                  'datasets',      # QAFineTuner.finetune
-                  'shap',          # tabular.TabularPredictor.explain
-                  'eli5 @ git+https://github@github.com/amaiya/eli5@tfkeras_0_10_1#egg=eli5',   # text and vision explain
-                  'stellargraph @ git+https://github@github.com/amaiya/stellargraph@no_tf_dep_082#egg=stellargraph'  # graph
+        # NOTE: If missing, these libraries below are installed manually on-the-fly when required by an invoked method with appropriate warnings
+        'all': [  'ipython', 
+                  'torch==1.8.1',
+                  'stellargraph @ git+https://github@github.com/amaiya/stellargraph@no_tf_dep_082#egg=stellargraph',
+                  'eli5 @ git+https://github@github.com/amaiya/eli5@tfkeras_0_10_1#egg=eli5',
+                  'shap',
+                  'causalnlp',
+                  'textract',
+                  'datasets', 
                   ],
-        # FIX NETWORKX!!!!
         # graph module
-        'graph': [ 'networkx>=2.3',
-                   'stellargraph @ git+https://github@github.com/amaiya/stellargraph@no_tf_dep_082#egg=stellargraph'],
-        #
+        'graph': ['stellargraph @ git+https://github@github.com/amaiya/stellargraph@no_tf_dep_082#egg=stellargraph' ],
+        # text, vision, and tabular explain
         'explain': [ 'shap',
-                     'eli5 @ https://files.pythonhosted.org/packages/05/dc/ae333ca238bf3809164f6dfef42f75d2199287f1db7c93425db6c1f4af7d/eli5-0.10.1.tar.gz'],
-                     #'eli5 @ git+https://github@github.com/amaiya/eli5@tfkeras_0_10_1#egg=eli5'],
+                     'eli5 @ https://files.pythonhosted.org/packages/05/dc/ae333ca238bf3809164f6dfef42f75d2199287f1db7c93425db6c1f4af7d/eli5-0.10.1.tar.gz'
+                     ],
+        # tabularl.causalinference
         'causal': [ 'causalnlp'],
-        'text_extraction': [ 'textract'],
-        # not included and checked within-code: 
+        # qa.SimpleQA text extraction
+        'text_extraction': ['textract'],
+        # not included and checked/requested within-code: 
         # 1. bokeh: in TopicModel.visualize_docuemnts
         # 2. datasets: in QAFineTuner.finetune
+        # 3. allennlp: for NETR Elmo embeddings since TF2 TF_HUB does not work
+        # 4. textblob: # used by textutils.extract_noun_phrases
     },
   classifiers=[  # Optional
     # How mature is this project? Common values are
@@ -99,5 +92,6 @@ setup(
     'Programming Language :: Python :: 3.6',
     'Programming Language :: Python :: 3.7',
     'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
   ],
 )
