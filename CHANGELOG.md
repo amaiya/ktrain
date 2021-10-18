@@ -6,14 +6,14 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
-## 0.28.1 (TBD)
+## 0.28.1 (2021-10-17)
 
 ### New:
 - N/A
 
 ### Changed
-- changed imports for summarization, translation, qa, and zsl in notebooks and tests
 - added `extra_requirements` to `setup.py`
+- changed imports for summarization, translation, qa, and zsl in notebooks and tests
 
 ### Fixed:
 - N/A
