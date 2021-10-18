@@ -333,7 +333,7 @@ Some optional, extra libraries used for some operations can be installed as need
 pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip
 # for ktrain.graph
 pip install https://github.com/amaiya/stellargraph/archive/refs/heads/no_tf_dep_082.zip
-# for ktrain.text.zsl (ZeroShotClassifier), ktrain.text..summarization, ktrain.text.translation
+# for ktrain.text.zsl (ZeroShotClassifier), ktrain.text.summarization, ktrain.text.translation
 pip install torch
 # for ktrain.tabular.TabularPredictor.explain
 pip install shap
