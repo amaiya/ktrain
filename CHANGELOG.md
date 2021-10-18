@@ -9,13 +9,13 @@ Most recent releases are shown at the top. Each release shows:
 ## 0.28.2 (2021-10-17)
 
 ### new:
-- n/a
+- N/A
 
 ### changed
 - minor fix to installation due to pypi
 
 ### fixed:
-- n/a
+- N/A
 
 
 ## 0.28.1 (2021-10-17)
