@@ -9,10 +9,10 @@ from .. import utils as U
 
 GRAPHSAGE = 'graphsage'
 NODE_CLASSIFIERS = {
-        GRAPHSAGE: 'GraphSAGE:  http://arxiv.org/pdf/1607.01759.pdf'}
+        GRAPHSAGE: 'GraphSAGE:  https://arxiv.org/pdf/1706.02216.pdf'}
 
 LINK_PREDICTORS = {
-        GRAPHSAGE: 'GraphSAGE:  http://arxiv.org/pdf/1607.01759.pdf'}
+        GRAPHSAGE: 'GraphSAGE:  https://arxiv.org/pdf/1706.02216.pdf'}
 
 
 def print_node_classifiers():
