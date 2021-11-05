@@ -330,16 +330,18 @@ The above should be all you need on Linux systems and cloud computing environmen
 
 Some optional, extra libraries used for some operations can be installed as needed:
 ```python
-# for ktrain.text.TextPredictor.explain and ktrain.vision.ImagePredictor.explain
-pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip
 # for ktrain.graph
 pip install https://github.com/amaiya/stellargraph/archive/refs/heads/no_tf_dep_082.zip
-# for ktrain.text.zsl (ZeroShotClassifier), ktrain.text.summarization, ktrain.text.translation
-pip install torch
+# for ktrain.text.TextPredictor.explain and ktrain.vision.ImagePredictor.explain
+pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip
 # for ktrain.tabular.TabularPredictor.explain
 pip install shap
+# for ktrain.text.zsl (ZeroShotClassifier), ktrain.text.summarization, ktrain.text.translation
+pip install torch
 # for ktrain.tabular.causal_inference_model
 pip install causalnlp
+# for ktrain.text.speech
+pip install librosa
 # for ktrain.text.TextExtractor
 pip install textract
 # for ktrain.text.qa.AnswerExtractor.finetune
