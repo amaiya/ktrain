@@ -6,6 +6,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.28.3 (2021-11-05)
+
+### new:
+- speech transcription support
+
+### changed
+- N/A
+
+### fixed:
+- N/A
+
+
 ## 0.28.2 (2021-10-17)
 
 ### new:
