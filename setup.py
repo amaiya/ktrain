@@ -52,8 +52,8 @@ setup(
         'tests': [ 'ipython',        # for tests
                   'datasets',        # for text.qa.AnswerExtractor.finetune
                   'textract',        # for TextExtractor
-                  'librosa',         # for text.speech
                   'causalnlp',       # for tabular.causalinference
+                  'librosa',         # for text.speech
                   'torch==1.8.1',    # for qa, summarization, translation, zsl, speech
                   'shap',            # for tabular.TabularPredictor.explain
                   'eli5 @ git+https://github@github.com/amaiya/eli5@tfkeras_0_10_1#egg=eli5',                        # for explain in text/vision
