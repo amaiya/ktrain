@@ -36,7 +36,7 @@ df[['Risk Fctors', 'Sample Size']].head()
 #2    None                                               356
 ```
 - **2021-07-20**
-  - **ktrain v0.27.x** is released and now supports causal inference using [meta-learners](https://arxiv.org/abs/1706.03461). See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/tabular/causal_inference_example.ipynb) for more information.
+  - **ktrain v0.27.x** is released and now supports causal inference using [meta-learners](https://arxiv.org/abs/1706.03461). See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/tabular/causal_inference_example.ipynb) for more information.
 - **2021-07-15**
   - **ktrain** was used to train machine learning models for [CoronaCentral.ai](https://coronacentral.ai/), a machine-learning-enhanced search engine for COVID publications at Stanford University. The CoronaCentral document classifier, **CoronaBERT**, is [available on the Hugging Face model hub](https://huggingface.co/jakelever/coronabert).  CoronaCentral.ai was developed by Jake Lever and Russ Altman and funded by the Chan Zuckerberg Biohub. Check out [their paper](https://www.biorxiv.org/content/10.1101/2020.12.21.423860v1).
 ----
@@ -61,6 +61,7 @@ df[['Risk Fctors', 'Sample Size']].head()
      - **Zero-Shot Learning**:  classify documents into user-provided topics **without** training examples <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/zero_shot_learning_with_nli.ipynb)]</sup></sub>
      - **Language Translation**:  translate text from one language to another <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/language_translation_example.ipynb)]</sup></sub>
      - **Text Extraction**: Extract text from PDFs, Word documents, etc. <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/text_extraction_example.ipynb)]</sup></sub>
+     - **Speech Transcription**: Extract text from audio files <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/speech_transcription_example.ipynb)]</sup></sub>
      - **Universal Information Extraction**:  extract any kind of information from documents by simply phrasing it in the form of a question <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/qa_information_extraction.ipynb)]</sup></sub>
   - `vision` data:
     - **image classification** (e.g., [ResNet](https://arxiv.org/abs/1512.03385), [Wide ResNet](https://arxiv.org/abs/1605.07146), [Inception](https://www.cs.unc.edu/~wliu/papers/GoogLeNet.pdf)) <sub><sup>[[example notebook](https://colab.research.google.com/drive/1WipQJUPL7zqyvLT10yekxf_HNMXDDtyR)]</sup></sub>
@@ -327,21 +328,23 @@ The above should be all you need on Linux systems and cloud computing environmen
 
 **Some important things to note about installation:**
 
-Some optional, extra libraries required for some operations can be installed as needed:
+Some optional, extra libraries used for some operations can be installed as needed:
 ```python
-# for ktrain.text.TextPredictor.explain and ktrain.vision.ImagePredictor.explain
-pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip
-# for ktrain.graph
+# for graph module
 pip install https://github.com/amaiya/stellargraph/archive/refs/heads/no_tf_dep_082.zip
-# for ktrain.text.ZeroShotClassifier, ktrain.text.TransformerSummarizer, ktrain.text.Translator
-pip install torch
-# for ktrain.tabular.TabularPredictor.explain
+# for text.TextPredictor.explain and vision.ImagePredictor.explain
+pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip
+# for tabular.TabularPredictor.explain
 pip install shap
-# for ktrain.tabular.causal_inference_model
+# for text.zsl (ZeroShotClassifier), text.summarization, text.translation, text.speech
+pip install torch
+# for text.speech
+pip install librosa
+# for tabular.causal_inference_model
 pip install causalnlp
-# for ktrain.text.TextExtractor
+# for text.TextExtractor
 pip install textract
-# for ktrain.text.qa.AnswerExtractor.finetune
+# for text.qa.AnswerExtractor.finetune
 pip install datasets
 ```
 Notice that **ktrain** is using forked versions of the `eli5` and `stellargraph` libraries above in order to support TensorFlow2.

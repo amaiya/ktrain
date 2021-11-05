@@ -17,9 +17,10 @@ class TextExtractor:
     def extract(self, filename=None, text=None,return_format='document', lang=None):
         """
         ```
-        Extracts text from supplied filename
+        Extracts text from document given file path to document.
         filename(str): path to file,  Mutually-exclusive with text.
         text(str): string to tokenize.  Mutually-exclusive with filename.
+                   The extract method can also simply accept a string and return lists of sentences or paragraphs.
         return_format(str): One of {'document', 'paragraphs', 'sentences'}
                           'document': returns text of document
                           'paragraphs': returns a list of paragraphs from document

@@ -48,14 +48,16 @@ setup(
       ],
     extras_require={
         # NOTE: If missing, these libraries below are installed manually on-the-fly when required by an invoked method with appropriate warnings
+        # for testing: pip3 install git+https://github@github.com/amaiya/ktrain@develop#egg=ktrain[tests]
         'tests': [ 'ipython',        # for tests
-                  'torch==1.8.1',    # for qa, summarization, translation, zsl
-                  'shap',            # for tabular.TabularPredictor.explain
-                  'causalnlp',       # for tabular.causalinference
-                  'textract',        # for TextExtractor
                   'datasets',        # for text.qa.AnswerExtractor.finetune
-                  'stellargraph @ git+https://github@github.com/amaiya/stellargraph@no_tf_dep_082#egg=stellargraph', # for graph module
+                  'textract',        # for TextExtractor
+                  'causalnlp',       # for tabular.causalinference
+                  'librosa',         # for text.speech
+                  'torch==1.8.1',    # for qa, summarization, translation, zsl, speech
+                  'shap',            # for tabular.TabularPredictor.explain
                   'eli5 @ git+https://github@github.com/amaiya/eli5@tfkeras_0_10_1#egg=eli5',                        # for explain in text/vision
+                  'stellargraph @ git+https://github@github.com/amaiya/stellargraph@no_tf_dep_082#egg=stellargraph', # for graph module
                   ],
         # not included and checked/requested within-code: 
         # 1. bokeh: in TopicModel.visualize_docuemnts
