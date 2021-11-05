@@ -263,3 +263,11 @@ translator = EnglishTranslator(src_lang='zh')
 src_text = '''大流行对世界经济造成了严重破坏。但是，截至2020年6月，美国股票市场持续上涨。'''
 print(translator.translate(src_text))
 
+
+# transcription
+from ktrain.text.speech import Transcriber
+transcriber = Transcriber()
+afiles = ['text_data/sample.wav']
+result = transcriber.transcribe(afiles)
+print(result)
+

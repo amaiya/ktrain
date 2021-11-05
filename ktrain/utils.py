@@ -481,7 +481,7 @@ def get_ktrain_data():
 def batchify(X, size):
     """
     ```
-    Splits texts into separate batch sizes specified by size.
+    Splits X into separate batch sizes specified by size.
     Args:
         X(list): elements
         size(int): batch size
@@ -489,8 +489,13 @@ def batchify(X, size):
         list of evenly sized batches with the last batch having the remaining elements
     ```
     """
-
     return [X[x : x + size] for x in range(0, len(X), size)]
+
+
+def list2chunks(a, n):
+    k, m = divmod(len(a), n)
+    return (a[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n))
+
 
 
 def check_array(X, y=None, X_name='X', y_name='targets' ):
@@ -539,9 +544,9 @@ def get_random_colors(n, name='hsv', hex_format=True):
     return np.array(result)
 
 
-def list2chunks(a, n):
-    k, m = divmod(len(a), n)
-    return (a[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n))
+
+
+
 
 
 def get_hf_model_name(model_id):
