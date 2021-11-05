@@ -29,7 +29,6 @@
 <pre><code class="python">from ..imports import *
 from .. import utils as U
 from ..preprocessor import Preprocessor
-import networkx as nx
 
 
 class NodePreprocessor(Preprocessor):
@@ -176,6 +175,12 @@ class NodePreprocessor(Preprocessor):
         G_te (Graph):  a networkx Graph containing new nodes
         ```
         &#34;&#34;&#34;
+        try:
+            import networkx as nx
+        except ImportError:
+            raise ImportError(&#39;Please install networkx:  pip install networkx&#39;)
+
+
         if self.y_encoding is None:
             raise Exception(&#39;Unset parameters. Are you sure you called preprocess_train first?&#39;)
 
@@ -651,6 +656,12 @@ Args:
         G_te (Graph):  a networkx Graph containing new nodes
         ```
         &#34;&#34;&#34;
+        try:
+            import networkx as nx
+        except ImportError:
+            raise ImportError(&#39;Please install networkx:  pip install networkx&#39;)
+
+
         if self.y_encoding is None:
             raise Exception(&#39;Unset parameters. Are you sure you called preprocess_train first?&#39;)
 
@@ -792,6 +803,12 @@ G_te (Graph):  a networkx Graph containing new nodes
     G_te (Graph):  a networkx Graph containing new nodes
     ```
     &#34;&#34;&#34;
+    try:
+        import networkx as nx
+    except ImportError:
+        raise ImportError(&#39;Please install networkx:  pip install networkx&#39;)
+
+
     if self.y_encoding is None:
         raise Exception(&#39;Unset parameters. Are you sure you called preprocess_train first?&#39;)
 
