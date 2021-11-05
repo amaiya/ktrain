@@ -201,6 +201,11 @@ Return:
         tuple of EdgeSequenceWrapper objects for train and validation sets and LinkPreprocessor
     ```
     &#34;&#34;&#34;
+    try:
+        import networkx as nx
+    except ImportError:
+        raise ImportError(&#39;Please install networkx:  pip install networkx&#39;)
+
 
     # import stellargraph
     try:
@@ -448,6 +453,10 @@ Return:
     #----------------------------------------------------------------
     # read graph structure
     #----------------------------------------------------------------
+    try:
+        import networkx as nx
+    except ImportError:
+        raise ImportError(&#39;Please install networkx:  pip install networkx&#39;)
     nx_sep = None if sep in [&#39; &#39;, &#39;\t&#39;] else sep
     g_nx = nx.read_edgelist(path=links_filepath, delimiter=nx_sep)
 

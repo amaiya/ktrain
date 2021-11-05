@@ -132,6 +132,10 @@ seqlen_stats = Transformer.seqlen_stats</code></pre>
 <dd>
 <div class="desc"></div>
 </dd>
+<dt><code class="name"><a title="ktrain.text.speech" href="speech/index.html">ktrain.text.speech</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
 <dt><code class="name"><a title="ktrain.text.summarization" href="summarization/index.html">ktrain.text.summarization</a></code></dt>
 <dd>
 <div class="desc"></div>
@@ -2508,9 +2512,10 @@ Returns:
     def extract(self, filename=None, text=None,return_format=&#39;document&#39;, lang=None):
         &#34;&#34;&#34;
         ```
-        Extracts text from supplied filename
+        Extracts text from document given file path to document.
         filename(str): path to file,  Mutually-exclusive with text.
         text(str): string to tokenize.  Mutually-exclusive with filename.
+                   The extract method can also simply accept a string and return lists of sentences or paragraphs.
         return_format(str): One of {&#39;document&#39;, &#39;paragraphs&#39;, &#39;sentences&#39;}
                           &#39;document&#39;: returns text of document
                           &#39;paragraphs&#39;: returns a list of paragraphs from document
@@ -2553,9 +2558,10 @@ Returns:
 <span>def <span class="ident">extract</span></span>(<span>self, filename=None, text=None, return_format='document', lang=None)</span>
 </code></dt>
 <dd>
-<div class="desc"><pre><code>Extracts text from supplied filename
+<div class="desc"><pre><code>Extracts text from document given file path to document.
 filename(str): path to file,  Mutually-exclusive with text.
 text(str): string to tokenize.  Mutually-exclusive with filename.
+           The extract method can also simply accept a string and return lists of sentences or paragraphs.
 return_format(str): One of {'document', 'paragraphs', 'sentences'}
                   'document': returns text of document
                   'paragraphs': returns a list of paragraphs from document
@@ -2569,9 +2575,10 @@ lang(str): language code. If None, lang will be detected from extracted text
 <pre><code class="python">def extract(self, filename=None, text=None,return_format=&#39;document&#39;, lang=None):
     &#34;&#34;&#34;
     ```
-    Extracts text from supplied filename
+    Extracts text from document given file path to document.
     filename(str): path to file,  Mutually-exclusive with text.
     text(str): string to tokenize.  Mutually-exclusive with filename.
+               The extract method can also simply accept a string and return lists of sentences or paragraphs.
     return_format(str): One of {&#39;document&#39;, &#39;paragraphs&#39;, &#39;sentences&#39;}
                       &#39;document&#39;: returns text of document
                       &#39;paragraphs&#39;: returns a list of paragraphs from document
@@ -5622,6 +5629,7 @@ Returns:
 <li><code><a title="ktrain.text.preprocessor" href="preprocessor.html">ktrain.text.preprocessor</a></code></li>
 <li><code><a title="ktrain.text.qa" href="qa/index.html">ktrain.text.qa</a></code></li>
 <li><code><a title="ktrain.text.shallownlp" href="shallownlp/index.html">ktrain.text.shallownlp</a></code></li>
+<li><code><a title="ktrain.text.speech" href="speech/index.html">ktrain.text.speech</a></code></li>
 <li><code><a title="ktrain.text.summarization" href="summarization/index.html">ktrain.text.summarization</a></code></li>
 <li><code><a title="ktrain.text.textextractor" href="textextractor.html">ktrain.text.textextractor</a></code></li>
 <li><code><a title="ktrain.text.textutils" href="textutils.html">ktrain.text.textutils</a></code></li>

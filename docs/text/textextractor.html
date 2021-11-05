@@ -45,9 +45,10 @@ class TextExtractor:
     def extract(self, filename=None, text=None,return_format=&#39;document&#39;, lang=None):
         &#34;&#34;&#34;
         ```
-        Extracts text from supplied filename
+        Extracts text from document given file path to document.
         filename(str): path to file,  Mutually-exclusive with text.
         text(str): string to tokenize.  Mutually-exclusive with filename.
+                   The extract method can also simply accept a string and return lists of sentences or paragraphs.
         return_format(str): One of {&#39;document&#39;, &#39;paragraphs&#39;, &#39;sentences&#39;}
                           &#39;document&#39;: returns text of document
                           &#39;paragraphs&#39;: returns a list of paragraphs from document
@@ -120,9 +121,10 @@ class TextExtractor:
     def extract(self, filename=None, text=None,return_format=&#39;document&#39;, lang=None):
         &#34;&#34;&#34;
         ```
-        Extracts text from supplied filename
+        Extracts text from document given file path to document.
         filename(str): path to file,  Mutually-exclusive with text.
         text(str): string to tokenize.  Mutually-exclusive with filename.
+                   The extract method can also simply accept a string and return lists of sentences or paragraphs.
         return_format(str): One of {&#39;document&#39;, &#39;paragraphs&#39;, &#39;sentences&#39;}
                           &#39;document&#39;: returns text of document
                           &#39;paragraphs&#39;: returns a list of paragraphs from document
@@ -165,9 +167,10 @@ class TextExtractor:
 <span>def <span class="ident">extract</span></span>(<span>self, filename=None, text=None, return_format='document', lang=None)</span>
 </code></dt>
 <dd>
-<div class="desc"><pre><code>Extracts text from supplied filename
+<div class="desc"><pre><code>Extracts text from document given file path to document.
 filename(str): path to file,  Mutually-exclusive with text.
 text(str): string to tokenize.  Mutually-exclusive with filename.
+           The extract method can also simply accept a string and return lists of sentences or paragraphs.
 return_format(str): One of {'document', 'paragraphs', 'sentences'}
                   'document': returns text of document
                   'paragraphs': returns a list of paragraphs from document
@@ -181,9 +184,10 @@ lang(str): language code. If None, lang will be detected from extracted text
 <pre><code class="python">def extract(self, filename=None, text=None,return_format=&#39;document&#39;, lang=None):
     &#34;&#34;&#34;
     ```
-    Extracts text from supplied filename
+    Extracts text from document given file path to document.
     filename(str): path to file,  Mutually-exclusive with text.
     text(str): string to tokenize.  Mutually-exclusive with filename.
+               The extract method can also simply accept a string and return lists of sentences or paragraphs.
     return_format(str): One of {&#39;document&#39;, &#39;paragraphs&#39;, &#39;sentences&#39;}
                       &#39;document&#39;: returns text of document
                       &#39;paragraphs&#39;: returns a list of paragraphs from document

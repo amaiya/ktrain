@@ -29,11 +29,15 @@
 <pre><code class="python">import tensorflow as tf
 
 
-from datasets import Dataset, load_dataset
 import pandas as pd
 import warnings
 
 def convert_to_dataset(list_of_dicts):
+    try:
+        from datasets import Dataset, load_dataset
+    except ImportError:
+        raise ImportError(&#39;The datasets package is required for fine-tuning QA models: pip install datasets&#39;)
+
     new_list = []
     for d in list_of_dicts:
         if &#39;question&#39; not in d or &#39;context&#39; not in d or &#39;answers&#39; not in d:
@@ -74,6 +78,11 @@ def convert_dataset_for_tensorflow(
     to the maximum sequence length, or whether we only pad to the maximum length within that batch. The former
     is most useful when training on TPU, as a new graph compilation is required for each sequence length.
     &#34;&#34;&#34;
+    try:
+        from datasets import Dataset, load_dataset
+    except ImportError:
+        raise ImportError(&#39;The datasets package is required for fine-tuning QA models: pip install datasets&#39;)
+
 
     def densify_ragged_batch(features, label=None):
         features = {
@@ -282,6 +291,11 @@ is most useful when training on TPU, as a new graph compilation is required for 
     to the maximum sequence length, or whether we only pad to the maximum length within that batch. The former
     is most useful when training on TPU, as a new graph compilation is required for each sequence length.
     &#34;&#34;&#34;
+    try:
+        from datasets import Dataset, load_dataset
+    except ImportError:
+        raise ImportError(&#39;The datasets package is required for fine-tuning QA models: pip install datasets&#39;)
+
 
     def densify_ragged_batch(features, label=None):
         features = {
@@ -330,6 +344,11 @@ is most useful when training on TPU, as a new graph compilation is required for 
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def convert_to_dataset(list_of_dicts):
+    try:
+        from datasets import Dataset, load_dataset
+    except ImportError:
+        raise ImportError(&#39;The datasets package is required for fine-tuning QA models: pip install datasets&#39;)
+
     new_list = []
     for d in list_of_dicts:
         if &#39;question&#39; not in d or &#39;context&#39; not in d or &#39;answers&#39; not in d:
