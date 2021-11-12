@@ -16,6 +16,7 @@ Most recent releases are shown at the top. Each release shows:
 
 ### fixed:
 - pin to `transformers==4.10.3` due to Issue #398
+- properly suppress TF/CUDA warnings by default
 
 
 ## 0.28.3 (2021-11-05)
