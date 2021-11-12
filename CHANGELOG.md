@@ -6,6 +6,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.28.4 (TBD)
+
+### new:
+- N/A
+
+### changed
+- N/A
+
+### fixed:
+- pin to `transformers==4.10.3` due to Issue #398
+
+
 ## 0.28.3 (2021-11-05)
 
 ### new:
