@@ -12,6 +12,9 @@ import re
 os.environ['NUMEXPR_MAX_THREADS'] = '8' # suppress warning from NumExpr on machines with many CPUs
 
 # TensorFlow
+SUPPRESS_DEP_WARNINGS = strtobool(os.environ.get('SUPPRESS_DEP_WARNINGS', '1'))
+if SUPPRESS_DEP_WARNINGS: # 2021-11-12:  copied this here to properly suppress TF/CUDA warnings in Kaggle notebooks, etc. 
+    os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 DISABLE_V2_BEHAVIOR = strtobool(os.environ.get('DISABLE_V2_BEHAVIOR', '0'))
 if DISABLE_V2_BEHAVIOR:
     # TF2-transition
@@ -250,7 +253,6 @@ KTRAIN_ELI5_TAG = '0.10.1-1'
 
 
 # Suppress Warnings
-SUPPRESS_DEP_WARNINGS = strtobool(os.environ.get('SUPPRESS_DEP_WARNINGS', '1'))
 def set_global_logging_level(level=logging.ERROR, prefices=[""]):
     """
     Override logging levels of different modules based on their name as a prefix.
