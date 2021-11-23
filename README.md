@@ -349,7 +349,6 @@ pip install datasets
 ```
 Notice that **ktrain** is using forked versions of the `eli5` and `stellargraph` libraries above in order to support TensorFlow2.
 
-This code was tested on Ubuntu 18.04 LTS using TensorFlow 2.3.1 and Python 3.6.9.
 
 
 ### How to Cite
