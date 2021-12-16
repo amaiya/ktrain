@@ -101,7 +101,7 @@ Please see the following tutorial notebooks for a guide on how to use **ktrain**
 * Tutorial A4: [Using Custom Data Formats and Models: Text Regression with Extra Regressors](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-A4-customdata-text_regression_with_extra_regressors.ipynb)
 
 
-Some blog tutorials about **ktrain** are shown below:
+Some blog tutorials and other guides about **ktrain** are shown below:
 
 > [**ktrain: A Lightweight Wrapper for Keras to Help Train Neural Networks**](https://towardsdatascience.com/ktrain-a-lightweight-wrapper-for-keras-to-help-train-neural-networks-82851ba889c) 
 
@@ -113,6 +113,8 @@ Some blog tutorials about **ktrain** are shown below:
 > [**Build an Open-Domain Question-Answering System With BERT in 3 Lines of Code**](https://towardsdatascience.com/build-an-open-domain-question-answering-system-with-bert-in-3-lines-of-code-da0131bc516b)
 
 > [**Finetuning BERT using ktrain for Disaster Tweets Classification**](https://medium.com/analytics-vidhya/finetuning-bert-using-ktrain-for-disaster-tweets-classification-18f64a50910b) by Hamiz Ahmed
+
+> [**Indonesian NLP Examples with ktrain**](https://github.com/ilos-vigil/ktrain-assessment-study) by Sandy Khossasi
 
 
 
