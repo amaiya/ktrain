@@ -114,7 +114,7 @@ Some blog tutorials and other guides about **ktrain** are shown below:
 
 > [**Finetuning BERT using ktrain for Disaster Tweets Classification**](https://medium.com/analytics-vidhya/finetuning-bert-using-ktrain-for-disaster-tweets-classification-18f64a50910b) by Hamiz Ahmed
 
-> [**Indonesian NLP Examples with ktrain**](https://github.com/ilos-vigil/ktrain-assessment-study) by Sandy Khossasi
+> [**Indonesian NLP Examples with ktrain**](https://github.com/ilos-vigil/ktrain-assessment-study) by Sandy Khosasi
 
 
 
