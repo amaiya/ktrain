@@ -699,7 +699,7 @@ class Learner(ABC):
             plt.xlabel('iterations')
         else:
             if plot_type not in self.history.history:
-                raise ValueError(f'no {plot_type} in history: are you sure {plot_type} exist in history?')
+                raise ValueError(f'no {plot_type} in history: are you sure {plot_type} exists in history?')
             plt.plot(self.history.history[plot_type])
                 
             val_key = f'val_{plot_type}'
