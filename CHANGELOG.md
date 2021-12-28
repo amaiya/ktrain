@@ -12,7 +12,7 @@ Most recent releases are shown at the top. Each release shows:
 - N/A
 
 ### changed
-- N/A
+- `core.Learner.plot` now supports plotting of any value that exists in the training `History` object (e.g., `mae` if previously specified as metric).
 
 ### fixed:
 - pin to `transformers==4.10.3` due to Issue #398

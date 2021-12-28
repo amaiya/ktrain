@@ -658,7 +658,9 @@ class Learner(ABC):
         ```
         plots training history
         Args:
-          plot_type (str):  one of {'loss', 'lr', 'momentum'}
+          plot_type (str):  A valid value in tf.keras History.  Either a built-in value  {'loss', 'lr', 'momentum'} or
+                            other values previously specified by user.  For instance, if 'mae' and/or 'mse' is previously specified as metrics
+                            when creating model, then these values can also be specified.
           return_fig(bool):  If True, return matplotlib.figure.Figure
         Return:
           matplotlib.figure.Figure if return_fig else None
