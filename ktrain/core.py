@@ -666,6 +666,8 @@ class Learner(ABC):
         """
         if self.history is None:
             raise Exception('No training history - did you train the model yet?')
+        if not isinstance(plot_type, str):
+            raise ValueError('plot_type must be str/string')
 
         fig = None
         if plot_type == 'loss':
@@ -694,7 +696,22 @@ class Learner(ABC):
             plt.ylabel('momentum')
             plt.xlabel('iterations')
         else:
-            raise ValueError('invalid type: choose loss, lr, or momentum')
+            if plot_type not in self.history.history:
+                raise ValueError(f'no {plot_type} in history: are you sure {plot_type} exist in history?')
+            plt.plot(self.history.history[plot_type])
+                
+            val_key = f'val_{plot_type}'
+            if val_key in self.history.history:
+                plt.plot(self.history.history[val_key])
+                legend_items = ['train', 'validation']
+            else:
+                warnings.warn(f'Validation value for {plot_type} wasn\'t found in history')
+                legend_items = ['train']
+                
+            plt.title(f'History of {plot_type}')
+            plt.ylabel(plot_type)
+            plt.xlabel('epoch')
+            plt.legend(legend_items, loc='upper left')
         fig = plt.gcf()
         plt.show()
         if return_fig: return fig
