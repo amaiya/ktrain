@@ -304,7 +304,7 @@ class QA(ABC):
 
 
     def ask(self, question, query=None, batch_size=8, n_docs_considered=10, n_answers=50, 
-            rerank_threshold=0.015, include_np=False):
+            raw_confidence=False, rerank_threshold=0.015, include_np=False):
         """
         ```
         submit question to obtain candidate answers
@@ -318,13 +318,17 @@ class QA(ABC):
                             Decrease to reduce memory (if out-of-memory errors occur).
           n_docs_considered(int): number of top search results that will
                                   be searched for answer
-                                  default:10
+                                  Default:10
           n_answers(int): maximum number of candidate answers to return
-                          default:50
+                          Default:50
+          raw_confidence(bool): If True, show raw confidence score of each answer. It could be used to
+                                mitigate very high confidence on first answer when softmax is used.
+                                If False, perform softmax on raw confidence scores.
+                                Default: False
           rerank_threshold(int): rerank top answers with confidence >= rerank_threshold
                                  based on semantic similarity between question and answer.
                                  This can help bump the correct answer closer to the top.
-                                 default:0.015.
+                                 Default:0.015.
                                  If None, no re-ranking is performed.
           include_np(bool):  If True, noun phrases will be extracted from question and included
                              in query that retrieves documents likely to contain candidate answers.
@@ -336,6 +340,10 @@ class QA(ABC):
           list
         ```
         """
+        # sanity check
+        if raw_confidence and rerank_threshold is not None and rerank_threshold < 1.00:
+            warnings.warn('Raw confidence is used, but rerank_threshold value is below 1.00: are you sure you this is what you wanted?')
+
         # locate candidate document contexts
         doc_results = self.search(_process_question(query if query is not None else question, include_np=include_np), limit=n_docs_considered)
         if not doc_results: 
@@ -374,16 +382,17 @@ class QA(ABC):
             answers = answers[:n_answers]
 
         # transform confidence scores
-        confidences = [a['confidence'] for a in answers]
-        max_conf = max(confidences)
-        total = 0.0
-        exp_scores = []
-        for c in confidences:
-            s = np.exp(c-max_conf)
-            exp_scores.append(s)
-        total = sum(exp_scores)
-        for idx,c in enumerate(confidences):
-            answers[idx]['confidence'] = exp_scores[idx]/total
+        if not raw_confidence:
+            confidences = [a['confidence'] for a in answers]
+            max_conf = max(confidences)
+            total = 0.0
+            exp_scores = []
+            for c in confidences:
+                s = np.exp(c-max_conf)
+                exp_scores.append(s)
+            total = sum(exp_scores)
+            for idx,c in enumerate(confidences):
+                answers[idx]['confidence'] = exp_scores[idx]/total
 
         if rerank_threshold is None or self.te is None:
             return answers
