@@ -117,10 +117,15 @@ categorical_crossentropy = keras.losses.categorical_crossentropy
 sparse_categorical_crossentropy = keras.losses.sparse_categorical_crossentropy
 ResNet50 = keras.applications.ResNet50
 MobileNet = keras.applications.mobilenet.MobileNet
+MobileNetV3Small = keras.applications.MobileNetV3Small
 InceptionV3 = keras.applications.inception_v3.InceptionV3
+EfficientNetB1 = keras.applications.efficientnet.EfficientNetB1
+EfficientNetB7 = keras.applications.efficientnet.EfficientNetB7
 pre_resnet50 = keras.applications.resnet50.preprocess_input
 pre_mobilenet = keras.applications.mobilenet.preprocess_input
+pre_mobilenetv3small = keras.applications.mobilenet_v3.preprocess_input
 pre_inception = keras.applications.inception_v3.preprocess_input
+pre_efficientnet = keras.applications.efficientnet.preprocess_input
 
 
 #----------------------------------------------------------

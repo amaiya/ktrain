@@ -1571,8 +1571,12 @@ def load_predictor(fpath, batch_size=U.DEFAULT_BS, custom_objects=None):
             preproc.datagen.preprocessing_function = pre_resnet50
         elif preproc_name == 'mobilenet':
             preproc.datagen.preprocessing_function = pre_mobilenet
+        elif preproc_name == 'mobilenetv3':
+            preproc.datagen.preprocessing_function = pre_mobilenetv3small
         elif preproc_name == 'inception':
             preproc.datagen.preprocessing_function = pre_inception
+        elif preproc_name == 'efficientnet':
+            preproc.datagen.preprocessing_function = pre_efficientnet
         else:
             raise Exception('Uknown preprocessing_function name: %s' % (preproc_name))
     
