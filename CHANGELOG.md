@@ -12,7 +12,8 @@ Most recent releases are shown at the top. Each release shows:
 - N/A
 
 ### changed
-- `core.Learner.plot` now supports plotting of any value that exists in the training `History` object (e.g., `mae` if previously specified as metric).
+- `core.Learner.plot` now supports plotting of any value that exists in the training `History` object (e.g., `mae` if previously specified as metric). Thanks to @ilos-vigil.
+- added `raw_confidence` parameter to `QA.ask` method to return raw confidence scores. Thanks to @ilos-vigil.
 
 ### fixed:
 - pin to `transformers==4.10.3` due to Issue #398
