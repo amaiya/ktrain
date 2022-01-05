@@ -260,6 +260,9 @@ def image_model( name,
                          'NumpyArrayIterator) - please use the ktrain.data.images_from* ' +\
                          'functions')
 
+    # check for MobileNetV3
+    if name in [PRETRAINED_MOBILENETV3, MOBILENETV3] and not HAS_MOBILENETV3:
+        raise ValueError(f'You chose {name}, but it does not appear to be available in your version of TensorFlow.')
 
 
     # set pretrained flag
