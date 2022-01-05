@@ -9,7 +9,7 @@ Most recent releases are shown at the top. Each release shows:
 ## 0.28.4 (TBD)
 
 ### new:
-- N/A
+- New vision models: added MobileNetV3-Small and EfficientNet.  Thanks to @ilos-vigil.
 
 ### changed
 - `core.Learner.plot` now supports plotting of any value that exists in the training `History` object (e.g., `mae` if previously specified as metric). Thanks to @ilos-vigil.
