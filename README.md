@@ -325,8 +325,11 @@ Using **ktrain** on **Google Colab**?  See these Colab examples:
 
 3. Install *ktrain*: `pip install ktrain`
 
+
 The above should be all you need on Linux systems and cloud computing environments like Google Colab and AWS EC2.  If you are using **ktrain** on a **Windows computer**, you can follow these 
 [more detailed instructions](https://github.com/amaiya/ktrain/blob/master/FAQ.md#how-do-i-install-ktrain-on-a-windows-machine) that include some extra steps.
+
+**ktrain** should currently support any version of TensorFlow at or above to v2.3: i.e., `pip install tensorflow>=2.3`.
 
 **Some important things to note about installation:**
 
