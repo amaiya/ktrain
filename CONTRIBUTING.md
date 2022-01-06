@@ -12,11 +12,11 @@ We are happy to accept your contributions to make `ktrain` better! To avoid unne
 We suggest cloning the repository and then checking out tutorials and examples for information on how to call various methods.
 Most relevant classes and methods should be documented. If not, you might consider helping to improve the docstrings.
 
-### setup
+### Setup
 
-See the [installation instructions](https://github.com/amaiya/ktrain#installation) for setting things up.
+See the [installation instructions](https://github.com/amaiya/ktrain#installation) for setting things up. Using virtual environment (such as [venv](https://docs.python.org/3/library/venv.html) and [Poetry](https://python-poetry.org/)) is strongly recommended.
 
-### tests
+### Tests
 
 To run all tests, execute:
 ```bash
@@ -29,8 +29,9 @@ To run a specific test (e.g., `test_dataloading.py`)
 python3 test_dataloading.py
 ```
 
-### PR Guidelines
+## PR Guidelines
 
 - Keep each PR focused. While it's more convenient, please try to avoid combining several unrelated fixes together.
+- Checkout to `develop` branch before make any changes. Do not forget to choose `amaiya:develop` as base on your PR.
 - Try to maintain backwards compatibility.  If this is not possible, please discuss with maintainer(s).
 - Use four spaces for indentation. 
