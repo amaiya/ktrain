@@ -32,6 +32,6 @@ python3 test_dataloading.py
 ## PR Guidelines
 
 - Keep each PR focused. While it's more convenient, please try to avoid combining several unrelated fixes together.
-- Checkout to `develop` branch before make any changes. Do not forget to choose `amaiya:develop` as base on your PR.
+- Checkout to `develop` branch before make any changes. Make sure you choose `develop` branch as base on your PR.
 - Try to maintain backwards compatibility.  If this is not possible, please discuss with maintainer(s).
 - Use four spaces for indentation. 
