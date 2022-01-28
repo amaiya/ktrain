@@ -163,7 +163,9 @@ def bert_tokenize(docs, tokenizer, max_length, verbose=1):
     indices = []
     for i in mb:
         for doc in pb:
-            ids, segments = tokenizer.encode(str(doc), max_len=max_length)
+            # https://stackoverflow.com/questions/67360987/bert-model-bug-encountered-during-training/67375675#67375675
+            doc = str(doc) if isinstance(doc, (float, int)) else doc
+            ids, segments = tokenizer.encode(doc, max_len=max_length)
             indices.append(ids)
         if verbose: mb.write('done.')
     zeros = np.zeros_like(indices)
