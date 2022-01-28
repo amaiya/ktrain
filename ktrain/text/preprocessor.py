@@ -163,7 +163,7 @@ def bert_tokenize(docs, tokenizer, max_length, verbose=1):
     indices = []
     for i in mb:
         for doc in pb:
-            ids, segments = tokenizer.encode(doc, max_len=max_length)
+            ids, segments = tokenizer.encode(str(doc), max_len=max_length)
             indices.append(ids)
         if verbose: mb.write('done.')
     zeros = np.zeros_like(indices)
