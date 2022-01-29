@@ -139,13 +139,13 @@ function may adjust these as needed.
 <span>def <span class="ident">image_classifier</span></span>(<span>name, train_data, val_data=None, freeze_layers=None, metrics=['accuracy'], optimizer_name='adam', multilabel=None, pt_fc=[], pt_ps=[], verbose=1)</span>
 </code></dt>
 <dd>
-<div class="desc"><pre><code>Returns a pre-trained ResNet50 model ready to be fine-tuned
+<div class="desc"><pre><code>Returns a pre-defined/pre-trained model ready to be trained/fine-tuned
 for multi-class classification. By default, all layers are
 trainable/unfrozen.
 
 
 Args:
-    name (string): one of {'pretrained_resnet50', 'resnet50', 'default_cnn'}
+    name (string): one of model shown on ktrain.vision.print_image_classifiers
     train_data (image.Iterator): train data. Note: Will be manipulated here!
     val_data (image.Iterator): validation data.  Note: Will be manipulated here!
     freeze_layers (int):  number of beginning layers to make untrainable
@@ -185,13 +185,13 @@ Return:
 
     &#34;&#34;&#34;
     ```
-    Returns a pre-trained ResNet50 model ready to be fine-tuned
+    Returns a pre-defined/pre-trained model ready to be trained/fine-tuned
     for multi-class classification. By default, all layers are
     trainable/unfrozen.
 
 
     Args:
-        name (string): one of {&#39;pretrained_resnet50&#39;, &#39;resnet50&#39;, &#39;default_cnn&#39;}
+        name (string): one of model shown on ktrain.vision.print_image_classifiers
         train_data (image.Iterator): train data. Note: Will be manipulated here!
         val_data (image.Iterator): validation data.  Note: Will be manipulated here!
         freeze_layers (int):  number of beginning layers to make untrainable
@@ -224,13 +224,13 @@ Return:
 <span>def <span class="ident">image_regression_model</span></span>(<span>name, train_data, val_data=None, freeze_layers=None, metrics=['mae'], optimizer_name='adam', pt_fc=[], pt_ps=[], verbose=1)</span>
 </code></dt>
 <dd>
-<div class="desc"><pre><code>Returns a pre-trained ResNet50 model ready to be fine-tuned
+<div class="desc"><pre><code>Returns a pre-defined/pre-trained model ready to be trained/fine-tuned
 for multi-class classification. By default, all layers are
 trainable/unfrozen.
 
 
 Args:
-    name (string): one of {'pretrained_resnet50', 'resnet50', 'default_cnn'}
+    name (string): one of model shown on ktrain.vision.print_image_regression_models
     train_data (image.Iterator): train data. Note: Will be manipulated here!
     val_data (image.Iterator): validation data.  Note: Will be manipulated here!
     freeze_layers (int):  number of beginning layers to make untrainable
@@ -269,13 +269,13 @@ Return:
 
     &#34;&#34;&#34;
     ```
-    Returns a pre-trained ResNet50 model ready to be fine-tuned
+    Returns a pre-defined/pre-trained model ready to be trained/fine-tuned
     for multi-class classification. By default, all layers are
     trainable/unfrozen.
 
 
     Args:
-        name (string): one of {&#39;pretrained_resnet50&#39;, &#39;resnet50&#39;, &#39;default_cnn&#39;}
+        name (string): one of model shown on ktrain.vision.print_image_regression_models
         train_data (image.Iterator): train data. Note: Will be manipulated here!
         val_data (image.Iterator): validation data.  Note: Will be manipulated here!
         freeze_layers (int):  number of beginning layers to make untrainable

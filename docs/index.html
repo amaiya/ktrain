@@ -479,8 +479,12 @@ Args
             preproc.datagen.preprocessing_function = pre_resnet50
         elif preproc_name == &#39;mobilenet&#39;:
             preproc.datagen.preprocessing_function = pre_mobilenet
+        elif preproc_name == &#39;mobilenetv3&#39;:
+            preproc.datagen.preprocessing_function = pre_mobilenetv3small
         elif preproc_name == &#39;inception&#39;:
             preproc.datagen.preprocessing_function = pre_inception
+        elif preproc_name == &#39;efficientnet&#39;:
+            preproc.datagen.preprocessing_function = pre_efficientnet
         else:
             raise Exception(&#39;Uknown preprocessing_function name: %s&#39; % (preproc_name))
     
