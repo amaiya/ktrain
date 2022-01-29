@@ -10,6 +10,8 @@
 
 
 ### News and Announcements
+- **2022-01-28**
+  - **ktrain v0.29.x** is released and now includes miscellaneous enhancements contributed by [Sandy Khosasi](https://github.com/ilos-vigil) such as [support for MobileNetV3 and EfficientNet](https://colab.research.google.com/drive/1EJHpMVG6fBCg33UPla_Ly_6LQdswU2Ur?usp=sharing), [plotting improvements](https://colab.research.google.com/drive/1_WaRQ0J4g0VTn6HWS3kszdFZbBBWoa7R?usp=sharing), and [raw confidence scores in QA](https://colab.research.google.com/drive/1ParprLN9hFX6cxJ1w7bv91PYx4o0J1zm?usp=sharing).
 - **2021-10-13**
   - **ktrain v0.28.x** is released and now includes the `AnswerExtractor`, which allows you to extract any information of interest from documents by simply phrasing it in the form of a question. A short example is shown here, but see the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/qa_information_extraction.ipynb) for more information.
 ```python
