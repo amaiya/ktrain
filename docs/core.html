@@ -686,7 +686,9 @@ class Learner(ABC):
         ```
         plots training history
         Args:
-          plot_type (str):  one of {&#39;loss&#39;, &#39;lr&#39;, &#39;momentum&#39;}
+          plot_type (str):  A valid value in tf.keras History.  Either a built-in value  {&#39;loss&#39;, &#39;lr&#39;, &#39;momentum&#39;} or
+                            other values previously specified by user.  For instance, if &#39;mae&#39; and/or &#39;mse&#39; is previously specified as metrics
+                            when creating model, then these values can also be specified.
           return_fig(bool):  If True, return matplotlib.figure.Figure
         Return:
           matplotlib.figure.Figure if return_fig else None
@@ -694,6 +696,8 @@ class Learner(ABC):
         &#34;&#34;&#34;
         if self.history is None:
             raise Exception(&#39;No training history - did you train the model yet?&#39;)
+        if not isinstance(plot_type, str):
+            raise ValueError(&#39;plot_type must be str/string&#39;)
 
         fig = None
         if plot_type == &#39;loss&#39;:
@@ -722,7 +726,22 @@ class Learner(ABC):
             plt.ylabel(&#39;momentum&#39;)
             plt.xlabel(&#39;iterations&#39;)
         else:
-            raise ValueError(&#39;invalid type: choose loss, lr, or momentum&#39;)
+            if plot_type not in self.history.history:
+                raise ValueError(f&#39;no {plot_type} in history: are you sure {plot_type} exists in history?&#39;)
+            plt.plot(self.history.history[plot_type])
+                
+            val_key = f&#39;val_{plot_type}&#39;
+            if val_key in self.history.history:
+                plt.plot(self.history.history[val_key])
+                legend_items = [&#39;train&#39;, &#39;validation&#39;]
+            else:
+                warnings.warn(f&#39;Validation value for {plot_type} wasn\&#39;t found in history&#39;)
+                legend_items = [&#39;train&#39;]
+                
+            plt.title(f&#39;History of {plot_type}&#39;)
+            plt.ylabel(plot_type)
+            plt.xlabel(&#39;epoch&#39;)
+            plt.legend(legend_items, loc=&#39;upper left&#39;)
         fig = plt.gcf()
         plt.show()
         if return_fig: return fig
@@ -1580,8 +1599,12 @@ def load_predictor(fpath, batch_size=U.DEFAULT_BS, custom_objects=None):
             preproc.datagen.preprocessing_function = pre_resnet50
         elif preproc_name == &#39;mobilenet&#39;:
             preproc.datagen.preprocessing_function = pre_mobilenet
+        elif preproc_name == &#39;mobilenetv3&#39;:
+            preproc.datagen.preprocessing_function = pre_mobilenetv3small
         elif preproc_name == &#39;inception&#39;:
             preproc.datagen.preprocessing_function = pre_inception
+        elif preproc_name == &#39;efficientnet&#39;:
+            preproc.datagen.preprocessing_function = pre_efficientnet
         else:
             raise Exception(&#39;Uknown preprocessing_function name: %s&#39; % (preproc_name))
     
@@ -1835,8 +1858,12 @@ Args
             preproc.datagen.preprocessing_function = pre_resnet50
         elif preproc_name == &#39;mobilenet&#39;:
             preproc.datagen.preprocessing_function = pre_mobilenet
+        elif preproc_name == &#39;mobilenetv3&#39;:
+            preproc.datagen.preprocessing_function = pre_mobilenetv3small
         elif preproc_name == &#39;inception&#39;:
             preproc.datagen.preprocessing_function = pre_inception
+        elif preproc_name == &#39;efficientnet&#39;:
+            preproc.datagen.preprocessing_function = pre_efficientnet
         else:
             raise Exception(&#39;Uknown preprocessing_function name: %s&#39; % (preproc_name))
     
@@ -3492,7 +3519,9 @@ an abstract method and must be implemented by subclasses.
         ```
         plots training history
         Args:
-          plot_type (str):  one of {&#39;loss&#39;, &#39;lr&#39;, &#39;momentum&#39;}
+          plot_type (str):  A valid value in tf.keras History.  Either a built-in value  {&#39;loss&#39;, &#39;lr&#39;, &#39;momentum&#39;} or
+                            other values previously specified by user.  For instance, if &#39;mae&#39; and/or &#39;mse&#39; is previously specified as metrics
+                            when creating model, then these values can also be specified.
           return_fig(bool):  If True, return matplotlib.figure.Figure
         Return:
           matplotlib.figure.Figure if return_fig else None
@@ -3500,6 +3529,8 @@ an abstract method and must be implemented by subclasses.
         &#34;&#34;&#34;
         if self.history is None:
             raise Exception(&#39;No training history - did you train the model yet?&#39;)
+        if not isinstance(plot_type, str):
+            raise ValueError(&#39;plot_type must be str/string&#39;)
 
         fig = None
         if plot_type == &#39;loss&#39;:
@@ -3528,7 +3559,22 @@ an abstract method and must be implemented by subclasses.
             plt.ylabel(&#39;momentum&#39;)
             plt.xlabel(&#39;iterations&#39;)
         else:
-            raise ValueError(&#39;invalid type: choose loss, lr, or momentum&#39;)
+            if plot_type not in self.history.history:
+                raise ValueError(f&#39;no {plot_type} in history: are you sure {plot_type} exists in history?&#39;)
+            plt.plot(self.history.history[plot_type])
+                
+            val_key = f&#39;val_{plot_type}&#39;
+            if val_key in self.history.history:
+                plt.plot(self.history.history[val_key])
+                legend_items = [&#39;train&#39;, &#39;validation&#39;]
+            else:
+                warnings.warn(f&#39;Validation value for {plot_type} wasn\&#39;t found in history&#39;)
+                legend_items = [&#39;train&#39;]
+                
+            plt.title(f&#39;History of {plot_type}&#39;)
+            plt.ylabel(plot_type)
+            plt.xlabel(&#39;epoch&#39;)
+            plt.legend(legend_items, loc=&#39;upper left&#39;)
         fig = plt.gcf()
         plt.show()
         if return_fig: return fig
@@ -4712,7 +4758,9 @@ Returns:
 <dd>
 <div class="desc"><pre><code>plots training history
 Args:
-  plot_type (str):  one of {'loss', 'lr', 'momentum'}
+  plot_type (str):  A valid value in tf.keras History.  Either a built-in value  {'loss', 'lr', 'momentum'} or
+                    other values previously specified by user.  For instance, if 'mae' and/or 'mse' is previously specified as metrics
+                    when creating model, then these values can also be specified.
   return_fig(bool):  If True, return matplotlib.figure.Figure
 Return:
   matplotlib.figure.Figure if return_fig else None
@@ -4726,7 +4774,9 @@ Return:
     ```
     plots training history
     Args:
-      plot_type (str):  one of {&#39;loss&#39;, &#39;lr&#39;, &#39;momentum&#39;}
+      plot_type (str):  A valid value in tf.keras History.  Either a built-in value  {&#39;loss&#39;, &#39;lr&#39;, &#39;momentum&#39;} or
+                        other values previously specified by user.  For instance, if &#39;mae&#39; and/or &#39;mse&#39; is previously specified as metrics
+                        when creating model, then these values can also be specified.
       return_fig(bool):  If True, return matplotlib.figure.Figure
     Return:
       matplotlib.figure.Figure if return_fig else None
@@ -4734,6 +4784,8 @@ Return:
     &#34;&#34;&#34;
     if self.history is None:
         raise Exception(&#39;No training history - did you train the model yet?&#39;)
+    if not isinstance(plot_type, str):
+        raise ValueError(&#39;plot_type must be str/string&#39;)
 
     fig = None
     if plot_type == &#39;loss&#39;:
@@ -4762,7 +4814,22 @@ Return:
         plt.ylabel(&#39;momentum&#39;)
         plt.xlabel(&#39;iterations&#39;)
     else:
-        raise ValueError(&#39;invalid type: choose loss, lr, or momentum&#39;)
+        if plot_type not in self.history.history:
+            raise ValueError(f&#39;no {plot_type} in history: are you sure {plot_type} exists in history?&#39;)
+        plt.plot(self.history.history[plot_type])
+            
+        val_key = f&#39;val_{plot_type}&#39;
+        if val_key in self.history.history:
+            plt.plot(self.history.history[val_key])
+            legend_items = [&#39;train&#39;, &#39;validation&#39;]
+        else:
+            warnings.warn(f&#39;Validation value for {plot_type} wasn\&#39;t found in history&#39;)
+            legend_items = [&#39;train&#39;]
+            
+        plt.title(f&#39;History of {plot_type}&#39;)
+        plt.ylabel(plot_type)
+        plt.xlabel(&#39;epoch&#39;)
+        plt.legend(legend_items, loc=&#39;upper left&#39;)
     fig = plt.gcf()
     plt.show()
     if return_fig: return fig

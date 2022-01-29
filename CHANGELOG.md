@@ -6,6 +6,22 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.29.0 (2022-01-28)
+
+### new:
+- New vision models: added MobileNetV3-Small and EfficientNet.  Thanks to @ilos-vigil.
+
+### changed
+- `core.Learner.plot` now supports plotting of any value that exists in the training `History` object (e.g., `mae` if previously specified as metric). Thanks to @ilos-vigil.
+- added `raw_confidence` parameter to `QA.ask` method to return raw confidence scores. Thanks to @ilos-vigil.
+
+### fixed:
+- pin to `transformers==4.10.3` due to Issue #398
+- pin to `syntok==1.3.3` due to bug with `syntok==1.4.1` causing paragraph tokenization in `qa` module to break
+- properly suppress TF/CUDA warnings by default
+- ensure document fed to `keras_bert`  tokenizer to avoid [this issue](https://stackoverflow.com/questions/67360987/bert-model-bug-encountered-during-training/67375675#67375675)
+
+
 ## 0.28.3 (2021-11-05)
 
 ### new:

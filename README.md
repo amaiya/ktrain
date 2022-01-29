@@ -10,6 +10,8 @@
 
 
 ### News and Announcements
+- **2022-01-28**
+  - **ktrain v0.29.x** is released and includes miscellaneous enhancements contributed by [Sandy Khosasi](https://github.com/ilos-vigil) such as [support for MobileNetV3 and EfficientNet](https://colab.research.google.com/drive/1EJHpMVG6fBCg33UPla_Ly_6LQdswU2Ur?usp=sharing), [plotting improvements](https://colab.research.google.com/drive/1_WaRQ0J4g0VTn6HWS3kszdFZbBBWoa7R?usp=sharing), and [raw confidence scores in QA](https://colab.research.google.com/drive/1ParprLN9hFX6cxJ1w7bv91PYx4o0J1zm?usp=sharing).
 - **2021-10-13**
   - **ktrain v0.28.x** is released and now includes the `AnswerExtractor`, which allows you to extract any information of interest from documents by simply phrasing it in the form of a question. A short example is shown here, but see the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/qa_information_extraction.ipynb) for more information.
 ```python
@@ -101,7 +103,7 @@ Please see the following tutorial notebooks for a guide on how to use **ktrain**
 * Tutorial A4: [Using Custom Data Formats and Models: Text Regression with Extra Regressors](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-A4-customdata-text_regression_with_extra_regressors.ipynb)
 
 
-Some blog tutorials about **ktrain** are shown below:
+Some blog tutorials and other guides about **ktrain** are shown below:
 
 > [**ktrain: A Lightweight Wrapper for Keras to Help Train Neural Networks**](https://towardsdatascience.com/ktrain-a-lightweight-wrapper-for-keras-to-help-train-neural-networks-82851ba889c) 
 
@@ -113,6 +115,8 @@ Some blog tutorials about **ktrain** are shown below:
 > [**Build an Open-Domain Question-Answering System With BERT in 3 Lines of Code**](https://towardsdatascience.com/build-an-open-domain-question-answering-system-with-bert-in-3-lines-of-code-da0131bc516b)
 
 > [**Finetuning BERT using ktrain for Disaster Tweets Classification**](https://medium.com/analytics-vidhya/finetuning-bert-using-ktrain-for-disaster-tweets-classification-18f64a50910b) by Hamiz Ahmed
+
+> [**Indonesian NLP Examples with ktrain**](https://github.com/ilos-vigil/ktrain-assessment-study) by Sandy Khosasi
 
 
 
@@ -323,8 +327,11 @@ Using **ktrain** on **Google Colab**?  See these Colab examples:
 
 3. Install *ktrain*: `pip install ktrain`
 
+
 The above should be all you need on Linux systems and cloud computing environments like Google Colab and AWS EC2.  If you are using **ktrain** on a **Windows computer**, you can follow these 
 [more detailed instructions](https://github.com/amaiya/ktrain/blob/master/FAQ.md#how-do-i-install-ktrain-on-a-windows-machine) that include some extra steps.
+
+**ktrain** should currently support any version of TensorFlow at or above to v2.3: i.e., `pip install tensorflow>=2.3`.
 
 **Some important things to note about installation:**
 
@@ -349,7 +356,11 @@ pip install datasets
 ```
 Notice that **ktrain** is using forked versions of the `eli5` and `stellargraph` libraries above in order to support TensorFlow2.
 
-
+<!--
+pip install pdoc3==0.9.2
+pdoc3 --html -o docs ktrain
+diff -qr docs/ktrain/ /path/to/repo/ktrain/docs
+-->
 
 ### How to Cite
 

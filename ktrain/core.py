@@ -658,7 +658,9 @@ class Learner(ABC):
         ```
         plots training history
         Args:
-          plot_type (str):  one of {'loss', 'lr', 'momentum'}
+          plot_type (str):  A valid value in tf.keras History.  Either a built-in value  {'loss', 'lr', 'momentum'} or
+                            other values previously specified by user.  For instance, if 'mae' and/or 'mse' is previously specified as metrics
+                            when creating model, then these values can also be specified.
           return_fig(bool):  If True, return matplotlib.figure.Figure
         Return:
           matplotlib.figure.Figure if return_fig else None
@@ -666,6 +668,8 @@ class Learner(ABC):
         """
         if self.history is None:
             raise Exception('No training history - did you train the model yet?')
+        if not isinstance(plot_type, str):
+            raise ValueError('plot_type must be str/string')
 
         fig = None
         if plot_type == 'loss':
@@ -694,7 +698,22 @@ class Learner(ABC):
             plt.ylabel('momentum')
             plt.xlabel('iterations')
         else:
-            raise ValueError('invalid type: choose loss, lr, or momentum')
+            if plot_type not in self.history.history:
+                raise ValueError(f'no {plot_type} in history: are you sure {plot_type} exists in history?')
+            plt.plot(self.history.history[plot_type])
+                
+            val_key = f'val_{plot_type}'
+            if val_key in self.history.history:
+                plt.plot(self.history.history[val_key])
+                legend_items = ['train', 'validation']
+            else:
+                warnings.warn(f'Validation value for {plot_type} wasn\'t found in history')
+                legend_items = ['train']
+                
+            plt.title(f'History of {plot_type}')
+            plt.ylabel(plot_type)
+            plt.xlabel('epoch')
+            plt.legend(legend_items, loc='upper left')
         fig = plt.gcf()
         plt.show()
         if return_fig: return fig
@@ -1552,8 +1571,12 @@ def load_predictor(fpath, batch_size=U.DEFAULT_BS, custom_objects=None):
             preproc.datagen.preprocessing_function = pre_resnet50
         elif preproc_name == 'mobilenet':
             preproc.datagen.preprocessing_function = pre_mobilenet
+        elif preproc_name == 'mobilenetv3':
+            preproc.datagen.preprocessing_function = pre_mobilenetv3small
         elif preproc_name == 'inception':
             preproc.datagen.preprocessing_function = pre_inception
+        elif preproc_name == 'efficientnet':
+            preproc.datagen.preprocessing_function = pre_efficientnet
         else:
             raise Exception('Uknown preprocessing_function name: %s' % (preproc_name))
     

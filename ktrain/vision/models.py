@@ -7,21 +7,38 @@ from .wrn import create_wide_residual_network
 
 PRETRAINED_RESNET50 = 'pretrained_resnet50'
 PRETRAINED_MOBILENET = 'pretrained_mobilenet'
+PRETRAINED_MOBILENETV3 = 'pretrained_mobilenetv3'
 PRETRAINED_INCEPTION = 'pretrained_inception'
+PRETRAINED_EFFICIENTNETB1 = 'pretrained_efficientnetb1'
+PRETRAINED_EFFICIENTNETB7 = 'pretrained_efficientnetb7'
 RESNET50 = 'resnet50'
 MOBILENET = 'mobilenet'
+MOBILENETV3 = 'mobilenetv3'
 INCEPTION = 'inception'
+EFFICIENTNETB1 = 'efficientnetb1'
+EFFICIENTNETB7 = 'efficientnetb7'
 CNN = 'default_cnn'
 WRN22 = 'wrn22'
-PRETRAINED_MODELS = [PRETRAINED_RESNET50, PRETRAINED_MOBILENET, PRETRAINED_INCEPTION]
-PREDEFINED_MODELS = PRETRAINED_MODELS + [RESNET50, MOBILENET, INCEPTION]
+PRETRAINED_MODELS = [
+    PRETRAINED_RESNET50, PRETRAINED_MOBILENET, PRETRAINED_MOBILENETV3,
+    PRETRAINED_INCEPTION, PRETRAINED_EFFICIENTNETB1, PRETRAINED_EFFICIENTNETB7
+]
+PREDEFINED_MODELS = PRETRAINED_MODELS + [
+    RESNET50, MOBILENET, MOBILENETV3, INCEPTION, EFFICIENTNETB1, EFFICIENTNETB7
+]
 IMAGE_CLASSIFIERS = {
                      PRETRAINED_RESNET50: '50-layer Residual Network (pretrained on ImageNet)',
-                     RESNET50:  '50-layer Resididual Network (randomly initialized)',
+                     RESNET50:  '50-layer Resididual Network (randomly initialized) [https://arxiv.org/abs/1512.03385]',
                      PRETRAINED_MOBILENET: 'MobileNet Neural Network (pretrained on ImageNet)',
-                     MOBILENET:  'MobileNet Neural Network (randomly initialized)',
+                     MOBILENET:  'MobileNet Neural Network (randomly initialized) [https://arxiv.org/abs/1704.04861]',
+                     PRETRAINED_MOBILENETV3: 'MobileNetV3-Small Neural Network (pretrained on ImageNet)',
+                     MOBILENETV3:  'MobileNetV3-Small Neural Network (randomly initialized) [https://arxiv.org/abs/1905.02244]',
                      PRETRAINED_INCEPTION: 'Inception Version 3  (pretrained on ImageNet)',
-                     INCEPTION:  'Inception Version 3 (randomly initialized)',
+                     INCEPTION:  'Inception Version 3 (randomly initialized) [http://arxiv.org/abs/1512.00567]',
+                     PRETRAINED_EFFICIENTNETB1: 'EfficientNet-B1 Neural Network (pretrained on ImageNet)',
+                     EFFICIENTNETB1: 'EfficientNet-B1 Neural Network (pretrained on ImageNet) [https://arxiv.org/abs/1905.11946]',
+                     PRETRAINED_EFFICIENTNETB7: 'EfficientNet-B7 Neural Network (pretrained on ImageNet)',
+                     EFFICIENTNETB7: 'EfficientNet-B7 Neural Network (pretrained on ImageNet) [https://arxiv.org/abs/1905.11946]',
                      WRN22: '22-layer Wide Residual Network (randomly initialized)',
                      CNN : 'a default LeNet-like Convolutional Neural Network'}
 
@@ -56,9 +73,27 @@ def pretrained_datagen(data, name):
         idg.featurewise_std_normalization=False
         idg.samplewise_std_normalization=False
         idg.zca_whitening = False
+    elif name == PRETRAINED_MOBILENETV3:
+        idg.preprocessing_function = pre_mobilenetv3small
+        idg.ktrain_preproc = 'mobilenetv3'
+        idg.rescale=None
+        idg.featurewise_center=False
+        idg.samplewise_center=False
+        idg.featurewise_std_normalization=False
+        idg.samplewise_std_normalization=False
+        idg.zca_whitening = False
     elif name == PRETRAINED_INCEPTION:
         idg.preprocessing_function = pre_inception
         idg.ktrain_preproc = 'inception'
+        idg.rescale=None
+        idg.featurewise_center=False
+        idg.samplewise_center=False
+        idg.featurewise_std_normalization=False
+        idg.samplewise_std_normalization=False
+        idg.zca_whitening = False
+    elif name == PRETRAINED_EFFICIENTNETB1 or name == PRETRAINED_EFFICIENTNETB7:
+        idg.preprocessing_function = pre_efficientnet
+        idg.ktrain_preproc = 'efficientnet'
         idg.rescale=None
         idg.featurewise_center=False
         idg.samplewise_center=False
@@ -83,13 +118,13 @@ def image_classifier(name,
 
     """
     ```
-    Returns a pre-trained ResNet50 model ready to be fine-tuned
+    Returns a pre-defined/pre-trained model ready to be trained/fine-tuned
     for multi-class classification. By default, all layers are
     trainable/unfrozen.
 
 
     Args:
-        name (string): one of {'pretrained_resnet50', 'resnet50', 'default_cnn'}
+        name (string): one of model shown on ktrain.vision.print_image_classifiers
         train_data (image.Iterator): train data. Note: Will be manipulated here!
         val_data (image.Iterator): validation data.  Note: Will be manipulated here!
         freeze_layers (int):  number of beginning layers to make untrainable
@@ -132,13 +167,13 @@ def image_regression_model(name,
 
     """
     ```
-    Returns a pre-trained ResNet50 model ready to be fine-tuned
+    Returns a pre-defined/pre-trained model ready to be trained/fine-tuned
     for multi-class classification. By default, all layers are
     trainable/unfrozen.
 
 
     Args:
-        name (string): one of {'pretrained_resnet50', 'resnet50', 'default_cnn'}
+        name (string): one of model shown on ktrain.vision.print_image_regression_models
         train_data (image.Iterator): train data. Note: Will be manipulated here!
         val_data (image.Iterator): validation data.  Note: Will be manipulated here!
         freeze_layers (int):  number of beginning layers to make untrainable
@@ -183,13 +218,13 @@ def image_model( name,
 
     """
     ```
-    Returns a pre-trained ResNet50 model ready to be fine-tuned
+    Returns a pre-defined/pre-trained model ready to be trained/fine-tuned
     for multi-class classification or regression. By default, all layers are
     trainable/unfrozen.
 
 
     Args:
-        name (string): one of {'pretrained_resnet50', 'resnet50', 'default_cnn'}
+        name (string): one of model shown on ktrain.vision.print_image_classifiers
         train_data (image.Iterator): train data. Note: Will be manipulated here!
         val_data (image.Iterator): validation data.  Note: Will be manipulated here!
         freeze_layers (int):  number of beginning layers to make untrainable
@@ -225,6 +260,9 @@ def image_model( name,
                          'NumpyArrayIterator) - please use the ktrain.data.images_from* ' +\
                          'functions')
 
+    # check for MobileNetV3
+    if name in [PRETRAINED_MOBILENETV3, MOBILENETV3] and not HAS_MOBILENETV3:
+        raise ValueError(f'You chose {name}, but it does not appear to be available in your version of TensorFlow.')
 
 
     # set pretrained flag
@@ -396,11 +434,26 @@ def build_predefined(
                         weights=weights,
                         input_tensor=input_tensor,
                         input_shape = input_shape)
+    elif name in [MOBILENETV3, PRETRAINED_MOBILENETV3]:
+        net = MobileNetV3Small(include_top=include_top, 
+                               weights=weights,
+                               input_tensor=input_tensor,
+                               input_shape = input_shape)
     elif name in [INCEPTION, PRETRAINED_INCEPTION]:
         net = InceptionV3(include_top=include_top, 
                           weights=weights,
                           input_tensor=input_tensor,
                            input_shape = input_shape)
+    elif name in [EFFICIENTNETB1, PRETRAINED_EFFICIENTNETB1]:
+        net = EfficientNetB1(include_top=include_top, 
+                          weights=weights,
+                          input_tensor=input_tensor,
+                          input_shape = input_shape)
+    elif name in [EFFICIENTNETB7, PRETRAINED_EFFICIENTNETB7]:
+        net = EfficientNetB7(include_top=include_top, 
+                          weights=weights,
+                          input_tensor=input_tensor,
+                          input_shape = input_shape)
     else:
         raise ValueError('Unsupported model: %s' % (name))
 

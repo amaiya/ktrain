@@ -36,11 +36,11 @@ setup(
           'jieba',
           'cchardet',  # previously pinned to 2.1.5 (due to this issue: https://github.com/PyYoshi/cChardet/issues/61) but no longer needed
           'chardet', # required by stellargraph and no longer installed by other dependencies as of July 2021
-          'syntok',
+          'syntok==1.3.3', # due to bug in 1.4.1 causing problems in QA paragraph tokenization
 
           # NOTE: these modules can be optionally omitted from deployment if not being used to yield lighter-weight footprint
           'seqeval==0.0.19', # imported in imports with warning and used in 'ktrain.text.ner' ; pin to 0.0.19 due to numpy version incompatibility with TensorFlow 2.3
-          'transformers>=4.0.0,<=4.10.3',  # imported in imports with warning and used in 'ktrain.text' ; pin to transformers>4.0 due to breaking changes;
+          'transformers==4.10.3',  # imported in imports with warning and used in 'ktrain.text' ; pin to transformers==4.10.3 due to issues saving using 4.5.1
           'sentencepiece', #  Added due to breaking change in transformers>=4.0
           'keras_bert>=0.86.0', # imported in imports with warning and used in 'ktrain.text' ; support for TF 2.3
           'whoosh', # imported by text.qa module

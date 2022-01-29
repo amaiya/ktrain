@@ -39,6 +39,9 @@ import re
 os.environ[&#39;NUMEXPR_MAX_THREADS&#39;] = &#39;8&#39; # suppress warning from NumExpr on machines with many CPUs
 
 # TensorFlow
+SUPPRESS_DEP_WARNINGS = strtobool(os.environ.get(&#39;SUPPRESS_DEP_WARNINGS&#39;, &#39;1&#39;))
+if SUPPRESS_DEP_WARNINGS: # 2021-11-12:  copied this here to properly suppress TF/CUDA warnings in Kaggle notebooks, etc. 
+    os.environ[&#34;TF_CPP_MIN_LOG_LEVEL&#34;] = &#34;3&#34;
 DISABLE_V2_BEHAVIOR = strtobool(os.environ.get(&#39;DISABLE_V2_BEHAVIOR&#39;, &#39;0&#39;))
 if DISABLE_V2_BEHAVIOR:
     # TF2-transition
@@ -142,9 +145,23 @@ sparse_categorical_crossentropy = keras.losses.sparse_categorical_crossentropy
 ResNet50 = keras.applications.ResNet50
 MobileNet = keras.applications.mobilenet.MobileNet
 InceptionV3 = keras.applications.inception_v3.InceptionV3
+EfficientNetB1 = keras.applications.efficientnet.EfficientNetB1
+EfficientNetB7 = keras.applications.efficientnet.EfficientNetB7
 pre_resnet50 = keras.applications.resnet50.preprocess_input
 pre_mobilenet = keras.applications.mobilenet.preprocess_input
 pre_inception = keras.applications.inception_v3.preprocess_input
+pre_efficientnet = keras.applications.efficientnet.preprocess_input
+
+# for TF backwards compatibility (e.g., support for TF 2.3.x):
+try:
+    MobileNetV3Small = keras.applications.MobileNetV3Small
+    pre_mobilenetv3small = keras.applications.mobilenet_v3.preprocess_input
+    HAS_MOBILENETV3 = True
+except:
+    HAS_MOBILENETV3 = False
+
+
+
 
 
 #----------------------------------------------------------
@@ -277,7 +294,6 @@ KTRAIN_ELI5_TAG = &#39;0.10.1-1&#39;
 
 
 # Suppress Warnings
-SUPPRESS_DEP_WARNINGS = strtobool(os.environ.get(&#39;SUPPRESS_DEP_WARNINGS&#39;, &#39;1&#39;))
 def set_global_logging_level(level=logging.ERROR, prefices=[&#34;&#34;]):
     &#34;&#34;&#34;
     Override logging levels of different modules based on their name as a prefix.
