@@ -6,6 +6,19 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.29.1 (2022-02-08)
+
+### new:
+- N/A
+
+### changed
+- pin to `sklearn==0.24.2` due to breaking changes.  `eli5` fork for tf.keras updated for 0.24.2.  
+   To use `scikit-learn==0.24.2`, users must uninstall and re-install the `eli5` fork with: `pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip`
+
+### fixed:
+- N/A
+
+
 ## 0.29.0 (2022-01-28)
 
 ### new:
