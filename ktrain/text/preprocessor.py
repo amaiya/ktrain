@@ -1076,6 +1076,8 @@ class TransformersPreprocessor(TextPreprocessor):
                     #raise ValueError('could not load pretrained model %s using both from_pt=False and from_pt=True' % (mname))
         else:
             model = self.model_type.from_pretrained(mname, num_labels=num_labels)
+        # ISSUE 416: mname is either model name (e.g., bert-base-uncased) or path to folder with tokenizer files
+        self.get_tokenizer(mname)
         return model
 
 
