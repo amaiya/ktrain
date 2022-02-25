@@ -51,7 +51,7 @@ def process_question(question, include_np=False, remove_english_stopwords=False)
     if include_np:
         try:
             # attempt to use extract_noun_phrases first if textblob is installed
-            np_list = ['"%s"' % (np) for np in extract_noun_phrases(question) if len(np.split()) > 1]
+            np_list = ['"%s"' % (np) for np in TU.extract_noun_phrases(question) if len(np.split()) > 1]
             q_tokens = TU.tokenize(question, join_tokens=False)
             q_tokens.extend(np_list)
             result = q_tokens
