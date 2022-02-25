@@ -46,28 +46,24 @@ def display_answers(answers):
     return display(HTML(df.to_html(render_links=True, escape=False)))
 
 
-def process_question(question, include_np=False, remove_english_stopwords=False):
+def process_question(question, include_np=False, and_np=False, remove_english_stopwords=False):
     result = None
+    np_list = []
     if include_np:
         try:
-            # attempt to use extract_noun_phrases first if textblob is installed
             np_list = ['"%s"' % (np) for np in TU.extract_noun_phrases(question) if len(np.split()) > 1]
-            q_tokens = TU.tokenize(question, join_tokens=False)
-            q_tokens.extend(np_list)
-            result = q_tokens
         except:
             import warnings
             warnings.warn('TextBlob is not currently installed, so falling back to include_np=False with no extra question processing. '+\
                           'To install: pip install textblob')
-            result =  TU.tokenize(question, join_tokens=False)
-    else:
-        result = TU.tokenize(question, join_tokens=False)
+    result =  TU.tokenize(question, join_tokens=False)
     if remove_english_stopwords:
         from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
-        result = ' '.join([term for term in result if term.lower().strip() not in list(ENGLISH_STOP_WORDS)+['?']])
-        return result
+        result = [term for term in result if term.lower().strip() not in list(ENGLISH_STOP_WORDS)+['?']]
+    if np_list and and_np:
+        return f'( {" ".join(result)} ) AND ({" ".join(np_list)})'
     else:
-        return ' '.join(result)
+        return ' '.join(result+np_list)
 
 _process_question = process_question # for backwards compatibility
 
@@ -353,7 +349,8 @@ class QA(ABC):
           rerank_threshold(int): rerank top answers with confidence >= rerank_threshold
                                  based on semantic similarity between question and answer.
                                  This can help bump the correct answer closer to the top.
-                                 Default:0.015.
+                                 Default:0.015. This should be changed to somethink like 6.0
+                                 if raw_confidence=True.
                                  If None, no re-ranking is performed.
           include_np(bool):  If True, noun phrases will be extracted from question and included
                              in query that retrieves documents likely to contain candidate answers.
