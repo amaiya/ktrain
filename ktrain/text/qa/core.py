@@ -46,21 +46,46 @@ def display_answers(answers):
     return display(HTML(df.to_html(render_links=True, escape=False)))
 
 
-def _process_question(question, include_np=False):
+def process_question(question, include_np=False, remove_english_stopwords=False):
+    result = None
     if include_np:
         try:
             # attempt to use extract_noun_phrases first if textblob is installed
-            np_list = ['"%s"' % (np) for np in TU.extract_noun_phrases(question) if len(np.split()) > 1]
+            np_list = ['"%s"' % (np) for np in extract_noun_phrases(question) if len(np.split()) > 1]
             q_tokens = TU.tokenize(question, join_tokens=False)
             q_tokens.extend(np_list)
-            return " ".join(q_tokens)
+            result = q_tokens
         except:
             import warnings
             warnings.warn('TextBlob is not currently installed, so falling back to include_np=False with no extra question processing. '+\
                           'To install: pip install textblob')
-            return TU.tokenize(question, join_tokens=True)
+            result =  TU.tokenize(question, join_tokens=False)
     else:
-        return TU.tokenize(question, join_tokens=True)
+        result = TU.tokenize(question, join_tokens=False)
+    if remove_english_stopwords:
+        from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
+        result = ' '.join([term for term in result if term.lower().strip() not in list(ENGLISH_STOP_WORDS)+['?']])
+        return result
+    else:
+        return ' '.join(result)
+
+_process_question = process_question # for backwards compatibility
+
+#def _process_question(question, include_np=False):
+#    if include_np:
+#        try:
+#            # attempt to use extract_noun_phrases first if textblob is installed
+#            np_list = ['"%s"' % (np) for np in TU.extract_noun_phrases(question) if len(np.split()) > 1]
+#            q_tokens = TU.tokenize(question, join_tokens=False)
+#            q_tokens.extend(np_list)
+#            return " ".join(q_tokens)
+#        except:
+#            import warnings
+#            warnings.warn('TextBlob is not currently installed, so falling back to include_np=False with no extra question processing. '+\
+#                          'To install: pip install textblob')
+#            return TU.tokenize(question, join_tokens=True)
+#    else:
+#        return TU.tokenize(question, join_tokens=True)
 
 
 
@@ -345,7 +370,7 @@ class QA(ABC):
             warnings.warn('Raw confidence is used, but rerank_threshold value is below 1.00: are you sure you this is what you wanted?')
 
         # locate candidate document contexts
-        doc_results = self.search(_process_question(query if query is not None else question, include_np=include_np), limit=n_docs_considered)
+        doc_results = self.search(process_question(query if query is not None else question, include_np=include_np), limit=n_docs_considered)
         if not doc_results: 
             warnings.warn('No documents matched words in question (or query if supplied)')
             return []
