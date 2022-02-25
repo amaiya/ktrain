@@ -57,7 +57,7 @@ def process_question(question, include_np=False, and_np=False, remove_english_st
             for np in raw_np_list:
                 N=2
                 sentence = np.split()
-                np_list.extend([' '.join(sentence[i:i+N]) for i in range(len(sentence)-N+1)])
+                np_list.extend( ['"%s"' % (' '.join(sentence[i:i+N])) for i in range(len(sentence)-N+1)] )
             np_list = list(set(np_list))
         except:
             import warnings
