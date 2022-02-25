@@ -6,6 +6,21 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.29.3 (TBD)
+
+### new:
+- N/A
+
+### changed
+- In `eda.TopicModel`, changed `lda_max_iter` to `max_iter` and `nmf_alpha` to `alpha`
+- Added `show_counts` parameter to `TopicModel.get_topics` method
+- Changed `qa.core._process_question` to `qa.core.process_question`
+- In `qa.core`, added `remove_english_stopwords` parameter to `process_question`
+
+### fixed:
+- N/A
+
+
 ## 0.29.2 (2022-02-09)
 
 ### new:
