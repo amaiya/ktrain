@@ -51,7 +51,13 @@ def process_question(question, include_np=False, and_np=False, remove_english_st
     np_list = []
     if include_np:
         try:
-            np_list = ['"%s"' % (np) for np in TU.extract_noun_phrases(question) if len(np.split()) > 1]
+            #np_list = ['"%s"' % (np) for np in TU.extract_noun_phrases(question) if len(np.split()) > 1]
+            raw_np_list = [np for np in TU.extract_noun_phrases(question) if len(np.split()) > 1]
+            np_list = []
+            for np in raw_np_list:
+                N=2
+                np_list.extend([np[i:i+N] for i in xrange(len(np)-N+1)])
+            np_list = list(set(np_list))
         except:
             import warnings
             warnings.warn('TextBlob is not currently installed, so falling back to include_np=False with no extra question processing. '+\
