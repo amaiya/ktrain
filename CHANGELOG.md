@@ -15,7 +15,7 @@ Most recent releases are shown at the top. Each release shows:
 - In `eda.TopicModel`, changed `lda_max_iter` to `max_iter` and `nmf_alpha` to `alpha`
 - Added `show_counts` parameter to `TopicModel.get_topics` method
 - Changed `qa.core._process_question` to `qa.core.process_question`
-- In `qa.core`, added `remove_english_stopwords` parameter to `process_question`
+- In `qa.core`, added `remove_english_stopwords` and `and_np` parameters to `process_question`
 
 ### fixed:
 - N/A
