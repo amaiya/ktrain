@@ -1070,7 +1070,6 @@ N_FOLDS = 2
 EPOCHS = 3
 LR = 5e-5
 def transformer_cv(MODEL_NAME):
-    preproc  = text.Transformer(MODEL_NAME, maxlen=500)
     predictions,accs=[],[]
     data = df[['text', 'target']]
     for train_index, val_index in KFold(N_FOLDS).split(data):
