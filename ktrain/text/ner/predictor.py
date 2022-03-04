@@ -129,12 +129,19 @@ class NERPredictor(Predictor):
 
 
     def _save_preproc(self, fpath):
-        self.preproc.p.te.model.save_pretrained(fpath)
-        self.preproc.p.te.tokenizer.save_pretrained(fpath)
-        self.preproc.p.te.config.save_pretrained(fpath)
-        self.preproc.p.te_model = fpath
-        #self.save('/tmp/offline')
 
+        # ensure transformers embedding model is saved in a subdirectory
+        p = self.preproc.p
+        hf_dir = os.path.join(fpath, 'hf')
+        if p.te is not None:
+            os.makedirs(hf_dir, exist_ok=True)
+        if te is not None: 
+            p.te.model.save_pretrained(hf_dir)
+            p.te.tokenizer.save_pretrained(hf_dir)
+            p.te.config.save_pretrained(hf_dir)
+            p.te_model = hf_dir
+
+        # save preproc
         with open(os.path.join(fpath, U.PREPROC_NAME), 'wb') as f:
             pickle.dump(self.preproc, f)
         return

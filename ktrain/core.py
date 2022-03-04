@@ -1655,6 +1655,23 @@ def _load_model(fpath, preproc=None, train_data=None, custom_objects=None):
         from .text.ner.anago.layers import CRF
         from .text.ner import crf_loss
         custom_objects={'CRF': CRF, 'crf_loss':crf_loss}
+        # save old te_model as backup
+        old_te_model = preproc.p.te_model
+        # load TransformerEmbedding model from fpath/hf folder
+        # if model_name is local_path, update it to reflect current predictor folder, since
+        # all model/tokenizer/config files should have been saved there by predictor.save
+        
+        preproc.p.te_model = os.path.join(fpath, 'hf')
+        if preproc.p.te_model:
+            # te_model should point fpath/hf folder
+            try:
+                preproc.p.activate_transformer(preproc.te_model, layers=preproc.te_layers)
+            except:
+                # fall back to old model id or location if error for backwards compatibility
+                warning.warn(f'could not load TransformerEmbedding model from {preproc.p.te_model} - trying {old_te_model}')
+                preproc.p.te_model = old_te_model
+                preproc.p.activate_transformer(preproc.te_model, layers=preproc.te_layers)
+
     elif (preproc and (isinstance(preproc, NodePreprocessor) or \
                     type(preproc).__name__ == 'NodePreprocessor')) or \
         train_data and U.is_nodeclass(data=train_data):
