@@ -127,3 +127,16 @@ class NERPredictor(Predictor):
             entities.append((current_token, current_tag))
         return entities
 
+
+    def _save_preproc(self, fpath):
+        self.preproc.p.te.model.save_pretrained(fpath)
+        self.preproc.p.te.tokenizer.save_pretrained(fpath)
+        self.preproc.p.te.config.save_pretrained(fpath)
+        self.preproc.p.te_model = fpath
+        #self.save('/tmp/offline')
+
+        with open(os.path.join(fpath, U.PREPROC_NAME), 'wb') as f:
+            pickle.dump(self.preproc, f)
+        return
+
+
