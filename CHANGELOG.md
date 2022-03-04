@@ -18,7 +18,8 @@ Most recent releases are shown at the top. Each release shows:
 - In `qa.core`, added `remove_english_stopwords` and `and_np` parameters to `process_question`
 
 ### fixed:
-- N/A
+- save `TransformerEmbedding` model, tokenizer, and configuration when saving `NERPredictor` and reset `te_model` to 
+  facilitate loading NERPredictors with BERT embeddings offline (#423)
 
 
 ## 0.29.2 (2022-02-09)
