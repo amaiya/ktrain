@@ -142,7 +142,7 @@ class LRFinder:
         return 
 
 
-    def plot_loss(self, n_skip_beginning=10, n_skip_end=1, suggest=False, return_fig=False, num_it=100):
+    def plot_loss(self, n_skip_beginning=10, n_skip_end=1, suggest=False, return_fig=False):
         """
         ```
         Plots the loss.
@@ -171,7 +171,7 @@ class LRFinder:
                 print("Failed to compute the gradients, there might not be enough points.\n" +\
                        "Plot displayed without suggestion.")
             else:
-                valley = self.valley(self.lrs, self.losses, num_it=num_it)
+                valley = self.valley(self.lrs, self.losses)
                 mg = self.mg
                 ml = self.ml
                 print('Three possible suggestions for LR from plot:')
@@ -179,7 +179,7 @@ class LRFinder:
                 print(f"\tMin numerical gradient (blue): {self.lrs[mg]:.2E}")
                 print(f"\tMin loss divided by 10 (not displayed): {self.lrs[ml]/10:.2E}")
                 ax.plot(self.lrs[valley],self.losses[valley], markersize=10,marker='o',color='red')
-                ax.plot(self.lrs[mg],self.losses[mg], markersize=10,marker='o',color='blue')
+                ax.plot(self.lrs[mg],self.losses[mg], markersize=10,marker='o',color='green')
                 #ax.plot(self.lrs[ml],self.losses[ml], markersize=10,marker='o',color='blue')
         fig = plt.gcf()
         plt.show()
@@ -187,7 +187,7 @@ class LRFinder:
         return
 
 
-    def valley(self, lrs, losses, num_it=100):
+    def valley(self, lrs, losses):
         """
         valley method for LR suggestions:
         https://github.com/fastai/fastai/pull/3377
@@ -235,6 +235,7 @@ class LRFinder:
         Generates two numerical estimates of lr: 
           1. lr associated with minum numerical gradient (None if gradient computation fails)
           2. lr associated with minimum loss divided by 10
+          3. lr associated with longest valley
         Args:
           tuple: (float, float)
 
@@ -247,7 +248,9 @@ class LRFinder:
         if self.mg is not None:
             lr1 = self.lrs[self.mg]
         lr2 = self.lrs[self.ml]/10
-        return (lr1, lr2)
+        lr3 = self.valley(self.lrs, self.losses)
+
+        return (lr1, lr2, lr3)
 
 
     def find_called(self):
