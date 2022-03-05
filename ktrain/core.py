@@ -599,7 +599,7 @@ class Learner(ABC):
         U.vprint('done.', verbose=verbose)
         if show_plot:
             U.vprint('Visually inspect loss plot and select learning rate associated with falling loss', verbose=verbose)
-            self.lr_plot()
+            self.lr_plot(suggest=suggest)
         else:
             U.vprint('Please invoke the Learner.lr_plot() method to visually inspect '
                   'the loss plot to help identify the maximal learning rate '
