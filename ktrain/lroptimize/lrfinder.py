@@ -176,10 +176,10 @@ class LRFinder:
                 ml = self.ml
                 print('Three possible suggestions for LR from plot:')
                 print(f"\tLongest valley (red): {self.lrs[valley]:.2E}")
-                print(f"\tMin numerical gradient (blue): {self.lrs[mg]:.2E}")
+                print(f"\tMin numerical gradient (green): {self.lrs[mg]:.2E}")
                 print(f"\tMin loss divided by 10 (not displayed): {self.lrs[ml]/10:.2E}")
                 ax.plot(self.lrs[valley],self.losses[valley], markersize=10,marker='o',color='red')
-                ax.plot(self.lrs[mg],self.losses[mg], markersize=10,marker='o',color='green')
+                ax.plot(self.lrs[mg],self.losses[mg], markersize=10,marker='*',color='green')
                 #ax.plot(self.lrs[ml],self.losses[ml], markersize=10,marker='o',color='blue')
         fig = plt.gcf()
         plt.show()
