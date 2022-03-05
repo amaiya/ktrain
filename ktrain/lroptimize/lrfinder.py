@@ -174,10 +174,11 @@ class LRFinder:
                 valley = self.valley(self.lrs, self.losses)
                 mg = self.mg
                 ml = self.ml
+                print(valley)
                 print('Three possible suggestions for LR from plot:')
-                print(f"\tLongest valley (red): {self.lrs[valley]:.2E}")
-                print(f"\tMin numerical gradient (green): {self.lrs[mg]:.2E}")
-                print(f"\tMin loss divided by 10 (not displayed): {self.lrs[ml]/10:.2E}")
+                print(f"\tLongest valley (red circle): {self.lrs[valley]:.2E}")
+                print(f"\tMin numerical gradient (green star): {self.lrs[mg]:.2E}")
+                print(f"\tMin loss divided by 10 (omitted from plot): {self.lrs[ml]/10:.2E}")
                 ax.plot(self.lrs[valley],self.losses[valley], markersize=10,marker='o',color='red')
                 ax.plot(self.lrs[mg],self.losses[mg], markersize=10,marker='*',color='green')
                 #ax.plot(self.lrs[ml],self.losses[ml], markersize=10,marker='o',color='blue')
@@ -224,8 +225,9 @@ class LRFinder:
         self.ml = np.argmin(self.losses)
         try: 
             self.mg = (np.gradient(np.array(self.losses[32:self.ml]))).argmin()
-        except:
+        except Exception as e:
             self.mg = None
+            warnings.warn(e)
         return
 
 

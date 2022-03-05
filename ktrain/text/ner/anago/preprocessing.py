@@ -73,10 +73,12 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
         if not hasattr(self, 'use_elmo'): self.use_elmo = False
         if not hasattr(self, 'te_layers'): self.te_layers = U.DEFAULT_TRANSFORMER_LAYERS
 
-        #if self.te_model is not None: self.activate_transformer(self.te_model, layers=self.te_layers)
-        #else:
-            #self.te = None
-        self.te = None # set in predictor for support for air-gapped networks
+        try:
+            if self.te_model is not None: self.activate_transformer(self.te_model, layers=self.te_layers)
+            else:
+                self.te = None
+        except:
+            self.te = None # set in predictor for support for air-gapped networks
         if self.use_elmo:  
             self.activate_elmo()
         else:
