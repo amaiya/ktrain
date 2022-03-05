@@ -1665,12 +1665,12 @@ def _load_model(fpath, preproc=None, train_data=None, custom_objects=None):
         if preproc.p.te_model:
             # te_model should point fpath/hf folder
             try:
-                preproc.p.activate_transformer(preproc.te_model, layers=preproc.te_layers)
+                preproc.p.activate_transformer(preproc.p.te_model, layers=preproc.p.te_layers)
             except:
                 # fall back to old model id or location if error for backwards compatibility
-                warning.warn(f'could not load TransformerEmbedding model from {preproc.p.te_model} - trying {old_te_model}')
+                warnings.warn(f'could not load TransformerEmbedding model from {preproc.p.te_model} - trying {old_te_model}')
                 preproc.p.te_model = old_te_model
-                preproc.p.activate_transformer(preproc.te_model, layers=preproc.te_layers)
+                preproc.p.activate_transformer(preproc.p.te_model, layers=preproc.p.te_layers)
 
     elif (preproc and (isinstance(preproc, NodePreprocessor) or \
                     type(preproc).__name__ == 'NodePreprocessor')) or \

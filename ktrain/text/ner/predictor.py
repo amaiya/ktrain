@@ -135,7 +135,6 @@ class NERPredictor(Predictor):
         hf_dir = os.path.join(fpath, 'hf')
         if p.te is not None:
             os.makedirs(hf_dir, exist_ok=True)
-        if te is not None: 
             p.te.model.save_pretrained(hf_dir)
             p.te.tokenizer.save_pretrained(hf_dir)
             p.te.config.save_pretrained(hf_dir)
