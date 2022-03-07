@@ -174,14 +174,12 @@ class LRFinder:
                 valley = self.valley(self.lrs, self.losses)
                 mg = self.mg
                 ml = self.ml
-                print(valley)
                 print('Three possible suggestions for LR from plot:')
-                print(f"\tLongest valley (red circle): {self.lrs[valley]:.2E}")
-                print(f"\tMin numerical gradient (green star): {self.lrs[mg]:.2E}")
+                print(f"\tLongest valley (red): {self.lrs[valley]:.2E}")
+                print(f"\tMin numerical gradient (purple): {self.lrs[mg]:.2E}")
                 print(f"\tMin loss divided by 10 (omitted from plot): {self.lrs[ml]/10:.2E}")
                 ax.plot(self.lrs[valley],self.losses[valley], markersize=10,marker='o',color='red')
-                ax.plot(self.lrs[mg],self.losses[mg], markersize=10,marker='*',color='green')
-                #ax.plot(self.lrs[ml],self.losses[ml], markersize=10,marker='o',color='blue')
+                ax.plot(self.lrs[mg],self.losses[mg], markersize=10,marker='o',color='purple')
         fig = plt.gcf()
         plt.show()
         if return_fig: return fig
@@ -250,7 +248,7 @@ class LRFinder:
         if self.mg is not None:
             lr1 = self.lrs[self.mg]
         lr2 = self.lrs[self.ml]/10
-        lr3 = self.valley(self.lrs, self.losses)
+        lr3 = self.lrs[self.valley(self.lrs, self.losses)]
 
         return (lr1, lr2, lr3)
 
