@@ -9,7 +9,7 @@ Most recent releases are shown at the top. Each release shows:
 ## 0.29.3 (TBD)
 
 ### new:
-- N/A
+- `NERPredictor.predict` now includes a `return_offsets` parameter.  If True, the results will include character offsets of predicted entities.
 
 ### changed
 - In `eda.TopicModel`, changed `lda_max_iter` to `max_iter` and `nmf_alpha` to `alpha`
