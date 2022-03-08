@@ -26,7 +26,7 @@ class NERPredictor(Predictor):
         return self.c
 
 
-    def predict(self, sentences, return_proba=False, merge_tokens=False, custom_tokenizer=None):
+    def predict(self, sentences, return_proba=False, merge_tokens=False, custom_tokenizer=None, return_offsets=False):
         """
         Makes predictions for a string-representation of a sentence
         Args:
@@ -36,12 +36,14 @@ class NERPredictor(Predictor):
                                to which they are associated:
                                ('Paul', 'B-PER'), ('Newman', 'I-PER') becomes ('Paul Newman', 'PER')
           custom_tokenizer(Callable): If specified, sentence will be tokenized based on custom tokenizer
+          return_offsets(bool): If True, will return the chracter offsets in the results [experimental]
 
         Returns:
           list: If sentences is a string representation of single sentence:
                      list containing a tuple for each token in sentence
                 IF sentences is a list of sentences:
                      list  of lists:  Each inner list represents a sentence and contains a tuple for each token in sentence
+                If return_proba and return_offsets are both True, then tuples are of the form:  (token, label, probability, character offsets)
         """
         is_array = not isinstance(sentences, str)
         if not isinstance(sentences, (str, list)):
@@ -66,17 +68,26 @@ class NERPredictor(Predictor):
             lengths = nerseq.get_lengths(0)
             y_pred = self.model.predict_on_batch(x_true)
             y_labels = self.preproc.p.inverse_transform(y_pred, lengths)
+            # TODO: clean this up
             if return_proba:
                 try:
                     probs = np.max(y_pred, axis=2)
                 except:
                     probs = y_pred[0].numpy().tolist() # TODO: remove after confirmation (#316)
-                for x, y, prob in zip(nerseq.x, y_labels, probs):
-                    result = [(x[i], y[i], prob[i]) for i in range(len(x))]
+                for i, (x, y, prob) in enumerate(zip(nerseq.x, y_labels, probs)):
+                    if return_offsets:
+                        offsets = TU.extract_offsets(sentences[i], tokens=[entry[0] for entry in x])
+                        result = [(x[i], y[i], prob[i], (offsets[i]['start'], offsets[i]['end'])) for i in range(len(x))]
+                    else:
+                        result = [(x[i], y[i], prob[i]) for i in range(len(x))]
                     results.append(result)
             else:
-                for x,y in zip(nerseq.x, y_labels):
-                    result =  list(zip(x,y))
+                for i, (x,y) in enumerate(zip(nerseq.x, y_labels)):
+                    if return_offsets:
+                        offsets = TU.extract_offsets(sentences[i], tokens=[entry[0] for entry in x])
+                        result =  list(zip(x,y, [(o['start'], o['end']) for o in offsets]))
+                    else:
+                        result =  list(zip(x,y))
                     if merge_tokens:
                         result = self.merge_tokens(result, lang)
                     results.append(result)
@@ -95,10 +106,13 @@ class NERPredictor(Predictor):
         current_token = ""
         current_tag = ""
         entities = []
+        start = None
+        last_end = None
 
         for tup in annotated_sentence:
             token = tup[0]
             entity = tup[1]
+            offsets = tup[2] if len(tup)>2 else None
             tag = entity.split('-')[1] if '-' in entity else None
             prefix = entity.split('-')[0] if '-' in entity else None
             # not within entity
@@ -108,14 +122,17 @@ class NERPredictor(Predictor):
             #elif tag and prefix=='B':
             elif tag and (prefix=='B' or prefix=='I' and not current_token):
                 if current_token: # consecutive entities
-                    entities.append((current_token, current_tag))
+                    entities.append(self._build_merge_tuple(current_token, current_tag, start, last_end))
                     current_token = ""
                     current_tag = None
+                    start, end = None, None
                 current_token = token
                 current_tag = tag
+                start = offsets[0] if offsets else None
+                last_end = offsets[1] if offsets else None
             # end of entity
             elif tag is None and current_token:
-                entities.append((current_token, current_tag))
+                entities.append(self._build_merge_tuple(current_token, current_tag, start, last_end))
                 current_token = ""
                 current_tag = None
                 continue
@@ -123,10 +140,15 @@ class NERPredictor(Predictor):
             elif tag and current_token:  #  prefix I
                 current_token = current_token + sep + token
                 current_tag = tag
+                last_end = offsets[1] if offsets else None
         if current_token and current_tag:
-            entities.append((current_token, current_tag))
+            entities.append(self._build_merge_tuple(current_token, current_tag, start, last_end)) 
         return entities
 
+    def _build_merge_tuple(self, current_token, current_tag, start=None, end=None):
+        entry = [current_token, current_tag]
+        if start is not None and end is not None: entry.append((start, end))
+        return tuple(entry)
 
     def _save_preproc(self, fpath):
 

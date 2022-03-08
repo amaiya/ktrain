@@ -409,3 +409,36 @@ def extract_noun_phrases(text):
     if start: np_list.append(" ".join(curr_phrase))
     return np_list
 
+
+def extract_offsets(sentence, tokens=None, tokenizer=tokenize):
+    """
+    ```
+    extracts character
+
+    Args:
+      sentence (str): text
+      tokens (list): list of tokens from sentence.  If None, tokens will be generated using supplied tokenizer.
+      tokenizer (Callable):  a callable that accepts text and returns a list of tokens
+    Return:
+      list of dictionaries of the form {'token': <the token>, 'start': start character index, 'end': end character index}
+    ```
+    """
+    s = sentence
+    tokens = tokenizer(sentence)
+    offsets = []
+    last_end = 0
+    for t in tokens:
+        # find start of current token
+        for start_ind in range(last_end, len(sentence)):
+            if sentence[start_ind] == t[0]: break
+        end_ind = len(sentence)
+        for end_ind in range(start_ind+1, len(sentence)):
+            if (end_ind-start_ind) >= len(t): 
+                break
+        d = {'token': t, 
+             'start' : start_ind, 'end' : end_ind,
+            }
+        offsets.append(d)
+        last_end = end_ind
+    return offsets
+
