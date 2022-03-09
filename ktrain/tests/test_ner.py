@@ -58,7 +58,10 @@ class TestNERClassification(TestCase):
         p.save('/tmp/test_predictor')
         p = ktrain.load_predictor('/tmp/test_predictor')
         self.assertEqual(p.predict(SENT)[-2][1], 'I-PER' )
-
+        merged_prediction = p.predict(SENT, merge_tokens=True, return_offsets=True)
+        self.assertEqual(merged_prediction[0][0], 'John Smith') 
+        self.assertEqual(merged_prediction[0][1], 'PER') 
+        self.assertEqual(merged_prediction[0][2], (21,31)) 
 
 
 
