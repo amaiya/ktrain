@@ -74,21 +74,49 @@ def display_answers(answers):
     return display(HTML(df.to_html(render_links=True, escape=False)))
 
 
-def _process_question(question, include_np=False):
+def process_question(question, include_np=False, and_np=False, remove_english_stopwords=False):
+    result = None
+    np_list = []
     if include_np:
         try:
-            # attempt to use extract_noun_phrases first if textblob is installed
-            np_list = [&#39;&#34;%s&#34;&#39; % (np) for np in TU.extract_noun_phrases(question) if len(np.split()) &gt; 1]
-            q_tokens = TU.tokenize(question, join_tokens=False)
-            q_tokens.extend(np_list)
-            return &#34; &#34;.join(q_tokens)
+            #np_list = [&#39;&#34;%s&#34;&#39; % (np) for np in TU.extract_noun_phrases(question) if len(np.split()) &gt; 1]
+            raw_np_list = [np for np in TU.extract_noun_phrases(question) if len(np.split()) &gt; 1]
+            np_list = []
+            for np in raw_np_list:
+                N=2
+                sentence = np.split()
+                np_list.extend( [&#39;&#34;%s&#34;&#39; % (&#39; &#39;.join(sentence[i:i+N])) for i in range(len(sentence)-N+1)] )
+            np_list = list(set(np_list))
         except:
             import warnings
             warnings.warn(&#39;TextBlob is not currently installed, so falling back to include_np=False with no extra question processing. &#39;+\
                           &#39;To install: pip install textblob&#39;)
-            return TU.tokenize(question, join_tokens=True)
+    result =  TU.tokenize(question, join_tokens=False)
+    if remove_english_stopwords:
+        from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
+        result = [term for term in result if term.lower().strip() not in list(ENGLISH_STOP_WORDS)+[&#39;?&#39;]]
+    if np_list and and_np:
+        return f&#39;( {&#34; &#34;.join(result)} ) AND ({&#34; &#34;.join(np_list)})&#39;
     else:
-        return TU.tokenize(question, join_tokens=True)
+        return &#39; &#39;.join(result+np_list)
+
+_process_question = process_question # for backwards compatibility
+
+#def _process_question(question, include_np=False):
+#    if include_np:
+#        try:
+#            # attempt to use extract_noun_phrases first if textblob is installed
+#            np_list = [&#39;&#34;%s&#34;&#39; % (np) for np in TU.extract_noun_phrases(question) if len(np.split()) &gt; 1]
+#            q_tokens = TU.tokenize(question, join_tokens=False)
+#            q_tokens.extend(np_list)
+#            return &#34; &#34;.join(q_tokens)
+#        except:
+#            import warnings
+#            warnings.warn(&#39;TextBlob is not currently installed, so falling back to include_np=False with no extra question processing. &#39;+\
+#                          &#39;To install: pip install textblob&#39;)
+#            return TU.tokenize(question, join_tokens=True)
+#    else:
+#        return TU.tokenize(question, join_tokens=True)
 
 
 
@@ -356,7 +384,8 @@ class QA(ABC):
           rerank_threshold(int): rerank top answers with confidence &gt;= rerank_threshold
                                  based on semantic similarity between question and answer.
                                  This can help bump the correct answer closer to the top.
-                                 Default:0.015.
+                                 Default:0.015. This should be changed to somethink like 6.0
+                                 if raw_confidence=True.
                                  If None, no re-ranking is performed.
           include_np(bool):  If True, noun phrases will be extracted from question and included
                              in query that retrieves documents likely to contain candidate answers.
@@ -373,7 +402,7 @@ class QA(ABC):
             warnings.warn(&#39;Raw confidence is used, but rerank_threshold value is below 1.00: are you sure you this is what you wanted?&#39;)
 
         # locate candidate document contexts
-        doc_results = self.search(_process_question(query if query is not None else question, include_np=include_np), limit=n_docs_considered)
+        doc_results = self.search(process_question(query if query is not None else question, include_np=include_np), limit=n_docs_considered)
         if not doc_results: 
             warnings.warn(&#39;No documents matched words in question (or query if supplied)&#39;)
             return []
@@ -853,6 +882,42 @@ class AnswerExtractor:
 to the format string S.format.
 See help(struct) for more on format
 strings.</p></div>
+</dd>
+<dt id="ktrain.text.qa.core.process_question"><code class="name flex">
+<span>def <span class="ident">process_question</span></span>(<span>question, include_np=False, and_np=False, remove_english_stopwords=False)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def process_question(question, include_np=False, and_np=False, remove_english_stopwords=False):
+    result = None
+    np_list = []
+    if include_np:
+        try:
+            #np_list = [&#39;&#34;%s&#34;&#39; % (np) for np in TU.extract_noun_phrases(question) if len(np.split()) &gt; 1]
+            raw_np_list = [np for np in TU.extract_noun_phrases(question) if len(np.split()) &gt; 1]
+            np_list = []
+            for np in raw_np_list:
+                N=2
+                sentence = np.split()
+                np_list.extend( [&#39;&#34;%s&#34;&#39; % (&#39; &#39;.join(sentence[i:i+N])) for i in range(len(sentence)-N+1)] )
+            np_list = list(set(np_list))
+        except:
+            import warnings
+            warnings.warn(&#39;TextBlob is not currently installed, so falling back to include_np=False with no extra question processing. &#39;+\
+                          &#39;To install: pip install textblob&#39;)
+    result =  TU.tokenize(question, join_tokens=False)
+    if remove_english_stopwords:
+        from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
+        result = [term for term in result if term.lower().strip() not in list(ENGLISH_STOP_WORDS)+[&#39;?&#39;]]
+    if np_list and and_np:
+        return f&#39;( {&#34; &#34;.join(result)} ) AND ({&#34; &#34;.join(np_list)})&#39;
+    else:
+        return &#39; &#39;.join(result+np_list)</code></pre>
+</details>
 </dd>
 <dt id="ktrain.text.qa.core.twolists"><code class="name flex">
 <span>def <span class="ident">twolists</span></span>(<span>l1, l2)</span>
@@ -1383,7 +1448,8 @@ Returns:
           rerank_threshold(int): rerank top answers with confidence &gt;= rerank_threshold
                                  based on semantic similarity between question and answer.
                                  This can help bump the correct answer closer to the top.
-                                 Default:0.015.
+                                 Default:0.015. This should be changed to somethink like 6.0
+                                 if raw_confidence=True.
                                  If None, no re-ranking is performed.
           include_np(bool):  If True, noun phrases will be extracted from question and included
                              in query that retrieves documents likely to contain candidate answers.
@@ -1400,7 +1466,7 @@ Returns:
             warnings.warn(&#39;Raw confidence is used, but rerank_threshold value is below 1.00: are you sure you this is what you wanted?&#39;)
 
         # locate candidate document contexts
-        doc_results = self.search(_process_question(query if query is not None else question, include_np=include_np), limit=n_docs_considered)
+        doc_results = self.search(process_question(query if query is not None else question, include_np=include_np), limit=n_docs_considered)
         if not doc_results: 
             warnings.warn(&#39;No documents matched words in question (or query if supplied)&#39;)
             return []
@@ -1511,7 +1577,8 @@ Args:
   rerank_threshold(int): rerank top answers with confidence &gt;= rerank_threshold
                          based on semantic similarity between question and answer.
                          This can help bump the correct answer closer to the top.
-                         Default:0.015.
+                         Default:0.015. This should be changed to somethink like 6.0
+                         if raw_confidence=True.
                          If None, no re-ranking is performed.
   include_np(bool):  If True, noun phrases will be extracted from question and included
                      in query that retrieves documents likely to contain candidate answers.
@@ -1551,7 +1618,8 @@ Returns:
       rerank_threshold(int): rerank top answers with confidence &gt;= rerank_threshold
                              based on semantic similarity between question and answer.
                              This can help bump the correct answer closer to the top.
-                             Default:0.015.
+                             Default:0.015. This should be changed to somethink like 6.0
+                             if raw_confidence=True.
                              If None, no re-ranking is performed.
       include_np(bool):  If True, noun phrases will be extracted from question and included
                          in query that retrieves documents likely to contain candidate answers.
@@ -1568,7 +1636,7 @@ Returns:
         warnings.warn(&#39;Raw confidence is used, but rerank_threshold value is below 1.00: are you sure you this is what you wanted?&#39;)
 
     # locate candidate document contexts
-    doc_results = self.search(_process_question(query if query is not None else question, include_np=include_np), limit=n_docs_considered)
+    doc_results = self.search(process_question(query if query is not None else question, include_np=include_np), limit=n_docs_considered)
     if not doc_results: 
         warnings.warn(&#39;No documents matched words in question (or query if supplied)&#39;)
         return []
@@ -2266,6 +2334,7 @@ Returns:
 <ul class="">
 <li><code><a title="ktrain.text.qa.core.display_answers" href="#ktrain.text.qa.core.display_answers">display_answers</a></code></li>
 <li><code><a title="ktrain.text.qa.core.pack_byte" href="#ktrain.text.qa.core.pack_byte">pack_byte</a></code></li>
+<li><code><a title="ktrain.text.qa.core.process_question" href="#ktrain.text.qa.core.process_question">process_question</a></code></li>
 <li><code><a title="ktrain.text.qa.core.twolists" href="#ktrain.text.qa.core.twolists">twolists</a></code></li>
 <li><code><a title="ktrain.text.qa.core.unpack_byte" href="#ktrain.text.qa.core.unpack_byte">unpack_byte</a></code></li>
 </ul>

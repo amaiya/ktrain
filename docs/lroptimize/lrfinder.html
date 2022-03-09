@@ -199,16 +199,44 @@ class LRFinder:
                 print(&#34;Failed to compute the gradients, there might not be enough points.\n&#34; +\
                        &#34;Plot displayed without suggestion.&#34;)
             else:
+                valley = self.valley(self.lrs, self.losses)
                 mg = self.mg
                 ml = self.ml
-                print(&#39;Two possible suggestions for LR from plot:&#39;)
-                print(f&#34;\tMin numerical gradient: {self.lrs[mg]:.2E}&#34;)
-                print(f&#34;\tMin loss divided by 10: {self.lrs[ml]/10:.2E}&#34;)
-                ax.plot(self.lrs[mg],self.losses[mg], markersize=10,marker=&#39;o&#39;,color=&#39;red&#39;)
+                print(&#39;Three possible suggestions for LR from plot:&#39;)
+                print(f&#34;\tLongest valley (red): {self.lrs[valley]:.2E}&#34;)
+                print(f&#34;\tMin numerical gradient (purple): {self.lrs[mg]:.2E}&#34;)
+                print(f&#34;\tMin loss divided by 10 (omitted from plot): {self.lrs[ml]/10:.2E}&#34;)
+                ax.plot(self.lrs[valley],self.losses[valley], markersize=10,marker=&#39;o&#39;,color=&#39;red&#39;)
+                ax.plot(self.lrs[mg],self.losses[mg], markersize=10,marker=&#39;o&#39;,color=&#39;purple&#39;)
         fig = plt.gcf()
         plt.show()
         if return_fig: return fig
         return
+
+
+    def valley(self, lrs, losses):
+        &#34;&#34;&#34;
+        valley method for LR suggestions:
+        https://github.com/fastai/fastai/pull/3377
+        &#34;&#34;&#34;
+        n = len(losses)
+        max_start, max_end = 0,0
+
+        # find the longest valley
+        lds = [1]*n
+        for i in range(1,n):
+            for j in range(0,i):
+                if (losses[i] &lt; losses[j]) and (lds[i] &lt; lds[j] + 1):
+                    lds[i] = lds[j] + 1
+                if lds[max_end] &lt; lds[i]:
+                    max_end = i
+                    max_start = max_end - lds[max_end]
+
+        sections = (max_end - max_start) / 3
+        idx = max_start + int(sections) + int(sections/2)
+
+        #return lrs[idx], (lrs[idx], losses[idx])
+        return idx
 
 
     def _compute_stats(self):
@@ -223,8 +251,9 @@ class LRFinder:
         self.ml = np.argmin(self.losses)
         try: 
             self.mg = (np.gradient(np.array(self.losses[32:self.ml]))).argmin()
-        except:
+        except Exception as e:
             self.mg = None
+            warnings.warn(e)
         return
 
 
@@ -234,6 +263,7 @@ class LRFinder:
         Generates two numerical estimates of lr: 
           1. lr associated with minum numerical gradient (None if gradient computation fails)
           2. lr associated with minimum loss divided by 10
+          3. lr associated with longest valley
         Args:
           tuple: (float, float)
 
@@ -246,7 +276,9 @@ class LRFinder:
         if self.mg is not None:
             lr1 = self.lrs[self.mg]
         lr2 = self.lrs[self.ml]/10
-        return (lr1, lr2)
+        lr3 = self.lrs[self.valley(self.lrs, self.losses)]
+
+        return (lr1, lr2, lr3)
 
 
     def find_called(self):
@@ -470,16 +502,44 @@ Reference:
                 print(&#34;Failed to compute the gradients, there might not be enough points.\n&#34; +\
                        &#34;Plot displayed without suggestion.&#34;)
             else:
+                valley = self.valley(self.lrs, self.losses)
                 mg = self.mg
                 ml = self.ml
-                print(&#39;Two possible suggestions for LR from plot:&#39;)
-                print(f&#34;\tMin numerical gradient: {self.lrs[mg]:.2E}&#34;)
-                print(f&#34;\tMin loss divided by 10: {self.lrs[ml]/10:.2E}&#34;)
-                ax.plot(self.lrs[mg],self.losses[mg], markersize=10,marker=&#39;o&#39;,color=&#39;red&#39;)
+                print(&#39;Three possible suggestions for LR from plot:&#39;)
+                print(f&#34;\tLongest valley (red): {self.lrs[valley]:.2E}&#34;)
+                print(f&#34;\tMin numerical gradient (purple): {self.lrs[mg]:.2E}&#34;)
+                print(f&#34;\tMin loss divided by 10 (omitted from plot): {self.lrs[ml]/10:.2E}&#34;)
+                ax.plot(self.lrs[valley],self.losses[valley], markersize=10,marker=&#39;o&#39;,color=&#39;red&#39;)
+                ax.plot(self.lrs[mg],self.losses[mg], markersize=10,marker=&#39;o&#39;,color=&#39;purple&#39;)
         fig = plt.gcf()
         plt.show()
         if return_fig: return fig
         return
+
+
+    def valley(self, lrs, losses):
+        &#34;&#34;&#34;
+        valley method for LR suggestions:
+        https://github.com/fastai/fastai/pull/3377
+        &#34;&#34;&#34;
+        n = len(losses)
+        max_start, max_end = 0,0
+
+        # find the longest valley
+        lds = [1]*n
+        for i in range(1,n):
+            for j in range(0,i):
+                if (losses[i] &lt; losses[j]) and (lds[i] &lt; lds[j] + 1):
+                    lds[i] = lds[j] + 1
+                if lds[max_end] &lt; lds[i]:
+                    max_end = i
+                    max_start = max_end - lds[max_end]
+
+        sections = (max_end - max_start) / 3
+        idx = max_start + int(sections) + int(sections/2)
+
+        #return lrs[idx], (lrs[idx], losses[idx])
+        return idx
 
 
     def _compute_stats(self):
@@ -494,8 +554,9 @@ Reference:
         self.ml = np.argmin(self.losses)
         try: 
             self.mg = (np.gradient(np.array(self.losses[32:self.ml]))).argmin()
-        except:
+        except Exception as e:
             self.mg = None
+            warnings.warn(e)
         return
 
 
@@ -505,6 +566,7 @@ Reference:
         Generates two numerical estimates of lr: 
           1. lr associated with minum numerical gradient (None if gradient computation fails)
           2. lr associated with minimum loss divided by 10
+          3. lr associated with longest valley
         Args:
           tuple: (float, float)
 
@@ -517,7 +579,9 @@ Reference:
         if self.mg is not None:
             lr1 = self.lrs[self.mg]
         lr2 = self.lrs[self.ml]/10
-        return (lr1, lr2)
+        lr3 = self.lrs[self.valley(self.lrs, self.losses)]
+
+        return (lr1, lr2, lr3)
 
 
     def find_called(self):
@@ -557,6 +621,7 @@ Reference:
 <div class="desc"><pre><code>Generates two numerical estimates of lr: 
   1. lr associated with minum numerical gradient (None if gradient computation fails)
   2. lr associated with minimum loss divided by 10
+  3. lr associated with longest valley
 Args:
   tuple: (float, float)
 
@@ -572,6 +637,7 @@ Args:
     Generates two numerical estimates of lr: 
       1. lr associated with minum numerical gradient (None if gradient computation fails)
       2. lr associated with minimum loss divided by 10
+      3. lr associated with longest valley
     Args:
       tuple: (float, float)
 
@@ -584,7 +650,9 @@ Args:
     if self.mg is not None:
         lr1 = self.lrs[self.mg]
     lr2 = self.lrs[self.ml]/10
-    return (lr1, lr2)</code></pre>
+    lr3 = self.lrs[self.valley(self.lrs, self.losses)]
+
+    return (lr1, lr2, lr3)</code></pre>
 </details>
 </dd>
 <dt id="ktrain.lroptimize.lrfinder.LRFinder.find"><code class="name flex">
@@ -782,12 +850,15 @@ Returns:
             print(&#34;Failed to compute the gradients, there might not be enough points.\n&#34; +\
                    &#34;Plot displayed without suggestion.&#34;)
         else:
+            valley = self.valley(self.lrs, self.losses)
             mg = self.mg
             ml = self.ml
-            print(&#39;Two possible suggestions for LR from plot:&#39;)
-            print(f&#34;\tMin numerical gradient: {self.lrs[mg]:.2E}&#34;)
-            print(f&#34;\tMin loss divided by 10: {self.lrs[ml]/10:.2E}&#34;)
-            ax.plot(self.lrs[mg],self.losses[mg], markersize=10,marker=&#39;o&#39;,color=&#39;red&#39;)
+            print(&#39;Three possible suggestions for LR from plot:&#39;)
+            print(f&#34;\tLongest valley (red): {self.lrs[valley]:.2E}&#34;)
+            print(f&#34;\tMin numerical gradient (purple): {self.lrs[mg]:.2E}&#34;)
+            print(f&#34;\tMin loss divided by 10 (omitted from plot): {self.lrs[ml]/10:.2E}&#34;)
+            ax.plot(self.lrs[valley],self.losses[valley], markersize=10,marker=&#39;o&#39;,color=&#39;red&#39;)
+            ax.plot(self.lrs[mg],self.losses[mg], markersize=10,marker=&#39;o&#39;,color=&#39;purple&#39;)
     fig = plt.gcf()
     plt.show()
     if return_fig: return fig
@@ -833,6 +904,41 @@ Parameters:
     plt.ylim(y_lim)</code></pre>
 </details>
 </dd>
+<dt id="ktrain.lroptimize.lrfinder.LRFinder.valley"><code class="name flex">
+<span>def <span class="ident">valley</span></span>(<span>self, lrs, losses)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>valley method for LR suggestions:
+<a href="https://github.com/fastai/fastai/pull/3377">https://github.com/fastai/fastai/pull/3377</a></p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def valley(self, lrs, losses):
+    &#34;&#34;&#34;
+    valley method for LR suggestions:
+    https://github.com/fastai/fastai/pull/3377
+    &#34;&#34;&#34;
+    n = len(losses)
+    max_start, max_end = 0,0
+
+    # find the longest valley
+    lds = [1]*n
+    for i in range(1,n):
+        for j in range(0,i):
+            if (losses[i] &lt; losses[j]) and (lds[i] &lt; lds[j] + 1):
+                lds[i] = lds[j] + 1
+            if lds[max_end] &lt; lds[i]:
+                max_end = i
+                max_start = max_end - lds[max_end]
+
+    sections = (max_end - max_start) / 3
+    idx = max_start + int(sections) + int(sections/2)
+
+    #return lrs[idx], (lrs[idx], losses[idx])
+    return idx</code></pre>
+</details>
+</dd>
 </dl>
 </dd>
 </dl>
@@ -860,6 +966,7 @@ Parameters:
 <li><code><a title="ktrain.lroptimize.lrfinder.LRFinder.on_batch_end" href="#ktrain.lroptimize.lrfinder.LRFinder.on_batch_end">on_batch_end</a></code></li>
 <li><code><a title="ktrain.lroptimize.lrfinder.LRFinder.plot_loss" href="#ktrain.lroptimize.lrfinder.LRFinder.plot_loss">plot_loss</a></code></li>
 <li><code><a title="ktrain.lroptimize.lrfinder.LRFinder.plot_loss_change" href="#ktrain.lroptimize.lrfinder.LRFinder.plot_loss_change">plot_loss_change</a></code></li>
+<li><code><a title="ktrain.lroptimize.lrfinder.LRFinder.valley" href="#ktrain.lroptimize.lrfinder.LRFinder.valley">valley</a></code></li>
 </ul>
 </li>
 </ul>

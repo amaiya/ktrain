@@ -435,7 +435,40 @@ def extract_noun_phrases(text):
                 curr_phrase = []
                 start = False
     if start: np_list.append(&#34; &#34;.join(curr_phrase))
-    return np_list</code></pre>
+    return np_list
+
+
+def extract_offsets(sentence, tokens=None, tokenizer=tokenize):
+    &#34;&#34;&#34;
+    ```
+    extracts character
+
+    Args:
+      sentence (str): text
+      tokens (list): list of tokens from sentence.  If None, tokens will be generated using supplied tokenizer.
+      tokenizer (Callable):  a callable that accepts text and returns a list of tokens
+    Return:
+      list of dictionaries of the form {&#39;token&#39;: &lt;the token&gt;, &#39;start&#39;: start character index, &#39;end&#39;: end character index}
+    ```
+    &#34;&#34;&#34;
+    s = sentence
+    tokens = tokenizer(sentence)
+    offsets = []
+    last_end = 0
+    for t in tokens:
+        # find start of current token
+        for start_ind in range(last_end, len(sentence)):
+            if sentence[start_ind] == t[0]: break
+        end_ind = len(sentence)
+        for end_ind in range(start_ind+1, len(sentence)):
+            if (end_ind-start_ind) &gt;= len(t): 
+                break
+        d = {&#39;token&#39;: t, 
+             &#39;start&#39; : start_ind, &#39;end&#39; : end_ind,
+            }
+        offsets.append(d)
+        last_end = end_ind
+    return offsets</code></pre>
 </details>
 </section>
 <section>
@@ -685,6 +718,56 @@ Returns:
                 start = False
     if start: np_list.append(&#34; &#34;.join(curr_phrase))
     return np_list</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.textutils.extract_offsets"><code class="name flex">
+<span>def <span class="ident">extract_offsets</span></span>(<span>sentence, tokens=None, tokenizer=&lt;function tokenize&gt;)</span>
+</code></dt>
+<dd>
+<div class="desc"><pre><code>extracts character
+
+Args:
+  sentence (str): text
+  tokens (list): list of tokens from sentence.  If None, tokens will be generated using supplied tokenizer.
+  tokenizer (Callable):  a callable that accepts text and returns a list of tokens
+Return:
+  list of dictionaries of the form {'token': &lt;the token&gt;, 'start': start character index, 'end': end character index}
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def extract_offsets(sentence, tokens=None, tokenizer=tokenize):
+    &#34;&#34;&#34;
+    ```
+    extracts character
+
+    Args:
+      sentence (str): text
+      tokens (list): list of tokens from sentence.  If None, tokens will be generated using supplied tokenizer.
+      tokenizer (Callable):  a callable that accepts text and returns a list of tokens
+    Return:
+      list of dictionaries of the form {&#39;token&#39;: &lt;the token&gt;, &#39;start&#39;: start character index, &#39;end&#39;: end character index}
+    ```
+    &#34;&#34;&#34;
+    s = sentence
+    tokens = tokenizer(sentence)
+    offsets = []
+    last_end = 0
+    for t in tokens:
+        # find start of current token
+        for start_ind in range(last_end, len(sentence)):
+            if sentence[start_ind] == t[0]: break
+        end_ind = len(sentence)
+        for end_ind in range(start_ind+1, len(sentence)):
+            if (end_ind-start_ind) &gt;= len(t): 
+                break
+        d = {&#39;token&#39;: t, 
+             &#39;start&#39; : start_ind, &#39;end&#39; : end_ind,
+            }
+        offsets.append(d)
+        last_end = end_ind
+    return offsets</code></pre>
 </details>
 </dd>
 <dt id="ktrain.text.textutils.filter_by_id"><code class="name flex">
@@ -1086,6 +1169,7 @@ unidecode map to be used by translate as explained here:</p>
 <li><code><a title="ktrain.text.textutils.extract_copy" href="#ktrain.text.textutils.extract_copy">extract_copy</a></code></li>
 <li><code><a title="ktrain.text.textutils.extract_filenames" href="#ktrain.text.textutils.extract_filenames">extract_filenames</a></code></li>
 <li><code><a title="ktrain.text.textutils.extract_noun_phrases" href="#ktrain.text.textutils.extract_noun_phrases">extract_noun_phrases</a></code></li>
+<li><code><a title="ktrain.text.textutils.extract_offsets" href="#ktrain.text.textutils.extract_offsets">extract_offsets</a></code></li>
 <li><code><a title="ktrain.text.textutils.filter_by_id" href="#ktrain.text.textutils.filter_by_id">filter_by_id</a></code></li>
 <li><code><a title="ktrain.text.textutils.get_mimetype" href="#ktrain.text.textutils.get_mimetype">get_mimetype</a></code></li>
 <li><code><a title="ktrain.text.textutils.is_chinese" href="#ktrain.text.textutils.is_chinese">is_chinese</a></code></li>

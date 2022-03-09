@@ -38,7 +38,7 @@ class TopicModel():
     def __init__(self,texts=None, n_topics=None, n_features=10000, 
                  min_df=5, max_df=0.5,  stop_words=&#39;english&#39;,
                  model_type=&#39;lda&#39;,
-                 lda_max_iter=5, lda_mode=&#39;online&#39;,
+                 max_iter=5, lda_max_iter=None, lda_mode=&#39;online&#39;,
                  token_pattern=None, verbose=1,
                  hyperparam_kwargs=None
     ):
@@ -56,12 +56,19 @@ class TopicModel():
             stop_words (str or list): either &#39;english&#39; for built-in stop words or
                                       a list of stop words to ignore
             model_type(str): type of topic model to fit. One of {&#39;lda&#39;, &#39;nmf&#39;}.  Default:&#39;lda&#39;
-            lda_max_iter (int): maximum iterations for &#39;lda&#39;.  5 is default if using lda_mode=&#39;online&#39;.
+            max_iter (int): maximum iterations.  5 is default if using lda_mode=&#39;online&#39; or nmf.
                                 If lda_mode=&#39;batch&#39;, this should be increased (e.g., 1500).
-                                Ignored if model_type != &#39;lda&#39;
+            lda_max_iter (int): alias for max_iter for backwards compatilibity
             lda_mode (str):  one of {&#39;online&#39;, &#39;batch&#39;}. Ignored if model_type !=&#39;lda&#39;
             token_pattern(str): regex pattern to use to tokenize documents. 
             verbose(bool): verbosity
+            hyperparam_kwargs(dict): hyperparameters for LDA/NMF
+                                     Keys in this dict can be any of the following:
+                                         alpha: alpha for LDA  default: 5./n_topics
+                                         beta: beta for LDA.  default:0.01
+                                         nmf_alpha: alias for alpha for backwars compatilibity
+                                         l1_ratio: l1_ratio for NMF. default: 0
+                                         ngram_range:  whether to consider bigrams, trigrams. default: (1,1) 
 
         &#34;&#34;&#34;
         self.verbose=verbose
@@ -80,6 +87,7 @@ class TopicModel():
                                              n_topics=n_topics, n_features=n_features,
                                              min_df = min_df, max_df = max_df, 
                                              stop_words=stop_words,
+                                             max_iter=max_iter,
                                              lda_max_iter=lda_max_iter, lda_mode=lda_mode,
                                              token_pattern=token_pattern,
                                              hyperparam_kwargs=hyperparam_kwargs)
@@ -108,7 +116,7 @@ class TopicModel():
 
     def train(self,texts, model_type=&#39;lda&#39;, n_topics=None, n_features=10000,
               min_df=5, max_df=0.5,  stop_words=&#39;english&#39;,
-              lda_max_iter=5, lda_mode=&#39;online&#39;,
+              max_iter=5, lda_max_iter=None, lda_mode=&#39;online&#39;,
               token_pattern=None, hyperparam_kwargs=None):
         &#34;&#34;&#34;
         Fits a topic model to documents in &lt;texts&gt;.
@@ -122,8 +130,9 @@ class TopicModel():
             n_features (int):  maximum words to consider
             max_df (float): words in more than max_df proportion of docs discarded
             stop_words (str or list): either &#39;english&#39; for built-in stop words or
-                                      a list of stop words to ignore
-            lda_max_iter (int): maximum iterations for &#39;lda&#39;.  5 is default if using lda_mode=&#39;online&#39;.
+                                     a list of stop words to ignore
+            max_iter (int): maximum iterations for &#39;lda&#39;.  5 is default if using lda_mode=&#39;online&#39;.
+            lda_max_iter (int): alias for max_iter for backwards compatibility
                                 If lda_mode=&#39;batch&#39;, this should be increased (e.g., 1500).
                                 Ignored if model_type != &#39;lda&#39;
             lda_mode (str):  one of {&#39;online&#39;, &#39;batch&#39;}. Ignored of model_type !=&#39;lda&#39;
@@ -133,18 +142,20 @@ class TopicModel():
                                      Keys in this dict can be any of the following:
                                          alpha: alpha for LDA  default: 5./n_topics
                                          beta: beta for LDA.  default:0.01
-                                         nmf_alpha: alpha for NMF.  default:0
+                                         nmf_alpha: alias for alpha for backwars compatilibity
                                          l1_ratio: l1_ratio for NMF. default: 0
                                          ngram_range:  whether to consider bigrams, trigrams. default: (1,1) 
                                     
         Returns:
             tuple: (model, vectorizer)
         &#34;&#34;&#34;
+        max_iter = lda_max_iter if lda_max_iter is not None else max_iter
         if hyperparam_kwargs is None:
             hyperparam_kwargs = {}
         alpha = hyperparam_kwargs.get(&#39;alpha&#39;, 5.0 / n_topics)
+        nmf_alpha = hyperparam_kwargs.get(&#39;nmf_alpha&#39;, None)
+        alpha = nmf_alpha if nmf_alpha is not None else alpha
         beta = hyperparam_kwargs.get(&#39;beta&#39;, 0.01)
-        nmf_alpha = hyperparam_kwargs.get(&#39;nmf_alpha&#39;, 0)
         l1_ratio = hyperparam_kwargs.get(&#39;l1_ratio&#39;, 0)
         ngram_range = hyperparam_kwargs.get(&#39;ngram_range&#39;, (1,1))
 
@@ -177,7 +188,7 @@ class TopicModel():
 
         if self.verbose: print(&#39;fitting model...&#39;)
         if model_type == &#39;lda&#39;:
-            model = LatentDirichletAllocation(n_components=n_topics, max_iter=lda_max_iter,
+            model = LatentDirichletAllocation(n_components=n_topics, max_iter=max_iter,
                                               learning_method=lda_mode, learning_offset=50.,
                                               doc_topic_prior=alpha,
                                               topic_word_prior=beta,
@@ -185,9 +196,9 @@ class TopicModel():
         elif model_type == &#39;nmf&#39;:
             model = NMF(
                 n_components=n_topics,
-                max_iter=lda_max_iter,
+                max_iter=max_iter,
                 verbose=self.verbose,
-                alpha=nmf_alpha,
+                alpha=alpha,
                 l1_ratio=l1_ratio,
                 random_state=0)
         else:
@@ -251,12 +262,18 @@ class TopicModel():
         return list( zip(words, probs) )
 
 
-    def get_topics(self, n_words=10, as_string=True):
+    def get_topics(self, n_words=10, as_string=True, show_counts=False):
         &#34;&#34;&#34;
         Returns a list of discovered topics
         Args:
             n_words(int): number of words to use in topic summary
             as_string(bool): If True, each summary is a space-delimited string instead of list of words
+            show_counts(bool): If True, returns list of tuples of form (id, topic summary, count). 
+                               Otherwise, a list of topic summaries.
+        Returns:
+          List of topic summaries if  show_count is False
+          Dictionary where key is topic ID and value is a tuple of form (topic summary, count) if show_count is True
+
         &#34;&#34;&#34;
         self._check_model()
         feature_names = self.vectorizer.get_feature_names()
@@ -265,6 +282,13 @@ class TopicModel():
             summary = [feature_names[i] for i in topic.argsort()[:-n_words - 1:-1]]
             if as_string: summary = &#34; &#34;.join(summary)
             topic_summaries.append(summary)
+
+        if show_counts:
+            self._check_build()
+            topic_counts = sorted([ (k, topic_summaries[k], len(v)) for k,v in self.topic_dict.items()], 
+                                    key=lambda kv:kv[-1], reverse=True)
+            return dict((t[0], t[1:]) for t in topic_counts)
+
         return topic_summaries
 
 
@@ -311,25 +335,25 @@ class TopicModel():
         return
 
 
-    def filter(self, lst):
+    def filter(self, obj):
         &#34;&#34;&#34;
         The build method may prune documents based on threshold.
         This method prunes other lists based on how build pruned documents.
         This is useful to filter lists containing metadata associated with documents
         for use with visualize_documents.
         Args:
-            lst(list): a list of data
+            obj(list|np.ndarray|pandas.DataFrame):a list, numpy array, or DataFrame of data
         Returns:
-            list:  a filtered list of data based on how build filtered the documents
+            filtered obj
         &#34;&#34;&#34;
-        if len(lst) != self.bool_array.shape[0]:
-            raise ValueError(&#39;Length of lst is not consistent with the number of documents &#39; +
+        length = obj.shape[0] if isinstance(obj, (pd.DataFrame, np.ndarray)) else len(obj)
+        if length != self.bool_array.shape[0]:
+            raise ValueError(&#39;Length of obj is not consistent with the number of documents &#39; +
                              &#39;supplied to get_topic_model&#39;)
-        arr = np.array(lst)
-        return list(arr[self.bool_array])
-                           
+        obj = np.array(obj) if isinstance(obj, list) else obj
+        return obj[self.bool_array]
 
-    
+
     def get_docs(self, topic_ids=[], doc_ids=[], rank=False):
         &#34;&#34;&#34;
         Returns document entries for supplied topic_ids.
@@ -812,7 +836,7 @@ get_topic_model = TopicModel </code></pre>
 <dl>
 <dt id="ktrain.text.eda.TopicModel"><code class="flex name class">
 <span>class <span class="ident">TopicModel</span></span>
-<span>(</span><span>texts=None, n_topics=None, n_features=10000, min_df=5, max_df=0.5, stop_words='english', model_type='lda', lda_max_iter=5, lda_mode='online', token_pattern=None, verbose=1, hyperparam_kwargs=None)</span>
+<span>(</span><span>texts=None, n_topics=None, n_features=10000, min_df=5, max_df=0.5, stop_words='english', model_type='lda', max_iter=5, lda_max_iter=None, lda_mode='online', token_pattern=None, verbose=1, hyperparam_kwargs=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Fits a topic model to documents in <texts>.</p>
@@ -835,16 +859,27 @@ If None, n_topics = min{400, sqrt[# documents/2]})</dd>
 a list of stop words to ignore</dd>
 <dt>model_type(str): type of topic model to fit. One of {'lda', 'nmf'}.
 Default:'lda'</dt>
+<dt><strong><code>max_iter</code></strong> :&ensp;<code>int</code></dt>
+<dd>maximum iterations.
+5 is default if using lda_mode='online' or nmf.
+If lda_mode='batch', this should be increased (e.g., 1500).</dd>
 <dt><strong><code>lda_max_iter</code></strong> :&ensp;<code>int</code></dt>
-<dd>maximum iterations for 'lda'.
-5 is default if using lda_mode='online'.
-If lda_mode='batch', this should be increased (e.g., 1500).
-Ignored if model_type != 'lda'</dd>
+<dd>alias for max_iter for backwards compatilibity</dd>
 <dt><strong><code>lda_mode</code></strong> :&ensp;<code>str</code></dt>
 <dd>one of {'online', 'batch'}. Ignored if model_type !='lda'</dd>
 </dl>
 <p>token_pattern(str): regex pattern to use to tokenize documents.
-verbose(bool): verbosity</p></div>
+verbose(bool): verbosity
+hyperparam_kwargs(dict): hyperparameters for LDA/NMF
+Keys in this dict can be any of the following:
+alpha: alpha for LDA
+default: 5./n_topics
+beta: beta for LDA.
+default:0.01
+nmf_alpha: alias for alpha for backwars compatilibity
+l1_ratio: l1_ratio for NMF. default: 0
+ngram_range:
+whether to consider bigrams, trigrams. default: (1,1)</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -855,7 +890,7 @@ verbose(bool): verbosity</p></div>
     def __init__(self,texts=None, n_topics=None, n_features=10000, 
                  min_df=5, max_df=0.5,  stop_words=&#39;english&#39;,
                  model_type=&#39;lda&#39;,
-                 lda_max_iter=5, lda_mode=&#39;online&#39;,
+                 max_iter=5, lda_max_iter=None, lda_mode=&#39;online&#39;,
                  token_pattern=None, verbose=1,
                  hyperparam_kwargs=None
     ):
@@ -873,12 +908,19 @@ verbose(bool): verbosity</p></div>
             stop_words (str or list): either &#39;english&#39; for built-in stop words or
                                       a list of stop words to ignore
             model_type(str): type of topic model to fit. One of {&#39;lda&#39;, &#39;nmf&#39;}.  Default:&#39;lda&#39;
-            lda_max_iter (int): maximum iterations for &#39;lda&#39;.  5 is default if using lda_mode=&#39;online&#39;.
+            max_iter (int): maximum iterations.  5 is default if using lda_mode=&#39;online&#39; or nmf.
                                 If lda_mode=&#39;batch&#39;, this should be increased (e.g., 1500).
-                                Ignored if model_type != &#39;lda&#39;
+            lda_max_iter (int): alias for max_iter for backwards compatilibity
             lda_mode (str):  one of {&#39;online&#39;, &#39;batch&#39;}. Ignored if model_type !=&#39;lda&#39;
             token_pattern(str): regex pattern to use to tokenize documents. 
             verbose(bool): verbosity
+            hyperparam_kwargs(dict): hyperparameters for LDA/NMF
+                                     Keys in this dict can be any of the following:
+                                         alpha: alpha for LDA  default: 5./n_topics
+                                         beta: beta for LDA.  default:0.01
+                                         nmf_alpha: alias for alpha for backwars compatilibity
+                                         l1_ratio: l1_ratio for NMF. default: 0
+                                         ngram_range:  whether to consider bigrams, trigrams. default: (1,1) 
 
         &#34;&#34;&#34;
         self.verbose=verbose
@@ -897,6 +939,7 @@ verbose(bool): verbosity</p></div>
                                              n_topics=n_topics, n_features=n_features,
                                              min_df = min_df, max_df = max_df, 
                                              stop_words=stop_words,
+                                             max_iter=max_iter,
                                              lda_max_iter=lda_max_iter, lda_mode=lda_mode,
                                              token_pattern=token_pattern,
                                              hyperparam_kwargs=hyperparam_kwargs)
@@ -925,7 +968,7 @@ verbose(bool): verbosity</p></div>
 
     def train(self,texts, model_type=&#39;lda&#39;, n_topics=None, n_features=10000,
               min_df=5, max_df=0.5,  stop_words=&#39;english&#39;,
-              lda_max_iter=5, lda_mode=&#39;online&#39;,
+              max_iter=5, lda_max_iter=None, lda_mode=&#39;online&#39;,
               token_pattern=None, hyperparam_kwargs=None):
         &#34;&#34;&#34;
         Fits a topic model to documents in &lt;texts&gt;.
@@ -939,8 +982,9 @@ verbose(bool): verbosity</p></div>
             n_features (int):  maximum words to consider
             max_df (float): words in more than max_df proportion of docs discarded
             stop_words (str or list): either &#39;english&#39; for built-in stop words or
-                                      a list of stop words to ignore
-            lda_max_iter (int): maximum iterations for &#39;lda&#39;.  5 is default if using lda_mode=&#39;online&#39;.
+                                     a list of stop words to ignore
+            max_iter (int): maximum iterations for &#39;lda&#39;.  5 is default if using lda_mode=&#39;online&#39;.
+            lda_max_iter (int): alias for max_iter for backwards compatibility
                                 If lda_mode=&#39;batch&#39;, this should be increased (e.g., 1500).
                                 Ignored if model_type != &#39;lda&#39;
             lda_mode (str):  one of {&#39;online&#39;, &#39;batch&#39;}. Ignored of model_type !=&#39;lda&#39;
@@ -950,18 +994,20 @@ verbose(bool): verbosity</p></div>
                                      Keys in this dict can be any of the following:
                                          alpha: alpha for LDA  default: 5./n_topics
                                          beta: beta for LDA.  default:0.01
-                                         nmf_alpha: alpha for NMF.  default:0
+                                         nmf_alpha: alias for alpha for backwars compatilibity
                                          l1_ratio: l1_ratio for NMF. default: 0
                                          ngram_range:  whether to consider bigrams, trigrams. default: (1,1) 
                                     
         Returns:
             tuple: (model, vectorizer)
         &#34;&#34;&#34;
+        max_iter = lda_max_iter if lda_max_iter is not None else max_iter
         if hyperparam_kwargs is None:
             hyperparam_kwargs = {}
         alpha = hyperparam_kwargs.get(&#39;alpha&#39;, 5.0 / n_topics)
+        nmf_alpha = hyperparam_kwargs.get(&#39;nmf_alpha&#39;, None)
+        alpha = nmf_alpha if nmf_alpha is not None else alpha
         beta = hyperparam_kwargs.get(&#39;beta&#39;, 0.01)
-        nmf_alpha = hyperparam_kwargs.get(&#39;nmf_alpha&#39;, 0)
         l1_ratio = hyperparam_kwargs.get(&#39;l1_ratio&#39;, 0)
         ngram_range = hyperparam_kwargs.get(&#39;ngram_range&#39;, (1,1))
 
@@ -994,7 +1040,7 @@ verbose(bool): verbosity</p></div>
 
         if self.verbose: print(&#39;fitting model...&#39;)
         if model_type == &#39;lda&#39;:
-            model = LatentDirichletAllocation(n_components=n_topics, max_iter=lda_max_iter,
+            model = LatentDirichletAllocation(n_components=n_topics, max_iter=max_iter,
                                               learning_method=lda_mode, learning_offset=50.,
                                               doc_topic_prior=alpha,
                                               topic_word_prior=beta,
@@ -1002,9 +1048,9 @@ verbose(bool): verbosity</p></div>
         elif model_type == &#39;nmf&#39;:
             model = NMF(
                 n_components=n_topics,
-                max_iter=lda_max_iter,
+                max_iter=max_iter,
                 verbose=self.verbose,
-                alpha=nmf_alpha,
+                alpha=alpha,
                 l1_ratio=l1_ratio,
                 random_state=0)
         else:
@@ -1068,12 +1114,18 @@ verbose(bool): verbosity</p></div>
         return list( zip(words, probs) )
 
 
-    def get_topics(self, n_words=10, as_string=True):
+    def get_topics(self, n_words=10, as_string=True, show_counts=False):
         &#34;&#34;&#34;
         Returns a list of discovered topics
         Args:
             n_words(int): number of words to use in topic summary
             as_string(bool): If True, each summary is a space-delimited string instead of list of words
+            show_counts(bool): If True, returns list of tuples of form (id, topic summary, count). 
+                               Otherwise, a list of topic summaries.
+        Returns:
+          List of topic summaries if  show_count is False
+          Dictionary where key is topic ID and value is a tuple of form (topic summary, count) if show_count is True
+
         &#34;&#34;&#34;
         self._check_model()
         feature_names = self.vectorizer.get_feature_names()
@@ -1082,6 +1134,13 @@ verbose(bool): verbosity</p></div>
             summary = [feature_names[i] for i in topic.argsort()[:-n_words - 1:-1]]
             if as_string: summary = &#34; &#34;.join(summary)
             topic_summaries.append(summary)
+
+        if show_counts:
+            self._check_build()
+            topic_counts = sorted([ (k, topic_summaries[k], len(v)) for k,v in self.topic_dict.items()], 
+                                    key=lambda kv:kv[-1], reverse=True)
+            return dict((t[0], t[1:]) for t in topic_counts)
+
         return topic_summaries
 
 
@@ -1128,25 +1187,25 @@ verbose(bool): verbosity</p></div>
         return
 
 
-    def filter(self, lst):
+    def filter(self, obj):
         &#34;&#34;&#34;
         The build method may prune documents based on threshold.
         This method prunes other lists based on how build pruned documents.
         This is useful to filter lists containing metadata associated with documents
         for use with visualize_documents.
         Args:
-            lst(list): a list of data
+            obj(list|np.ndarray|pandas.DataFrame):a list, numpy array, or DataFrame of data
         Returns:
-            list:  a filtered list of data based on how build filtered the documents
+            filtered obj
         &#34;&#34;&#34;
-        if len(lst) != self.bool_array.shape[0]:
-            raise ValueError(&#39;Length of lst is not consistent with the number of documents &#39; +
+        length = obj.shape[0] if isinstance(obj, (pd.DataFrame, np.ndarray)) else len(obj)
+        if length != self.bool_array.shape[0]:
+            raise ValueError(&#39;Length of obj is not consistent with the number of documents &#39; +
                              &#39;supplied to get_topic_model&#39;)
-        arr = np.array(lst)
-        return list(arr[self.bool_array])
-                           
+        obj = np.array(obj) if isinstance(obj, list) else obj
+        return obj[self.bool_array]
 
-    
+
     def get_docs(self, topic_ids=[], doc_ids=[], rank=False):
         &#34;&#34;&#34;
         Returns document entries for supplied topic_ids.
@@ -1677,7 +1736,7 @@ is less than threshold are filtered out.</dd>
 </details>
 </dd>
 <dt id="ktrain.text.eda.TopicModel.filter"><code class="name flex">
-<span>def <span class="ident">filter</span></span>(<span>self, lst)</span>
+<span>def <span class="ident">filter</span></span>(<span>self, obj)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>The build method may prune documents based on threshold.
@@ -1685,32 +1744,30 @@ This method prunes other lists based on how build pruned documents.
 This is useful to filter lists containing metadata associated with documents
 for use with visualize_documents.</p>
 <h2 id="args">Args</h2>
-<p>lst(list): a list of data</p>
+<p>obj(list|np.ndarray|pandas.DataFrame):a list, numpy array, or DataFrame of data</p>
 <h2 id="returns">Returns</h2>
-<dl>
-<dt><code>list</code></dt>
-<dd>a filtered list of data based on how build filtered the documents</dd>
-</dl></div>
+<p>filtered obj</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def filter(self, lst):
+<pre><code class="python">def filter(self, obj):
     &#34;&#34;&#34;
     The build method may prune documents based on threshold.
     This method prunes other lists based on how build pruned documents.
     This is useful to filter lists containing metadata associated with documents
     for use with visualize_documents.
     Args:
-        lst(list): a list of data
+        obj(list|np.ndarray|pandas.DataFrame):a list, numpy array, or DataFrame of data
     Returns:
-        list:  a filtered list of data based on how build filtered the documents
+        filtered obj
     &#34;&#34;&#34;
-    if len(lst) != self.bool_array.shape[0]:
-        raise ValueError(&#39;Length of lst is not consistent with the number of documents &#39; +
+    length = obj.shape[0] if isinstance(obj, (pd.DataFrame, np.ndarray)) else len(obj)
+    if length != self.bool_array.shape[0]:
+        raise ValueError(&#39;Length of obj is not consistent with the number of documents &#39; +
                          &#39;supplied to get_topic_model&#39;)
-    arr = np.array(lst)
-    return list(arr[self.bool_array])</code></pre>
+    obj = np.array(obj) if isinstance(obj, list) else obj
+    return obj[self.bool_array]</code></pre>
 </details>
 </dd>
 <dt id="ktrain.text.eda.TopicModel.get_docs"><code class="name flex">
@@ -1903,23 +1960,35 @@ with primary topic that is one of <topic_ids></p>
 </details>
 </dd>
 <dt id="ktrain.text.eda.TopicModel.get_topics"><code class="name flex">
-<span>def <span class="ident">get_topics</span></span>(<span>self, n_words=10, as_string=True)</span>
+<span>def <span class="ident">get_topics</span></span>(<span>self, n_words=10, as_string=True, show_counts=False)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Returns a list of discovered topics</p>
 <h2 id="args">Args</h2>
 <p>n_words(int): number of words to use in topic summary
-as_string(bool): If True, each summary is a space-delimited string instead of list of words</p></div>
+as_string(bool): If True, each summary is a space-delimited string instead of list of words
+show_counts(bool): If True, returns list of tuples of form (id, topic summary, count).
+Otherwise, a list of topic summaries.</p>
+<h2 id="returns">Returns</h2>
+<p>List of topic summaries if
+show_count is False
+Dictionary where key is topic ID and value is a tuple of form (topic summary, count) if show_count is True</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_topics(self, n_words=10, as_string=True):
+<pre><code class="python">def get_topics(self, n_words=10, as_string=True, show_counts=False):
     &#34;&#34;&#34;
     Returns a list of discovered topics
     Args:
         n_words(int): number of words to use in topic summary
         as_string(bool): If True, each summary is a space-delimited string instead of list of words
+        show_counts(bool): If True, returns list of tuples of form (id, topic summary, count). 
+                           Otherwise, a list of topic summaries.
+    Returns:
+      List of topic summaries if  show_count is False
+      Dictionary where key is topic ID and value is a tuple of form (topic summary, count) if show_count is True
+
     &#34;&#34;&#34;
     self._check_model()
     feature_names = self.vectorizer.get_feature_names()
@@ -1928,6 +1997,13 @@ as_string(bool): If True, each summary is a space-delimited string instead of li
         summary = [feature_names[i] for i in topic.argsort()[:-n_words - 1:-1]]
         if as_string: summary = &#34; &#34;.join(summary)
         topic_summaries.append(summary)
+
+    if show_counts:
+        self._check_build()
+        topic_counts = sorted([ (k, topic_summaries[k], len(v)) for k,v in self.topic_dict.items()], 
+                                key=lambda kv:kv[-1], reverse=True)
+        return dict((t[0], t[1:]) for t in topic_counts)
+
     return topic_summaries</code></pre>
 </details>
 </dd>
@@ -2283,7 +2359,7 @@ If True, case sensitive search</p></div>
 </details>
 </dd>
 <dt id="ktrain.text.eda.TopicModel.train"><code class="name flex">
-<span>def <span class="ident">train</span></span>(<span>self, texts, model_type='lda', n_topics=None, n_features=10000, min_df=5, max_df=0.5, stop_words='english', lda_max_iter=5, lda_mode='online', token_pattern=None, hyperparam_kwargs=None)</span>
+<span>def <span class="ident">train</span></span>(<span>self, texts, model_type='lda', n_topics=None, n_features=10000, min_df=5, max_df=0.5, stop_words='english', max_iter=5, lda_max_iter=None, lda_mode='online', token_pattern=None, hyperparam_kwargs=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Fits a topic model to documents in <texts>.</p>
@@ -2304,9 +2380,11 @@ If None, n_topics = min{400, sqrt[# documents/2]})</dd>
 <dt><strong><code>stop_words</code></strong> :&ensp;<code>str</code> or <code>list</code></dt>
 <dd>either 'english' for built-in stop words or
 a list of stop words to ignore</dd>
-<dt><strong><code>lda_max_iter</code></strong> :&ensp;<code>int</code></dt>
+<dt><strong><code>max_iter</code></strong> :&ensp;<code>int</code></dt>
 <dd>maximum iterations for 'lda'.
-5 is default if using lda_mode='online'.
+5 is default if using lda_mode='online'.</dd>
+<dt><strong><code>lda_max_iter</code></strong> :&ensp;<code>int</code></dt>
+<dd>alias for max_iter for backwards compatibility
 If lda_mode='batch', this should be increased (e.g., 1500).
 Ignored if model_type != 'lda'</dd>
 <dt><strong><code>lda_mode</code></strong> :&ensp;<code>str</code></dt>
@@ -2320,8 +2398,7 @@ alpha: alpha for LDA
 default: 5./n_topics
 beta: beta for LDA.
 default:0.01
-nmf_alpha: alpha for NMF.
-default:0
+nmf_alpha: alias for alpha for backwars compatilibity
 l1_ratio: l1_ratio for NMF. default: 0
 ngram_range:
 whether to consider bigrams, trigrams. default: (1,1) </p>
@@ -2336,7 +2413,7 @@ whether to consider bigrams, trigrams. default: (1,1) </p>
 </summary>
 <pre><code class="python">def train(self,texts, model_type=&#39;lda&#39;, n_topics=None, n_features=10000,
           min_df=5, max_df=0.5,  stop_words=&#39;english&#39;,
-          lda_max_iter=5, lda_mode=&#39;online&#39;,
+          max_iter=5, lda_max_iter=None, lda_mode=&#39;online&#39;,
           token_pattern=None, hyperparam_kwargs=None):
     &#34;&#34;&#34;
     Fits a topic model to documents in &lt;texts&gt;.
@@ -2350,8 +2427,9 @@ whether to consider bigrams, trigrams. default: (1,1) </p>
         n_features (int):  maximum words to consider
         max_df (float): words in more than max_df proportion of docs discarded
         stop_words (str or list): either &#39;english&#39; for built-in stop words or
-                                  a list of stop words to ignore
-        lda_max_iter (int): maximum iterations for &#39;lda&#39;.  5 is default if using lda_mode=&#39;online&#39;.
+                                 a list of stop words to ignore
+        max_iter (int): maximum iterations for &#39;lda&#39;.  5 is default if using lda_mode=&#39;online&#39;.
+        lda_max_iter (int): alias for max_iter for backwards compatibility
                             If lda_mode=&#39;batch&#39;, this should be increased (e.g., 1500).
                             Ignored if model_type != &#39;lda&#39;
         lda_mode (str):  one of {&#39;online&#39;, &#39;batch&#39;}. Ignored of model_type !=&#39;lda&#39;
@@ -2361,18 +2439,20 @@ whether to consider bigrams, trigrams. default: (1,1) </p>
                                  Keys in this dict can be any of the following:
                                      alpha: alpha for LDA  default: 5./n_topics
                                      beta: beta for LDA.  default:0.01
-                                     nmf_alpha: alpha for NMF.  default:0
+                                     nmf_alpha: alias for alpha for backwars compatilibity
                                      l1_ratio: l1_ratio for NMF. default: 0
                                      ngram_range:  whether to consider bigrams, trigrams. default: (1,1) 
                                 
     Returns:
         tuple: (model, vectorizer)
     &#34;&#34;&#34;
+    max_iter = lda_max_iter if lda_max_iter is not None else max_iter
     if hyperparam_kwargs is None:
         hyperparam_kwargs = {}
     alpha = hyperparam_kwargs.get(&#39;alpha&#39;, 5.0 / n_topics)
+    nmf_alpha = hyperparam_kwargs.get(&#39;nmf_alpha&#39;, None)
+    alpha = nmf_alpha if nmf_alpha is not None else alpha
     beta = hyperparam_kwargs.get(&#39;beta&#39;, 0.01)
-    nmf_alpha = hyperparam_kwargs.get(&#39;nmf_alpha&#39;, 0)
     l1_ratio = hyperparam_kwargs.get(&#39;l1_ratio&#39;, 0)
     ngram_range = hyperparam_kwargs.get(&#39;ngram_range&#39;, (1,1))
 
@@ -2405,7 +2485,7 @@ whether to consider bigrams, trigrams. default: (1,1) </p>
 
     if self.verbose: print(&#39;fitting model...&#39;)
     if model_type == &#39;lda&#39;:
-        model = LatentDirichletAllocation(n_components=n_topics, max_iter=lda_max_iter,
+        model = LatentDirichletAllocation(n_components=n_topics, max_iter=max_iter,
                                           learning_method=lda_mode, learning_offset=50.,
                                           doc_topic_prior=alpha,
                                           topic_word_prior=beta,
@@ -2413,9 +2493,9 @@ whether to consider bigrams, trigrams. default: (1,1) </p>
     elif model_type == &#39;nmf&#39;:
         model = NMF(
             n_components=n_topics,
-            max_iter=lda_max_iter,
+            max_iter=max_iter,
             verbose=self.verbose,
-            alpha=nmf_alpha,
+            alpha=alpha,
             l1_ratio=l1_ratio,
             random_state=0)
     else:
@@ -2662,7 +2742,7 @@ Optional filepath to save the interactive visualization</p></div>
 </dd>
 <dt id="ktrain.text.eda.TopicModel"><code class="flex name class">
 <span>class <span class="ident">get_topic_model</span></span>
-<span>(</span><span>texts=None, n_topics=None, n_features=10000, min_df=5, max_df=0.5, stop_words='english', model_type='lda', lda_max_iter=5, lda_mode='online', token_pattern=None, verbose=1, hyperparam_kwargs=None)</span>
+<span>(</span><span>texts=None, n_topics=None, n_features=10000, min_df=5, max_df=0.5, stop_words='english', model_type='lda', max_iter=5, lda_max_iter=None, lda_mode='online', token_pattern=None, verbose=1, hyperparam_kwargs=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Fits a topic model to documents in <texts>.</p>
@@ -2685,16 +2765,27 @@ If None, n_topics = min{400, sqrt[# documents/2]})</dd>
 a list of stop words to ignore</dd>
 <dt>model_type(str): type of topic model to fit. One of {'lda', 'nmf'}.
 Default:'lda'</dt>
+<dt><strong><code>max_iter</code></strong> :&ensp;<code>int</code></dt>
+<dd>maximum iterations.
+5 is default if using lda_mode='online' or nmf.
+If lda_mode='batch', this should be increased (e.g., 1500).</dd>
 <dt><strong><code>lda_max_iter</code></strong> :&ensp;<code>int</code></dt>
-<dd>maximum iterations for 'lda'.
-5 is default if using lda_mode='online'.
-If lda_mode='batch', this should be increased (e.g., 1500).
-Ignored if model_type != 'lda'</dd>
+<dd>alias for max_iter for backwards compatilibity</dd>
 <dt><strong><code>lda_mode</code></strong> :&ensp;<code>str</code></dt>
 <dd>one of {'online', 'batch'}. Ignored if model_type !='lda'</dd>
 </dl>
 <p>token_pattern(str): regex pattern to use to tokenize documents.
-verbose(bool): verbosity</p></div>
+verbose(bool): verbosity
+hyperparam_kwargs(dict): hyperparameters for LDA/NMF
+Keys in this dict can be any of the following:
+alpha: alpha for LDA
+default: 5./n_topics
+beta: beta for LDA.
+default:0.01
+nmf_alpha: alias for alpha for backwars compatilibity
+l1_ratio: l1_ratio for NMF. default: 0
+ngram_range:
+whether to consider bigrams, trigrams. default: (1,1)</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2705,7 +2796,7 @@ verbose(bool): verbosity</p></div>
     def __init__(self,texts=None, n_topics=None, n_features=10000, 
                  min_df=5, max_df=0.5,  stop_words=&#39;english&#39;,
                  model_type=&#39;lda&#39;,
-                 lda_max_iter=5, lda_mode=&#39;online&#39;,
+                 max_iter=5, lda_max_iter=None, lda_mode=&#39;online&#39;,
                  token_pattern=None, verbose=1,
                  hyperparam_kwargs=None
     ):
@@ -2723,12 +2814,19 @@ verbose(bool): verbosity</p></div>
             stop_words (str or list): either &#39;english&#39; for built-in stop words or
                                       a list of stop words to ignore
             model_type(str): type of topic model to fit. One of {&#39;lda&#39;, &#39;nmf&#39;}.  Default:&#39;lda&#39;
-            lda_max_iter (int): maximum iterations for &#39;lda&#39;.  5 is default if using lda_mode=&#39;online&#39;.
+            max_iter (int): maximum iterations.  5 is default if using lda_mode=&#39;online&#39; or nmf.
                                 If lda_mode=&#39;batch&#39;, this should be increased (e.g., 1500).
-                                Ignored if model_type != &#39;lda&#39;
+            lda_max_iter (int): alias for max_iter for backwards compatilibity
             lda_mode (str):  one of {&#39;online&#39;, &#39;batch&#39;}. Ignored if model_type !=&#39;lda&#39;
             token_pattern(str): regex pattern to use to tokenize documents. 
             verbose(bool): verbosity
+            hyperparam_kwargs(dict): hyperparameters for LDA/NMF
+                                     Keys in this dict can be any of the following:
+                                         alpha: alpha for LDA  default: 5./n_topics
+                                         beta: beta for LDA.  default:0.01
+                                         nmf_alpha: alias for alpha for backwars compatilibity
+                                         l1_ratio: l1_ratio for NMF. default: 0
+                                         ngram_range:  whether to consider bigrams, trigrams. default: (1,1) 
 
         &#34;&#34;&#34;
         self.verbose=verbose
@@ -2747,6 +2845,7 @@ verbose(bool): verbosity</p></div>
                                              n_topics=n_topics, n_features=n_features,
                                              min_df = min_df, max_df = max_df, 
                                              stop_words=stop_words,
+                                             max_iter=max_iter,
                                              lda_max_iter=lda_max_iter, lda_mode=lda_mode,
                                              token_pattern=token_pattern,
                                              hyperparam_kwargs=hyperparam_kwargs)
@@ -2775,7 +2874,7 @@ verbose(bool): verbosity</p></div>
 
     def train(self,texts, model_type=&#39;lda&#39;, n_topics=None, n_features=10000,
               min_df=5, max_df=0.5,  stop_words=&#39;english&#39;,
-              lda_max_iter=5, lda_mode=&#39;online&#39;,
+              max_iter=5, lda_max_iter=None, lda_mode=&#39;online&#39;,
               token_pattern=None, hyperparam_kwargs=None):
         &#34;&#34;&#34;
         Fits a topic model to documents in &lt;texts&gt;.
@@ -2789,8 +2888,9 @@ verbose(bool): verbosity</p></div>
             n_features (int):  maximum words to consider
             max_df (float): words in more than max_df proportion of docs discarded
             stop_words (str or list): either &#39;english&#39; for built-in stop words or
-                                      a list of stop words to ignore
-            lda_max_iter (int): maximum iterations for &#39;lda&#39;.  5 is default if using lda_mode=&#39;online&#39;.
+                                     a list of stop words to ignore
+            max_iter (int): maximum iterations for &#39;lda&#39;.  5 is default if using lda_mode=&#39;online&#39;.
+            lda_max_iter (int): alias for max_iter for backwards compatibility
                                 If lda_mode=&#39;batch&#39;, this should be increased (e.g., 1500).
                                 Ignored if model_type != &#39;lda&#39;
             lda_mode (str):  one of {&#39;online&#39;, &#39;batch&#39;}. Ignored of model_type !=&#39;lda&#39;
@@ -2800,18 +2900,20 @@ verbose(bool): verbosity</p></div>
                                      Keys in this dict can be any of the following:
                                          alpha: alpha for LDA  default: 5./n_topics
                                          beta: beta for LDA.  default:0.01
-                                         nmf_alpha: alpha for NMF.  default:0
+                                         nmf_alpha: alias for alpha for backwars compatilibity
                                          l1_ratio: l1_ratio for NMF. default: 0
                                          ngram_range:  whether to consider bigrams, trigrams. default: (1,1) 
                                     
         Returns:
             tuple: (model, vectorizer)
         &#34;&#34;&#34;
+        max_iter = lda_max_iter if lda_max_iter is not None else max_iter
         if hyperparam_kwargs is None:
             hyperparam_kwargs = {}
         alpha = hyperparam_kwargs.get(&#39;alpha&#39;, 5.0 / n_topics)
+        nmf_alpha = hyperparam_kwargs.get(&#39;nmf_alpha&#39;, None)
+        alpha = nmf_alpha if nmf_alpha is not None else alpha
         beta = hyperparam_kwargs.get(&#39;beta&#39;, 0.01)
-        nmf_alpha = hyperparam_kwargs.get(&#39;nmf_alpha&#39;, 0)
         l1_ratio = hyperparam_kwargs.get(&#39;l1_ratio&#39;, 0)
         ngram_range = hyperparam_kwargs.get(&#39;ngram_range&#39;, (1,1))
 
@@ -2844,7 +2946,7 @@ verbose(bool): verbosity</p></div>
 
         if self.verbose: print(&#39;fitting model...&#39;)
         if model_type == &#39;lda&#39;:
-            model = LatentDirichletAllocation(n_components=n_topics, max_iter=lda_max_iter,
+            model = LatentDirichletAllocation(n_components=n_topics, max_iter=max_iter,
                                               learning_method=lda_mode, learning_offset=50.,
                                               doc_topic_prior=alpha,
                                               topic_word_prior=beta,
@@ -2852,9 +2954,9 @@ verbose(bool): verbosity</p></div>
         elif model_type == &#39;nmf&#39;:
             model = NMF(
                 n_components=n_topics,
-                max_iter=lda_max_iter,
+                max_iter=max_iter,
                 verbose=self.verbose,
-                alpha=nmf_alpha,
+                alpha=alpha,
                 l1_ratio=l1_ratio,
                 random_state=0)
         else:
@@ -2918,12 +3020,18 @@ verbose(bool): verbosity</p></div>
         return list( zip(words, probs) )
 
 
-    def get_topics(self, n_words=10, as_string=True):
+    def get_topics(self, n_words=10, as_string=True, show_counts=False):
         &#34;&#34;&#34;
         Returns a list of discovered topics
         Args:
             n_words(int): number of words to use in topic summary
             as_string(bool): If True, each summary is a space-delimited string instead of list of words
+            show_counts(bool): If True, returns list of tuples of form (id, topic summary, count). 
+                               Otherwise, a list of topic summaries.
+        Returns:
+          List of topic summaries if  show_count is False
+          Dictionary where key is topic ID and value is a tuple of form (topic summary, count) if show_count is True
+
         &#34;&#34;&#34;
         self._check_model()
         feature_names = self.vectorizer.get_feature_names()
@@ -2932,6 +3040,13 @@ verbose(bool): verbosity</p></div>
             summary = [feature_names[i] for i in topic.argsort()[:-n_words - 1:-1]]
             if as_string: summary = &#34; &#34;.join(summary)
             topic_summaries.append(summary)
+
+        if show_counts:
+            self._check_build()
+            topic_counts = sorted([ (k, topic_summaries[k], len(v)) for k,v in self.topic_dict.items()], 
+                                    key=lambda kv:kv[-1], reverse=True)
+            return dict((t[0], t[1:]) for t in topic_counts)
+
         return topic_summaries
 
 
@@ -2978,25 +3093,25 @@ verbose(bool): verbosity</p></div>
         return
 
 
-    def filter(self, lst):
+    def filter(self, obj):
         &#34;&#34;&#34;
         The build method may prune documents based on threshold.
         This method prunes other lists based on how build pruned documents.
         This is useful to filter lists containing metadata associated with documents
         for use with visualize_documents.
         Args:
-            lst(list): a list of data
+            obj(list|np.ndarray|pandas.DataFrame):a list, numpy array, or DataFrame of data
         Returns:
-            list:  a filtered list of data based on how build filtered the documents
+            filtered obj
         &#34;&#34;&#34;
-        if len(lst) != self.bool_array.shape[0]:
-            raise ValueError(&#39;Length of lst is not consistent with the number of documents &#39; +
+        length = obj.shape[0] if isinstance(obj, (pd.DataFrame, np.ndarray)) else len(obj)
+        if length != self.bool_array.shape[0]:
+            raise ValueError(&#39;Length of obj is not consistent with the number of documents &#39; +
                              &#39;supplied to get_topic_model&#39;)
-        arr = np.array(lst)
-        return list(arr[self.bool_array])
-                           
+        obj = np.array(obj) if isinstance(obj, list) else obj
+        return obj[self.bool_array]
 
-    
+
     def get_docs(self, topic_ids=[], doc_ids=[], rank=False):
         &#34;&#34;&#34;
         Returns document entries for supplied topic_ids.
@@ -3527,7 +3642,7 @@ is less than threshold are filtered out.</dd>
 </details>
 </dd>
 <dt id="ktrain.text.eda.TopicModel.filter"><code class="name flex">
-<span>def <span class="ident">filter</span></span>(<span>self, lst)</span>
+<span>def <span class="ident">filter</span></span>(<span>self, obj)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>The build method may prune documents based on threshold.
@@ -3535,32 +3650,30 @@ This method prunes other lists based on how build pruned documents.
 This is useful to filter lists containing metadata associated with documents
 for use with visualize_documents.</p>
 <h2 id="args">Args</h2>
-<p>lst(list): a list of data</p>
+<p>obj(list|np.ndarray|pandas.DataFrame):a list, numpy array, or DataFrame of data</p>
 <h2 id="returns">Returns</h2>
-<dl>
-<dt><code>list</code></dt>
-<dd>a filtered list of data based on how build filtered the documents</dd>
-</dl></div>
+<p>filtered obj</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def filter(self, lst):
+<pre><code class="python">def filter(self, obj):
     &#34;&#34;&#34;
     The build method may prune documents based on threshold.
     This method prunes other lists based on how build pruned documents.
     This is useful to filter lists containing metadata associated with documents
     for use with visualize_documents.
     Args:
-        lst(list): a list of data
+        obj(list|np.ndarray|pandas.DataFrame):a list, numpy array, or DataFrame of data
     Returns:
-        list:  a filtered list of data based on how build filtered the documents
+        filtered obj
     &#34;&#34;&#34;
-    if len(lst) != self.bool_array.shape[0]:
-        raise ValueError(&#39;Length of lst is not consistent with the number of documents &#39; +
+    length = obj.shape[0] if isinstance(obj, (pd.DataFrame, np.ndarray)) else len(obj)
+    if length != self.bool_array.shape[0]:
+        raise ValueError(&#39;Length of obj is not consistent with the number of documents &#39; +
                          &#39;supplied to get_topic_model&#39;)
-    arr = np.array(lst)
-    return list(arr[self.bool_array])</code></pre>
+    obj = np.array(obj) if isinstance(obj, list) else obj
+    return obj[self.bool_array]</code></pre>
 </details>
 </dd>
 <dt id="ktrain.text.eda.TopicModel.get_docs"><code class="name flex">
@@ -3753,23 +3866,35 @@ with primary topic that is one of <topic_ids></p>
 </details>
 </dd>
 <dt id="ktrain.text.eda.TopicModel.get_topics"><code class="name flex">
-<span>def <span class="ident">get_topics</span></span>(<span>self, n_words=10, as_string=True)</span>
+<span>def <span class="ident">get_topics</span></span>(<span>self, n_words=10, as_string=True, show_counts=False)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Returns a list of discovered topics</p>
 <h2 id="args">Args</h2>
 <p>n_words(int): number of words to use in topic summary
-as_string(bool): If True, each summary is a space-delimited string instead of list of words</p></div>
+as_string(bool): If True, each summary is a space-delimited string instead of list of words
+show_counts(bool): If True, returns list of tuples of form (id, topic summary, count).
+Otherwise, a list of topic summaries.</p>
+<h2 id="returns">Returns</h2>
+<p>List of topic summaries if
+show_count is False
+Dictionary where key is topic ID and value is a tuple of form (topic summary, count) if show_count is True</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_topics(self, n_words=10, as_string=True):
+<pre><code class="python">def get_topics(self, n_words=10, as_string=True, show_counts=False):
     &#34;&#34;&#34;
     Returns a list of discovered topics
     Args:
         n_words(int): number of words to use in topic summary
         as_string(bool): If True, each summary is a space-delimited string instead of list of words
+        show_counts(bool): If True, returns list of tuples of form (id, topic summary, count). 
+                           Otherwise, a list of topic summaries.
+    Returns:
+      List of topic summaries if  show_count is False
+      Dictionary where key is topic ID and value is a tuple of form (topic summary, count) if show_count is True
+
     &#34;&#34;&#34;
     self._check_model()
     feature_names = self.vectorizer.get_feature_names()
@@ -3778,6 +3903,13 @@ as_string(bool): If True, each summary is a space-delimited string instead of li
         summary = [feature_names[i] for i in topic.argsort()[:-n_words - 1:-1]]
         if as_string: summary = &#34; &#34;.join(summary)
         topic_summaries.append(summary)
+
+    if show_counts:
+        self._check_build()
+        topic_counts = sorted([ (k, topic_summaries[k], len(v)) for k,v in self.topic_dict.items()], 
+                                key=lambda kv:kv[-1], reverse=True)
+        return dict((t[0], t[1:]) for t in topic_counts)
+
     return topic_summaries</code></pre>
 </details>
 </dd>
@@ -4133,7 +4265,7 @@ If True, case sensitive search</p></div>
 </details>
 </dd>
 <dt id="ktrain.text.eda.TopicModel.train"><code class="name flex">
-<span>def <span class="ident">train</span></span>(<span>self, texts, model_type='lda', n_topics=None, n_features=10000, min_df=5, max_df=0.5, stop_words='english', lda_max_iter=5, lda_mode='online', token_pattern=None, hyperparam_kwargs=None)</span>
+<span>def <span class="ident">train</span></span>(<span>self, texts, model_type='lda', n_topics=None, n_features=10000, min_df=5, max_df=0.5, stop_words='english', max_iter=5, lda_max_iter=None, lda_mode='online', token_pattern=None, hyperparam_kwargs=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Fits a topic model to documents in <texts>.</p>
@@ -4154,9 +4286,11 @@ If None, n_topics = min{400, sqrt[# documents/2]})</dd>
 <dt><strong><code>stop_words</code></strong> :&ensp;<code>str</code> or <code>list</code></dt>
 <dd>either 'english' for built-in stop words or
 a list of stop words to ignore</dd>
-<dt><strong><code>lda_max_iter</code></strong> :&ensp;<code>int</code></dt>
+<dt><strong><code>max_iter</code></strong> :&ensp;<code>int</code></dt>
 <dd>maximum iterations for 'lda'.
-5 is default if using lda_mode='online'.
+5 is default if using lda_mode='online'.</dd>
+<dt><strong><code>lda_max_iter</code></strong> :&ensp;<code>int</code></dt>
+<dd>alias for max_iter for backwards compatibility
 If lda_mode='batch', this should be increased (e.g., 1500).
 Ignored if model_type != 'lda'</dd>
 <dt><strong><code>lda_mode</code></strong> :&ensp;<code>str</code></dt>
@@ -4170,8 +4304,7 @@ alpha: alpha for LDA
 default: 5./n_topics
 beta: beta for LDA.
 default:0.01
-nmf_alpha: alpha for NMF.
-default:0
+nmf_alpha: alias for alpha for backwars compatilibity
 l1_ratio: l1_ratio for NMF. default: 0
 ngram_range:
 whether to consider bigrams, trigrams. default: (1,1) </p>
@@ -4186,7 +4319,7 @@ whether to consider bigrams, trigrams. default: (1,1) </p>
 </summary>
 <pre><code class="python">def train(self,texts, model_type=&#39;lda&#39;, n_topics=None, n_features=10000,
           min_df=5, max_df=0.5,  stop_words=&#39;english&#39;,
-          lda_max_iter=5, lda_mode=&#39;online&#39;,
+          max_iter=5, lda_max_iter=None, lda_mode=&#39;online&#39;,
           token_pattern=None, hyperparam_kwargs=None):
     &#34;&#34;&#34;
     Fits a topic model to documents in &lt;texts&gt;.
@@ -4200,8 +4333,9 @@ whether to consider bigrams, trigrams. default: (1,1) </p>
         n_features (int):  maximum words to consider
         max_df (float): words in more than max_df proportion of docs discarded
         stop_words (str or list): either &#39;english&#39; for built-in stop words or
-                                  a list of stop words to ignore
-        lda_max_iter (int): maximum iterations for &#39;lda&#39;.  5 is default if using lda_mode=&#39;online&#39;.
+                                 a list of stop words to ignore
+        max_iter (int): maximum iterations for &#39;lda&#39;.  5 is default if using lda_mode=&#39;online&#39;.
+        lda_max_iter (int): alias for max_iter for backwards compatibility
                             If lda_mode=&#39;batch&#39;, this should be increased (e.g., 1500).
                             Ignored if model_type != &#39;lda&#39;
         lda_mode (str):  one of {&#39;online&#39;, &#39;batch&#39;}. Ignored of model_type !=&#39;lda&#39;
@@ -4211,18 +4345,20 @@ whether to consider bigrams, trigrams. default: (1,1) </p>
                                  Keys in this dict can be any of the following:
                                      alpha: alpha for LDA  default: 5./n_topics
                                      beta: beta for LDA.  default:0.01
-                                     nmf_alpha: alpha for NMF.  default:0
+                                     nmf_alpha: alias for alpha for backwars compatilibity
                                      l1_ratio: l1_ratio for NMF. default: 0
                                      ngram_range:  whether to consider bigrams, trigrams. default: (1,1) 
                                 
     Returns:
         tuple: (model, vectorizer)
     &#34;&#34;&#34;
+    max_iter = lda_max_iter if lda_max_iter is not None else max_iter
     if hyperparam_kwargs is None:
         hyperparam_kwargs = {}
     alpha = hyperparam_kwargs.get(&#39;alpha&#39;, 5.0 / n_topics)
+    nmf_alpha = hyperparam_kwargs.get(&#39;nmf_alpha&#39;, None)
+    alpha = nmf_alpha if nmf_alpha is not None else alpha
     beta = hyperparam_kwargs.get(&#39;beta&#39;, 0.01)
-    nmf_alpha = hyperparam_kwargs.get(&#39;nmf_alpha&#39;, 0)
     l1_ratio = hyperparam_kwargs.get(&#39;l1_ratio&#39;, 0)
     ngram_range = hyperparam_kwargs.get(&#39;ngram_range&#39;, (1,1))
 
@@ -4255,7 +4391,7 @@ whether to consider bigrams, trigrams. default: (1,1) </p>
 
     if self.verbose: print(&#39;fitting model...&#39;)
     if model_type == &#39;lda&#39;:
-        model = LatentDirichletAllocation(n_components=n_topics, max_iter=lda_max_iter,
+        model = LatentDirichletAllocation(n_components=n_topics, max_iter=max_iter,
                                           learning_method=lda_mode, learning_offset=50.,
                                           doc_topic_prior=alpha,
                                           topic_word_prior=beta,
@@ -4263,9 +4399,9 @@ whether to consider bigrams, trigrams. default: (1,1) </p>
     elif model_type == &#39;nmf&#39;:
         model = NMF(
             n_components=n_topics,
-            max_iter=lda_max_iter,
+            max_iter=max_iter,
             verbose=self.verbose,
-            alpha=nmf_alpha,
+            alpha=alpha,
             l1_ratio=l1_ratio,
             random_state=0)
     else:

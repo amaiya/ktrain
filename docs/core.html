@@ -627,7 +627,7 @@ class Learner(ABC):
         U.vprint(&#39;done.&#39;, verbose=verbose)
         if show_plot:
             U.vprint(&#39;Visually inspect loss plot and select learning rate associated with falling loss&#39;, verbose=verbose)
-            self.lr_plot()
+            self.lr_plot(suggest=suggest)
         else:
             U.vprint(&#39;Please invoke the Learner.lr_plot() method to visually inspect &#39;
                   &#39;the loss plot to help identify the maximal learning rate &#39;
@@ -1683,6 +1683,24 @@ def _load_model(fpath, preproc=None, train_data=None, custom_objects=None):
         from .text.ner.anago.layers import CRF
         from .text.ner import crf_loss
         custom_objects={&#39;CRF&#39;: CRF, &#39;crf_loss&#39;:crf_loss}
+        # save old te_model as backup
+        if preproc:
+            old_te_model = preproc.p.te_model
+            # load TransformerEmbedding model from fpath/hf folder
+            # if model_name is local_path, update it to reflect current predictor folder, since
+            # all model/tokenizer/config files should have been saved there by predictor.save
+            
+            preproc.p.te_model = os.path.join(fpath, &#39;hf&#39;) if preproc.p.te_model else preproc.p.te_model
+            if preproc.p.te_model:
+                # te_model should point fpath/hf folder
+                try:
+                    preproc.p.activate_transformer(preproc.p.te_model, layers=preproc.p.te_layers)
+                except:
+                    # fall back to old model id or location if error for backwards compatibility
+                    warnings.warn(f&#39;could not load TransformerEmbedding model from {preproc.p.te_model} - trying {old_te_model}&#39;)
+                    preproc.p.te_model = old_te_model
+                    preproc.p.activate_transformer(preproc.p.te_model, layers=preproc.p.te_layers)
+
     elif (preproc and (isinstance(preproc, NodePreprocessor) or \
                     type(preproc).__name__ == &#39;NodePreprocessor&#39;)) or \
         train_data and U.is_nodeclass(data=train_data):
@@ -3460,7 +3478,7 @@ an abstract method and must be implemented by subclasses.
         U.vprint(&#39;done.&#39;, verbose=verbose)
         if show_plot:
             U.vprint(&#39;Visually inspect loss plot and select learning rate associated with falling loss&#39;, verbose=verbose)
-            self.lr_plot()
+            self.lr_plot(suggest=suggest)
         else:
             U.vprint(&#39;Please invoke the Learner.lr_plot() method to visually inspect &#39;
                   &#39;the loss plot to help identify the maximal learning rate &#39;
@@ -4697,7 +4715,7 @@ Returns:
     U.vprint(&#39;done.&#39;, verbose=verbose)
     if show_plot:
         U.vprint(&#39;Visually inspect loss plot and select learning rate associated with falling loss&#39;, verbose=verbose)
-        self.lr_plot()
+        self.lr_plot(suggest=suggest)
     else:
         U.vprint(&#39;Please invoke the Learner.lr_plot() method to visually inspect &#39;
               &#39;the loss plot to help identify the maximal learning rate &#39;
