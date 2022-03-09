@@ -20,6 +20,7 @@ Most recent releases are shown at the top. Each release shows:
 ### fixed:
 - save `TransformerEmbedding` model, tokenizer, and configuration when saving `NERPredictor` and reset `te_model` to 
   facilitate loading NERPredictors with BERT embeddings offline (#423)
+- switched from `keras2onnx` to `tf2onnx`, which supports newer versions of TensorFlow
 
 
 ## 0.29.2 (2022-02-09)
