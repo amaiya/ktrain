@@ -1662,7 +1662,7 @@ def _load_model(fpath, preproc=None, train_data=None, custom_objects=None):
             # if model_name is local_path, update it to reflect current predictor folder, since
             # all model/tokenizer/config files should have been saved there by predictor.save
             
-            preproc.p.te_model = os.path.join(fpath, 'hf')
+            preproc.p.te_model = os.path.join(fpath, 'hf') if preproc.p.te_model else preproc.p.te_model
             if preproc.p.te_model:
                 # te_model should point fpath/hf folder
                 try:
