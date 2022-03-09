@@ -123,7 +123,7 @@ class Predictor(ABC):
             import onnxruntime, onnxruntime_tools, onnx, keras2onnx
         except ImportError:
             raise Exception('This method requires ONNX libraries to be installed: '+\
-                            'pip install -q --upgrade onnxruntime==1.5.1 onnxruntime-tools onnx sympy keras2onnx')
+                            'pip install -q --upgrade onnxruntime==1.5.1 onnxruntime-tools onnx sympy tf2onnx')
         from pathlib import Path
         if type(self.preproc).__name__ == 'BERTPreprocessor':
             raise Exception('currently_unsupported:  BERT models created with text_classifier("bert",...) are not supported (i.e., keras_bert models). ' +\
@@ -143,8 +143,17 @@ class Predictor(ABC):
             self.model._set_save_spec(input_dict) # for tf > 2.2
             self.model._get_save_spec()
 
-        onnx_model = keras2onnx.convert_keras(self.model, self.model.name, target_opset=target_opset)
-        keras2onnx.save_model(onnx_model, fpath)
+        #onnx_model = keras2onnx.convert_keras(self.model, self.model.name, target_opset=target_opset)
+        #keras2onnx.save_model(onnx_model, fpath)
+        tflite_model_path = predictor.export_model_to_tflite(fpath+'-TFLITE_TMP', verbose=verbose)
+
+        import subprocess
+        proc = subprocess.run(f'python -m tf2onnx.convert --tflite {tflite_model_path} --output {fpath}'.split(),
+                              stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
+        if verbose:
+            print(proc.returncode)
+            print(proc.stdout.decode('ascii'))
+            print(proc.stderr.decode('ascii'))
         return_fpath = fpath
 
         if quantize:
