@@ -120,7 +120,7 @@ class Predictor(ABC):
         ```
         """
         try:
-            import onnxruntime, onnxruntime_tools, onnx, keras2onnx
+            import onnxruntime, onnxruntime_tools, onnx
         except ImportError:
             raise Exception('This method requires ONNX libraries to be installed: '+\
                             'pip install -q --upgrade onnxruntime==1.5.1 onnxruntime-tools onnx sympy tf2onnx')
@@ -145,9 +145,12 @@ class Predictor(ABC):
 
         #onnx_model = keras2onnx.convert_keras(self.model, self.model.name, target_opset=target_opset)
         #keras2onnx.save_model(onnx_model, fpath)
-        tflite_model_path = predictor.export_model_to_tflite(fpath+'-TFLITE_TMP', verbose=verbose)
+        if verbose: print('converting to TFLite first...')
+        tflite_model_path = self.export_model_to_tflite(fpath+'-TFLITE_TMP', verbose=verbose)
+
 
         import subprocess
+        if verbose: print('converting to ONNX using tf2onnx...')
         proc = subprocess.run(f'python -m tf2onnx.convert --tflite {tflite_model_path} --output {fpath}'.split(),
                               stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
         if verbose:
