@@ -16,6 +16,7 @@ Most recent releases are shown at the top. Each release shows:
 - Added `show_counts` parameter to `TopicModel.get_topics` method
 - Changed `qa.core._process_question` to `qa.core.process_question`
 - In `qa.core`, added `remove_english_stopwords` and `and_np` parameters to `process_question`
+-  The `valley` learning rate suggestion is now returned in `learner.lr_estimate` and `learner.lr_plot` (when `suggest=True` supplied to `learner.lr_plot`)
 
 ### fixed:
 - save `TransformerEmbedding` model, tokenizer, and configuration when saving `NERPredictor` and reset `te_model` to 
