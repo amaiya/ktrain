@@ -28,6 +28,7 @@ class NERPredictor(Predictor):
 
     def predict(self, sentences, return_proba=False, merge_tokens=False, custom_tokenizer=None, return_offsets=False):
         """
+        ```
         Makes predictions for a string-representation of a sentence
         Args:
           sentences(list|str): either a single sentence as a string or a list of sentences
@@ -44,6 +45,7 @@ class NERPredictor(Predictor):
                 IF sentences is a list of sentences:
                      list  of lists:  Each inner list represents a sentence and contains a tuple for each token in sentence
                 If return_proba and return_offsets are both True, then tuples are of the form:  (token, label, probability, character offsets)
+        ```
         """
         is_array = not isinstance(sentences, str)
         if not isinstance(sentences, (str, list)):
