@@ -6,7 +6,7 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
-## 0.29.3 (TBD)
+## 0.29.3 (2022-03-09)
 
 ### new:
 - `NERPredictor.predict` now includes a `return_offsets` parameter.  If True, the results will include character offsets of predicted entities.
