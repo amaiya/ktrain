@@ -87,6 +87,10 @@ class Predictor(ABC):
             self.model._saved_model_inputs_spec = None # for tf > 2.2
             self.model._set_save_spec(input_dict) # for tf > 2.2
             self.model._get_save_spec()
+            if verbose:
+                print('----------------------------------------------')
+                print('NOTE: For Hugging Face models, please ensure you use return_tensors="tf" and padding="max_length" when encoding your inputs.')
+                print('----------------------------------------------')
 
         converter = tf.lite.TFLiteConverter.from_keras_model(self.model)
 
@@ -120,16 +124,16 @@ class Predictor(ABC):
         ```
         """
         try:
-            import onnxruntime, onnxruntime_tools, onnx
+            import onnxruntime, onnx
         except ImportError:
             raise Exception('This method requires ONNX libraries to be installed: '+\
-                            'pip install -q --upgrade onnxruntime==1.5.1 onnxruntime-tools onnx sympy tf2onnx')
+                            'pip install -q --upgrade onnxruntime==1.10.0 onnx sympy tf2onnx')
         from pathlib import Path
         if type(self.preproc).__name__ == 'BERTPreprocessor':
             raise Exception('currently_unsupported:  BERT models created with text_classifier("bert",...) are not supported (i.e., keras_bert models). ' +\
                             'Only BERT models created with Transformer(...) are supported.')
 
-        if verbose: print('converting to ONNX format ... this may take a few moments...')
+        if verbose: print('converting to ONNX format by way of TFLite ... this may take a few moments...')
         if U.is_huggingface(model=self.model):
             tokenizer = self.preproc.get_tokenizer()
             maxlen = self.preproc.maxlen
@@ -145,7 +149,6 @@ class Predictor(ABC):
 
         #onnx_model = keras2onnx.convert_keras(self.model, self.model.name, target_opset=target_opset)
         #keras2onnx.save_model(onnx_model, fpath)
-        if verbose: print('converting to TFLite first...')
         tflite_model_path = self.export_model_to_tflite(fpath+'-TFLITE_TMP', verbose=verbose)
 
 
@@ -166,8 +169,8 @@ class Predictor(ABC):
             if U.is_huggingface(model=self.model) and\
                type(self.model).__name__ in ['TFDistilBertForSequenceClassification', 'TFBertForSequenceClassification']:
                 try:
-                    from onnxruntime_tools import optimizer
-                    from onnxruntime_tools.transformers.onnx_model_bert import BertOptimizationOptions
+                    from onnxruntime.transformers import optimizer
+                    from onnxruntime.transformers.onnx_model_bert import BertOptimizationOptions
                     # disable embedding layer norm optimization for better model size reduction
                     opt_options = BertOptimizationOptions('bert')
                     opt_options.enable_embed_layer_norm = False
