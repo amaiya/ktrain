@@ -13,7 +13,7 @@ from ktrain.imports import ACC_NAME, VAL_ACC_NAME
 class TestQA(TestCase):
 
 
-    #@skip('temporarily disabled')
+    @skip('temporarily disabled')
     def test_qa(self):
         
         from sklearn.datasets import fetch_20newsgroups
@@ -68,7 +68,7 @@ class TestQA(TestCase):
        'His speciality is medical risk assessments, and he is 30 years old.',
        'Results: A total of nine studies including 356 patients were included in this study, the mean age was 52.4 years and 221 (62.1%) were male.']
         from ktrain.text import AnswerExtractor
-        ae = AnswerExtractor(framework='pt', device='cpu')
+        ae = AnswerExtractor(framework='pt', device=None, half=True)
         import pandas as pd
         pd.set_option("display.max_colwidth", None)
         df = pd.DataFrame(data, columns=['Text'])
