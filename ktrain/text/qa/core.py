@@ -117,20 +117,8 @@ class QA(ABC, TorchBase):
                 self.model = TFAutoModelForQuestionAnswering.from_pretrained(self.model_name, from_pt=True)
         else:
             super().__init__(device=device, quantize=quantize)
-            #try:
-                #import torch
-            #except ImportError:
-                #raise Exception('If framework=="pt", PyTorch must be installed.')
-            #bert_emb_model = None # set to None and ignore since we only want to use PyTorch
-            #self.torch_device = device
-            #if device is None: 
-                #self.torch_device = 'cuda' if torch.cuda.is_available() else 'cpu'
             self.model = AutoModelForQuestionAnswering.from_pretrained(self.model_name).to(self.torch_device)
             if quantize: self.model = self.quantize_model(self.model)
-            #if quantize and self.torch_device == 'cpu': 
-                #self.model = torch.quantization.quantize_dynamic(self.model, {torch.nn.Linear}, dtype=torch.qint8)
-            #elif quantize and self.torch_device != 'cpu':
-                #self.model = self.model.half()
 
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
         self.maxlen = 512
