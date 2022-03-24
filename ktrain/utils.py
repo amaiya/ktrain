@@ -42,7 +42,7 @@ PREPROC_NAME = MODEL_BASENAME+'.preproc'
 #------------------------------------------------------------------------------
 
 def is_ktrain_dataset(data):
-    from .data import Dataset
+    from .dataset import Dataset
     return isinstance(data, Dataset)
 
 

@@ -200,8 +200,9 @@ def entities_from_df(train_df,
     p = IndexTransformer(use_char=use_char)
     preproc = NERPreprocessor(p)
     preproc.fit(x_train, y_train)
-    trn = pp.NERSequence(x_train, y_train, batch_size=U.DEFAULT_BS, p=p)
-    val = pp.NERSequence(x_valid, y_valid, batch_size=U.DEFAULT_BS, p=p)
+    from .dataset import NERSequence
+    trn = NERSequence(x_train, y_train, batch_size=U.DEFAULT_BS, p=p)
+    val = NERSequence(x_valid, y_valid, batch_size=U.DEFAULT_BS, p=p)
 
     return ( trn, val, preproc)
 
