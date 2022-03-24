@@ -38,9 +38,9 @@ try:
         raise Exception('As of v0.8.x, ktrain needs TensorFlow 2. Please upgrade TensorFlow.')
     os.environ['TF_KERAS'] = '1' # to use keras_bert package below with tf.Keras
 except ImportError:
-    warnings.warn('TensorFlow is not installed. You can still use  scikit-learn and pretrained PyTorch models: '+\
+    warnings.warn('TensorFlow is not installed. You can still use ktrain\'s scikit-learn models and pretrained PyTorch models: '+\
                   'text.zsl.ZeroShotClassifier, text.translation.Translator, text.summarization.TransformerSummarizer, '+\
-                  'text.speech.Transcriber. To train neural network models, you will need to install TensorFlow: '+\
+                  'text.speech.Transcriber, and text.eda.TopicModel. To train neural network models, you will need to install TensorFlow: '+\
                   'pip install tensorflow')
     keras = None
     K = None
@@ -145,7 +145,7 @@ try:
     import keras_bert
     from keras_bert import Tokenizer as BERT_Tokenizer
 except ImportError:
-    warnings.warn("keras_bert is not installed - needed only for 'bert' text classification model")
+    warnings.warn("keras_bert (and/or TensorFlow) is not installed. keras_bert is only needed only for 'bert' text classification model")
 
 
 # transformers for models in 'text' module
