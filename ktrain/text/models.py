@@ -421,7 +421,7 @@ def _build_bigru(num_classes,
     x = keras.layers.SpatialDropout1D(0.2)(x)
     x = keras.layers.Bidirectional(keras.layers.GRU(80, return_sequences=True))(x)
     avg_pool = keras.layers.GlobalAveragePooling1D()(x)
-    max_pool = GlobalMaxPool1D()(x)
+    max_pool = keras.layers.GlobalMaxPool1D()(x)
     conc = keras.layers.concatenate([avg_pool, max_pool])
     outp = keras.layers.Dense(num_classes, activation=activation)(conc)
     model = keras.Model(inputs=inp, outputs=outp)
