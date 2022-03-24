@@ -225,7 +225,7 @@ class LRFinder:
             self.mg = (np.gradient(np.array(self.losses[32:self.ml]))).argmin()
         except Exception as e:
             self.mg = None
-            warnings.warn(e)
+            warnings.warn(str(e))
         return
 
 
