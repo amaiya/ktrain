@@ -10,6 +10,8 @@ Most recent releases are shown at the top. Each release shows:
 
 ### new:
 - `text.qa.SimpleQA` and `text.qa.AnswerExtractor` now both support PyTorch with optional fp16 inference
+- `text.qa.SimpleQA` and `text.qa.AnswerExtractor` now both support a `quantize` argument that can speed up
+  inference when True on both CPU and GPU.
 
 ### changed
 - reorganized imports 
