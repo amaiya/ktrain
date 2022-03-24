@@ -39,7 +39,7 @@ class Transcriber(TorchBase):
           device(str): device to use (e.g., 'cuda', 'cpu')
         ```
         """
-        super().__init__(device=device)
+        super().__init__(device=device, quantize=False)
         #if not SOUNDFILE:
             #raise ImportError("SoundFile library not installed or libsndfile not found: pip install soundfile")
         if not LIBROSA:

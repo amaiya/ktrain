@@ -10,7 +10,7 @@ class Translator(TorchBase):
     Translator: basic wrapper around MarianMT model for language translation
     """
 
-    def __init__(self, model_name=None, device=None, half=False):
+    def __init__(self, model_name=None, device=None, quantize=False):
         """
         ```
         basic wrapper around MarianMT model for language translation
@@ -18,16 +18,16 @@ class Translator(TorchBase):
         Args:
           model_name(str): Helsinki-NLP model
           device(str): device to use (e.g., 'cuda', 'cpu')
-          half(bool): If True, use half precision.
+          quantize(bool): If True, use quantization.
         ```
         """
         if 'Helsinki-NLP' not in model_name:
             warnings.warn('Translator requires a Helsinki-NLP model: https://huggingface.co/Helsinki-NLP')
-        super().__init__(device=device)
+        super().__init__(device=device, quantize=quantize)
         from transformers import MarianMTModel, MarianTokenizer
         self.tokenizer = MarianTokenizer.from_pretrained(model_name)
         self.model = MarianMTModel.from_pretrained(model_name).to(self.torch_device)
-        if half: self.model = self.model.half()
+        if quantize: self.model = self.quantize_model(self.model)
 
 
     def translate(self, src_text, join_with='\n', num_beams=None, early_stopping=None):
@@ -93,7 +93,7 @@ class EnglishTranslator():
     Class to translate text in various languages to English.
     """
 
-    def __init__(self, src_lang=None, device=None):
+    def __init__(self, src_lang=None, device=None, quantize=False):
         """
         ```
         Constructor for English translator
@@ -111,6 +111,7 @@ class EnglishTranslator():
                            'it': Italian
                            'pt': Portuguese
           device(str): device to use (e.g., 'cuda', 'cpu')
+          quantize(bool): If True, use quantization.
         ```
         """
 
@@ -119,20 +120,20 @@ class EnglishTranslator():
         self.src_lang = src_lang
         self.translators = []
         if src_lang == 'ar':
-            self.translators.append(Translator(model_name='Helsinki-NLP/opus-mt-ar-en', device=device))
+            self.translators.append(Translator(model_name='Helsinki-NLP/opus-mt-ar-en', device=device, quantize=quantize))
         elif src_lang == 'ru':
-            self.translators.append(Translator(model_name='Helsinki-NLP/opus-mt-ru-en', device=device))
+            self.translators.append(Translator(model_name='Helsinki-NLP/opus-mt-ru-en', device=device, quantize=quantize))
         elif src_lang == 'de':
-            self.translators.append(Translator(model_name='Helsinki-NLP/opus-mt-de-en', device=device))
+            self.translators.append(Translator(model_name='Helsinki-NLP/opus-mt-de-en', device=device, quantize=quantize))
         elif src_lang == 'af':
-            self.translators.append(Translator(model_name='Helsinki-NLP/opus-mt-af-en', device=device))
+            self.translators.append(Translator(model_name='Helsinki-NLP/opus-mt-af-en', device=device, quantize=quantize))
         elif src_lang in ['es', 'fr', 'it', 'pt']:
-            self.translators.append(Translator(model_name='Helsinki-NLP/opus-mt-ROMANCE-en', device=device))
+            self.translators.append(Translator(model_name='Helsinki-NLP/opus-mt-ROMANCE-en', device=device, quantize=quantize))
         #elif src_lang == 'zh': # could not find zh->en model, so currently doing two-step translation to English via German
             #self.translators.append(Translator(model_name='Helsinki-NLP/opus-mt-ZH-de', device=device))
             #self.translators.append(Translator(model_name='Helsinki-NLP/opus-mt-de-en', device=device))
         elif src_lang == 'zh':
-            self.translators.append(Translator(model_name='Helsinki-NLP/opus-mt-zh-en', device=device))
+            self.translators.append(Translator(model_name='Helsinki-NLP/opus-mt-zh-en', device=device, quantize=quantize))
         else:
             raise ValueError('lang:%s is currently not supported.' % (src_lang))
 

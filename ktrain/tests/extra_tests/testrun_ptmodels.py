@@ -246,13 +246,14 @@ UPCOMING PLANETARY PROBES - MISSIONS AND SCHEDULES
 	    vaporized by the intense heat. The Ice probe will head out
 	    towards Pluto, reaching the tiny world for study by 2016."""
 
-
+start = time.time()
 print(ts.summarize(sample_doc))
+print(time.time()-start)
 
 
 # zsl
 from ktrain.text.zsl import ZeroShotClassifier
-zsl = ZeroShotClassifier(device=None, quantize=True)
+zsl = ZeroShotClassifier(device='cpu', quantize=True)
 topic_strings=['politics', 'elections', 'sports', 'films', 'television']
 doc = 'I am unhappy with decisions of the government and will definitely vote in 2020.'
 start = time.time()
@@ -262,9 +263,11 @@ print(time.time()-start)
 
 # translation
 from ktrain.text.translation import EnglishTranslator
-translator = EnglishTranslator(src_lang='zh')
+translator = EnglishTranslator(src_lang='zh', device=None, quantize=True)
 src_text = '''大流行对世界经济造成了严重破坏。但是，截至2020年6月，美国股票市场持续上涨。'''
+start = time.time()
 print(translator.translate(src_text))
+print(time.time()-start)
 
 
 # transcription

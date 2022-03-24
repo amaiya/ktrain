@@ -26,7 +26,7 @@ class ZeroShotClassifier(TorchBase):
         if 'mnli' not in model_name and 'xnli' not in model_name:
             raise ValueError('ZeroShotClasifier requires an MNLI or XNLI model')
 
-        super().__init__(device=device)
+        super().__init__(device=device, quantize=quantize)
         from transformers import AutoModelForSequenceClassification, AutoTokenizer
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         self.model = AutoModelForSequenceClassification.from_pretrained(model_name).to(self.torch_device)
