@@ -98,7 +98,7 @@ class QA(ABC):
     """
 
     def __init__(self, model_name=DEFAULT_MODEL, bert_squad_model=None, bert_emb_model='bert-base-uncased',
-                 framework='tf', device=None, half=False):
+                 framework='tf', device=None, quantize=False):
         model_name = bert_squad_model if bert_squad_model is not None else model_name
         if bert_squad_model:
             warnings.warn('the bert_squad_model is deprecated - please use model_name instead.', DeprecationWarning, stacklevel=2)
@@ -125,7 +125,10 @@ class QA(ABC):
             if device is None: 
                 self.torch_device = 'cuda' if torch.cuda.is_available() else 'cpu'
             self.model = AutoModelForQuestionAnswering.from_pretrained(self.model_name).to(self.torch_device)
-            if half and self.torch_device != 'cpu': self.model = self.model.half()
+            if quantize and self.torch_device == 'cpu': 
+                self.model = torch.quantization.quantize_dynamic(self.model, {torch.nn.Linear}, dtype=torch.qint8)
+            elif quantize and self.torch_device != 'cpu':
+                self.model = self.model.half()
 
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
         self.maxlen = 512
@@ -487,7 +490,7 @@ class SimpleQA(QA):
                  bert_emb_model='bert-base-uncased',
                  framework='tf',
                  device=None,
-                 half=False):
+                 quantize=False):
         """
         ```
         SimpleQA constructor
@@ -500,7 +503,7 @@ class SimpleQA(QA):
           device(str): Torch device to use (e.g., 'cuda', 'cpu'). Ignored if framework=='tf'.
                        If framework=='tf', use CUDA_VISIBLE_DEVICES environment variable
                        to select device.
-          half(bool): If True and framework=='pt' and device != 'cpu', then faster half precision is used.
+          quantize(bool): If True and framework=='pt' and device != 'cpu', then faster quantized inference is used.
                       Ignored if framework=="tf".
         ```
         """
@@ -511,7 +514,7 @@ class SimpleQA(QA):
         except:
             raise ValueError('index_dir has not yet been created - please call SimpleQA.initialize_index("%s")' % (self.index_dir))
         super().__init__(model_name=model_name, bert_squad_model=bert_squad_model, bert_emb_model=bert_emb_model,
-                         framework=framework, device=device, half=half)
+                         framework=framework, device=device, quantize=quantize)
 
 
     def _open_ix(self):
@@ -699,7 +702,7 @@ class SimpleQA(QA):
 
 
 class _QAExtractor(QA):
-    def __init__(self, model_name=DEFAULT_MODEL, bert_squad_model=None, framework='tf', device=None, half=False):
+    def __init__(self, model_name=DEFAULT_MODEL, bert_squad_model=None, framework='tf', device=None, quantize=False):
         """
         ```
         QAExtractor is a convenience class for extracting answers from contexts
@@ -710,12 +713,12 @@ class _QAExtractor(QA):
           device(str): Torch device to use (e.g., 'cuda', 'cpu'). Ignored if framework=='tf'.
                        If framework=='tf', use CUDA_VISIBLE_DEVICES environment variable
                        to select device.
-          half(bool): If True and framework=='pt' and device != 'cpu', then faster half precision is used.
+          quantize(bool): If True and framework=='pt' and device != 'cpu', then faster quantized inference is used.
                       Ignored if framework=="tf".
         ```
         """
         super().__init__(model_name=model_name, bert_squad_model=bert_squad_model, 
-                         framework=framework, device=device, half=half)
+                         framework=framework, device=device, quantize=quantize)
 
     def search(self, query):
         raise NotImplemented('This method is not used or needed for extraction QA-based extraction.')
@@ -767,7 +770,7 @@ class AnswerExtractor:
                 bert_squad_model=None,
                 framework='tf',
                 device=None,
-                half=False):
+                quantize=False):
         """
         ```
         Extracts information from documents using Question-Answering.
@@ -778,12 +781,12 @@ class AnswerExtractor:
           device(str): Torch device to use (e.g., 'cuda', 'cpu'). Ignored if framework=='tf'.
                        If framework=='tf', use CUDA_VISIBLE_DEVICES environment variable
                        to select device.
-          half(bool): If True and framework=='pt' and device != 'cpu', then faster half precision is used.
+          quantize(bool): If True and framework=='pt' and device != 'cpu', then faster quantized inference is used.
                       Ignored if framework=="tf".
         ```
         """
         self.qa = _QAExtractor(model_name=model_name, bert_squad_model=bert_squad_model,
-                               framework=framework, device=device, half=half)
+                               framework=framework, device=device, quantize=quantize)
         return
 
 

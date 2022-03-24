@@ -68,11 +68,14 @@ class TestQA(TestCase):
        'His speciality is medical risk assessments, and he is 30 years old.',
        'Results: A total of nine studies including 356 patients were included in this study, the mean age was 52.4 years and 221 (62.1%) were male.']
         from ktrain.text import AnswerExtractor
-        ae = AnswerExtractor(framework='pt', device=None, half=True)
+        ae = AnswerExtractor(framework='pt', device='cpu', quantize=True)
         import pandas as pd
         pd.set_option("display.max_colwidth", None)
         df = pd.DataFrame(data, columns=['Text'])
+        import time
+        start = time.time()
         df = ae.extract(df.Text.values, df, [('What are the risk factors?', 'Risk Factors'), ('How many individuals in sample?', 'Sample Size')], min_conf=5)
+        print(time.time() - start)
         print(df.head())
         answers = df['Risk Factors'].values
         self.assertEqual(answers[0].startswith('sex'), True)
