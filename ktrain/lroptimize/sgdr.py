@@ -1,6 +1,6 @@
 from ..imports import *
 
-class SGDRScheduler(Callback):
+class SGDRScheduler(keras.callbacks.Callback):
     '''Cosine annealing learning rate scheduler with periodic restarts.
     # Usage
         ```python
@@ -32,7 +32,7 @@ class SGDRScheduler(Callback):
                  cycle_length=10,
                  mult_factor=2):
 
-        super(Callback, self).__init__()
+        super(keras.callbacks.Callback, self).__init__()
         self.min_lr = min_lr
         self.max_lr = max_lr
         self.lr_decay = lr_decay

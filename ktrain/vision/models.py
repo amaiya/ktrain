@@ -56,7 +56,7 @@ def pretrained_datagen(data, name):
     if not data or not U.is_iter(data): return
     idg = data.image_data_generator
     if name == PRETRAINED_RESNET50:
-        idg.preprocessing_function = pre_resnet50
+        idg.preprocessing_function = keras.applications.resnet50.preprocess_input
         idg.ktrain_preproc = 'resnet50'
         idg.rescale=None
         idg.featurewise_center=False
@@ -65,7 +65,7 @@ def pretrained_datagen(data, name):
         idg.samplewise_std_normalization=False
         idg.zca_whitening = False
     elif name == PRETRAINED_MOBILENET:
-        idg.preprocessing_function = pre_mobilenet
+        idg.preprocessing_function = keras.applications.mobilenet.preprocess_input
         idg.ktrain_preproc = 'mobilenet'
         idg.rescale=None
         idg.featurewise_center=False
@@ -74,7 +74,7 @@ def pretrained_datagen(data, name):
         idg.samplewise_std_normalization=False
         idg.zca_whitening = False
     elif name == PRETRAINED_MOBILENETV3:
-        idg.preprocessing_function = pre_mobilenetv3small
+        idg.preprocessing_function = keras.applications.mobilenet_v3.preprocess_input
         idg.ktrain_preproc = 'mobilenetv3'
         idg.rescale=None
         idg.featurewise_center=False
@@ -83,7 +83,7 @@ def pretrained_datagen(data, name):
         idg.samplewise_std_normalization=False
         idg.zca_whitening = False
     elif name == PRETRAINED_INCEPTION:
-        idg.preprocessing_function = pre_inception
+        idg.preprocessing_function = keras.applications.inception_v3.preprocess_input
         idg.ktrain_preproc = 'inception'
         idg.rescale=None
         idg.featurewise_center=False
@@ -92,7 +92,7 @@ def pretrained_datagen(data, name):
         idg.samplewise_std_normalization=False
         idg.zca_whitening = False
     elif name == PRETRAINED_EFFICIENTNETB1 or name == PRETRAINED_EFFICIENTNETB7:
-        idg.preprocessing_function = pre_efficientnet
+        idg.preprocessing_function = keras.applications.efficientnet.preprocess_input
         idg.ktrain_preproc = 'efficientnet'
         idg.rescale=None
         idg.featurewise_center=False
@@ -360,27 +360,27 @@ def build_visionmodel(name,
 def build_cnn(num_classes, 
               input_shape=(28,28,1),
               activation='softmax'):
-    model = Sequential()
-    model.add(Conv2D(32, kernel_size=(3, 3),activation='relu',
+    model = keras.models.Sequential()
+    model.add(keras.layers.Conv2D(32, kernel_size=(3, 3),activation='relu',
                      kernel_initializer='he_normal',input_shape=input_shape))
-    model.add(Conv2D(32, kernel_size=(3, 3),activation='relu',
+    model.add(keras.layers.Conv2D(32, kernel_size=(3, 3),activation='relu',
                      kernel_initializer='he_normal'))
-    model.add(MaxPooling2D((2, 2)))
-    model.add(Dropout(0.20))
-    model.add(Conv2D(64, (3, 3), activation='relu',padding='same',
+    model.add(keras.layers.MaxPooling2D((2, 2)))
+    model.add(keras.layers.Dropout(0.20))
+    model.add(keras.layers.Conv2D(64, (3, 3), activation='relu',padding='same',
                       kernel_initializer='he_normal'))
-    model.add(Conv2D(64, (3, 3), activation='relu',padding='same',
+    model.add(keras.layers.Conv2D(64, (3, 3), activation='relu',padding='same',
                      kernel_initializer='he_normal'))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
-    model.add(Dropout(0.25))
-    model.add(Conv2D(128, (3, 3), activation='relu',padding='same',
+    model.add(keras.layers.MaxPooling2D(pool_size=(2, 2)))
+    model.add(keras.layers.Dropout(0.25))
+    model.add(keras.layers.Conv2D(128, (3, 3), activation='relu',padding='same',
                      kernel_initializer='he_normal'))
-    model.add(Dropout(0.25))
-    model.add(Flatten())
-    model.add(Dense(128, activation='relu'))
-    model.add(BatchNormalization())
-    model.add(Dropout(0.25))
-    model.add(Dense(num_classes, activation=activation))
+    model.add(keras.layers.Dropout(0.25))
+    model.add(keras.layers.Flatten())
+    model.add(keras.layers.Dense(128, activation='relu'))
+    model.add(keras.layers.BatchNormalization())
+    model.add(keras.layers.Dropout(0.25))
+    model.add(keras.layers.Dense(num_classes, activation=activation))
     return model
 
 
@@ -425,32 +425,32 @@ def build_predefined(
     if name in [RESNET50, PRETRAINED_RESNET50]:
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')
-            net = ResNet50(include_top=include_top, 
+            net = keras.applications.ResNet50(include_top=include_top, 
                            weights=weights,
                            input_tensor=input_tensor,
                            input_shape = input_shape)
     elif name in [MOBILENET, PRETRAINED_MOBILENET]:
-        net = MobileNet(include_top=include_top, 
+        net = keras.applications.MobileNet(include_top=include_top, 
                         weights=weights,
                         input_tensor=input_tensor,
                         input_shape = input_shape)
     elif name in [MOBILENETV3, PRETRAINED_MOBILENETV3]:
-        net = MobileNetV3Small(include_top=include_top, 
+        net = keras.applications.MobileNetV3Small(include_top=include_top, 
                                weights=weights,
                                input_tensor=input_tensor,
                                input_shape = input_shape)
     elif name in [INCEPTION, PRETRAINED_INCEPTION]:
-        net = InceptionV3(include_top=include_top, 
+        net = keras.applications.InceptionV3(include_top=include_top, 
                           weights=weights,
                           input_tensor=input_tensor,
                            input_shape = input_shape)
     elif name in [EFFICIENTNETB1, PRETRAINED_EFFICIENTNETB1]:
-        net = EfficientNetB1(include_top=include_top, 
+        net = keras.applications.EfficientNetB1(include_top=include_top, 
                           weights=weights,
                           input_tensor=input_tensor,
                           input_shape = input_shape)
     elif name in [EFFICIENTNETB7, PRETRAINED_EFFICIENTNETB7]:
-        net = EfficientNetB7(include_top=include_top, 
+        net = keras.applications.EfficientNetB7(include_top=include_top, 
                           weights=weights,
                           input_tensor=input_tensor,
                           input_shape = input_shape)
@@ -463,7 +463,7 @@ def build_predefined(
             layer.trainable = False
 
     x = net.output
-    x = Flatten()(x)
+    x = keras.layers.Flatten()(x)
 
     # xtra FCs in pretrained model
     if name in PRETRAINED_MODELS:
@@ -473,15 +473,15 @@ def build_predefined(
             p = pt_ps[i]
             fc_name = "fc%s" % (i)
             if p is not None:
-                x = Dropout(p)(x)
-            x = Dense(fc, activation='relu', 
+                x = keras.layers.Dropout(p)(x)
+            x = keras.layers.Dense(fc, activation='relu', 
                       kernel_initializer='he_normal', name=fc_name)(x)
 
 
     # final FC
-    x = Dropout(dropout)(x)
-    output_layer = Dense(num_classes, activation=activation, name=activation)(x)
-    model = Model(inputs=net.input, outputs=output_layer)
+    x = keras.layers.Dropout(dropout)(x)
+    output_layer = keras.layers.Dense(num_classes, activation=activation, name=activation)(x)
+    model = keras.Model(inputs=net.input, outputs=output_layer)
 
     if freeze_layers is not None:
         # set certain earlier layers as non-trainable

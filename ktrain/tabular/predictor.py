@@ -12,8 +12,8 @@ class TabularPredictor(Predictor):
 
     def __init__(self, model, preproc, batch_size=U.DEFAULT_BS):
 
-        if not isinstance(model, Model):
-            raise ValueError('model must be of instance Model')
+        if not isinstance(model, keras.Model):
+            raise ValueError('model must be of instance keras.Model')
         if not isinstance(preproc, TabularPreprocessor) and type(preproc).__name__ != 'TabularPreprocessor':
             raise ValueError('preproc must be a TabularPreprocessor object')
         self.model = model

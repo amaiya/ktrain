@@ -114,7 +114,7 @@ def _tabular_model(name, train_data, multilabel=None, is_regression=False, metri
     output = bn_drop_lin(output, num_classes , bn=bn, p=output_dropout, actn=activation)
 
     # construct and compile model
-    model = Model(inputs=ilayers, outputs=output)
+    model = keras.Model(inputs=ilayers, outputs=output)
     model.compile(optimizer=U.DEFAULT_OPT, loss=loss_func, metrics=metrics)
     U.vprint('done.', verbose=verbose)
     return model

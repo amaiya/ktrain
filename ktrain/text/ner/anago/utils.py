@@ -11,7 +11,7 @@ def download(url):
     Args:
         url (str): target url.
     """
-    filepath = get_file(fname='tmp.zip', origin=url, extract=True)
+    filepath = keras.utils.get_file(fname='tmp.zip', origin=url, extract=True)
     base_dir = os.path.dirname(filepath)
     weights_file = os.path.join(base_dir, 'weights.h5')
     params_file = os.path.join(base_dir, 'params.json')

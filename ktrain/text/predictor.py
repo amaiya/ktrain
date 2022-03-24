@@ -12,8 +12,8 @@ class TextPredictor(Predictor):
 
     def __init__(self, model, preproc, batch_size=U.DEFAULT_BS):
 
-        if not isinstance(model, Model):
-            raise ValueError('model must be of instance Model')
+        if not isinstance(model, keras.Model):
+            raise ValueError('model must be of instance keras.Model')
         if not isinstance(preproc, TextPreprocessor):
         #if type(preproc).__name__ != 'TextPreprocessor':
             raise ValueError('preproc must be a TextPreprocessor object')
@@ -71,9 +71,9 @@ class TextPredictor(Predictor):
         if U.is_huggingface(model=self.model):
             # convert logits to probabilities for Hugging Face models
             if multilabel and self.c:
-                preds = activations.sigmoid(tf.convert_to_tensor(preds)).numpy()
+                preds = keras.activations.sigmoid(tf.convert_to_tensor(preds)).numpy()
             elif self.c:
-                preds = activations.softmax(tf.convert_to_tensor(preds)).numpy()
+                preds = keras.activations.softmax(tf.convert_to_tensor(preds)).numpy()
             else:
                 preds = np.squeeze(preds)
                 if len(preds.shape) == 0: preds = np.expand_dims(preds, -1)

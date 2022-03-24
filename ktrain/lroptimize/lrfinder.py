@@ -110,7 +110,7 @@ class LRFinder:
         # Set the initial learning rate
         K.set_value(self.model.optimizer.lr, start_lr)
 
-        callback = LambdaCallback(on_batch_end=lambda batch, logs: self.on_batch_end(batch, logs))
+        callback = keras.callbacks.LambdaCallback(on_batch_end=lambda batch, logs: self.on_batch_end(batch, logs))
 
 
         if use_gen:

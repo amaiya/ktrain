@@ -10,10 +10,10 @@ from ktrain.imports import ACC_NAME, VAL_ACC_NAME
 from ktrain import utils as U
 
 
-Sequential = ktrain.imports.Sequential
-Dense = ktrain.imports.Dense
-Embedding = ktrain.imports.Embedding
-GlobalAveragePooling1D = ktrain.imports.GlobalAveragePooling1D
+Sequential = ktrain.imports.keras.models.Sequential
+Dense = ktrain.imports.keras.layers.Dense
+Embedding = ktrain.imports.keras.layers.Embedding
+GlobalAveragePooling1D = ktrain.imports.keras.layers.GlobalAveragePooling1D
 
 def synthetic_multilabel():
 

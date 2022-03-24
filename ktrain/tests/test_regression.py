@@ -5,8 +5,8 @@ Tests of ktrain text classification flows
 import testenv
 from unittest import TestCase, main, skip
 import ktrain
-Sequential = ktrain.imports.Sequential
-Dense = ktrain.imports.Dense
+Sequential = ktrain.imports.keras.models.Sequential
+Dense = ktrain.imports.keras.layers.Dense
 
 def bostonhousing():
     from tensorflow.keras.datasets import boston_housing

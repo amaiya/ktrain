@@ -1,7 +1,7 @@
 from ..imports import * 
 from .. import utils as U
 
-class CyclicLR(Callback):
+class CyclicLR(keras.callbacks.Callback):
     """
     This callback implements a cyclical learning rate policy (CLR).
     The method cycles the learning rate between two boundaries with
@@ -83,7 +83,7 @@ class CyclicLR(Callback):
                  gamma=1., scale_fn=None, scale_mode='cycle', 
                  reduce_on_plateau=0, monitor='val_loss', reduce_factor=2, 
                  max_momentum=0.95, min_momentum=0.85, verbose=1):
-        super(Callback, self).__init__()
+        super(keras.callbacks.Callback, self).__init__()
 
         self.base_lr = base_lr
         self.max_lr = max_lr

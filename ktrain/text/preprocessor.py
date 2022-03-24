@@ -612,7 +612,7 @@ class StandardTextPreprocessor(TextPreprocessor):
         train_text = self.process_chinese(train_text, lang=self.lang)
 
         # extract vocabulary
-        self.tok = Tokenizer(num_words=self.max_features)
+        self.tok = keras.preprocessing.text.Tokenizer(num_words=self.max_features)
         self.tok.fit_on_texts(train_text)
         U.vprint('Word Counts: {}'.format(len(self.tok.word_counts)), verbose=verbose)
         U.vprint('Nrows: {}'.format(len(train_text)), verbose=verbose)
@@ -626,7 +626,7 @@ class StandardTextPreprocessor(TextPreprocessor):
         x_train = self._fit_ngrams(x_train, verbose=verbose)
 
         # pad sequences
-        x_train = sequence.pad_sequences(x_train, maxlen=self.maxlen)
+        x_train = keras.preprocessing.sequence.pad_sequences(x_train, maxlen=self.maxlen)
         U.vprint('x_train shape: ({},{})'.format(x_train.shape[0], x_train.shape[1]), verbose=verbose)
 
         # transform y
@@ -664,7 +664,7 @@ class StandardTextPreprocessor(TextPreprocessor):
 
 
         # pad sequences
-        x_test = sequence.pad_sequences(x_test, maxlen=self.maxlen)
+        x_test = keras.preprocessing.sequence.pad_sequences(x_test, maxlen=self.maxlen)
         U.vprint('x_test shape: ({},{})'.format(x_test.shape[0], x_test.shape[1]), verbose=verbose)
 
         # transform y

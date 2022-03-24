@@ -86,8 +86,8 @@ def graph_node_classifier(name, train_data, layer_sizes=[32,32], verbose=1):
 	)
     #x_inp, x_out = graphsage_model.default_model(flatten_output=True)
     x_inp, x_out = graphsage_model.build()
-    prediction = Dense(units=num_classes, activation=activation)(x_out)
-    model = Model(inputs=x_inp, outputs=prediction)
+    prediction = keras.layers.Dense(units=num_classes, activation=activation)(x_out)
+    model = keras.Model(inputs=x_inp, outputs=prediction)
     model.compile(optimizer='adam',
                   loss=loss_func,
                   metrics=["accuracy"])
@@ -146,7 +146,7 @@ def graph_link_predictor(name, train_data, preproc, layer_sizes=[20,20], verbose
     graphsage = GraphSAGE(layer_sizes=layer_sizes, generator=train_data, bias=True, dropout=0.3) 
     x_inp, x_out = graphsage.build()
     prediction = link_classification( output_dim=1, output_act="relu", edge_embedding_method='ip')(x_out)
-    model = Model(inputs=x_inp, outputs=prediction)
+    model = keras.Model(inputs=x_inp, outputs=prediction)
     model.compile( optimizer=U.DEFAULT_OPT, loss='binary_crossentropy', metrics=["accuracy"])
     return model
 

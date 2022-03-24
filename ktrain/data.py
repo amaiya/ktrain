@@ -108,7 +108,7 @@ class TFDataset(Dataset):
         return self.tfdataset
 
 
-class SequenceDataset(Dataset, Sequence):
+class SequenceDataset(Dataset, keras.utils.Sequence):
     """
     ```
     Base class for custom datasets in ktrain.

@@ -28,8 +28,8 @@ def show_random_images(img_folder, n=4, rows=1):
     ims = []
     for i in range(n):
         img_path = random.choice(fnames)
-        img = image.load_img(img_path)
-        x = image.img_to_array(img)
+        img = keras.preprocessing.image.load_img(img_path)
+        x = keras.preprocessing.image.img_to_array(img)
         x = x/255.
         ims.append(x)
     U.plots(ims, rows=rows)
@@ -54,8 +54,8 @@ def preview_data_aug(img_path, data_aug, rows=1, n=4):
     idg.zca_whitening = False
     idg.preprocessing_function = None
 
-    img = image.load_img(img_path)
-    x = image.img_to_array(img)
+    img = keras.preprocessing.image.load_img(img_path)
+    x = keras.preprocessing.image.img_to_array(img)
     x = x/255.
     x = x.reshape((1,) + x.shape)
     i = 0
@@ -86,8 +86,8 @@ def preview_data_aug_OLD(img_path, data_aug, n=4):
     idg.zca_whitening = False
     idg.preprocessing_function = None
 
-    img = image.load_img(img_path)
-    x = image.img_to_array(img)
+    img = keras.preprocessing.image.load_img(img_path)
+    x = keras.preprocessing.image.img_to_array(img)
     x = x/255.
     x = x.reshape((1,) + x.shape)
     i = 0
@@ -125,7 +125,7 @@ def get_data_aug(
     ```
     """
 
-    data_aug = image.ImageDataGenerator(
+    data_aug = keras.preprocessing.image.ImageDataGenerator(
                                 rotation_range=rotation_range,
                                 zoom_range=zoom_range,
                                 width_shift_range=width_shift_range,
@@ -149,7 +149,7 @@ def get_test_datagen(data_aug=None):
         samplewise_std_normalization = data_aug.samplewise_std_normalization
         rescale = data_aug.rescale
         zca_whitening = data_aug.zca_whitening
-        test_datagen = image.ImageDataGenerator(
+        test_datagen = keras.preprocessing.image.ImageDataGenerator(
                                 rescale=rescale,
                                 featurewise_center=featurewise_center,
                                 samplewise_center=samplewise_center,
@@ -157,7 +157,7 @@ def get_test_datagen(data_aug=None):
                                 samplewise_std_normalization=samplewise_std_normalization,
                                 zca_whitening=zca_whitening)
     else:
-        test_datagen = image.ImageDataGenerator()
+        test_datagen = keras.preprocessing.image.ImageDataGenerator()
     return test_datagen
 
 
@@ -233,7 +233,7 @@ def sample_image_folder(train_directory,
 
     # sample images
     batch_size = 100
-    img_gen = image.ImageDataGenerator()
+    img_gen = keras.preprocessing.image.ImageDataGenerator()
     batches = img_gen.flow_from_directory(
                 directory=train_directory,
                 classes=classes,

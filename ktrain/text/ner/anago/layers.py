@@ -9,7 +9,7 @@ from .... import utils as U
 #from keras_contrib.utils.test_utils import to_tuple
 
 
-class CRF(Layer):
+class CRF(keras.layers.Layer):
     """An implementation of linear chain conditional random field (CRF).
 
     An linear chain CRF is defined to maximize the following likelihood function:
@@ -220,28 +220,28 @@ class CRF(Layer):
         self.use_boundary = use_boundary
         self.use_bias = use_bias
 
-        self.activation = activations.get(activation)
+        self.activation = keras.activations.get(activation)
 
-        self.kernel_initializer = initializers.get(kernel_initializer)
-        self.chain_initializer = initializers.get(chain_initializer)
-        self.boundary_initializer = initializers.get(boundary_initializer)
-        self.bias_initializer = initializers.get(bias_initializer)
+        self.kernel_initializer = keras.initializers.get(kernel_initializer)
+        self.chain_initializer = keras.initializers.get(chain_initializer)
+        self.boundary_initializer = keras.initializers.get(boundary_initializer)
+        self.bias_initializer = keras.initializers.get(bias_initializer)
 
-        self.kernel_regularizer = regularizers.get(kernel_regularizer)
-        self.chain_regularizer = regularizers.get(chain_regularizer)
-        self.boundary_regularizer = regularizers.get(boundary_regularizer)
-        self.bias_regularizer = regularizers.get(bias_regularizer)
+        self.kernel_regularizer = keras.regularizers.get(kernel_regularizer)
+        self.chain_regularizer = keras.regularizers.get(chain_regularizer)
+        self.boundary_regularizer = keras.regularizers.get(boundary_regularizer)
+        self.bias_regularizer = keras.regularizers.get(bias_regularizer)
 
-        self.kernel_constraint = constraints.get(kernel_constraint)
-        self.chain_constraint = constraints.get(chain_constraint)
-        self.boundary_constraint = constraints.get(boundary_constraint)
-        self.bias_constraint = constraints.get(bias_constraint)
+        self.kernel_constraint = keras.constraints.get(kernel_constraint)
+        self.chain_constraint = keras.constraints.get(chain_constraint)
+        self.boundary_constraint = keras.constraints.get(boundary_constraint)
+        self.bias_constraint = keras.constraints.get(bias_constraint)
 
         self.unroll = unroll
 
     def build(self, input_shape):
         input_shape = to_tuple(input_shape)
-        self.input_spec = [InputSpec(shape=input_shape)]
+        self.input_spec = [keras.layers.InputSpec(shape=input_shape)]
         self.input_dim = input_shape[-1]
 
         self.kernel = self.add_weight(shape=(self.input_dim, self.units),
@@ -313,21 +313,21 @@ class CRF(Layer):
             'use_boundary': self.use_boundary,
             'use_bias': self.use_bias,
             'sparse_target': self.sparse_target,
-            'kernel_initializer': initializers.serialize(self.kernel_initializer),
-            'chain_initializer': initializers.serialize(self.chain_initializer),
-            'boundary_initializer': initializers.serialize(
+            'kernel_initializer': keras.initializers.serialize(self.kernel_initializer),
+            'chain_initializer': keras.initializers.serialize(self.chain_initializer),
+            'boundary_initializer': keras.initializers.serialize(
                 self.boundary_initializer),
-            'bias_initializer': initializers.serialize(self.bias_initializer),
-            'activation': activations.serialize(self.activation),
-            'kernel_regularizer': regularizers.serialize(self.kernel_regularizer),
-            'chain_regularizer': regularizers.serialize(self.chain_regularizer),
-            'boundary_regularizer': regularizers.serialize(
+            'bias_initializer': keras.initializers.serialize(self.bias_initializer),
+            'activation': keras.activations.serialize(self.activation),
+            'kernel_regularizer': keras.regularizers.serialize(self.kernel_regularizer),
+            'chain_regularizer': keras.regularizers.serialize(self.chain_regularizer),
+            'boundary_regularizer': keras.regularizers.serialize(
                 self.boundary_regularizer),
-            'bias_regularizer': regularizers.serialize(self.bias_regularizer),
-            'kernel_constraint': constraints.serialize(self.kernel_constraint),
-            'chain_constraint': constraints.serialize(self.chain_constraint),
-            'boundary_constraint': constraints.serialize(self.boundary_constraint),
-            'bias_constraint': constraints.serialize(self.bias_constraint),
+            'bias_regularizer': keras.regularizers.serialize(self.bias_regularizer),
+            'kernel_constraint': keras.constraints.serialize(self.kernel_constraint),
+            'chain_constraint': keras.constraints.serialize(self.chain_constraint),
+            'boundary_constraint': keras.constraints.serialize(self.boundary_constraint),
+            'bias_constraint': keras.constraints.serialize(self.bias_constraint),
             'input_dim': self.input_dim,
             'unroll': self.unroll}
         base_config = super(CRF, self).get_config()
@@ -648,9 +648,9 @@ def crf_loss(y_true, y_pred):
         return crf_nll(y_true, y_pred)
     else:
         if crf.sparse_target:
-            return sparse_categorical_crossentropy(y_true, y_pred)
+            return keras.losses.sparse_categorical_crossentropy(y_true, y_pred)
         else:
-            return categorical_crossentropy(y_true, y_pred)
+            return keras.losses.categorical_crossentropy(y_true, y_pred)
 
 
 def _get_accuracy(y_true, y_pred, mask, sparse_target=False):

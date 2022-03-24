@@ -230,15 +230,15 @@ def _build_logreg(num_classes,
     embedding_matrix[0] = 0
 
     # set up the model
-    inp = Input(shape=(maxlen,))
-    r = Embedding(max_features, 1, input_length=maxlen, 
+    inp = keras.layers.Input(shape=(maxlen,))
+    r = keras.layers.Embedding(max_features, 1, input_length=maxlen, 
                   weights=[embedding_matrix], trainable=False)(inp)
-    x = Embedding(max_features, num_classes, input_length=maxlen, 
+    x = keras.layers.Embedding(max_features, num_classes, input_length=maxlen, 
                   embeddings_initializer='glorot_normal')(inp)
-    x = dot([x,r], axes=1)
-    x = Flatten()(x)
-    if activation: x = Activation(activation)(x)
-    model = Model(inputs=inp, outputs=x)
+    x = keras.layers.dot([x,r], axes=1)
+    x = keras.layers.Flatten()(x)
+    if activation: x = keras.layers.Activation(activation)(x)
+    model = keras.Model(inputs=inp, outputs=x)
     model.compile(loss=loss_func,
                   optimizer=U.DEFAULT_OPT,
                   metrics=metrics)
@@ -264,8 +264,8 @@ def _build_bert(num_classes,
                                     seq_len=maxlen)
     inputs = model.inputs[:2]
     dense = model.get_layer('NSP-Dense').output
-    outputs = Dense(units=num_classes, activation=activation)(dense)
-    model = Model(inputs, outputs)
+    outputs = keras.layers.Dense(units=num_classes, activation=activation)(dense)
+    model = keras.Model(inputs, outputs)
     model.compile(loss=loss_func,
                   optimizer=U.DEFAULT_OPT,
                   metrics=metrics)
@@ -337,15 +337,15 @@ def _build_nbsvm(num_classes,
             embedding_matrix[i,j] = nbratios[i,j]
 
     # set up the model
-    inp = Input(shape=(maxlen,))
-    r = Embedding(num_columns, num_classes, input_length=maxlen, 
+    inp = keras.layers.Input(shape=(maxlen,))
+    r = keras.layers.Embedding(num_columns, num_classes, input_length=maxlen, 
                   weights=[embedding_matrix], trainable=False)(inp)
-    x = Embedding(num_columns, 1, input_length=maxlen, 
+    x = keras.layers.Embedding(num_columns, 1, input_length=maxlen, 
                   embeddings_initializer='glorot_normal')(inp)
-    x = dot([r,x], axes=1)
-    x = Flatten()(x)
-    x = Activation(activation)(x)
-    model = Model(inputs=inp, outputs=x)
+    x = keras.layers.dot([r,x], axes=1)
+    x = keras.layers.Flatten()(x)
+    x = keras.layers.Activation(activation)(x)
+    model = keras.Model(inputs=inp, outputs=x)
     model.compile(loss=loss_func,
                   optimizer=U.DEFAULT_OPT,
                   metrics=metrics)
@@ -357,14 +357,14 @@ def _build_fasttext(num_classes,
                  loss_func='categorical_crossentropy',
                  activation = 'softmax', metrics=['accuracy'],  verbose=1):
 
-    model = Sequential()
-    model.add(Embedding(max_features, 64, input_length=maxlen))
-    model.add(SpatialDropout1D(0.25))
-    model.add(GlobalMaxPool1D())
-    model.add(BatchNormalization())
-    model.add(Dense(64, activation='relu', kernel_initializer='he_normal'))
-    model.add(Dropout(0.5))
-    model.add(Dense(num_classes, activation=activation))
+    model = keras.models.Sequential()
+    model.add(keras.layers.Embedding(max_features, 64, input_length=maxlen))
+    model.add(keras.layers.SpatialDropout1D(0.25))
+    model.add(keras.layers.GlobalMaxPool1D())
+    model.add(keras.layers.BatchNormalization())
+    model.add(keras.layers.Dense(64, activation='relu', kernel_initializer='he_normal'))
+    model.add(keras.layers.Dropout(0.5))
+    model.add(keras.layers.Dense(num_classes, activation=activation))
     model.compile(loss=loss_func, optimizer=U.DEFAULT_OPT, metrics=metrics)
 
     return model
@@ -374,11 +374,11 @@ def _build_standard_gru(num_classes,
                  maxlen, max_features, features,
                  loss_func='categorical_crossentropy',
                  activation = 'softmax', metrics=['accuracy'], verbose=1):
-    model = Sequential()
-    model.add(Embedding(max_features, 256, input_length = maxlen))
-    model.add(GRU(256, dropout=0.9, return_sequences=True))
-    model.add(GRU(256, dropout=0.9))
-    model.add(Dense(num_classes, activation=activation))
+    model = keras.models.Sequential()
+    model.add(keras.layers.Embedding(max_features, 256, input_length = maxlen))
+    model.add(keras.layers.GRU(256, dropout=0.9, return_sequences=True))
+    model.add(keras.layers.GRU(256, dropout=0.9))
+    model.add(keras.layers.Dense(num_classes, activation=activation))
     model.compile(loss=loss_func, optimizer=U.DEFAULT_OPT, metrics=metrics)
     return model
 
@@ -416,15 +416,15 @@ def _build_bigru(num_classes,
         if embedding_vector is not None: embedding_matrix[i] = embedding_vector
 
     # define model
-    inp = Input(shape=(maxlen, ))
-    x = Embedding(max_features, embed_size, weights=[embedding_matrix])(inp)
-    x = SpatialDropout1D(0.2)(x)
-    x = Bidirectional(GRU(80, return_sequences=True))(x)
-    avg_pool = GlobalAveragePooling1D()(x)
+    inp = keras.layers.Input(shape=(maxlen, ))
+    x = keras.layers.Embedding(max_features, embed_size, weights=[embedding_matrix])(inp)
+    x = keras.layers.SpatialDropout1D(0.2)(x)
+    x = keras.layers.Bidirectional(keras.layers.GRU(80, return_sequences=True))(x)
+    avg_pool = keras.layers.GlobalAveragePooling1D()(x)
     max_pool = GlobalMaxPool1D()(x)
-    conc = concatenate([avg_pool, max_pool])
-    outp = Dense(num_classes, activation=activation)(conc)
-    model = Model(inputs=inp, outputs=outp)
+    conc = keras.layers.concatenate([avg_pool, max_pool])
+    outp = keras.layers.Dense(num_classes, activation=activation)(conc)
+    model = keras.Model(inputs=inp, outputs=outp)
     model.compile(loss=loss_func,
                   optimizer=U.DEFAULT_OPT,
                   metrics=metrics)

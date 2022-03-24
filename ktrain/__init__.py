@@ -47,7 +47,7 @@ def get_learner(model, train_data=None, val_data=None,
     """
 
     # check arguments
-    if not isinstance(model, I.Model):
+    if not isinstance(model, I.keras.Model):
         raise ValueError('model must be of instance Model')
     U.data_arg_check(train_data=train_data, val_data=val_data)
     if type(workers) != type(1) or workers < 1:

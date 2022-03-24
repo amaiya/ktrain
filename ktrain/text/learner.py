@@ -170,9 +170,9 @@ class TransformerTextClassLearner(GenLearner):
 
         if classification:
             if multilabel:
-                return activations.sigmoid(tf.convert_to_tensor(preds)).numpy()
+                return keras.activations.sigmoid(tf.convert_to_tensor(preds)).numpy()
             else:
-                return activations.softmax(tf.convert_to_tensor(preds)).numpy()
+                return keras.activations.softmax(tf.convert_to_tensor(preds)).numpy()
         else:
             return preds
 

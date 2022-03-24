@@ -14,8 +14,8 @@ class ImagePredictor(Predictor):
 
     def __init__(self, model, preproc, batch_size=U.DEFAULT_BS):
 
-        if not isinstance(model, Model):
-            raise ValueError('model must be of instance Model')
+        if not isinstance(model, keras.Model):
+            raise ValueError('model must be of instance keras.Model')
         if not isinstance(preproc, ImagePreprocessor):
             raise ValueError('preproc must be instance of ImagePreprocessor')
         self.model = model
@@ -68,10 +68,10 @@ class ImagePredictor(Predictor):
             return
 
 
-        img = image.load_img(img_fpath,
+        img = keras.preprocessing.image.load_img(img_fpath,
                              target_size=self.preproc.target_size,
                              color_mode=self.preproc.color_mode)
-        x = image.img_to_array(img)
+        x = keras.preprocessing.image.img_to_array(img)
         x = np.expand_dims(x, axis=0)
         return eli5.show_prediction(self.model, x)
 

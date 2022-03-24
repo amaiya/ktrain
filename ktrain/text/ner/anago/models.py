@@ -18,7 +18,7 @@ def save_model(model, weights_file, params_file):
 
 def load_model(weights_file, params_file):
     with open(params_file) as f:
-        model = model_from_json(f.read(), custom_objects={'CRF': CRF})
+        model = keras.models.model_from_json(f.read(), custom_objects={'CRF': CRF})
         model.load_weights(weights_file)
 
     return model
@@ -92,16 +92,16 @@ class BiLSTMCRF(object):
     def build(self):
 
         # build word embedding
-        word_ids = Input(batch_shape=(None, None), dtype='int32', name='word_input')
+        word_ids = keras.layers.Input(batch_shape=(None, None), dtype='int32', name='word_input')
         inputs = [word_ids]
         embedding_list = []
         if self._embeddings is None:
-            word_embeddings = Embedding(input_dim=self._word_vocab_size,
+            word_embeddings = keras.layers.Embedding(input_dim=self._word_vocab_size,
                                         output_dim=self._word_embedding_dim,
                                         mask_zero=True,
                                         name='word_embedding')(word_ids)
         else:
-            word_embeddings = Embedding(input_dim=self._embeddings.shape[0],
+            word_embeddings = keras.layers.Embedding(input_dim=self._embeddings.shape[0],
                                         output_dim=self._embeddings.shape[1],
                                         mask_zero=True,
                                         weights=[self._embeddings],
@@ -110,36 +110,36 @@ class BiLSTMCRF(object):
 
         # build character based word embedding
         if self._use_char:
-            char_ids = Input(batch_shape=(None, None, None), dtype='int32', name='char_input')
+            char_ids = keras.layers.Input(batch_shape=(None, None, None), dtype='int32', name='char_input')
             inputs.append(char_ids)
-            char_embeddings = Embedding(input_dim=self._char_vocab_size,
+            char_embeddings = keras.layers.Embedding(input_dim=self._char_vocab_size,
                                         output_dim=self._char_embedding_dim,
                                         mask_zero=self._char_mask_zero,
                                         name='char_embedding')(char_ids)
-            char_embeddings = TimeDistributed(Bidirectional(LSTM(self._char_lstm_size)))(char_embeddings)
+            char_embeddings = keras.layers.TimeDistributed(keras.layers.Bidirectional(keras.layers.LSTM(self._char_lstm_size)))(char_embeddings)
             embedding_list.append(char_embeddings)
 
         # add elmo embedding
         if self._use_elmo:
-            elmo_embeddings = Input(shape=(None, 1024), dtype='float32')
+            elmo_embeddings = keras.layers.Input(shape=(None, 1024), dtype='float32')
             inputs.append(elmo_embeddings)
             embedding_list.append(elmo_embeddings)
 
         # add transformer embedding
         if self._use_transformer_with_dim is not None:
-            transformer_embeddings = Input(shape=(None, self._use_transformer_with_dim), dtype='float32')
+            transformer_embeddings = keras.layers.Input(shape=(None, self._use_transformer_with_dim), dtype='float32')
             inputs.append(transformer_embeddings)
             embedding_list.append(transformer_embeddings)
 
 
         # concatenate embeddings
-        word_embeddings = Concatenate()(embedding_list) if len(embedding_list) > 1 else embedding_list[0]
+        word_embeddings = keras.layers.Concatenate()(embedding_list) if len(embedding_list) > 1 else embedding_list[0]
 
 
         # build model
-        word_embeddings = Dropout(self._dropout)(word_embeddings)
-        z = Bidirectional(LSTM(units=self._word_lstm_size, return_sequences=True))(word_embeddings)
-        z = Dense(self._fc_dim, activation='tanh')(z)
+        word_embeddings = keras.layers.Dropout(self._dropout)(word_embeddings)
+        z = keras.layers.Bidirectional(keras.layers.LSTM(units=self._word_lstm_size, return_sequences=True))(word_embeddings)
+        z = keras.layers.Dense(self._fc_dim, activation='tanh')(z)
 
         if self._use_crf:
             from .layers import CRF
@@ -148,9 +148,9 @@ class BiLSTMCRF(object):
             pred = crf(z)
         else:
             loss = 'categorical_crossentropy'
-            pred = Dense(self._num_labels, activation='softmax')(z)
+            pred = keras.layers.Dense(self._num_labels, activation='softmax')(z)
 
-        model = Model(inputs=inputs, outputs=pred)
+        model = keras.Model(inputs=inputs, outputs=pred)
 
         return model, loss
 

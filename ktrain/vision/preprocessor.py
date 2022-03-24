@@ -10,7 +10,7 @@ class ImagePreprocessor(Preprocessor):
 
     def __init__(self, datagen, classes, target_size=(224,224), color_mode='rgb'):
 
-        if not isinstance(datagen, image.ImageDataGenerator):
+        if not isinstance(datagen, keras.preprocessing.image.ImageDataGenerator):
             raise ValueError('datagen must be instance of ImageDataGenerator')
         self.datagen = datagen
         self.c = classes
@@ -76,8 +76,8 @@ class ImagePreprocessor(Preprocessor):
                 raise Exception('To use predict_filename, you must load the data using either '+\
                                 'the ktrain.vision.images_from_folder function or the ' +\
                                 'ktrain.vision.images_from_csv function.')
-            img = image.load_img(data, target_size=self.target_size, color_mode=self.color_mode)
-            x = image.img_to_array(img)
+            img = keras.preprocessing.image.load_img(data, target_size=self.target_size, color_mode=self.color_mode)
+            x = keras.preprocessing.image.img_to_array(img)
             x = np.expand_dims(x, axis=0)
             generator =  self.datagen.flow(np.array(x), shuffle=False)
             generator.batch_size = batch_size

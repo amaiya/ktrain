@@ -3,7 +3,7 @@ Custom callbacks.
 """
 from ....imports import *
 
-class F1score(Callback):
+class F1score(keras.callbacks.Callback):
 
     def __init__(self, seq, preprocessor=None):
         super(F1score, self).__init__()

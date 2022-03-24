@@ -116,8 +116,8 @@ def is_classifier(model):
             last = model.layers[-1]
             output_shape = last.output_shape
             mult_output = True if len(output_shape) ==2 and output_shape[1] >  1 else False
-            if ( (hasattr(last, 'activation') and isinstance(last.activation, type(sigmoid))) or\
-               isinstance(last, type(sigmoid)) ) and mult_output:
+            if ( (hasattr(last, 'activation') and isinstance(last.activation, type(keras.activations.sigmoid))) or\
+               isinstance(last, type(keras.activations.sigmoid)) ) and mult_output:
                 is_multilabel = True
     return (is_classifier, is_multilabel)
 
@@ -318,7 +318,7 @@ def y_from_data(data):
     if is_iter(data):
         if isinstance(data, Dataset): return data.get_y()
         elif hasattr(data, 'classes'): # DirectoryIterator
-            return to_categorical(data.classes)
+            return keras.utils.to_categorical(data.classes)
         elif hasattr(data, 'labels'):  # DataFrameIterator
             return data.labels
         elif hasattr(data, 'y'): # NumpyArrayIterator
@@ -638,7 +638,7 @@ class YTransform:
 
             if train and ( len(set(targets)) != int(max(targets)+1) ):
                 raise ValueError('len(set(targets) is %s but max(targets)+1 is  %s' % ( len(set(targets)), int(max(targets)+1) ))
-            targets = to_categorical(targets, num_classes=len(self.get_classes()))
+            targets = keras.utils.to_categorical(targets, num_classes=len(self.get_classes()))
         if train: self.train_called=True
         return targets
 

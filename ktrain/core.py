@@ -27,8 +27,8 @@ class Learner(ABC):
 
     """
     def __init__(self, model, workers=1, use_multiprocessing=False):
-        if not isinstance(model, Model):
-            raise ValueError('model must be of instance Model')
+        if not isinstance(model, keras.Model):
+            raise ValueError('model must be of instance keras.Model')
         self.model = model
         self.lr_finder = LRFinder(self.model)
         self.workers = workers
@@ -395,8 +395,8 @@ class Learner(ABC):
         replace model in this Learner instance
         ```
         """
-        if not isinstance(model, Model):
-            raise ValueError('model must be of instance Model')
+        if not isinstance(model, keras.Model):
+            raise ValueError('model must be of instance keras.Model')
         self.model = model
         self.history = None
         return
@@ -424,7 +424,7 @@ class Learner(ABC):
             # first find last dense layer
             dense_id = None
             for i, layer in reversed(list(enumerate(self.model.layers))):
-                if isinstance(layer, Dense):
+                if isinstance(layer, keras.layers.Dense):
                     dense_id = i
                     break
             if dense_id is None: raise Exception('cannot find Dense layer in this model')
@@ -800,7 +800,7 @@ class Learner(ABC):
             if not isinstance(callbacks, list): callbacks = []
             #filepath=os.path.join(folder, "weights-{epoch:02d}-{val_loss:.2f}.hdf5")
             filepath=os.path.join(folder, "weights-{epoch:02d}.hdf5")
-            callbacks.append(ModelCheckpoint(filepath, save_best_only=False, save_weights_only=True))
+            callbacks.append(keras.callbacks.ModelCheckpoint(filepath, save_best_only=False, save_weights_only=True))
         if not callbacks: callbacks=None
         return callbacks
 
@@ -811,7 +811,7 @@ class Learner(ABC):
             if not isinstance(callbacks, list): callbacks = []
             #if StrictVersion(keras.__version__) >= StrictVersion('2.2.3'):
             try:
-                callbacks.append(EarlyStopping(monitor='val_loss', min_delta=0, patience=early_stopping, 
+                callbacks.append(keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0, patience=early_stopping, 
                                                restore_best_weights=True, verbose=0, mode='auto'))
             except TypeError:
                 warnings.warn("""
@@ -819,7 +819,7 @@ class Learner(ABC):
                               which is only supported on Keras 2.2.3 or greater. 
                               For now, we are falling back to EarlyStopping.restore_best_weights=False.
                               Please use checkpoint_folder option in fit() to restore best weights.""")
-                callbacks.append(EarlyStopping(monitor='val_loss', min_delta=0, patience=early_stopping, 
+                callbacks.append(keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0, patience=early_stopping, 
                                                verbose=0, mode='auto'))
 
         if not callbacks: callbacks=None
@@ -1044,7 +1044,7 @@ class Learner(ABC):
                        min_momentum=min_momentum)
         kcallbacks.append(clr)
         if early_stopping:
-            kcallbacks.append(EarlyStopping(monitor=monitor, min_delta=0, 
+            kcallbacks.append(keras.callbacks.EarlyStopping(monitor=monitor, min_delta=0, 
                                            patience=early_stopping,
                                            restore_best_weights=True, 
                                            verbose=1, mode='auto'))
@@ -1508,8 +1508,8 @@ def get_predictor(model, preproc, batch_size=U.DEFAULT_BS):
     """
 
     # check arguments
-    if not isinstance(model, Model):
-        raise ValueError('model must be of instance Model')
+    if not isinstance(model, keras.Model):
+        raise ValueError('model must be of instance keras.Model')
     if not isinstance(preproc, (ImagePreprocessor,TextPreprocessor, NERPreprocessor, NodePreprocessor, LinkPreprocessor, TabularPreprocessor)):
         raise ValueError('preproc must be instance of ktrain.preprocessor.Preprocessor')
     if isinstance(preproc, ImagePreprocessor):
@@ -1568,21 +1568,21 @@ def load_predictor(fpath, batch_size=U.DEFAULT_BS, custom_objects=None):
     if hasattr(preproc, 'datagen') and hasattr(preproc.datagen, 'ktrain_preproc'):
         preproc_name = preproc.datagen.ktrain_preproc
         if preproc_name == 'resnet50':
-            preproc.datagen.preprocessing_function = pre_resnet50
+            preproc.datagen.preprocessing_function = keras.applications.resnet50.preprocess_input
         elif preproc_name == 'mobilenet':
-            preproc.datagen.preprocessing_function = pre_mobilenet
+            preproc.datagen.preprocessing_function = keras.applications.mobilenet.preprocess_input
         elif preproc_name == 'mobilenetv3':
-            preproc.datagen.preprocessing_function = pre_mobilenetv3small
+            preproc.datagen.preprocessing_function = keras.applications.mobilenet_v3.preprocess_input
         elif preproc_name == 'inception':
-            preproc.datagen.preprocessing_function = pre_inception
+            preproc.datagen.preprocessing_function = keras.applications.inception_v3.preprocess_input
         elif preproc_name == 'efficientnet':
-            preproc.datagen.preprocessing_function = pre_efficientnet
+            preproc.datagen.preprocessing_function = keras.applications.efficientnet.preprocess_input
         else:
             raise Exception('Uknown preprocessing_function name: %s' % (preproc_name))
     
     # return the appropriate predictor
-    if not isinstance(model, Model):
-        raise ValueError('model must be of instance Model')
+    if not isinstance(model, keras.Model):
+        raise ValueError('model must be of instance keras.Model')
     if not isinstance(preproc, (ImagePreprocessor, TextPreprocessor, NERPreprocessor, NodePreprocessor, LinkPreprocessor, TabularPreprocessor)):
         raise ValueError('preproc must be instance of ktrain.preprocessor.Preprocessor')
     if isinstance(preproc, ImagePreprocessor):
