@@ -38,7 +38,7 @@ class Predictor(ABC):
 
     def _save_model(self, fpath):
         if U.is_crf(self.model): # TODO: fix/refactor this
-            from .text.ner import crf_loss
+            from .text.ner.anago.layers import crf_loss
             self.model.compile(loss=crf_loss, optimizer=U.DEFAULT_OPT)
         model_path = os.path.join(fpath, U.MODEL_NAME)
         self.model.save(model_path, save_format='h5')

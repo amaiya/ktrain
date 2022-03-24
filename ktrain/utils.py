@@ -1,5 +1,4 @@
 from .imports import *
-from .data import Dataset
 
 
 #------------------------------------------------------------------------------
@@ -41,6 +40,11 @@ PREPROC_NAME = MODEL_BASENAME+'.preproc'
 #------------------------------------------------------------------------------
 # DATA/MODEL INSPECTORS
 #------------------------------------------------------------------------------
+
+def is_ktrain_dataset(data):
+    from .data import Dataset
+    return isinstance(data, Dataset)
+
 
 def loss_fn_from_model(model):
     # dep_fix
@@ -250,7 +254,7 @@ def is_multilabel(data):
 def shape_from_data(data):
     err_msg = 'could not determine shape from %s' % (type(data))
     if is_iter(data):
-        if isinstance(data, Dataset): return data.xshape()
+        if is_ktrain_dataset(data): return data.xshape()
         elif hasattr(data, 'image_shape'): return data.image_shape          # DirectoryIterator/DataFrameIterator
         elif hasattr(data, 'x'):                                            # NumpyIterator
             return data.x.shape[1:]
@@ -280,7 +284,7 @@ def ondisk(data):
 def nsamples_from_data(data):
     err_msg = 'could not determine number of samples from %s' % (type(data))
     if is_iter(data):
-        if isinstance(data, Dataset): return data.nsamples()
+        if is_ktrain_dataset(data): return data.nsamples()
         elif hasattr(data, 'samples'):  # DirectoryIterator/DataFrameIterator
             return data.samples
         elif hasattr(data, 'n'):     # DirectoryIterator/DataFrameIterator/NumpyIterator
@@ -299,7 +303,7 @@ def nsamples_from_data(data):
 
 def nclasses_from_data(data):
     if is_iter(data):
-        if isinstance(data, Dataset): return data.nclasses()
+        if is_ktrain_dataset(data): return data.nclasses()
         elif hasattr(data, 'classes'):   # DirectoryIterator
             return len(set(data.classes))
         else:
@@ -316,7 +320,7 @@ def nclasses_from_data(data):
 
 def y_from_data(data):
     if is_iter(data):
-        if isinstance(data, Dataset): return data.get_y()
+        if is_ktrain_dataset(data): return data.get_y()
         elif hasattr(data, 'classes'): # DirectoryIterator
             return keras.utils.to_categorical(data.classes)
         elif hasattr(data, 'labels'):  # DataFrameIterator
@@ -336,7 +340,7 @@ def y_from_data(data):
 def is_iter(data, ignore=False):
     if ignore: return True
     iter_classes = ["NumpyArrayIterator", "DirectoryIterator", "DataFrameIterator"]
-    return data.__class__.__name__ in iter_classes or isinstance(data, Dataset)
+    return data.__class__.__name__ in iter_classes or is_ktrain_dataset(data)
 
 
 

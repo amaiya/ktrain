@@ -2,7 +2,6 @@
 from ...imports import *
 from ... import utils as U
 from . import preprocessor as pp
-from .anago.models import BiLSTMCRF
 
 BILSTM_CRF = 'bilstm-crf'
 BILSTM = 'bilstm'
@@ -160,6 +159,7 @@ def sequence_tagger(name, preproc,
         preproc.p.activate_transformer(bert_model, layers=bert_layers_to_use, force=True)
     else:
         raise ValueError('Unsupported model name')
+    from .anago.models import BiLSTMCRF
     model = BiLSTMCRF(char_embedding_dim=char_embedding_dim,
                       word_embedding_dim=word_embedding_dim,
                       char_lstm_size=char_lstm_size,

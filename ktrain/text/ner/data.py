@@ -5,7 +5,6 @@ from .. import textutils as TU
 from . import preprocessor as pp
 from .preprocessor import NERPreprocessor
 
-from .anago.preprocessing import IndexTransformer
 
 
 MAXLEN = 128
@@ -197,6 +196,7 @@ def entities_from_df(train_df,
                                             verbose=0)
 
     # preprocess and convert to generator
+    from .anago.preprocessing import IndexTransformer
     p = IndexTransformer(use_char=use_char)
     preproc = NERPreprocessor(p)
     preproc.fit(x_train, y_train)

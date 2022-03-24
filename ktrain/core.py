@@ -1,9 +1,9 @@
 from .imports import *
 
-from .lroptimize.sgdr import *
-from .lroptimize.triangular import *
-from .lroptimize.lrfinder import *
-from .lroptimize.optimization import AdamWeightDecay
+#from .lroptimize.sgdr import *
+#from .lroptimize.triangular import *
+#from .lroptimize.lrfinder import *
+#from .lroptimize.optimization import AdamWeightDecay
 from . import utils as U
 
 from .vision.preprocessor import ImagePreprocessor
@@ -1653,7 +1653,7 @@ def _load_model(fpath, preproc=None, train_data=None, custom_objects=None):
                     type(preproc).__name__ == 'NERPreprocessor')) or \
         train_data and U.is_ner(data=train_data):
         from .text.ner.anago.layers import CRF
-        from .text.ner import crf_loss
+        from .text.ner.anago.layers import crf_loss
         custom_objects={'CRF': CRF, 'crf_loss':crf_loss}
         # save old te_model as backup
         if preproc:

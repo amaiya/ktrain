@@ -5,12 +5,10 @@ from .vision.learner import ImageClassLearner
 from .text.learner import BERTTextClassLearner, TransformerTextClassLearner
 from .text.ner.learner import NERLearner
 from .graph.learner import NodeClassLearner, LinkPredLearner
-from .data import Dataset, TFDataset, SequenceDataset
 
 from . import utils as U
 
-__all__ = ['get_learner', 'get_predictor', 'load_predictor', 'release_gpu_memory',
-           'Dataset', 'TFDataset', 'SequenceDataset']
+__all__ = ['get_learner', 'get_predictor', 'load_predictor', 'release_gpu_memory' ]
 
 
 

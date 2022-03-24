@@ -16,115 +16,34 @@ SUPPRESS_DEP_WARNINGS = strtobool(os.environ.get('SUPPRESS_DEP_WARNINGS', '1'))
 if SUPPRESS_DEP_WARNINGS: # 2021-11-12:  copied this here to properly suppress TF/CUDA warnings in Kaggle notebooks, etc. 
     os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 DISABLE_V2_BEHAVIOR = strtobool(os.environ.get('DISABLE_V2_BEHAVIOR', '0'))
-if DISABLE_V2_BEHAVIOR:
-    # TF2-transition
-    ACC_NAME = 'acc'
-    VAL_ACC_NAME = 'val_acc'
-    try:
+try:
+    if DISABLE_V2_BEHAVIOR:
+        # TF2-transition
+        ACC_NAME = 'acc'
+        VAL_ACC_NAME = 'val_acc'
         import tensorflow.compat.v1 as tf
-    except ImportError:
-        raise Exception('ktrain requires TensorFlow 2 to be installed: pip install tensorflow')
-    tf.disable_v2_behavior()
-    from tensorflow.compat.v1 import keras
-    print('Using DISABLE_V2_BEHAVIOR with TensorFlow')
-else:
-    # TF2
-    ACC_NAME = 'accuracy'
-    VAL_ACC_NAME = 'val_accuracy'
-    try:
+        tf.disable_v2_behavior()
+        from tensorflow.compat.v1 import keras
+        print('Using DISABLE_V2_BEHAVIOR with TensorFlow')
+    else:
+        # TF2
+        ACC_NAME = 'accuracy'
+        VAL_ACC_NAME = 'val_accuracy'
         import tensorflow as tf
-    except ImportError:
-        raise Exception('ktrain requires TensorFlow 2 to be installed: pip install tensorflow')
-
-    from tensorflow import keras
-
-# suppress autograph warnings
-tf.autograph.set_verbosity(1)
-#if SUPPRESS_WARNINGS:
-    #tf.autograph.set_verbosity(1)
-
-if version.parse(tf.__version__) < version.parse('2.0'):
-    raise Exception('As of v0.8.x, ktrain needs TensorFlow 2. Please upgrade TensorFlow.')
-
-os.environ['TF_KERAS'] = '1' # to use keras_bert package below with tf.Keras
-
-
-
-
-
-# output Keras version
-#print("using Keras version: %s" % (keras.__version__))
-
-K = keras.backend
-#Layer = keras.layers.Layer
-#InputSpec = keras.layers.InputSpec
-#Model = keras.Model
-#model_from_json = keras.models.model_from_json
-#load_model = keras.models.load_model
-#Sequential = keras.models.Sequential
-#ModelCheckpoint = keras.callbacks.ModelCheckpoint
-#EarlyStopping = keras.callbacks.EarlyStopping
-#LambdaCallback = keras.callbacks.LambdaCallback
-#Callback = keras.callbacks.Callback
-#Dense = keras.layers.Dense
-#Embedding = keras.layers.Embedding
-#Input = keras.layers.Input
-#Flatten = keras.layers.Flatten
-#GRU = keras.layers.GRU
-#Bidirectional = keras.layers.Bidirectional
-#LSTM = keras.layers.LSTM
-#LeakyReLU = keras.layers.LeakyReLU # SG
-#Multiply = keras.layers.Multiply   # SG
-#Average = keras.layers.Average     # SG
-#Reshape = keras.layers.Reshape     #SG
-#SpatialDropout1D = keras.layers.SpatialDropout1D
-#GlobalMaxPool1D = keras.layers.GlobalMaxPool1D
-#GlobalAveragePooling1D = keras.layers.GlobalAveragePooling1D
-#concatenate = keras.layers.concatenate
-#dot = keras.layers.dot
-#Dropout = keras.layers.Dropout
-#BatchNormalization = keras.layers.BatchNormalization
-#Add = keras.layers.Add
-#Convolution2D = keras.layers.Convolution2D
-#MaxPooling2D = keras.layers.MaxPooling2D
-#AveragePooling2D = keras.layers.AveragePooling2D
-#Conv2D = keras.layers.Conv2D
-#MaxPooling2D = keras.layers.MaxPooling2D
-#TimeDistributed = keras.layers.TimeDistributed
-#Lambda = keras.layers.Lambda
-#Activation = keras.layers.Activation
-#add = keras.layers.add
-#Concatenate = keras.layers.Concatenate
-#initializers = keras.initializers
-#glorot_uniform = keras.initializers.glorot_uniform
-#regularizers = keras.regularizers
-#l2 = keras.regularizers.l2
-#constraints = keras.constraints
-#sequence = keras.preprocessing.sequence
-#image = keras.preprocessing.image
-#NumpyArrayIterator = keras.preprocessing.image.NumpyArrayIterator
-#Iterator = keras.preprocessing.image.Iterator
-#ImageDataGenerator = keras.preprocessing.image.ImageDataGenerator
-#Tokenizer = keras.preprocessing.text.Tokenizer
-#Sequence = keras.utils.Sequence
-#get_file = keras.utils.get_file
-#plot_model = keras.utils.plot_model
-#to_categorical = keras.utils.to_categorical
-#multi_gpu_model = keras.utils.multi_gpu_model # removed in TF 2.4
-#activations = keras.activations
-#sigmoid = keras.activations.sigmoid
-#categorical_crossentropy = keras.losses.categorical_crossentropy
-#sparse_categorical_crossentropy = keras.losses.sparse_categorical_crossentropy
-#ResNet50 = keras.applications.ResNet50
-#MobileNet = keras.applications.mobilenet.MobileNet
-#InceptionV3 = keras.applications.inception_v3.InceptionV3
-#EfficientNetB1 = keras.applications.efficientnet.EfficientNetB1
-#EfficientNetB7 = keras.applications.efficientnet.EfficientNetB7
-#pre_resnet50 = keras.applications.resnet50.preprocess_input
-#pre_mobilenet = keras.applications.mobilenet.preprocess_input
-#pre_inception = keras.applications.inception_v3.preprocess_input
-#pre_efficientnet = keras.applications.efficientnet.preprocess_input
-
+        from tensorflow import keras
+    K = keras.backend
+    # suppress autograph warnings
+    tf.autograph.set_verbosity(1)
+    if version.parse(tf.__version__) < version.parse('2.0'):
+        raise Exception('As of v0.8.x, ktrain needs TensorFlow 2. Please upgrade TensorFlow.')
+    os.environ['TF_KERAS'] = '1' # to use keras_bert package below with tf.Keras
+except ImportError:
+    warnings.warn('TensorFlow is not installed. You can still use  scikit-learn and pretrained PyTorch models: '+\
+                  'text.zsl.ZeroShotClassifier, text.translation.Translator, text.summarization.TransformerSummarizer, '+\
+                  'text.speech.Transcriber. To train neural network models, you will need to install TensorFlow: '+\
+                  'pip install tensorflow')
+    keras = None
+    K = None
 # for TF backwards compatibility (e.g., support for TF 2.3.x):
 try:
     MobileNetV3Small = keras.applications.MobileNetV3Small
@@ -227,16 +146,6 @@ try:
     from keras_bert import Tokenizer as BERT_Tokenizer
 except ImportError:
     warnings.warn("keras_bert is not installed - needed only for 'bert' text classification model")
-
-
-## text.ner module
-#try:
-#    from seqeval.metrics import classification_report as ner_classification_report
-#    from seqeval.metrics import f1_score as ner_f1_score
-#    from seqeval.metrics import accuracy_score as ner_accuracy_score
-#    from seqeval.metrics.sequence_labeling import get_entities
-#except ImportError:
-#    warnings.warn("seqeval is not installed - needed only by 'text.ner' module")
 
 
 # transformers for models in 'text' module
