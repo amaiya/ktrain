@@ -13,6 +13,7 @@ Most recent releases are shown at the top. Each release shows:
 
 ### changed
 - reorganized imports 
+- localized seqeval
 
 ### fixed:
 - N/A
