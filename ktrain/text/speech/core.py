@@ -1,9 +1,4 @@
 try:
-    import torch
-    TORCH = True
-except (ImportError, OSError):
-    TORCH=False
-try:
     import librosa as librosa
     LIBROSA = True
 except (ImportError, OSError):
@@ -11,6 +6,7 @@ except (ImportError, OSError):
 
 from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor
 
+from ...torch_base import TorchBase
 
 # duplicated from ktrain.utils for now
 def batchify(X, size):
@@ -27,13 +23,13 @@ def batchify(X, size):
     return [X[x : x + size] for x in range(0, len(X), size)]
 
 
-class Transcriber():
+class Transcriber(TorchBase):
     """
     Transcriber: speech to text pipeline
     """
 
 
-    def __init__(self, model_name="facebook/wav2vec2-base-960h", device=None, half=False):
+    def __init__(self, model_name="facebook/wav2vec2-base-960h", device=None):
         """
         ```
         basic wrapper speech transcription
@@ -41,13 +37,9 @@ class Transcriber():
         Args:
           model_name(str): Helsinki-NLP model
           device(str): device to use (e.g., 'cuda', 'cpu')
-          half(bool): If True, use half precision.
         ```
         """
-        if not TORCH:
-            raise ImportError('Transcriber requires PyTorch to be installed.')
-        self.torch_device = device
-        if self.torch_device is None: self.torch_device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        super().__init__(device=device)
         #if not SOUNDFILE:
             #raise ImportError("SoundFile library not installed or libsndfile not found: pip install soundfile")
         if not LIBROSA:
@@ -57,7 +49,6 @@ class Transcriber():
         # load model and processor
         self.model = Wav2Vec2ForCTC.from_pretrained(model_name).to(self.torch_device)
         self.processor = Wav2Vec2Processor.from_pretrained(model_name)
-        if half: self.model = self.model.half()
 
 
     def transcribe(self, afiles, batch_size=32):
@@ -112,6 +103,7 @@ class Transcriber():
         Returns:
             list of transcribed text
         """
+        import torch
         with torch.no_grad():
             # Convert samples to features
             inputs = self.processor(speech, sampling_rate=sampling, padding=True, return_tensors='pt').input_values

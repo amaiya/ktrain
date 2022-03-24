@@ -1,10 +1,11 @@
 from ...imports import *
 from ... import utils as U
 from .. import textutils as TU
+from ...torch_base import TorchBase
 
 SUPPORTED_SRC_LANGS = ['zh', 'ar', 'ru', 'de', 'af', 'es', 'fr', 'it', 'pt']
 
-class Translator():
+class Translator(TorchBase):
     """
     Translator: basic wrapper around MarianMT model for language translation
     """
@@ -22,12 +23,7 @@ class Translator():
         """
         if 'Helsinki-NLP' not in model_name:
             warnings.warn('Translator requires a Helsinki-NLP model: https://huggingface.co/Helsinki-NLP')
-        try:
-            import torch
-        except ImportError:
-            raise Exception('Translator requires PyTorch to be installed.')
-        self.torch_device = device
-        if self.torch_device is None: self.torch_device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        super().__init__(device=device)
         from transformers import MarianMTModel, MarianTokenizer
         self.tokenizer = MarianTokenizer.from_pretrained(model_name)
         self.model = MarianMTModel.from_pretrained(model_name).to(self.torch_device)

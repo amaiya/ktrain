@@ -1,22 +1,18 @@
-# 2020-08-10: unnecessary imports removed for ZSL to address #225
-#from ...imports import *
-#from ... import utils as U
 
 import math
 import warnings
 import numpy as np
 
-# duplicated from ktrain.utils
-def list2chunks(a, n):
-    k, m = divmod(len(a), n)
-    return (a[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n))
+from ...torch_base import TorchBase
+from ... import utils as U
+list2chunks = U.list2chunks
 
-class ZeroShotClassifier():
+class ZeroShotClassifier(TorchBase):
     """
     interface to Zero Shot Topic Classifier
     """
 
-    def __init__(self, model_name='facebook/bart-large-mnli', device=None):
+    def __init__(self, model_name='facebook/bart-large-mnli', device=None, quantize=False):
         """
         ```
         ZeroShotClassifier constructor
@@ -24,19 +20,18 @@ class ZeroShotClassifier():
         Args:
           model_name(str): name of a BART NLI model
           device(str): device to use (e.g., 'cuda', 'cpu')
+          quantize(bool): If True, faster quantization will be used
         ```
         """
         if 'mnli' not in model_name and 'xnli' not in model_name:
             raise ValueError('ZeroShotClasifier requires an MNLI or XNLI model')
-        try:
-            import torch
-        except ImportError:
-            raise Exception('ZeroShotClassifier requires PyTorch to be installed.')
-        self.torch_device = device
-        if self.torch_device is None: self.torch_device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+        super().__init__(device=device)
         from transformers import AutoModelForSequenceClassification, AutoTokenizer
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         self.model = AutoModelForSequenceClassification.from_pretrained(model_name).to(self.torch_device)
+        if quantize:
+            self.model = self.quantize_model(self.model)
 
 
     def predict(self, docs, labels=[], include_labels=False, multilabel=True,

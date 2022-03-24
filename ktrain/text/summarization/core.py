@@ -1,8 +1,6 @@
-# 2020-08-10: unnecessary imports removed for ZSL to address #225
-#from ...imports import *
-#from ... import utils as U
 
-class TransformerSummarizer():
+from ...torch_base import TorchBase
+class TransformerSummarizer(TorchBase):
     """
     interface to Transformer-based text summarization
     """
@@ -19,12 +17,7 @@ class TransformerSummarizer():
         """
         if 'bart' not in model_name:
             raise ValueError('TransformerSummarizer currently only accepts BART models')
-        try:
-            import torch
-        except ImportError:
-            raise Exception('TransformerSummarizer requires PyTorch to be installed.')
-        self.torch_device = device
-        if self.torch_device is None: self.torch_device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        super().__init__(device=device)
         from transformers import BartTokenizer, BartForConditionalGeneration
         self.tokenizer = BartTokenizer.from_pretrained(model_name)
         self.model = BartForConditionalGeneration.from_pretrained(model_name).to(self.torch_device)
