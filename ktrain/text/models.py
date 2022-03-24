@@ -255,7 +255,7 @@ def _build_bert(num_classes,
     if lang is None: raise ValueError('lang is missing')
     config_path = os.path.join(tpp.get_bert_path(lang=lang), 'bert_config.json')
     checkpoint_path = os.path.join(tpp.get_bert_path(lang=lang), 'bert_model.ckpt')
-
+    import keras_bert
     model = keras_bert.load_trained_model_from_checkpoint(
                                     config_path,
                                     checkpoint_path,

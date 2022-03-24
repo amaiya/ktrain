@@ -229,14 +229,14 @@ except ImportError:
     warnings.warn("keras_bert is not installed - needed only for 'bert' text classification model")
 
 
-# text.ner module
-try:
-    from seqeval.metrics import classification_report as ner_classification_report
-    from seqeval.metrics import f1_score as ner_f1_score
-    from seqeval.metrics import accuracy_score as ner_accuracy_score
-    from seqeval.metrics.sequence_labeling import get_entities
-except ImportError:
-    warnings.warn("seqeval is not installed - needed only by 'text.ner' module")
+## text.ner module
+#try:
+#    from seqeval.metrics import classification_report as ner_classification_report
+#    from seqeval.metrics import f1_score as ner_f1_score
+#    from seqeval.metrics import accuracy_score as ner_accuracy_score
+#    from seqeval.metrics.sequence_labeling import get_entities
+#except ImportError:
+#    warnings.warn("seqeval is not installed - needed only by 'text.ner' module")
 
 
 # transformers for models in 'text' module

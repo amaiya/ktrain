@@ -8,6 +8,8 @@ from .preprocessing import IndexTransformer
 from .tagger import Tagger
 from .trainer import Trainer
 from .utils import filter_embeddings
+from .. import metrics
+
 
 
 class Sequence(object):
@@ -107,7 +109,7 @@ class Sequence(object):
             lengths = map(len, y_test)
             y_pred = self.model.predict(x_test)
             y_pred = self.p.inverse_transform(y_pred, lengths)
-            score = ner_f1_score(y_test, y_pred)
+            score = metrics.f1_score(y_test, y_pred)
             return score
         else:
             raise OSError('Could not find a model. Call load(dir_path).')

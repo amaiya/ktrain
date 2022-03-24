@@ -2,6 +2,7 @@
 Custom callbacks.
 """
 from ....imports import *
+from .. import metrics
 
 class F1score(keras.callbacks.Callback):
 
@@ -35,7 +36,7 @@ class F1score(keras.callbacks.Callback):
             label_true.extend(y_true)
             label_pred.extend(y_pred)
 
-        score = ner_f1_score(label_true, label_pred)
+        score = metrics.f1_score(label_true, label_pred)
         print(' - f1: {:04.2f}'.format(score * 100))
-        print(ner_classification_report(label_true, label_pred))
+        print(metrics.classification_report(label_true, label_pred))
         logs['f1'] = score

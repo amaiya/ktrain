@@ -2,6 +2,8 @@
 Model API.
 """
 from ....imports import *
+from .. import metrics
+
 
 class Tagger(object):
     """A model API that tags input sentence.
@@ -58,7 +60,7 @@ class Tagger(object):
 
             ]
         }
-        chunks = get_entities(tags)
+        chunks = metrics.get_entities(tags)
 
         for chunk_type, chunk_start, chunk_end in chunks:
             chunk_end += 1
