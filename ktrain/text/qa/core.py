@@ -2,6 +2,7 @@ from ...imports import *
 from ... import utils as U
 from .. import textutils as TU
 from .. import preprocessor as tpp
+from ...torch_base import TorchBase
 
 
 from whoosh import index
@@ -92,7 +93,7 @@ _process_question = process_question # for backwards compatibility
 
 
 
-class QA(ABC):
+class QA(ABC, TorchBase):
     """
     Base class for QA
     """
@@ -103,7 +104,6 @@ class QA(ABC):
         if bert_squad_model:
             warnings.warn('the bert_squad_model is deprecated - please use model_name instead.', DeprecationWarning, stacklevel=2)
         self.model_name = model_name
-        self.torch_device = None
         self.framework = framework
         if framework == 'tf':
             try:
@@ -116,19 +116,21 @@ class QA(ABC):
                 warnings.warn('Could not load supplied model as TensorFlow checkpoint - attempting to load using from_pt=True')
                 self.model = TFAutoModelForQuestionAnswering.from_pretrained(self.model_name, from_pt=True)
         else:
-            try:
-                import torch
-            except ImportError:
-                raise Exception('If framework=="pt", PyTorch must be installed.')
-            bert_emb_model = None # set to None and ignore since we only want to use PyTorch
-            self.torch_device = device
-            if device is None: 
-                self.torch_device = 'cuda' if torch.cuda.is_available() else 'cpu'
+            super().__init__(device=device, quantize=quantize)
+            #try:
+                #import torch
+            #except ImportError:
+                #raise Exception('If framework=="pt", PyTorch must be installed.')
+            #bert_emb_model = None # set to None and ignore since we only want to use PyTorch
+            #self.torch_device = device
+            #if device is None: 
+                #self.torch_device = 'cuda' if torch.cuda.is_available() else 'cpu'
             self.model = AutoModelForQuestionAnswering.from_pretrained(self.model_name).to(self.torch_device)
-            if quantize and self.torch_device == 'cpu': 
-                self.model = torch.quantization.quantize_dynamic(self.model, {torch.nn.Linear}, dtype=torch.qint8)
-            elif quantize and self.torch_device != 'cpu':
-                self.model = self.model.half()
+            if quantize: self.model = self.quantize_model(self.model)
+            #if quantize and self.torch_device == 'cpu': 
+                #self.model = torch.quantization.quantize_dynamic(self.model, {torch.nn.Linear}, dtype=torch.qint8)
+            #elif quantize and self.torch_device != 'cpu':
+                #self.model = self.model.half()
 
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
         self.maxlen = 512
