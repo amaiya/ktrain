@@ -779,7 +779,7 @@ class Learner(ABC):
         #  use learning_rate schedule
         if cycle_len is not None:
             if not isinstance(callbacks, list): callbacks = []
-            from .lroptimize.sgdr import *
+            from .lroptimize.sgdr import SGDRScheduler
             schedule = SGDRScheduler(min_lr=min_lr,
                                      max_lr=max_lr,
                                      steps_per_epoch=steps_per_epoch,
@@ -900,7 +900,7 @@ class Learner(ABC):
             max_momentum = None
             min_momentum = None
 
-        from .lroptimize.triangular import *
+        from .lroptimize.triangular import CyclicLR
         clr = CyclicLR(base_lr=lr/10, max_lr=lr,
                        step_size=math.ceil((steps_per_epoch*epochs)/2), 
                        reduce_on_plateau=0,
@@ -1035,7 +1035,7 @@ class Learner(ABC):
             max_momentum = None
             min_momentum = None
 
-        from .lroptimize.triangular import *
+        from .lroptimize.triangular import CyclicLR
         clr = CyclicLR(base_lr=lr/10, max_lr=lr,
                        step_size=step_size, verbose=verbose,
                        monitor=monitor,
