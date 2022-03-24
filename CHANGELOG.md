@@ -9,7 +9,7 @@ Most recent releases are shown at the top. Each release shows:
 ## 0.30.0
 
 ### new:
-- N/A
+- `text.qa.SimpleQA` and `text.qa.AnswerExtractor` now both support PyTorch with optional fp16 inference
 
 ### changed
 - reorganized imports 
