@@ -1,4 +1,5 @@
 import testenv
+import time
 
 from ktrain.text.summarization import TransformerSummarizer
 ts = TransformerSummarizer()
@@ -251,10 +252,12 @@ print(ts.summarize(sample_doc))
 
 # zsl
 from ktrain.text.zsl import ZeroShotClassifier
-zsl = ZeroShotClassifier()
+zsl = ZeroShotClassifier(device=None, quantize=True)
 topic_strings=['politics', 'elections', 'sports', 'films', 'television']
 doc = 'I am unhappy with decisions of the government and will definitely vote in 2020.'
+start = time.time()
 print(zsl.predict(doc, topic_strings=topic_strings, include_labels=True))
+print(time.time()-start)
 
 
 # translation
@@ -268,6 +271,8 @@ print(translator.translate(src_text))
 from ktrain.text.speech import Transcriber
 transcriber = Transcriber()
 afiles = ['text_data/sample.wav']
+start = time.time()
 result = transcriber.transcribe(afiles)
+print(time.time()-start)
 print(result)
 
