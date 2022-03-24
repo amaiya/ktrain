@@ -29,7 +29,7 @@ class TestQA(TestCase):
         shutil.rmtree(tmp_folder)
         text.SimpleQA.initialize_index(tmp_folder)
         text.SimpleQA.index_from_list(docs, tmp_folder, commit_every=len(docs),  multisegment=True)
-        qa = text.SimpleQA(tmp_folder)
+        qa = text.SimpleQA(tmp_folder, framework='tf')
 
         answers = qa.ask('When did Cassini launch?')
         top_answer = answers[0]['answer']
@@ -68,7 +68,7 @@ class TestQA(TestCase):
        'His speciality is medical risk assessments, and he is 30 years old.',
        'Results: A total of nine studies including 356 patients were included in this study, the mean age was 52.4 years and 221 (62.1%) were male.']
         from ktrain.text import AnswerExtractor
-        ae = AnswerExtractor()
+        ae = AnswerExtractor(framework='pt', device='cpu')
         import pandas as pd
         pd.set_option("display.max_colwidth", None)
         df = pd.DataFrame(data, columns=['Text'])

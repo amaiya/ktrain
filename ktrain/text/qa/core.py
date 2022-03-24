@@ -12,7 +12,7 @@ from whoosh.qparser import QueryParser
 
 #from transformers import TFBertForQuestionAnswering
 #from transformers import BertTokenizer
-from transformers import TFAutoModelForQuestionAnswering
+from transformers import TFAutoModelForQuestionAnswering, AutoModelForQuestionAnswering
 from transformers import AutoTokenizer
 LOWCONF = -10000
 
@@ -97,14 +97,33 @@ class QA(ABC):
     Base class for QA
     """
 
-    def __init__(self, bert_squad_model=DEFAULT_MODEL,
-                 bert_emb_model='bert-base-uncased'):
-        self.model_name = bert_squad_model
-        try:
-            self.model = TFAutoModelForQuestionAnswering.from_pretrained(self.model_name)
-        except:
-            warnings.warn('Could not load supplied model as TensorFlow checkpoint - attempting to load using from_pt=True')
-            self.model = TFAutoModelForQuestionAnswering.from_pretrained(self.model_name, from_pt=True)
+    def __init__(self, model_name=DEFAULT_MODEL, bert_squad_model=None, bert_emb_model='bert-base-uncased',
+                 framework='tf', device=None):
+        model_name = bert_squad_model if bert_squad_model is not None else model_name
+        if bert_squad_model:
+            warnings.warn('the bert_squad_model is deprecated - please use model_name instead.', DeprecationWarning, stacklevel=2)
+        self.model_name = model_name
+        self.torch_device = None
+        self.framework = framework
+        if framework == 'tf':
+            try:
+                import tensorflow as tf
+            except ImportError:
+                raise Exception('If framework=="tf", TensorFlow must be installed.')
+            try:
+                self.model = TFAutoModelForQuestionAnswering.from_pretrained(self.model_name)
+            except:
+                warnings.warn('Could not load supplied model as TensorFlow checkpoint - attempting to load using from_pt=True')
+                self.model = TFAutoModelForQuestionAnswering.from_pretrained(self.model_name, from_pt=True)
+        else:
+            try:
+                import torch
+            except ImportError:
+                raise Exception('If framework=="pt", PyTorch must be installed.')
+            bert_emb_model = None # set to None and ignore since we only want to use PyTorch
+            if device is None: self.torch_device = 'cuda' if torch.cuda.is_available() else 'cpu'
+            self.model = AutoModelForQuestionAnswering.from_pretrained(self.model_name).to(self.torch_device)
+
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
         self.maxlen = 512
         self.te = tpp.TransformerEmbedding(bert_emb_model, layers=[-2]) if bert_emb_model is not None else None
@@ -120,7 +139,8 @@ class QA(ABC):
         """
         if isinstance(documents, str): documents = [documents]
         sequences = [[question, d] for d in documents]
-        batch = self.tokenizer.batch_encode_plus(sequences, return_tensors='tf', max_length=self.maxlen, truncation='only_second', padding=True)
+        batch = self.tokenizer.batch_encode_plus(sequences, return_tensors=self.framework, max_length=self.maxlen, truncation='only_second', padding=True)
+        batch = batch.to(self.torch_device) if self.framework == 'pt' else batch
         tokens_batch = list( map(self.tokenizer.convert_ids_to_tokens, batch['input_ids']))
 
         # Added from: https://github.com/huggingface/transformers/commit/16ce15ed4bd0865d24a94aa839a44cf0f400ef50
@@ -129,6 +149,8 @@ class QA(ABC):
         else:
            start_scores, end_scores = self.model(batch['input_ids'], attention_mask=batch['attention_mask'], 
                                                  token_type_ids=batch['token_type_ids'], return_dict=False)
+        start_scores = start_scores.cpu().detach().numpy() if self.framework == 'pt' else start_scores.numpy()
+        end_scores = end_scores.cpu().detach().numpy() if self.framework == 'pt' else end_scores.numpy()
         start_scores = start_scores[:,1:-1]
         end_scores = end_scores[:,1:-1]
 
@@ -159,6 +181,7 @@ class QA(ABC):
                 #confidence = np.log(confidence.item())
                 #ans['confidence'] = start_scores[i,answer_start]*end_scores[i,answer_end]
                 ans['confidence'] = start_scores[i,answer_start]+end_scores[i,answer_end]
+
             ans['start'] = answer_start
             ans['end'] = answer_end
             ans['context'] = paragraph_bert
@@ -398,7 +421,7 @@ class QA(ABC):
                 for answer in answer_batch:
                     idx+=1
                     if not answer['answer'] or answer['confidence'] <-100: continue
-                    answer['confidence'] = answer['confidence'].numpy()
+                    answer['confidence'] = answer['confidence']
                     answer['reference'] = refs[idx-1]
                     answer = self._expand_answer(answer)
                     answers.append(answer)
@@ -456,15 +479,23 @@ class SimpleQA(QA):
     SimpleQA: Question-Answering on a list of texts
     """
     def __init__(self, index_dir, 
-                 bert_squad_model=DEFAULT_MODEL,
-                 bert_emb_model='bert-base-uncased'):
+                 model_name=DEFAULT_MODEL,
+                 bert_squad_model=None, #deprecated
+                 bert_emb_model='bert-base-uncased',
+                 framework='tf',
+                 device=None):
         """
         ```
         SimpleQA constructor
         Args:
           index_dir(str):  path to index directory created by SimpleQA.initialze_index
-          bert_squad_model(str): name of BERT SQUAD model to use
+          model_name(str): name of Question-Answering model (e.g., BERT SQUAD) to use
+          bert_squad_model(str): alias for model_name (deprecated)
           bert_emb_model(str): BERT model to use to generate embeddings for semantic similarity
+          framework(str): 'tf' for TensorFlow or 'pt' for PyTorch
+          device(str): Torch device to use (e.g., 'cuda', 'cpu'). Ignored if framework=='tf'.
+                       If framework=='tf', use CUDA_VISIBLE_DEVICES environment variable
+                       to select device.
         ```
         """
 
@@ -473,7 +504,8 @@ class SimpleQA(QA):
             ix = index.open_dir(self.index_dir)
         except:
             raise ValueError('index_dir has not yet been created - please call SimpleQA.initialize_index("%s")' % (self.index_dir))
-        super().__init__(bert_squad_model=bert_squad_model, bert_emb_model=bert_emb_model)
+        super().__init__(model_name=model_name, bert_squad_model=bert_squad_model, bert_emb_model=bert_emb_model,
+                         framework=framework, device=device)
 
 
     def _open_ix(self):
@@ -661,15 +693,20 @@ class SimpleQA(QA):
 
 
 class _QAExtractor(QA):
-    def __init__(self, bert_squad_model=DEFAULT_MODEL):
+    def __init__(self, model_name=DEFAULT_MODEL, bert_squad_model=None, framework='tf', device=None):
         """
         ```
-        QAExtractor is a convenience class for extract answers from contexts
+        QAExtractor is a convenience class for extracting answers from contexts
         Args:
-          bert_squad_model(str): name of BERT SQUAD model to use
+          model_name(str): name of Question-Answering model (e.g., BERT SQUAD) to use
+          bert_squad_model(str): alias for model_name (deprecated)
+          framework(str): 'tf' for TensorFlow or 'pt' for PyTorch
+          device(str): Torch device to use (e.g., 'cuda', 'cpu'). Ignored if framework=='tf'.
+                       If framework=='tf', use CUDA_VISIBLE_DEVICES environment variable
+                       to select device.
         ```
         """
-        super().__init__(bert_squad_model=bert_squad_model)
+        super().__init__(model_name=model_name, bert_squad_model=bert_squad_model, framework=framework, device=device)
 
     def search(self, query):
         raise NotImplemented('This method is not used or needed for extraction QA-based extraction.')
@@ -716,8 +753,24 @@ class AnswerExtractor:
     """
     Question-Answering-based Information Extraction
     """
-    def __init__(self, bert_squad_model=DEFAULT_MODEL):
-        self.qa = _QAExtractor(bert_squad_model=bert_squad_model)
+    def __init__(self, 
+                model_name=DEFAULT_MODEL,
+                bert_squad_model=None,
+                framework='tf',
+                device=None):
+        """
+        Extracts information from documents using Question-Answering.
+
+          model_name(str): name of Question-Answering model (e.g., BERT SQUAD) to use
+          bert_squad_model(str): alias for model_name (deprecated)
+          framework(str): 'tf' for TensorFlow or 'pt' for PyTorch
+          device(str): Torch device to use (e.g., 'cuda', 'cpu'). Ignored if framework=='tf'.
+                       If framework=='tf', use CUDA_VISIBLE_DEVICES environment variable
+                       to select device.
+
+        """
+        self.qa = _QAExtractor(model_name=model_name, bert_squad_model=bert_squad_model,
+                               framework=framework, device=device)
         return
 
 
@@ -816,6 +869,8 @@ class AnswerExtractor:
           None
         ```
         """
+        if self.qa.framework != 'tf':
+            raise ValueError('The finetune method does not currently support the framework="pt" option. Please use framework="tf" to finetune.')
         from .qa_finetuner import QAFineTuner
         ft = QAFineTuner(self.qa.model, self.qa.tokenizer)
         model =ft.finetune(data, epochs=epochs, learning_rate=learning_rate, batch_size=batch_size)
