@@ -1,5 +1,5 @@
 from ...imports import *
-from ...data import SequenceDataset
+from ...dataset import SequenceDataset
 
 class NERSequence(SequenceDataset):
 

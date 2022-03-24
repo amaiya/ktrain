@@ -1,5 +1,5 @@
 from ..imports import *
-from ..data import SequenceDataset
+from ..dataset import SequenceDataset
 
 class TabularDataset(SequenceDataset):
     def __init__(self, df, cat_columns, cont_columns, label_columns, batch_size=32, shuffle=False):

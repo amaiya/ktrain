@@ -1,9 +1,6 @@
 from .imports import *
 
-#from .lroptimize.sgdr import *
-#from .lroptimize.triangular import *
-#from .lroptimize.lrfinder import *
-#from .lroptimize.optimization import AdamWeightDecay
+from .lroptimize.lrfinder import *
 from . import utils as U
 
 from .vision.preprocessor import ImagePreprocessor
@@ -782,6 +779,7 @@ class Learner(ABC):
         #  use learning_rate schedule
         if cycle_len is not None:
             if not isinstance(callbacks, list): callbacks = []
+            from .lroptimize.sgdr import *
             schedule = SGDRScheduler(min_lr=min_lr,
                                      max_lr=max_lr,
                                      steps_per_epoch=steps_per_epoch,
@@ -901,6 +899,8 @@ class Learner(ABC):
         else:
             max_momentum = None
             min_momentum = None
+
+        from .lroptimize.triangular import *
         clr = CyclicLR(base_lr=lr/10, max_lr=lr,
                        step_size=math.ceil((steps_per_epoch*epochs)/2), 
                        reduce_on_plateau=0,
@@ -1035,6 +1035,7 @@ class Learner(ABC):
             max_momentum = None
             min_momentum = None
 
+        from .lroptimize.triangular import *
         clr = CyclicLR(base_lr=lr/10, max_lr=lr,
                        step_size=step_size, verbose=verbose,
                        monitor=monitor,
@@ -1684,6 +1685,7 @@ def _load_model(fpath, preproc=None, train_data=None, custom_objects=None):
         from stellargraph.layer import MeanAggregator
         custom_objects={'MeanAggregator': MeanAggregator}
     custom_objects = {} if custom_objects is None else custom_objects
+    from .lroptimize.optimization import AdamWeightDecay
     custom_objects['AdamWeightDecay'] = AdamWeightDecay
     try:
         try:
