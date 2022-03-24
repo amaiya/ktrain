@@ -71,7 +71,7 @@ def load_data_and_labels(filename, encoding='utf-8'):
     return sents, labels
 
 
-class AnagoNERSequence(Sequence):
+class AnagoNERSequence(keras.utils.Sequence):
 
     def __init__(self, x, y, batch_size=1, preprocess=None):
         self.x = x
