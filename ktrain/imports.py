@@ -145,7 +145,7 @@ try:
     import keras_bert
     from keras_bert import Tokenizer as BERT_Tokenizer
 except ImportError:
-    warnings.warn("keras_bert (and/or TensorFlow) is not installed. keras_bert is only needed only for 'bert' text classification model")
+    warnings.warn("keras_bert (and/or its TensorFlow dependency) is not installed. keras_bert is only needed only for 'bert' text classification model")
 
 
 # transformers for models in 'text' module

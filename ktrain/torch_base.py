@@ -7,7 +7,7 @@ class TorchBase:
         try:
             import torch
         except (ImportError, OSError):
-            raise Exception('This capability requires PyTorch to be installed. Please install for your environment: '+\
+            raise Exception('This capability in ktrain requires PyTorch to be installed. Please install for your environment: '+\
                             'https://pytorch.org/get-started/locally/')
         self.quantize = quantize
         self.torch_device = device
