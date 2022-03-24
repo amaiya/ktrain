@@ -9,13 +9,18 @@ Most recent releases are shown at the top. Each release shows:
 ## 0.30.0
 
 ### new:
-- `text.qa.SimpleQA` and `text.qa.AnswerExtractor` now both support PyTorch with optional fp16 inference
+- **ktrain** now only issues a warning if TensorFlow is not installed, insteading of halting and preventing further use. This means that 
+  pre-trained PyTorch models (e.g., `text.zsl.ZeroShotClassifier`) and sklearn models (e.g., `text.eda.TopicModel`) in **ktrain** can now be used
+  **without** having TensorFlow installed.
+- `text.qa.SimpleQA` and `text.qa.AnswerExtractor` now both support PyTorch with optional quantization (use `framework='pt'` for PyTorch version)
 - `text.qa.SimpleQA` and `text.qa.AnswerExtractor` now both support a `quantize` argument that can speed up
-  inference when True on both CPU and GPU.
+- `text.zsl.ZeroShotClassifier`, `text.translation.Translator`, and `text.translation.EnglishTranslator` all support a `quantize` argument.
 
 ### changed
-- reorganized imports 
+- reorganized imports
 - localized seqeval
+- The `half` parameter to `text.translation.Translator`, and `text.translation.EnglishTranslator` was changed to `quantize` and now supports
+  both CPU and GPU.
 
 ### fixed:
 - N/A
