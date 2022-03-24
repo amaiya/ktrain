@@ -116,6 +116,7 @@ class QA(ABC, TorchBase):
                 warnings.warn('Could not load supplied model as TensorFlow checkpoint - attempting to load using from_pt=True')
                 self.model = TFAutoModelForQuestionAnswering.from_pretrained(self.model_name, from_pt=True)
         else:
+            bert_emb_model = None # set to None and ignore since we only want to use PyTorch
             super().__init__(device=device, quantize=quantize)
             self.model = AutoModelForQuestionAnswering.from_pretrained(self.model_name).to(self.torch_device)
             if quantize: self.model = self.quantize_model(self.model)
