@@ -191,7 +191,7 @@ Image labels are in the form of a CSV containing paths to images.
 #### [Age Prediction](http://aicip.eecs.utk.edu/wiki/UTKFace):  Image Regression 
 - [utk_faces_age_prediction-resnet50.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/vision):  ResNet50 pretrained on ImageNet for age prediction  using UTK Face dataset
 
-### <a name="imagecaptioning"></a> [Image Captioning](https://en.wikipedia.org/wiki/Automatic_image_annotation)
+### <a name="imagecaptioning"></a> Image Captioning
 - [image_captioning_example.ipynb]((https://github.com/amaiya/ktrain/tree/master/examples/vision) is a notebook illustrating pretrained image-captioning in **ktrain**
 
 ## Graph Data
