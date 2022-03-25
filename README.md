@@ -333,8 +333,6 @@ The above should be all you need on Linux systems and cloud computing environmen
 
 **ktrain** should currently support any version of TensorFlow at or above to v2.3: i.e., `pip install tensorflow>=2.3`.
 
-**Some important things to note about installation:**
-
 Some optional, extra libraries used for some operations can be installed as needed:
 ```python
 # for graph module
@@ -355,6 +353,23 @@ pip install textract
 pip install datasets
 ```
 Notice that **ktrain** is using forked versions of the `eli5` and `stellargraph` libraries above in order to support TensorFlow2.
+
+**ktrain** uses TensorFlow for neural network training, but also includes a variety of useful pretrained PyTorch models and sklearn models, which
+can be used without having TensorFlow installed, as summarized in this table:
+| Feature  | TensorFlow |  PyTorch | Sklearn
+| --- | :-: | :-: | :-: |
+| [training](https://towardsdatascience.com/ktrain-a-lightweight-wrapper-for-keras-to-help-train-neural-networks-82851ba889c) any neural network (e.g., text or image classification)  |  ✅  | ❌  | ❌  |
+| [End-to-End Question-Answering](https://nbviewer.org/github/amaiya/ktrain/blob/master/examples/text/question_answering_with_bert.ipynb) (pretrained)             |  ✅  | ✅  | ❌  |
+| [QA-Based Information Extraction](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/qa_information_extraction.ipynb) (pretrained)      |  ✅  | ✅  | ❌  |
+| [Fine-tuning Question-Answering](https://nbviewer.org/github/amaiya/ktrain/blob/master/examples/text/qa_information_extraction.ipynb#Customizing-the-AnswerExtractor-to-Your-Use-Case)  |  ✅  | ❌  | ❌  |
+| [Zero-Shot Classification](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/zero_shot_learning_with_nli.ipynb) (pretrained)   |  ❌  | ✅  | ❌  |
+| [Language Translation](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/language_translation_example.ipynb) (pretrained)      |  ❌  | ✅  | ❌  |
+| [Summarization](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/text_summarization_with_bart.ipynb) (pretrained)             |  ❌  | ✅  | ❌  |
+| [Speech Transcription](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/speech_transcription_example.ipynb) (pretrained)     |  ❌  | ✅  |❌   |
+| [Topic Modeling](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-05-learning_from_unlabeled_text_data.ipynb) (sklearn)  |  ❌  | ❌  | ✅  |
+
+
+
 
 <!--
 pip install pdoc3==0.9.2
