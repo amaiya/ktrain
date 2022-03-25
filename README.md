@@ -360,6 +360,8 @@ pip install datasets
 
 - **ktrain** uses TensorFlow for neural network training, but also includes a variety of useful pretrained PyTorch models and sklearn models, which
 can be used out-of-the-box **without** having TensorFlow installed, as summarized in this table:
+
+
 | Feature  | TensorFlow |  PyTorch | Sklearn
 | --- | :-: | :-: | :-: |
 | [training](https://towardsdatascience.com/ktrain-a-lightweight-wrapper-for-keras-to-help-train-neural-networks-82851ba889c) any neural network (e.g., text or image classification)  |  ✅  | ❌  | ❌  |
