@@ -3,7 +3,13 @@ class TorchBase:
     Utility methods for working pretrained Torch models
     """
 
-    def __init__(self, device, quantize=False):
+    def __init__(self, device, quantize=False, min_transformers_version=None):
+        if min_transformers_version is not None:
+            import transformers
+            from packaging import version
+            if version.parse(transformers.__version__) < version.parse(min_transformers_version):
+                raise Exception(f'This feature requires transformers>={min_transformers_version}. '+\
+                                 'It is usually safe for you to manually upgrade transformers even if ktrain installed a lower version.')
         try:
             import torch
         except (ImportError, OSError):

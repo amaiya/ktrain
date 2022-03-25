@@ -21,6 +21,7 @@ This directory contains various example notebooks using *ktrain*.  The directory
 - `vision`:  
   - [image classification](#imageclass):  models for image datasetsimage classification examples using various models and datasets
   - [image regression](#imageregression): example of predicting numerical values purely from images/photos
+  - [image captioning](#imagecaptioning): example of captioning images with a pretrained model
 - `graphs`: 
   - [node classification](#-graph-node-classification-datasets): node classification in graphs or networks
   - [link prediction](#-graph-link-prediction-datasets): link prediction in graphs or networks
@@ -190,6 +191,7 @@ Image labels are in the form of a CSV containing paths to images.
 #### [Age Prediction](http://aicip.eecs.utk.edu/wiki/UTKFace):  Image Regression 
 - [utk_faces_age_prediction-resnet50.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/vision):  ResNet50 pretrained on ImageNet for age prediction  using UTK Face dataset
 
+### <a name="imagecaptioning"></a> [image_captioning_example.ipynb]((https://github.com/amaiya/ktrain/tree/master/examples/vision) is a notebook illustrating pretrained image-captioning in **ktrain**.
 
 ## Graph Data
 
