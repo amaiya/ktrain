@@ -196,7 +196,3 @@ if SUPPRESS_DEP_WARNINGS:
     # elevate warnings to errors for debugging dependencies
     #warnings.simplefilter('error', FutureWarning)
     set_global_logging_level(logging.ERROR, ["transformers", "nlp", "torch", "tensorflow", "tensorboard", "wandb", 'mosestokenizer', 'shap'])
-
-# NOTES: As of 0.30.x, TensorFlow is optional and no longer forced to allow for use of pretrained PyTorch or sklearn models.
-# In core, lroptimize imports were localized to allow for optional TF
-# References to ktrain.dataset and anago were also localized (from module-level) for optional TF

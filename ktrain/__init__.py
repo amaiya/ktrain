@@ -118,3 +118,8 @@ def get_learner(model, train_data=None, val_data=None,
 # currently_unsupported: unsupported or disabled features (e.g., xai graph neural networks have not been implemented)
 # dep_fix:  a fix to address a problem in a dependency
 # TODO: things to change
+
+
+# NOTES: As of 0.30.x, TensorFlow is optional and no longer forced to allow for use of pretrained PyTorch or sklearn models.
+# In core, lroptimize imports were localized to allow for optional TF
+# References to ktrain.dataset (keras.utils) and anago (keras.Callback) were also localized (from module-level) for optional TF
