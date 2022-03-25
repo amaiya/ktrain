@@ -356,7 +356,7 @@ pip install datasets
 ```
 Notice that **ktrain** is using forked versions of the `eli5` and `stellargraph` libraries above in order to support TensorFlow2.
 
-**ktrain** uses TensorFlow for neural network training, but also includes a variety of useful pretrained PyTorch models and sklearn models, which
+Finally, **ktrain** uses TensorFlow for neural network training, but also includes a variety of useful pretrained PyTorch models and sklearn models, which
 can be used out-of-the-box without having TensorFlow installed, as summarized in this table:
 | Feature  | TensorFlow |  PyTorch | Sklearn
 | --- | :-: | :-: | :-: |
