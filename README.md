@@ -337,7 +337,7 @@ The above should be all you need on Linux systems and cloud computing environmen
 
 #### Additional Notes About Installation
 
-Some optional, extra libraries used for some operations can be installed as needed:
+- Some optional, extra libraries used for some operations can be installed as needed: (Notice that **ktrain** is using forked versions of the `eli5` and `stellargraph` libraries above in order to support TensorFlow2.)
 ```python
 # for graph module:
 pip install https://github.com/amaiya/stellargraph/archive/refs/heads/no_tf_dep_082.zip
@@ -356,9 +356,9 @@ pip install textract
 # for text.qa.AnswerExtractor.finetune:
 pip install datasets
 ```
-Notice that **ktrain** is using forked versions of the `eli5` and `stellargraph` libraries above in order to support TensorFlow2.
+- **ktrain** purposely pins to a lower version of **transformers** to include support for older veresions of TensorFlow.  If you need a newer version of `transformers`, it is usually safe for you to upgrade `transformers` to a newer version, as long as you do it **after** installing **ktrain**.
 
-Finally, **ktrain** uses TensorFlow for neural network training, but also includes a variety of useful pretrained PyTorch models and sklearn models, which
+- **ktrain** uses TensorFlow for neural network training, but also includes a variety of useful pretrained PyTorch models and sklearn models, which
 can be used out-of-the-box **without** having TensorFlow installed, as summarized in this table:
 | Feature  | TensorFlow |  PyTorch | Sklearn
 | --- | :-: | :-: | :-: |
