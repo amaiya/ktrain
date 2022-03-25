@@ -356,7 +356,7 @@ pip install textract
 # for text.qa.AnswerExtractor.finetune:
 pip install datasets
 ```
-- **ktrain** purposely pins to a lower version of **transformers** to include support for older veresions of TensorFlow.  If you need a newer version of `transformers`, it is usually safe for you to upgrade `transformers`, as long as you do it **after** installing **ktrain**.
+- **ktrain** purposely pins to a lower version of **transformers** to include support for older versions of TensorFlow.  If you need a newer version of `transformers`, it is usually safe for you to upgrade `transformers`, as long as you do it **after** installing **ktrain**.
 
 - **ktrain** uses TensorFlow for neural network training, but also includes a variety of useful pretrained PyTorch models and sklearn models, which
 can be used out-of-the-box **without** having TensorFlow installed, as summarized in this table:
