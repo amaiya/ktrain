@@ -370,6 +370,7 @@ can be used out-of-the-box without having TensorFlow installed, as summarized in
 | [Speech Transcription](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/speech_transcription_example.ipynb) (pretrained)     |  ❌  | ✅  |❌   |
 | [Topic Modeling](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-05-learning_from_unlabeled_text_data.ipynb) (sklearn)  |  ❌  | ❌  | ✅  |
 
+As noted above, end-to-end question-answering and information extraction in **ktrain** can be used with either TensorFlow (using `framework='tf'`) or PyTorch (using `framework='pt'`).
 
 
 
