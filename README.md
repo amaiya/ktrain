@@ -337,21 +337,21 @@ The above should be all you need on Linux systems and cloud computing environmen
 
 Some optional, extra libraries used for some operations can be installed as needed:
 ```python
-# for graph module
+# for graph module:
 pip install https://github.com/amaiya/stellargraph/archive/refs/heads/no_tf_dep_082.zip
-# for text.TextPredictor.explain and vision.ImagePredictor.explain
+# for text.TextPredictor.explain and vision.ImagePredictor.explain:
 pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip
-# for tabular.TabularPredictor.explain
+# for tabular.TabularPredictor.explain:
 pip install shap
-# for text.zsl (ZeroShotClassifier), text.summarization, text.translation, text.speech
+# for text.zsl (ZeroShotClassifier), text.summarization, text.translation, text.speech:
 pip install torch
-# for text.speech
+# for text.speech:
 pip install librosa
-# for tabular.causal_inference_model
+# for tabular.causal_inference_model:
 pip install causalnlp
-# for text.TextExtractor
+# for text.TextExtractor:
 pip install textract
-# for text.qa.AnswerExtractor.finetune
+# for text.qa.AnswerExtractor.finetune:
 pip install datasets
 ```
 Notice that **ktrain** is using forked versions of the `eli5` and `stellargraph` libraries above in order to support TensorFlow2.
