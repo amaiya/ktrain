@@ -337,7 +337,7 @@ The above should be all you need on Linux systems and cloud computing environmen
 
 #### Additional Notes About Installation
 
-- Some optional, extra libraries used for some operations can be installed as needed: (Notice that **ktrain** is using forked versions of the `eli5` and `stellargraph` libraries above in order to support TensorFlow2.)
+- Some optional, extra libraries used for some operations can be installed as needed: (Notice that **ktrain** is using forked versions of the `eli5` and `stellargraph` libraries in order to support TensorFlow2.)
 ```python
 # for graph module:
 pip install https://github.com/amaiya/stellargraph/archive/refs/heads/no_tf_dep_082.zip
@@ -356,7 +356,7 @@ pip install textract
 # for text.qa.AnswerExtractor.finetune:
 pip install datasets
 ```
-- **ktrain** purposely pins to a lower version of **transformers** to include support for older veresions of TensorFlow.  If you need a newer version of `transformers`, it is usually safe for you to upgrade `transformers` to a newer version, as long as you do it **after** installing **ktrain**.
+- **ktrain** purposely pins to a lower version of **transformers** to include support for older veresions of TensorFlow.  If you need a newer version of `transformers`, it is usually safe for you to upgrade `transformers`, as long as you do it **after** installing **ktrain**.
 
 - **ktrain** uses TensorFlow for neural network training, but also includes a variety of useful pretrained PyTorch models and sklearn models, which
 can be used out-of-the-box **without** having TensorFlow installed, as summarized in this table:
@@ -371,6 +371,8 @@ can be used out-of-the-box **without** having TensorFlow installed, as summarize
 | [Language Translation](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/language_translation_example.ipynb) (pretrained)      |  ❌  | ✅  | ❌  |
 | [Summarization](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/text_summarization_with_bart.ipynb) (pretrained)             |  ❌  | ✅  | ❌  |
 | [Speech Transcription](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/speech_transcription_example.ipynb) (pretrained)     |  ❌  | ✅  |❌   |
+| [Image Captioning](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/vision/image_captioning_example.ipynb) (pretrained)     |  ❌  | ✅  |❌   |
+| [Object Detection](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/vision/object_detection_example.ipynb) (pretrained)     |  ❌  | ✅  |❌   |
 | [Topic Modeling](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-05-learning_from_unlabeled_text_data.ipynb) (sklearn)  |  ❌  | ❌  | ✅  |
 
 As noted above, end-to-end question-answering and information extraction in **ktrain** can be used with either TensorFlow (using `framework='tf'`) or PyTorch (using `framework='pt'`).
