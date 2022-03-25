@@ -13,7 +13,7 @@ from ktrain.imports import ACC_NAME, VAL_ACC_NAME
 class TestQA(TestCase):
 
 
-    @skip('temporarily disabled')
+    #@skip('temporarily disabled')
     def test_qa(self):
         
         from sklearn.datasets import fetch_20newsgroups
