@@ -337,7 +337,7 @@ The above should be all you need on Linux systems and cloud computing environmen
 
 #### Additional Notes About Installation
 
-- Some optional, extra libraries used for some operations can be installed as needed: (Notice that **ktrain** is using forked versions of the `eli5` and `stellargraph` libraries in order to support TensorFlow2.)
+- Some optional, extra libraries used for some operations can be installed as needed. (Notice that **ktrain** is using forked versions of the `eli5` and `stellargraph` libraries in order to support TensorFlow2.)
 ```python
 # for graph module:
 pip install https://github.com/amaiya/stellargraph/archive/refs/heads/no_tf_dep_082.zip
