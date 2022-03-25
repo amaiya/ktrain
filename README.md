@@ -363,7 +363,7 @@ can be used out-of-the-box without having TensorFlow installed, as summarized in
 | [training](https://towardsdatascience.com/ktrain-a-lightweight-wrapper-for-keras-to-help-train-neural-networks-82851ba889c) any neural network (e.g., text or image classification)  |  ✅  | ❌  | ❌  |
 | [End-to-End Question-Answering](https://nbviewer.org/github/amaiya/ktrain/blob/master/examples/text/question_answering_with_bert.ipynb) (pretrained)             |  ✅  | ✅  | ❌  |
 | [QA-Based Information Extraction](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/qa_information_extraction.ipynb) (pretrained)      |  ✅  | ✅  | ❌  |
-| [Fine-tuning Question-Answering](https://nbviewer.org/github/amaiya/ktrain/blob/master/examples/text/qa_information_extraction.ipynb#Customizing-the-AnswerExtractor-to-Your-Use-Case)  |  ✅  | ❌  | ❌  |
+| [Fine-tuning a question-answering model](https://nbviewer.org/github/amaiya/ktrain/blob/master/examples/text/qa_information_extraction.ipynb#Customizing-the-AnswerExtractor-to-Your-Use-Case)  |  ✅  | ❌  | ❌  |
 | [Zero-Shot Classification](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/zero_shot_learning_with_nli.ipynb) (pretrained)   |  ❌  | ✅  | ❌  |
 | [Language Translation](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/language_translation_example.ipynb) (pretrained)      |  ❌  | ✅  | ❌  |
 | [Summarization](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/text_summarization_with_bart.ipynb) (pretrained)             |  ❌  | ✅  | ❌  |
