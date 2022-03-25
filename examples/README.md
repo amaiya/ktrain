@@ -22,6 +22,7 @@ This directory contains various example notebooks using *ktrain*.  The directory
   - [image classification](#imageclass):  models for image datasetsimage classification examples using various models and datasets
   - [image regression](#imageregression): example of predicting numerical values purely from images/photos
   - [image captioning](#imagecaptioning): example of captioning images with a pretrained model
+  - [object detection](#objectdetection): example of object detection in images with a pretrained model
 - `graphs`: 
   - [node classification](#-graph-node-classification-datasets): node classification in graphs or networks
   - [link prediction](#-graph-link-prediction-datasets): link prediction in graphs or networks
@@ -193,6 +194,9 @@ Image labels are in the form of a CSV containing paths to images.
 
 ### <a name="imagecaptioning"></a> Image Captioning
 - [image_captioning_example.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/vision) is a notebook illustrating pretrained image-captioning in **ktrain**
+
+### <a name="objectdetection"></a> Object Detection
+- [object_detection_example.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/vision) is a notebook illustrating pretrained object-detection in **ktrain**
 
 ## Graph Data
 
