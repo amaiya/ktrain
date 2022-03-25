@@ -15,6 +15,7 @@ Most recent releases are shown at the top. Each release shows:
 - `text.qa.SimpleQA` and `text.qa.AnswerExtractor` now both support PyTorch with optional quantization (use `framework='pt'` for PyTorch version)
 - `text.qa.SimpleQA` and `text.qa.AnswerExtractor` now both support a `quantize` argument that can speed up
 - `text.zsl.ZeroShotClassifier`, `text.translation.Translator`, and `text.translation.EnglishTranslator` all support a `quantize` argument.
+- pretrained image-captioning and object-detection via `transformers` is now supported
 
 ### changed
 - reorganized imports
