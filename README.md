@@ -333,6 +333,8 @@ The above should be all you need on Linux systems and cloud computing environmen
 
 **ktrain** should currently support any version of TensorFlow at or above to v2.3: i.e., `pip install tensorflow>=2.3`.
 
+#### Additional Notes About Installation
+
 Some optional, extra libraries used for some operations can be installed as needed:
 ```python
 # for graph module
