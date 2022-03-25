@@ -279,3 +279,14 @@ result = transcriber.transcribe(afiles)
 print(time.time()-start)
 print(result)
 
+
+
+# image-captioning
+from ktrain.vision.caption import ImageCaptioner
+ic = ImageCaptioner()
+ifiles = ['image_data/squirrel.jpg']
+start = time.time()
+result = ic.caption(ifiles)
+print(time.time()-start)
+print(result)
+
