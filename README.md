@@ -10,35 +10,31 @@
 
 
 ### News and Announcements
+- **2022-03-31**
+  - **ktrain v0.30.x** is released and now includes support for keyphrase extraction in addition to pretrained image-captioning and object-detection. A short example is shown here, but see the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/keyword_extraction_example.ipynb) for more information.
+```python
+# Keyphrase Extraction
+from ktrain.text.kw import KeywordExtractor
+from ktrain.text.textextractor import TextExtractor
+!wget --user-agent="Mozilla" https://arxiv.org/pdf/2004.10703.pdf -O /tmp/downloaded_paper.pdf -q
+text = TextExtractor().extract('/tmp/downloaded_paper.pdf')
+kwe.extract_keywords(text, candidate_generator='noun_phrases')
+
+# OUTPUT
+#[('machine learning', 0.0784313725490196),
+# ('text classification', 0.049019607843137254),
+# ('image classification', 0.049019607843137254),
+# ('exact answers', 0.0392156862745098),
+# ('augmented machine learning', 0.0392156862745098),
+# ('graph data', 0.029411764705882353),
+# ('node classification', 0.029411764705882353),
+# ('entity recognition', 0.029411764705882353),
+# ('code example', 0.029411764705882353),
+# ('index documents', 0.029411764705882353)]
+```
 - **2022-01-28**
   - **ktrain v0.29.x** is released and includes miscellaneous enhancements contributed by [Sandy Khosasi](https://github.com/ilos-vigil) such as [support for MobileNetV3 and EfficientNet](https://colab.research.google.com/drive/1EJHpMVG6fBCg33UPla_Ly_6LQdswU2Ur?usp=sharing), [plotting improvements](https://colab.research.google.com/drive/1_WaRQ0J4g0VTn6HWS3kszdFZbBBWoa7R?usp=sharing), and [raw confidence scores in QA](https://colab.research.google.com/drive/1ParprLN9hFX6cxJ1w7bv91PYx4o0J1zm?usp=sharing).
-- **2021-10-13**
-  - **ktrain v0.28.x** is released and now includes the `AnswerExtractor`, which allows you to extract any information of interest from documents by simply phrasing it in the form of a question. A short example is shown here, but see the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/qa_information_extraction.ipynb) for more information.
-```python
-# QA-Based Information Extraction
 
-# DataFrame BEFORE
-df.head()
-#     Text
-#0    Three major risk factors for COVID-19 were sex (male), age (≥60), and severe pneumonia.
-#1    His speciality is medical risk assessments, and he is 30 years old.
-#2    A total of nine studies including 356 patients were included in this study.
-
-# AnswerExtractor will create two new columns:  'Risk Factors' and 'Sample Size'
-from ktrain.text.qa import AnswerExtractor
-ae = AnswerExtractor()
-df = ae.extract(df.Text.values, df, [('What are the risk factors?', 'Risk Factors'),
-                                     ('How many individuals in sample?', 'Sample Size')])
-
-# DataFrame AFTER
-df[['Risk Fctors', 'Sample Size']].head()
-#     Risk Factors                                       Sample Size
-#0    sex (male), age (≥60), and severe pneumonia        None
-#1    None                                               None
-#2    None                                               356
-```
-- **2021-07-20**
-  - **ktrain v0.27.x** is released and now supports causal inference using [meta-learners](https://arxiv.org/abs/1706.03461). See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/tabular/causal_inference_example.ipynb) for more information.
 - **2021-07-15**
   - **ktrain** was used to train machine learning models for [CoronaCentral.ai](https://coronacentral.ai/), a machine-learning-enhanced search engine for COVID publications at Stanford University. The CoronaCentral document classifier, **CoronaBERT**, is [available on the Hugging Face model hub](https://huggingface.co/jakelever/coronabert).  CoronaCentral.ai was developed by Jake Lever and Russ Altman and funded by the Chan Zuckerberg Biohub. Check out [their paper](https://www.biorxiv.org/content/10.1101/2020.12.21.423860v1).
 ----
@@ -65,6 +61,7 @@ df[['Risk Fctors', 'Sample Size']].head()
      - **Text Extraction**: Extract text from PDFs, Word documents, etc. <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/text_extraction_example.ipynb)]</sup></sub>
      - **Speech Transcription**: Extract text from audio files <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/speech_transcription_example.ipynb)]</sup></sub>
      - **Universal Information Extraction**:  extract any kind of information from documents by simply phrasing it in the form of a question <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/qa_information_extraction.ipynb)]</sup></sub>
+     - **Keyphrase Extraction**:  extract keyphrasen from documents <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/keyword_extraction_example.ipynb)]</sup></sub>
   - `vision` data:
     - **image classification** (e.g., [ResNet](https://arxiv.org/abs/1512.03385), [Wide ResNet](https://arxiv.org/abs/1605.07146), [Inception](https://www.cs.unc.edu/~wliu/papers/GoogLeNet.pdf)) <sub><sup>[[example notebook](https://colab.research.google.com/drive/1WipQJUPL7zqyvLT10yekxf_HNMXDDtyR)]</sup></sub>
     - **image regression** for predicting numerical targets from photos (e.g., age prediction) <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/vision/utk_faces_age_prediction-resnet50.ipynb)]</sup></sub>
