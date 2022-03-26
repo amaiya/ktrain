@@ -14,7 +14,7 @@ class TextExtractor:
             raise Exception('TextExtractor requires textract: pip install textract')
         self.process = textract.process
 
-    def extract(self, filename=None, text=None,return_format='document', lang=None):
+    def extract(self, filename=None, text=None,return_format='document', lang=None, verbose=1):
         """
         ```
         Extracts text from document given file path to document.
@@ -26,6 +26,7 @@ class TextExtractor:
                           'paragraphs': returns a list of paragraphs from document
                           'sentences': returns a list of sentences from document
         lang(str): language code. If None, lang will be detected from extracted text
+        verbose(bool): verbosity
         ```
         """
         if filename is None and text is None:
