@@ -50,6 +50,7 @@ setup(
         # for testing: pip3 install git+https://github@github.com/amaiya/ktrain@develop#egg=ktrain[tests]
         'tests': [ 'ipython',        # for tests
                   'datasets',        # for text.qa.AnswerExtractor.finetune
+                  'textblob',        # for text.kw.KeywordExtractor and textutils.extract_noun_phrases
                   'textract',        # for TextExtractor
                   'causalnlp',       # for tabular.causalinference
                   'librosa',         # for text.speech
@@ -61,7 +62,6 @@ setup(
         # not included and checked/requested within-code: 
         # 1. bokeh: in TopicModel.visualize_docuemnts
         # 2. allennlp: for NETR Elmo embeddings since TF2 TF_HUB does not work
-        # 3. textblob: # used by textutils.extract_noun_phrases
     },
   classifiers=[  # Optional
     # How mature is this project? Common values are

@@ -350,6 +350,8 @@ pip install librosa
 pip install causalnlp
 # for text.TextExtractor:
 pip install textract
+# for text.kw.KeywordExtractor
+pip install textblob
 # for text.qa.AnswerExtractor.finetune:
 pip install datasets
 ```
