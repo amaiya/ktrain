@@ -11,13 +11,14 @@
 
 ### News and Announcements
 - **2022-03-31**
-  - **ktrain v0.30.x** is released and now includes support for keyphrase extraction in addition to pretrained image-captioning and object-detection. A short example is shown here, but see the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/keyword_extraction_example.ipynb) for more information.
+  - **ktrain v0.30.x** is released and now includes support for [keyphrase extraction](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/keyword_extraction_example.ipynb) in addition to pretrained [image-captioning](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/vision/image_captioning_example.ipynb) and [object-detection](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/vision/object_detection_example.ipynb):
 ```python
-# Keyphrase Extraction
+# Keyphrase Extraction in ktrain
 from ktrain.text.kw import KeywordExtractor
 from ktrain.text.textextractor import TextExtractor
 !wget --user-agent="Mozilla" https://arxiv.org/pdf/2004.10703.pdf -O /tmp/downloaded_paper.pdf -q
 text = TextExtractor().extract('/tmp/downloaded_paper.pdf')
+kwe = KeywordExtractor()
 kwe.extract_keywords(text, candidate_generator='noun_phrases')
 
 # OUTPUT
