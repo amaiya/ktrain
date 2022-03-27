@@ -214,7 +214,7 @@ def filter_by_id(lst, ids=[]):
 
 
 def chinese_stopwords():
-    with open(os.path.join(os.path.dirname(os.path.abspath(localbert.__file__)), 'stopwords-zh.txt'), 'r') as f:
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'stopwords-zh.txt'), 'r') as f:
         return [line.strip() for line in f]
 
 

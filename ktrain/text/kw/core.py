@@ -1,6 +1,8 @@
 from collections import Counter
 import warnings
-import jieba
+
+from ... import imports as I
+from .. import textutils as TU
 try:
     import textblob
     TEXTBLOB_INSTALLED = True
@@ -59,7 +61,9 @@ class KeywordExtractor:
         from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
         if lang == 'en':
             stopwords = list(ENGLISH_STOP_WORDS)+custom_stopwords
-        elif lang in SUPPORTED_LANGS and lang != 'zh':
+        elif lang == 'zh':
+            stopwords = TU.chinese_stopwords()+custom_stopwords
+        elif lang in SUPPORTED_LANGS:
             stopwords = nltk_stopwords.words(SUPPORTED_LANGS[lang])
         else:
             stopwords = []
@@ -94,7 +98,7 @@ class KeywordExtractor:
         if candidate_generator not in ['noun_phrases', 'ngrams']: 
             raise ValueError('candidate_generator must be one of {"noun_phrases", "ngrams"}')
         if self.lang == 'zh':
-            text = ' '.join(jieba.cut(text, HMM=False))
+            text = ' '.join(I.jieba.cut(text, HMM=False))
         if candidate_generator == 'noun_phrases' and self.lang != 'en':
             warnings.warn(f'lang={self.lang} but candidate_generator="noun_phrases" is not supported. '+\
                           'Falling back to candidate_generator="ngrams"')
