@@ -9,6 +9,7 @@ Most recent releases are shown at the top. Each release shows:
 ## 0.30.0
 
 ### new:
+- **ktrain** now supports simple, fast, and robust keyphrase extraction with the `ktran.text.kw.KeywordExtractor` module
 - **ktrain** now only issues a warning if TensorFlow is not installed, insteading of halting and preventing further use. This means that 
   pre-trained PyTorch models (e.g., `text.zsl.ZeroShotClassifier`) and sklearn models (e.g., `text.eda.TopicModel`) in **ktrain** can now be used
   **without** having TensorFlow installed.
