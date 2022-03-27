@@ -13,7 +13,7 @@ exec(open('ktrain/version.py').read())
 setup(
   name = 'ktrain',
   packages = setuptools.find_packages(),
-  package_data={'ktrain': ['text/shallownlp/ner_models/*']},
+  package_data={'ktrain': ['text/shallownlp/ner_models/*', 'text/stopwords-zh.txt']},
   version = __version__,
   license='Apache License 2.0',
   description = 'ktrain is a wrapper for TensorFlow Keras that makes deep learning and AI more accessible and easier to apply',
