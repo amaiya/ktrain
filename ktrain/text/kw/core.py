@@ -1,45 +1,73 @@
 from collections import Counter
+import warnings
+import jieba
 try:
     import textblob
     TEXTBLOB_INSTALLED = True
 except ImportError:
     TEXTBLOB_INSTALLED = False
 
+SUPPORTED_LANGS = {'en' : 'english',
+                   'ar' : 'arabic',
+                   'az' : 'azerbaijani',
+                   'da' : 'danish',
+                   'nl' : 'dutch',
+                   'fi' : 'finnish',
+                   'fr' : 'french',
+                   'de' : 'german',
+                   'el' : 'greek',
+                   'hu' : 'hungarian',
+                   'id' : 'indonesian',
+                   'it' : 'italian',
+                   'kk' : 'kazakh',
+                   'ne' : 'nepali',
+                   'no' : 'norwegian',
+                   'pt' : 'portuguese',
+                   'ro' : 'romanian',
+                   'ru' : 'russian',
+                   'sl' : 'slovene',
+                   'es' : 'spanish',
+                   'sv' : 'swedish',
+                   'tg' : 'tajik',
+                   'tr' : 'turkish',
+                   'zh' : 'chinese'}
 
 class KeywordExtractor:
     """
     Keyphrase Extraction
     """
 
-    def __init__(self, stopwords='english', custom_blacklist = ['et al', 'et', 'al', "n't", 'did', 'does']):
+    def __init__(self, lang='en', custom_stopwords = ['et al', 'et', 'al', "n't", 'did', 'does']):
         """
         ```
         Keyphrase Extraction
 
         Args:
-          stopwords(str|list): 
-                               If a list is supplied, the list of strings will be used as stopwords.
-                               If a string is supplied, an NLTK language-specific stopwords list will be used.
-                               To view languages supported: run nltk.corpus.stopwords.fileids()
-          custom_blacklist(list): a list of extra words to ignore that may not be covered by stopwords
+          lang(str):  2-character language code: 
+          custom_stopwords(list): list of custom stopwords to ignore
         ```
         """
+        # error checks
         if not TEXTBLOB_INSTALLED:
             raise Exception('The textblob package is required for keyphrase extraction: pip install textblob; python -m textblob.download_corpora')
+        if lang not in SUPPORTED_LANGS:
+            raise ValueError(f'lang="{lang}" is not supported. Supported 2-character ISO 639-1 language codes are: {SUPPORTED_LANGS}')
+        self.lang = lang
+
+        # build blacklist
         from nltk.corpus import stopwords as nltk_stopwords
         from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
-        self.stopwords = stopwords
-        if isinstance(stopwords, str) and stopwords not in nltk_stopwords.fileids():
-            raise ValueError('The stopwords parameter supports following languages: %s' % (nltk_stopwords.fileids()))
-        if isinstance(stopwords, list):
-            blacklist = stopwords
+        if lang == 'en':
+            stopwords = list(ENGLISH_STOP_WORDS)+custom_stopwords
+        elif lang in SUPPORTED_LANGS and lang != 'zh':
+            stopwords = nltk_stopwords.words(SUPPORTED_LANGS[lang])
         else:
-            blacklist = list(ENGLISH_STOP_WORDS)+custom_blacklist \
-                           if stopwords == 'english' else nltk_stopwords.words(stopwords)
+            stopwords = []
+        blacklist = stopwords+custom_stopwords
         self.blacklist = blacklist
 
 
-    def extract_keywords(self, text, ngram_range=(1,3), top_n=10, n_candidates=50, omit_scores=False, stopwords='english',
+    def extract_keywords(self, text, ngram_range=(1,3), top_n=10, n_candidates=50, omit_scores=False,
                          candidate_generator='ngrams', constrain_unigram_case=True, maxlen=64):
         """
         simple keyword extraction
@@ -65,6 +93,13 @@ class KeywordExtractor:
         """
         if candidate_generator not in ['noun_phrases', 'ngrams']: 
             raise ValueError('candidate_generator must be one of {"noun_phrases", "ngrams"}')
+        if self.lang == 'zh':
+            text = ' '.join(jieba.cut(text, HMM=False))
+        if candidate_generator == 'noun_phrases' and self.lang != 'en':
+            warnings.warn(f'lang={self.lang} but candidate_generator="noun_phrases" is not supported. '+\
+                          'Falling back to candidate_generator="ngrams"')
+            candidate_generator = 'ngrams'
+
         blob = textblob.TextBlob(text)
         candidates = []
         min_n, max_n = ngram_range
