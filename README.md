@@ -355,8 +355,6 @@ pip install causalnlp
 pip install textract
 # for text.kw.KeywordExtractor
 pip install textblob
-# for text.qa.AnswerExtractor.finetune:
-pip install datasets
 ```
 - **ktrain** purposely pins to a lower version of **transformers** to include support for older versions of TensorFlow.  If you need a newer version of `transformers`, it is usually safe for you to upgrade `transformers`, as long as you do it **after** installing **ktrain**.
 
