@@ -9,13 +9,12 @@ with open('README.md', encoding='utf-8') as readme_file:
     readme = readme_file.read()
 exec(open('ktrain/version.py').read())
 
-all_extras = [ 'ipython',        # for tests
-              'datasets',        # for text.qa.AnswerExtractor.finetune
+all_extras = [ 'datasets',        # for text.qa.AnswerExtractor.finetune
               'textblob',        # for text.kw.KeywordExtractor and textutils.extract_noun_phrases
               'textract',        # for TextExtractor
               'causalnlp',       # for tabular.causalinference
               'librosa',         # for text.speech
-              'torch==1.8.1',    # for qa, summarization, translation, zsl, speech
+              'torch>=1.8.1',    # for qa, summarization, translation, zsl, speech, caption, object_detection
               'shap',            # for tabular.TabularPredictor.explain
               'eli5 @ git+https://github@github.com/amaiya/eli5@tfkeras_0_10_1#egg=eli5',                        # for explain in text/vision
               'stellargraph @ git+https://github@github.com/amaiya/stellargraph@no_tf_dep_082#egg=stellargraph', # for graph module
@@ -62,7 +61,7 @@ setup(
     extras_require={
         # NOTE: If missing, these libraries below are installed manually on-the-fly when required by an invoked method with appropriate warnings
         # for testing: pip3 install git+https://github@github.com/amaiya/ktrain@develop#egg=ktrain[tests]
-        'tests': all_extras,
+        'tests': all_extras+['ipython'],
         'all' : all_extras,
     },
   classifiers=[  # Optional
