@@ -80,7 +80,7 @@ class KeywordExtractor:
         This is a simplified TextBlob implementation of the KERA algorithm from:
           https://arxiv.org/pdf/1308.2359.pdf
         Args:
-          text (str): the text as unicode string
+          text(str): the text as unicode string
           ngram_range(tuple): the ngram range.  Example: (1,3) considers unigrams, bigrams, and trigrams as candidates
           top_n(int): number of keyphrases to return
           n_candidates(int): number of candidates considered, when ranking
