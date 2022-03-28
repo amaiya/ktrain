@@ -74,6 +74,7 @@ class KeywordExtractor:
     def extract_keywords(self, text, ngram_range=(1,3), top_n=10, n_candidates=50, omit_scores=False,
                          candidate_generator='ngrams', constrain_unigram_case=True, maxlen=64):
         """
+        ```
         simple keyword extraction
         
         This is a simplified TextBlob implementation of the KERA algorithm from:
@@ -93,6 +94,7 @@ class KeywordExtractor:
 
           Returns:
             list
+          ```
                                         
         """
         if candidate_generator not in ['noun_phrases', 'ngrams']: 
