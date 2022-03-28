@@ -9,6 +9,20 @@ with open('README.md', encoding='utf-8') as readme_file:
     readme = readme_file.read()
 exec(open('ktrain/version.py').read())
 
+all_extras = [ 'ipython',        # for tests
+              'datasets',        # for text.qa.AnswerExtractor.finetune
+              'textblob',        # for text.kw.KeywordExtractor and textutils.extract_noun_phrases
+              'textract',        # for TextExtractor
+              'causalnlp',       # for tabular.causalinference
+              'librosa',         # for text.speech
+              'torch==1.8.1',    # for qa, summarization, translation, zsl, speech
+              'shap',            # for tabular.TabularPredictor.explain
+              'eli5 @ git+https://github@github.com/amaiya/eli5@tfkeras_0_10_1#egg=eli5',                        # for explain in text/vision
+              'stellargraph @ git+https://github@github.com/amaiya/stellargraph@no_tf_dep_082#egg=stellargraph', # for graph module
+ ]
+# not included and checked/requested within-code: 
+# 1. bokeh: in TopicModel.visualize_docuemnts
+# 2. allennlp: for NETR Elmo embeddings since TF2 TF_HUB does not work
 
 setup(
   name = 'ktrain',
@@ -48,20 +62,8 @@ setup(
     extras_require={
         # NOTE: If missing, these libraries below are installed manually on-the-fly when required by an invoked method with appropriate warnings
         # for testing: pip3 install git+https://github@github.com/amaiya/ktrain@develop#egg=ktrain[tests]
-        'tests': [ 'ipython',        # for tests
-                  'datasets',        # for text.qa.AnswerExtractor.finetune
-                  'textblob',        # for text.kw.KeywordExtractor and textutils.extract_noun_phrases
-                  'textract',        # for TextExtractor
-                  'causalnlp',       # for tabular.causalinference
-                  'librosa',         # for text.speech
-                  'torch==1.8.1',    # for qa, summarization, translation, zsl, speech
-                  'shap',            # for tabular.TabularPredictor.explain
-                  'eli5 @ git+https://github@github.com/amaiya/eli5@tfkeras_0_10_1#egg=eli5',                        # for explain in text/vision
-                  'stellargraph @ git+https://github@github.com/amaiya/stellargraph@no_tf_dep_082#egg=stellargraph', # for graph module
-                  ],
-        # not included and checked/requested within-code: 
-        # 1. bokeh: in TopicModel.visualize_docuemnts
-        # 2. allennlp: for NETR Elmo embeddings since TF2 TF_HUB does not work
+        'tests': all_extras,
+        'all' : all_extras,
     },
   classifiers=[  # Optional
     # How mature is this project? Common values are
