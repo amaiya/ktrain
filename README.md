@@ -374,6 +374,7 @@ can be used out-of-the-box **without** having TensorFlow installed, as summarize
 | [Image Captioning](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/vision/image_captioning_example.ipynb) (pretrained)     |  ❌  | ✅  |❌   |
 | [Object Detection](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/vision/object_detection_example.ipynb) (pretrained)     |  ❌  | ✅  |❌   |
 | [Topic Modeling](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-05-learning_from_unlabeled_text_data.ipynb) (sklearn)  |  ❌  | ❌  | ✅  |
+| [Keyphrase Extraction](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/keyword_extraction_example.ipynb) (textblob/nltk/sklearn)   |  ❌  | ❌  | ✅  |
 
 As noted above, end-to-end question-answering and information extraction in **ktrain** can be used with either TensorFlow (using `framework='tf'`) or PyTorch (using `framework='pt'`).
 
