@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.9.2" />
+<title>ktrain.text.ner.anago.models API documentation</title>
+<meta name="description" content="Model definition." />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>ktrain.text.ner.anago.models</code></h1>
+</header>
+<section id="section-intro">
+<p>Model definition.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Model definition.
+&#34;&#34;&#34;
+from ....imports import *
+from .... import utils as U
+#if U.is_tf_keras():
+    #from .layers import CRF
+#else:
+    #from .layers_standalone import CRF
+
+
+def save_model(model, weights_file, params_file):
+    with open(params_file, &#39;w&#39;) as f:
+        params = model.to_json()
+        json.dump(json.loads(params), f, sort_keys=True, indent=4)
+        model.save_weights(weights_file)
+
+
+def load_model(weights_file, params_file):
+    with open(params_file) as f:
+        model = keras.models.model_from_json(f.read(), custom_objects={&#39;CRF&#39;: CRF})
+        model.load_weights(weights_file)
+
+    return model
+
+
+class BiLSTMCRF(object):
+    &#34;&#34;&#34;A Keras implementation of BiLSTM-CRF for sequence labeling.
+
+    References
+    --
+    Guillaume Lample, Miguel Ballesteros, Sandeep Subramanian, Kazuya Kawakami, Chris Dyer.
+    &#34;Neural Architectures for Named Entity Recognition&#34;. Proceedings of NAACL 2016.
+    https://arxiv.org/abs/1603.01360
+    &#34;&#34;&#34;
+
+    def __init__(self,
+                 num_labels,
+                 word_vocab_size,
+                 char_vocab_size=None,
+                 word_embedding_dim=100,
+                 char_embedding_dim=25,
+                 word_lstm_size=100,
+                 char_lstm_size=25,
+                 fc_dim=100,
+                 dropout=0.5,
+                 embeddings=None,
+                 use_char=True,
+                 use_crf=True,
+                 char_mask_zero=True,
+                 use_elmo=False,
+                 use_transformer_with_dim=None):
+        &#34;&#34;&#34;Build a Bi-LSTM CRF model.
+
+        Args:
+            word_vocab_size (int): word vocabulary size.
+            char_vocab_size (int): character vocabulary size.
+            num_labels (int): number of entity labels.
+            word_embedding_dim (int): word embedding dimensions.
+            char_embedding_dim (int): character embedding dimensions.
+            word_lstm_size (int): character LSTM feature extractor output dimensions.
+            char_lstm_size (int): word tagger LSTM output dimensions.
+            fc_dim (int): output fully-connected layer size.
+            dropout (float): dropout rate.
+            embeddings (numpy array): word embedding matrix.
+            use_char (boolean): add char feature.
+            use_crf (boolean): use crf as last layer.
+            char_mask_zero(boolean): mask zero for character embedding (see TF2 isse #33148 and #33069)
+            use_elmo(boolean): If True, model will be configured to accept Elmo embeddings
+                               as an additional input to word and character embeddings
+            use_transformer_with_dim(int): If not None, model will be configured to accept
+                                           transformer embeddings of given dimension
+        &#34;&#34;&#34;
+        super(BiLSTMCRF).__init__()
+        self._char_embedding_dim = char_embedding_dim
+        self._word_embedding_dim = word_embedding_dim
+        self._char_lstm_size = char_lstm_size
+        self._word_lstm_size = word_lstm_size
+        self._char_vocab_size = char_vocab_size
+        self._word_vocab_size = word_vocab_size
+        self._fc_dim = fc_dim
+        self._dropout = dropout
+        self._use_char = use_char
+        self._use_crf = use_crf
+        self._embeddings = embeddings
+        self._num_labels = num_labels
+        self._char_mask_zero = char_mask_zero
+        self._use_elmo = use_elmo
+        self._use_transformer_with_dim = use_transformer_with_dim
+
+
+    def build(self):
+
+        # build word embedding
+        word_ids = keras.layers.Input(batch_shape=(None, None), dtype=&#39;int32&#39;, name=&#39;word_input&#39;)
+        inputs = [word_ids]
+        embedding_list = []
+        if self._embeddings is None:
+            word_embeddings = keras.layers.Embedding(input_dim=self._word_vocab_size,
+                                        output_dim=self._word_embedding_dim,
+                                        mask_zero=True,
+                                        name=&#39;word_embedding&#39;)(word_ids)
+        else:
+            word_embeddings = keras.layers.Embedding(input_dim=self._embeddings.shape[0],
+                                        output_dim=self._embeddings.shape[1],
+                                        mask_zero=True,
+                                        weights=[self._embeddings],
+                                        name=&#39;word_embedding&#39;)(word_ids)
+        embedding_list.append(word_embeddings)
+
+        # build character based word embedding
+        if self._use_char:
+            char_ids = keras.layers.Input(batch_shape=(None, None, None), dtype=&#39;int32&#39;, name=&#39;char_input&#39;)
+            inputs.append(char_ids)
+            char_embeddings = keras.layers.Embedding(input_dim=self._char_vocab_size,
+                                        output_dim=self._char_embedding_dim,
+                                        mask_zero=self._char_mask_zero,
+                                        name=&#39;char_embedding&#39;)(char_ids)
+            char_embeddings = keras.layers.TimeDistributed(keras.layers.Bidirectional(keras.layers.LSTM(self._char_lstm_size)))(char_embeddings)
+            embedding_list.append(char_embeddings)
+
+        # add elmo embedding
+        if self._use_elmo:
+            elmo_embeddings = keras.layers.Input(shape=(None, 1024), dtype=&#39;float32&#39;)
+            inputs.append(elmo_embeddings)
+            embedding_list.append(elmo_embeddings)
+
+        # add transformer embedding
+        if self._use_transformer_with_dim is not None:
+            transformer_embeddings = keras.layers.Input(shape=(None, self._use_transformer_with_dim), dtype=&#39;float32&#39;)
+            inputs.append(transformer_embeddings)
+            embedding_list.append(transformer_embeddings)
+
+
+        # concatenate embeddings
+        word_embeddings = keras.layers.Concatenate()(embedding_list) if len(embedding_list) &gt; 1 else embedding_list[0]
+
+
+        # build model
+        word_embeddings = keras.layers.Dropout(self._dropout)(word_embeddings)
+        z = keras.layers.Bidirectional(keras.layers.LSTM(units=self._word_lstm_size, return_sequences=True))(word_embeddings)
+        z = keras.layers.Dense(self._fc_dim, activation=&#39;tanh&#39;)(z)
+
+        if self._use_crf:
+            from .layers import CRF
+            crf = CRF(self._num_labels, sparse_target=False)
+            loss = crf.loss_function
+            pred = crf(z)
+        else:
+            loss = &#39;categorical_crossentropy&#39;
+            pred = keras.layers.Dense(self._num_labels, activation=&#39;softmax&#39;)(z)
+
+        model = keras.Model(inputs=inputs, outputs=pred)
+
+        return model, loss</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="ktrain.text.ner.anago.models.load_model"><code class="name flex">
+<span>def <span class="ident">load_model</span></span>(<span>weights_file, params_file)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def load_model(weights_file, params_file):
+    with open(params_file) as f:
+        model = keras.models.model_from_json(f.read(), custom_objects={&#39;CRF&#39;: CRF})
+        model.load_weights(weights_file)
+
+    return model</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.ner.anago.models.save_model"><code class="name flex">
+<span>def <span class="ident">save_model</span></span>(<span>model, weights_file, params_file)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def save_model(model, weights_file, params_file):
+    with open(params_file, &#39;w&#39;) as f:
+        params = model.to_json()
+        json.dump(json.loads(params), f, sort_keys=True, indent=4)
+        model.save_weights(weights_file)</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="ktrain.text.ner.anago.models.BiLSTMCRF"><code class="flex name class">
+<span>class <span class="ident">BiLSTMCRF</span></span>
+<span>(</span><span>num_labels, word_vocab_size, char_vocab_size=None, word_embedding_dim=100, char_embedding_dim=25, word_lstm_size=100, char_lstm_size=25, fc_dim=100, dropout=0.5, embeddings=None, use_char=True, use_crf=True, char_mask_zero=True, use_elmo=False, use_transformer_with_dim=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A Keras implementation of BiLSTM-CRF for sequence labeling.</p>
+<h2 id="references">References</h2>
+<p>Guillaume Lample, Miguel Ballesteros, Sandeep Subramanian, Kazuya Kawakami, Chris Dyer.
+"Neural Architectures for Named Entity Recognition". Proceedings of NAACL 2016.
+<a href="https://arxiv.org/abs/1603.01360">https://arxiv.org/abs/1603.01360</a></p>
+<p>Build a Bi-LSTM CRF model.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>word_vocab_size</code></strong> :&ensp;<code>int</code></dt>
+<dd>word vocabulary size.</dd>
+<dt><strong><code>char_vocab_size</code></strong> :&ensp;<code>int</code></dt>
+<dd>character vocabulary size.</dd>
+<dt><strong><code>num_labels</code></strong> :&ensp;<code>int</code></dt>
+<dd>number of entity labels.</dd>
+<dt><strong><code>word_embedding_dim</code></strong> :&ensp;<code>int</code></dt>
+<dd>word embedding dimensions.</dd>
+<dt><strong><code>char_embedding_dim</code></strong> :&ensp;<code>int</code></dt>
+<dd>character embedding dimensions.</dd>
+<dt><strong><code>word_lstm_size</code></strong> :&ensp;<code>int</code></dt>
+<dd>character LSTM feature extractor output dimensions.</dd>
+<dt><strong><code>char_lstm_size</code></strong> :&ensp;<code>int</code></dt>
+<dd>word tagger LSTM output dimensions.</dd>
+<dt><strong><code>fc_dim</code></strong> :&ensp;<code>int</code></dt>
+<dd>output fully-connected layer size.</dd>
+<dt><strong><code>dropout</code></strong> :&ensp;<code>float</code></dt>
+<dd>dropout rate.</dd>
+<dt><strong><code>embeddings</code></strong> :&ensp;<code>numpy array</code></dt>
+<dd>word embedding matrix.</dd>
+<dt><strong><code>use_char</code></strong> :&ensp;<code>boolean</code></dt>
+<dd>add char feature.</dd>
+<dt><strong><code>use_crf</code></strong> :&ensp;<code>boolean</code></dt>
+<dd>use crf as last layer.</dd>
+</dl>
+<p>char_mask_zero(boolean): mask zero for character embedding (see TF2 isse #33148 and #33069)
+use_elmo(boolean): If True, model will be configured to accept Elmo embeddings
+as an additional input to word and character embeddings
+use_transformer_with_dim(int): If not None, model will be configured to accept
+transformer embeddings of given dimension</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class BiLSTMCRF(object):
+    &#34;&#34;&#34;A Keras implementation of BiLSTM-CRF for sequence labeling.
+
+    References
+    --
+    Guillaume Lample, Miguel Ballesteros, Sandeep Subramanian, Kazuya Kawakami, Chris Dyer.
+    &#34;Neural Architectures for Named Entity Recognition&#34;. Proceedings of NAACL 2016.
+    https://arxiv.org/abs/1603.01360
+    &#34;&#34;&#34;
+
+    def __init__(self,
+                 num_labels,
+                 word_vocab_size,
+                 char_vocab_size=None,
+                 word_embedding_dim=100,
+                 char_embedding_dim=25,
+                 word_lstm_size=100,
+                 char_lstm_size=25,
+                 fc_dim=100,
+                 dropout=0.5,
+                 embeddings=None,
+                 use_char=True,
+                 use_crf=True,
+                 char_mask_zero=True,
+                 use_elmo=False,
+                 use_transformer_with_dim=None):
+        &#34;&#34;&#34;Build a Bi-LSTM CRF model.
+
+        Args:
+            word_vocab_size (int): word vocabulary size.
+            char_vocab_size (int): character vocabulary size.
+            num_labels (int): number of entity labels.
+            word_embedding_dim (int): word embedding dimensions.
+            char_embedding_dim (int): character embedding dimensions.
+            word_lstm_size (int): character LSTM feature extractor output dimensions.
+            char_lstm_size (int): word tagger LSTM output dimensions.
+            fc_dim (int): output fully-connected layer size.
+            dropout (float): dropout rate.
+            embeddings (numpy array): word embedding matrix.
+            use_char (boolean): add char feature.
+            use_crf (boolean): use crf as last layer.
+            char_mask_zero(boolean): mask zero for character embedding (see TF2 isse #33148 and #33069)
+            use_elmo(boolean): If True, model will be configured to accept Elmo embeddings
+                               as an additional input to word and character embeddings
+            use_transformer_with_dim(int): If not None, model will be configured to accept
+                                           transformer embeddings of given dimension
+        &#34;&#34;&#34;
+        super(BiLSTMCRF).__init__()
+        self._char_embedding_dim = char_embedding_dim
+        self._word_embedding_dim = word_embedding_dim
+        self._char_lstm_size = char_lstm_size
+        self._word_lstm_size = word_lstm_size
+        self._char_vocab_size = char_vocab_size
+        self._word_vocab_size = word_vocab_size
+        self._fc_dim = fc_dim
+        self._dropout = dropout
+        self._use_char = use_char
+        self._use_crf = use_crf
+        self._embeddings = embeddings
+        self._num_labels = num_labels
+        self._char_mask_zero = char_mask_zero
+        self._use_elmo = use_elmo
+        self._use_transformer_with_dim = use_transformer_with_dim
+
+
+    def build(self):
+
+        # build word embedding
+        word_ids = keras.layers.Input(batch_shape=(None, None), dtype=&#39;int32&#39;, name=&#39;word_input&#39;)
+        inputs = [word_ids]
+        embedding_list = []
+        if self._embeddings is None:
+            word_embeddings = keras.layers.Embedding(input_dim=self._word_vocab_size,
+                                        output_dim=self._word_embedding_dim,
+                                        mask_zero=True,
+                                        name=&#39;word_embedding&#39;)(word_ids)
+        else:
+            word_embeddings = keras.layers.Embedding(input_dim=self._embeddings.shape[0],
+                                        output_dim=self._embeddings.shape[1],
+                                        mask_zero=True,
+                                        weights=[self._embeddings],
+                                        name=&#39;word_embedding&#39;)(word_ids)
+        embedding_list.append(word_embeddings)
+
+        # build character based word embedding
+        if self._use_char:
+            char_ids = keras.layers.Input(batch_shape=(None, None, None), dtype=&#39;int32&#39;, name=&#39;char_input&#39;)
+            inputs.append(char_ids)
+            char_embeddings = keras.layers.Embedding(input_dim=self._char_vocab_size,
+                                        output_dim=self._char_embedding_dim,
+                                        mask_zero=self._char_mask_zero,
+                                        name=&#39;char_embedding&#39;)(char_ids)
+            char_embeddings = keras.layers.TimeDistributed(keras.layers.Bidirectional(keras.layers.LSTM(self._char_lstm_size)))(char_embeddings)
+            embedding_list.append(char_embeddings)
+
+        # add elmo embedding
+        if self._use_elmo:
+            elmo_embeddings = keras.layers.Input(shape=(None, 1024), dtype=&#39;float32&#39;)
+            inputs.append(elmo_embeddings)
+            embedding_list.append(elmo_embeddings)
+
+        # add transformer embedding
+        if self._use_transformer_with_dim is not None:
+            transformer_embeddings = keras.layers.Input(shape=(None, self._use_transformer_with_dim), dtype=&#39;float32&#39;)
+            inputs.append(transformer_embeddings)
+            embedding_list.append(transformer_embeddings)
+
+
+        # concatenate embeddings
+        word_embeddings = keras.layers.Concatenate()(embedding_list) if len(embedding_list) &gt; 1 else embedding_list[0]
+
+
+        # build model
+        word_embeddings = keras.layers.Dropout(self._dropout)(word_embeddings)
+        z = keras.layers.Bidirectional(keras.layers.LSTM(units=self._word_lstm_size, return_sequences=True))(word_embeddings)
+        z = keras.layers.Dense(self._fc_dim, activation=&#39;tanh&#39;)(z)
+
+        if self._use_crf:
+            from .layers import CRF
+            crf = CRF(self._num_labels, sparse_target=False)
+            loss = crf.loss_function
+            pred = crf(z)
+        else:
+            loss = &#39;categorical_crossentropy&#39;
+            pred = keras.layers.Dense(self._num_labels, activation=&#39;softmax&#39;)(z)
+
+        model = keras.Model(inputs=inputs, outputs=pred)
+
+        return model, loss</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="ktrain.text.ner.anago.models.BiLSTMCRF.build"><code class="name flex">
+<span>def <span class="ident">build</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def build(self):
+
+    # build word embedding
+    word_ids = keras.layers.Input(batch_shape=(None, None), dtype=&#39;int32&#39;, name=&#39;word_input&#39;)
+    inputs = [word_ids]
+    embedding_list = []
+    if self._embeddings is None:
+        word_embeddings = keras.layers.Embedding(input_dim=self._word_vocab_size,
+                                    output_dim=self._word_embedding_dim,
+                                    mask_zero=True,
+                                    name=&#39;word_embedding&#39;)(word_ids)
+    else:
+        word_embeddings = keras.layers.Embedding(input_dim=self._embeddings.shape[0],
+                                    output_dim=self._embeddings.shape[1],
+                                    mask_zero=True,
+                                    weights=[self._embeddings],
+                                    name=&#39;word_embedding&#39;)(word_ids)
+    embedding_list.append(word_embeddings)
+
+    # build character based word embedding
+    if self._use_char:
+        char_ids = keras.layers.Input(batch_shape=(None, None, None), dtype=&#39;int32&#39;, name=&#39;char_input&#39;)
+        inputs.append(char_ids)
+        char_embeddings = keras.layers.Embedding(input_dim=self._char_vocab_size,
+                                    output_dim=self._char_embedding_dim,
+                                    mask_zero=self._char_mask_zero,
+                                    name=&#39;char_embedding&#39;)(char_ids)
+        char_embeddings = keras.layers.TimeDistributed(keras.layers.Bidirectional(keras.layers.LSTM(self._char_lstm_size)))(char_embeddings)
+        embedding_list.append(char_embeddings)
+
+    # add elmo embedding
+    if self._use_elmo:
+        elmo_embeddings = keras.layers.Input(shape=(None, 1024), dtype=&#39;float32&#39;)
+        inputs.append(elmo_embeddings)
+        embedding_list.append(elmo_embeddings)
+
+    # add transformer embedding
+    if self._use_transformer_with_dim is not None:
+        transformer_embeddings = keras.layers.Input(shape=(None, self._use_transformer_with_dim), dtype=&#39;float32&#39;)
+        inputs.append(transformer_embeddings)
+        embedding_list.append(transformer_embeddings)
+
+
+    # concatenate embeddings
+    word_embeddings = keras.layers.Concatenate()(embedding_list) if len(embedding_list) &gt; 1 else embedding_list[0]
+
+
+    # build model
+    word_embeddings = keras.layers.Dropout(self._dropout)(word_embeddings)
+    z = keras.layers.Bidirectional(keras.layers.LSTM(units=self._word_lstm_size, return_sequences=True))(word_embeddings)
+    z = keras.layers.Dense(self._fc_dim, activation=&#39;tanh&#39;)(z)
+
+    if self._use_crf:
+        from .layers import CRF
+        crf = CRF(self._num_labels, sparse_target=False)
+        loss = crf.loss_function
+        pred = crf(z)
+    else:
+        loss = &#39;categorical_crossentropy&#39;
+        pred = keras.layers.Dense(self._num_labels, activation=&#39;softmax&#39;)(z)
+
+    model = keras.Model(inputs=inputs, outputs=pred)
+
+    return model, loss</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="ktrain.text.ner.anago" href="index.html">ktrain.text.ner.anago</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="ktrain.text.ner.anago.models.load_model" href="#ktrain.text.ner.anago.models.load_model">load_model</a></code></li>
+<li><code><a title="ktrain.text.ner.anago.models.save_model" href="#ktrain.text.ner.anago.models.save_model">save_model</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="ktrain.text.ner.anago.models.BiLSTMCRF" href="#ktrain.text.ner.anago.models.BiLSTMCRF">BiLSTMCRF</a></code></h4>
+<ul class="">
+<li><code><a title="ktrain.text.ner.anago.models.BiLSTMCRF.build" href="#ktrain.text.ner.anago.models.BiLSTMCRF.build">build</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+</footer>
+</body>
+</html>
