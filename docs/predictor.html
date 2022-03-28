@@ -1,0 +1,824 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.9.2" />
+<title>ktrain.predictor API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>ktrain.predictor</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">from .imports import *
+from . import utils as U
+class Predictor(ABC):
+    &#34;&#34;&#34;
+    ```
+    Abstract class to preprocess data
+    ```
+    &#34;&#34;&#34;
+    @abstractmethod
+    def predict(self, data):
+        pass
+
+    @abstractmethod
+    def get_classes(self, filename):
+        pass
+
+    def explain(self, x):
+        raise NotImplementedError(&#39;explain is not currently supported for this model&#39;)
+
+
+    def _make_predictor_folder(self, fpath):
+        if os.path.isfile(fpath):
+            raise ValueError(f&#39;There is an existing file named {fpath}. &#39; +\
+                              &#39;Please use dfferent value for fpath.&#39;)
+        elif os.path.exists(fpath):
+            #warnings.warn(&#39;predictor files are being saved to folder that already exists: %s&#39; % (fpath))
+            pass
+        elif not os.path.exists(fpath):
+            os.makedirs(fpath)
+        return
+
+
+    def _save_preproc(self, fpath):
+        with open(os.path.join(fpath, U.PREPROC_NAME), &#39;wb&#39;) as f:
+            pickle.dump(self.preproc, f)
+        return
+
+
+    def _save_model(self, fpath):
+        if U.is_crf(self.model): # TODO: fix/refactor this
+            from .text.ner import crf_loss
+            self.model.compile(loss=crf_loss, optimizer=U.DEFAULT_OPT)
+        model_path = os.path.join(fpath, U.MODEL_NAME)
+        self.model.save(model_path, save_format=&#39;h5&#39;)
+        return
+
+
+
+    def save(self, fpath):
+        &#34;&#34;&#34;
+        ```
+        saves both model and Preprocessor instance associated with Predictor 
+        Args:
+          fpath(str): path to folder to store model and Preprocessor instance (.preproc file)
+        Returns:
+          None
+        ```
+        &#34;&#34;&#34;
+        self._make_predictor_folder(fpath)
+        self._save_model(fpath)
+        self._save_preproc(fpath)
+        return
+
+
+    def export_model_to_tflite(self, fpath, verbose=1):
+        &#34;&#34;&#34;
+        ```
+        Export model to TFLite
+        Args:
+          fpath(str): String representing full path to model file where TFLite model will be saved.
+                      Example: &#39;/tmp/my_model.tflite&#39;
+          verbose(bool): verbosity
+        Returns:
+          str: fpath is returned back
+        ```
+        &#34;&#34;&#34;
+        if verbose: print(&#39;converting to TFLite format ... this may take a few moments...&#39;)
+        if U.is_huggingface(model=self.model):
+            tokenizer = self.preproc.get_tokenizer()
+            maxlen = self.preproc.maxlen
+            input_dict = tokenizer(&#39;Name&#39;, return_tensors=&#39;tf&#39;,
+                                   padding=&#39;max_length&#39;, max_length=maxlen)
+
+            if version.parse(tf.__version__) &lt; version.parse(&#39;2.2&#39;):
+                raise Exception(&#39;export_model_to_tflite requires tensorflow&gt;=2.2&#39;)
+                #self.model._set_inputs(input_spec, training=False) # for tf &lt; 2.2
+            self.model._saved_model_inputs_spec = None # for tf &gt; 2.2
+            self.model._set_save_spec(input_dict) # for tf &gt; 2.2
+            self.model._get_save_spec()
+            if verbose:
+                print(&#39;----------------------------------------------&#39;)
+                print(&#39;NOTE: For Hugging Face models, please ensure you use return_tensors=&#34;tf&#34; and padding=&#34;max_length&#34; when encoding your inputs.&#39;)
+                print(&#39;----------------------------------------------&#39;)
+
+        converter = tf.lite.TFLiteConverter.from_keras_model(self.model)
+
+        # normal conversion
+        converter.target_spec.supported_ops = [tf.lite.OpsSet.SELECT_TF_OPS]
+        tflite_model = converter.convert()
+        open(fpath, &#34;wb&#34;).write(tflite_model)
+        if verbose: print(&#39;done.&#39;)
+        return fpath
+
+
+
+    def export_model_to_onnx(self, fpath, quantize=False, target_opset=None, verbose=1):
+        &#34;&#34;&#34;
+        ```
+        Export model to onnx
+        Args:
+          fpath(str): String representing full path to model file where ONNX model will be saved.
+                      Example: &#39;/tmp/my_model.onnx&#39;
+          quantize(str): If True, will create a total of three model files will be created using transformers.convert_graph_to_onnx: 
+                         1) ONNX model  (created directly using keras2onnx
+                         2) an optimized ONNX model (created by transformers library)
+                         3) a quantized version of optimized ONNX model (created by transformers library)
+                         All files will be created in the parent folder of fpath:
+                         Example: 
+                           If fpath=&#39;/tmp/model.onnx&#39;, then both /tmp/model-optimized.onnx and
+                           /tmp/model-optimized-quantized.onnx will also be created.
+          verbose(bool): verbosity
+        Returns:
+          str: string representing fpath.  If quantize=True, returned fpath will be different than supplied fpath
+        ```
+        &#34;&#34;&#34;
+        try:
+            import onnxruntime, onnx
+        except ImportError:
+            raise Exception(&#39;This method requires ONNX libraries to be installed: &#39;+\
+                            &#39;pip install -q --upgrade onnxruntime==1.10.0 onnx sympy tf2onnx&#39;)
+        from pathlib import Path
+        if type(self.preproc).__name__ == &#39;BERTPreprocessor&#39;:
+            raise Exception(&#39;currently_unsupported:  BERT models created with text_classifier(&#34;bert&#34;,...) are not supported (i.e., keras_bert models). &#39; +\
+                            &#39;Only BERT models created with Transformer(...) are supported.&#39;)
+
+        if verbose: print(&#39;converting to ONNX format by way of TFLite ... this may take a few moments...&#39;)
+        if U.is_huggingface(model=self.model):
+            tokenizer = self.preproc.get_tokenizer()
+            maxlen = self.preproc.maxlen
+            input_dict = tokenizer(&#39;Name&#39;, return_tensors=&#39;tf&#39;,
+                                   padding=&#39;max_length&#39;, max_length=maxlen)
+
+            if version.parse(tf.__version__) &lt; version.parse(&#39;2.2&#39;):
+                raise Exception(&#39;export_model_to_tflite requires tensorflow&gt;=2.2&#39;)
+                #self.model._set_inputs(input_spec, training=False) # for tf &lt; 2.2
+            self.model._saved_model_inputs_spec = None # for tf &gt; 2.2
+            self.model._set_save_spec(input_dict) # for tf &gt; 2.2
+            self.model._get_save_spec()
+
+        #onnx_model = keras2onnx.convert_keras(self.model, self.model.name, target_opset=target_opset)
+        #keras2onnx.save_model(onnx_model, fpath)
+        tflite_model_path = self.export_model_to_tflite(fpath+&#39;-TFLITE_TMP&#39;, verbose=verbose)
+
+
+        import subprocess
+        if verbose: print(&#39;converting to ONNX using tf2onnx...&#39;)
+        proc = subprocess.run(f&#39;python -m tf2onnx.convert --tflite {tflite_model_path} --output {fpath}&#39;.split(),
+                              stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
+        if verbose:
+            print(proc.returncode)
+            print(proc.stdout.decode(&#39;ascii&#39;))
+            print(proc.stderr.decode(&#39;ascii&#39;))
+        return_fpath = fpath
+
+        if quantize:
+            from transformers.convert_graph_to_onnx import optimize, quantize
+            #opt_path = optimize(Path(fpath))
+
+            if U.is_huggingface(model=self.model) and\
+               type(self.model).__name__ in [&#39;TFDistilBertForSequenceClassification&#39;, &#39;TFBertForSequenceClassification&#39;]:
+                try:
+                    from onnxruntime.transformers import optimizer
+                    from onnxruntime.transformers.onnx_model_bert import BertOptimizationOptions
+                    # disable embedding layer norm optimization for better model size reduction
+                    opt_options = BertOptimizationOptions(&#39;bert&#39;)
+                    opt_options.enable_embed_layer_norm = False
+                    opt_model = optimizer.optimize_model(
+                        fpath,
+                       &#39;bert&#39;,  # bert_keras causes error with transformers
+                        num_heads=12,
+                        hidden_size=768,
+                        optimization_options=opt_options)
+                    opt_model.save_model_to_file(fpath)
+                except:
+                    warnings.warn(&#39;Could not run BERT-specific optimizations&#39;)
+                    pass
+            quantize_path = quantize(Path(fpath))
+            return_fpath = quantize_path.as_posix()
+        if verbose: print(&#39;done.&#39;)
+        return return_fpath
+
+
+    def create_onnx_session(self, onnx_model_path, provider=&#39;CPUExecutionProvider&#39;):
+        &#34;&#34;&#34;
+        ```
+        Creates ONNX inference session from provided onnx_model_path
+        ```
+        &#34;&#34;&#34;
+      
+        from onnxruntime import GraphOptimizationLevel, InferenceSession, SessionOptions, get_all_providers
+        assert provider in get_all_providers(), f&#34;provider {provider} not found, {get_all_providers()}&#34;
+
+        # Few properties that might have an impact on performances (provided by MS)
+        options = SessionOptions()
+        options.intra_op_num_threads = 0
+        options.graph_optimization_level = GraphOptimizationLevel.ORT_ENABLE_ALL
+
+        # Load the model as a graph and prepare the CPU backend 
+        session = InferenceSession(onnx_model_path, options, providers=[provider])
+        session.disable_fallback()
+
+        #if &#39;OMP_NUM_THREADS&#39; not in os.environ or &#39;OMP_WAIT_POLICY&#39; not in os.environ:
+            #warnings.warn(&#39;&#39;&#39;We recommend adding the following at top of script for CPU inference:
+
+                            #from psutil import cpu_count
+                            ##Constants from the performance optimization available in onnxruntime
+                            ##It needs to be done before importing onnxruntime
+                            #os.environ[&#34;OMP_NUM_THREADS&#34;] = str(cpu_count(logical=True))
+                            #os.environ[&#34;OMP_WAIT_POLICY&#34;] = &#39;ACTIVE&#39;
+                            #&#39;&#39;&#39;)
+        return session</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="ktrain.predictor.Predictor"><code class="flex name class">
+<span>class <span class="ident">Predictor</span></span>
+</code></dt>
+<dd>
+<div class="desc"><pre><code>Abstract class to preprocess data
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Predictor(ABC):
+    &#34;&#34;&#34;
+    ```
+    Abstract class to preprocess data
+    ```
+    &#34;&#34;&#34;
+    @abstractmethod
+    def predict(self, data):
+        pass
+
+    @abstractmethod
+    def get_classes(self, filename):
+        pass
+
+    def explain(self, x):
+        raise NotImplementedError(&#39;explain is not currently supported for this model&#39;)
+
+
+    def _make_predictor_folder(self, fpath):
+        if os.path.isfile(fpath):
+            raise ValueError(f&#39;There is an existing file named {fpath}. &#39; +\
+                              &#39;Please use dfferent value for fpath.&#39;)
+        elif os.path.exists(fpath):
+            #warnings.warn(&#39;predictor files are being saved to folder that already exists: %s&#39; % (fpath))
+            pass
+        elif not os.path.exists(fpath):
+            os.makedirs(fpath)
+        return
+
+
+    def _save_preproc(self, fpath):
+        with open(os.path.join(fpath, U.PREPROC_NAME), &#39;wb&#39;) as f:
+            pickle.dump(self.preproc, f)
+        return
+
+
+    def _save_model(self, fpath):
+        if U.is_crf(self.model): # TODO: fix/refactor this
+            from .text.ner import crf_loss
+            self.model.compile(loss=crf_loss, optimizer=U.DEFAULT_OPT)
+        model_path = os.path.join(fpath, U.MODEL_NAME)
+        self.model.save(model_path, save_format=&#39;h5&#39;)
+        return
+
+
+
+    def save(self, fpath):
+        &#34;&#34;&#34;
+        ```
+        saves both model and Preprocessor instance associated with Predictor 
+        Args:
+          fpath(str): path to folder to store model and Preprocessor instance (.preproc file)
+        Returns:
+          None
+        ```
+        &#34;&#34;&#34;
+        self._make_predictor_folder(fpath)
+        self._save_model(fpath)
+        self._save_preproc(fpath)
+        return
+
+
+    def export_model_to_tflite(self, fpath, verbose=1):
+        &#34;&#34;&#34;
+        ```
+        Export model to TFLite
+        Args:
+          fpath(str): String representing full path to model file where TFLite model will be saved.
+                      Example: &#39;/tmp/my_model.tflite&#39;
+          verbose(bool): verbosity
+        Returns:
+          str: fpath is returned back
+        ```
+        &#34;&#34;&#34;
+        if verbose: print(&#39;converting to TFLite format ... this may take a few moments...&#39;)
+        if U.is_huggingface(model=self.model):
+            tokenizer = self.preproc.get_tokenizer()
+            maxlen = self.preproc.maxlen
+            input_dict = tokenizer(&#39;Name&#39;, return_tensors=&#39;tf&#39;,
+                                   padding=&#39;max_length&#39;, max_length=maxlen)
+
+            if version.parse(tf.__version__) &lt; version.parse(&#39;2.2&#39;):
+                raise Exception(&#39;export_model_to_tflite requires tensorflow&gt;=2.2&#39;)
+                #self.model._set_inputs(input_spec, training=False) # for tf &lt; 2.2
+            self.model._saved_model_inputs_spec = None # for tf &gt; 2.2
+            self.model._set_save_spec(input_dict) # for tf &gt; 2.2
+            self.model._get_save_spec()
+            if verbose:
+                print(&#39;----------------------------------------------&#39;)
+                print(&#39;NOTE: For Hugging Face models, please ensure you use return_tensors=&#34;tf&#34; and padding=&#34;max_length&#34; when encoding your inputs.&#39;)
+                print(&#39;----------------------------------------------&#39;)
+
+        converter = tf.lite.TFLiteConverter.from_keras_model(self.model)
+
+        # normal conversion
+        converter.target_spec.supported_ops = [tf.lite.OpsSet.SELECT_TF_OPS]
+        tflite_model = converter.convert()
+        open(fpath, &#34;wb&#34;).write(tflite_model)
+        if verbose: print(&#39;done.&#39;)
+        return fpath
+
+
+
+    def export_model_to_onnx(self, fpath, quantize=False, target_opset=None, verbose=1):
+        &#34;&#34;&#34;
+        ```
+        Export model to onnx
+        Args:
+          fpath(str): String representing full path to model file where ONNX model will be saved.
+                      Example: &#39;/tmp/my_model.onnx&#39;
+          quantize(str): If True, will create a total of three model files will be created using transformers.convert_graph_to_onnx: 
+                         1) ONNX model  (created directly using keras2onnx
+                         2) an optimized ONNX model (created by transformers library)
+                         3) a quantized version of optimized ONNX model (created by transformers library)
+                         All files will be created in the parent folder of fpath:
+                         Example: 
+                           If fpath=&#39;/tmp/model.onnx&#39;, then both /tmp/model-optimized.onnx and
+                           /tmp/model-optimized-quantized.onnx will also be created.
+          verbose(bool): verbosity
+        Returns:
+          str: string representing fpath.  If quantize=True, returned fpath will be different than supplied fpath
+        ```
+        &#34;&#34;&#34;
+        try:
+            import onnxruntime, onnx
+        except ImportError:
+            raise Exception(&#39;This method requires ONNX libraries to be installed: &#39;+\
+                            &#39;pip install -q --upgrade onnxruntime==1.10.0 onnx sympy tf2onnx&#39;)
+        from pathlib import Path
+        if type(self.preproc).__name__ == &#39;BERTPreprocessor&#39;:
+            raise Exception(&#39;currently_unsupported:  BERT models created with text_classifier(&#34;bert&#34;,...) are not supported (i.e., keras_bert models). &#39; +\
+                            &#39;Only BERT models created with Transformer(...) are supported.&#39;)
+
+        if verbose: print(&#39;converting to ONNX format by way of TFLite ... this may take a few moments...&#39;)
+        if U.is_huggingface(model=self.model):
+            tokenizer = self.preproc.get_tokenizer()
+            maxlen = self.preproc.maxlen
+            input_dict = tokenizer(&#39;Name&#39;, return_tensors=&#39;tf&#39;,
+                                   padding=&#39;max_length&#39;, max_length=maxlen)
+
+            if version.parse(tf.__version__) &lt; version.parse(&#39;2.2&#39;):
+                raise Exception(&#39;export_model_to_tflite requires tensorflow&gt;=2.2&#39;)
+                #self.model._set_inputs(input_spec, training=False) # for tf &lt; 2.2
+            self.model._saved_model_inputs_spec = None # for tf &gt; 2.2
+            self.model._set_save_spec(input_dict) # for tf &gt; 2.2
+            self.model._get_save_spec()
+
+        #onnx_model = keras2onnx.convert_keras(self.model, self.model.name, target_opset=target_opset)
+        #keras2onnx.save_model(onnx_model, fpath)
+        tflite_model_path = self.export_model_to_tflite(fpath+&#39;-TFLITE_TMP&#39;, verbose=verbose)
+
+
+        import subprocess
+        if verbose: print(&#39;converting to ONNX using tf2onnx...&#39;)
+        proc = subprocess.run(f&#39;python -m tf2onnx.convert --tflite {tflite_model_path} --output {fpath}&#39;.split(),
+                              stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
+        if verbose:
+            print(proc.returncode)
+            print(proc.stdout.decode(&#39;ascii&#39;))
+            print(proc.stderr.decode(&#39;ascii&#39;))
+        return_fpath = fpath
+
+        if quantize:
+            from transformers.convert_graph_to_onnx import optimize, quantize
+            #opt_path = optimize(Path(fpath))
+
+            if U.is_huggingface(model=self.model) and\
+               type(self.model).__name__ in [&#39;TFDistilBertForSequenceClassification&#39;, &#39;TFBertForSequenceClassification&#39;]:
+                try:
+                    from onnxruntime.transformers import optimizer
+                    from onnxruntime.transformers.onnx_model_bert import BertOptimizationOptions
+                    # disable embedding layer norm optimization for better model size reduction
+                    opt_options = BertOptimizationOptions(&#39;bert&#39;)
+                    opt_options.enable_embed_layer_norm = False
+                    opt_model = optimizer.optimize_model(
+                        fpath,
+                       &#39;bert&#39;,  # bert_keras causes error with transformers
+                        num_heads=12,
+                        hidden_size=768,
+                        optimization_options=opt_options)
+                    opt_model.save_model_to_file(fpath)
+                except:
+                    warnings.warn(&#39;Could not run BERT-specific optimizations&#39;)
+                    pass
+            quantize_path = quantize(Path(fpath))
+            return_fpath = quantize_path.as_posix()
+        if verbose: print(&#39;done.&#39;)
+        return return_fpath
+
+
+    def create_onnx_session(self, onnx_model_path, provider=&#39;CPUExecutionProvider&#39;):
+        &#34;&#34;&#34;
+        ```
+        Creates ONNX inference session from provided onnx_model_path
+        ```
+        &#34;&#34;&#34;
+      
+        from onnxruntime import GraphOptimizationLevel, InferenceSession, SessionOptions, get_all_providers
+        assert provider in get_all_providers(), f&#34;provider {provider} not found, {get_all_providers()}&#34;
+
+        # Few properties that might have an impact on performances (provided by MS)
+        options = SessionOptions()
+        options.intra_op_num_threads = 0
+        options.graph_optimization_level = GraphOptimizationLevel.ORT_ENABLE_ALL
+
+        # Load the model as a graph and prepare the CPU backend 
+        session = InferenceSession(onnx_model_path, options, providers=[provider])
+        session.disable_fallback()
+
+        #if &#39;OMP_NUM_THREADS&#39; not in os.environ or &#39;OMP_WAIT_POLICY&#39; not in os.environ:
+            #warnings.warn(&#39;&#39;&#39;We recommend adding the following at top of script for CPU inference:
+
+                            #from psutil import cpu_count
+                            ##Constants from the performance optimization available in onnxruntime
+                            ##It needs to be done before importing onnxruntime
+                            #os.environ[&#34;OMP_NUM_THREADS&#34;] = str(cpu_count(logical=True))
+                            #os.environ[&#34;OMP_WAIT_POLICY&#34;] = &#39;ACTIVE&#39;
+                            #&#39;&#39;&#39;)
+        return session</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>abc.ABC</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="ktrain.graph.predictor.LinkPredictor" href="graph/predictor.html#ktrain.graph.predictor.LinkPredictor">LinkPredictor</a></li>
+<li><a title="ktrain.graph.predictor.NodePredictor" href="graph/predictor.html#ktrain.graph.predictor.NodePredictor">NodePredictor</a></li>
+<li><a title="ktrain.tabular.predictor.TabularPredictor" href="tabular/predictor.html#ktrain.tabular.predictor.TabularPredictor">TabularPredictor</a></li>
+<li><a title="ktrain.text.ner.predictor.NERPredictor" href="text/ner/predictor.html#ktrain.text.ner.predictor.NERPredictor">NERPredictor</a></li>
+<li><a title="ktrain.text.predictor.TextPredictor" href="text/predictor.html#ktrain.text.predictor.TextPredictor">TextPredictor</a></li>
+<li><a title="ktrain.vision.predictor.ImagePredictor" href="vision/predictor.html#ktrain.vision.predictor.ImagePredictor">ImagePredictor</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="ktrain.predictor.Predictor.create_onnx_session"><code class="name flex">
+<span>def <span class="ident">create_onnx_session</span></span>(<span>self, onnx_model_path, provider='CPUExecutionProvider')</span>
+</code></dt>
+<dd>
+<div class="desc"><pre><code>Creates ONNX inference session from provided onnx_model_path
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def create_onnx_session(self, onnx_model_path, provider=&#39;CPUExecutionProvider&#39;):
+    &#34;&#34;&#34;
+    ```
+    Creates ONNX inference session from provided onnx_model_path
+    ```
+    &#34;&#34;&#34;
+  
+    from onnxruntime import GraphOptimizationLevel, InferenceSession, SessionOptions, get_all_providers
+    assert provider in get_all_providers(), f&#34;provider {provider} not found, {get_all_providers()}&#34;
+
+    # Few properties that might have an impact on performances (provided by MS)
+    options = SessionOptions()
+    options.intra_op_num_threads = 0
+    options.graph_optimization_level = GraphOptimizationLevel.ORT_ENABLE_ALL
+
+    # Load the model as a graph and prepare the CPU backend 
+    session = InferenceSession(onnx_model_path, options, providers=[provider])
+    session.disable_fallback()
+
+    #if &#39;OMP_NUM_THREADS&#39; not in os.environ or &#39;OMP_WAIT_POLICY&#39; not in os.environ:
+        #warnings.warn(&#39;&#39;&#39;We recommend adding the following at top of script for CPU inference:
+
+                        #from psutil import cpu_count
+                        ##Constants from the performance optimization available in onnxruntime
+                        ##It needs to be done before importing onnxruntime
+                        #os.environ[&#34;OMP_NUM_THREADS&#34;] = str(cpu_count(logical=True))
+                        #os.environ[&#34;OMP_WAIT_POLICY&#34;] = &#39;ACTIVE&#39;
+                        #&#39;&#39;&#39;)
+    return session</code></pre>
+</details>
+</dd>
+<dt id="ktrain.predictor.Predictor.explain"><code class="name flex">
+<span>def <span class="ident">explain</span></span>(<span>self, x)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def explain(self, x):
+    raise NotImplementedError(&#39;explain is not currently supported for this model&#39;)</code></pre>
+</details>
+</dd>
+<dt id="ktrain.predictor.Predictor.export_model_to_onnx"><code class="name flex">
+<span>def <span class="ident">export_model_to_onnx</span></span>(<span>self, fpath, quantize=False, target_opset=None, verbose=1)</span>
+</code></dt>
+<dd>
+<div class="desc"><pre><code>Export model to onnx
+Args:
+  fpath(str): String representing full path to model file where ONNX model will be saved.
+              Example: '/tmp/my_model.onnx'
+  quantize(str): If True, will create a total of three model files will be created using transformers.convert_graph_to_onnx: 
+                 1) ONNX model  (created directly using keras2onnx
+                 2) an optimized ONNX model (created by transformers library)
+                 3) a quantized version of optimized ONNX model (created by transformers library)
+                 All files will be created in the parent folder of fpath:
+                 Example: 
+                   If fpath='/tmp/model.onnx', then both /tmp/model-optimized.onnx and
+                   /tmp/model-optimized-quantized.onnx will also be created.
+  verbose(bool): verbosity
+Returns:
+  str: string representing fpath.  If quantize=True, returned fpath will be different than supplied fpath
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def export_model_to_onnx(self, fpath, quantize=False, target_opset=None, verbose=1):
+    &#34;&#34;&#34;
+    ```
+    Export model to onnx
+    Args:
+      fpath(str): String representing full path to model file where ONNX model will be saved.
+                  Example: &#39;/tmp/my_model.onnx&#39;
+      quantize(str): If True, will create a total of three model files will be created using transformers.convert_graph_to_onnx: 
+                     1) ONNX model  (created directly using keras2onnx
+                     2) an optimized ONNX model (created by transformers library)
+                     3) a quantized version of optimized ONNX model (created by transformers library)
+                     All files will be created in the parent folder of fpath:
+                     Example: 
+                       If fpath=&#39;/tmp/model.onnx&#39;, then both /tmp/model-optimized.onnx and
+                       /tmp/model-optimized-quantized.onnx will also be created.
+      verbose(bool): verbosity
+    Returns:
+      str: string representing fpath.  If quantize=True, returned fpath will be different than supplied fpath
+    ```
+    &#34;&#34;&#34;
+    try:
+        import onnxruntime, onnx
+    except ImportError:
+        raise Exception(&#39;This method requires ONNX libraries to be installed: &#39;+\
+                        &#39;pip install -q --upgrade onnxruntime==1.10.0 onnx sympy tf2onnx&#39;)
+    from pathlib import Path
+    if type(self.preproc).__name__ == &#39;BERTPreprocessor&#39;:
+        raise Exception(&#39;currently_unsupported:  BERT models created with text_classifier(&#34;bert&#34;,...) are not supported (i.e., keras_bert models). &#39; +\
+                        &#39;Only BERT models created with Transformer(...) are supported.&#39;)
+
+    if verbose: print(&#39;converting to ONNX format by way of TFLite ... this may take a few moments...&#39;)
+    if U.is_huggingface(model=self.model):
+        tokenizer = self.preproc.get_tokenizer()
+        maxlen = self.preproc.maxlen
+        input_dict = tokenizer(&#39;Name&#39;, return_tensors=&#39;tf&#39;,
+                               padding=&#39;max_length&#39;, max_length=maxlen)
+
+        if version.parse(tf.__version__) &lt; version.parse(&#39;2.2&#39;):
+            raise Exception(&#39;export_model_to_tflite requires tensorflow&gt;=2.2&#39;)
+            #self.model._set_inputs(input_spec, training=False) # for tf &lt; 2.2
+        self.model._saved_model_inputs_spec = None # for tf &gt; 2.2
+        self.model._set_save_spec(input_dict) # for tf &gt; 2.2
+        self.model._get_save_spec()
+
+    #onnx_model = keras2onnx.convert_keras(self.model, self.model.name, target_opset=target_opset)
+    #keras2onnx.save_model(onnx_model, fpath)
+    tflite_model_path = self.export_model_to_tflite(fpath+&#39;-TFLITE_TMP&#39;, verbose=verbose)
+
+
+    import subprocess
+    if verbose: print(&#39;converting to ONNX using tf2onnx...&#39;)
+    proc = subprocess.run(f&#39;python -m tf2onnx.convert --tflite {tflite_model_path} --output {fpath}&#39;.split(),
+                          stdout=subprocess.PIPE,  stderr=subprocess.PIPE)
+    if verbose:
+        print(proc.returncode)
+        print(proc.stdout.decode(&#39;ascii&#39;))
+        print(proc.stderr.decode(&#39;ascii&#39;))
+    return_fpath = fpath
+
+    if quantize:
+        from transformers.convert_graph_to_onnx import optimize, quantize
+        #opt_path = optimize(Path(fpath))
+
+        if U.is_huggingface(model=self.model) and\
+           type(self.model).__name__ in [&#39;TFDistilBertForSequenceClassification&#39;, &#39;TFBertForSequenceClassification&#39;]:
+            try:
+                from onnxruntime.transformers import optimizer
+                from onnxruntime.transformers.onnx_model_bert import BertOptimizationOptions
+                # disable embedding layer norm optimization for better model size reduction
+                opt_options = BertOptimizationOptions(&#39;bert&#39;)
+                opt_options.enable_embed_layer_norm = False
+                opt_model = optimizer.optimize_model(
+                    fpath,
+                   &#39;bert&#39;,  # bert_keras causes error with transformers
+                    num_heads=12,
+                    hidden_size=768,
+                    optimization_options=opt_options)
+                opt_model.save_model_to_file(fpath)
+            except:
+                warnings.warn(&#39;Could not run BERT-specific optimizations&#39;)
+                pass
+        quantize_path = quantize(Path(fpath))
+        return_fpath = quantize_path.as_posix()
+    if verbose: print(&#39;done.&#39;)
+    return return_fpath</code></pre>
+</details>
+</dd>
+<dt id="ktrain.predictor.Predictor.export_model_to_tflite"><code class="name flex">
+<span>def <span class="ident">export_model_to_tflite</span></span>(<span>self, fpath, verbose=1)</span>
+</code></dt>
+<dd>
+<div class="desc"><pre><code>Export model to TFLite
+Args:
+  fpath(str): String representing full path to model file where TFLite model will be saved.
+              Example: '/tmp/my_model.tflite'
+  verbose(bool): verbosity
+Returns:
+  str: fpath is returned back
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def export_model_to_tflite(self, fpath, verbose=1):
+    &#34;&#34;&#34;
+    ```
+    Export model to TFLite
+    Args:
+      fpath(str): String representing full path to model file where TFLite model will be saved.
+                  Example: &#39;/tmp/my_model.tflite&#39;
+      verbose(bool): verbosity
+    Returns:
+      str: fpath is returned back
+    ```
+    &#34;&#34;&#34;
+    if verbose: print(&#39;converting to TFLite format ... this may take a few moments...&#39;)
+    if U.is_huggingface(model=self.model):
+        tokenizer = self.preproc.get_tokenizer()
+        maxlen = self.preproc.maxlen
+        input_dict = tokenizer(&#39;Name&#39;, return_tensors=&#39;tf&#39;,
+                               padding=&#39;max_length&#39;, max_length=maxlen)
+
+        if version.parse(tf.__version__) &lt; version.parse(&#39;2.2&#39;):
+            raise Exception(&#39;export_model_to_tflite requires tensorflow&gt;=2.2&#39;)
+            #self.model._set_inputs(input_spec, training=False) # for tf &lt; 2.2
+        self.model._saved_model_inputs_spec = None # for tf &gt; 2.2
+        self.model._set_save_spec(input_dict) # for tf &gt; 2.2
+        self.model._get_save_spec()
+        if verbose:
+            print(&#39;----------------------------------------------&#39;)
+            print(&#39;NOTE: For Hugging Face models, please ensure you use return_tensors=&#34;tf&#34; and padding=&#34;max_length&#34; when encoding your inputs.&#39;)
+            print(&#39;----------------------------------------------&#39;)
+
+    converter = tf.lite.TFLiteConverter.from_keras_model(self.model)
+
+    # normal conversion
+    converter.target_spec.supported_ops = [tf.lite.OpsSet.SELECT_TF_OPS]
+    tflite_model = converter.convert()
+    open(fpath, &#34;wb&#34;).write(tflite_model)
+    if verbose: print(&#39;done.&#39;)
+    return fpath</code></pre>
+</details>
+</dd>
+<dt id="ktrain.predictor.Predictor.get_classes"><code class="name flex">
+<span>def <span class="ident">get_classes</span></span>(<span>self, filename)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@abstractmethod
+def get_classes(self, filename):
+    pass</code></pre>
+</details>
+</dd>
+<dt id="ktrain.predictor.Predictor.predict"><code class="name flex">
+<span>def <span class="ident">predict</span></span>(<span>self, data)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@abstractmethod
+def predict(self, data):
+    pass</code></pre>
+</details>
+</dd>
+<dt id="ktrain.predictor.Predictor.save"><code class="name flex">
+<span>def <span class="ident">save</span></span>(<span>self, fpath)</span>
+</code></dt>
+<dd>
+<div class="desc"><pre><code>saves both model and Preprocessor instance associated with Predictor 
+Args:
+  fpath(str): path to folder to store model and Preprocessor instance (.preproc file)
+Returns:
+  None
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def save(self, fpath):
+    &#34;&#34;&#34;
+    ```
+    saves both model and Preprocessor instance associated with Predictor 
+    Args:
+      fpath(str): path to folder to store model and Preprocessor instance (.preproc file)
+    Returns:
+      None
+    ```
+    &#34;&#34;&#34;
+    self._make_predictor_folder(fpath)
+    self._save_model(fpath)
+    self._save_preproc(fpath)
+    return</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="ktrain" href="index.html">ktrain</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="ktrain.predictor.Predictor" href="#ktrain.predictor.Predictor">Predictor</a></code></h4>
+<ul class="">
+<li><code><a title="ktrain.predictor.Predictor.create_onnx_session" href="#ktrain.predictor.Predictor.create_onnx_session">create_onnx_session</a></code></li>
+<li><code><a title="ktrain.predictor.Predictor.explain" href="#ktrain.predictor.Predictor.explain">explain</a></code></li>
+<li><code><a title="ktrain.predictor.Predictor.export_model_to_onnx" href="#ktrain.predictor.Predictor.export_model_to_onnx">export_model_to_onnx</a></code></li>
+<li><code><a title="ktrain.predictor.Predictor.export_model_to_tflite" href="#ktrain.predictor.Predictor.export_model_to_tflite">export_model_to_tflite</a></code></li>
+<li><code><a title="ktrain.predictor.Predictor.get_classes" href="#ktrain.predictor.Predictor.get_classes">get_classes</a></code></li>
+<li><code><a title="ktrain.predictor.Predictor.predict" href="#ktrain.predictor.Predictor.predict">predict</a></code></li>
+<li><code><a title="ktrain.predictor.Predictor.save" href="#ktrain.predictor.Predictor.save">save</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+</footer>
+</body>
+</html>

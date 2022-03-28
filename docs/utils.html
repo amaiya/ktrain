@@ -1,0 +1,2181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.9.2" />
+<title>ktrain.utils API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>ktrain.utils</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">from .imports import *
+from .data import Dataset
+
+
+#------------------------------------------------------------------------------
+# KTRAIN DEFAULTS
+#------------------------------------------------------------------------------
+DEFAULT_WD = 0.01
+def get_default_optimizer(lr=0.001, wd=DEFAULT_WD):
+    from .lroptimize.optimization import AdamWeightDecay
+    opt = AdamWeightDecay(learning_rate=lr, 
+                         weight_decay_rate=wd, 
+                         beta_1=0.9,
+                         beta_2=0.999,
+                         epsilon=1e-6,
+                         exclude_from_weight_decay=[&#39;layer_norm&#39;, &#39;bias&#39;])
+    return opt
+# Use vanilla Adam as default unless weight decay is explicitly set by user
+# in which case AdamWeightDecay is default optimizer.
+# See core.Learner.set_weight_decay for more information
+DEFAULT_OPT = &#39;adam&#39; 
+DEFAULT_BS = 32
+DEFAULT_ES = 5 
+DEFAULT_ROP = 2 
+#from .lroptimize.optimization import AdamWeightDecay
+#DEFAULT_OPT = AdamWeightDecay(learning_rate=0.001, 
+                              #weight_decay_rate=0.01, 
+                              #beta_1=0.9,
+                              #beta_2=0.999,
+                              #epsilon=1e-6,
+                              #exclude_from_weight_decay=[&#39;layer_norm&#39;, &#39;bias&#39;])
+DEFAULT_TRANSFORMER_LAYERS = [-2] # second-to-last hidden state
+DEFAULT_TRANSFORMER_MAXLEN = 512
+DEFAULT_TRANSFORMER_NUM_SPECIAL = 2
+MODEL_BASENAME = &#39;tf_model&#39;
+MODEL_NAME = MODEL_BASENAME+&#39;.h5&#39;
+PREPROC_NAME = MODEL_BASENAME+&#39;.preproc&#39;
+
+
+
+#------------------------------------------------------------------------------
+# DATA/MODEL INSPECTORS
+#------------------------------------------------------------------------------
+
+def loss_fn_from_model(model):
+    # dep_fix
+    if version.parse(tf.__version__) &lt; version.parse(&#39;2.2&#39;):
+        return model.loss_functions[0].fn
+    else: # TF 2.2.0
+        return model.compiled_loss._get_loss_object(model.compiled_loss._losses[0].name).fn
+
+def metrics_from_model(model):
+    msg = &#39;Could not retrieve metrics list from compiled model&#39;
+
+    # dep_fix
+    if version.parse(tf.__version__) &lt; version.parse(&#39;2.2&#39;) or DISABLE_V2_BEHAVIOR:
+        return model._compile_metrics
+        #return [m.name for m in model.metrics] if is_tf_keras() else model.metrics
+    else: # TF &gt;= 2.2.0
+        mlist =  model.compiled_metrics._metrics
+        if isinstance(mlist, list) and isinstance(mlist[0], str): # metrics are strings prior to training
+            return mlist
+        elif isinstance(mlist, list) and isinstance(mlist[0], list):
+            try:
+                return [m.name for m in mlist[0]]
+            except:
+                warnings.warn(msg)
+                return []
+        elif isinstance(mlist, list) and hasattr(mlist[0], &#39;name&#39;): # tf.keras.metrics.AUC()
+            try:
+                return [m.name for m in mlist]
+            except:
+                warnings.warn(msg)
+                return []
+
+        else:
+            warnings.warn(msg)
+            return []
+
+
+
+def is_classifier(model):
+    &#34;&#34;&#34;
+    checks for classification and mutlilabel from model
+    &#34;&#34;&#34;
+    is_classifier = False
+    is_multilabel = False
+
+    # get loss name
+    loss = model.loss
+    if callable(loss): 
+        if hasattr(loss, &#39;__name__&#39;):
+            loss = loss.__name__
+        elif hasattr(loss, &#39;name&#39;):
+            loss = loss.name
+        else:
+            raise Exception(&#39;could not get loss name&#39;)
+
+    # check for classification
+    if loss in [&#39;categorical_crossentropy&#39;,
+                 &#39;sparse_categorical_crossentropy&#39;,
+                 &#39;binary_crossentropy&#39;]:
+        is_classifier = True
+    else:
+        mlist = metrics_from_model(model)
+        if isinstance(mlist, (list, np.ndarray)) and any([&#39;accuracy&#39; in m for m in mlist]):
+            is_classifier = True
+        elif isinstance(mlist, (list, np.ndarray)) and any([&#39;auc&#39; in m for m in mlist]):
+            is_classifier = True
+
+    # check for multilabel
+    if loss == &#39;binary_crossentropy&#39;:
+        if is_huggingface(model=model):
+            is_multilabel = True
+        else:
+            last = model.layers[-1]
+            output_shape = last.output_shape
+            mult_output = True if len(output_shape) ==2 and output_shape[1] &gt;  1 else False
+            if ( (hasattr(last, &#39;activation&#39;) and isinstance(last.activation, type(sigmoid))) or\
+               isinstance(last, type(sigmoid)) ) and mult_output:
+                is_multilabel = True
+    return (is_classifier, is_multilabel)
+
+def is_tabular_from_data(data):
+    return type(data).__name__ in [&#39;TabularDataset&#39;]
+
+def is_huggingface(model=None, data=None):
+    &#34;&#34;&#34;
+    check for hugging face transformer model
+    from  model and/or data
+    &#34;&#34;&#34;
+    huggingface = False
+    if model is not None and is_huggingface_from_model(model):
+        huggingface = True
+    elif data is not None and is_huggingface_from_data(data):
+        huggingface = True
+    return huggingface
+
+
+def is_huggingface_from_model(model):
+    # 20201202: support both transformers&lt;4.0 and transformers&gt;=4.0
+    return &#39;transformers.modeling_tf&#39; in str(type(model)) or &#39;transformers.models&#39; in str(type(model))
+
+
+def is_huggingface_from_data(data):
+    return type(data).__name__ in [&#39;TransformerDataset&#39;]
+
+
+
+def is_ner(model=None, data=None):
+    ner = False
+    if data is None:
+        warnings.warn(&#39;is_ner only detects CRF-based NER models when data is None&#39;)
+    if model is not None and is_crf(model):
+        ner = True
+    elif data is not None and is_ner_from_data(data):
+        ner = True
+    return ner 
+
+
+def is_crf(model):
+    &#34;&#34;&#34;
+    checks for CRF sequence tagger.
+    &#34;&#34;&#34;
+    #loss = model.loss
+    #if callable(loss): 
+        #if hasattr(loss, &#39;__name__&#39;):
+            #loss = loss.__name__
+        #elif hasattr(loss, &#39;name&#39;):
+            #loss = loss.name
+        #else:
+            #raise Exception(&#39;could not get loss name&#39;)
+    #return loss == &#39;crf_loss&#39; or &#39;CRF.loss_function&#39; in str(model.loss)
+    return type(model.layers[-1]).__name__ == &#39;CRF&#39;
+
+
+#def is_ner_from_model(model):
+    #&#34;&#34;&#34;
+    #checks for sequence tagger.
+    #Curently, only checks for a CRF-based sequence tagger
+    #&#34;&#34;&#34;
+    #loss = model.loss
+    #if callable(loss): 
+        #if hasattr(loss, &#39;__name__&#39;):
+            #loss = loss.__name__
+        #elif hasattr(loss, &#39;name&#39;):
+            #loss = loss.name
+        #else:
+            #raise Exception(&#39;could not get loss name&#39;)
+
+    #return loss == &#39;crf_loss&#39; or &#39;CRF.loss_function&#39; in str(model.loss)
+
+
+def is_ner_from_data(data):
+    return type(data).__name__ == &#39;NERSequence&#39;
+
+
+def is_nodeclass(model=None, data=None):
+    result = False
+    if data is not None and type(data).__name__ == &#39;NodeSequenceWrapper&#39;:
+        result = True
+    return result
+
+def is_linkpred(model=None, data=None):
+    result = False
+    if data is not None and type(data).__name__ == &#39;LinkSequenceWrapper&#39;:
+        result = True
+    return result
+
+
+def is_imageclass_from_data(data):
+    return type(data).__name__ in [&#39;DirectoryIterator&#39;, &#39;DataFrameIterator&#39;, &#39;NumpyArrayIterator&#39;]
+
+
+def is_regression_from_data(data):
+    &#34;&#34;&#34;
+    checks for regression task from data
+    &#34;&#34;&#34;
+    data_arg_check(val_data=data, val_required=True)
+    if is_ner(data=data): return False          # NERSequence
+    elif is_nodeclass(data=data): return False  # NodeSequenceWrapper
+    elif is_linkpred(data=data): return False   #LinkSequenceWrapper
+    Y = y_from_data(data)
+    if len(Y.shape) == 1 or (len(Y.shape) &gt; 1 and Y.shape[1] == 1): return True
+    return False
+
+
+def is_multilabel(data):
+    &#34;&#34;&#34;
+    checks for multilabel from data
+    &#34;&#34;&#34;
+    data_arg_check(val_data=data, val_required=True)
+    if is_ner(data=data): return False          # NERSequence
+    elif is_nodeclass(data=data): return False  # NodeSequenceWrapper
+    elif is_linkpred(data=data): return False   #LinkSequenceWrapper
+    multilabel = False
+    Y = y_from_data(data)
+    if len(Y.shape) == 1 or (len(Y.shape) &gt; 1 and Y.shape[1] == 1): return False
+    for idx, y in enumerate(Y):
+        if idx &gt;= 1024: break
+        if np.issubdtype(type(y), np.integer) or np.issubdtype(type(y), np.floating):
+            return False
+        total_for_example = sum(y)
+        if total_for_example &gt; 1:
+            multilabel=True
+            break
+    return multilabel
+
+
+def shape_from_data(data):
+    err_msg = &#39;could not determine shape from %s&#39; % (type(data))
+    if is_iter(data):
+        if isinstance(data, Dataset): return data.xshape()
+        elif hasattr(data, &#39;image_shape&#39;): return data.image_shape          # DirectoryIterator/DataFrameIterator
+        elif hasattr(data, &#39;x&#39;):                                            # NumpyIterator
+            return data.x.shape[1:]
+        else:
+            try:
+                return data[0][0].shape[1:]
+            except:
+                raise Exception(err_msg)
+    else:
+        try:
+            if type(data[0]) == list: # BERT-style tuple
+                return data[0][0].shape
+            else:
+                return data[0].shape  # standard tuple
+        except:
+            raise Exception(err_msg)
+
+
+def ondisk(data):
+    if hasattr(data, &#39;ondisk&#39;): return data.ondisk()
+
+    ondisk = is_iter(data) and \
+             (type(data).__name__ not in  [&#39;NumpyArrayIterator&#39;])
+    return ondisk
+
+
+def nsamples_from_data(data):
+    err_msg = &#39;could not determine number of samples from %s&#39; % (type(data))
+    if is_iter(data):
+        if isinstance(data, Dataset): return data.nsamples()
+        elif hasattr(data, &#39;samples&#39;):  # DirectoryIterator/DataFrameIterator
+            return data.samples
+        elif hasattr(data, &#39;n&#39;):     # DirectoryIterator/DataFrameIterator/NumpyIterator
+            return data.n
+        else:
+            raise Exception(err_msg)
+    else:
+        try:
+            if type(data[0]) == list: # BERT-style tuple
+                return len(data[0][0])
+            else:
+                return len(data[0])   # standard tuple
+        except:
+            raise Exception(err_msg)
+
+
+def nclasses_from_data(data):
+    if is_iter(data):
+        if isinstance(data, Dataset): return data.nclasses()
+        elif hasattr(data, &#39;classes&#39;):   # DirectoryIterator
+            return len(set(data.classes))
+        else:
+            try:
+                return data[0][1].shape[1]  # DataFrameIterator/NumpyIterator
+            except:
+                raise Exception(&#39;could not determine number of classes from %s&#39; % (type(data)))
+    else:
+        try:
+            return data[1].shape[1]
+        except:
+                raise Exception(&#39;could not determine number of classes from %s&#39; % (type(data)))
+
+
+def y_from_data(data):
+    if is_iter(data):
+        if isinstance(data, Dataset): return data.get_y()
+        elif hasattr(data, &#39;classes&#39;): # DirectoryIterator
+            return to_categorical(data.classes)
+        elif hasattr(data, &#39;labels&#39;):  # DataFrameIterator
+            return data.labels
+        elif hasattr(data, &#39;y&#39;): # NumpyArrayIterator
+            #return to_categorical(data.y)
+            return data.y
+        else:
+            raise Exception(&#39;could not determine number of classes from %s&#39; % (type(data)))
+    else:
+        try:
+            return data[1]
+        except:
+            raise Exception(&#39;could not determine number of classes from %s&#39; % (type(data)))
+
+
+def is_iter(data, ignore=False):
+    if ignore: return True
+    iter_classes = [&#34;NumpyArrayIterator&#34;, &#34;DirectoryIterator&#34;, &#34;DataFrameIterator&#34;]
+    return data.__class__.__name__ in iter_classes or isinstance(data, Dataset)
+
+
+
+def data_arg_check(train_data=None, val_data=None, train_required=False, val_required=False,
+                   ndarray_only=False):
+    if train_required and train_data is None:
+        raise ValueError(&#39;train_data is required&#39;)
+    if val_required and val_data is None:
+        raise ValueError(&#39;val_data is required&#39;)
+    if train_data is not None and not is_iter(train_data, ndarray_only):
+        if bad_data_tuple(train_data):
+            err_msg = &#39;data must be tuple of numpy.ndarrays&#39;
+            if not ndarray_only: err_msg += &#39; or an instance of ktrain.Dataset&#39;
+            raise ValueError(err_msg)
+    if val_data is not None and not is_iter(val_data, ndarray_only):
+        if bad_data_tuple(val_data):
+            err_msg = &#39;data must be tuple of numpy.ndarrays or BERT-style tuple&#39;
+            if not ndarray_only: err_msg += &#39; or an instance of Iterator&#39;
+            raise ValueError(err_msg)
+    return
+
+
+def bert_data_tuple(data):
+    &#34;&#34;&#34;
+    checks if data tuple is BERT-style format
+    &#34;&#34;&#34;
+    if is_iter(data): return False
+    if type(data[0]) == list and len(data[0]) == 2 and \
+       type(data[0][0]) is np.ndarray and type(data[0][1]) is np.ndarray and \
+       type(data[1]) is np.ndarray and np.count_nonzero(data[0][1]) == 0:
+           return True
+    else:
+        return False
+
+
+def bad_data_tuple(data):
+    &#34;&#34;&#34;
+    Checks for standard tuple or BERT-style tuple
+    &#34;&#34;&#34;
+    if not isinstance(data, tuple) or len(data) != 2 or \
+       type(data[0]) not in [np.ndarray, list] or \
+       (type(data[0]) in [list] and type(data[0][0]) is not np.ndarray) or \
+       type(data[1]) is not np.ndarray: 
+        return True
+    else:
+        return False
+
+
+
+#------------------------------------------------------------------------------
+# PLOTTING UTILITIES
+#------------------------------------------------------------------------------
+
+
+# plots images with labels within jupyter notebook
+def plots(ims, figsize=(12,6), rows=1, interp=False, titles=None):
+    #if type(ims[0]) is np.ndarray:
+        #ims = np.array(ims).astype(np.uint8)
+        #if (ims.shape[-1] != 3):
+            #ims = ims.transpose((0,2,3,1))
+    f = plt.figure(figsize=figsize)
+    cols = len(ims)//rows if len(ims) % 2 == 0 else len(ims)//rows + 1
+    for i in range(len(ims)):
+        sp = f.add_subplot(rows, cols, i+1)
+        sp.axis(&#39;Off&#39;)
+        if titles is not None:
+            sp.set_title(titles[i], fontsize=16)
+        plt.imshow(ims[i], interpolation=None if interp else &#39;none&#39;)
+
+def plot_confusion_matrix(cm, classes,
+                          normalize=False,
+                          title=&#39;Confusion matrix&#39;,
+                          cmap=plt.cm.Blues):
+    &#34;&#34;&#34;
+    This function prints and plots the confusion matrix.
+    Normalization can be applied by setting `normalize=True`.
+    &#34;&#34;&#34;
+    plt.imshow(cm, interpolation=&#39;nearest&#39;, cmap=cmap)
+    plt.title(title)
+    plt.colorbar()
+    tick_marks = np.arange(len(classes))
+    plt.xticks(tick_marks, classes, rotation=45)
+    plt.yticks(tick_marks, classes)
+
+    if normalize:
+        cm = cm.astype(&#39;float&#39;) / cm.sum(axis=1)[:, np.newaxis]
+        print(&#34;Normalized confusion matrix&#34;)
+    else:
+        print(&#39;Confusion matrix, without normalization&#39;)
+
+    print(cm)
+
+    thresh = cm.max() / 2.
+    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+        plt.text(j, i, cm[i, j],
+                 horizontalalignment=&#34;center&#34;,
+                 color=&#34;white&#34; if cm[i, j] &gt; thresh else &#34;black&#34;)
+
+    plt.tight_layout()
+    plt.ylabel(&#39;True label&#39;)
+    plt.xlabel(&#39;Predicted label&#39;)
+
+
+
+#------------------------------------------------------------------------------
+# DOWNLOAD UTILITIES
+#------------------------------------------------------------------------------
+
+
+def download(url, filename):
+    with open(filename, &#39;wb&#39;) as f:
+        response = requests.get(url, stream=True,  verify=False)
+        total = response.headers.get(&#39;content-length&#39;)
+
+        if total is None:
+            f.write(response.content)
+        else:
+            downloaded = 0
+            total = int(total)
+            #print(total)
+            for data in response.iter_content(chunk_size=max(int(total/1000), 1024*1024)):
+                downloaded += len(data)
+                f.write(data)
+                done = int(50*downloaded/total)
+                sys.stdout.write(&#39;\r[{}{}]&#39;.format(&#39;█&#39; * done, &#39;.&#39; * (50-done)))
+                sys.stdout.flush()
+
+
+def get_ktrain_data():
+    home = os.path.expanduser(&#39;~&#39;)
+    ktrain_data = os.path.join(home, &#39;ktrain_data&#39;)
+    if not os.path.isdir(ktrain_data):
+        os.mkdir(ktrain_data)
+    return ktrain_data
+
+
+
+#------------------------------------------------------------------------------
+# MISC UTILITIES
+#------------------------------------------------------------------------------
+
+def batchify(X, size):
+    &#34;&#34;&#34;
+    ```
+    Splits X into separate batch sizes specified by size.
+    Args:
+        X(list): elements
+        size(int): batch size
+    Returns:
+        list of evenly sized batches with the last batch having the remaining elements
+    ```
+    &#34;&#34;&#34;
+    return [X[x : x + size] for x in range(0, len(X), size)]
+
+
+def list2chunks(a, n):
+    k, m = divmod(len(a), n)
+    return (a[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n))
+
+
+
+def check_array(X, y=None, X_name=&#39;X&#39;, y_name=&#39;targets&#39; ):
+    if not isinstance(X, (list, np.ndarray)): raise ValueError(&#34;%s must be a list or NumPy array&#34; % X_name)
+    if y is not None and not isinstance(y, (list, np.ndarray)): raise ValueError(&#34;%s must be a list or NumPy array&#34; % y_name)
+    return
+
+def is_tf_keras():
+    if keras.__name__ == &#39;keras&#39;:
+        is_tf_keras = False
+    elif keras.__name__ in [&#39;tensorflow.keras&#39;, &#39;tensorflow.python.keras&#39;, &#39;tensorflow_core.keras&#39;] or\
+            keras.__version__[-3:] == &#39;-tf&#39;:
+        is_tf_keras = True
+    else:
+        raise KeyError(&#39;Cannot detect if using keras or tf.keras.&#39;)
+    return is_tf_keras
+
+
+def vprint(s=None, verbose=1):
+    if not s: s = &#39;\n&#39;
+    if verbose:
+        print(s)
+
+
+def add_headers_to_df(fname_in, header_dict, fname_out=None):
+
+    df = pd.read_csv(fname_in, header=None)
+    df.rename(columns=header_dict, inplace=True)
+    if fname_out is None:
+        name, ext = os.path.splitext(fname_in)
+        name += &#39;-headers&#39;
+        fname_out = name + &#39;.&#39; + ext
+    df.to_csv(fname_out, index=False) # save to new csv file
+    return
+
+
+def get_random_colors(n, name=&#39;hsv&#39;, hex_format=True):
+    &#39;&#39;&#39;Returns a function that maps each index in 0, 1, ..., n-1 to a distinct
+    RGB color; the keyword argument name must be a standard mpl colormap name.&#39;&#39;&#39;
+    cmap = plt.cm.get_cmap(name, n)
+    result = []
+    for i in range(n):
+        color = cmap(i)
+        if hex_format: color = rgb2hex(color)
+        result.append(color)
+    return np.array(result)
+
+
+
+
+
+
+
+def get_hf_model_name(model_id):
+    parts = model_id.split(&#39;/&#39;)
+    if len(parts) == 1:
+        model_id = parts[0]
+    else:
+        model_id = &#39;/&#39;.join(parts[1:])
+    if model_id.startswith(&#39;xlm-roberta&#39;): 
+        model_name = &#39;xlm-roberta&#39;
+    else:
+        model_name = model_id.split(&#39;-&#39;)[0]
+    return model_name
+
+
+class YTransform:
+    def __init__(self, class_names=[], label_encoder=None):
+        &#34;&#34;&#34;
+        ```
+        Cheks and transforms array of targets. Targets are transformed in place.
+        Args:
+          class_names(list):  labels associated with targets (e.g., [&#39;negative&#39;, &#39;positive&#39;])
+                         Only used/required if:
+                         1. targets are one/multi-hot-encoded
+                         2. targets are integers and represent class IDs for classification task
+                         Not required if:
+                         1. targets are numeric and task is regression
+                         2. targets are strings and task is classification (class_names are populated automatically)
+          label_encoder(LabelEncoder): a prior instance of LabelEncoder.  
+                                       If None, will be created when train=True
+        ```
+        &#34;&#34;&#34;
+        if type(class_names) != list:
+            if isinstance(class_names, (pd.Series, np.ndarray)): class_names = class_names.tolist()
+            else:
+                raise ValueError(&#39;class_names must be list&#39;)
+        self.c = class_names
+        self.le = label_encoder
+        self.train_called = False
+
+    def get_classes(self):
+        return self.c
+
+    def set_classes(self, class_names):
+        self.c = class_names.tolist() if isinstance(class_names, np.ndarray) else class_names
+
+
+    def apply(self, targets, train=True):
+        if targets is None and train: 
+            raise ValueError(&#39;targets is None&#39;)
+        elif targets is None and not train:
+            return
+
+        # validate labels against data
+        targets = np.array(targets) if type(targets) == list else targets
+        if len(targets.shape) &gt; 1 and targets.shape[1] == 1: targets = np.squeeze(targets, axis=1)
+
+        # handle numeric targets (regression)
+        if len(targets.shape) ==1 and not isinstance(targets[0], str):
+            # numeric targets
+            if not self.get_classes() and train:
+                warnings.warn(&#39;Task is being treated as REGRESSION because &#39; +\
+                              &#39;either class_names argument was not supplied or is_regression=True. &#39; + \
+                              &#39;If this is incorrect, change accordingly.&#39;)
+            if not self.get_classes(): targets = np.array(targets, dtype=np.float32)
+        # string targets (classification)
+        elif len(targets.shape) == 1 and isinstance(targets[0], str):
+            if not train and self.le is None: raise ValueError(&#39;LabelEncoder has not been trained. Call with train=True&#39;)
+            if train:
+                self.le = LabelEncoder()
+                self.le.fit(targets)
+                if self.get_classes(): warnings.warn(&#39;class_names argument was ignored, as they were extracted from string labels in dataset&#39;)
+                self.set_classes(self.le.classes_)
+            targets = self.le.transform(targets) # convert to numerical targets for classfication
+        # handle categorical targets (classification)
+        elif len(targets.shape) &gt; 1:
+            if not self.get_classes():
+                raise ValueError(&#39;targets are 1-hot or multi-hot encoded but class_names is empty. &#39; +\
+                                 &#39;The classes argument should have been supplied.&#39;)
+            else:
+                if train and len(self.get_classes()) != targets.shape[1]:
+                    raise ValueError(&#39;training targets suggest %s classes, but class_names are %s&#39; % (targets.shape[1], 
+                                                                                                     self.get_classes()))
+
+        # numeric targets (classification)
+        if len(targets.shape) == 1 and self.get_classes():
+            if np.issubdtype(type(max(targets)), np.floating):
+                warnings.warn(&#39;class_names implies classification but targets array contains float(s) instead of integers or strings&#39;)
+
+            if train and ( len(set(targets)) != int(max(targets)+1) ):
+                raise ValueError(&#39;len(set(targets) is %s but max(targets)+1 is  %s&#39; % ( len(set(targets)), int(max(targets)+1) ))
+            targets = to_categorical(targets, num_classes=len(self.get_classes()))
+        if train: self.train_called=True
+        return targets
+
+    def apply_train(self, targets):
+        return self.apply(targets, train=True)
+
+    def apply_test(self, targets):
+        return self.apply(targets, train=False)
+
+
+
+class YTransformDataFrame(YTransform):
+    def __init__(self, label_columns=[], is_regression=False):
+        &#34;&#34;&#34;
+        ```
+        Checks and transforms label columns in DataFrame. DataFrame is modified in place
+        Args:
+          label_columns(list): list of columns storing labels 
+          is_regression(bool): If True, task is regression and integer targets are treated as numeric dependent variable.
+                               IF False, task is classification and integer targets are treated as class IDs.
+        ```
+        &#34;&#34;&#34;
+        self.is_regression = is_regression
+        if isinstance(label_columns, str): label_columns = [label_columns]
+        self.label_columns = label_columns
+        if not label_columns: raise ValueError(&#39;label_columns is required&#39;)
+        self.label_columns = [self.label_columns] if isinstance(self.label_columns, str) else self.label_columns
+        #class_names = label_columns if len(label_columns) &gt; 1 else []
+        super().__init__(class_names=[])
+
+
+    def get_label_columns(self, squeeze=True):
+        &#34;&#34;&#34;
+        Returns label columns of transformed DataFrame
+        &#34;&#34;&#34;
+        if not self.train_called: raise Exception(&#39;apply_train should be called first&#39;)
+        if not self.is_regression:
+            new_lab_cols = self.c
+        else:
+            new_lab_cols = self.label_columns
+        return new_lab_cols[0] if len(new_lab_cols) ==1 and squeeze else new_lab_cols
+
+    def apply(self, df, train=True):
+        df = df.copy() # dep_fix: SettingWithCopy - prevent original DataFrame from losing old label columns
+
+        labels_exist = True
+        lst = self.label_columns[:]
+        if not all(x in df.columns.values for x in lst): labels_exist = False
+        if train and not labels_exist: raise ValueError(&#39;dataframe is missing label columns: %s&#39; % (self.label_columns))
+
+        # extract targets
+        # todo: sort?
+        if len(self.label_columns) &gt; 1: 
+            if train and self.is_regression:
+                warnings.warn(&#39;is_regression=True was supplied but ignored because multiple label columns imply classification&#39;)
+            cols = df.columns.values
+            missing_cols = []
+            for l in self.label_columns:
+                if l not in df.columns.values: missing_cols.append(l)
+            if len(missing_cols) &gt; 0: 
+                raise ValueError(&#39;These label_columns do not exist in df: %s&#39; % (missing_cols))
+
+            # set targets
+            targets = df[self.label_columns].values if labels_exist else np.zeros((df.shape[0], len(self.label_columns)))
+            # set class names
+            if train: self.set_classes(self.label_columns)
+        # single column
+        else: 
+            # set targets
+            targets = df[self.label_columns[0]].values if labels_exist else np.zeros(df.shape[0], dtype=np.int)
+            if self.is_regression and isinstance(targets[0], str):
+                warnings.warn(&#39;is_regression=True was supplied but targets are strings - casting to floats&#39;)
+                targets = targets.astype(np.float)
+
+            # set class_names if classification task and targets with integer labels
+            if train and not self.is_regression and not isinstance(targets[0], str):
+                class_names = list(set(targets))
+                class_names.sort()
+                class_names = list( map(str, class_names) )
+                if len(class_names) == 2: 
+                    class_names = [&#39;not_&#39;+self.label_columns[0], self.label_columns[0]]
+                else:
+                    class_names = [self.label_columns[0]+&#39;_&#39;+c for c in class_names]
+                self.set_classes(class_names)
+
+        # transform targets
+        targets = super().apply(targets, train=train) # self.c (new label_columns) may be modified here
+        targets = targets if len(targets.shape) &gt; 1 else np.expand_dims(targets, 1) # since self.label_columns is list
+
+        # modify DataFrame
+        if labels_exist:
+            for l in self.label_columns: del df[l] # delete old label columns
+
+        new_lab_cols = self.get_label_columns(squeeze=False)
+        if len(new_lab_cols) != targets.shape[1]:
+            raise ValueError(&#39;mismatch between target shape and number of labels - please open ktrain GitHub issue&#39;)
+        for i, col in enumerate(new_lab_cols):
+            df[col] = targets[:,i]
+        df[new_lab_cols] = targets
+        print(new_lab_cols)
+        print(df[new_lab_cols].head())
+        df[new_lab_cols] = df[new_lab_cols].astype(&#39;float32&#39;)
+
+        return df
+
+    def apply_train(self, df):
+        return self.apply(df, train=True)
+    def apply_test(self, df):
+        return self.apply(df, train=False)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="ktrain.utils.add_headers_to_df"><code class="name flex">
+<span>def <span class="ident">add_headers_to_df</span></span>(<span>fname_in, header_dict, fname_out=None)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_headers_to_df(fname_in, header_dict, fname_out=None):
+
+    df = pd.read_csv(fname_in, header=None)
+    df.rename(columns=header_dict, inplace=True)
+    if fname_out is None:
+        name, ext = os.path.splitext(fname_in)
+        name += &#39;-headers&#39;
+        fname_out = name + &#39;.&#39; + ext
+    df.to_csv(fname_out, index=False) # save to new csv file
+    return</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.bad_data_tuple"><code class="name flex">
+<span>def <span class="ident">bad_data_tuple</span></span>(<span>data)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Checks for standard tuple or BERT-style tuple</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def bad_data_tuple(data):
+    &#34;&#34;&#34;
+    Checks for standard tuple or BERT-style tuple
+    &#34;&#34;&#34;
+    if not isinstance(data, tuple) or len(data) != 2 or \
+       type(data[0]) not in [np.ndarray, list] or \
+       (type(data[0]) in [list] and type(data[0][0]) is not np.ndarray) or \
+       type(data[1]) is not np.ndarray: 
+        return True
+    else:
+        return False</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.batchify"><code class="name flex">
+<span>def <span class="ident">batchify</span></span>(<span>X, size)</span>
+</code></dt>
+<dd>
+<div class="desc"><pre><code>Splits X into separate batch sizes specified by size.
+Args:
+    X(list): elements
+    size(int): batch size
+Returns:
+    list of evenly sized batches with the last batch having the remaining elements
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def batchify(X, size):
+    &#34;&#34;&#34;
+    ```
+    Splits X into separate batch sizes specified by size.
+    Args:
+        X(list): elements
+        size(int): batch size
+    Returns:
+        list of evenly sized batches with the last batch having the remaining elements
+    ```
+    &#34;&#34;&#34;
+    return [X[x : x + size] for x in range(0, len(X), size)]</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.bert_data_tuple"><code class="name flex">
+<span>def <span class="ident">bert_data_tuple</span></span>(<span>data)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>checks if data tuple is BERT-style format</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def bert_data_tuple(data):
+    &#34;&#34;&#34;
+    checks if data tuple is BERT-style format
+    &#34;&#34;&#34;
+    if is_iter(data): return False
+    if type(data[0]) == list and len(data[0]) == 2 and \
+       type(data[0][0]) is np.ndarray and type(data[0][1]) is np.ndarray and \
+       type(data[1]) is np.ndarray and np.count_nonzero(data[0][1]) == 0:
+           return True
+    else:
+        return False</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.check_array"><code class="name flex">
+<span>def <span class="ident">check_array</span></span>(<span>X, y=None, X_name='X', y_name='targets')</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def check_array(X, y=None, X_name=&#39;X&#39;, y_name=&#39;targets&#39; ):
+    if not isinstance(X, (list, np.ndarray)): raise ValueError(&#34;%s must be a list or NumPy array&#34; % X_name)
+    if y is not None and not isinstance(y, (list, np.ndarray)): raise ValueError(&#34;%s must be a list or NumPy array&#34; % y_name)
+    return</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.data_arg_check"><code class="name flex">
+<span>def <span class="ident">data_arg_check</span></span>(<span>train_data=None, val_data=None, train_required=False, val_required=False, ndarray_only=False)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def data_arg_check(train_data=None, val_data=None, train_required=False, val_required=False,
+                   ndarray_only=False):
+    if train_required and train_data is None:
+        raise ValueError(&#39;train_data is required&#39;)
+    if val_required and val_data is None:
+        raise ValueError(&#39;val_data is required&#39;)
+    if train_data is not None and not is_iter(train_data, ndarray_only):
+        if bad_data_tuple(train_data):
+            err_msg = &#39;data must be tuple of numpy.ndarrays&#39;
+            if not ndarray_only: err_msg += &#39; or an instance of ktrain.Dataset&#39;
+            raise ValueError(err_msg)
+    if val_data is not None and not is_iter(val_data, ndarray_only):
+        if bad_data_tuple(val_data):
+            err_msg = &#39;data must be tuple of numpy.ndarrays or BERT-style tuple&#39;
+            if not ndarray_only: err_msg += &#39; or an instance of Iterator&#39;
+            raise ValueError(err_msg)
+    return</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.download"><code class="name flex">
+<span>def <span class="ident">download</span></span>(<span>url, filename)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def download(url, filename):
+    with open(filename, &#39;wb&#39;) as f:
+        response = requests.get(url, stream=True,  verify=False)
+        total = response.headers.get(&#39;content-length&#39;)
+
+        if total is None:
+            f.write(response.content)
+        else:
+            downloaded = 0
+            total = int(total)
+            #print(total)
+            for data in response.iter_content(chunk_size=max(int(total/1000), 1024*1024)):
+                downloaded += len(data)
+                f.write(data)
+                done = int(50*downloaded/total)
+                sys.stdout.write(&#39;\r[{}{}]&#39;.format(&#39;█&#39; * done, &#39;.&#39; * (50-done)))
+                sys.stdout.flush()</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.get_default_optimizer"><code class="name flex">
+<span>def <span class="ident">get_default_optimizer</span></span>(<span>lr=0.001, wd=0.01)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_default_optimizer(lr=0.001, wd=DEFAULT_WD):
+    from .lroptimize.optimization import AdamWeightDecay
+    opt = AdamWeightDecay(learning_rate=lr, 
+                         weight_decay_rate=wd, 
+                         beta_1=0.9,
+                         beta_2=0.999,
+                         epsilon=1e-6,
+                         exclude_from_weight_decay=[&#39;layer_norm&#39;, &#39;bias&#39;])
+    return opt</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.get_hf_model_name"><code class="name flex">
+<span>def <span class="ident">get_hf_model_name</span></span>(<span>model_id)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_hf_model_name(model_id):
+    parts = model_id.split(&#39;/&#39;)
+    if len(parts) == 1:
+        model_id = parts[0]
+    else:
+        model_id = &#39;/&#39;.join(parts[1:])
+    if model_id.startswith(&#39;xlm-roberta&#39;): 
+        model_name = &#39;xlm-roberta&#39;
+    else:
+        model_name = model_id.split(&#39;-&#39;)[0]
+    return model_name</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.get_ktrain_data"><code class="name flex">
+<span>def <span class="ident">get_ktrain_data</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_ktrain_data():
+    home = os.path.expanduser(&#39;~&#39;)
+    ktrain_data = os.path.join(home, &#39;ktrain_data&#39;)
+    if not os.path.isdir(ktrain_data):
+        os.mkdir(ktrain_data)
+    return ktrain_data</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.get_random_colors"><code class="name flex">
+<span>def <span class="ident">get_random_colors</span></span>(<span>n, name='hsv', hex_format=True)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns a function that maps each index in 0, 1, &hellip;, n-1 to a distinct
+RGB color; the keyword argument name must be a standard mpl colormap name.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_random_colors(n, name=&#39;hsv&#39;, hex_format=True):
+    &#39;&#39;&#39;Returns a function that maps each index in 0, 1, ..., n-1 to a distinct
+    RGB color; the keyword argument name must be a standard mpl colormap name.&#39;&#39;&#39;
+    cmap = plt.cm.get_cmap(name, n)
+    result = []
+    for i in range(n):
+        color = cmap(i)
+        if hex_format: color = rgb2hex(color)
+        result.append(color)
+    return np.array(result)</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.is_classifier"><code class="name flex">
+<span>def <span class="ident">is_classifier</span></span>(<span>model)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>checks for classification and mutlilabel from model</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_classifier(model):
+    &#34;&#34;&#34;
+    checks for classification and mutlilabel from model
+    &#34;&#34;&#34;
+    is_classifier = False
+    is_multilabel = False
+
+    # get loss name
+    loss = model.loss
+    if callable(loss): 
+        if hasattr(loss, &#39;__name__&#39;):
+            loss = loss.__name__
+        elif hasattr(loss, &#39;name&#39;):
+            loss = loss.name
+        else:
+            raise Exception(&#39;could not get loss name&#39;)
+
+    # check for classification
+    if loss in [&#39;categorical_crossentropy&#39;,
+                 &#39;sparse_categorical_crossentropy&#39;,
+                 &#39;binary_crossentropy&#39;]:
+        is_classifier = True
+    else:
+        mlist = metrics_from_model(model)
+        if isinstance(mlist, (list, np.ndarray)) and any([&#39;accuracy&#39; in m for m in mlist]):
+            is_classifier = True
+        elif isinstance(mlist, (list, np.ndarray)) and any([&#39;auc&#39; in m for m in mlist]):
+            is_classifier = True
+
+    # check for multilabel
+    if loss == &#39;binary_crossentropy&#39;:
+        if is_huggingface(model=model):
+            is_multilabel = True
+        else:
+            last = model.layers[-1]
+            output_shape = last.output_shape
+            mult_output = True if len(output_shape) ==2 and output_shape[1] &gt;  1 else False
+            if ( (hasattr(last, &#39;activation&#39;) and isinstance(last.activation, type(sigmoid))) or\
+               isinstance(last, type(sigmoid)) ) and mult_output:
+                is_multilabel = True
+    return (is_classifier, is_multilabel)</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.is_crf"><code class="name flex">
+<span>def <span class="ident">is_crf</span></span>(<span>model)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>checks for CRF sequence tagger.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_crf(model):
+    &#34;&#34;&#34;
+    checks for CRF sequence tagger.
+    &#34;&#34;&#34;
+    #loss = model.loss
+    #if callable(loss): 
+        #if hasattr(loss, &#39;__name__&#39;):
+            #loss = loss.__name__
+        #elif hasattr(loss, &#39;name&#39;):
+            #loss = loss.name
+        #else:
+            #raise Exception(&#39;could not get loss name&#39;)
+    #return loss == &#39;crf_loss&#39; or &#39;CRF.loss_function&#39; in str(model.loss)
+    return type(model.layers[-1]).__name__ == &#39;CRF&#39;</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.is_huggingface"><code class="name flex">
+<span>def <span class="ident">is_huggingface</span></span>(<span>model=None, data=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>check for hugging face transformer model
+from
+model and/or data</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_huggingface(model=None, data=None):
+    &#34;&#34;&#34;
+    check for hugging face transformer model
+    from  model and/or data
+    &#34;&#34;&#34;
+    huggingface = False
+    if model is not None and is_huggingface_from_model(model):
+        huggingface = True
+    elif data is not None and is_huggingface_from_data(data):
+        huggingface = True
+    return huggingface</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.is_huggingface_from_data"><code class="name flex">
+<span>def <span class="ident">is_huggingface_from_data</span></span>(<span>data)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_huggingface_from_data(data):
+    return type(data).__name__ in [&#39;TransformerDataset&#39;]</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.is_huggingface_from_model"><code class="name flex">
+<span>def <span class="ident">is_huggingface_from_model</span></span>(<span>model)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_huggingface_from_model(model):
+    # 20201202: support both transformers&lt;4.0 and transformers&gt;=4.0
+    return &#39;transformers.modeling_tf&#39; in str(type(model)) or &#39;transformers.models&#39; in str(type(model))</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.is_imageclass_from_data"><code class="name flex">
+<span>def <span class="ident">is_imageclass_from_data</span></span>(<span>data)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_imageclass_from_data(data):
+    return type(data).__name__ in [&#39;DirectoryIterator&#39;, &#39;DataFrameIterator&#39;, &#39;NumpyArrayIterator&#39;]</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.is_iter"><code class="name flex">
+<span>def <span class="ident">is_iter</span></span>(<span>data, ignore=False)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_iter(data, ignore=False):
+    if ignore: return True
+    iter_classes = [&#34;NumpyArrayIterator&#34;, &#34;DirectoryIterator&#34;, &#34;DataFrameIterator&#34;]
+    return data.__class__.__name__ in iter_classes or isinstance(data, Dataset)</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.is_linkpred"><code class="name flex">
+<span>def <span class="ident">is_linkpred</span></span>(<span>model=None, data=None)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_linkpred(model=None, data=None):
+    result = False
+    if data is not None and type(data).__name__ == &#39;LinkSequenceWrapper&#39;:
+        result = True
+    return result</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.is_multilabel"><code class="name flex">
+<span>def <span class="ident">is_multilabel</span></span>(<span>data)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>checks for multilabel from data</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_multilabel(data):
+    &#34;&#34;&#34;
+    checks for multilabel from data
+    &#34;&#34;&#34;
+    data_arg_check(val_data=data, val_required=True)
+    if is_ner(data=data): return False          # NERSequence
+    elif is_nodeclass(data=data): return False  # NodeSequenceWrapper
+    elif is_linkpred(data=data): return False   #LinkSequenceWrapper
+    multilabel = False
+    Y = y_from_data(data)
+    if len(Y.shape) == 1 or (len(Y.shape) &gt; 1 and Y.shape[1] == 1): return False
+    for idx, y in enumerate(Y):
+        if idx &gt;= 1024: break
+        if np.issubdtype(type(y), np.integer) or np.issubdtype(type(y), np.floating):
+            return False
+        total_for_example = sum(y)
+        if total_for_example &gt; 1:
+            multilabel=True
+            break
+    return multilabel</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.is_ner"><code class="name flex">
+<span>def <span class="ident">is_ner</span></span>(<span>model=None, data=None)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_ner(model=None, data=None):
+    ner = False
+    if data is None:
+        warnings.warn(&#39;is_ner only detects CRF-based NER models when data is None&#39;)
+    if model is not None and is_crf(model):
+        ner = True
+    elif data is not None and is_ner_from_data(data):
+        ner = True
+    return ner </code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.is_ner_from_data"><code class="name flex">
+<span>def <span class="ident">is_ner_from_data</span></span>(<span>data)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_ner_from_data(data):
+    return type(data).__name__ == &#39;NERSequence&#39;</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.is_nodeclass"><code class="name flex">
+<span>def <span class="ident">is_nodeclass</span></span>(<span>model=None, data=None)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_nodeclass(model=None, data=None):
+    result = False
+    if data is not None and type(data).__name__ == &#39;NodeSequenceWrapper&#39;:
+        result = True
+    return result</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.is_regression_from_data"><code class="name flex">
+<span>def <span class="ident">is_regression_from_data</span></span>(<span>data)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>checks for regression task from data</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_regression_from_data(data):
+    &#34;&#34;&#34;
+    checks for regression task from data
+    &#34;&#34;&#34;
+    data_arg_check(val_data=data, val_required=True)
+    if is_ner(data=data): return False          # NERSequence
+    elif is_nodeclass(data=data): return False  # NodeSequenceWrapper
+    elif is_linkpred(data=data): return False   #LinkSequenceWrapper
+    Y = y_from_data(data)
+    if len(Y.shape) == 1 or (len(Y.shape) &gt; 1 and Y.shape[1] == 1): return True
+    return False</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.is_tabular_from_data"><code class="name flex">
+<span>def <span class="ident">is_tabular_from_data</span></span>(<span>data)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_tabular_from_data(data):
+    return type(data).__name__ in [&#39;TabularDataset&#39;]</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.is_tf_keras"><code class="name flex">
+<span>def <span class="ident">is_tf_keras</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_tf_keras():
+    if keras.__name__ == &#39;keras&#39;:
+        is_tf_keras = False
+    elif keras.__name__ in [&#39;tensorflow.keras&#39;, &#39;tensorflow.python.keras&#39;, &#39;tensorflow_core.keras&#39;] or\
+            keras.__version__[-3:] == &#39;-tf&#39;:
+        is_tf_keras = True
+    else:
+        raise KeyError(&#39;Cannot detect if using keras or tf.keras.&#39;)
+    return is_tf_keras</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.list2chunks"><code class="name flex">
+<span>def <span class="ident">list2chunks</span></span>(<span>a, n)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def list2chunks(a, n):
+    k, m = divmod(len(a), n)
+    return (a[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n))</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.loss_fn_from_model"><code class="name flex">
+<span>def <span class="ident">loss_fn_from_model</span></span>(<span>model)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def loss_fn_from_model(model):
+    # dep_fix
+    if version.parse(tf.__version__) &lt; version.parse(&#39;2.2&#39;):
+        return model.loss_functions[0].fn
+    else: # TF 2.2.0
+        return model.compiled_loss._get_loss_object(model.compiled_loss._losses[0].name).fn</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.metrics_from_model"><code class="name flex">
+<span>def <span class="ident">metrics_from_model</span></span>(<span>model)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def metrics_from_model(model):
+    msg = &#39;Could not retrieve metrics list from compiled model&#39;
+
+    # dep_fix
+    if version.parse(tf.__version__) &lt; version.parse(&#39;2.2&#39;) or DISABLE_V2_BEHAVIOR:
+        return model._compile_metrics
+        #return [m.name for m in model.metrics] if is_tf_keras() else model.metrics
+    else: # TF &gt;= 2.2.0
+        mlist =  model.compiled_metrics._metrics
+        if isinstance(mlist, list) and isinstance(mlist[0], str): # metrics are strings prior to training
+            return mlist
+        elif isinstance(mlist, list) and isinstance(mlist[0], list):
+            try:
+                return [m.name for m in mlist[0]]
+            except:
+                warnings.warn(msg)
+                return []
+        elif isinstance(mlist, list) and hasattr(mlist[0], &#39;name&#39;): # tf.keras.metrics.AUC()
+            try:
+                return [m.name for m in mlist]
+            except:
+                warnings.warn(msg)
+                return []
+
+        else:
+            warnings.warn(msg)
+            return []</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.nclasses_from_data"><code class="name flex">
+<span>def <span class="ident">nclasses_from_data</span></span>(<span>data)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def nclasses_from_data(data):
+    if is_iter(data):
+        if isinstance(data, Dataset): return data.nclasses()
+        elif hasattr(data, &#39;classes&#39;):   # DirectoryIterator
+            return len(set(data.classes))
+        else:
+            try:
+                return data[0][1].shape[1]  # DataFrameIterator/NumpyIterator
+            except:
+                raise Exception(&#39;could not determine number of classes from %s&#39; % (type(data)))
+    else:
+        try:
+            return data[1].shape[1]
+        except:
+                raise Exception(&#39;could not determine number of classes from %s&#39; % (type(data)))</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.nsamples_from_data"><code class="name flex">
+<span>def <span class="ident">nsamples_from_data</span></span>(<span>data)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def nsamples_from_data(data):
+    err_msg = &#39;could not determine number of samples from %s&#39; % (type(data))
+    if is_iter(data):
+        if isinstance(data, Dataset): return data.nsamples()
+        elif hasattr(data, &#39;samples&#39;):  # DirectoryIterator/DataFrameIterator
+            return data.samples
+        elif hasattr(data, &#39;n&#39;):     # DirectoryIterator/DataFrameIterator/NumpyIterator
+            return data.n
+        else:
+            raise Exception(err_msg)
+    else:
+        try:
+            if type(data[0]) == list: # BERT-style tuple
+                return len(data[0][0])
+            else:
+                return len(data[0])   # standard tuple
+        except:
+            raise Exception(err_msg)</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.ondisk"><code class="name flex">
+<span>def <span class="ident">ondisk</span></span>(<span>data)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def ondisk(data):
+    if hasattr(data, &#39;ondisk&#39;): return data.ondisk()
+
+    ondisk = is_iter(data) and \
+             (type(data).__name__ not in  [&#39;NumpyArrayIterator&#39;])
+    return ondisk</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.plot_confusion_matrix"><code class="name flex">
+<span>def <span class="ident">plot_confusion_matrix</span></span>(<span>cm, classes, normalize=False, title='Confusion matrix', cmap=&lt;matplotlib.colors.LinearSegmentedColormap object&gt;)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>This function prints and plots the confusion matrix.
+Normalization can be applied by setting <code>normalize=True</code>.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def plot_confusion_matrix(cm, classes,
+                          normalize=False,
+                          title=&#39;Confusion matrix&#39;,
+                          cmap=plt.cm.Blues):
+    &#34;&#34;&#34;
+    This function prints and plots the confusion matrix.
+    Normalization can be applied by setting `normalize=True`.
+    &#34;&#34;&#34;
+    plt.imshow(cm, interpolation=&#39;nearest&#39;, cmap=cmap)
+    plt.title(title)
+    plt.colorbar()
+    tick_marks = np.arange(len(classes))
+    plt.xticks(tick_marks, classes, rotation=45)
+    plt.yticks(tick_marks, classes)
+
+    if normalize:
+        cm = cm.astype(&#39;float&#39;) / cm.sum(axis=1)[:, np.newaxis]
+        print(&#34;Normalized confusion matrix&#34;)
+    else:
+        print(&#39;Confusion matrix, without normalization&#39;)
+
+    print(cm)
+
+    thresh = cm.max() / 2.
+    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+        plt.text(j, i, cm[i, j],
+                 horizontalalignment=&#34;center&#34;,
+                 color=&#34;white&#34; if cm[i, j] &gt; thresh else &#34;black&#34;)
+
+    plt.tight_layout()
+    plt.ylabel(&#39;True label&#39;)
+    plt.xlabel(&#39;Predicted label&#39;)</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.plots"><code class="name flex">
+<span>def <span class="ident">plots</span></span>(<span>ims, figsize=(12, 6), rows=1, interp=False, titles=None)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def plots(ims, figsize=(12,6), rows=1, interp=False, titles=None):
+    #if type(ims[0]) is np.ndarray:
+        #ims = np.array(ims).astype(np.uint8)
+        #if (ims.shape[-1] != 3):
+            #ims = ims.transpose((0,2,3,1))
+    f = plt.figure(figsize=figsize)
+    cols = len(ims)//rows if len(ims) % 2 == 0 else len(ims)//rows + 1
+    for i in range(len(ims)):
+        sp = f.add_subplot(rows, cols, i+1)
+        sp.axis(&#39;Off&#39;)
+        if titles is not None:
+            sp.set_title(titles[i], fontsize=16)
+        plt.imshow(ims[i], interpolation=None if interp else &#39;none&#39;)</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.shape_from_data"><code class="name flex">
+<span>def <span class="ident">shape_from_data</span></span>(<span>data)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def shape_from_data(data):
+    err_msg = &#39;could not determine shape from %s&#39; % (type(data))
+    if is_iter(data):
+        if isinstance(data, Dataset): return data.xshape()
+        elif hasattr(data, &#39;image_shape&#39;): return data.image_shape          # DirectoryIterator/DataFrameIterator
+        elif hasattr(data, &#39;x&#39;):                                            # NumpyIterator
+            return data.x.shape[1:]
+        else:
+            try:
+                return data[0][0].shape[1:]
+            except:
+                raise Exception(err_msg)
+    else:
+        try:
+            if type(data[0]) == list: # BERT-style tuple
+                return data[0][0].shape
+            else:
+                return data[0].shape  # standard tuple
+        except:
+            raise Exception(err_msg)</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.vprint"><code class="name flex">
+<span>def <span class="ident">vprint</span></span>(<span>s=None, verbose=1)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def vprint(s=None, verbose=1):
+    if not s: s = &#39;\n&#39;
+    if verbose:
+        print(s)</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.y_from_data"><code class="name flex">
+<span>def <span class="ident">y_from_data</span></span>(<span>data)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def y_from_data(data):
+    if is_iter(data):
+        if isinstance(data, Dataset): return data.get_y()
+        elif hasattr(data, &#39;classes&#39;): # DirectoryIterator
+            return to_categorical(data.classes)
+        elif hasattr(data, &#39;labels&#39;):  # DataFrameIterator
+            return data.labels
+        elif hasattr(data, &#39;y&#39;): # NumpyArrayIterator
+            #return to_categorical(data.y)
+            return data.y
+        else:
+            raise Exception(&#39;could not determine number of classes from %s&#39; % (type(data)))
+    else:
+        try:
+            return data[1]
+        except:
+            raise Exception(&#39;could not determine number of classes from %s&#39; % (type(data)))</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="ktrain.utils.YTransform"><code class="flex name class">
+<span>class <span class="ident">YTransform</span></span>
+<span>(</span><span>class_names=[], label_encoder=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><pre><code>Cheks and transforms array of targets. Targets are transformed in place.
+Args:
+  class_names(list):  labels associated with targets (e.g., ['negative', 'positive'])
+                 Only used/required if:
+                 1. targets are one/multi-hot-encoded
+                 2. targets are integers and represent class IDs for classification task
+                 Not required if:
+                 1. targets are numeric and task is regression
+                 2. targets are strings and task is classification (class_names are populated automatically)
+  label_encoder(LabelEncoder): a prior instance of LabelEncoder.  
+                               If None, will be created when train=True
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class YTransform:
+    def __init__(self, class_names=[], label_encoder=None):
+        &#34;&#34;&#34;
+        ```
+        Cheks and transforms array of targets. Targets are transformed in place.
+        Args:
+          class_names(list):  labels associated with targets (e.g., [&#39;negative&#39;, &#39;positive&#39;])
+                         Only used/required if:
+                         1. targets are one/multi-hot-encoded
+                         2. targets are integers and represent class IDs for classification task
+                         Not required if:
+                         1. targets are numeric and task is regression
+                         2. targets are strings and task is classification (class_names are populated automatically)
+          label_encoder(LabelEncoder): a prior instance of LabelEncoder.  
+                                       If None, will be created when train=True
+        ```
+        &#34;&#34;&#34;
+        if type(class_names) != list:
+            if isinstance(class_names, (pd.Series, np.ndarray)): class_names = class_names.tolist()
+            else:
+                raise ValueError(&#39;class_names must be list&#39;)
+        self.c = class_names
+        self.le = label_encoder
+        self.train_called = False
+
+    def get_classes(self):
+        return self.c
+
+    def set_classes(self, class_names):
+        self.c = class_names.tolist() if isinstance(class_names, np.ndarray) else class_names
+
+
+    def apply(self, targets, train=True):
+        if targets is None and train: 
+            raise ValueError(&#39;targets is None&#39;)
+        elif targets is None and not train:
+            return
+
+        # validate labels against data
+        targets = np.array(targets) if type(targets) == list else targets
+        if len(targets.shape) &gt; 1 and targets.shape[1] == 1: targets = np.squeeze(targets, axis=1)
+
+        # handle numeric targets (regression)
+        if len(targets.shape) ==1 and not isinstance(targets[0], str):
+            # numeric targets
+            if not self.get_classes() and train:
+                warnings.warn(&#39;Task is being treated as REGRESSION because &#39; +\
+                              &#39;either class_names argument was not supplied or is_regression=True. &#39; + \
+                              &#39;If this is incorrect, change accordingly.&#39;)
+            if not self.get_classes(): targets = np.array(targets, dtype=np.float32)
+        # string targets (classification)
+        elif len(targets.shape) == 1 and isinstance(targets[0], str):
+            if not train and self.le is None: raise ValueError(&#39;LabelEncoder has not been trained. Call with train=True&#39;)
+            if train:
+                self.le = LabelEncoder()
+                self.le.fit(targets)
+                if self.get_classes(): warnings.warn(&#39;class_names argument was ignored, as they were extracted from string labels in dataset&#39;)
+                self.set_classes(self.le.classes_)
+            targets = self.le.transform(targets) # convert to numerical targets for classfication
+        # handle categorical targets (classification)
+        elif len(targets.shape) &gt; 1:
+            if not self.get_classes():
+                raise ValueError(&#39;targets are 1-hot or multi-hot encoded but class_names is empty. &#39; +\
+                                 &#39;The classes argument should have been supplied.&#39;)
+            else:
+                if train and len(self.get_classes()) != targets.shape[1]:
+                    raise ValueError(&#39;training targets suggest %s classes, but class_names are %s&#39; % (targets.shape[1], 
+                                                                                                     self.get_classes()))
+
+        # numeric targets (classification)
+        if len(targets.shape) == 1 and self.get_classes():
+            if np.issubdtype(type(max(targets)), np.floating):
+                warnings.warn(&#39;class_names implies classification but targets array contains float(s) instead of integers or strings&#39;)
+
+            if train and ( len(set(targets)) != int(max(targets)+1) ):
+                raise ValueError(&#39;len(set(targets) is %s but max(targets)+1 is  %s&#39; % ( len(set(targets)), int(max(targets)+1) ))
+            targets = to_categorical(targets, num_classes=len(self.get_classes()))
+        if train: self.train_called=True
+        return targets
+
+    def apply_train(self, targets):
+        return self.apply(targets, train=True)
+
+    def apply_test(self, targets):
+        return self.apply(targets, train=False)</code></pre>
+</details>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="ktrain.utils.YTransformDataFrame" href="#ktrain.utils.YTransformDataFrame">YTransformDataFrame</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="ktrain.utils.YTransform.apply"><code class="name flex">
+<span>def <span class="ident">apply</span></span>(<span>self, targets, train=True)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def apply(self, targets, train=True):
+    if targets is None and train: 
+        raise ValueError(&#39;targets is None&#39;)
+    elif targets is None and not train:
+        return
+
+    # validate labels against data
+    targets = np.array(targets) if type(targets) == list else targets
+    if len(targets.shape) &gt; 1 and targets.shape[1] == 1: targets = np.squeeze(targets, axis=1)
+
+    # handle numeric targets (regression)
+    if len(targets.shape) ==1 and not isinstance(targets[0], str):
+        # numeric targets
+        if not self.get_classes() and train:
+            warnings.warn(&#39;Task is being treated as REGRESSION because &#39; +\
+                          &#39;either class_names argument was not supplied or is_regression=True. &#39; + \
+                          &#39;If this is incorrect, change accordingly.&#39;)
+        if not self.get_classes(): targets = np.array(targets, dtype=np.float32)
+    # string targets (classification)
+    elif len(targets.shape) == 1 and isinstance(targets[0], str):
+        if not train and self.le is None: raise ValueError(&#39;LabelEncoder has not been trained. Call with train=True&#39;)
+        if train:
+            self.le = LabelEncoder()
+            self.le.fit(targets)
+            if self.get_classes(): warnings.warn(&#39;class_names argument was ignored, as they were extracted from string labels in dataset&#39;)
+            self.set_classes(self.le.classes_)
+        targets = self.le.transform(targets) # convert to numerical targets for classfication
+    # handle categorical targets (classification)
+    elif len(targets.shape) &gt; 1:
+        if not self.get_classes():
+            raise ValueError(&#39;targets are 1-hot or multi-hot encoded but class_names is empty. &#39; +\
+                             &#39;The classes argument should have been supplied.&#39;)
+        else:
+            if train and len(self.get_classes()) != targets.shape[1]:
+                raise ValueError(&#39;training targets suggest %s classes, but class_names are %s&#39; % (targets.shape[1], 
+                                                                                                 self.get_classes()))
+
+    # numeric targets (classification)
+    if len(targets.shape) == 1 and self.get_classes():
+        if np.issubdtype(type(max(targets)), np.floating):
+            warnings.warn(&#39;class_names implies classification but targets array contains float(s) instead of integers or strings&#39;)
+
+        if train and ( len(set(targets)) != int(max(targets)+1) ):
+            raise ValueError(&#39;len(set(targets) is %s but max(targets)+1 is  %s&#39; % ( len(set(targets)), int(max(targets)+1) ))
+        targets = to_categorical(targets, num_classes=len(self.get_classes()))
+    if train: self.train_called=True
+    return targets</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.YTransform.apply_test"><code class="name flex">
+<span>def <span class="ident">apply_test</span></span>(<span>self, targets)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def apply_test(self, targets):
+    return self.apply(targets, train=False)</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.YTransform.apply_train"><code class="name flex">
+<span>def <span class="ident">apply_train</span></span>(<span>self, targets)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def apply_train(self, targets):
+    return self.apply(targets, train=True)</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.YTransform.get_classes"><code class="name flex">
+<span>def <span class="ident">get_classes</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_classes(self):
+    return self.c</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.YTransform.set_classes"><code class="name flex">
+<span>def <span class="ident">set_classes</span></span>(<span>self, class_names)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def set_classes(self, class_names):
+    self.c = class_names.tolist() if isinstance(class_names, np.ndarray) else class_names</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="ktrain.utils.YTransformDataFrame"><code class="flex name class">
+<span>class <span class="ident">YTransformDataFrame</span></span>
+<span>(</span><span>label_columns=[], is_regression=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><pre><code>Checks and transforms label columns in DataFrame. DataFrame is modified in place
+Args:
+  label_columns(list): list of columns storing labels 
+  is_regression(bool): If True, task is regression and integer targets are treated as numeric dependent variable.
+                       IF False, task is classification and integer targets are treated as class IDs.
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class YTransformDataFrame(YTransform):
+    def __init__(self, label_columns=[], is_regression=False):
+        &#34;&#34;&#34;
+        ```
+        Checks and transforms label columns in DataFrame. DataFrame is modified in place
+        Args:
+          label_columns(list): list of columns storing labels 
+          is_regression(bool): If True, task is regression and integer targets are treated as numeric dependent variable.
+                               IF False, task is classification and integer targets are treated as class IDs.
+        ```
+        &#34;&#34;&#34;
+        self.is_regression = is_regression
+        if isinstance(label_columns, str): label_columns = [label_columns]
+        self.label_columns = label_columns
+        if not label_columns: raise ValueError(&#39;label_columns is required&#39;)
+        self.label_columns = [self.label_columns] if isinstance(self.label_columns, str) else self.label_columns
+        #class_names = label_columns if len(label_columns) &gt; 1 else []
+        super().__init__(class_names=[])
+
+
+    def get_label_columns(self, squeeze=True):
+        &#34;&#34;&#34;
+        Returns label columns of transformed DataFrame
+        &#34;&#34;&#34;
+        if not self.train_called: raise Exception(&#39;apply_train should be called first&#39;)
+        if not self.is_regression:
+            new_lab_cols = self.c
+        else:
+            new_lab_cols = self.label_columns
+        return new_lab_cols[0] if len(new_lab_cols) ==1 and squeeze else new_lab_cols
+
+    def apply(self, df, train=True):
+        df = df.copy() # dep_fix: SettingWithCopy - prevent original DataFrame from losing old label columns
+
+        labels_exist = True
+        lst = self.label_columns[:]
+        if not all(x in df.columns.values for x in lst): labels_exist = False
+        if train and not labels_exist: raise ValueError(&#39;dataframe is missing label columns: %s&#39; % (self.label_columns))
+
+        # extract targets
+        # todo: sort?
+        if len(self.label_columns) &gt; 1: 
+            if train and self.is_regression:
+                warnings.warn(&#39;is_regression=True was supplied but ignored because multiple label columns imply classification&#39;)
+            cols = df.columns.values
+            missing_cols = []
+            for l in self.label_columns:
+                if l not in df.columns.values: missing_cols.append(l)
+            if len(missing_cols) &gt; 0: 
+                raise ValueError(&#39;These label_columns do not exist in df: %s&#39; % (missing_cols))
+
+            # set targets
+            targets = df[self.label_columns].values if labels_exist else np.zeros((df.shape[0], len(self.label_columns)))
+            # set class names
+            if train: self.set_classes(self.label_columns)
+        # single column
+        else: 
+            # set targets
+            targets = df[self.label_columns[0]].values if labels_exist else np.zeros(df.shape[0], dtype=np.int)
+            if self.is_regression and isinstance(targets[0], str):
+                warnings.warn(&#39;is_regression=True was supplied but targets are strings - casting to floats&#39;)
+                targets = targets.astype(np.float)
+
+            # set class_names if classification task and targets with integer labels
+            if train and not self.is_regression and not isinstance(targets[0], str):
+                class_names = list(set(targets))
+                class_names.sort()
+                class_names = list( map(str, class_names) )
+                if len(class_names) == 2: 
+                    class_names = [&#39;not_&#39;+self.label_columns[0], self.label_columns[0]]
+                else:
+                    class_names = [self.label_columns[0]+&#39;_&#39;+c for c in class_names]
+                self.set_classes(class_names)
+
+        # transform targets
+        targets = super().apply(targets, train=train) # self.c (new label_columns) may be modified here
+        targets = targets if len(targets.shape) &gt; 1 else np.expand_dims(targets, 1) # since self.label_columns is list
+
+        # modify DataFrame
+        if labels_exist:
+            for l in self.label_columns: del df[l] # delete old label columns
+
+        new_lab_cols = self.get_label_columns(squeeze=False)
+        if len(new_lab_cols) != targets.shape[1]:
+            raise ValueError(&#39;mismatch between target shape and number of labels - please open ktrain GitHub issue&#39;)
+        for i, col in enumerate(new_lab_cols):
+            df[col] = targets[:,i]
+        df[new_lab_cols] = targets
+        print(new_lab_cols)
+        print(df[new_lab_cols].head())
+        df[new_lab_cols] = df[new_lab_cols].astype(&#39;float32&#39;)
+
+        return df
+
+    def apply_train(self, df):
+        return self.apply(df, train=True)
+    def apply_test(self, df):
+        return self.apply(df, train=False)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="ktrain.utils.YTransform" href="#ktrain.utils.YTransform">YTransform</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="ktrain.utils.YTransformDataFrame.apply"><code class="name flex">
+<span>def <span class="ident">apply</span></span>(<span>self, df, train=True)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def apply(self, df, train=True):
+    df = df.copy() # dep_fix: SettingWithCopy - prevent original DataFrame from losing old label columns
+
+    labels_exist = True
+    lst = self.label_columns[:]
+    if not all(x in df.columns.values for x in lst): labels_exist = False
+    if train and not labels_exist: raise ValueError(&#39;dataframe is missing label columns: %s&#39; % (self.label_columns))
+
+    # extract targets
+    # todo: sort?
+    if len(self.label_columns) &gt; 1: 
+        if train and self.is_regression:
+            warnings.warn(&#39;is_regression=True was supplied but ignored because multiple label columns imply classification&#39;)
+        cols = df.columns.values
+        missing_cols = []
+        for l in self.label_columns:
+            if l not in df.columns.values: missing_cols.append(l)
+        if len(missing_cols) &gt; 0: 
+            raise ValueError(&#39;These label_columns do not exist in df: %s&#39; % (missing_cols))
+
+        # set targets
+        targets = df[self.label_columns].values if labels_exist else np.zeros((df.shape[0], len(self.label_columns)))
+        # set class names
+        if train: self.set_classes(self.label_columns)
+    # single column
+    else: 
+        # set targets
+        targets = df[self.label_columns[0]].values if labels_exist else np.zeros(df.shape[0], dtype=np.int)
+        if self.is_regression and isinstance(targets[0], str):
+            warnings.warn(&#39;is_regression=True was supplied but targets are strings - casting to floats&#39;)
+            targets = targets.astype(np.float)
+
+        # set class_names if classification task and targets with integer labels
+        if train and not self.is_regression and not isinstance(targets[0], str):
+            class_names = list(set(targets))
+            class_names.sort()
+            class_names = list( map(str, class_names) )
+            if len(class_names) == 2: 
+                class_names = [&#39;not_&#39;+self.label_columns[0], self.label_columns[0]]
+            else:
+                class_names = [self.label_columns[0]+&#39;_&#39;+c for c in class_names]
+            self.set_classes(class_names)
+
+    # transform targets
+    targets = super().apply(targets, train=train) # self.c (new label_columns) may be modified here
+    targets = targets if len(targets.shape) &gt; 1 else np.expand_dims(targets, 1) # since self.label_columns is list
+
+    # modify DataFrame
+    if labels_exist:
+        for l in self.label_columns: del df[l] # delete old label columns
+
+    new_lab_cols = self.get_label_columns(squeeze=False)
+    if len(new_lab_cols) != targets.shape[1]:
+        raise ValueError(&#39;mismatch between target shape and number of labels - please open ktrain GitHub issue&#39;)
+    for i, col in enumerate(new_lab_cols):
+        df[col] = targets[:,i]
+    df[new_lab_cols] = targets
+    print(new_lab_cols)
+    print(df[new_lab_cols].head())
+    df[new_lab_cols] = df[new_lab_cols].astype(&#39;float32&#39;)
+
+    return df</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.YTransformDataFrame.apply_test"><code class="name flex">
+<span>def <span class="ident">apply_test</span></span>(<span>self, df)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def apply_test(self, df):
+    return self.apply(df, train=False)</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.YTransformDataFrame.apply_train"><code class="name flex">
+<span>def <span class="ident">apply_train</span></span>(<span>self, df)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def apply_train(self, df):
+    return self.apply(df, train=True)</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.YTransformDataFrame.get_label_columns"><code class="name flex">
+<span>def <span class="ident">get_label_columns</span></span>(<span>self, squeeze=True)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns label columns of transformed DataFrame</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_label_columns(self, squeeze=True):
+    &#34;&#34;&#34;
+    Returns label columns of transformed DataFrame
+    &#34;&#34;&#34;
+    if not self.train_called: raise Exception(&#39;apply_train should be called first&#39;)
+    if not self.is_regression:
+        new_lab_cols = self.c
+    else:
+        new_lab_cols = self.label_columns
+    return new_lab_cols[0] if len(new_lab_cols) ==1 and squeeze else new_lab_cols</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="ktrain" href="index.html">ktrain</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="ktrain.utils.add_headers_to_df" href="#ktrain.utils.add_headers_to_df">add_headers_to_df</a></code></li>
+<li><code><a title="ktrain.utils.bad_data_tuple" href="#ktrain.utils.bad_data_tuple">bad_data_tuple</a></code></li>
+<li><code><a title="ktrain.utils.batchify" href="#ktrain.utils.batchify">batchify</a></code></li>
+<li><code><a title="ktrain.utils.bert_data_tuple" href="#ktrain.utils.bert_data_tuple">bert_data_tuple</a></code></li>
+<li><code><a title="ktrain.utils.check_array" href="#ktrain.utils.check_array">check_array</a></code></li>
+<li><code><a title="ktrain.utils.data_arg_check" href="#ktrain.utils.data_arg_check">data_arg_check</a></code></li>
+<li><code><a title="ktrain.utils.download" href="#ktrain.utils.download">download</a></code></li>
+<li><code><a title="ktrain.utils.get_default_optimizer" href="#ktrain.utils.get_default_optimizer">get_default_optimizer</a></code></li>
+<li><code><a title="ktrain.utils.get_hf_model_name" href="#ktrain.utils.get_hf_model_name">get_hf_model_name</a></code></li>
+<li><code><a title="ktrain.utils.get_ktrain_data" href="#ktrain.utils.get_ktrain_data">get_ktrain_data</a></code></li>
+<li><code><a title="ktrain.utils.get_random_colors" href="#ktrain.utils.get_random_colors">get_random_colors</a></code></li>
+<li><code><a title="ktrain.utils.is_classifier" href="#ktrain.utils.is_classifier">is_classifier</a></code></li>
+<li><code><a title="ktrain.utils.is_crf" href="#ktrain.utils.is_crf">is_crf</a></code></li>
+<li><code><a title="ktrain.utils.is_huggingface" href="#ktrain.utils.is_huggingface">is_huggingface</a></code></li>
+<li><code><a title="ktrain.utils.is_huggingface_from_data" href="#ktrain.utils.is_huggingface_from_data">is_huggingface_from_data</a></code></li>
+<li><code><a title="ktrain.utils.is_huggingface_from_model" href="#ktrain.utils.is_huggingface_from_model">is_huggingface_from_model</a></code></li>
+<li><code><a title="ktrain.utils.is_imageclass_from_data" href="#ktrain.utils.is_imageclass_from_data">is_imageclass_from_data</a></code></li>
+<li><code><a title="ktrain.utils.is_iter" href="#ktrain.utils.is_iter">is_iter</a></code></li>
+<li><code><a title="ktrain.utils.is_linkpred" href="#ktrain.utils.is_linkpred">is_linkpred</a></code></li>
+<li><code><a title="ktrain.utils.is_multilabel" href="#ktrain.utils.is_multilabel">is_multilabel</a></code></li>
+<li><code><a title="ktrain.utils.is_ner" href="#ktrain.utils.is_ner">is_ner</a></code></li>
+<li><code><a title="ktrain.utils.is_ner_from_data" href="#ktrain.utils.is_ner_from_data">is_ner_from_data</a></code></li>
+<li><code><a title="ktrain.utils.is_nodeclass" href="#ktrain.utils.is_nodeclass">is_nodeclass</a></code></li>
+<li><code><a title="ktrain.utils.is_regression_from_data" href="#ktrain.utils.is_regression_from_data">is_regression_from_data</a></code></li>
+<li><code><a title="ktrain.utils.is_tabular_from_data" href="#ktrain.utils.is_tabular_from_data">is_tabular_from_data</a></code></li>
+<li><code><a title="ktrain.utils.is_tf_keras" href="#ktrain.utils.is_tf_keras">is_tf_keras</a></code></li>
+<li><code><a title="ktrain.utils.list2chunks" href="#ktrain.utils.list2chunks">list2chunks</a></code></li>
+<li><code><a title="ktrain.utils.loss_fn_from_model" href="#ktrain.utils.loss_fn_from_model">loss_fn_from_model</a></code></li>
+<li><code><a title="ktrain.utils.metrics_from_model" href="#ktrain.utils.metrics_from_model">metrics_from_model</a></code></li>
+<li><code><a title="ktrain.utils.nclasses_from_data" href="#ktrain.utils.nclasses_from_data">nclasses_from_data</a></code></li>
+<li><code><a title="ktrain.utils.nsamples_from_data" href="#ktrain.utils.nsamples_from_data">nsamples_from_data</a></code></li>
+<li><code><a title="ktrain.utils.ondisk" href="#ktrain.utils.ondisk">ondisk</a></code></li>
+<li><code><a title="ktrain.utils.plot_confusion_matrix" href="#ktrain.utils.plot_confusion_matrix">plot_confusion_matrix</a></code></li>
+<li><code><a title="ktrain.utils.plots" href="#ktrain.utils.plots">plots</a></code></li>
+<li><code><a title="ktrain.utils.shape_from_data" href="#ktrain.utils.shape_from_data">shape_from_data</a></code></li>
+<li><code><a title="ktrain.utils.vprint" href="#ktrain.utils.vprint">vprint</a></code></li>
+<li><code><a title="ktrain.utils.y_from_data" href="#ktrain.utils.y_from_data">y_from_data</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="ktrain.utils.YTransform" href="#ktrain.utils.YTransform">YTransform</a></code></h4>
+<ul class="">
+<li><code><a title="ktrain.utils.YTransform.apply" href="#ktrain.utils.YTransform.apply">apply</a></code></li>
+<li><code><a title="ktrain.utils.YTransform.apply_test" href="#ktrain.utils.YTransform.apply_test">apply_test</a></code></li>
+<li><code><a title="ktrain.utils.YTransform.apply_train" href="#ktrain.utils.YTransform.apply_train">apply_train</a></code></li>
+<li><code><a title="ktrain.utils.YTransform.get_classes" href="#ktrain.utils.YTransform.get_classes">get_classes</a></code></li>
+<li><code><a title="ktrain.utils.YTransform.set_classes" href="#ktrain.utils.YTransform.set_classes">set_classes</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="ktrain.utils.YTransformDataFrame" href="#ktrain.utils.YTransformDataFrame">YTransformDataFrame</a></code></h4>
+<ul class="">
+<li><code><a title="ktrain.utils.YTransformDataFrame.apply" href="#ktrain.utils.YTransformDataFrame.apply">apply</a></code></li>
+<li><code><a title="ktrain.utils.YTransformDataFrame.apply_test" href="#ktrain.utils.YTransformDataFrame.apply_test">apply_test</a></code></li>
+<li><code><a title="ktrain.utils.YTransformDataFrame.apply_train" href="#ktrain.utils.YTransformDataFrame.apply_train">apply_train</a></code></li>
+<li><code><a title="ktrain.utils.YTransformDataFrame.get_label_columns" href="#ktrain.utils.YTransformDataFrame.get_label_columns">get_label_columns</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+</footer>
+</body>
+</html>

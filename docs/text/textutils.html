@@ -1,0 +1,1198 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.9.2" />
+<title>ktrain.text.textutils API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>ktrain.text.textutils</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">from ..imports import *
+from subprocess import Popen, PIPE, DEVNULL
+
+
+DEFAULT_TOKEN_PATTERN = (r&#34;\b[a-zA-Z][a-zA-Z0-9]*(?:[_/&amp;-][a-zA-Z0-9]+)+\b|&#34;
+                         r&#34;\b\d*[a-zA-Z][a-zA-Z0-9][a-zA-Z0-9]+\b&#34;)
+
+
+
+def extract_copy(corpus_path, output_path, verbose=0):
+    &#34;&#34;&#34;
+    ```
+    Crawl &lt;corpus_path&gt;, extract plain text from documents
+    and then copy them to output_path.
+    Requires textract package
+    Args:
+        corpus_path(str):  root folder containing documents
+        output_path(str):  root folder of output directory
+        verbose(bool):  Default:0.  Set to 1 (or True) to see error details on why each skipped document was skipped.
+    Returns:
+        list: list of skipped filenames
+    ```
+    &#34;&#34;&#34;
+    try:
+        # TODO: change this to use TextExtractor
+        import textract
+    except ImportError:
+        raise Exception(&#39;extract_copy requires textract: pip install textract&#39;)
+
+    skipped = set()
+    num_skipped = 0
+    corpus_path = os.path.normpath(corpus_path)
+    output_path = os.path.normpath(output_path)
+    for idx, filename in enumerate(extract_filenames(corpus_path)):
+        if idx %1000 == 0: print(&#39;processed %s doc(s)&#39; % (idx+1))
+        mtype = get_mimetype(filename)
+        try:
+            if mtype and mtype.split(&#39;/&#39;)[0] == &#39;text&#39;:
+                with open(filename, &#39;r&#39;) as f:
+                    text = f.read()
+                    text = str.encode(text)
+            else:
+                text = textract.process(filename)
+        except Exception as e:
+            if verbose:
+                print(&#39;ERROR on %s:\n%s&#39; % (filename, e))
+            num_skipped += 1
+            if not mtype:
+                mtype =  os.path.splitext(filename)[1]
+                if not mtype: mtype == &#39;unknown&#39;
+            skipped.add(mtype)
+            continue
+
+        if not text: 
+            num_skipped += 1
+            continue
+        fpath, fname = os.path.split(filename)
+        if mtype and mtype.split(&#39;/&#39;)[0] != &#39;text&#39;: fname = fname+&#39;.txt&#39;
+        relfpath = fpath.replace(corpus_path, &#39;&#39;)
+        relfpath = relfpath[1:] if relfpath and relfpath[0] == os.sep else relfpath
+        opath = os.path.join(output_path, relfpath)
+        if not os.path.exists(opath):
+            os.makedirs(opath)
+        ofilename = os.path.join(opath, fname)
+        with open(ofilename, &#39;wb&#39;) as f:
+            f.write(text)
+    print(&#39;processed %s docs&#39; % (idx+1))
+    print(&#39;done.&#39;)
+    print(&#39;skipped %s docs&#39; % (num_skipped))
+    if skipped: print(&#39;%s&#39; %(skipped))
+
+
+def get_mimetype(filepath):
+    return mimetypes.guess_type(filepath)[0]
+
+def is_txt(filepath, strict=False):
+    if strict:
+        return mimetypes.guess_type(filepath)[0] == &#39;text/plain&#39;
+    else:
+        mtype = get_mimetype(filepath)
+        return mtype is not None and mtype.split(&#39;/&#39;)[0] == &#39;text&#39;
+
+
+def is_pdf(filepath):
+    return mimetypes.guess_type(filepath)[0] == &#39;application/pdf&#39;
+
+
+
+def pdftotext(filename):
+    &#34;&#34;&#34;
+    ```
+    Use pdftotext program to convert PDF to text string.
+    :param filename: of PDF file
+    :return: text from file, or empty string if failure
+    ```
+    &#34;&#34;&#34;
+    output = Popen([&#39;pdftotext&#39;, &#39;-q&#39;, filename, &#39;-&#39;],
+                   stdout=PIPE).communicate()[0]
+    # None may indicate damage, but convert for consistency
+    return &#39;&#39; if output is None else output
+
+
+
+def requires_ocr(filename):
+    &#34;&#34;&#34;
+    ```
+    Uses pdffonts program to determine if the PDF requires OCR, i.e., it
+    doesn&#39;t contain any fonts.
+    :param filename: of PDF file
+    :return: True if requires OCR, False if not
+    ```
+    &#34;&#34;&#34;
+    output = Popen([&#39;pdffonts&#39;, filename], stdout=PIPE,
+                   stderr=DEVNULL).communicate()[0]
+    return len(output.split(&#39;\n&#39;)) &lt; 4
+
+
+def extract_filenames(corpus_path, follow_links=False):
+    if os.listdir(corpus_path) == []:
+        raise ValueError(&#34;%s: path is empty&#34; % corpus_path)
+    walk = os.walk
+    for root, dirs, filenames in walk(corpus_path, followlinks=follow_links):
+        for filename in filenames:
+            try:
+                yield os.path.join(root, filename)
+            except:
+                continue
+
+
+def strip_control_characters(data):
+    if data:
+        # unicode invalid characters
+        re_xml_illegal = (
+            &#39;([\u0000-\u0008\u000b-\u000c\u000e-\u001f\ufffe-\uffff])|&#39;
+            &#39;([%s-%s][^%s-%s])|([^%s-%s][%s-%s])|([%s-%s]$)|(^[%s-%s])&#39;
+            % (chr(0xd800), chr(0xdbff), chr(0xdc00), chr(0xdfff), chr(0xd800),
+               chr(0xdbff), chr(0xdc00), chr(0xdfff), chr(0xd800), chr(0xdbff),
+               chr(0xdc00), chr(0xdfff))
+        )
+        data = re.sub(re_xml_illegal, &#34;&#34;, data)
+        # ascii control characters
+        #data = re.sub(r&#34;[\x01-\x1F\x7F]&#34;, &#34;&#34;, data)
+        # See:  http://w3.org/International/questions/qa-forms-utf-8.html
+        # Printable utf-8 does not include any of these chars below x7F
+        data = re.sub(r&#34;[\x00-\x08\x0B\x0C\x0E-\x1F]&#34;, &#34;&#34;, data)
+    return data
+
+
+
+def to_ascii(data):
+    &#34;&#34;&#34;Transform accentuated unicode symbols into ascii or nothing
+
+    Warning: this solution is only suited for languages that have a direct
+    transliteration to ASCII symbols.
+
+    A better solution would be to use transliteration based on a precomputed
+    unidecode map to be used by translate as explained here:
+
+        http://stackoverflow.com/questions/2854230/
+
+    &#34;&#34;&#34;
+    import unicodedata
+    if isinstance(data, bytes):
+        data = data.decode()
+    nkfd_form = unicodedata.normalize(&#39;NFKD&#39;, data)
+    only_ascii = nkfd_form.encode(&#39;ASCII&#39;, &#39;ignore&#39;)
+
+    # Return a string
+    return only_ascii.decode(&#39;ascii&#39;)
+
+
+
+def load_text_files(corpus_path, truncate_len=None, 
+                    clean=True, return_fnames=False):
+    &#34;&#34;&#34;
+    ```
+    load text files
+    ```
+    &#34;&#34;&#34;
+    
+    texts = []
+    filenames = []
+    mb = master_bar(range(1))
+    for i in mb:
+        for filename in progress_bar(list(extract_filenames(corpus_path)), parent=mb):
+            with open(filename, &#39;r&#39;) as f:
+                text = f.read()
+            if clean:
+                text = strip_control_characters(text)
+                text = to_ascii(text)
+            if truncate_len is not None:
+                text = &#34; &#34;.join(text.split()[:truncate_len])
+            texts.append(text)
+            filenames.append(filename)
+        mb.write(&#39;done.&#39;)
+    if return_fnames:
+        return (texts, filenames)
+    else:
+        return texts
+
+
+def filter_by_id(lst, ids=[]):
+    &#34;&#34;&#34;
+    ```
+    filter list by supplied IDs
+    ```
+    &#34;&#34;&#34;
+    return [x for i,x in enumerate(lst) if i in ids]
+
+
+#------------------------------------------------------------------------------
+# Language-Handling
+#------------------------------------------------------------------------------
+
+
+def detect_lang(texts, sample_size=32):
+    &#34;&#34;&#34;
+    ```
+    detect language
+    ```
+    &#34;&#34;&#34;
+
+    # convert sentence pairs
+    if isinstance(texts, (tuple, list, np.ndarray)) and len(texts) == 2:
+        texts = [texts[0], texts[1]]
+    elif isinstance(texts, (tuple, list, np.ndarray)) and isinstance(texts[0], (tuple, list, np.ndarray)) and len(texts[0]) == 2:
+        texts = [t[0] for t in texts]
+
+    if isinstance(texts, (pd.Series, pd.DataFrame)):
+        texts = texts.values
+    if isinstance(texts, str): texts = [texts]
+    if not isinstance(texts, (list, np.ndarray)):
+        raise ValueError(&#39;texts must be a list or NumPy array of strings&#39;)
+    lst = []
+    for doc in texts[:sample_size]:
+        try:
+            lst.append(langdetect.detect(doc))
+        except:
+            continue
+    if len(lst) == 0: 
+        warnings.warn(&#39;Defaulting to English for language detection: could not detect language from documents. &#39;+\
+                      &#39;This may be due to empty or invalid texts being provided to detect_lang.&#39;)
+        lang = &#39;en&#39;
+    else:
+        lang = max(set(lst), key=lst.count)
+    #return max(set(lst), key=lst.count)
+    return lang
+
+
+
+def is_chinese(lang, strict=True):
+    &#34;&#34;&#34;
+    ```
+    Args:
+      lang(str): language code (e.g., en)
+      strict(bool):  If False, include additional languages due to mistakes on short texts by langdetect
+    ```
+    &#34;&#34;&#34;
+    if strict:
+        extra_clause = False
+    else:
+        extra_clause = lang in [&#39;ja&#39;, &#39;ko&#39;]
+    return lang is not None and lang.startswith(&#39;zh-&#39;) or extra_clause
+
+
+def split_chinese(texts):
+    if isinstance(texts, str): texts=[texts]
+
+    split_texts = []
+    for doc in texts:
+        seg_list = jieba.cut(doc, cut_all=False)
+        seg_list = list(seg_list)
+        split_texts.append(seg_list)
+    return [&#34; &#34;.join(tokens) for tokens in split_texts]
+
+
+NOSPACE_LANGS = [&#39;zh-cn&#39;, &#39;zh-tw&#39;, &#39;ja&#39;]
+
+
+def is_nospace_lang(lang):
+    return lang in NOSPACE_LANGS
+
+
+def decode_by_line(texts, encoding=&#39;utf-8&#39;, verbose=1):
+    &#34;&#34;&#34;
+    ```
+    Decode text line by line and skip over errors.
+    ```
+    &#34;&#34;&#34;
+
+    if isinstance(texts, str): texts = [texts]
+    new_texts = []
+    skips=0
+    num_lines = 0
+    for doc in texts:
+        text = &#34;&#34;
+        for line in doc.splitlines():
+            num_lines +=1
+            try:
+                line = line.decode(encoding)
+            except:
+                skips +=1
+                continue
+            text += line
+        new_texts.append(text)
+    pct = round((skips*1./num_lines) * 100, 1)
+    if verbose:
+        print(&#39;skipped %s lines (%s%%) due to character decoding errors&#39; % (skips, pct))
+        if pct &gt; 10:
+            print(&#39;If this is too many, try a different encoding&#39;)
+    return new_texts
+
+
+def detect_encoding(texts, sample_size=32):
+    if not isinstance(texts, list): texts = [texts] # check for instance of list as bytes are supplied as input
+    lst = [chardet.detect(doc)[&#39;encoding&#39;] for doc in texts[:sample_size]]
+    encoding = max(set(lst), key=lst.count)
+    # standardize to utf-8 to prevent BERT problems
+    encoding = &#39;utf-8&#39; if encoding.lower() in [&#39;ascii&#39;, &#39;utf8&#39;, &#39;utf-8&#39;] else encoding
+    return encoding
+
+
+def read_text(filename):
+    with open(filename, &#39;rb&#39;) as f:
+        text = f.read()
+    encoding = detect_encoding([text])
+    try:
+        decoded_text = text.decode(encoding)
+    except:
+        U.vprint(&#39;Decoding with %s failed 1st attempt - using %s with skips&#39; % (encoding,
+                                                                                encoding),
+                                                                                verbose=verbose)
+        decoded_text = decode_by_line(text, encoding=encoding)
+    return decoded_text.strip()
+
+
+#tokenizer_filter = rs=&#39;!&#34;#$%&amp;()*+,-./:;&lt;=&gt;?@[\\]^_`{|}~\t\n&#39;
+re_tok = re.compile(f&#39;([{string.punctuation}“”¨«»®´·º½¾¿¡§£₤‘’])&#39;)
+def tokenize(s, join_tokens=False, join_char=&#39; &#39;): 
+    tokens = re_tok.sub(r&#39; \1 &#39;, s).split()
+    if join_tokens: tokens = join_char.join(tokens)
+    return tokens
+
+
+
+def sent_tokenize(text, lang=None):
+    &#34;&#34;&#34;
+    ```
+    segment text into sentences
+    ```
+    &#34;&#34;&#34;
+    lang = detect_lang(text) if lang is None else lang
+    sents = []
+    if is_chinese(lang):
+        for sent in re.findall(u&#39;[^!?。\.\!\?]+[!?。\.\!\?]?&#39;, text, flags=re.U):
+            sents.append(sent)
+    else:
+        for paragraph in segmenter.process(text):
+            for sentence in paragraph:
+                sents.append(&#34; &#34;.join([t.value for t in sentence]))
+    return sents
+
+
+
+def paragraph_tokenize(text, join_sentences=False, lang=None):
+    &#34;&#34;&#34;
+    ```
+    segment text into paragraphs
+    ```
+    &#34;&#34;&#34;
+    lang = detect_lang(text) if lang is None else lang
+    if is_chinese(lang):
+        raise ValueError(&#39;paragraph_tokenize does not currently support Chinese.&#39;)
+    paragraphs = []
+    sents = []
+    for paragraph in segmenter.process(text):
+        sents = []
+        for sentence in paragraph:
+            sents.append(&#34; &#34;.join([t.value for t in sentence]))
+        if join_sentences: sents = &#39; &#39;.join(sents)
+        paragraphs.append(sents)
+    return paragraphs
+
+
+def extract_noun_phrases(text):
+    &#34;&#34;&#34;
+    ```
+    extracts noun phrases
+    ```
+    &#34;&#34;&#34;
+    try:
+        from textblob import TextBlob
+    except:
+        raise Exception(&#39;extract_noun_phrases require TextBlob: pip install textblob&#39;)
+    blob = TextBlob(text)
+    stop_words = [&#39;which&#39;, &#39;what&#39;]
+    curr_phrase = []
+    np_list = []
+    start = False
+    for token in blob.tags:
+        if token[1].startswith(&#39;J&#39;) or token[1].startswith(&#39;N&#39;):
+            if not start: start = True
+            if token[0].lower() not in stop_words: curr_phrase.append(token[0])
+        else:
+            if start:
+                np_list.append(&#34; &#34;.join(curr_phrase))
+                curr_phrase = []
+                start = False
+    if start: np_list.append(&#34; &#34;.join(curr_phrase))
+    return np_list
+
+
+def extract_offsets(sentence, tokens=None, tokenizer=tokenize):
+    &#34;&#34;&#34;
+    ```
+    extracts character
+
+    Args:
+      sentence (str): text
+      tokens (list): list of tokens from sentence.  If None, tokens will be generated using supplied tokenizer.
+      tokenizer (Callable):  a callable that accepts text and returns a list of tokens
+    Return:
+      list of dictionaries of the form {&#39;token&#39;: &lt;the token&gt;, &#39;start&#39;: start character index, &#39;end&#39;: end character index}
+    ```
+    &#34;&#34;&#34;
+    s = sentence
+    tokens = tokenizer(sentence)
+    offsets = []
+    last_end = 0
+    for t in tokens:
+        # find start of current token
+        for start_ind in range(last_end, len(sentence)):
+            if sentence[start_ind] == t[0]: break
+        end_ind = len(sentence)
+        for end_ind in range(start_ind+1, len(sentence)):
+            if (end_ind-start_ind) &gt;= len(t): 
+                break
+        d = {&#39;token&#39;: t, 
+             &#39;start&#39; : start_ind, &#39;end&#39; : end_ind,
+            }
+        offsets.append(d)
+        last_end = end_ind
+    return offsets</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="ktrain.text.textutils.decode_by_line"><code class="name flex">
+<span>def <span class="ident">decode_by_line</span></span>(<span>texts, encoding='utf-8', verbose=1)</span>
+</code></dt>
+<dd>
+<div class="desc"><pre><code>Decode text line by line and skip over errors.
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def decode_by_line(texts, encoding=&#39;utf-8&#39;, verbose=1):
+    &#34;&#34;&#34;
+    ```
+    Decode text line by line and skip over errors.
+    ```
+    &#34;&#34;&#34;
+
+    if isinstance(texts, str): texts = [texts]
+    new_texts = []
+    skips=0
+    num_lines = 0
+    for doc in texts:
+        text = &#34;&#34;
+        for line in doc.splitlines():
+            num_lines +=1
+            try:
+                line = line.decode(encoding)
+            except:
+                skips +=1
+                continue
+            text += line
+        new_texts.append(text)
+    pct = round((skips*1./num_lines) * 100, 1)
+    if verbose:
+        print(&#39;skipped %s lines (%s%%) due to character decoding errors&#39; % (skips, pct))
+        if pct &gt; 10:
+            print(&#39;If this is too many, try a different encoding&#39;)
+    return new_texts</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.textutils.detect_encoding"><code class="name flex">
+<span>def <span class="ident">detect_encoding</span></span>(<span>texts, sample_size=32)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def detect_encoding(texts, sample_size=32):
+    if not isinstance(texts, list): texts = [texts] # check for instance of list as bytes are supplied as input
+    lst = [chardet.detect(doc)[&#39;encoding&#39;] for doc in texts[:sample_size]]
+    encoding = max(set(lst), key=lst.count)
+    # standardize to utf-8 to prevent BERT problems
+    encoding = &#39;utf-8&#39; if encoding.lower() in [&#39;ascii&#39;, &#39;utf8&#39;, &#39;utf-8&#39;] else encoding
+    return encoding</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.textutils.detect_lang"><code class="name flex">
+<span>def <span class="ident">detect_lang</span></span>(<span>texts, sample_size=32)</span>
+</code></dt>
+<dd>
+<div class="desc"><pre><code>detect language
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def detect_lang(texts, sample_size=32):
+    &#34;&#34;&#34;
+    ```
+    detect language
+    ```
+    &#34;&#34;&#34;
+
+    # convert sentence pairs
+    if isinstance(texts, (tuple, list, np.ndarray)) and len(texts) == 2:
+        texts = [texts[0], texts[1]]
+    elif isinstance(texts, (tuple, list, np.ndarray)) and isinstance(texts[0], (tuple, list, np.ndarray)) and len(texts[0]) == 2:
+        texts = [t[0] for t in texts]
+
+    if isinstance(texts, (pd.Series, pd.DataFrame)):
+        texts = texts.values
+    if isinstance(texts, str): texts = [texts]
+    if not isinstance(texts, (list, np.ndarray)):
+        raise ValueError(&#39;texts must be a list or NumPy array of strings&#39;)
+    lst = []
+    for doc in texts[:sample_size]:
+        try:
+            lst.append(langdetect.detect(doc))
+        except:
+            continue
+    if len(lst) == 0: 
+        warnings.warn(&#39;Defaulting to English for language detection: could not detect language from documents. &#39;+\
+                      &#39;This may be due to empty or invalid texts being provided to detect_lang.&#39;)
+        lang = &#39;en&#39;
+    else:
+        lang = max(set(lst), key=lst.count)
+    #return max(set(lst), key=lst.count)
+    return lang</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.textutils.extract_copy"><code class="name flex">
+<span>def <span class="ident">extract_copy</span></span>(<span>corpus_path, output_path, verbose=0)</span>
+</code></dt>
+<dd>
+<div class="desc"><pre><code>Crawl &lt;corpus_path&gt;, extract plain text from documents
+and then copy them to output_path.
+Requires textract package
+Args:
+    corpus_path(str):  root folder containing documents
+    output_path(str):  root folder of output directory
+    verbose(bool):  Default:0.  Set to 1 (or True) to see error details on why each skipped document was skipped.
+Returns:
+    list: list of skipped filenames
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def extract_copy(corpus_path, output_path, verbose=0):
+    &#34;&#34;&#34;
+    ```
+    Crawl &lt;corpus_path&gt;, extract plain text from documents
+    and then copy them to output_path.
+    Requires textract package
+    Args:
+        corpus_path(str):  root folder containing documents
+        output_path(str):  root folder of output directory
+        verbose(bool):  Default:0.  Set to 1 (or True) to see error details on why each skipped document was skipped.
+    Returns:
+        list: list of skipped filenames
+    ```
+    &#34;&#34;&#34;
+    try:
+        # TODO: change this to use TextExtractor
+        import textract
+    except ImportError:
+        raise Exception(&#39;extract_copy requires textract: pip install textract&#39;)
+
+    skipped = set()
+    num_skipped = 0
+    corpus_path = os.path.normpath(corpus_path)
+    output_path = os.path.normpath(output_path)
+    for idx, filename in enumerate(extract_filenames(corpus_path)):
+        if idx %1000 == 0: print(&#39;processed %s doc(s)&#39; % (idx+1))
+        mtype = get_mimetype(filename)
+        try:
+            if mtype and mtype.split(&#39;/&#39;)[0] == &#39;text&#39;:
+                with open(filename, &#39;r&#39;) as f:
+                    text = f.read()
+                    text = str.encode(text)
+            else:
+                text = textract.process(filename)
+        except Exception as e:
+            if verbose:
+                print(&#39;ERROR on %s:\n%s&#39; % (filename, e))
+            num_skipped += 1
+            if not mtype:
+                mtype =  os.path.splitext(filename)[1]
+                if not mtype: mtype == &#39;unknown&#39;
+            skipped.add(mtype)
+            continue
+
+        if not text: 
+            num_skipped += 1
+            continue
+        fpath, fname = os.path.split(filename)
+        if mtype and mtype.split(&#39;/&#39;)[0] != &#39;text&#39;: fname = fname+&#39;.txt&#39;
+        relfpath = fpath.replace(corpus_path, &#39;&#39;)
+        relfpath = relfpath[1:] if relfpath and relfpath[0] == os.sep else relfpath
+        opath = os.path.join(output_path, relfpath)
+        if not os.path.exists(opath):
+            os.makedirs(opath)
+        ofilename = os.path.join(opath, fname)
+        with open(ofilename, &#39;wb&#39;) as f:
+            f.write(text)
+    print(&#39;processed %s docs&#39; % (idx+1))
+    print(&#39;done.&#39;)
+    print(&#39;skipped %s docs&#39; % (num_skipped))
+    if skipped: print(&#39;%s&#39; %(skipped))</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.textutils.extract_filenames"><code class="name flex">
+<span>def <span class="ident">extract_filenames</span></span>(<span>corpus_path, follow_links=False)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def extract_filenames(corpus_path, follow_links=False):
+    if os.listdir(corpus_path) == []:
+        raise ValueError(&#34;%s: path is empty&#34; % corpus_path)
+    walk = os.walk
+    for root, dirs, filenames in walk(corpus_path, followlinks=follow_links):
+        for filename in filenames:
+            try:
+                yield os.path.join(root, filename)
+            except:
+                continue</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.textutils.extract_noun_phrases"><code class="name flex">
+<span>def <span class="ident">extract_noun_phrases</span></span>(<span>text)</span>
+</code></dt>
+<dd>
+<div class="desc"><pre><code>extracts noun phrases
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def extract_noun_phrases(text):
+    &#34;&#34;&#34;
+    ```
+    extracts noun phrases
+    ```
+    &#34;&#34;&#34;
+    try:
+        from textblob import TextBlob
+    except:
+        raise Exception(&#39;extract_noun_phrases require TextBlob: pip install textblob&#39;)
+    blob = TextBlob(text)
+    stop_words = [&#39;which&#39;, &#39;what&#39;]
+    curr_phrase = []
+    np_list = []
+    start = False
+    for token in blob.tags:
+        if token[1].startswith(&#39;J&#39;) or token[1].startswith(&#39;N&#39;):
+            if not start: start = True
+            if token[0].lower() not in stop_words: curr_phrase.append(token[0])
+        else:
+            if start:
+                np_list.append(&#34; &#34;.join(curr_phrase))
+                curr_phrase = []
+                start = False
+    if start: np_list.append(&#34; &#34;.join(curr_phrase))
+    return np_list</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.textutils.extract_offsets"><code class="name flex">
+<span>def <span class="ident">extract_offsets</span></span>(<span>sentence, tokens=None, tokenizer=&lt;function tokenize&gt;)</span>
+</code></dt>
+<dd>
+<div class="desc"><pre><code>extracts character
+
+Args:
+  sentence (str): text
+  tokens (list): list of tokens from sentence.  If None, tokens will be generated using supplied tokenizer.
+  tokenizer (Callable):  a callable that accepts text and returns a list of tokens
+Return:
+  list of dictionaries of the form {'token': &lt;the token&gt;, 'start': start character index, 'end': end character index}
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def extract_offsets(sentence, tokens=None, tokenizer=tokenize):
+    &#34;&#34;&#34;
+    ```
+    extracts character
+
+    Args:
+      sentence (str): text
+      tokens (list): list of tokens from sentence.  If None, tokens will be generated using supplied tokenizer.
+      tokenizer (Callable):  a callable that accepts text and returns a list of tokens
+    Return:
+      list of dictionaries of the form {&#39;token&#39;: &lt;the token&gt;, &#39;start&#39;: start character index, &#39;end&#39;: end character index}
+    ```
+    &#34;&#34;&#34;
+    s = sentence
+    tokens = tokenizer(sentence)
+    offsets = []
+    last_end = 0
+    for t in tokens:
+        # find start of current token
+        for start_ind in range(last_end, len(sentence)):
+            if sentence[start_ind] == t[0]: break
+        end_ind = len(sentence)
+        for end_ind in range(start_ind+1, len(sentence)):
+            if (end_ind-start_ind) &gt;= len(t): 
+                break
+        d = {&#39;token&#39;: t, 
+             &#39;start&#39; : start_ind, &#39;end&#39; : end_ind,
+            }
+        offsets.append(d)
+        last_end = end_ind
+    return offsets</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.textutils.filter_by_id"><code class="name flex">
+<span>def <span class="ident">filter_by_id</span></span>(<span>lst, ids=[])</span>
+</code></dt>
+<dd>
+<div class="desc"><pre><code>filter list by supplied IDs
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def filter_by_id(lst, ids=[]):
+    &#34;&#34;&#34;
+    ```
+    filter list by supplied IDs
+    ```
+    &#34;&#34;&#34;
+    return [x for i,x in enumerate(lst) if i in ids]</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.textutils.get_mimetype"><code class="name flex">
+<span>def <span class="ident">get_mimetype</span></span>(<span>filepath)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_mimetype(filepath):
+    return mimetypes.guess_type(filepath)[0]</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.textutils.is_chinese"><code class="name flex">
+<span>def <span class="ident">is_chinese</span></span>(<span>lang, strict=True)</span>
+</code></dt>
+<dd>
+<div class="desc"><pre><code>Args:
+  lang(str): language code (e.g., en)
+  strict(bool):  If False, include additional languages due to mistakes on short texts by langdetect
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_chinese(lang, strict=True):
+    &#34;&#34;&#34;
+    ```
+    Args:
+      lang(str): language code (e.g., en)
+      strict(bool):  If False, include additional languages due to mistakes on short texts by langdetect
+    ```
+    &#34;&#34;&#34;
+    if strict:
+        extra_clause = False
+    else:
+        extra_clause = lang in [&#39;ja&#39;, &#39;ko&#39;]
+    return lang is not None and lang.startswith(&#39;zh-&#39;) or extra_clause</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.textutils.is_nospace_lang"><code class="name flex">
+<span>def <span class="ident">is_nospace_lang</span></span>(<span>lang)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_nospace_lang(lang):
+    return lang in NOSPACE_LANGS</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.textutils.is_pdf"><code class="name flex">
+<span>def <span class="ident">is_pdf</span></span>(<span>filepath)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_pdf(filepath):
+    return mimetypes.guess_type(filepath)[0] == &#39;application/pdf&#39;</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.textutils.is_txt"><code class="name flex">
+<span>def <span class="ident">is_txt</span></span>(<span>filepath, strict=False)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_txt(filepath, strict=False):
+    if strict:
+        return mimetypes.guess_type(filepath)[0] == &#39;text/plain&#39;
+    else:
+        mtype = get_mimetype(filepath)
+        return mtype is not None and mtype.split(&#39;/&#39;)[0] == &#39;text&#39;</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.textutils.load_text_files"><code class="name flex">
+<span>def <span class="ident">load_text_files</span></span>(<span>corpus_path, truncate_len=None, clean=True, return_fnames=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><pre><code>load text files
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def load_text_files(corpus_path, truncate_len=None, 
+                    clean=True, return_fnames=False):
+    &#34;&#34;&#34;
+    ```
+    load text files
+    ```
+    &#34;&#34;&#34;
+    
+    texts = []
+    filenames = []
+    mb = master_bar(range(1))
+    for i in mb:
+        for filename in progress_bar(list(extract_filenames(corpus_path)), parent=mb):
+            with open(filename, &#39;r&#39;) as f:
+                text = f.read()
+            if clean:
+                text = strip_control_characters(text)
+                text = to_ascii(text)
+            if truncate_len is not None:
+                text = &#34; &#34;.join(text.split()[:truncate_len])
+            texts.append(text)
+            filenames.append(filename)
+        mb.write(&#39;done.&#39;)
+    if return_fnames:
+        return (texts, filenames)
+    else:
+        return texts</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.textutils.paragraph_tokenize"><code class="name flex">
+<span>def <span class="ident">paragraph_tokenize</span></span>(<span>text, join_sentences=False, lang=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><pre><code>segment text into paragraphs
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def paragraph_tokenize(text, join_sentences=False, lang=None):
+    &#34;&#34;&#34;
+    ```
+    segment text into paragraphs
+    ```
+    &#34;&#34;&#34;
+    lang = detect_lang(text) if lang is None else lang
+    if is_chinese(lang):
+        raise ValueError(&#39;paragraph_tokenize does not currently support Chinese.&#39;)
+    paragraphs = []
+    sents = []
+    for paragraph in segmenter.process(text):
+        sents = []
+        for sentence in paragraph:
+            sents.append(&#34; &#34;.join([t.value for t in sentence]))
+        if join_sentences: sents = &#39; &#39;.join(sents)
+        paragraphs.append(sents)
+    return paragraphs</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.textutils.pdftotext"><code class="name flex">
+<span>def <span class="ident">pdftotext</span></span>(<span>filename)</span>
+</code></dt>
+<dd>
+<div class="desc"><pre><code>Use pdftotext program to convert PDF to text string.
+:param filename: of PDF file
+:return: text from file, or empty string if failure
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def pdftotext(filename):
+    &#34;&#34;&#34;
+    ```
+    Use pdftotext program to convert PDF to text string.
+    :param filename: of PDF file
+    :return: text from file, or empty string if failure
+    ```
+    &#34;&#34;&#34;
+    output = Popen([&#39;pdftotext&#39;, &#39;-q&#39;, filename, &#39;-&#39;],
+                   stdout=PIPE).communicate()[0]
+    # None may indicate damage, but convert for consistency
+    return &#39;&#39; if output is None else output</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.textutils.read_text"><code class="name flex">
+<span>def <span class="ident">read_text</span></span>(<span>filename)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def read_text(filename):
+    with open(filename, &#39;rb&#39;) as f:
+        text = f.read()
+    encoding = detect_encoding([text])
+    try:
+        decoded_text = text.decode(encoding)
+    except:
+        U.vprint(&#39;Decoding with %s failed 1st attempt - using %s with skips&#39; % (encoding,
+                                                                                encoding),
+                                                                                verbose=verbose)
+        decoded_text = decode_by_line(text, encoding=encoding)
+    return decoded_text.strip()</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.textutils.requires_ocr"><code class="name flex">
+<span>def <span class="ident">requires_ocr</span></span>(<span>filename)</span>
+</code></dt>
+<dd>
+<div class="desc"><pre><code>Uses pdffonts program to determine if the PDF requires OCR, i.e., it
+doesn't contain any fonts.
+:param filename: of PDF file
+:return: True if requires OCR, False if not
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def requires_ocr(filename):
+    &#34;&#34;&#34;
+    ```
+    Uses pdffonts program to determine if the PDF requires OCR, i.e., it
+    doesn&#39;t contain any fonts.
+    :param filename: of PDF file
+    :return: True if requires OCR, False if not
+    ```
+    &#34;&#34;&#34;
+    output = Popen([&#39;pdffonts&#39;, filename], stdout=PIPE,
+                   stderr=DEVNULL).communicate()[0]
+    return len(output.split(&#39;\n&#39;)) &lt; 4</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.textutils.sent_tokenize"><code class="name flex">
+<span>def <span class="ident">sent_tokenize</span></span>(<span>text, lang=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><pre><code>segment text into sentences
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def sent_tokenize(text, lang=None):
+    &#34;&#34;&#34;
+    ```
+    segment text into sentences
+    ```
+    &#34;&#34;&#34;
+    lang = detect_lang(text) if lang is None else lang
+    sents = []
+    if is_chinese(lang):
+        for sent in re.findall(u&#39;[^!?。\.\!\?]+[!?。\.\!\?]?&#39;, text, flags=re.U):
+            sents.append(sent)
+    else:
+        for paragraph in segmenter.process(text):
+            for sentence in paragraph:
+                sents.append(&#34; &#34;.join([t.value for t in sentence]))
+    return sents</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.textutils.split_chinese"><code class="name flex">
+<span>def <span class="ident">split_chinese</span></span>(<span>texts)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def split_chinese(texts):
+    if isinstance(texts, str): texts=[texts]
+
+    split_texts = []
+    for doc in texts:
+        seg_list = jieba.cut(doc, cut_all=False)
+        seg_list = list(seg_list)
+        split_texts.append(seg_list)
+    return [&#34; &#34;.join(tokens) for tokens in split_texts]</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.textutils.strip_control_characters"><code class="name flex">
+<span>def <span class="ident">strip_control_characters</span></span>(<span>data)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def strip_control_characters(data):
+    if data:
+        # unicode invalid characters
+        re_xml_illegal = (
+            &#39;([\u0000-\u0008\u000b-\u000c\u000e-\u001f\ufffe-\uffff])|&#39;
+            &#39;([%s-%s][^%s-%s])|([^%s-%s][%s-%s])|([%s-%s]$)|(^[%s-%s])&#39;
+            % (chr(0xd800), chr(0xdbff), chr(0xdc00), chr(0xdfff), chr(0xd800),
+               chr(0xdbff), chr(0xdc00), chr(0xdfff), chr(0xd800), chr(0xdbff),
+               chr(0xdc00), chr(0xdfff))
+        )
+        data = re.sub(re_xml_illegal, &#34;&#34;, data)
+        # ascii control characters
+        #data = re.sub(r&#34;[\x01-\x1F\x7F]&#34;, &#34;&#34;, data)
+        # See:  http://w3.org/International/questions/qa-forms-utf-8.html
+        # Printable utf-8 does not include any of these chars below x7F
+        data = re.sub(r&#34;[\x00-\x08\x0B\x0C\x0E-\x1F]&#34;, &#34;&#34;, data)
+    return data</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.textutils.to_ascii"><code class="name flex">
+<span>def <span class="ident">to_ascii</span></span>(<span>data)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Transform accentuated unicode symbols into ascii or nothing</p>
+<p>Warning: this solution is only suited for languages that have a direct
+transliteration to ASCII symbols.</p>
+<p>A better solution would be to use transliteration based on a precomputed
+unidecode map to be used by translate as explained here:</p>
+<pre><code>&lt;http://stackoverflow.com/questions/2854230/&gt;
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_ascii(data):
+    &#34;&#34;&#34;Transform accentuated unicode symbols into ascii or nothing
+
+    Warning: this solution is only suited for languages that have a direct
+    transliteration to ASCII symbols.
+
+    A better solution would be to use transliteration based on a precomputed
+    unidecode map to be used by translate as explained here:
+
+        http://stackoverflow.com/questions/2854230/
+
+    &#34;&#34;&#34;
+    import unicodedata
+    if isinstance(data, bytes):
+        data = data.decode()
+    nkfd_form = unicodedata.normalize(&#39;NFKD&#39;, data)
+    only_ascii = nkfd_form.encode(&#39;ASCII&#39;, &#39;ignore&#39;)
+
+    # Return a string
+    return only_ascii.decode(&#39;ascii&#39;)</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.textutils.tokenize"><code class="name flex">
+<span>def <span class="ident">tokenize</span></span>(<span>s, join_tokens=False, join_char=' ')</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def tokenize(s, join_tokens=False, join_char=&#39; &#39;): 
+    tokens = re_tok.sub(r&#39; \1 &#39;, s).split()
+    if join_tokens: tokens = join_char.join(tokens)
+    return tokens</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="ktrain.text" href="index.html">ktrain.text</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="ktrain.text.textutils.decode_by_line" href="#ktrain.text.textutils.decode_by_line">decode_by_line</a></code></li>
+<li><code><a title="ktrain.text.textutils.detect_encoding" href="#ktrain.text.textutils.detect_encoding">detect_encoding</a></code></li>
+<li><code><a title="ktrain.text.textutils.detect_lang" href="#ktrain.text.textutils.detect_lang">detect_lang</a></code></li>
+<li><code><a title="ktrain.text.textutils.extract_copy" href="#ktrain.text.textutils.extract_copy">extract_copy</a></code></li>
+<li><code><a title="ktrain.text.textutils.extract_filenames" href="#ktrain.text.textutils.extract_filenames">extract_filenames</a></code></li>
+<li><code><a title="ktrain.text.textutils.extract_noun_phrases" href="#ktrain.text.textutils.extract_noun_phrases">extract_noun_phrases</a></code></li>
+<li><code><a title="ktrain.text.textutils.extract_offsets" href="#ktrain.text.textutils.extract_offsets">extract_offsets</a></code></li>
+<li><code><a title="ktrain.text.textutils.filter_by_id" href="#ktrain.text.textutils.filter_by_id">filter_by_id</a></code></li>
+<li><code><a title="ktrain.text.textutils.get_mimetype" href="#ktrain.text.textutils.get_mimetype">get_mimetype</a></code></li>
+<li><code><a title="ktrain.text.textutils.is_chinese" href="#ktrain.text.textutils.is_chinese">is_chinese</a></code></li>
+<li><code><a title="ktrain.text.textutils.is_nospace_lang" href="#ktrain.text.textutils.is_nospace_lang">is_nospace_lang</a></code></li>
+<li><code><a title="ktrain.text.textutils.is_pdf" href="#ktrain.text.textutils.is_pdf">is_pdf</a></code></li>
+<li><code><a title="ktrain.text.textutils.is_txt" href="#ktrain.text.textutils.is_txt">is_txt</a></code></li>
+<li><code><a title="ktrain.text.textutils.load_text_files" href="#ktrain.text.textutils.load_text_files">load_text_files</a></code></li>
+<li><code><a title="ktrain.text.textutils.paragraph_tokenize" href="#ktrain.text.textutils.paragraph_tokenize">paragraph_tokenize</a></code></li>
+<li><code><a title="ktrain.text.textutils.pdftotext" href="#ktrain.text.textutils.pdftotext">pdftotext</a></code></li>
+<li><code><a title="ktrain.text.textutils.read_text" href="#ktrain.text.textutils.read_text">read_text</a></code></li>
+<li><code><a title="ktrain.text.textutils.requires_ocr" href="#ktrain.text.textutils.requires_ocr">requires_ocr</a></code></li>
+<li><code><a title="ktrain.text.textutils.sent_tokenize" href="#ktrain.text.textutils.sent_tokenize">sent_tokenize</a></code></li>
+<li><code><a title="ktrain.text.textutils.split_chinese" href="#ktrain.text.textutils.split_chinese">split_chinese</a></code></li>
+<li><code><a title="ktrain.text.textutils.strip_control_characters" href="#ktrain.text.textutils.strip_control_characters">strip_control_characters</a></code></li>
+<li><code><a title="ktrain.text.textutils.to_ascii" href="#ktrain.text.textutils.to_ascii">to_ascii</a></code></li>
+<li><code><a title="ktrain.text.textutils.tokenize" href="#ktrain.text.textutils.tokenize">tokenize</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+</footer>
+</body>
+</html>
