@@ -54,24 +54,19 @@ class Tagger(object):
 
     def _build_response(self, sent, tags, prob):
         words = self.tokenizer(sent)
-        res = {
-            'words': words,
-            'entities': [
-
-            ]
-        }
+        res = {"words": words, "entities": []}
         chunks = metrics.get_entities(tags)
 
         for chunk_type, chunk_start, chunk_end in chunks:
             chunk_end += 1
             entity = {
-                'text': ' '.join(words[chunk_start: chunk_end]),
-                'type': chunk_type,
-                'score': float(np.average(prob[chunk_start: chunk_end])),
-                'beginOffset': chunk_start,
-                'endOffset': chunk_end
+                "text": " ".join(words[chunk_start:chunk_end]),
+                "type": chunk_type,
+                "score": float(np.average(prob[chunk_start:chunk_end])),
+                "beginOffset": chunk_start,
+                "endOffset": chunk_end,
             }
-            res['entities'].append(entity)
+            res["entities"].append(entity)
 
         return res
 

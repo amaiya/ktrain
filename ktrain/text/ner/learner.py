@@ -4,22 +4,31 @@ from ...core import GenLearner
 from . import metrics
 
 
-
 class NERLearner(GenLearner):
     """
     Learner for Sequence Taggers.
     """
 
-
-    def __init__(self, model, train_data=None, val_data=None, 
-                 batch_size=U.DEFAULT_BS, eval_batch_size=U.DEFAULT_BS,
-                 workers=1, use_multiprocessing=False):
-        super().__init__(model, train_data=train_data, val_data=val_data, 
-                         batch_size=batch_size, eval_batch_size=eval_batch_size,
-                         workers=workers, use_multiprocessing=use_multiprocessing)
+    def __init__(
+        self,
+        model,
+        train_data=None,
+        val_data=None,
+        batch_size=U.DEFAULT_BS,
+        eval_batch_size=U.DEFAULT_BS,
+        workers=1,
+        use_multiprocessing=False,
+    ):
+        super().__init__(
+            model,
+            train_data=train_data,
+            val_data=val_data,
+            batch_size=batch_size,
+            eval_batch_size=eval_batch_size,
+            workers=workers,
+            use_multiprocessing=use_multiprocessing,
+        )
         return
-
-
 
     def validate(self, val_data=None, print_report=True, class_names=[]):
         """
@@ -31,14 +40,14 @@ class NERLearner(GenLearner):
             val.prepare()
 
         if not U.is_ner(model=self.model, data=val):
-            warnings.warn('learner.validate_ner is only for sequence taggers.')
+            warnings.warn("learner.validate_ner is only for sequence taggers.")
             return
 
         label_true = []
         label_pred = []
         for i in range(len(val)):
             x_true, y_true = val[i]
-            #lengths = self.ner_lengths(y_true)
+            # lengths = self.ner_lengths(y_true)
             lengths = val.get_lengths(i)
             y_pred = self.model.predict_on_batch(x_true)
 
@@ -49,10 +58,10 @@ class NERLearner(GenLearner):
             label_pred.extend(y_pred)
 
         score = metrics.f1_score(label_true, label_pred)
-        #acc = metrics.accuracy_score(label_true, label_pred)
+        # acc = metrics.accuracy_score(label_true, label_pred)
         if print_report:
-            print('   F1:  {:04.2f}'.format(score * 100))
-            #print('   ACC: {:04.2f}'.format(acc * 100))
+            print("   F1:  {:04.2f}".format(score * 100))
+            # print('   ACC: {:04.2f}'.format(acc * 100))
             print(metrics.classification_report(label_true, label_pred))
 
         return score
@@ -65,7 +74,7 @@ class NERLearner(GenLearner):
                           e.g., n=8 is treated as n=(0,8)
           val_data:  optional val_data to use instead of self.val_data
         Returns:
-            list of n tuples where first element is either 
+            list of n tuples where first element is either
             filepath or id of validation example and second element
             is loss.
 
@@ -82,16 +91,15 @@ class NERLearner(GenLearner):
         losses = []
         for idx, y_t in enumerate(y_true):
             y_p = y_pred[idx]
-            #err = 1- sum(1 for x,y in zip(y_t,y_p) if x == y) / len(y_t)
-            err = sum(1 for x,y in zip(y_t,y_p) if x != y) 
+            # err = 1- sum(1 for x,y in zip(y_t,y_p) if x == y) / len(y_t)
+            err = sum(1 for x, y in zip(y_t, y_p) if x != y)
             losses.append(err)
-        tups = [(i,x, y_true[i], y_pred[i]) for i, x in enumerate(losses) if x > 0]
+        tups = [(i, x, y_true[i], y_pred[i]) for i, x in enumerate(losses) if x > 0]
         tups.sort(key=operator.itemgetter(1), reverse=True)
 
         # prune by given range
-        tups = tups[n[0]:n[1]] if n is not None else tups
+        tups = tups[n[0] : n[1]] if n is not None else tups
         return tups
-
 
     def view_top_losses(self, n=4, preproc=None, val_data=None):
         """
@@ -105,7 +113,7 @@ class NERLearner(GenLearner):
                                  to correctly view raw data.
           val_data:  optional val_data to use instead of self.val_data
         Returns:
-            list of n tuples where first element is either 
+            list of n tuples where first element is either
             filepath or id of validation example and second element
             is loss.
 
@@ -129,14 +137,13 @@ class NERLearner(GenLearner):
             pred = tup[3]
 
             seq = val.x[idx]
-            print('total incorrect: %s' % (loss))
+            print("total incorrect: %s" % (loss))
             print("{:15} {:5}: ({})".format("Word", "True", "Pred"))
-            print("="*30)
+            print("=" * 30)
             for w, true_tag, pred_tag in zip(seq, truth, pred):
                 print("{:15}:{:5} ({})".format(w, true_tag, pred_tag))
-            print('\n')
+            print("\n")
         return
-
 
     def save_model(self, fpath):
         """
@@ -145,10 +152,10 @@ class NERLearner(GenLearner):
         self._make_model_folder(fpath)
         if U.is_crf(self.model):
             from .anago.layers import crf_loss
-            self.model.compile(loss=crf_loss, optimizer=U.DEFAULT_OPT)
-        self.model.save(os.path.join(fpath, U.MODEL_NAME), save_format='h5')
-        return
 
+            self.model.compile(loss=crf_loss, optimizer=U.DEFAULT_OPT)
+        self.model.save(os.path.join(fpath, U.MODEL_NAME), save_format="h5")
+        return
 
     def predict(self, val_data=None):
         """
@@ -158,8 +165,9 @@ class NERLearner(GenLearner):
             val = val_data
         else:
             val = self.val_data
-        if val is None: raise Exception('val_data must be supplied to get_learner or predict')
-        steps = np.ceil(U.nsamples_from_data(val)/val.batch_size)
+        if val is None:
+            raise Exception("val_data must be supplied to get_learner or predict")
+        steps = np.ceil(U.nsamples_from_data(val) / val.batch_size)
         results = []
         for idx, (X, y) in enumerate(val):
             y_pred = self.model.predict_on_batch(X)
@@ -168,16 +176,15 @@ class NERLearner(GenLearner):
             results.extend(y_pred)
         return results
 
-
     def _prepare(self, data, train=True):
         """
         prepare NERSequence for training
         """
-        if data is None: return None
-        mode = 'training' if train else 'validation'
+        if data is None:
+            return None
+        mode = "training" if train else "validation"
         if not data.prepare_called:
-            print('preparing %s data ...' % (mode), end='')
+            print("preparing %s data ..." % (mode), end="")
             data.prepare()
-            print('done.')
+            print("done.")
         return data
-

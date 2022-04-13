@@ -1,25 +1,26 @@
 def causal_inference_model(
-                             df,
-                             method='t-learner',
-                             metalearner_type=None,
-                             treatment_col='treatment',
-                             outcome_col='outcome',
-                             text_col=None,
-                             ignore_cols=[],
-                             include_cols=[],
-                             treatment_effect_col = 'treatment_effect',
-                             learner = None,
-                             effect_learner=None,
-                             min_df=0.05,
-                             max_df=0.5,
-                             ngram_range=(1,1),
-                             stop_words='english',
-                             verbose=1):
+    df,
+    method="t-learner",
+    metalearner_type=None,
+    treatment_col="treatment",
+    outcome_col="outcome",
+    text_col=None,
+    ignore_cols=[],
+    include_cols=[],
+    treatment_effect_col="treatment_effect",
+    learner=None,
+    effect_learner=None,
+    min_df=0.05,
+    max_df=0.5,
+    ngram_range=(1, 1),
+    stop_words="english",
+    verbose=1,
+):
     """
     ```
     Infers causality from the data contained in `df` using a metalearner.
     This function is a wrapper to the CausalNLP.CausalInferenceModel class.
-    For more details on methods and capabilities of the returned `CausalInferenceModel` object, 
+    For more details on methods and capabilities of the returned `CausalInferenceModel` object,
     see the [CausalNLP documentation](https://amaiya.github.io/causalnlp/causalinference.html).
 
     Usage:
@@ -56,23 +57,24 @@ def causal_inference_model(
     try:
         import causalnlp
     except ImportError:
-        raise Exception('CausalNLP must be installed: pip install causalnlp')
+        raise Exception("CausalNLP must be installed: pip install causalnlp")
     from causalnlp import CausalInferenceModel
-    return CausalInferenceModel(
-                             df,
-                             method=method,
-                             metalearner_type=metalearner_type,
-                             treatment_col=treatment_col,
-                             outcome_col=outcome_col,
-                             text_col=text_col,
-                             ignore_cols=ignore_cols,
-                             include_cols=include_cols,
-                             treatment_effect_col = treatment_effect_col,
-                             learner = learner,
-                             effect_learner=effect_learner,
-                             min_df=min_df,
-                             max_df=max_df,
-                             ngram_range=ngram_range,
-                             stop_words=stop_words,
-                             verbose=verbose,)
 
+    return CausalInferenceModel(
+        df,
+        method=method,
+        metalearner_type=metalearner_type,
+        treatment_col=treatment_col,
+        outcome_col=outcome_col,
+        text_col=text_col,
+        ignore_cols=ignore_cols,
+        include_cols=include_cols,
+        treatment_effect_col=treatment_effect_col,
+        learner=learner,
+        effect_learner=effect_learner,
+        min_df=min_df,
+        max_df=max_df,
+        ngram_range=ngram_range,
+        stop_words=stop_words,
+        verbose=verbose,
+    )

@@ -4,8 +4,8 @@ Custom callbacks.
 from ....imports import *
 from .. import metrics
 
-class F1score(keras.callbacks.Callback):
 
+class F1score(keras.callbacks.Callback):
     def __init__(self, seq, preprocessor=None):
         super(F1score, self).__init__()
         self.seq = seq
@@ -37,6 +37,6 @@ class F1score(keras.callbacks.Callback):
             label_pred.extend(y_pred)
 
         score = metrics.f1_score(label_true, label_pred)
-        print(' - f1: {:04.2f}'.format(score * 100))
+        print(" - f1: {:04.2f}".format(score * 100))
         print(metrics.classification_report(label_true, label_pred))
-        logs['f1'] = score
+        logs["f1"] = score

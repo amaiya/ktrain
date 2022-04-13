@@ -1,9 +1,8 @@
 from ...imports import *
 from ...dataset import SequenceDataset
 
+
 class NERSequence(SequenceDataset):
-
-
     def __init__(self, x, y, batch_size=1, p=None):
         self.x = x
         self.y = y
@@ -17,16 +16,14 @@ class NERSequence(SequenceDataset):
         self.prepare_called = True
         return
 
-
     def __getitem__(self, idx):
-        batch_x = self.x[idx * self.batch_size: (idx + 1) * self.batch_size]
-        batch_y = self.y[idx * self.batch_size: (idx + 1) * self.batch_size]
+        batch_x = self.x[idx * self.batch_size : (idx + 1) * self.batch_size]
+        batch_y = self.y[idx * self.batch_size : (idx + 1) * self.batch_size]
 
         return self.p.transform(batch_x, batch_y)
 
     def __len__(self):
         return math.ceil(len(self.x) / self.batch_size)
-
 
     def get_lengths(self, idx):
         x_true, y_true = self[idx]
@@ -41,17 +38,13 @@ class NERSequence(SequenceDataset):
         return lengths
 
     def nsamples(self):
-        return len(self.x)   
-
+        return len(self.x)
 
     def get_y(self):
         return self.y
 
-
     def xshape(self):
-        return (len(self.x), self[0][0][0].shape[1]) 
-
+        return (len(self.x), self[0][0][0].shape[1])
 
     def nclasses(self):
-        return len(self.p._label_vocab._id2token) 
-
+        return len(self.p._label_vocab._id2token)

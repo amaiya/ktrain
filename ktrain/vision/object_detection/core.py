@@ -2,6 +2,7 @@ from ...torch_base import TorchBase
 from ... import imports as I
 from transformers import pipeline
 
+
 class ObjectDetector(TorchBase):
     """
     interface to Image Captioner
@@ -20,13 +21,19 @@ class ObjectDetector(TorchBase):
         ```
         """
         if not I.PIL_INSTALLED:
-            raise Exception('PIL is not installed. Please install with: pip install pillow>=9.0.1')
+            raise Exception(
+                "PIL is not installed. Please install with: pip install pillow>=9.0.1"
+            )
 
-        super().__init__(device=device, quantize=False, min_transformers_version='4.12.3')
-        self.pipeline = pipeline('image-classification' if classification else 'object-detection', device=self.device_to_id())
+        super().__init__(
+            device=device, quantize=False, min_transformers_version="4.12.3"
+        )
+        self.pipeline = pipeline(
+            "image-classification" if classification else "object-detection",
+            device=self.device_to_id(),
+        )
         self.threshold = threshold
         self.classification = classification
-
 
     def detect(self, images, flatten=False, workers=0):
         """
@@ -48,8 +55,9 @@ class ObjectDetector(TorchBase):
         values = [images] if not isinstance(images, list) else images
 
         # Open images if file strings
-        values = [I.Image.open(image) if isinstance(image, str) else image for image in values]
-
+        values = [
+            I.Image.open(image) if isinstance(image, str) else image for image in values
+        ]
 
         # Run pipeline
         results = (
@@ -62,7 +70,9 @@ class ObjectDetector(TorchBase):
         outputs = []
         for result in results:
             # Convert to (label, score) tuples
-            result = [(x["label"], x["score"]) for x in result if x["score"] > self.threshold]
+            result = [
+                (x["label"], x["score"]) for x in result if x["score"] > self.threshold
+            ]
 
             # Sort by score descending
             result = sorted(result, key=lambda x: x[1], reverse=True)

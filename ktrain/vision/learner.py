@@ -4,8 +4,6 @@ from ..core import GenLearner
 from .data import show_image
 
 
-
-
 class ImageClassLearner(GenLearner):
     """
     ```
@@ -18,16 +16,27 @@ class ImageClassLearner(GenLearner):
     ```
     """
 
-
-    def __init__(self, model, train_data=None, val_data=None, 
-                 batch_size=U.DEFAULT_BS, eval_batch_size=U.DEFAULT_BS,
-                 workers=1, use_multiprocessing=False):
-        super().__init__(model, train_data=train_data, val_data=val_data,
-                         batch_size=batch_size, eval_batch_size=eval_batch_size,
-                         workers=workers, use_multiprocessing=use_multiprocessing)
+    def __init__(
+        self,
+        model,
+        train_data=None,
+        val_data=None,
+        batch_size=U.DEFAULT_BS,
+        eval_batch_size=U.DEFAULT_BS,
+        workers=1,
+        use_multiprocessing=False,
+    ):
+        super().__init__(
+            model,
+            train_data=train_data,
+            val_data=val_data,
+            batch_size=batch_size,
+            eval_batch_size=eval_batch_size,
+            workers=workers,
+            use_multiprocessing=use_multiprocessing,
+        )
         return
 
-    
     def view_top_losses(self, n=4, preproc=None, val_data=None):
         """
         ```
@@ -41,7 +50,7 @@ class ImageClassLearner(GenLearner):
                                  to correctly view raw data.
           val_data:  optional val_data to use instead of self.val_data
         Returns:
-            list of n tuples where first element is either 
+            list of n tuples where first element is either
             filepath or id of validation example and second element
             is loss.
         ```
@@ -53,7 +62,10 @@ class ImageClassLearner(GenLearner):
             val = val_data
         else:
             val = self.val_data
-        if val is None: raise Exception('val_data must be supplied to get_learner or view_top_losses')
+        if val is None:
+            raise Exception(
+                "val_data must be supplied to get_learner or view_top_losses"
+            )
 
         # get top losses and associated data
         tups = self.top_losses(n=n, val_data=val, preproc=preproc)
@@ -71,22 +83,30 @@ class ImageClassLearner(GenLearner):
             pred = tup[3]
 
             # Image Classification
-            if type(val).__name__ in ['DirectoryIterator', 'DataFrameIterator']:
+            if type(val).__name__ in ["DirectoryIterator", "DataFrameIterator"]:
                 fpath = val.filepaths[tup[0]]
-                fp = os.path.join(os.path.basename(os.path.dirname(fpath)), os.path.basename(fpath))
+                fp = os.path.join(
+                    os.path.basename(os.path.dirname(fpath)), os.path.basename(fpath)
+                )
                 plt.figure()
-                plt.title("%s | loss:%s | true:%s | pred:%s)" % (fp, round(loss,2), truth, pred))
+                plt.title(
+                    "%s | loss:%s | true:%s | pred:%s)"
+                    % (fp, round(loss, 2), truth, pred)
+                )
                 show_image(fpath)
-            elif type(val).__name__ in ['NumpyArrayIterator']:
+            elif type(val).__name__ in ["NumpyArrayIterator"]:
                 obs = val.x[idx]
-                #if preproc is not None: obs = preproc.undo(obs)
+                # if preproc is not None: obs = preproc.undo(obs)
                 plt.figure()
-                plt.title("id:%s | loss:%s | true:%s | pred:%s)" % (idx, round(loss,2), truth, pred))
+                plt.title(
+                    "id:%s | loss:%s | true:%s | pred:%s)"
+                    % (idx, round(loss, 2), truth, pred)
+                )
                 plt.imshow(np.squeeze(obs))
                 # everything else including text classification
             else:
-                raise Exception('ImageClassLearner.view_top_losses only supports ' +
-                                'DirectoryIterators, DataFrameIterators, and NumpyArrayIterators')
+                raise Exception(
+                    "ImageClassLearner.view_top_losses only supports "
+                    + "DirectoryIterators, DataFrameIterators, and NumpyArrayIterators"
+                )
         return
-
-

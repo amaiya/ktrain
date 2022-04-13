@@ -4,18 +4,18 @@ from ...preprocessor import Preprocessor
 from .. import textutils as TU
 from .. import preprocessor as tpp
 
-OTHER = 'O'
-W2V = 'word2vec'
+OTHER = "O"
+W2V = "word2vec"
 SUPPORTED_EMBEDDINGS = [W2V]
 
-WORD_COL = 'Word'
-TAG_COL = 'Tag'
-SENT_COL = 'SentenceID'
+WORD_COL = "Word"
+TAG_COL = "Tag"
+SENT_COL = "SentenceID"
 
 
-#tokenizer_filter = rs='!"#$%&()*+,-./:;<=>?@[\\]^_`{|}~\t\n'
-#re_tok = re.compile(f'([{string.punctuation}“”¨«»®´·º½¾¿¡§£₤‘’])')
-#def tokenize(s): return re_tok.sub(r' \1 ', s).split()
+# tokenizer_filter = rs='!"#$%&()*+,-./:;<=>?@[\\]^_`{|}~\t\n'
+# re_tok = re.compile(f'([{string.punctuation}“”¨«»®´·º½¾¿¡§£₤‘’])')
+# def tokenize(s): return re_tok.sub(r' \1 ', s).split()
 
 
 class NERPreprocessor(Preprocessor):
@@ -30,10 +30,8 @@ class NERPreprocessor(Preprocessor):
     def get_preprocessor(self):
         return self.p
 
-
     def get_classes(self):
         return self.c
-
 
     def filter_embeddings(self, embeddings, vocab, dim):
         """Loads word vectors in numpy array.
@@ -54,32 +52,39 @@ class NERPreprocessor(Preprocessor):
                 _embeddings[word_idx] = embeddings[word]
         return _embeddings
 
-
-
     def get_wv_model(self, wv_path_or_url, verbose=1):
-        if wv_path_or_url is None: 
-            raise ValueError('wordvector_path_or_url is empty: supply a file path or '+\
-                             'URL to fasttext word vector file')
-        if verbose: print('pretrained word embeddings will be loaded from:\n\t%s' % (wv_path_or_url))
-        word_embedding_dim = 300 # all fasttext word vectors are of dim=300
+        if wv_path_or_url is None:
+            raise ValueError(
+                "wordvector_path_or_url is empty: supply a file path or "
+                + "URL to fasttext word vector file"
+            )
+        if verbose:
+            print(
+                "pretrained word embeddings will be loaded from:\n\t%s"
+                % (wv_path_or_url)
+            )
+        word_embedding_dim = 300  # all fasttext word vectors are of dim=300
         embs = tpp.load_wv(wv_path_or_url, verbose=verbose)
-        wv_model = self.filter_embeddings(embs, self.p._word_vocab.vocab, word_embedding_dim)
+        wv_model = self.filter_embeddings(
+            embs, self.p._word_vocab.vocab, word_embedding_dim
+        )
         return (wv_model, word_embedding_dim)
-
-
 
     def preprocess(self, sentences, lang=None, custom_tokenizer=None):
         if type(sentences) != list:
-            raise ValueError('Param sentences must be a list of strings')
+            raise ValueError("Param sentences must be a list of strings")
 
         # language detection
-        if lang is None: lang = TU.detect_lang(sentences)
+        if lang is None:
+            lang = TU.detect_lang(sentences)
 
         # set tokenizer
         if custom_tokenizer is not None:
             tokfunc = custom_tokenizer
-        elif TU.is_chinese(lang, strict=False): # strict=False: workaround for langdetect bug on short chinese texts
-            tokfunc = lambda text:[c for c in text]
+        elif TU.is_chinese(
+            lang, strict=False
+        ):  # strict=False: workaround for langdetect bug on short chinese texts
+            tokfunc = lambda text: [c for c in text]
         else:
             tokfunc = TU.tokenize
 
@@ -91,9 +96,9 @@ class NERPreprocessor(Preprocessor):
             X.append(tokens)
             y.append([OTHER] * len(tokens))
         from .dataset import NERSequence
+
         nerseq = NERSequence(X, y, p=self.p)
         return nerseq
-
 
     def preprocess_test(self, x_test, y_test, verbose=1):
         """
@@ -106,17 +111,17 @@ class NERPreprocessor(Preprocessor):
         """
         # array > df > array in order to print statistics more easily
         from .data import array_to_df
-        test_df = array_to_df(x_test, y_test) 
-        (x_list, y_list)  = process_df(test_df, verbose=verbose) 
-        from .dataset import NERSequence
-        return NERSequence(x_list, y_list, batch_size=U.DEFAULT_BS, p=self.p)
 
+        test_df = array_to_df(x_test, y_test)
+        (x_list, y_list) = process_df(test_df, verbose=verbose)
+        from .dataset import NERSequence
+
+        return NERSequence(x_list, y_list, batch_size=U.DEFAULT_BS, p=self.p)
 
     def preprocess_test_from_conll2003(self, filepath, verbose=1):
         df = conll2003_to_df(filepath)
-        (x, y)  = process_df(df)
+        (x, y) = process_df(df)
         return self.preprocess_test(x, y, verbose=verbose)
-
 
     def undo(self, nerseq):
         """
@@ -125,9 +130,6 @@ class NERPreprocessor(Preprocessor):
         """
         return [" ".join(e) for e in nerseq.x]
 
-
-
-
     def fit(self, X, y):
         """
         Learn vocabulary from training set
@@ -135,13 +137,11 @@ class NERPreprocessor(Preprocessor):
         self.p.fit(X, y)
         return
 
-
     def transform(self, X, y=None):
         """
         Transform documents to sequences of word IDs
         """
         return self.p.transform(X, y=y)
-
 
 
 def array_to_df(x_list, y_list):
@@ -156,50 +156,44 @@ def array_to_df(x_list, y_list):
     return pd.DataFrame(zip(ids, words, tags), columns=[SENT_COL, WORD_COL, TAG_COL])
 
 
-
-
-def conll2003_to_df(filepath, encoding='latin1'):
+def conll2003_to_df(filepath, encoding="latin1"):
     # read data and convert to dataframe
-    sents, words, tags = [],  [], []
+    sents, words, tags = [], [], []
     sent_id = 0
     docstart = False
     with open(filepath, encoding=encoding) as f:
         for line in f:
             line = line.rstrip()
             if line:
-                if line.startswith('-DOCSTART-'): 
-                    docstart=True
+                if line.startswith("-DOCSTART-"):
+                    docstart = True
                     continue
                 else:
-                    docstart=False
+                    docstart = False
                     parts = line.split()
                     words.append(parts[0])
                     tags.append(parts[-1])
                     sents.append(sent_id)
             else:
                 if not docstart:
-                    sent_id +=1
-    df = pd.DataFrame({SENT_COL: sents, WORD_COL : words, TAG_COL:tags})
+                    sent_id += 1
+    df = pd.DataFrame({SENT_COL: sents, WORD_COL: words, TAG_COL: tags})
     df = df.fillna(method="ffill")
     return df
 
 
-def gmb_to_df(filepath, encoding='latin1'):
+def gmb_to_df(filepath, encoding="latin1"):
     df = pd.read_csv(filepath, encoding=encoding)
     df = df.fillna(method="ffill")
     return df
 
 
-
-def process_df(df, 
-               sentence_column='SentenceID', 
-               word_column='Word', 
-               tag_column='Tag',
-               verbose=1):
+def process_df(
+    df, sentence_column="SentenceID", word_column="Word", tag_column="Tag", verbose=1
+):
     """
     Extract words, tags, and sentences from dataframe
     """
-
 
     # get words and tags
     words = list(set(df[word_column].values))
@@ -212,31 +206,34 @@ def process_df(df,
         print("Tags:", tags)
         print("Number of Labels: ", n_tags)
 
-
     # retrieve all sentences
     getter = SentenceGetter(df, word_column, tag_column, sentence_column)
     sentences = getter.sentences
     largest_sen = max(len(sen) for sen in sentences)
-    if verbose: print('Longest sentence: {} words'.format(largest_sen))
+    if verbose:
+        print("Longest sentence: {} words".format(largest_sen))
     data = [list(zip(*s)) for s in sentences]
     X = [list(e[0]) for e in data]
     y = [list(e[1]) for e in data]
     return (X, y)
 
 
-
-
 class SentenceGetter(object):
     """Class to Get the sentence in this format:
     [(Token_1, Part_of_Speech_1, Tag_1), ..., (Token_n, Part_of_Speech_1, Tag_1)]"""
+
     def __init__(self, data, word_column, tag_column, sentence_column):
         """Args:
-            data is the pandas.DataFrame which contains the above dataset"""
+        data is the pandas.DataFrame which contains the above dataset"""
         self.n_sent = 1
         self.data = data
         self.empty = False
-        agg_func = lambda s: [(w, t) for w, t in zip(s[word_column].values.tolist(),
-                                                           s[tag_column].values.tolist())]
+        agg_func = lambda s: [
+            (w, t)
+            for w, t in zip(
+                s[word_column].values.tolist(), s[tag_column].values.tolist()
+            )
+        ]
         self.grouped = self.data.groupby(sentence_column).apply(agg_func)
         self.sentences = [s for s in self.grouped]
 
@@ -248,5 +245,3 @@ class SentenceGetter(object):
             return s
         except:
             return None
-
-

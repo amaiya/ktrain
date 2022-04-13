@@ -5,22 +5,23 @@ Utility functions.
 
 from ....imports import *
 
+
 def download(url):
     """Download a trained weights, config and preprocessor.
 
     Args:
         url (str): target url.
     """
-    filepath = keras.utils.get_file(fname='tmp.zip', origin=url, extract=True)
+    filepath = keras.utils.get_file(fname="tmp.zip", origin=url, extract=True)
     base_dir = os.path.dirname(filepath)
-    weights_file = os.path.join(base_dir, 'weights.h5')
-    params_file = os.path.join(base_dir, 'params.json')
-    preprocessor_file = os.path.join(base_dir, 'preprocessor.pickle')
+    weights_file = os.path.join(base_dir, "weights.h5")
+    params_file = os.path.join(base_dir, "params.json")
+    preprocessor_file = os.path.join(base_dir, "preprocessor.pickle")
 
     return weights_file, params_file, preprocessor_file
 
 
-def load_data_and_labels(filename, encoding='utf-8'):
+def load_data_and_labels(filename, encoding="utf-8"):
     """Loads data and label from a file.
 
     Args:
@@ -60,7 +61,7 @@ def load_data_and_labels(filename, encoding='utf-8'):
         for line in f:
             line = line.rstrip()
             if line:
-                word, tag = line.split('\t')
+                word, tag = line.split("\t")
                 words.append(word)
                 tags.append(tag)
             else:
@@ -72,7 +73,6 @@ def load_data_and_labels(filename, encoding='utf-8'):
 
 
 class AnagoNERSequence(keras.utils.Sequence):
-
     def __init__(self, x, y, batch_size=1, preprocess=None):
         self.x = x
         self.y = y
@@ -80,8 +80,8 @@ class AnagoNERSequence(keras.utils.Sequence):
         self.preprocess = preprocess
 
     def __getitem__(self, idx):
-        batch_x = self.x[idx * self.batch_size: (idx + 1) * self.batch_size]
-        batch_y = self.y[idx * self.batch_size: (idx + 1) * self.batch_size]
+        batch_x = self.x[idx * self.batch_size : (idx + 1) * self.batch_size]
+        batch_y = self.y[idx * self.batch_size : (idx + 1) * self.batch_size]
 
         return self.preprocess(batch_x, batch_y)
 
@@ -100,7 +100,7 @@ class Vocabulary(object):
         _id2token: A list of token strings indexed by their numerical identifiers.
     """
 
-    def __init__(self, max_size=None, lower=True, unk_token=True, specials=('<pad>',)):
+    def __init__(self, max_size=None, lower=True, unk_token=True, specials=("<pad>",)):
         """Create a Vocabulary object.
 
         Args:
@@ -175,7 +175,7 @@ class Vocabulary(object):
             self._id2token.append(token)
             idx += 1
         if self._unk:
-            unk = '<unk>'
+            unk = "<unk>"
             self._token2id[unk] = idx
             self._id2token.append(unk)
 
@@ -272,7 +272,7 @@ def load_glove(file):
     model = {}
     with open(file) as f:
         for line in f:
-            line = line.split(' ')
+            line = line.split(" ")
             word = line[0]
             vector = np.array([float(val) for val in line[1:]])
             model[word] = vector

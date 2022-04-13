@@ -11,21 +11,21 @@ from .utils import filter_embeddings
 from .. import metrics
 
 
-
 class Sequence(object):
-
-    def __init__(self,
-                 word_embedding_dim=100,
-                 char_embedding_dim=25,
-                 word_lstm_size=100,
-                 char_lstm_size=25,
-                 fc_dim=100,
-                 dropout=0.5,
-                 embeddings=None,
-                 use_char=True,
-                 use_crf=True,
-                 initial_vocab=None,
-                 optimizer='adam'):
+    def __init__(
+        self,
+        word_embedding_dim=100,
+        char_embedding_dim=25,
+        word_lstm_size=100,
+        char_lstm_size=25,
+        fc_dim=100,
+        dropout=0.5,
+        embeddings=None,
+        use_char=True,
+        use_crf=True,
+        initial_vocab=None,
+        optimizer="adam",
+    ):
 
         self.model = None
         self.p = None
@@ -43,8 +43,18 @@ class Sequence(object):
         self.initial_vocab = initial_vocab
         self.optimizer = optimizer
 
-    def fit(self, x_train, y_train, x_valid=None, y_valid=None,
-            epochs=1, batch_size=32, verbose=1, callbacks=None, shuffle=True):
+    def fit(
+        self,
+        x_train,
+        y_train,
+        x_valid=None,
+        y_valid=None,
+        epochs=1,
+        batch_size=32,
+        verbose=1,
+        callbacks=None,
+        shuffle=True,
+    ):
         """Fit the model for a fixed number of epochs.
 
         Args:
@@ -65,28 +75,39 @@ class Sequence(object):
         """
         p = IndexTransformer(initial_vocab=self.initial_vocab, use_char=self.use_char)
         p.fit(x_train, y_train)
-        embeddings = filter_embeddings(self.embeddings, p._word_vocab.vocab, self.word_embedding_dim)
+        embeddings = filter_embeddings(
+            self.embeddings, p._word_vocab.vocab, self.word_embedding_dim
+        )
 
-        model = BiLSTMCRF(char_vocab_size=p.char_vocab_size,
-                          word_vocab_size=p.word_vocab_size,
-                          num_labels=p.label_size,
-                          word_embedding_dim=self.word_embedding_dim,
-                          char_embedding_dim=self.char_embedding_dim,
-                          word_lstm_size=self.word_lstm_size,
-                          char_lstm_size=self.char_lstm_size,
-                          fc_dim=self.fc_dim,
-                          dropout=self.dropout,
-                          embeddings=embeddings,
-                          use_char=self.use_char,
-                          use_crf=self.use_crf)
+        model = BiLSTMCRF(
+            char_vocab_size=p.char_vocab_size,
+            word_vocab_size=p.word_vocab_size,
+            num_labels=p.label_size,
+            word_embedding_dim=self.word_embedding_dim,
+            char_embedding_dim=self.char_embedding_dim,
+            word_lstm_size=self.word_lstm_size,
+            char_lstm_size=self.char_lstm_size,
+            fc_dim=self.fc_dim,
+            dropout=self.dropout,
+            embeddings=embeddings,
+            use_char=self.use_char,
+            use_crf=self.use_crf,
+        )
         model, loss = model.build()
         model.compile(loss=loss, optimizer=self.optimizer)
 
         trainer = Trainer(model, preprocessor=p)
-        trainer.train(x_train, y_train, x_valid, y_valid,
-                      epochs=epochs, batch_size=batch_size,
-                      verbose=verbose, callbacks=callbacks,
-                      shuffle=shuffle)
+        trainer.train(
+            x_train,
+            y_train,
+            x_valid,
+            y_valid,
+            epochs=epochs,
+            batch_size=batch_size,
+            verbose=verbose,
+            callbacks=callbacks,
+            shuffle=shuffle,
+        )
 
         self.p = p
         self.model = model
@@ -112,7 +133,7 @@ class Sequence(object):
             score = metrics.f1_score(y_test, y_pred)
             return score
         else:
-            raise OSError('Could not find a model. Call load(dir_path).')
+            raise OSError("Could not find a model. Call load(dir_path).")
 
     def analyze(self, text, tokenizer=str.split):
         """Analyze text and return pretty format.
@@ -125,9 +146,7 @@ class Sequence(object):
             res: dict.
         """
         if not self.tagger:
-            self.tagger = Tagger(self.model,
-                                 preprocessor=self.p,
-                                 tokenizer=tokenizer)
+            self.tagger = Tagger(self.model, preprocessor=self.p, tokenizer=tokenizer)
 
         return self.tagger.analyze(text)
 

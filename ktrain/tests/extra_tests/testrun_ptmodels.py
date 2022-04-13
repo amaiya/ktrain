@@ -2,6 +2,7 @@ import testenv
 import time
 
 from ktrain.text.summarization import TransformerSummarizer
+
 ts = TransformerSummarizer()
 
 
@@ -248,45 +249,47 @@ UPCOMING PLANETARY PROBES - MISSIONS AND SCHEDULES
 
 start = time.time()
 print(ts.summarize(sample_doc))
-print(time.time()-start)
+print(time.time() - start)
 
 
 # zsl
 from ktrain.text.zsl import ZeroShotClassifier
-zsl = ZeroShotClassifier(device='cpu', quantize=True)
-topic_strings=['politics', 'elections', 'sports', 'films', 'television']
-doc = 'I am unhappy with decisions of the government and will definitely vote in 2020.'
+
+zsl = ZeroShotClassifier(device="cpu", quantize=True)
+topic_strings = ["politics", "elections", "sports", "films", "television"]
+doc = "I am unhappy with decisions of the government and will definitely vote in 2020."
 start = time.time()
 print(zsl.predict(doc, topic_strings=topic_strings, include_labels=True))
-print(time.time()-start)
+print(time.time() - start)
 
 
 # translation
 from ktrain.text.translation import EnglishTranslator
-translator = EnglishTranslator(src_lang='zh', device=None, quantize=True)
-src_text = '''大流行对世界经济造成了严重破坏。但是，截至2020年6月，美国股票市场持续上涨。'''
+
+translator = EnglishTranslator(src_lang="zh", device=None, quantize=True)
+src_text = """大流行对世界经济造成了严重破坏。但是，截至2020年6月，美国股票市场持续上涨。"""
 start = time.time()
 print(translator.translate(src_text))
-print(time.time()-start)
+print(time.time() - start)
 
 
 # transcription
 from ktrain.text.speech import Transcriber
+
 transcriber = Transcriber()
-afiles = ['text_data/sample.wav']
+afiles = ["text_data/sample.wav"]
 start = time.time()
 result = transcriber.transcribe(afiles)
-print(time.time()-start)
+print(time.time() - start)
 print(result)
-
 
 
 # image-captioning
 from ktrain.vision.caption import ImageCaptioner
+
 ic = ImageCaptioner()
-ifiles = ['image_data/squirrel.jpg']
+ifiles = ["image_data/squirrel.jpg"]
 start = time.time()
 result = ic.caption(ifiles)
-print(time.time()-start)
+print(time.time() - start)
 print(result)
-

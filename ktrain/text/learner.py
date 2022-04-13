@@ -4,8 +4,6 @@ from ..core import ArrayLearner, GenLearner, _load_model
 from .preprocessor import TransformersPreprocessor
 
 
-
-
 class BERTTextClassLearner(ArrayLearner):
     """
     ```
@@ -13,15 +11,26 @@ class BERTTextClassLearner(ArrayLearner):
     ```
     """
 
-
-    def __init__(self, model, train_data=None, val_data=None, 
-                 batch_size=U.DEFAULT_BS, eval_batch_size=U.DEFAULT_BS,
-                 workers=1, use_multiprocessing=False):
-        super().__init__(model, train_data=train_data, val_data=val_data,
-                         batch_size=batch_size, eval_batch_size=eval_batch_size,
-                         workers=workers, use_multiprocessing=use_multiprocessing)
+    def __init__(
+        self,
+        model,
+        train_data=None,
+        val_data=None,
+        batch_size=U.DEFAULT_BS,
+        eval_batch_size=U.DEFAULT_BS,
+        workers=1,
+        use_multiprocessing=False,
+    ):
+        super().__init__(
+            model,
+            train_data=train_data,
+            val_data=val_data,
+            batch_size=batch_size,
+            eval_batch_size=eval_batch_size,
+            workers=workers,
+            use_multiprocessing=use_multiprocessing,
+        )
         return
-
 
     def view_top_losses(self, n=4, preproc=None, val_data=None):
         """
@@ -36,13 +45,12 @@ class BERTTextClassLearner(ArrayLearner):
                                  to correctly view raw data.
           val_data:  optional val_data to use instead of self.val_data
         Returns:
-            list of n tuples where first element is either 
+            list of n tuples where first element is either
             filepath or id of validation example and second element
             is loss.
         ```
         """
         val = self._check_val(val_data)
-
 
         # get top losses and associated data
         tups = self.top_losses(n=n, val_data=val, preproc=preproc)
@@ -60,15 +68,19 @@ class BERTTextClassLearner(ArrayLearner):
             pred = tup[3]
 
             # BERT-style tuple
-            join_char = ' '
+            join_char = " "
             obs = val[0][0][idx]
-            if preproc is not None: 
+            if preproc is not None:
                 obs = preproc.undo(obs)
-                if preproc.is_nospace_lang(): join_char = ''
+                if preproc.is_nospace_lang():
+                    join_char = ""
             if type(obs) == str:
                 obs = join_char.join(obs.split()[:512])
-            print('----------')
-            print("id:%s | loss:%s | true:%s | pred:%s)\n" % (idx, round(loss,2), truth, pred))
+            print("----------")
+            print(
+                "id:%s | loss:%s | true:%s | pred:%s)\n"
+                % (idx, round(loss, 2), truth, pred)
+            )
             print(obs)
         return
 
@@ -80,15 +92,26 @@ class TransformerTextClassLearner(GenLearner):
     ```
     """
 
-
-    def __init__(self, model, train_data=None, val_data=None, 
-                 batch_size=U.DEFAULT_BS, eval_batch_size=U.DEFAULT_BS,
-                 workers=1, use_multiprocessing=False):
-        super().__init__(model, train_data=train_data, val_data=val_data,
-                         batch_size=batch_size, eval_batch_size=eval_batch_size,
-                         workers=workers, use_multiprocessing=use_multiprocessing)
+    def __init__(
+        self,
+        model,
+        train_data=None,
+        val_data=None,
+        batch_size=U.DEFAULT_BS,
+        eval_batch_size=U.DEFAULT_BS,
+        workers=1,
+        use_multiprocessing=False,
+    ):
+        super().__init__(
+            model,
+            train_data=train_data,
+            val_data=val_data,
+            batch_size=batch_size,
+            eval_batch_size=eval_batch_size,
+            workers=workers,
+            use_multiprocessing=use_multiprocessing,
+        )
         return
-
 
     def view_top_losses(self, n=4, preproc=None, val_data=None):
         """
@@ -103,13 +126,12 @@ class TransformerTextClassLearner(GenLearner):
                                  to correctly view raw data.
           val_data:  optional val_data to use instead of self.val_data
         Returns:
-            list of n tuples where first element is either 
+            list of n tuples where first element is either
             filepath or id of validation example and second element
             is loss.
         ```
         """
         val = self._check_val(val_data)
-
 
         # get top losses and associated data
         tups = self.top_losses(n=n, val_data=val, preproc=preproc)
@@ -126,12 +148,14 @@ class TransformerTextClassLearner(GenLearner):
             truth = tup[2]
             pred = tup[3]
 
-            join_char = ' '
-            #obs = val.x[idx][0]
-            print('----------')
-            print("id:%s | loss:%s | true:%s | pred:%s)\n" % (idx, round(loss,2), truth, pred))
+            join_char = " "
+            # obs = val.x[idx][0]
+            print("----------")
+            print(
+                "id:%s | loss:%s | true:%s | pred:%s)\n"
+                % (idx, round(loss, 2), truth, pred)
+            )
         return
-
 
     def _prepare(self, data, train=True):
         """
@@ -142,9 +166,9 @@ class TransformerTextClassLearner(GenLearner):
         # HF_EXCEPTION
         # convert arrays to TF dataset (iterator) on-the-fly
         # to work around issues with transformers and tf.Datasets
-        if data is None: return None
+        if data is None:
+            return None
         return data.to_tfdataset(train=train)
-
 
     def predict(self, val_data=None):
         """
@@ -156,17 +180,22 @@ class TransformerTextClassLearner(GenLearner):
             val = val_data
         else:
             val = self.val_data
-        if val is None: raise Exception('val_data must be supplied to get_learner or predict')
-        if hasattr(val, 'reset'): val.reset()
+        if val is None:
+            raise Exception("val_data must be supplied to get_learner or predict")
+        if hasattr(val, "reset"):
+            val.reset()
         classification, multilabel = U.is_classifier(self.model)
         preds = self.model.predict(self._prepare(val, train=False))
-        if hasattr(preds, 'logits'): # dep_fix: breaking change in transformers==4.0.0 - also needed for Longformer
-        #if type(preds).__name__ == 'TFSequenceClassifierOutput': # dep_fix: undocumented breaking change in transformers==4.0.0
+        if hasattr(
+            preds, "logits"
+        ):  # dep_fix: breaking change in transformers==4.0.0 - also needed for Longformer
+            # if type(preds).__name__ == 'TFSequenceClassifierOutput': # dep_fix: undocumented breaking change in transformers==4.0.0
             # REFERENCE: https://discuss.huggingface.co/t/new-model-output-types/195
             preds = preds.logits
 
         # dep_fix: transformers in TF 2.2.0 returns a tuple insead of NumPy array for some reason
-        if isinstance(preds, tuple) and len(preds) == 1: preds = preds[0] 
+        if isinstance(preds, tuple) and len(preds) == 1:
+            preds = preds[0]
 
         if classification:
             if multilabel:
@@ -175,7 +204,6 @@ class TransformerTextClassLearner(GenLearner):
                 return keras.activations.softmax(tf.convert_to_tensor(preds)).numpy()
         else:
             return preds
-
 
     def save_model(self, fpath):
         """
@@ -187,9 +215,8 @@ class TransformerTextClassLearner(GenLearner):
         self.model.save_pretrained(fpath)
         return
 
-
     # 2020-07-07: removed, as core.Learner.load_model calls TransformerPreprocessor.load_model_and_configure
-    #def load_model(self, fpath, preproc=None):
+    # def load_model(self, fpath, preproc=None):
     #    """
     #    load Transformers model
     #    Args:
@@ -202,9 +229,5 @@ class TransformerTextClassLearner(GenLearner):
     #                          'either the third return value from texts_from* function or '+\
     #                          'the result of calling ktrain.text.Transformer')
 
-
     #    self.model = _load_model(fpath, preproc=preproc)
     #    return
-
-
-

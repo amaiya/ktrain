@@ -1,5 +1,6 @@
 try:
     import librosa as librosa
+
     LIBROSA = True
 except (ImportError, OSError):
     LIBROSA = False
@@ -28,7 +29,6 @@ class Transcriber(TorchBase):
     Transcriber: speech to text pipeline
     """
 
-
     def __init__(self, model_name="facebook/wav2vec2-base-960h", device=None):
         """
         ```
@@ -40,16 +40,16 @@ class Transcriber(TorchBase):
         ```
         """
         super().__init__(device=device, quantize=False)
-        #if not SOUNDFILE:
-            #raise ImportError("SoundFile library not installed or libsndfile not found: pip install soundfile")
+        # if not SOUNDFILE:
+        # raise ImportError("SoundFile library not installed or libsndfile not found: pip install soundfile")
         if not LIBROSA:
-            raise ImportError("librosa library must be installed: pip install librosa. Conda users may also have to install ffmpeg: conda install -c conda-forge ffmpeg")
-
+            raise ImportError(
+                "librosa library must be installed: pip install librosa. Conda users may also have to install ffmpeg: conda install -c conda-forge ffmpeg"
+            )
 
         # load model and processor
         self.model = Wav2Vec2ForCTC.from_pretrained(model_name).to(self.torch_device)
         self.processor = Wav2Vec2Processor.from_pretrained(model_name)
-
 
     def transcribe(self, afiles, batch_size=32):
         """
@@ -69,7 +69,7 @@ class Transcriber(TorchBase):
         values = [afiles] if not isinstance(afiles, list) else afiles
 
         # parse audio files
-        #speech = [sf.read(f) for f in values]
+        # speech = [sf.read(f) for f in values]
         speech = [librosa.load(f, sr=16000) for f in values]
 
         # get unique list of sampling rates (since we're resampling, should be {16000})
@@ -93,7 +93,6 @@ class Transcriber(TorchBase):
         results = [results[x] for x in sorted(results)]
         return results[0] if isinstance(afiles, str) else results
 
-
     def _transcribe(self, speech, sampling):
         """
         Transcribes audio to text.
@@ -104,9 +103,12 @@ class Transcriber(TorchBase):
             list of transcribed text
         """
         import torch
+
         with torch.no_grad():
             # Convert samples to features
-            inputs = self.processor(speech, sampling_rate=sampling, padding=True, return_tensors='pt').input_values
+            inputs = self.processor(
+                speech, sampling_rate=sampling, padding=True, return_tensors="pt"
+            ).input_values
             # Place inputs on tensor device
             inputs = inputs.to(self.torch_device)
             # Retrieve logits
@@ -114,4 +116,3 @@ class Transcriber(TorchBase):
             # Decode argmax
             ids = torch.argmax(logits, dim=-1)
             return self.processor.batch_decode(ids)
-

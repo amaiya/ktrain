@@ -53,7 +53,7 @@ class Dataset:
         ```
         """
         raise NotImplemented
-    
+
     # optional: used only if invoking *_classifier functions
     def nclasses(self):
         """
@@ -72,6 +72,7 @@ class TFDataset(Dataset):
     Wrapper for tf.data.Datasets
     ```
     """
+
     def __init__(self, tfdataset, n, y):
         """
         ```
@@ -82,9 +83,13 @@ class TFDataset(Dataset):
         ```
         """
         if not isinstance(tfdataset, tf.data.Dataset):
-            raise ValueError('tfdataset must be a fully-configured tf.data.Dataset with batch_size, etc. set appropriately')
+            raise ValueError(
+                "tfdataset must be a fully-configured tf.data.Dataset with batch_size, etc. set appropriately"
+            )
         self.tfdataset = tfdataset
-        self.bs = next(tfdataset.as_numpy_iterator())[-1].shape[0] # extract batch_size from tfdataset
+        self.bs = next(tfdataset.as_numpy_iterator())[-1].shape[
+            0
+        ]  # extract batch_size from tfdataset
         self.n = n
         self.y = y
 
@@ -95,8 +100,9 @@ class TFDataset(Dataset):
     @batch_size.setter
     def batch_size(self, value):
         if value != self.bs:
-            warnings.warn('batch_size parameter is ignored, as pre-configured batch_size of tf.data.Dataset is used')
-
+            warnings.warn(
+                "batch_size parameter is ignored, as pre-configured batch_size of tf.data.Dataset is used"
+            )
 
     def nsamples(self):
         return self.n
@@ -127,6 +133,7 @@ class SequenceDataset(Dataset, keras.utils.Sequence):
     See ktrain.text.preprocess.TransformerDataset as an example.
     ```
     """
+
     def __init__(self, batch_size=32):
         self.batch_size = batch_size
 
@@ -141,23 +148,23 @@ class SequenceDataset(Dataset, keras.utils.Sequence):
         return False
 
 
-
-
 class MultiArrayDataset(SequenceDataset):
     def __init__(self, x, y, batch_size=32, shuffle=True):
         # error checks
         err = False
-        if type(x) == np.ndarray and len(x.shape) != 2: err = True
+        if type(x) == np.ndarray and len(x.shape) != 2:
+            err = True
         elif type(x) == list:
             for d in x:
                 if type(d) != np.ndarray or len(d.shape) != 2:
                     err = True
                     break
-        else: err = True
+        else:
+            err = True
         if err:
-            raise ValueError('x must be a 2d numpy array or a list of 2d numpy arrays')
+            raise ValueError("x must be a 2d numpy array or a list of 2d numpy arrays")
         if type(y) != np.ndarray:
-            raise ValueError('y must be a numpy array')
+            raise ValueError("y must be a numpy array")
         if type(x) == np.ndarray:
             x = [x]
 
@@ -168,12 +175,11 @@ class MultiArrayDataset(SequenceDataset):
         self.n_inputs = len(x)
         self.shuffle = shuffle
 
-
     def __len__(self):
         return math.ceil(self.x[0].shape[0] / self.batch_size)
 
     def __getitem__(self, idx):
-        inds = self.indices[idx * self.batch_size:(idx + 1) * self.batch_size]
+        inds = self.indices[idx * self.batch_size : (idx + 1) * self.batch_size]
         batch_x = []
         for i in range(self.n_inputs):
             batch_x.append(self.x[i][inds])
@@ -187,7 +193,8 @@ class MultiArrayDataset(SequenceDataset):
         return self.y
 
     def on_epoch_end(self):
-        if self.shuffle: np.random.shuffle(self.indices)
+        if self.shuffle:
+            np.random.shuffle(self.indices)
 
     def xshape(self):
         return self.x[0].shape
@@ -197,4 +204,3 @@ class MultiArrayDataset(SequenceDataset):
 
     def ondisk(self):
         return False
-

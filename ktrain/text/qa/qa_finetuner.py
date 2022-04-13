@@ -4,47 +4,58 @@ import tensorflow as tf
 import pandas as pd
 import warnings
 
+
 def convert_to_dataset(list_of_dicts):
     try:
         from datasets import Dataset, load_dataset
     except ImportError:
-        raise ImportError('The datasets package is required for fine-tuning QA models: pip install datasets')
+        raise ImportError(
+            "The datasets package is required for fine-tuning QA models: pip install datasets"
+        )
 
     new_list = []
     for d in list_of_dicts:
-        if 'question' not in d or 'context' not in d or 'answers' not in d:
-            raise ValueError('All dictionaries in list must have the following keys: "question", "context", "answers"')
-        q = d['question'].strip()
-        c = d['context'].strip()
-        a = d['answers'].strip() if isinstance(d['answers'], str) else d['answers']
+        if "question" not in d or "context" not in d or "answers" not in d:
+            raise ValueError(
+                'All dictionaries in list must have the following keys: "question", "context", "answers"'
+            )
+        q = d["question"].strip()
+        c = d["context"].strip()
+        a = d["answers"].strip() if isinstance(d["answers"], str) else d["answers"]
         if a is None:
-            answers = {'text':[], 'answer_start':[]}
+            answers = {"text": [], "answer_start": []}
         elif isinstance(a, dict):
-            ans_start = a['answer_start']
-            ans_text = a['text']
-            answers = {'text':ans_text, 'answer_start': ans_start}
+            ans_start = a["answer_start"]
+            ans_text = a["text"]
+            answers = {"text": ans_text, "answer_start": ans_start}
         elif isinstance(a, str):
             ans_start = c.index(a)
-            if ans_start < 0: raise ValueError('Could not locate answer in context: %s' % (d))
+            if ans_start < 0:
+                raise ValueError("Could not locate answer in context: %s" % (d))
             ans_start = [ans_start]
-            answers = {'text':[a], 'answer_start':ans_start}
+            answers = {"text": [a], "answer_start": ans_start}
         else:
-            raise ValueError('Value for "answers" key must be a string, dictionary, or None')
-        new_d = {'question': q, 'context': c, 'answers': answers}
+            raise ValueError(
+                'Value for "answers" key must be a string, dictionary, or None'
+            )
+        new_d = {"question": q, "context": c, "answers": answers}
         new_list.append(new_d)
     dataset = Dataset.from_pandas(pd.DataFrame(new_list))
 
     # uncomment to test with squad sample
-    #datasets = load_dataset('squad')
-    #td = datasets['train']
-    #td = Dataset.from_pandas(td.to_pandas().head(100))
-    #return td
+    # datasets = load_dataset('squad')
+    # td = datasets['train']
+    # td = Dataset.from_pandas(td.to_pandas().head(100))
+    # return td
     return dataset
 
 
-
 def convert_dataset_for_tensorflow(
-    dataset, batch_size, dataset_mode="variable_batch", shuffle=True, drop_remainder=True
+    dataset,
+    batch_size,
+    dataset_mode="variable_batch",
+    shuffle=True,
+    drop_remainder=True,
 ):
     """Converts a Hugging Face dataset to a Tensorflow Dataset. The dataset_mode controls whether we pad all batches
     to the maximum sequence length, or whether we only pad to the maximum length within that batch. The former
@@ -53,12 +64,15 @@ def convert_dataset_for_tensorflow(
     try:
         from datasets import Dataset, load_dataset
     except ImportError:
-        raise ImportError('The datasets package is required for fine-tuning QA models: pip install datasets')
-
+        raise ImportError(
+            "The datasets package is required for fine-tuning QA models: pip install datasets"
+        )
 
     def densify_ragged_batch(features, label=None):
         features = {
-            feature: ragged_tensor.to_tensor(shape=batch_shape[feature]) if feature in tensor_keys else ragged_tensor
+            feature: ragged_tensor.to_tensor(shape=batch_shape[feature])
+            if feature in tensor_keys
+            else ragged_tensor
             for feature, ragged_tensor in features.items()
         }
         if label is None:
@@ -89,7 +103,9 @@ def convert_dataset_for_tensorflow(
         tf_dataset = tf.data.Dataset.from_tensor_slices(data)
     if shuffle:
         tf_dataset = tf_dataset.shuffle(buffer_size=len(dataset))
-    tf_dataset = tf_dataset.batch(batch_size=batch_size, drop_remainder=drop_remainder).map(densify_ragged_batch)
+    tf_dataset = tf_dataset.batch(
+        batch_size=batch_size, drop_remainder=drop_remainder
+    ).map(densify_ragged_batch)
     return tf_dataset
 
 
@@ -98,14 +114,15 @@ class QAFineTuner:
         self.model = model
         self.tokenizer = tokenizer
 
-
-    def finetune(self, data,  epochs=3, learning_rate=2e-5, batch_size=8, max_seq_length=512):
+    def finetune(
+        self, data, epochs=3, learning_rate=2e-5, batch_size=8, max_seq_length=512
+    ):
         """
         ```
         Finetune a QA model.
 
         Args:
-          data(list): list of dictionaries of the form: 
+          data(list): list of dictionaries of the form:
                       [{'question': 'What is ktrain?'
                        'context': 'ktrain is a low-code library for augmented machine learning.'
                        'answer': 'ktrain'}]
@@ -115,17 +132,20 @@ class QAFineTuner:
           fine-tuned model (i.e., QAFineTuner.model)
         ```
         """
-        if self.model.name_or_path.startswith('bert-large'):
-            warnings.warn('You are fine-tuning a bert-large-* model, which requires lots of memory.  ' +\
-                          'If you get a memory error, switch to distilbert-base-cased-distilled-squad.')
-        if batch_size > len(data): batch_size=len(data)
+        if self.model.name_or_path.startswith("bert-large"):
+            warnings.warn(
+                "You are fine-tuning a bert-large-* model, which requires lots of memory.  "
+                + "If you get a memory error, switch to distilbert-base-cased-distilled-squad."
+            )
+        if batch_size > len(data):
+            batch_size = len(data)
 
         model = self.model
         tokenizer = self.tokenizer
-        question_column_name = 'question'
-        context_column_name = 'context'
-        answer_column_name = 'answers'
-        
+        question_column_name = "question"
+        context_column_name = "context"
+        answer_column_name = "answers"
+
         # Padding side determines if we do (question|context) or (context|question).
         pad_on_right = tokenizer.padding_side == "right"
 
@@ -134,7 +154,9 @@ class QAFineTuner:
             # Some of the questions have lots of whitespace on the left, which is not useful and will make the
             # truncation of the context fail (the tokenized question will take a lots of space). So we remove that
             # left whitespace
-            examples[question_column_name] = [q.lstrip() for q in examples[question_column_name]]
+            examples[question_column_name] = [
+                q.lstrip() for q in examples[question_column_name]
+            ]
 
             # Tokenize our examples with truncation and maybe padding, but keep the overflows using a stride. This results
             # in one example possible giving several features when a context is long, each of those features having a
@@ -147,7 +169,7 @@ class QAFineTuner:
                 stride=128,
                 return_overflowing_tokens=True,
                 return_offsets_mapping=True,
-                #padding="max_length" if data_args.pad_to_max_length else False,
+                # padding="max_length" if data_args.pad_to_max_length else False,
                 padding="max_length",
             )
 
@@ -193,22 +215,28 @@ class QAFineTuner:
                         token_end_index -= 1
 
                     # Detect if the answer is out of the span (in which case this feature is labeled with the CLS index).
-                    if not (offsets[token_start_index][0] <= start_char and offsets[token_end_index][1] >= end_char):
+                    if not (
+                        offsets[token_start_index][0] <= start_char
+                        and offsets[token_end_index][1] >= end_char
+                    ):
                         tokenized_examples["start_positions"].append(cls_index)
                         tokenized_examples["end_positions"].append(cls_index)
                     else:
                         # Otherwise move the token_start_index and token_end_index to the two ends of the answer.
                         # Note: we could go after the last offset if the answer is the last word (edge case).
-                        while token_start_index < len(offsets) and offsets[token_start_index][0] <= start_char:
+                        while (
+                            token_start_index < len(offsets)
+                            and offsets[token_start_index][0] <= start_char
+                        ):
                             token_start_index += 1
-                        tokenized_examples["start_positions"].append(token_start_index - 1)
+                        tokenized_examples["start_positions"].append(
+                            token_start_index - 1
+                        )
                         while offsets[token_end_index][1] >= end_char:
                             token_end_index -= 1
                         tokenized_examples["end_positions"].append(token_end_index + 1)
 
             return tokenized_examples
-
-
 
         dataset = convert_to_dataset(data)
         print(dataset)
@@ -218,9 +246,8 @@ class QAFineTuner:
             prepare_train_features,
             batched=True,
             num_proc=1,
-        )    
-        optimizer = tf.keras.optimizers.Adam(
-        learning_rate=learning_rate)
+        )
+        optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
 
         def dummy_loss(y_true, y_pred):
             return tf.reduce_mean(y_pred)
@@ -229,10 +256,10 @@ class QAFineTuner:
         model.compile(optimizer=optimizer, loss=losses)
 
         training_dataset = convert_dataset_for_tensorflow(
-                    train_dataset,
-                    batch_size=batch_size,
-                    dataset_mode='variable_batch',
-                    drop_remainder=True,
-                    shuffle=True,
-                )
+            train_dataset,
+            batch_size=batch_size,
+            dataset_mode="variable_batch",
+            drop_remainder=True,
+            shuffle=True,
+        )
         model.fit(training_dataset, epochs=int(epochs))

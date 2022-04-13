@@ -8,11 +8,7 @@ from unittest import TestCase, main, skip
 from ktrain.text.kw import KeywordExtractor
 
 
-
-
-
 class TestKeywordExtraction(TestCase):
-
     def test_ci(self):
         text = """Supervised learning is the machine learning task of learning a function that
          maps an input to an output based on example input-output pairs. It infers a
@@ -26,8 +22,9 @@ class TestKeywordExtraction(TestCase):
          'reasonable' way (see inductive bias)."""
         kwe = KeywordExtractor()
         result = kwe.extract_keywords(text)
-        self.assertEqual(result[0][0], 'supervised learning')
+        self.assertEqual(result[0][0], "supervised learning")
         self.assertAlmostEqual(result[0][1], 0.07317073170731707)
+
 
 if __name__ == "__main__":
     main()

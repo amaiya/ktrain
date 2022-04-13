@@ -1,21 +1,23 @@
 import os, logging, warnings
-#os.environ['DISABLE_V2_BEHAVIOR'] = '1'
+
+# os.environ['DISABLE_V2_BEHAVIOR'] = '1'
 
 from ...imports import SUPPRESS_DEP_WARNINGS
+
 if SUPPRESS_DEP_WARNINGS:
     os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
     logging.getLogger("tensorflow").setLevel(logging.ERROR)
     logging.getLogger("tensorflow_hub").setLevel(logging.ERROR)
-    warnings.simplefilter(action='ignore', category=FutureWarning)
+    warnings.simplefilter(action="ignore", category=FutureWarning)
 
 try:
     import tensorflow as tf
+
     TF_INSTALLED = True
 except ImportError:
     TF_INSTALLED = False
 if TF_INSTALLED:
     tf.autograph.set_verbosity(1)
-
 
 
 import re
@@ -24,9 +26,10 @@ import os.path
 import numpy as np
 from scipy.sparse import spmatrix, coo_matrix
 from sklearn.base import BaseEstimator
-try: # sklearn<0.24.x
+
+try:  # sklearn<0.24.x
     from sklearn.linear_model.base import LinearClassifierMixin, SparseCoefMixin
-except ImportError: # sklearn>=0.24.x
+except ImportError:  # sklearn>=0.24.x
     from sklearn.linear_model._base import LinearClassifierMixin, SparseCoefMixin
 from sklearn.svm import LinearSVC
 from sklearn.pipeline import Pipeline
@@ -39,23 +42,26 @@ from joblib import dump, load
 import syntok.segmenter as segmenter
 
 # ktrain imported locally in ner.py
-#import ktrain 
+# import ktrain
 
 # pandas imported locally in classifier.py
-#import pandas as pd
+# import pandas as pd
 
 try:
     import langdetect
-    LANGDETECT=True
+
+    LANGDETECT = True
 except:
-    LANGDETECT=False
+    LANGDETECT = False
 try:
     import cchardet as chardet
-    CHARDET=True
+
+    CHARDET = True
 except:
-    CHARDET=False
+    CHARDET = False
 try:
     import jieba
-    JIEBA=True
+
+    JIEBA = True
 except:
-    JIEBA=False
+    JIEBA = False

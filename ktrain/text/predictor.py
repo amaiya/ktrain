@@ -3,6 +3,7 @@ from ..predictor import Predictor
 from .preprocessor import TextPreprocessor, TransformersPreprocessor, detect_text_format
 from .. import utils as U
 
+
 class TextPredictor(Predictor):
     """
     ```
@@ -13,19 +14,17 @@ class TextPredictor(Predictor):
     def __init__(self, model, preproc, batch_size=U.DEFAULT_BS):
 
         if not isinstance(model, keras.Model):
-            raise ValueError('model must be of instance keras.Model')
+            raise ValueError("model must be of instance keras.Model")
         if not isinstance(preproc, TextPreprocessor):
-        #if type(preproc).__name__ != 'TextPreprocessor':
-            raise ValueError('preproc must be a TextPreprocessor object')
+            # if type(preproc).__name__ != 'TextPreprocessor':
+            raise ValueError("preproc must be a TextPreprocessor object")
         self.model = model
         self.preproc = preproc
         self.c = self.preproc.get_classes()
         self.batch_size = batch_size
 
-
     def get_classes(self):
         return self.c
-
 
     def predict(self, texts, return_proba=False):
         """
@@ -46,7 +45,8 @@ class TextPredictor(Predictor):
         """
 
         is_array, is_pair = detect_text_format(texts)
-        if not is_array: texts = [texts]
+        if not is_array:
+            texts = [texts]
 
         classification, multilabel = U.is_classifier(self.model)
 
@@ -56,13 +56,16 @@ class TextPredictor(Predictor):
             tseq.batch_size = self.batch_size
             tfd = tseq.to_tfdataset(train=False)
             preds = self.model.predict(tfd)
-            if hasattr(preds, 'logits'): # dep_fix: breaking change - also needed for LongFormer
-            #if type(preds).__name__ == 'TFSequenceClassifierOutput': # dep_fix: undocumented breaking change in transformers==4.0.0
+            if hasattr(
+                preds, "logits"
+            ):  # dep_fix: breaking change - also needed for LongFormer
+                # if type(preds).__name__ == 'TFSequenceClassifierOutput': # dep_fix: undocumented breaking change in transformers==4.0.0
                 # REFERENCE: https://discuss.huggingface.co/t/new-model-output-types/195
                 preds = preds.logits
-            
+
             # dep_fix: transformers in TF 2.2.0 returns a tuple insead of NumPy array for some reason
-            if isinstance(preds, tuple) and len(preds) == 1: preds = preds[0] 
+            if isinstance(preds, tuple) and len(preds) == 1:
+                preds = preds[0]
         else:
             texts = self.preproc.preprocess(texts)
             preds = self.model.predict(texts, batch_size=self.batch_size)
@@ -76,14 +79,19 @@ class TextPredictor(Predictor):
                 preds = keras.activations.softmax(tf.convert_to_tensor(preds)).numpy()
             else:
                 preds = np.squeeze(preds)
-                if len(preds.shape) == 0: preds = np.expand_dims(preds, -1)
-        result =  preds if return_proba or multilabel or not self.c else [self.c[np.argmax(pred)] for pred in preds] 
+                if len(preds.shape) == 0:
+                    preds = np.expand_dims(preds, -1)
+        result = (
+            preds
+            if return_proba or multilabel or not self.c
+            else [self.c[np.argmax(pred)] for pred in preds]
+        )
         if multilabel and not return_proba:
-            result =  [list(zip(self.c, r)) for r in result]
-        if not is_array: return result[0]
-        else:      return result
-
-
+            result = [list(zip(self.c, r)) for r in result]
+        if not is_array:
+            return result[0]
+        else:
+            return result
 
     def predict_proba(self, texts):
         """
@@ -94,7 +102,6 @@ class TextPredictor(Predictor):
         ```
         """
         return self.predict(texts, return_proba=True)
-
 
     def explain(self, doc, truncate_len=512, all_targets=False, n_samples=2500):
         """
@@ -109,37 +116,50 @@ class TextPredictor(Predictor):
                             Lower this value if explain is taking too long.
         """
         is_array, is_pair = detect_text_format(doc)
-        if is_pair: 
-            warnings.warn('currently_unsupported: explain does not currently support sentence pair classification')
+        if is_pair:
+            warnings.warn(
+                "currently_unsupported: explain does not currently support sentence pair classification"
+            )
             return
         if not self.c:
-            warnings.warn('currently_unsupported: explain does not support text regression')
+            warnings.warn(
+                "currently_unsupported: explain does not support text regression"
+            )
             return
         try:
             import eli5
             from eli5.lime import TextExplainer
         except:
-            msg = 'ktrain requires a forked version of eli5 to support tf.keras. '+\
-                  'Install with: pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip'
+            msg = (
+                "ktrain requires a forked version of eli5 to support tf.keras. "
+                + "Install with: pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip"
+            )
             warnings.warn(msg)
             return
-        if not hasattr(eli5, 'KTRAIN_ELI5_TAG') or eli5.KTRAIN_ELI5_TAG != KTRAIN_ELI5_TAG:
-            msg = 'ktrain requires a forked version of eli5 to support tf.keras. It is either missing or not up-to-date. '+\
-                  'Uninstall the current version and install/re-install the fork with: pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip'
+        if (
+            not hasattr(eli5, "KTRAIN_ELI5_TAG")
+            or eli5.KTRAIN_ELI5_TAG != KTRAIN_ELI5_TAG
+        ):
+            msg = (
+                "ktrain requires a forked version of eli5 to support tf.keras. It is either missing or not up-to-date. "
+                + "Uninstall the current version and install/re-install the fork with: pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip"
+            )
             warnings.warn(msg)
             return
 
-        if not isinstance(doc, str): raise TypeError('text must of type str')
+        if not isinstance(doc, str):
+            raise TypeError("text must of type str")
         prediction = [self.predict(doc)] if not all_targets else None
 
         if self.preproc.is_nospace_lang():
             doc = self.preproc.process_chinese([doc])
             doc = doc[0]
-        doc = ' '.join(doc.split()[:truncate_len])
+        doc = " ".join(doc.split()[:truncate_len])
         te = TextExplainer(random_state=42, n_samples=n_samples)
         _ = te.fit(doc, self.predict_proba)
-        return te.show_prediction(target_names=self.preproc.get_classes(), targets=prediction)
-
+        return te.show_prediction(
+            target_names=self.preproc.get_classes(), targets=prediction
+        )
 
     def _save_model(self, fpath):
         if isinstance(self.preproc, TransformersPreprocessor):
@@ -150,4 +170,3 @@ class TextPredictor(Predictor):
         else:
             super()._save_model(fpath)
         return
-

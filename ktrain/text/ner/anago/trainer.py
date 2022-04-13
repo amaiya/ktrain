@@ -18,8 +18,18 @@ class Trainer(object):
         self._model = model
         self._preprocessor = preprocessor
 
-    def train(self, x_train, y_train, x_valid=None, y_valid=None,
-              epochs=1, batch_size=32, verbose=1, callbacks=None, shuffle=True):
+    def train(
+        self,
+        x_train,
+        y_train,
+        x_valid=None,
+        y_valid=None,
+        epochs=1,
+        batch_size=32,
+        verbose=1,
+        callbacks=None,
+        shuffle=True,
+    ):
         """Trains the model for a fixed number of epochs (iterations on a dataset).
 
         Args:
@@ -39,15 +49,21 @@ class Trainer(object):
                 before each epoch). `shuffle` will default to True.
         """
 
-        train_seq = AnagoNERSequence(x_train, y_train, batch_size, self._preprocessor.transform)
+        train_seq = AnagoNERSequence(
+            x_train, y_train, batch_size, self._preprocessor.transform
+        )
 
         if x_valid and y_valid:
-            valid_seq = AnagoNERSequence(x_valid, y_valid, batch_size, self._preprocessor.transform)
+            valid_seq = AnagoNERSequence(
+                x_valid, y_valid, batch_size, self._preprocessor.transform
+            )
             f1 = F1score(valid_seq, preprocessor=self._preprocessor)
             callbacks = [f1] + callbacks if callbacks else [f1]
 
-        self._model.fit_generator(generator=train_seq,
-                                  epochs=epochs,
-                                  callbacks=callbacks,
-                                  verbose=verbose,
-                                  shuffle=shuffle)
+        self._model.fit_generator(
+            generator=train_seq,
+            epochs=epochs,
+            callbacks=callbacks,
+            verbose=verbose,
+            shuffle=shuffle,
+        )
