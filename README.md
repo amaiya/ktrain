@@ -13,7 +13,7 @@
 
 ### News and Announcements
 - **2022-03-31**
-  - **ktrain v0.30.x** is released and now includes support for [keyphrase extraction](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/keyword_extraction_example.ipynb) in addition to pretrained [image-captioning](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/vision/image_captioning_example.ipynb) and [object-detection](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/vision/object_detection_example.ipynb):
+  - **ktrain v0.30.x** is released and now includes support for [keyphrase extraction](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/keyword_extraction_example.ipynb):
 ```python
 # Keyphrase Extraction in ktrain
 from ktrain.text.kw import KeywordExtractor
