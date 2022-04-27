@@ -13,6 +13,7 @@ Most recent releases are shown at the top. Each release shows:
 
 ### changed
 - Code base was reformatted using [black](https://github.com/psf/black)
+- removed warning about sentence pair classification to avoid confusion
 
 ### fixed:
 - N/A
