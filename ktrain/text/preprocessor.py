@@ -239,16 +239,16 @@ def _is_sentence_pair(tup):
     ):
         return True
     else:
-        # if (
-        # isinstance(tup, (list, np.ndarray))
-        # and len(tup) == 2
-        # and isinstance(tup[0], str)
-        # and isinstance(tup[1], str)
-        # ):
-        # warnings.warn(
-        # "List or array of two texts supplied, so task being treated as text classification. "
-        # + "If this is a sentence pair classification task, please cast to tuple."
-        # )
+        if (
+            isinstance(tup, (list, np.ndarray))
+            and len(tup) == 2
+            and isinstance(tup[0], str)
+            and isinstance(tup[1], str)
+        ):
+            warnings.warn(
+                "List or array of two texts supplied, so task being treated as text classification. "
+                + "If this is a sentence pair classification task, please cast to tuple."
+            )
         return False
 
 
@@ -1449,16 +1449,17 @@ class TransformerEmbedding:
             ]  # (batch_size, embsize)
         except:
             warnings.warn("could not determine Embedding size")
-        if type(self.model).__name__ not in [
-            "TFBertModel",
-            "TFDistilBertModel",
-            "TFAlbertModel",
-        ]:
-            raise ValueError(
-                "TransformerEmbedding class currently only supports BERT-style models: "
-                + "Bert, DistilBert, and Albert and variants like BioBERT and SciBERT\n\n"
-                + "model received: %s (%s))" % (type(self.model).__name__, model_name)
-            )
+        # 2022-04-26: removed due to ISSUE #437
+        # if type(self.model).__name__ not in [
+        #    "TFBertModel",
+        #    "TFDistilBertModel",
+        #    "TFAlbertModel",
+        # ]:
+        #    raise ValueError(
+        #        "TransformerEmbedding class currently only supports BERT-style models: "
+        #        + "Bert, DistilBert, and Albert and variants like BioBERT and SciBERT\n\n"
+        #        + "model received: %s (%s))" % (type(self.model).__name__, model_name)
+        #    )
 
     def _load_pretrained(self, model_name):
         """
@@ -1526,19 +1527,31 @@ class TransformerEmbedding:
 
         all_input_ids = []
         all_input_masks = []
+        all_word_ids = []
         for text in texts:
-            tokens = self.tokenizer.tokenize(text)
+            # 2022-04-26: replaced due to ISSUE #437
+            # tokens = self.tokenizer.tokenize(text)
+            # if len(tokens) > maxlen - 2:
+            # tokens = tokens[0 : (maxlen - 2)]
+            # sentences.append(tokens)
+            # tokens = [self.tokenizer.cls_token] + tokens + [self.tokenizer.sep_token]
+            # input_ids = self.tokenizer.convert_tokens_to_ids(tokens)
+            encoded = self.tokenizer.encode_plus(text, max_length=maxlen, truncation=True)
+            input_ids = encoded['input_ids']
+            inp = encoded['input_ids'][:]
+            inp = inp[1:] if inp[0] == self.tokenizer.cls_token_id else inp
+            inp = inp[:-1] if inp[-1] == self.tokenizer.sep_token_id else inp
+            tokens = self.tokenizer.convert_ids_to_tokens(inp)
             if len(tokens) > maxlen - 2:
                 tokens = tokens[0 : (maxlen - 2)]
             sentences.append(tokens)
-            tokens = [self.tokenizer.cls_token] + tokens + [self.tokenizer.sep_token]
-            input_ids = self.tokenizer.convert_tokens_to_ids(tokens)
             input_mask = [1] * len(input_ids)
             while len(input_ids) < maxlen:
                 input_ids.append(0)
                 input_mask.append(0)
             all_input_ids.append(input_ids)
             all_input_masks.append(input_mask)
+            all_word_ids.append(encoded.word_ids())
 
         all_input_ids = np.array(all_input_ids)
         all_input_masks = np.array(all_input_masks)
@@ -1569,17 +1582,56 @@ class TransformerEmbedding:
 
         # filter-out extra subword tokens and special tokens
         # (using first subword of each token as embedding representations)
+
+        # 2022-04-26: replaced due to ISSUE #437
+        #filtered_embeddings = []
+        #for batch_idx, tokens in enumerate(sentences):
+            #embedding = []
+            #for token_idx, token in enumerate(tokens):
+                #if token in [
+                    #self.tokenizer.cls_token,
+                    #self.tokenizer.sep_token,
+                #] or token.startswith("##"):
+                    #continue
+                #embedding.append(raw_embeddings[batch_idx][token_idx])
+            #filtered_embeddings.append(embedding)
+
         filtered_embeddings = []
-        for batch_idx, tokens in enumerate(sentences):
-            embedding = []
-            for token_idx, token in enumerate(tokens):
-                if token in [
-                    self.tokenizer.cls_token,
-                    self.tokenizer.sep_token,
-                ] or token.startswith("##"):
-                    continue
-                embedding.append(raw_embeddings[batch_idx][token_idx])
-            filtered_embeddings.append(embedding)
+        for i in range(len(raw_embeddings)):
+           word_ids = all_word_ids[i]
+           filtered_embedding = []
+           raw_embedding = raw_embeddings[i]
+           subvectors = []
+           last_id = -1
+           for j in range(len(word_ids)):
+               if word_ids[j] == None:
+                   continue
+               if word_ids[j] == last_id:
+                   subvectors.append(raw_embedding[j])
+               if word_ids[j] > last_id:
+                   if len(subvectors) > 0:
+                       #filtered_embedding.append(np.mean(subvectors, axis=0))
+                       filtered_embedding.append(subvectors[0])
+                       subvectors = []
+                   subvectors.append(raw_embedding[j])
+                   last_id = word_ids[j]
+           if len(subvectors) > 0:
+               #filtered_embedding.append(np.mean(subvectors, axis=0))
+               filtered_embedding.append(subvectors[0])
+               subvectors = []
+           filtered_embeddings.append(filtered_embedding) 
+
+        #filtered_embeddings = []
+        #for i in range(len(raw_embeddings)):
+           #word_ids = all_word_ids[i]
+           #raw_embedding = raw_embeddings[i]
+           #filtered_embedding = []
+           #for j, word_id in enumerate(word_ids):
+               #if word_id is None: continue
+               #currlen = len(filtered_embedding)
+               #if (word_id+1) > currlen:
+                   #filtered_embedding.append(raw_embedding[j])
+
 
         # pad embeddings with zeros
         max_length = max([len(e) for e in filtered_embeddings])
