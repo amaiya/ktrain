@@ -127,7 +127,7 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
     def transformer_is_activated(self):
         return self.te is not None
 
-    def fix_tokenization(
+     def fix_tokenization(
         self,
         X,
         Y,
@@ -140,7 +140,7 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
         if not self.transformer_is_activated():
             return X, Y
         ids2tok = self.te.tokenizer.convert_ids_to_tokens
-        encode = self.te.tokenizer.encode
+        encode = self.te.tokenizer.encode_plus
         new_X = []
         new_Y = []
         for i, x in enumerate(X):
@@ -148,12 +148,29 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
             new_y = []
             seq_len = 0
             for j, s in enumerate(x):
-                subtokens = ids2tok(encode(s, add_special_tokens=False))
+                # subtokens = ids2tok(encode(s, add_special_tokens=False))
+                encoded_input = encode(
+                    s, add_special_tokens=False, return_offsets_mapping=True
+                )
+                offsets = encoded_input["offset_mapping"]
+                subtokens = encoded_input.tokens()
                 token_len = len(subtokens)
                 if seq_len + token_len > (maxlen - num_special):
                     break
                 seq_len += token_len
-                hf_s = " ".join(subtokens).replace(" ##", "").split()
+
+                word_ids = encoded_input.word_ids()
+                hf_s = []
+                for k, subtoken in enumerate(subtokens):
+                    word_id = word_ids[k]
+                    currlen = len(hf_s)
+                    if currlen == word_id + 1:
+                        hf_s[word_id].append(offsets[k])
+                    elif word_id + 1 > currlen:
+                        hf_s.append([offsets[k]])
+                hf_s = [s[entry[0][0] : entry[-1][1]] for entry in hf_s]
+                # hf_s = " ".join(subtokens).replace(" ##", "").split()
+
                 new_x.extend(hf_s)
                 if Y is not None:
                     tag = Y[i][j]
