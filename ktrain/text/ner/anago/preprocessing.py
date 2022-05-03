@@ -127,9 +127,8 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
     def transformer_is_activated(self):
         return self.te is not None
 
-
     def _clean_transformers_token(self, token):
-        return token.replace('##','').replace('\u0120', '')
+        return token.replace("##", "").replace("\u0120", "")
 
     def fix_tokenization(
         self,
@@ -152,9 +151,11 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
             new_y = []
             seq_len = 0
             for j, s in enumerate(x):
-                #subtokens = ids2tok(encode(s, add_special_tokens=False))
-                encoded_input = encode(s, add_special_tokens=False, return_offsets_mapping=True)
-                offsets = encoded_input['offset_mapping']
+                # subtokens = ids2tok(encode(s, add_special_tokens=False))
+                encoded_input = encode(
+                    s, add_special_tokens=False, return_offsets_mapping=True
+                )
+                offsets = encoded_input["offset_mapping"]
                 subtokens = encoded_input.tokens()
                 token_len = len(subtokens)
                 if seq_len + token_len > (maxlen - num_special):
@@ -166,12 +167,12 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
                 for k, subtoken in enumerate(subtokens):
                     word_id = word_ids[k]
                     currlen = len(hf_s)
-                    if currlen == word_id+1:
+                    if currlen == word_id + 1:
                         hf_s[word_id].append(offsets[k])
-                    elif word_id+1 > currlen:
+                    elif word_id + 1 > currlen:
                         hf_s.append([offsets[k]])
-                hf_s = [s[entry[0][0]:entry[-1][1]] for entry in hf_s]
-                #hf_s = " ".join(subtokens).replace(" ##", "").split()
+                hf_s = [s[entry[0][0] : entry[-1][1]] for entry in hf_s]
+                # hf_s = " ".join(subtokens).replace(" ##", "").split()
 
                 new_x.extend(hf_s)
                 if Y is not None:

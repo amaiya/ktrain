@@ -1450,17 +1450,18 @@ class TransformerEmbedding:
         except:
             warnings.warn("could not determine Embedding size")
 
-        # 2022-04-26: removed due to ISSUE #437
+        ##2022-04-26: removed due to ISSUE #437
         # if type(self.model).__name__ not in [
-        #    "TFBertModel",
-        #    "TFDistilBertModel",
-        #    "TFAlbertModel",
+        #   "TFBertModel",
+        #   "TFDistilBertModel",
+        #   "TFAlbertModel",
+        #   "TFRobertaModel"
         # ]:
-        #    raise ValueError(
-        #        "TransformerEmbedding class currently only supports BERT-style models: "
-        #        + "Bert, DistilBert, and Albert and variants like BioBERT and SciBERT\n\n"
-        #        + "model received: %s (%s))" % (type(self.model).__name__, model_name)
-        #    )
+        #   raise ValueError(
+        #       "TransformerEmbedding class currently only supports BERT-style models: "
+        #       + "Bert, DistilBert, and Albert and variants like BioBERT and SciBERT\n\n"
+        #       + "model received: %s (%s))" % (type(self.model).__name__, model_name)
+        #   )
 
     def _load_pretrained(self, model_name):
         """
@@ -1477,14 +1478,18 @@ class TransformerEmbedding:
                     "Could not successfully load a Tensorflow version of model.  Attempting to download/load PyTorch version as TensorFlow model using from_pt=True. "
                     + "You will need PyTorch installed for this. (If things worked before, it might be an out-of-memory issue.)"
                 )
-                model = self.model_type.from_pretrained(model_name, config=self.config, from_pt=True)
+                model = self.model_type.from_pretrained(
+                    model_name, config=self.config, from_pt=True
+                )
         else:
             model = self.model_type.from_pretrained(
                 model_name, output_hidden_states=True
             )
         return model
 
-    def embed(self, texts, word_level=True, max_length=512, aggregation_strategy='first'):
+    def embed(
+        self, texts, word_level=True, max_length=512, aggregation_strategy="first"
+    ):
         """
         ```
         get embedding for word, phrase, or sentence
@@ -1493,7 +1498,7 @@ class TransformerEmbedding:
           word_level(bool): If True, returns embedding for each token in supplied texts.
                             If False, returns embedding for each text in texts
           max_length(int): max length of tokens
-          aggregation_strategy(str): If 'first', vector of first subword is used as representation. 
+          aggregation_strategy(str): If 'first', vector of first subword is used as representation.
                                      If 'average', mean of all subword vectors is used.
         Returns:
             np.ndarray : embeddings
@@ -1523,13 +1528,15 @@ class TransformerEmbedding:
         all_input_ids = []
         all_input_masks = []
         all_word_ids = []
-        all_offsets=[]
+        all_offsets = []
         for text in texts:
-            encoded = self.tokenizer.encode_plus(text, max_length=maxlen, truncation=True, return_offsets_mapping=True)
-            input_ids = encoded['input_ids']
-            offsets = encoded['offset_mapping']
-            del encoded['offset_mapping']
-            inp = encoded['input_ids'][:]
+            encoded = self.tokenizer.encode_plus(
+                text, max_length=maxlen, truncation=True, return_offsets_mapping=True
+            )
+            input_ids = encoded["input_ids"]
+            offsets = encoded["offset_mapping"]
+            del encoded["offset_mapping"]
+            inp = encoded["input_ids"][:]
             inp = inp[1:] if inp[0] == self.tokenizer.cls_token_id else inp
             inp = inp[:-1] if inp[-1] == self.tokenizer.sep_token_id else inp
             tokens = self.tokenizer.convert_ids_to_tokens(inp)
@@ -1583,15 +1590,16 @@ class TransformerEmbedding:
             raw_embedding = raw_embeddings[i]
             subvectors = []
             last_index = -1
-            
+
             for j in range(len(all_offsets[i])):
-                if all_word_ids[i][j] is None: continue
+                if all_word_ids[i][j] is None:
+                    continue
                 if all_offsets[i][j][0] == last_index:
                     subvectors.append(raw_embedding[j])
                     last_index = all_offsets[i][j][1]
                 if all_offsets[i][j][0] > last_index:
                     if len(subvectors) > 0:
-                        if aggregation_strategy == 'average':
+                        if aggregation_strategy == "average":
                             filtered_embedding.append(np.mean(subvectors, axis=0))
                         else:
                             filtered_embedding.append(subvectors[0])
@@ -1599,12 +1607,12 @@ class TransformerEmbedding:
                     subvectors.append(raw_embedding[j])
                     last_index = all_offsets[i][j][1]
             if len(subvectors) > 0:
-                if aggregation_strategy == 'average':
+                if aggregation_strategy == "average":
                     filtered_embedding.append(np.mean(subvectors, axis=0))
                 else:
                     filtered_embedding.append(subvectors[0])
                 subvectors = []
-            filtered_embeddings.append(filtered_embedding) 
+            filtered_embeddings.append(filtered_embedding)
 
         # pad embeddings with zeros
         max_length = max([len(e) for e in filtered_embeddings])
