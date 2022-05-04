@@ -1453,10 +1453,11 @@ class TransformerEmbedding:
             "TFBertModel",
             "TFDistilBertModel",
             "TFAlbertModel",
+            "TFRobertaModel"
         ]:
             raise ValueError(
                 "TransformerEmbedding class currently only supports BERT-style models: "
-                + "Bert, DistilBert, and Albert and variants like BioBERT and SciBERT\n\n"
+                + "Bert, DistilBert, RoBERTa and Albert and variants like BioBERT and SciBERT\n\n"
                 + "model received: %s (%s))" % (type(self.model).__name__, model_name)
             )
 
@@ -1490,7 +1491,9 @@ class TransformerEmbedding:
             )
         return model
 
-    def embed(self, texts, word_level=True, max_length=512):
+    def embed(
+        self, texts, word_level=True, max_length=512, aggregation_strategy="first"
+    ):
         """
         ```
         get embedding for word, phrase, or sentence
@@ -1499,6 +1502,8 @@ class TransformerEmbedding:
           word_level(bool): If True, returns embedding for each token in supplied texts.
                             If False, returns embedding for each text in texts
           max_length(int): max length of tokens
+          aggregation_strategy(str): If 'first', vector of first subword is used as representation.
+                                     If 'average', mean of all subword vectors is used.
         Returns:
             np.ndarray : embeddings
         ```
@@ -1526,19 +1531,30 @@ class TransformerEmbedding:
 
         all_input_ids = []
         all_input_masks = []
+        all_word_ids = []
+        all_offsets = []
         for text in texts:
-            tokens = self.tokenizer.tokenize(text)
+            encoded = self.tokenizer.encode_plus(
+                text, max_length=maxlen, truncation=True, return_offsets_mapping=True
+            )
+            input_ids = encoded["input_ids"]
+            offsets = encoded["offset_mapping"]
+            del encoded["offset_mapping"]
+            inp = encoded["input_ids"][:]
+            inp = inp[1:] if inp[0] == self.tokenizer.cls_token_id else inp
+            inp = inp[:-1] if inp[-1] == self.tokenizer.sep_token_id else inp
+            tokens = self.tokenizer.convert_ids_to_tokens(inp)
             if len(tokens) > maxlen - 2:
                 tokens = tokens[0 : (maxlen - 2)]
             sentences.append(tokens)
-            tokens = [self.tokenizer.cls_token] + tokens + [self.tokenizer.sep_token]
-            input_ids = self.tokenizer.convert_tokens_to_ids(tokens)
             input_mask = [1] * len(input_ids)
             while len(input_ids) < maxlen:
                 input_ids.append(0)
                 input_mask.append(0)
             all_input_ids.append(input_ids)
             all_input_masks.append(input_mask)
+            all_word_ids.append(encoded.word_ids())
+            all_offsets.append(offsets)
 
         all_input_ids = np.array(all_input_ids)
         all_input_masks = np.array(all_input_masks)
@@ -1565,21 +1581,39 @@ class TransformerEmbedding:
 
         if not word_level:  # sentence-level embedding
             return np.mean(raw_embeddings, axis=1)
-            # return np.squeeze(raw_embeddings[:,0:1,:], axis=1)
 
-        # filter-out extra subword tokens and special tokens
-        # (using first subword of each token as embedding representations)
+        # all space-separate tokens in input should be assigned a single embedding vector
+        # example: If 99.9% is a token, then it gets a single embedding.
+        # example: If input is pre-tokenized (i.e., 99 . 9 %), then there are four embedding vectors
         filtered_embeddings = []
-        for batch_idx, tokens in enumerate(sentences):
-            embedding = []
-            for token_idx, token in enumerate(tokens):
-                if token in [
-                    self.tokenizer.cls_token,
-                    self.tokenizer.sep_token,
-                ] or token.startswith("##"):
+        for i in range(len(raw_embeddings)):
+            filtered_embedding = []
+            raw_embedding = raw_embeddings[i]
+            subvectors = []
+            last_index = -1
+
+            for j in range(len(all_offsets[i])):
+                if all_word_ids[i][j] is None:
                     continue
-                embedding.append(raw_embeddings[batch_idx][token_idx])
-            filtered_embeddings.append(embedding)
+                if all_offsets[i][j][0] == last_index:
+                    subvectors.append(raw_embedding[j])
+                    last_index = all_offsets[i][j][1]
+                if all_offsets[i][j][0] > last_index:
+                    if len(subvectors) > 0:
+                        if aggregation_strategy == "average":
+                            filtered_embedding.append(np.mean(subvectors, axis=0))
+                        else:
+                            filtered_embedding.append(subvectors[0])
+                        subvectors = []
+                    subvectors.append(raw_embedding[j])
+                    last_index = all_offsets[i][j][1]
+            if len(subvectors) > 0:
+                if aggregation_strategy == "average":
+                    filtered_embedding.append(np.mean(subvectors, axis=0))
+                else:
+                    filtered_embedding.append(subvectors[0])
+                subvectors = []
+            filtered_embeddings.append(filtered_embedding)
 
         # pad embeddings with zeros
         max_length = max([len(e) for e in filtered_embeddings])
