@@ -27,18 +27,23 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">from .imports import *
+
+
 class Preprocessor(ABC):
     &#34;&#34;&#34;
     ```
     Abstract class to preprocess data
     ```
     &#34;&#34;&#34;
+
     @abstractmethod
     def get_preprocessor(self):
         pass
+
     @abstractmethod
     def get_classes(self):
         pass
+
     @abstractmethod
     def preprocess(self):
         pass
@@ -72,12 +77,15 @@ class Preprocessor(ABC):
     Abstract class to preprocess data
     ```
     &#34;&#34;&#34;
+
     @abstractmethod
     def get_preprocessor(self):
         pass
+
     @abstractmethod
     def get_classes(self):
         pass
+
     @abstractmethod
     def preprocess(self):
         pass

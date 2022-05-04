@@ -30,16 +30,18 @@
 from . import utils as U
 
 
-
 def search(query, doc, case_sensitive=False, keys=[], progress=False):
     searcher = Searcher(query)
-    return searcher.search(doc, case_sensitive=case_sensitive, keys=keys, progress=progress)
+    return searcher.search(
+        doc, case_sensitive=case_sensitive, keys=keys, progress=progress
+    )
 
 
 class Searcher:
     &#34;&#34;&#34;
     Search for keywords in text documents
     &#34;&#34;&#34;
+
     def __init__(self, queries, lang=None):
         &#34;&#34;&#34;
         ```
@@ -49,13 +51,12 @@ class Searcher:
         ```
         &#34;&#34;&#34;
         self.queries = queries
-        if isinstance(self.queries, str): self.queries = [self.queries]
+        if isinstance(self.queries, str):
+            self.queries = [self.queries]
         self.lang = lang
         if self.lang is None:
             self.lang = U.detect_lang(queries)
-        #print(&#34;lang:%s&#34; %(self.lang))
-
-
+        # print(&#34;lang:%s&#34; %(self.lang))
 
     def search(self, docs, case_sensitive=False, keys=[], min_matches=1, progress=True):
         &#34;&#34;&#34;
@@ -74,35 +75,59 @@ class Searcher:
           For Chinese, no. of matches will be number of unique Jieba-extracted character sequences that match
         ```
         &#34;&#34;&#34;
-        if isinstance(docs, str): 
+        if isinstance(docs, str):
             docs = [docs]
         if keys and len(keys) != len(docs):
-            raise ValueError(&#39;lengths of keys and docs must be the same&#39;)
+            raise ValueError(&#34;lengths of keys and docs must be the same&#34;)
         results = []
         l = len(docs)
         for idx, text in enumerate(docs):
             for q in self.queries:
                 if U.is_chinese(self.lang):
-                    r = self._search_chinese(q, [text], min_matches=min_matches, parse=1, progress=False)
-                elif self.lang == &#39;ar&#39;:
-                    r = self._search(q, [text], case_sensitive=case_sensitive, min_matches=min_matches, 
-                                     progress=False, substrings_on=True)
+                    r = self._search_chinese(
+                        q, [text], min_matches=min_matches, parse=1, progress=False
+                    )
+                elif self.lang == &#34;ar&#34;:
+                    r = self._search(
+                        q,
+                        [text],
+                        case_sensitive=case_sensitive,
+                        min_matches=min_matches,
+                        progress=False,
+                        substrings_on=True,
+                    )
                 else:
-                    r = self._search(q, [text], case_sensitive=case_sensitive, min_matches=min_matches, 
-                                     progress=False, substrings_on=False)
-                if not r: continue
+                    r = self._search(
+                        q,
+                        [text],
+                        case_sensitive=case_sensitive,
+                        min_matches=min_matches,
+                        progress=False,
+                        substrings_on=False,
+                    )
+                if not r:
+                    continue
                 r = r[0]
                 k = idx
-                if keys: k = keys[idx]
+                if keys:
+                    k = keys[idx]
                 num_matches = len(set(r[2])) if U.is_chinese(self.lang) else len(r[2])
                 results.append((k, q, num_matches))
-            if progress: printProgressBar(idx+1, l, prefix=&#39;progress: &#39;, suffix =&#39;complete&#39;, length=50)
+            if progress:
+                printProgressBar(
+                    idx + 1, l, prefix=&#34;progress: &#34;, suffix=&#34;complete&#34;, length=50
+                )
         return results
 
-
-    def _search(self, query, docs,
-                case_sensitive=False, substrings_on=False, 
-                min_matches=1, progress=True):
+    def _search(
+        self,
+        query,
+        docs,
+        case_sensitive=False,
+        substrings_on=False,
+        min_matches=1,
+        progress=True,
+    ):
         &#34;&#34;&#34;
         ```
         search documents for query string.
@@ -117,40 +142,48 @@ class Searcher:
             list or tuple:  Returns list of results if len(docs) &gt; 1.  Otherwise, returns tuple of results
         ```
         &#34;&#34;&#34;
-        if not isinstance(query, (list, tuple, str)): raise ValueError(&#39;query must be str or list of str&#39;)
-        if isinstance(query, str): query = [query]
-        if not isinstance(docs, (list, np.ndarray)): raise ValueError(&#39;docs must be list of str&#39;)
+        if not isinstance(query, (list, tuple, str)):
+            raise ValueError(&#34;query must be str or list of str&#34;)
+        if isinstance(query, str):
+            query = [query]
+        if not isinstance(docs, (list, np.ndarray)):
+            raise ValueError(&#34;docs must be list of str&#34;)
 
         flag = 0
         if not case_sensitive:
             flag = re.I
-        qlist =[]
+        qlist = []
         for q in query:
-            qlist.append(&#39;\s+&#39;.join(q.split()))
+            qlist.append(&#34;\s+&#34;.join(q.split()))
         original_query = query
-        query = &#39;|&#39;.join(qlist)
-        bound = r&#39;\b&#39;
-        if substrings_on: bound = &#39;&#39;
-        pattern_str = r&#39;%s(?:%s)%s&#39; % (bound, query, bound)
-        pattern = re.compile( pattern_str, flag)
+        query = &#34;|&#34;.join(qlist)
+        bound = r&#34;\b&#34;
+        if substrings_on:
+            bound = &#34;&#34;
+        pattern_str = r&#34;%s(?:%s)%s&#34; % (bound, query, bound)
+        pattern = re.compile(pattern_str, flag)
 
         results = []
         l = len(docs)
         for idx, text in enumerate(docs):
             matches = pattern.findall(text)
-            if matches and len(matches)&gt;=min_matches: results.append((idx, text, matches))
+            if matches and len(matches) &gt;= min_matches:
+                results.append((idx, text, matches))
             if progress:
-                printProgressBar(idx+1, l, prefix=&#39;progress: &#39;, suffix =&#39;complete&#39;, length=50)
+                printProgressBar(
+                    idx + 1, l, prefix=&#34;progress: &#34;, suffix=&#34;complete&#34;, length=50
+                )
         return results
 
-
-    def _search_chinese(self, query, docs, 
-                        substrings_on=True, parse=1, min_matches=1, progress=False):
+    def _search_chinese(
+        self, query, docs, substrings_on=True, parse=1, min_matches=1, progress=False
+    ):
         &#34;&#34;&#34;
         convenience method to search chinese text
         &#34;&#34;&#34;
         original_query = query
-        if not isinstance(query, str): raise ValueError(&#39;query must be str&#39;)
+        if not isinstance(query, str):
+            raise ValueError(&#34;query must be str&#34;)
         if parse &gt; 0:
             q = U.split_chinese(query)[0]
             num_words = len(q.split())
@@ -159,32 +192,55 @@ class Searcher:
         return self._search(query, docs, substrings_on=substrings_on, progress=progress)
 
 
-
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Non-English Language-Handling
-#------------------------------------------------------------------------------
-def find_chinese(s): return re.findall(r&#39;[\u4e00-\u9fff]+&#39;, s)
-def find_arabic(s): return re.findall(r&#39;[\u0600-\u06FF]+&#39;, s)
-def find_cyrillic(s): return re.findall(r&#39;[\u0400-\u04FF]+&#39;, s)
-def find_cyrillic2(s): return re.findall(r&#39;[а-яА-Я]+&#39;, s)
-def find_russian(s): return find_cyrillic(s)
-def find_times(s): return re.findall(r&#39;\d{2}:\d{2}(?:am|pm)&#39;, s, re.I)
+# ------------------------------------------------------------------------------
+def find_chinese(s):
+    return re.findall(r&#34;[\u4e00-\u9fff]+&#34;, s)
+
+
+def find_arabic(s):
+    return re.findall(r&#34;[\u0600-\u06FF]+&#34;, s)
+
+
+def find_cyrillic(s):
+    return re.findall(r&#34;[\u0400-\u04FF]+&#34;, s)
+
+
+def find_cyrillic2(s):
+    return re.findall(r&#34;[а-яА-Я]+&#34;, s)
+
+
+def find_russian(s):
+    return find_cyrillic(s)
+
+
+def find_times(s):
+    return re.findall(r&#34;\d{2}:\d{2}(?:am|pm)&#34;, s, re.I)
 
 
 def build_ngrams(s, n=2):
     lst = s.split()
     ngrams = []
-    for i in range(len(lst)-(n-1)):
+    for i in range(len(lst) - (n - 1)):
         ngram = []
         for j in range(n):
-            ngram.append(lst[i+j])
+            ngram.append(lst[i + j])
         ngram = tuple(ngram)
         ngrams.append(ngram)
     return ngrams
-        
 
 
-def printProgressBar (iteration, total, prefix = &#39;&#39;, suffix = &#39;&#39;, decimals = 1, length = 50, fill = &#39;█&#39;, printEnd = &#34;\r&#34;):
+def printProgressBar(
+    iteration,
+    total,
+    prefix=&#34;&#34;,
+    suffix=&#34;&#34;,
+    decimals=1,
+    length=50,
+    fill=&#34;█&#34;,
+    printEnd=&#34;\r&#34;,
+):
     &#34;&#34;&#34;
     ```
     Call in a loop to create terminal progress bar
@@ -201,10 +257,10 @@ def printProgressBar (iteration, total, prefix = &#39;&#39;, suffix = &#39;&#39;
     &#34;&#34;&#34;
     percent = (&#34;{0:.&#34; + str(decimals) + &#34;f}&#34;).format(100 * (iteration / float(total)))
     filledLength = int(length * iteration // total)
-    bar = fill * filledLength + &#39;-&#39; * (length - filledLength)
-    print(&#39;\r%s |%s| %s%% %s&#39; % (prefix, bar, percent, suffix), end = printEnd)
+    bar = fill * filledLength + &#34;-&#34; * (length - filledLength)
+    print(&#34;\r%s |%s| %s%% %s&#34; % (prefix, bar, percent, suffix), end=printEnd)
     # Print New Line on Complete
-    if iteration == total: 
+    if iteration == total:
         print()</code></pre>
 </details>
 </section>
@@ -227,10 +283,10 @@ def printProgressBar (iteration, total, prefix = &#39;&#39;, suffix = &#39;&#39;
 <pre><code class="python">def build_ngrams(s, n=2):
     lst = s.split()
     ngrams = []
-    for i in range(len(lst)-(n-1)):
+    for i in range(len(lst) - (n - 1)):
         ngram = []
         for j in range(n):
-            ngram.append(lst[i+j])
+            ngram.append(lst[i + j])
         ngram = tuple(ngram)
         ngrams.append(ngram)
     return ngrams</code></pre>
@@ -245,7 +301,8 @@ def printProgressBar (iteration, total, prefix = &#39;&#39;, suffix = &#39;&#39;
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def find_arabic(s): return re.findall(r&#39;[\u0600-\u06FF]+&#39;, s)</code></pre>
+<pre><code class="python">def find_arabic(s):
+    return re.findall(r&#34;[\u0600-\u06FF]+&#34;, s)</code></pre>
 </details>
 </dd>
 <dt id="ktrain.text.shallownlp.searcher.find_chinese"><code class="name flex">
@@ -257,7 +314,8 @@ def printProgressBar (iteration, total, prefix = &#39;&#39;, suffix = &#39;&#39;
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def find_chinese(s): return re.findall(r&#39;[\u4e00-\u9fff]+&#39;, s)</code></pre>
+<pre><code class="python">def find_chinese(s):
+    return re.findall(r&#34;[\u4e00-\u9fff]+&#34;, s)</code></pre>
 </details>
 </dd>
 <dt id="ktrain.text.shallownlp.searcher.find_cyrillic"><code class="name flex">
@@ -269,7 +327,8 @@ def printProgressBar (iteration, total, prefix = &#39;&#39;, suffix = &#39;&#39;
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def find_cyrillic(s): return re.findall(r&#39;[\u0400-\u04FF]+&#39;, s)</code></pre>
+<pre><code class="python">def find_cyrillic(s):
+    return re.findall(r&#34;[\u0400-\u04FF]+&#34;, s)</code></pre>
 </details>
 </dd>
 <dt id="ktrain.text.shallownlp.searcher.find_cyrillic2"><code class="name flex">
@@ -281,7 +340,8 @@ def printProgressBar (iteration, total, prefix = &#39;&#39;, suffix = &#39;&#39;
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def find_cyrillic2(s): return re.findall(r&#39;[а-яА-Я]+&#39;, s)</code></pre>
+<pre><code class="python">def find_cyrillic2(s):
+    return re.findall(r&#34;[а-яА-Я]+&#34;, s)</code></pre>
 </details>
 </dd>
 <dt id="ktrain.text.shallownlp.searcher.find_russian"><code class="name flex">
@@ -293,7 +353,8 @@ def printProgressBar (iteration, total, prefix = &#39;&#39;, suffix = &#39;&#39;
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def find_russian(s): return find_cyrillic(s)</code></pre>
+<pre><code class="python">def find_russian(s):
+    return find_cyrillic(s)</code></pre>
 </details>
 </dd>
 <dt id="ktrain.text.shallownlp.searcher.find_times"><code class="name flex">
@@ -305,7 +366,8 @@ def printProgressBar (iteration, total, prefix = &#39;&#39;, suffix = &#39;&#39;
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def find_times(s): return re.findall(r&#39;\d{2}:\d{2}(?:am|pm)&#39;, s, re.I)</code></pre>
+<pre><code class="python">def find_times(s):
+    return re.findall(r&#34;\d{2}:\d{2}(?:am|pm)&#34;, s, re.I)</code></pre>
 </details>
 </dd>
 <dt id="ktrain.text.shallownlp.searcher.printProgressBar"><code class="name flex">
@@ -344,7 +406,16 @@ printEnd
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def printProgressBar (iteration, total, prefix = &#39;&#39;, suffix = &#39;&#39;, decimals = 1, length = 50, fill = &#39;█&#39;, printEnd = &#34;\r&#34;):
+<pre><code class="python">def printProgressBar(
+    iteration,
+    total,
+    prefix=&#34;&#34;,
+    suffix=&#34;&#34;,
+    decimals=1,
+    length=50,
+    fill=&#34;█&#34;,
+    printEnd=&#34;\r&#34;,
+):
     &#34;&#34;&#34;
     ```
     Call in a loop to create terminal progress bar
@@ -361,10 +432,10 @@ printEnd
     &#34;&#34;&#34;
     percent = (&#34;{0:.&#34; + str(decimals) + &#34;f}&#34;).format(100 * (iteration / float(total)))
     filledLength = int(length * iteration // total)
-    bar = fill * filledLength + &#39;-&#39; * (length - filledLength)
-    print(&#39;\r%s |%s| %s%% %s&#39; % (prefix, bar, percent, suffix), end = printEnd)
+    bar = fill * filledLength + &#34;-&#34; * (length - filledLength)
+    print(&#34;\r%s |%s| %s%% %s&#34; % (prefix, bar, percent, suffix), end=printEnd)
     # Print New Line on Complete
-    if iteration == total: 
+    if iteration == total:
         print()</code></pre>
 </details>
 </dd>
@@ -379,7 +450,9 @@ printEnd
 </summary>
 <pre><code class="python">def search(query, doc, case_sensitive=False, keys=[], progress=False):
     searcher = Searcher(query)
-    return searcher.search(doc, case_sensitive=case_sensitive, keys=keys, progress=progress)</code></pre>
+    return searcher.search(
+        doc, case_sensitive=case_sensitive, keys=keys, progress=progress
+    )</code></pre>
 </details>
 </dd>
 </dl>
@@ -405,6 +478,7 @@ printEnd
     &#34;&#34;&#34;
     Search for keywords in text documents
     &#34;&#34;&#34;
+
     def __init__(self, queries, lang=None):
         &#34;&#34;&#34;
         ```
@@ -414,13 +488,12 @@ printEnd
         ```
         &#34;&#34;&#34;
         self.queries = queries
-        if isinstance(self.queries, str): self.queries = [self.queries]
+        if isinstance(self.queries, str):
+            self.queries = [self.queries]
         self.lang = lang
         if self.lang is None:
             self.lang = U.detect_lang(queries)
-        #print(&#34;lang:%s&#34; %(self.lang))
-
-
+        # print(&#34;lang:%s&#34; %(self.lang))
 
     def search(self, docs, case_sensitive=False, keys=[], min_matches=1, progress=True):
         &#34;&#34;&#34;
@@ -439,35 +512,59 @@ printEnd
           For Chinese, no. of matches will be number of unique Jieba-extracted character sequences that match
         ```
         &#34;&#34;&#34;
-        if isinstance(docs, str): 
+        if isinstance(docs, str):
             docs = [docs]
         if keys and len(keys) != len(docs):
-            raise ValueError(&#39;lengths of keys and docs must be the same&#39;)
+            raise ValueError(&#34;lengths of keys and docs must be the same&#34;)
         results = []
         l = len(docs)
         for idx, text in enumerate(docs):
             for q in self.queries:
                 if U.is_chinese(self.lang):
-                    r = self._search_chinese(q, [text], min_matches=min_matches, parse=1, progress=False)
-                elif self.lang == &#39;ar&#39;:
-                    r = self._search(q, [text], case_sensitive=case_sensitive, min_matches=min_matches, 
-                                     progress=False, substrings_on=True)
+                    r = self._search_chinese(
+                        q, [text], min_matches=min_matches, parse=1, progress=False
+                    )
+                elif self.lang == &#34;ar&#34;:
+                    r = self._search(
+                        q,
+                        [text],
+                        case_sensitive=case_sensitive,
+                        min_matches=min_matches,
+                        progress=False,
+                        substrings_on=True,
+                    )
                 else:
-                    r = self._search(q, [text], case_sensitive=case_sensitive, min_matches=min_matches, 
-                                     progress=False, substrings_on=False)
-                if not r: continue
+                    r = self._search(
+                        q,
+                        [text],
+                        case_sensitive=case_sensitive,
+                        min_matches=min_matches,
+                        progress=False,
+                        substrings_on=False,
+                    )
+                if not r:
+                    continue
                 r = r[0]
                 k = idx
-                if keys: k = keys[idx]
+                if keys:
+                    k = keys[idx]
                 num_matches = len(set(r[2])) if U.is_chinese(self.lang) else len(r[2])
                 results.append((k, q, num_matches))
-            if progress: printProgressBar(idx+1, l, prefix=&#39;progress: &#39;, suffix =&#39;complete&#39;, length=50)
+            if progress:
+                printProgressBar(
+                    idx + 1, l, prefix=&#34;progress: &#34;, suffix=&#34;complete&#34;, length=50
+                )
         return results
 
-
-    def _search(self, query, docs,
-                case_sensitive=False, substrings_on=False, 
-                min_matches=1, progress=True):
+    def _search(
+        self,
+        query,
+        docs,
+        case_sensitive=False,
+        substrings_on=False,
+        min_matches=1,
+        progress=True,
+    ):
         &#34;&#34;&#34;
         ```
         search documents for query string.
@@ -482,40 +579,48 @@ printEnd
             list or tuple:  Returns list of results if len(docs) &gt; 1.  Otherwise, returns tuple of results
         ```
         &#34;&#34;&#34;
-        if not isinstance(query, (list, tuple, str)): raise ValueError(&#39;query must be str or list of str&#39;)
-        if isinstance(query, str): query = [query]
-        if not isinstance(docs, (list, np.ndarray)): raise ValueError(&#39;docs must be list of str&#39;)
+        if not isinstance(query, (list, tuple, str)):
+            raise ValueError(&#34;query must be str or list of str&#34;)
+        if isinstance(query, str):
+            query = [query]
+        if not isinstance(docs, (list, np.ndarray)):
+            raise ValueError(&#34;docs must be list of str&#34;)
 
         flag = 0
         if not case_sensitive:
             flag = re.I
-        qlist =[]
+        qlist = []
         for q in query:
-            qlist.append(&#39;\s+&#39;.join(q.split()))
+            qlist.append(&#34;\s+&#34;.join(q.split()))
         original_query = query
-        query = &#39;|&#39;.join(qlist)
-        bound = r&#39;\b&#39;
-        if substrings_on: bound = &#39;&#39;
-        pattern_str = r&#39;%s(?:%s)%s&#39; % (bound, query, bound)
-        pattern = re.compile( pattern_str, flag)
+        query = &#34;|&#34;.join(qlist)
+        bound = r&#34;\b&#34;
+        if substrings_on:
+            bound = &#34;&#34;
+        pattern_str = r&#34;%s(?:%s)%s&#34; % (bound, query, bound)
+        pattern = re.compile(pattern_str, flag)
 
         results = []
         l = len(docs)
         for idx, text in enumerate(docs):
             matches = pattern.findall(text)
-            if matches and len(matches)&gt;=min_matches: results.append((idx, text, matches))
+            if matches and len(matches) &gt;= min_matches:
+                results.append((idx, text, matches))
             if progress:
-                printProgressBar(idx+1, l, prefix=&#39;progress: &#39;, suffix =&#39;complete&#39;, length=50)
+                printProgressBar(
+                    idx + 1, l, prefix=&#34;progress: &#34;, suffix=&#34;complete&#34;, length=50
+                )
         return results
 
-
-    def _search_chinese(self, query, docs, 
-                        substrings_on=True, parse=1, min_matches=1, progress=False):
+    def _search_chinese(
+        self, query, docs, substrings_on=True, parse=1, min_matches=1, progress=False
+    ):
         &#34;&#34;&#34;
         convenience method to search chinese text
         &#34;&#34;&#34;
         original_query = query
-        if not isinstance(query, str): raise ValueError(&#39;query must be str&#39;)
+        if not isinstance(query, str):
+            raise ValueError(&#34;query must be str&#34;)
         if parse &gt; 0:
             q = U.split_chinese(query)[0]
             num_words = len(q.split())
@@ -563,29 +668,48 @@ Returns:
       For Chinese, no. of matches will be number of unique Jieba-extracted character sequences that match
     ```
     &#34;&#34;&#34;
-    if isinstance(docs, str): 
+    if isinstance(docs, str):
         docs = [docs]
     if keys and len(keys) != len(docs):
-        raise ValueError(&#39;lengths of keys and docs must be the same&#39;)
+        raise ValueError(&#34;lengths of keys and docs must be the same&#34;)
     results = []
     l = len(docs)
     for idx, text in enumerate(docs):
         for q in self.queries:
             if U.is_chinese(self.lang):
-                r = self._search_chinese(q, [text], min_matches=min_matches, parse=1, progress=False)
-            elif self.lang == &#39;ar&#39;:
-                r = self._search(q, [text], case_sensitive=case_sensitive, min_matches=min_matches, 
-                                 progress=False, substrings_on=True)
+                r = self._search_chinese(
+                    q, [text], min_matches=min_matches, parse=1, progress=False
+                )
+            elif self.lang == &#34;ar&#34;:
+                r = self._search(
+                    q,
+                    [text],
+                    case_sensitive=case_sensitive,
+                    min_matches=min_matches,
+                    progress=False,
+                    substrings_on=True,
+                )
             else:
-                r = self._search(q, [text], case_sensitive=case_sensitive, min_matches=min_matches, 
-                                 progress=False, substrings_on=False)
-            if not r: continue
+                r = self._search(
+                    q,
+                    [text],
+                    case_sensitive=case_sensitive,
+                    min_matches=min_matches,
+                    progress=False,
+                    substrings_on=False,
+                )
+            if not r:
+                continue
             r = r[0]
             k = idx
-            if keys: k = keys[idx]
+            if keys:
+                k = keys[idx]
             num_matches = len(set(r[2])) if U.is_chinese(self.lang) else len(r[2])
             results.append((k, q, num_matches))
-        if progress: printProgressBar(idx+1, l, prefix=&#39;progress: &#39;, suffix =&#39;complete&#39;, length=50)
+        if progress:
+            printProgressBar(
+                idx + 1, l, prefix=&#34;progress: &#34;, suffix=&#34;complete&#34;, length=50
+            )
     return results</code></pre>
 </details>
 </dd>

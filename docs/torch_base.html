@@ -27,6 +27,8 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">import warnings
+
+
 class TorchBase:
     &#34;&#34;&#34;
     Utility methods for working pretrained Torch models
@@ -36,42 +38,51 @@ class TorchBase:
         if min_transformers_version is not None:
             import transformers
             from packaging import version
-            if version.parse(transformers.__version__) &lt; version.parse(min_transformers_version):
-                raise Exception(f&#39;This feature requires transformers&gt;={min_transformers_version}. &#39;+\
-                                 &#39;It is usually safe for you to manually upgrade transformers even if ktrain installed a lower version.&#39;)
+
+            if version.parse(transformers.__version__) &lt; version.parse(
+                min_transformers_version
+            ):
+                raise Exception(
+                    f&#34;This feature requires transformers&gt;={min_transformers_version}. &#34;
+                    + &#34;It is usually safe for you to manually upgrade transformers even if ktrain installed a lower version.&#34;
+                )
         try:
             import torch
         except (ImportError, OSError):
-            raise Exception(&#39;This capability in ktrain requires PyTorch to be installed. Please install for your environment: &#39;+\
-                            &#39;https://pytorch.org/get-started/locally/&#39;)
+            raise Exception(
+                &#34;This capability in ktrain requires PyTorch to be installed. Please install for your environment: &#34;
+                + &#34;https://pytorch.org/get-started/locally/&#34;
+            )
         self.quantize = quantize
         self.torch_device = device
-        if self.torch_device is None: self.torch_device = &#39;cuda&#39; if torch.cuda.is_available() else &#39;cpu&#39;
-
+        if self.torch_device is None:
+            self.torch_device = &#34;cuda&#34; if torch.cuda.is_available() else &#34;cpu&#34;
 
     def quantize_model(self, model):
         &#34;&#34;&#34;
         quantize a model
         &#34;&#34;&#34;
         import torch
-        if self.torch_device == &#39;cpu&#39;:
-            return torch.quantization.quantize_dynamic(model, {torch.nn.Linear}, dtype=torch.qint8)
-        elif self.torch_device != &#39;cpu&#39;:
-            return model.half()
 
+        if self.torch_device == &#34;cpu&#34;:
+            return torch.quantization.quantize_dynamic(
+                model, {torch.nn.Linear}, dtype=torch.qint8
+            )
+        elif self.torch_device != &#34;cpu&#34;:
+            return model.half()
 
     def device_to_id(self, device_str=None):
         device_str = self.torch_device if device_str is None else device_str
-        if device_str.lower() == &#39;cpu&#39;:
+        if device_str.lower() == &#34;cpu&#34;:
             return -1
-        elif device_str.lower() == &#39;cuda&#39;:
+        elif device_str.lower() == &#34;cuda&#34;:
             return 0
-        elif device_str.lower().startswith(&#39;cuda:&#39;):
-            _, device_id = device_str.split(&#39;:&#39;)[1]
+        elif device_str.lower().startswith(&#34;cuda:&#34;):
+            _, device_id = device_str.split(&#34;:&#34;)[1]
             device_id = int(device_id)
             return device_id
         else:
-            warnings.warn(&#39;Could not determine device ID - defaulting to -1&#39;)
+            warnings.warn(&#34;Could not determine device ID - defaulting to -1&#34;)
             return -1</code></pre>
 </details>
 </section>
@@ -103,42 +114,51 @@ class TorchBase:
         if min_transformers_version is not None:
             import transformers
             from packaging import version
-            if version.parse(transformers.__version__) &lt; version.parse(min_transformers_version):
-                raise Exception(f&#39;This feature requires transformers&gt;={min_transformers_version}. &#39;+\
-                                 &#39;It is usually safe for you to manually upgrade transformers even if ktrain installed a lower version.&#39;)
+
+            if version.parse(transformers.__version__) &lt; version.parse(
+                min_transformers_version
+            ):
+                raise Exception(
+                    f&#34;This feature requires transformers&gt;={min_transformers_version}. &#34;
+                    + &#34;It is usually safe for you to manually upgrade transformers even if ktrain installed a lower version.&#34;
+                )
         try:
             import torch
         except (ImportError, OSError):
-            raise Exception(&#39;This capability in ktrain requires PyTorch to be installed. Please install for your environment: &#39;+\
-                            &#39;https://pytorch.org/get-started/locally/&#39;)
+            raise Exception(
+                &#34;This capability in ktrain requires PyTorch to be installed. Please install for your environment: &#34;
+                + &#34;https://pytorch.org/get-started/locally/&#34;
+            )
         self.quantize = quantize
         self.torch_device = device
-        if self.torch_device is None: self.torch_device = &#39;cuda&#39; if torch.cuda.is_available() else &#39;cpu&#39;
-
+        if self.torch_device is None:
+            self.torch_device = &#34;cuda&#34; if torch.cuda.is_available() else &#34;cpu&#34;
 
     def quantize_model(self, model):
         &#34;&#34;&#34;
         quantize a model
         &#34;&#34;&#34;
         import torch
-        if self.torch_device == &#39;cpu&#39;:
-            return torch.quantization.quantize_dynamic(model, {torch.nn.Linear}, dtype=torch.qint8)
-        elif self.torch_device != &#39;cpu&#39;:
-            return model.half()
 
+        if self.torch_device == &#34;cpu&#34;:
+            return torch.quantization.quantize_dynamic(
+                model, {torch.nn.Linear}, dtype=torch.qint8
+            )
+        elif self.torch_device != &#34;cpu&#34;:
+            return model.half()
 
     def device_to_id(self, device_str=None):
         device_str = self.torch_device if device_str is None else device_str
-        if device_str.lower() == &#39;cpu&#39;:
+        if device_str.lower() == &#34;cpu&#34;:
             return -1
-        elif device_str.lower() == &#39;cuda&#39;:
+        elif device_str.lower() == &#34;cuda&#34;:
             return 0
-        elif device_str.lower().startswith(&#39;cuda:&#39;):
-            _, device_id = device_str.split(&#39;:&#39;)[1]
+        elif device_str.lower().startswith(&#34;cuda:&#34;):
+            _, device_id = device_str.split(&#34;:&#34;)[1]
             device_id = int(device_id)
             return device_id
         else:
-            warnings.warn(&#39;Could not determine device ID - defaulting to -1&#39;)
+            warnings.warn(&#34;Could not determine device ID - defaulting to -1&#34;)
             return -1</code></pre>
 </details>
 <h3>Subclasses</h3>
@@ -164,16 +184,16 @@ class TorchBase:
 </summary>
 <pre><code class="python">def device_to_id(self, device_str=None):
     device_str = self.torch_device if device_str is None else device_str
-    if device_str.lower() == &#39;cpu&#39;:
+    if device_str.lower() == &#34;cpu&#34;:
         return -1
-    elif device_str.lower() == &#39;cuda&#39;:
+    elif device_str.lower() == &#34;cuda&#34;:
         return 0
-    elif device_str.lower().startswith(&#39;cuda:&#39;):
-        _, device_id = device_str.split(&#39;:&#39;)[1]
+    elif device_str.lower().startswith(&#34;cuda:&#34;):
+        _, device_id = device_str.split(&#34;:&#34;)[1]
         device_id = int(device_id)
         return device_id
     else:
-        warnings.warn(&#39;Could not determine device ID - defaulting to -1&#39;)
+        warnings.warn(&#34;Could not determine device ID - defaulting to -1&#34;)
         return -1</code></pre>
 </details>
 </dd>
@@ -191,9 +211,12 @@ class TorchBase:
     quantize a model
     &#34;&#34;&#34;
     import torch
-    if self.torch_device == &#39;cpu&#39;:
-        return torch.quantization.quantize_dynamic(model, {torch.nn.Linear}, dtype=torch.qint8)
-    elif self.torch_device != &#39;cpu&#39;:
+
+    if self.torch_device == &#34;cpu&#34;:
+        return torch.quantization.quantize_dynamic(
+            model, {torch.nn.Linear}, dtype=torch.qint8
+        )
+    elif self.torch_device != &#34;cpu&#34;:
         return model.half()</code></pre>
 </details>
 </dd>

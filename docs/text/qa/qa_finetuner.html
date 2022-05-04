@@ -32,47 +32,58 @@
 import pandas as pd
 import warnings
 
+
 def convert_to_dataset(list_of_dicts):
     try:
         from datasets import Dataset, load_dataset
     except ImportError:
-        raise ImportError(&#39;The datasets package is required for fine-tuning QA models: pip install datasets&#39;)
+        raise ImportError(
+            &#34;The datasets package is required for fine-tuning QA models: pip install datasets&#34;
+        )
 
     new_list = []
     for d in list_of_dicts:
-        if &#39;question&#39; not in d or &#39;context&#39; not in d or &#39;answers&#39; not in d:
-            raise ValueError(&#39;All dictionaries in list must have the following keys: &#34;question&#34;, &#34;context&#34;, &#34;answers&#34;&#39;)
-        q = d[&#39;question&#39;].strip()
-        c = d[&#39;context&#39;].strip()
-        a = d[&#39;answers&#39;].strip() if isinstance(d[&#39;answers&#39;], str) else d[&#39;answers&#39;]
+        if &#34;question&#34; not in d or &#34;context&#34; not in d or &#34;answers&#34; not in d:
+            raise ValueError(
+                &#39;All dictionaries in list must have the following keys: &#34;question&#34;, &#34;context&#34;, &#34;answers&#34;&#39;
+            )
+        q = d[&#34;question&#34;].strip()
+        c = d[&#34;context&#34;].strip()
+        a = d[&#34;answers&#34;].strip() if isinstance(d[&#34;answers&#34;], str) else d[&#34;answers&#34;]
         if a is None:
-            answers = {&#39;text&#39;:[], &#39;answer_start&#39;:[]}
+            answers = {&#34;text&#34;: [], &#34;answer_start&#34;: []}
         elif isinstance(a, dict):
-            ans_start = a[&#39;answer_start&#39;]
-            ans_text = a[&#39;text&#39;]
-            answers = {&#39;text&#39;:ans_text, &#39;answer_start&#39;: ans_start}
+            ans_start = a[&#34;answer_start&#34;]
+            ans_text = a[&#34;text&#34;]
+            answers = {&#34;text&#34;: ans_text, &#34;answer_start&#34;: ans_start}
         elif isinstance(a, str):
             ans_start = c.index(a)
-            if ans_start &lt; 0: raise ValueError(&#39;Could not locate answer in context: %s&#39; % (d))
+            if ans_start &lt; 0:
+                raise ValueError(&#34;Could not locate answer in context: %s&#34; % (d))
             ans_start = [ans_start]
-            answers = {&#39;text&#39;:[a], &#39;answer_start&#39;:ans_start}
+            answers = {&#34;text&#34;: [a], &#34;answer_start&#34;: ans_start}
         else:
-            raise ValueError(&#39;Value for &#34;answers&#34; key must be a string, dictionary, or None&#39;)
-        new_d = {&#39;question&#39;: q, &#39;context&#39;: c, &#39;answers&#39;: answers}
+            raise ValueError(
+                &#39;Value for &#34;answers&#34; key must be a string, dictionary, or None&#39;
+            )
+        new_d = {&#34;question&#34;: q, &#34;context&#34;: c, &#34;answers&#34;: answers}
         new_list.append(new_d)
     dataset = Dataset.from_pandas(pd.DataFrame(new_list))
 
     # uncomment to test with squad sample
-    #datasets = load_dataset(&#39;squad&#39;)
-    #td = datasets[&#39;train&#39;]
-    #td = Dataset.from_pandas(td.to_pandas().head(100))
-    #return td
+    # datasets = load_dataset(&#39;squad&#39;)
+    # td = datasets[&#39;train&#39;]
+    # td = Dataset.from_pandas(td.to_pandas().head(100))
+    # return td
     return dataset
 
 
-
 def convert_dataset_for_tensorflow(
-    dataset, batch_size, dataset_mode=&#34;variable_batch&#34;, shuffle=True, drop_remainder=True
+    dataset,
+    batch_size,
+    dataset_mode=&#34;variable_batch&#34;,
+    shuffle=True,
+    drop_remainder=True,
 ):
     &#34;&#34;&#34;Converts a Hugging Face dataset to a Tensorflow Dataset. The dataset_mode controls whether we pad all batches
     to the maximum sequence length, or whether we only pad to the maximum length within that batch. The former
@@ -81,12 +92,15 @@ def convert_dataset_for_tensorflow(
     try:
         from datasets import Dataset, load_dataset
     except ImportError:
-        raise ImportError(&#39;The datasets package is required for fine-tuning QA models: pip install datasets&#39;)
-
+        raise ImportError(
+            &#34;The datasets package is required for fine-tuning QA models: pip install datasets&#34;
+        )
 
     def densify_ragged_batch(features, label=None):
         features = {
-            feature: ragged_tensor.to_tensor(shape=batch_shape[feature]) if feature in tensor_keys else ragged_tensor
+            feature: ragged_tensor.to_tensor(shape=batch_shape[feature])
+            if feature in tensor_keys
+            else ragged_tensor
             for feature, ragged_tensor in features.items()
         }
         if label is None:
@@ -117,7 +131,9 @@ def convert_dataset_for_tensorflow(
         tf_dataset = tf.data.Dataset.from_tensor_slices(data)
     if shuffle:
         tf_dataset = tf_dataset.shuffle(buffer_size=len(dataset))
-    tf_dataset = tf_dataset.batch(batch_size=batch_size, drop_remainder=drop_remainder).map(densify_ragged_batch)
+    tf_dataset = tf_dataset.batch(
+        batch_size=batch_size, drop_remainder=drop_remainder
+    ).map(densify_ragged_batch)
     return tf_dataset
 
 
@@ -126,14 +142,15 @@ class QAFineTuner:
         self.model = model
         self.tokenizer = tokenizer
 
-
-    def finetune(self, data,  epochs=3, learning_rate=2e-5, batch_size=8, max_seq_length=512):
+    def finetune(
+        self, data, epochs=3, learning_rate=2e-5, batch_size=8, max_seq_length=512
+    ):
         &#34;&#34;&#34;
         ```
         Finetune a QA model.
 
         Args:
-          data(list): list of dictionaries of the form: 
+          data(list): list of dictionaries of the form:
                       [{&#39;question&#39;: &#39;What is ktrain?&#39;
                        &#39;context&#39;: &#39;ktrain is a low-code library for augmented machine learning.&#39;
                        &#39;answer&#39;: &#39;ktrain&#39;}]
@@ -143,17 +160,20 @@ class QAFineTuner:
           fine-tuned model (i.e., QAFineTuner.model)
         ```
         &#34;&#34;&#34;
-        if self.model.name_or_path.startswith(&#39;bert-large&#39;):
-            warnings.warn(&#39;You are fine-tuning a bert-large-* model, which requires lots of memory.  &#39; +\
-                          &#39;If you get a memory error, switch to distilbert-base-cased-distilled-squad.&#39;)
-        if batch_size &gt; len(data): batch_size=len(data)
+        if self.model.name_or_path.startswith(&#34;bert-large&#34;):
+            warnings.warn(
+                &#34;You are fine-tuning a bert-large-* model, which requires lots of memory.  &#34;
+                + &#34;If you get a memory error, switch to distilbert-base-cased-distilled-squad.&#34;
+            )
+        if batch_size &gt; len(data):
+            batch_size = len(data)
 
         model = self.model
         tokenizer = self.tokenizer
-        question_column_name = &#39;question&#39;
-        context_column_name = &#39;context&#39;
-        answer_column_name = &#39;answers&#39;
-        
+        question_column_name = &#34;question&#34;
+        context_column_name = &#34;context&#34;
+        answer_column_name = &#34;answers&#34;
+
         # Padding side determines if we do (question|context) or (context|question).
         pad_on_right = tokenizer.padding_side == &#34;right&#34;
 
@@ -162,7 +182,9 @@ class QAFineTuner:
             # Some of the questions have lots of whitespace on the left, which is not useful and will make the
             # truncation of the context fail (the tokenized question will take a lots of space). So we remove that
             # left whitespace
-            examples[question_column_name] = [q.lstrip() for q in examples[question_column_name]]
+            examples[question_column_name] = [
+                q.lstrip() for q in examples[question_column_name]
+            ]
 
             # Tokenize our examples with truncation and maybe padding, but keep the overflows using a stride. This results
             # in one example possible giving several features when a context is long, each of those features having a
@@ -175,7 +197,7 @@ class QAFineTuner:
                 stride=128,
                 return_overflowing_tokens=True,
                 return_offsets_mapping=True,
-                #padding=&#34;max_length&#34; if data_args.pad_to_max_length else False,
+                # padding=&#34;max_length&#34; if data_args.pad_to_max_length else False,
                 padding=&#34;max_length&#34;,
             )
 
@@ -221,22 +243,28 @@ class QAFineTuner:
                         token_end_index -= 1
 
                     # Detect if the answer is out of the span (in which case this feature is labeled with the CLS index).
-                    if not (offsets[token_start_index][0] &lt;= start_char and offsets[token_end_index][1] &gt;= end_char):
+                    if not (
+                        offsets[token_start_index][0] &lt;= start_char
+                        and offsets[token_end_index][1] &gt;= end_char
+                    ):
                         tokenized_examples[&#34;start_positions&#34;].append(cls_index)
                         tokenized_examples[&#34;end_positions&#34;].append(cls_index)
                     else:
                         # Otherwise move the token_start_index and token_end_index to the two ends of the answer.
                         # Note: we could go after the last offset if the answer is the last word (edge case).
-                        while token_start_index &lt; len(offsets) and offsets[token_start_index][0] &lt;= start_char:
+                        while (
+                            token_start_index &lt; len(offsets)
+                            and offsets[token_start_index][0] &lt;= start_char
+                        ):
                             token_start_index += 1
-                        tokenized_examples[&#34;start_positions&#34;].append(token_start_index - 1)
+                        tokenized_examples[&#34;start_positions&#34;].append(
+                            token_start_index - 1
+                        )
                         while offsets[token_end_index][1] &gt;= end_char:
                             token_end_index -= 1
                         tokenized_examples[&#34;end_positions&#34;].append(token_end_index + 1)
 
             return tokenized_examples
-
-
 
         dataset = convert_to_dataset(data)
         print(dataset)
@@ -246,9 +274,8 @@ class QAFineTuner:
             prepare_train_features,
             batched=True,
             num_proc=1,
-        )    
-        optimizer = tf.keras.optimizers.Adam(
-        learning_rate=learning_rate)
+        )
+        optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
 
         def dummy_loss(y_true, y_pred):
             return tf.reduce_mean(y_pred)
@@ -257,12 +284,12 @@ class QAFineTuner:
         model.compile(optimizer=optimizer, loss=losses)
 
         training_dataset = convert_dataset_for_tensorflow(
-                    train_dataset,
-                    batch_size=batch_size,
-                    dataset_mode=&#39;variable_batch&#39;,
-                    drop_remainder=True,
-                    shuffle=True,
-                )
+            train_dataset,
+            batch_size=batch_size,
+            dataset_mode=&#34;variable_batch&#34;,
+            drop_remainder=True,
+            shuffle=True,
+        )
         model.fit(training_dataset, epochs=int(epochs))</code></pre>
 </details>
 </section>
@@ -285,7 +312,11 @@ is most useful when training on TPU, as a new graph compilation is required for 
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def convert_dataset_for_tensorflow(
-    dataset, batch_size, dataset_mode=&#34;variable_batch&#34;, shuffle=True, drop_remainder=True
+    dataset,
+    batch_size,
+    dataset_mode=&#34;variable_batch&#34;,
+    shuffle=True,
+    drop_remainder=True,
 ):
     &#34;&#34;&#34;Converts a Hugging Face dataset to a Tensorflow Dataset. The dataset_mode controls whether we pad all batches
     to the maximum sequence length, or whether we only pad to the maximum length within that batch. The former
@@ -294,12 +325,15 @@ is most useful when training on TPU, as a new graph compilation is required for 
     try:
         from datasets import Dataset, load_dataset
     except ImportError:
-        raise ImportError(&#39;The datasets package is required for fine-tuning QA models: pip install datasets&#39;)
-
+        raise ImportError(
+            &#34;The datasets package is required for fine-tuning QA models: pip install datasets&#34;
+        )
 
     def densify_ragged_batch(features, label=None):
         features = {
-            feature: ragged_tensor.to_tensor(shape=batch_shape[feature]) if feature in tensor_keys else ragged_tensor
+            feature: ragged_tensor.to_tensor(shape=batch_shape[feature])
+            if feature in tensor_keys
+            else ragged_tensor
             for feature, ragged_tensor in features.items()
         }
         if label is None:
@@ -330,7 +364,9 @@ is most useful when training on TPU, as a new graph compilation is required for 
         tf_dataset = tf.data.Dataset.from_tensor_slices(data)
     if shuffle:
         tf_dataset = tf_dataset.shuffle(buffer_size=len(dataset))
-    tf_dataset = tf_dataset.batch(batch_size=batch_size, drop_remainder=drop_remainder).map(densify_ragged_batch)
+    tf_dataset = tf_dataset.batch(
+        batch_size=batch_size, drop_remainder=drop_remainder
+    ).map(densify_ragged_batch)
     return tf_dataset</code></pre>
 </details>
 </dd>
@@ -347,37 +383,44 @@ is most useful when training on TPU, as a new graph compilation is required for 
     try:
         from datasets import Dataset, load_dataset
     except ImportError:
-        raise ImportError(&#39;The datasets package is required for fine-tuning QA models: pip install datasets&#39;)
+        raise ImportError(
+            &#34;The datasets package is required for fine-tuning QA models: pip install datasets&#34;
+        )
 
     new_list = []
     for d in list_of_dicts:
-        if &#39;question&#39; not in d or &#39;context&#39; not in d or &#39;answers&#39; not in d:
-            raise ValueError(&#39;All dictionaries in list must have the following keys: &#34;question&#34;, &#34;context&#34;, &#34;answers&#34;&#39;)
-        q = d[&#39;question&#39;].strip()
-        c = d[&#39;context&#39;].strip()
-        a = d[&#39;answers&#39;].strip() if isinstance(d[&#39;answers&#39;], str) else d[&#39;answers&#39;]
+        if &#34;question&#34; not in d or &#34;context&#34; not in d or &#34;answers&#34; not in d:
+            raise ValueError(
+                &#39;All dictionaries in list must have the following keys: &#34;question&#34;, &#34;context&#34;, &#34;answers&#34;&#39;
+            )
+        q = d[&#34;question&#34;].strip()
+        c = d[&#34;context&#34;].strip()
+        a = d[&#34;answers&#34;].strip() if isinstance(d[&#34;answers&#34;], str) else d[&#34;answers&#34;]
         if a is None:
-            answers = {&#39;text&#39;:[], &#39;answer_start&#39;:[]}
+            answers = {&#34;text&#34;: [], &#34;answer_start&#34;: []}
         elif isinstance(a, dict):
-            ans_start = a[&#39;answer_start&#39;]
-            ans_text = a[&#39;text&#39;]
-            answers = {&#39;text&#39;:ans_text, &#39;answer_start&#39;: ans_start}
+            ans_start = a[&#34;answer_start&#34;]
+            ans_text = a[&#34;text&#34;]
+            answers = {&#34;text&#34;: ans_text, &#34;answer_start&#34;: ans_start}
         elif isinstance(a, str):
             ans_start = c.index(a)
-            if ans_start &lt; 0: raise ValueError(&#39;Could not locate answer in context: %s&#39; % (d))
+            if ans_start &lt; 0:
+                raise ValueError(&#34;Could not locate answer in context: %s&#34; % (d))
             ans_start = [ans_start]
-            answers = {&#39;text&#39;:[a], &#39;answer_start&#39;:ans_start}
+            answers = {&#34;text&#34;: [a], &#34;answer_start&#34;: ans_start}
         else:
-            raise ValueError(&#39;Value for &#34;answers&#34; key must be a string, dictionary, or None&#39;)
-        new_d = {&#39;question&#39;: q, &#39;context&#39;: c, &#39;answers&#39;: answers}
+            raise ValueError(
+                &#39;Value for &#34;answers&#34; key must be a string, dictionary, or None&#39;
+            )
+        new_d = {&#34;question&#34;: q, &#34;context&#34;: c, &#34;answers&#34;: answers}
         new_list.append(new_d)
     dataset = Dataset.from_pandas(pd.DataFrame(new_list))
 
     # uncomment to test with squad sample
-    #datasets = load_dataset(&#39;squad&#39;)
-    #td = datasets[&#39;train&#39;]
-    #td = Dataset.from_pandas(td.to_pandas().head(100))
-    #return td
+    # datasets = load_dataset(&#39;squad&#39;)
+    # td = datasets[&#39;train&#39;]
+    # td = Dataset.from_pandas(td.to_pandas().head(100))
+    # return td
     return dataset</code></pre>
 </details>
 </dd>
@@ -401,14 +444,15 @@ is most useful when training on TPU, as a new graph compilation is required for 
         self.model = model
         self.tokenizer = tokenizer
 
-
-    def finetune(self, data,  epochs=3, learning_rate=2e-5, batch_size=8, max_seq_length=512):
+    def finetune(
+        self, data, epochs=3, learning_rate=2e-5, batch_size=8, max_seq_length=512
+    ):
         &#34;&#34;&#34;
         ```
         Finetune a QA model.
 
         Args:
-          data(list): list of dictionaries of the form: 
+          data(list): list of dictionaries of the form:
                       [{&#39;question&#39;: &#39;What is ktrain?&#39;
                        &#39;context&#39;: &#39;ktrain is a low-code library for augmented machine learning.&#39;
                        &#39;answer&#39;: &#39;ktrain&#39;}]
@@ -418,17 +462,20 @@ is most useful when training on TPU, as a new graph compilation is required for 
           fine-tuned model (i.e., QAFineTuner.model)
         ```
         &#34;&#34;&#34;
-        if self.model.name_or_path.startswith(&#39;bert-large&#39;):
-            warnings.warn(&#39;You are fine-tuning a bert-large-* model, which requires lots of memory.  &#39; +\
-                          &#39;If you get a memory error, switch to distilbert-base-cased-distilled-squad.&#39;)
-        if batch_size &gt; len(data): batch_size=len(data)
+        if self.model.name_or_path.startswith(&#34;bert-large&#34;):
+            warnings.warn(
+                &#34;You are fine-tuning a bert-large-* model, which requires lots of memory.  &#34;
+                + &#34;If you get a memory error, switch to distilbert-base-cased-distilled-squad.&#34;
+            )
+        if batch_size &gt; len(data):
+            batch_size = len(data)
 
         model = self.model
         tokenizer = self.tokenizer
-        question_column_name = &#39;question&#39;
-        context_column_name = &#39;context&#39;
-        answer_column_name = &#39;answers&#39;
-        
+        question_column_name = &#34;question&#34;
+        context_column_name = &#34;context&#34;
+        answer_column_name = &#34;answers&#34;
+
         # Padding side determines if we do (question|context) or (context|question).
         pad_on_right = tokenizer.padding_side == &#34;right&#34;
 
@@ -437,7 +484,9 @@ is most useful when training on TPU, as a new graph compilation is required for 
             # Some of the questions have lots of whitespace on the left, which is not useful and will make the
             # truncation of the context fail (the tokenized question will take a lots of space). So we remove that
             # left whitespace
-            examples[question_column_name] = [q.lstrip() for q in examples[question_column_name]]
+            examples[question_column_name] = [
+                q.lstrip() for q in examples[question_column_name]
+            ]
 
             # Tokenize our examples with truncation and maybe padding, but keep the overflows using a stride. This results
             # in one example possible giving several features when a context is long, each of those features having a
@@ -450,7 +499,7 @@ is most useful when training on TPU, as a new graph compilation is required for 
                 stride=128,
                 return_overflowing_tokens=True,
                 return_offsets_mapping=True,
-                #padding=&#34;max_length&#34; if data_args.pad_to_max_length else False,
+                # padding=&#34;max_length&#34; if data_args.pad_to_max_length else False,
                 padding=&#34;max_length&#34;,
             )
 
@@ -496,22 +545,28 @@ is most useful when training on TPU, as a new graph compilation is required for 
                         token_end_index -= 1
 
                     # Detect if the answer is out of the span (in which case this feature is labeled with the CLS index).
-                    if not (offsets[token_start_index][0] &lt;= start_char and offsets[token_end_index][1] &gt;= end_char):
+                    if not (
+                        offsets[token_start_index][0] &lt;= start_char
+                        and offsets[token_end_index][1] &gt;= end_char
+                    ):
                         tokenized_examples[&#34;start_positions&#34;].append(cls_index)
                         tokenized_examples[&#34;end_positions&#34;].append(cls_index)
                     else:
                         # Otherwise move the token_start_index and token_end_index to the two ends of the answer.
                         # Note: we could go after the last offset if the answer is the last word (edge case).
-                        while token_start_index &lt; len(offsets) and offsets[token_start_index][0] &lt;= start_char:
+                        while (
+                            token_start_index &lt; len(offsets)
+                            and offsets[token_start_index][0] &lt;= start_char
+                        ):
                             token_start_index += 1
-                        tokenized_examples[&#34;start_positions&#34;].append(token_start_index - 1)
+                        tokenized_examples[&#34;start_positions&#34;].append(
+                            token_start_index - 1
+                        )
                         while offsets[token_end_index][1] &gt;= end_char:
                             token_end_index -= 1
                         tokenized_examples[&#34;end_positions&#34;].append(token_end_index + 1)
 
             return tokenized_examples
-
-
 
         dataset = convert_to_dataset(data)
         print(dataset)
@@ -521,9 +576,8 @@ is most useful when training on TPU, as a new graph compilation is required for 
             prepare_train_features,
             batched=True,
             num_proc=1,
-        )    
-        optimizer = tf.keras.optimizers.Adam(
-        learning_rate=learning_rate)
+        )
+        optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
 
         def dummy_loss(y_true, y_pred):
             return tf.reduce_mean(y_pred)
@@ -532,12 +586,12 @@ is most useful when training on TPU, as a new graph compilation is required for 
         model.compile(optimizer=optimizer, loss=losses)
 
         training_dataset = convert_dataset_for_tensorflow(
-                    train_dataset,
-                    batch_size=batch_size,
-                    dataset_mode=&#39;variable_batch&#39;,
-                    drop_remainder=True,
-                    shuffle=True,
-                )
+            train_dataset,
+            batch_size=batch_size,
+            dataset_mode=&#34;variable_batch&#34;,
+            drop_remainder=True,
+            shuffle=True,
+        )
         model.fit(training_dataset, epochs=int(epochs))</code></pre>
 </details>
 <h3>Methods</h3>
@@ -549,7 +603,7 @@ is most useful when training on TPU, as a new graph compilation is required for 
 <div class="desc"><pre><code>Finetune a QA model.
 
 Args:
-  data(list): list of dictionaries of the form: 
+  data(list): list of dictionaries of the form:
               [{'question': 'What is ktrain?'
                'context': 'ktrain is a low-code library for augmented machine learning.'
                'answer': 'ktrain'}]
@@ -562,13 +616,15 @@ Returns:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def finetune(self, data,  epochs=3, learning_rate=2e-5, batch_size=8, max_seq_length=512):
+<pre><code class="python">def finetune(
+    self, data, epochs=3, learning_rate=2e-5, batch_size=8, max_seq_length=512
+):
     &#34;&#34;&#34;
     ```
     Finetune a QA model.
 
     Args:
-      data(list): list of dictionaries of the form: 
+      data(list): list of dictionaries of the form:
                   [{&#39;question&#39;: &#39;What is ktrain?&#39;
                    &#39;context&#39;: &#39;ktrain is a low-code library for augmented machine learning.&#39;
                    &#39;answer&#39;: &#39;ktrain&#39;}]
@@ -578,17 +634,20 @@ Returns:
       fine-tuned model (i.e., QAFineTuner.model)
     ```
     &#34;&#34;&#34;
-    if self.model.name_or_path.startswith(&#39;bert-large&#39;):
-        warnings.warn(&#39;You are fine-tuning a bert-large-* model, which requires lots of memory.  &#39; +\
-                      &#39;If you get a memory error, switch to distilbert-base-cased-distilled-squad.&#39;)
-    if batch_size &gt; len(data): batch_size=len(data)
+    if self.model.name_or_path.startswith(&#34;bert-large&#34;):
+        warnings.warn(
+            &#34;You are fine-tuning a bert-large-* model, which requires lots of memory.  &#34;
+            + &#34;If you get a memory error, switch to distilbert-base-cased-distilled-squad.&#34;
+        )
+    if batch_size &gt; len(data):
+        batch_size = len(data)
 
     model = self.model
     tokenizer = self.tokenizer
-    question_column_name = &#39;question&#39;
-    context_column_name = &#39;context&#39;
-    answer_column_name = &#39;answers&#39;
-    
+    question_column_name = &#34;question&#34;
+    context_column_name = &#34;context&#34;
+    answer_column_name = &#34;answers&#34;
+
     # Padding side determines if we do (question|context) or (context|question).
     pad_on_right = tokenizer.padding_side == &#34;right&#34;
 
@@ -597,7 +656,9 @@ Returns:
         # Some of the questions have lots of whitespace on the left, which is not useful and will make the
         # truncation of the context fail (the tokenized question will take a lots of space). So we remove that
         # left whitespace
-        examples[question_column_name] = [q.lstrip() for q in examples[question_column_name]]
+        examples[question_column_name] = [
+            q.lstrip() for q in examples[question_column_name]
+        ]
 
         # Tokenize our examples with truncation and maybe padding, but keep the overflows using a stride. This results
         # in one example possible giving several features when a context is long, each of those features having a
@@ -610,7 +671,7 @@ Returns:
             stride=128,
             return_overflowing_tokens=True,
             return_offsets_mapping=True,
-            #padding=&#34;max_length&#34; if data_args.pad_to_max_length else False,
+            # padding=&#34;max_length&#34; if data_args.pad_to_max_length else False,
             padding=&#34;max_length&#34;,
         )
 
@@ -656,22 +717,28 @@ Returns:
                     token_end_index -= 1
 
                 # Detect if the answer is out of the span (in which case this feature is labeled with the CLS index).
-                if not (offsets[token_start_index][0] &lt;= start_char and offsets[token_end_index][1] &gt;= end_char):
+                if not (
+                    offsets[token_start_index][0] &lt;= start_char
+                    and offsets[token_end_index][1] &gt;= end_char
+                ):
                     tokenized_examples[&#34;start_positions&#34;].append(cls_index)
                     tokenized_examples[&#34;end_positions&#34;].append(cls_index)
                 else:
                     # Otherwise move the token_start_index and token_end_index to the two ends of the answer.
                     # Note: we could go after the last offset if the answer is the last word (edge case).
-                    while token_start_index &lt; len(offsets) and offsets[token_start_index][0] &lt;= start_char:
+                    while (
+                        token_start_index &lt; len(offsets)
+                        and offsets[token_start_index][0] &lt;= start_char
+                    ):
                         token_start_index += 1
-                    tokenized_examples[&#34;start_positions&#34;].append(token_start_index - 1)
+                    tokenized_examples[&#34;start_positions&#34;].append(
+                        token_start_index - 1
+                    )
                     while offsets[token_end_index][1] &gt;= end_char:
                         token_end_index -= 1
                     tokenized_examples[&#34;end_positions&#34;].append(token_end_index + 1)
 
         return tokenized_examples
-
-
 
     dataset = convert_to_dataset(data)
     print(dataset)
@@ -681,9 +748,8 @@ Returns:
         prepare_train_features,
         batched=True,
         num_proc=1,
-    )    
-    optimizer = tf.keras.optimizers.Adam(
-    learning_rate=learning_rate)
+    )
+    optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
 
     def dummy_loss(y_true, y_pred):
         return tf.reduce_mean(y_pred)
@@ -692,12 +758,12 @@ Returns:
     model.compile(optimizer=optimizer, loss=losses)
 
     training_dataset = convert_dataset_for_tensorflow(
-                train_dataset,
-                batch_size=batch_size,
-                dataset_mode=&#39;variable_batch&#39;,
-                drop_remainder=True,
-                shuffle=True,
-            )
+        train_dataset,
+        batch_size=batch_size,
+        dataset_mode=&#34;variable_batch&#34;,
+        drop_remainder=True,
+        shuffle=True,
+    )
     model.fit(training_dataset, epochs=int(epochs))</code></pre>
 </details>
 </dd>

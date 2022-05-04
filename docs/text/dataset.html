@@ -29,6 +29,7 @@
 <pre><code class="python">from ..imports import *
 from ..dataset import SequenceDataset
 
+
 class TransformerDataset(SequenceDataset):
     &#34;&#34;&#34;
     ```
@@ -37,24 +38,25 @@ class TransformerDataset(SequenceDataset):
     &#34;&#34;&#34;
 
     def __init__(self, x, y, batch_size=1):
-        if type(x) not in [list, np.ndarray]: raise ValueError(&#39;x must be list or np.ndarray&#39;)
-        if type(y) not in [list, np.ndarray]: raise ValueError(&#39;y must be list or np.ndarray&#39;)
-        if type(x) == list: x = np.array(x)
-        if type(y) == list: y = np.array(y)
+        if type(x) not in [list, np.ndarray]:
+            raise ValueError(&#34;x must be list or np.ndarray&#34;)
+        if type(y) not in [list, np.ndarray]:
+            raise ValueError(&#34;y must be list or np.ndarray&#34;)
+        if type(x) == list:
+            x = np.array(x)
+        if type(y) == list:
+            y = np.array(y)
         self.x = x
         self.y = y
         self.batch_size = batch_size
 
-
     def __getitem__(self, idx):
-        batch_x = self.x[idx * self.batch_size: (idx + 1) * self.batch_size]
-        batch_y = self.y[idx * self.batch_size: (idx + 1) * self.batch_size]
+        batch_x = self.x[idx * self.batch_size : (idx + 1) * self.batch_size]
+        batch_y = self.y[idx * self.batch_size : (idx + 1) * self.batch_size]
         return (batch_x, batch_y)
-
 
     def __len__(self):
         return math.ceil(len(self.x) / self.batch_size)
-
 
     def to_tfdataset(self, train=True):
         &#34;&#34;&#34;
@@ -63,11 +65,11 @@ class TransformerDataset(SequenceDataset):
         ```
         &#34;&#34;&#34;
         if train:
-            shuffle=True
+            shuffle = True
             repeat = True
         else:
-            shuffle=False
-            repeat=False
+            shuffle = False
+            repeat = False
 
         if len(self.y.shape) == 1:
             yshape = []
@@ -78,20 +80,34 @@ class TransformerDataset(SequenceDataset):
 
         def gen():
             for idx, data in enumerate(self.x):
-                yield ({&#39;input_ids&#39;: data[0],
-                         &#39;attention_mask&#39;: data[1],
-                         &#39;token_type_ids&#39;: data[2]},
-                        self.y[idx])
+                yield (
+                    {
+                        &#34;input_ids&#34;: data[0],
+                        &#34;attention_mask&#34;: data[1],
+                        &#34;token_type_ids&#34;: data[2],
+                    },
+                    self.y[idx],
+                )
 
-        tfdataset= tf.data.Dataset.from_generator(gen,
-            ({&#39;input_ids&#39;: tf.int32,
-              &#39;attention_mask&#39;: tf.int32,
-              &#39;token_type_ids&#39;: tf.int32},
-             ytype),
-            ({&#39;input_ids&#39;: tf.TensorShape([None]),
-              &#39;attention_mask&#39;: tf.TensorShape([None]),
-              &#39;token_type_ids&#39;: tf.TensorShape([None])},
-             tf.TensorShape(yshape)))
+        tfdataset = tf.data.Dataset.from_generator(
+            gen,
+            (
+                {
+                    &#34;input_ids&#34;: tf.int32,
+                    &#34;attention_mask&#34;: tf.int32,
+                    &#34;token_type_ids&#34;: tf.int32,
+                },
+                ytype,
+            ),
+            (
+                {
+                    &#34;input_ids&#34;: tf.TensorShape([None]),
+                    &#34;attention_mask&#34;: tf.TensorShape([None]),
+                    &#34;token_type_ids&#34;: tf.TensorShape([None]),
+                },
+                tf.TensorShape(yshape),
+            ),
+        )
 
         if shuffle:
             tfdataset = tfdataset.shuffle(self.x.shape[0])
@@ -99,7 +115,6 @@ class TransformerDataset(SequenceDataset):
         if repeat:
             tfdataset = tfdataset.repeat(-1)
         return tfdataset
-
 
     def get_y(self):
         return self.y
@@ -142,24 +157,25 @@ class TransformerDataset(SequenceDataset):
     &#34;&#34;&#34;
 
     def __init__(self, x, y, batch_size=1):
-        if type(x) not in [list, np.ndarray]: raise ValueError(&#39;x must be list or np.ndarray&#39;)
-        if type(y) not in [list, np.ndarray]: raise ValueError(&#39;y must be list or np.ndarray&#39;)
-        if type(x) == list: x = np.array(x)
-        if type(y) == list: y = np.array(y)
+        if type(x) not in [list, np.ndarray]:
+            raise ValueError(&#34;x must be list or np.ndarray&#34;)
+        if type(y) not in [list, np.ndarray]:
+            raise ValueError(&#34;y must be list or np.ndarray&#34;)
+        if type(x) == list:
+            x = np.array(x)
+        if type(y) == list:
+            y = np.array(y)
         self.x = x
         self.y = y
         self.batch_size = batch_size
 
-
     def __getitem__(self, idx):
-        batch_x = self.x[idx * self.batch_size: (idx + 1) * self.batch_size]
-        batch_y = self.y[idx * self.batch_size: (idx + 1) * self.batch_size]
+        batch_x = self.x[idx * self.batch_size : (idx + 1) * self.batch_size]
+        batch_y = self.y[idx * self.batch_size : (idx + 1) * self.batch_size]
         return (batch_x, batch_y)
-
 
     def __len__(self):
         return math.ceil(len(self.x) / self.batch_size)
-
 
     def to_tfdataset(self, train=True):
         &#34;&#34;&#34;
@@ -168,11 +184,11 @@ class TransformerDataset(SequenceDataset):
         ```
         &#34;&#34;&#34;
         if train:
-            shuffle=True
+            shuffle = True
             repeat = True
         else:
-            shuffle=False
-            repeat=False
+            shuffle = False
+            repeat = False
 
         if len(self.y.shape) == 1:
             yshape = []
@@ -183,20 +199,34 @@ class TransformerDataset(SequenceDataset):
 
         def gen():
             for idx, data in enumerate(self.x):
-                yield ({&#39;input_ids&#39;: data[0],
-                         &#39;attention_mask&#39;: data[1],
-                         &#39;token_type_ids&#39;: data[2]},
-                        self.y[idx])
+                yield (
+                    {
+                        &#34;input_ids&#34;: data[0],
+                        &#34;attention_mask&#34;: data[1],
+                        &#34;token_type_ids&#34;: data[2],
+                    },
+                    self.y[idx],
+                )
 
-        tfdataset= tf.data.Dataset.from_generator(gen,
-            ({&#39;input_ids&#39;: tf.int32,
-              &#39;attention_mask&#39;: tf.int32,
-              &#39;token_type_ids&#39;: tf.int32},
-             ytype),
-            ({&#39;input_ids&#39;: tf.TensorShape([None]),
-              &#39;attention_mask&#39;: tf.TensorShape([None]),
-              &#39;token_type_ids&#39;: tf.TensorShape([None])},
-             tf.TensorShape(yshape)))
+        tfdataset = tf.data.Dataset.from_generator(
+            gen,
+            (
+                {
+                    &#34;input_ids&#34;: tf.int32,
+                    &#34;attention_mask&#34;: tf.int32,
+                    &#34;token_type_ids&#34;: tf.int32,
+                },
+                ytype,
+            ),
+            (
+                {
+                    &#34;input_ids&#34;: tf.TensorShape([None]),
+                    &#34;attention_mask&#34;: tf.TensorShape([None]),
+                    &#34;token_type_ids&#34;: tf.TensorShape([None]),
+                },
+                tf.TensorShape(yshape),
+            ),
+        )
 
         if shuffle:
             tfdataset = tfdataset.shuffle(self.x.shape[0])
@@ -204,7 +234,6 @@ class TransformerDataset(SequenceDataset):
         if repeat:
             tfdataset = tfdataset.repeat(-1)
         return tfdataset
-
 
     def get_y(self):
         return self.y
@@ -269,11 +298,11 @@ class TransformerDataset(SequenceDataset):
     ```
     &#34;&#34;&#34;
     if train:
-        shuffle=True
+        shuffle = True
         repeat = True
     else:
-        shuffle=False
-        repeat=False
+        shuffle = False
+        repeat = False
 
     if len(self.y.shape) == 1:
         yshape = []
@@ -284,20 +313,34 @@ class TransformerDataset(SequenceDataset):
 
     def gen():
         for idx, data in enumerate(self.x):
-            yield ({&#39;input_ids&#39;: data[0],
-                     &#39;attention_mask&#39;: data[1],
-                     &#39;token_type_ids&#39;: data[2]},
-                    self.y[idx])
+            yield (
+                {
+                    &#34;input_ids&#34;: data[0],
+                    &#34;attention_mask&#34;: data[1],
+                    &#34;token_type_ids&#34;: data[2],
+                },
+                self.y[idx],
+            )
 
-    tfdataset= tf.data.Dataset.from_generator(gen,
-        ({&#39;input_ids&#39;: tf.int32,
-          &#39;attention_mask&#39;: tf.int32,
-          &#39;token_type_ids&#39;: tf.int32},
-         ytype),
-        ({&#39;input_ids&#39;: tf.TensorShape([None]),
-          &#39;attention_mask&#39;: tf.TensorShape([None]),
-          &#39;token_type_ids&#39;: tf.TensorShape([None])},
-         tf.TensorShape(yshape)))
+    tfdataset = tf.data.Dataset.from_generator(
+        gen,
+        (
+            {
+                &#34;input_ids&#34;: tf.int32,
+                &#34;attention_mask&#34;: tf.int32,
+                &#34;token_type_ids&#34;: tf.int32,
+            },
+            ytype,
+        ),
+        (
+            {
+                &#34;input_ids&#34;: tf.TensorShape([None]),
+                &#34;attention_mask&#34;: tf.TensorShape([None]),
+                &#34;token_type_ids&#34;: tf.TensorShape([None]),
+            },
+            tf.TensorShape(yshape),
+        ),
+    )
 
     if shuffle:
         tfdataset = tfdataset.shuffle(self.x.shape[0])

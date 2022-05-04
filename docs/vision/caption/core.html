@@ -29,12 +29,13 @@
 <pre><code class="python">from ...torch_base import TorchBase
 from ... import imports as I
 
+
 class ImageCaptioner(TorchBase):
     &#34;&#34;&#34;
     interface to Image Captioner
     &#34;&#34;&#34;
 
-    def __init__(self, model_name=&#39;ydshieh/vit-gpt2-coco-en&#39;, device=None):
+    def __init__(self, model_name=&#34;ydshieh/vit-gpt2-coco-en&#34;, device=None):
         &#34;&#34;&#34;
         ```
         ImageCaptioner constructor
@@ -45,15 +46,25 @@ class ImageCaptioner(TorchBase):
         ```
         &#34;&#34;&#34;
         if not I.PIL_INSTALLED:
-            raise Exception(&#39;PIL is not installed. Please install with: pip install pillow&gt;=9.0.1&#39;)
+            raise Exception(
+                &#34;PIL is not installed. Please install with: pip install pillow&gt;=9.0.1&#34;
+            )
 
-        super().__init__(device=device, quantize=False, min_transformers_version=&#39;4.12.3&#39;)
+        super().__init__(
+            device=device, quantize=False, min_transformers_version=&#34;4.12.3&#34;
+        )
         self.model_name = model_name
-        from transformers import AutoTokenizer, VisionEncoderDecoderModel, ViTFeatureExtractor
-        self.model = VisionEncoderDecoderModel.from_pretrained(self.model_name).to(self.torch_device)
+        from transformers import (
+            AutoTokenizer,
+            VisionEncoderDecoderModel,
+            ViTFeatureExtractor,
+        )
+
+        self.model = VisionEncoderDecoderModel.from_pretrained(self.model_name).to(
+            self.torch_device
+        )
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
         self.extractor = ViTFeatureExtractor.from_pretrained(self.model_name)
-
 
     def caption(self, images):
         &#34;&#34;&#34;
@@ -72,7 +83,9 @@ class ImageCaptioner(TorchBase):
         values = [images] if not isinstance(images, list) else images
 
         # Open images if file strings
-        values = [I.Image.open(image) if isinstance(image, str) else image for image in values]
+        values = [
+            I.Image.open(image) if isinstance(image, str) else image for image in values
+        ]
 
         # Feature extraction
         pixels = self.extractor(images=values, return_tensors=&#34;pt&#34;).pixel_values
@@ -80,8 +93,11 @@ class ImageCaptioner(TorchBase):
 
         # Run model
         import torch
+
         with torch.no_grad():
-            outputs = self.model.generate(pixels, max_length=16, num_beams=4, return_dict_in_generate=True).sequences
+            outputs = self.model.generate(
+                pixels, max_length=16, num_beams=4, return_dict_in_generate=True
+            ).sequences
 
         # Tokenize outputs into text results
         captions = self.tokenizer.batch_decode(outputs, skip_special_tokens=True)
@@ -121,7 +137,7 @@ Args:
     interface to Image Captioner
     &#34;&#34;&#34;
 
-    def __init__(self, model_name=&#39;ydshieh/vit-gpt2-coco-en&#39;, device=None):
+    def __init__(self, model_name=&#34;ydshieh/vit-gpt2-coco-en&#34;, device=None):
         &#34;&#34;&#34;
         ```
         ImageCaptioner constructor
@@ -132,15 +148,25 @@ Args:
         ```
         &#34;&#34;&#34;
         if not I.PIL_INSTALLED:
-            raise Exception(&#39;PIL is not installed. Please install with: pip install pillow&gt;=9.0.1&#39;)
+            raise Exception(
+                &#34;PIL is not installed. Please install with: pip install pillow&gt;=9.0.1&#34;
+            )
 
-        super().__init__(device=device, quantize=False, min_transformers_version=&#39;4.12.3&#39;)
+        super().__init__(
+            device=device, quantize=False, min_transformers_version=&#34;4.12.3&#34;
+        )
         self.model_name = model_name
-        from transformers import AutoTokenizer, VisionEncoderDecoderModel, ViTFeatureExtractor
-        self.model = VisionEncoderDecoderModel.from_pretrained(self.model_name).to(self.torch_device)
+        from transformers import (
+            AutoTokenizer,
+            VisionEncoderDecoderModel,
+            ViTFeatureExtractor,
+        )
+
+        self.model = VisionEncoderDecoderModel.from_pretrained(self.model_name).to(
+            self.torch_device
+        )
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
         self.extractor = ViTFeatureExtractor.from_pretrained(self.model_name)
-
 
     def caption(self, images):
         &#34;&#34;&#34;
@@ -159,7 +185,9 @@ Args:
         values = [images] if not isinstance(images, list) else images
 
         # Open images if file strings
-        values = [I.Image.open(image) if isinstance(image, str) else image for image in values]
+        values = [
+            I.Image.open(image) if isinstance(image, str) else image for image in values
+        ]
 
         # Feature extraction
         pixels = self.extractor(images=values, return_tensors=&#34;pt&#34;).pixel_values
@@ -167,8 +195,11 @@ Args:
 
         # Run model
         import torch
+
         with torch.no_grad():
-            outputs = self.model.generate(pixels, max_length=16, num_beams=4, return_dict_in_generate=True).sequences
+            outputs = self.model.generate(
+                pixels, max_length=16, num_beams=4, return_dict_in_generate=True
+            ).sequences
 
         # Tokenize outputs into text results
         captions = self.tokenizer.batch_decode(outputs, skip_special_tokens=True)
@@ -217,7 +248,9 @@ Returns:
     values = [images] if not isinstance(images, list) else images
 
     # Open images if file strings
-    values = [I.Image.open(image) if isinstance(image, str) else image for image in values]
+    values = [
+        I.Image.open(image) if isinstance(image, str) else image for image in values
+    ]
 
     # Feature extraction
     pixels = self.extractor(images=values, return_tensors=&#34;pt&#34;).pixel_values
@@ -225,8 +258,11 @@ Returns:
 
     # Run model
     import torch
+
     with torch.no_grad():
-        outputs = self.model.generate(pixels, max_length=16, num_beams=4, return_dict_in_generate=True).sequences
+        outputs = self.model.generate(
+            pixels, max_length=16, num_beams=4, return_dict_in_generate=True
+        ).sequences
 
     # Tokenize outputs into text results
     captions = self.tokenizer.batch_decode(outputs, skip_special_tokens=True)

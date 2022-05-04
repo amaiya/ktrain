@@ -31,118 +31,129 @@ from .. import utils as U
 from .wrn import create_wide_residual_network
 
 
-
-
-PRETRAINED_RESNET50 = &#39;pretrained_resnet50&#39;
-PRETRAINED_MOBILENET = &#39;pretrained_mobilenet&#39;
-PRETRAINED_MOBILENETV3 = &#39;pretrained_mobilenetv3&#39;
-PRETRAINED_INCEPTION = &#39;pretrained_inception&#39;
-PRETRAINED_EFFICIENTNETB1 = &#39;pretrained_efficientnetb1&#39;
-PRETRAINED_EFFICIENTNETB7 = &#39;pretrained_efficientnetb7&#39;
-RESNET50 = &#39;resnet50&#39;
-MOBILENET = &#39;mobilenet&#39;
-MOBILENETV3 = &#39;mobilenetv3&#39;
-INCEPTION = &#39;inception&#39;
-EFFICIENTNETB1 = &#39;efficientnetb1&#39;
-EFFICIENTNETB7 = &#39;efficientnetb7&#39;
-CNN = &#39;default_cnn&#39;
-WRN22 = &#39;wrn22&#39;
+PRETRAINED_RESNET50 = &#34;pretrained_resnet50&#34;
+PRETRAINED_MOBILENET = &#34;pretrained_mobilenet&#34;
+PRETRAINED_MOBILENETV3 = &#34;pretrained_mobilenetv3&#34;
+PRETRAINED_INCEPTION = &#34;pretrained_inception&#34;
+PRETRAINED_EFFICIENTNETB1 = &#34;pretrained_efficientnetb1&#34;
+PRETRAINED_EFFICIENTNETB7 = &#34;pretrained_efficientnetb7&#34;
+RESNET50 = &#34;resnet50&#34;
+MOBILENET = &#34;mobilenet&#34;
+MOBILENETV3 = &#34;mobilenetv3&#34;
+INCEPTION = &#34;inception&#34;
+EFFICIENTNETB1 = &#34;efficientnetb1&#34;
+EFFICIENTNETB7 = &#34;efficientnetb7&#34;
+CNN = &#34;default_cnn&#34;
+WRN22 = &#34;wrn22&#34;
 PRETRAINED_MODELS = [
-    PRETRAINED_RESNET50, PRETRAINED_MOBILENET, PRETRAINED_MOBILENETV3,
-    PRETRAINED_INCEPTION, PRETRAINED_EFFICIENTNETB1, PRETRAINED_EFFICIENTNETB7
+    PRETRAINED_RESNET50,
+    PRETRAINED_MOBILENET,
+    PRETRAINED_MOBILENETV3,
+    PRETRAINED_INCEPTION,
+    PRETRAINED_EFFICIENTNETB1,
+    PRETRAINED_EFFICIENTNETB7,
 ]
 PREDEFINED_MODELS = PRETRAINED_MODELS + [
-    RESNET50, MOBILENET, MOBILENETV3, INCEPTION, EFFICIENTNETB1, EFFICIENTNETB7
+    RESNET50,
+    MOBILENET,
+    MOBILENETV3,
+    INCEPTION,
+    EFFICIENTNETB1,
+    EFFICIENTNETB7,
 ]
 IMAGE_CLASSIFIERS = {
-                     PRETRAINED_RESNET50: &#39;50-layer Residual Network (pretrained on ImageNet)&#39;,
-                     RESNET50:  &#39;50-layer Resididual Network (randomly initialized) [https://arxiv.org/abs/1512.03385]&#39;,
-                     PRETRAINED_MOBILENET: &#39;MobileNet Neural Network (pretrained on ImageNet)&#39;,
-                     MOBILENET:  &#39;MobileNet Neural Network (randomly initialized) [https://arxiv.org/abs/1704.04861]&#39;,
-                     PRETRAINED_MOBILENETV3: &#39;MobileNetV3-Small Neural Network (pretrained on ImageNet)&#39;,
-                     MOBILENETV3:  &#39;MobileNetV3-Small Neural Network (randomly initialized) [https://arxiv.org/abs/1905.02244]&#39;,
-                     PRETRAINED_INCEPTION: &#39;Inception Version 3  (pretrained on ImageNet)&#39;,
-                     INCEPTION:  &#39;Inception Version 3 (randomly initialized) [http://arxiv.org/abs/1512.00567]&#39;,
-                     PRETRAINED_EFFICIENTNETB1: &#39;EfficientNet-B1 Neural Network (pretrained on ImageNet)&#39;,
-                     EFFICIENTNETB1: &#39;EfficientNet-B1 Neural Network (pretrained on ImageNet) [https://arxiv.org/abs/1905.11946]&#39;,
-                     PRETRAINED_EFFICIENTNETB7: &#39;EfficientNet-B7 Neural Network (pretrained on ImageNet)&#39;,
-                     EFFICIENTNETB7: &#39;EfficientNet-B7 Neural Network (pretrained on ImageNet) [https://arxiv.org/abs/1905.11946]&#39;,
-                     WRN22: &#39;22-layer Wide Residual Network (randomly initialized)&#39;,
-                     CNN : &#39;a default LeNet-like Convolutional Neural Network&#39;}
+    PRETRAINED_RESNET50: &#34;50-layer Residual Network (pretrained on ImageNet)&#34;,
+    RESNET50: &#34;50-layer Resididual Network (randomly initialized) [https://arxiv.org/abs/1512.03385]&#34;,
+    PRETRAINED_MOBILENET: &#34;MobileNet Neural Network (pretrained on ImageNet)&#34;,
+    MOBILENET: &#34;MobileNet Neural Network (randomly initialized) [https://arxiv.org/abs/1704.04861]&#34;,
+    PRETRAINED_MOBILENETV3: &#34;MobileNetV3-Small Neural Network (pretrained on ImageNet)&#34;,
+    MOBILENETV3: &#34;MobileNetV3-Small Neural Network (randomly initialized) [https://arxiv.org/abs/1905.02244]&#34;,
+    PRETRAINED_INCEPTION: &#34;Inception Version 3  (pretrained on ImageNet)&#34;,
+    INCEPTION: &#34;Inception Version 3 (randomly initialized) [http://arxiv.org/abs/1512.00567]&#34;,
+    PRETRAINED_EFFICIENTNETB1: &#34;EfficientNet-B1 Neural Network (pretrained on ImageNet)&#34;,
+    EFFICIENTNETB1: &#34;EfficientNet-B1 Neural Network (pretrained on ImageNet) [https://arxiv.org/abs/1905.11946]&#34;,
+    PRETRAINED_EFFICIENTNETB7: &#34;EfficientNet-B7 Neural Network (pretrained on ImageNet)&#34;,
+    EFFICIENTNETB7: &#34;EfficientNet-B7 Neural Network (pretrained on ImageNet) [https://arxiv.org/abs/1905.11946]&#34;,
+    WRN22: &#34;22-layer Wide Residual Network (randomly initialized)&#34;,
+    CNN: &#34;a default LeNet-like Convolutional Neural Network&#34;,
+}
+
 
 def print_image_classifiers():
-    for k,v in IMAGE_CLASSIFIERS.items():
-        print(&#34;%s: %s&#34; % (k,v))
+    for k, v in IMAGE_CLASSIFIERS.items():
+        print(&#34;%s: %s&#34; % (k, v))
 
 
 def print_image_regression_models():
-    for k,v in IMAGE_CLASSIFIERS.items():
-        print(&#34;%s: %s&#34; % (k,v))
+    for k, v in IMAGE_CLASSIFIERS.items():
+        print(&#34;%s: %s&#34; % (k, v))
 
 
 def pretrained_datagen(data, name):
-    if not data or not U.is_iter(data): return
+    if not data or not U.is_iter(data):
+        return
     idg = data.image_data_generator
     if name == PRETRAINED_RESNET50:
         idg.preprocessing_function = keras.applications.resnet50.preprocess_input
-        idg.ktrain_preproc = &#39;resnet50&#39;
-        idg.rescale=None
-        idg.featurewise_center=False
-        idg.samplewise_center=False
-        idg.featurewise_std_normalization=False
-        idg.samplewise_std_normalization=False
+        idg.ktrain_preproc = &#34;resnet50&#34;
+        idg.rescale = None
+        idg.featurewise_center = False
+        idg.samplewise_center = False
+        idg.featurewise_std_normalization = False
+        idg.samplewise_std_normalization = False
         idg.zca_whitening = False
     elif name == PRETRAINED_MOBILENET:
         idg.preprocessing_function = keras.applications.mobilenet.preprocess_input
-        idg.ktrain_preproc = &#39;mobilenet&#39;
-        idg.rescale=None
-        idg.featurewise_center=False
-        idg.samplewise_center=False
-        idg.featurewise_std_normalization=False
-        idg.samplewise_std_normalization=False
+        idg.ktrain_preproc = &#34;mobilenet&#34;
+        idg.rescale = None
+        idg.featurewise_center = False
+        idg.samplewise_center = False
+        idg.featurewise_std_normalization = False
+        idg.samplewise_std_normalization = False
         idg.zca_whitening = False
     elif name == PRETRAINED_MOBILENETV3:
         idg.preprocessing_function = keras.applications.mobilenet_v3.preprocess_input
-        idg.ktrain_preproc = &#39;mobilenetv3&#39;
-        idg.rescale=None
-        idg.featurewise_center=False
-        idg.samplewise_center=False
-        idg.featurewise_std_normalization=False
-        idg.samplewise_std_normalization=False
+        idg.ktrain_preproc = &#34;mobilenetv3&#34;
+        idg.rescale = None
+        idg.featurewise_center = False
+        idg.samplewise_center = False
+        idg.featurewise_std_normalization = False
+        idg.samplewise_std_normalization = False
         idg.zca_whitening = False
     elif name == PRETRAINED_INCEPTION:
         idg.preprocessing_function = keras.applications.inception_v3.preprocess_input
-        idg.ktrain_preproc = &#39;inception&#39;
-        idg.rescale=None
-        idg.featurewise_center=False
-        idg.samplewise_center=False
-        idg.featurewise_std_normalization=False
-        idg.samplewise_std_normalization=False
+        idg.ktrain_preproc = &#34;inception&#34;
+        idg.rescale = None
+        idg.featurewise_center = False
+        idg.samplewise_center = False
+        idg.featurewise_std_normalization = False
+        idg.samplewise_std_normalization = False
         idg.zca_whitening = False
     elif name == PRETRAINED_EFFICIENTNETB1 or name == PRETRAINED_EFFICIENTNETB7:
         idg.preprocessing_function = keras.applications.efficientnet.preprocess_input
-        idg.ktrain_preproc = &#39;efficientnet&#39;
-        idg.rescale=None
-        idg.featurewise_center=False
-        idg.samplewise_center=False
-        idg.featurewise_std_normalization=False
-        idg.samplewise_std_normalization=False
+        idg.ktrain_preproc = &#34;efficientnet&#34;
+        idg.rescale = None
+        idg.featurewise_center = False
+        idg.samplewise_center = False
+        idg.featurewise_std_normalization = False
+        idg.samplewise_std_normalization = False
         idg.zca_whitening = False
 
     return
 
 
-
-def image_classifier(name,
-                     train_data,
-                     val_data=None,
-                     freeze_layers=None, 
-                     metrics=[&#39;accuracy&#39;],
-                     optimizer_name = U.DEFAULT_OPT,
-                     multilabel=None,
-                     pt_fc = [],
-                     pt_ps = [],
-                     verbose=1):
+def image_classifier(
+    name,
+    train_data,
+    val_data=None,
+    freeze_layers=None,
+    metrics=[&#34;accuracy&#34;],
+    optimizer_name=U.DEFAULT_OPT,
+    multilabel=None,
+    pt_fc=[],
+    pt_ps=[],
+    verbose=1,
+):
 
     &#34;&#34;&#34;
     ```
@@ -176,22 +187,31 @@ def image_classifier(name,
 
     ```
     &#34;&#34;&#34;
-    return image_model(name, train_data, val_data=val_data, freeze_layers=freeze_layers,
-                       metrics=metrics, optimizer_name=optimizer_name, multilabel=multilabel,
-                       pt_fc=pt_fc, pt_ps=pt_ps, verbose=verbose)
+    return image_model(
+        name,
+        train_data,
+        val_data=val_data,
+        freeze_layers=freeze_layers,
+        metrics=metrics,
+        optimizer_name=optimizer_name,
+        multilabel=multilabel,
+        pt_fc=pt_fc,
+        pt_ps=pt_ps,
+        verbose=verbose,
+    )
 
 
-
-
-def image_regression_model(name,
-                          train_data,
-                          val_data=None,
-                          freeze_layers=None, 
-                          metrics=[&#39;mae&#39;],
-                          optimizer_name = U.DEFAULT_OPT,
-                          pt_fc = [],
-                          pt_ps = [],
-                          verbose=1):
+def image_regression_model(
+    name,
+    train_data,
+    val_data=None,
+    freeze_layers=None,
+    metrics=[&#34;mae&#34;],
+    optimizer_name=U.DEFAULT_OPT,
+    pt_fc=[],
+    pt_ps=[],
+    verbose=1,
+):
 
     &#34;&#34;&#34;
     ```
@@ -223,26 +243,35 @@ def image_regression_model(name,
     Return:
         model(Model):  the compiled model ready to be fine-tuned/trained
 
-    ```   
+    ```
     &#34;&#34;&#34;
 
+    return image_model(
+        name,
+        train_data,
+        val_data=val_data,
+        freeze_layers=freeze_layers,
+        metrics=metrics,
+        optimizer_name=optimizer_name,
+        multilabel=False,
+        pt_fc=pt_fc,
+        pt_ps=pt_ps,
+        verbose=verbose,
+    )
 
-    return image_model(name, train_data, val_data=val_data, freeze_layers=freeze_layers,
-                       metrics=metrics, optimizer_name=optimizer_name, multilabel=False,
-                       pt_fc=pt_fc, pt_ps=pt_ps, verbose=verbose)
 
-
-
-def image_model( name,
-                 train_data,
-                 val_data=None,
-                 freeze_layers=None, 
-                 metrics=[&#39;accuracy&#39;],
-                 optimizer_name = U.DEFAULT_OPT,
-                 multilabel=None,
-                 pt_fc = [],
-                 pt_ps = [],
-                 verbose=1):
+def image_model(
+    name,
+    train_data,
+    val_data=None,
+    freeze_layers=None,
+    metrics=[&#34;accuracy&#34;],
+    optimizer_name=U.DEFAULT_OPT,
+    multilabel=None,
+    pt_fc=[],
+    pt_ps=[],
+    verbose=1,
+):
 
     &#34;&#34;&#34;
     ```
@@ -274,138 +303,187 @@ def image_model( name,
     Return:
         model(Model):  the compiled model ready to be fine-tuned/trained
 
-    ```   
+    ```
     &#34;&#34;&#34;
     # arg check
     U.data_arg_check(train_data=train_data, train_required=True)
     if name not in list(IMAGE_CLASSIFIERS.keys()):
-        raise ValueError(&#39;Unknown or unsupported model: %s&#39; % (name))
-
+        raise ValueError(&#34;Unknown or unsupported model: %s&#34; % (name))
 
     if not U.is_iter(train_data):
-        raise ValueError(&#39;train_data must be an Keras iterator &#39; +\
-                         &#39;(e.g., DirectoryIterator, DataframIterator, &#39;+ \
-                         &#39;NumpyArrayIterator) - please use the ktrain.data.images_from* &#39; +\
-                         &#39;functions&#39;)
+        raise ValueError(
+            &#34;train_data must be an Keras iterator &#34;
+            + &#34;(e.g., DirectoryIterator, DataframIterator, &#34;
+            + &#34;NumpyArrayIterator) - please use the ktrain.data.images_from* &#34;
+            + &#34;functions&#34;
+        )
 
     # check for MobileNetV3
     if name in [PRETRAINED_MOBILENETV3, MOBILENETV3] and not HAS_MOBILENETV3:
-        raise ValueError(f&#39;You chose {name}, but it does not appear to be available in your version of TensorFlow.&#39;)
-
+        raise ValueError(
+            f&#34;You chose {name}, but it does not appear to be available in your version of TensorFlow.&#34;
+        )
 
     # set pretrained flag
     pretrained = True if name in PRETRAINED_MODELS else False
 
     # adjust freeze_layers with warning
     if not pretrained and freeze_layers is not None and freeze_layers &gt; 0:
-        warnings.warn(&#39;Only pretrained models (e.g., pretrained_resnet50) support freeze_layers. &#39; +\
-                      &#39;Setting freeze_layers to 0. Use one of the following models if&#39; +\
-                      &#39;desiring a model pretrained on ImageNet: %s&#39; % (PRETRAINED_MODELS))
+        warnings.warn(
+            &#34;Only pretrained models (e.g., pretrained_resnet50) support freeze_layers. &#34;
+            + &#34;Setting freeze_layers to 0. Use one of the following models if&#34;
+            + &#34;desiring a model pretrained on ImageNet: %s&#34; % (PRETRAINED_MODELS)
+        )
         freeze_layers = 0
 
     if pretrained and val_data is None:
-        raise ValueError(&#39;val_data is required if selecting a pretrained model, &#39;+\
-                         &#39;as normalization scheme will be altered.&#39;)
+        raise ValueError(
+            &#34;val_data is required if selecting a pretrained model, &#34;
+            + &#34;as normalization scheme will be altered.&#34;
+        )
 
     # adjust the data augmentation based on model selected
     if pretrained:
         pretrained_datagen(train_data, name)
         pretrained_datagen(val_data, name)
-        U.vprint(&#39;The normalization scheme has been changed for use with a %s&#39; % (name) +\
-                &#39; model. If you decide to use a different model, please reload your&#39; +\
-                &#39; dataset with a ktrain.vision.data.images_from* function.\n&#39;, verbose=verbose)
+        U.vprint(
+            &#34;The normalization scheme has been changed for use with a %s&#34; % (name)
+            + &#34; model. If you decide to use a different model, please reload your&#34;
+            + &#34; dataset with a ktrain.vision.data.images_from* function.\n&#34;,
+            verbose=verbose,
+        )
 
     # determine if multilabel
     if multilabel is None:
         multilabel = U.is_multilabel(train_data)
-    is_regression=False
-    if not multilabel and len(train_data[0][-1].shape) == 1: is_regression=True
+    is_regression = False
+    if not multilabel and len(train_data[0][-1].shape) == 1:
+        is_regression = True
 
     # set loss and acivations
-    loss_func = &#39;categorical_crossentropy&#39;
-    activation = &#39;softmax&#39;
+    loss_func = &#34;categorical_crossentropy&#34;
+    activation = &#34;softmax&#34;
     if multilabel:
-        loss_func = &#39;binary_crossentropy&#39;
-        activation = &#39;sigmoid&#39;
+        loss_func = &#34;binary_crossentropy&#34;
+        activation = &#34;sigmoid&#34;
     elif is_regression:
-        loss_func = &#39;mse&#39;
+        loss_func = &#34;mse&#34;
         activation = None
-        if metrics == [&#39;accuracy&#39;]: metrics = [&#39;mae&#39;]
+        if metrics == [&#34;accuracy&#34;]:
+            metrics = [&#34;mae&#34;]
 
     U.vprint(&#34;Is Multi-Label? %s&#34; % (multilabel), verbose=verbose)
     U.vprint(&#34;Is Regression? %s&#34; % (is_regression), verbose=verbose)
-
 
     # determine number of classes and shape
     num_classes = 1 if is_regression else U.nclasses_from_data(train_data)
     input_shape = U.shape_from_data(train_data)
 
-    #------------
+    # ------------
     # build model
-    #------------
-    model = build_visionmodel(name,
-                              num_classes,
-                              input_shape=input_shape,
-                              freeze_layers=freeze_layers,
-                              activation=activation,
-                              pt_fc = pt_fc,
-                              pt_ps = pt_ps)
+    # ------------
+    model = build_visionmodel(
+        name,
+        num_classes,
+        input_shape=input_shape,
+        freeze_layers=freeze_layers,
+        activation=activation,
+        pt_fc=pt_fc,
+        pt_ps=pt_ps,
+    )
     model.compile(optimizer=optimizer_name, loss=loss_func, metrics=metrics)
     return model
 
 
-def build_visionmodel(name,
-                      num_classes, 
-                      input_shape=(224,224,3),
-                      freeze_layers=2, 
-                      activation=&#39;softmax&#39;,
-                      pt_fc=[],
-                      pt_ps = []):
+def build_visionmodel(
+    name,
+    num_classes,
+    input_shape=(224, 224, 3),
+    freeze_layers=2,
+    activation=&#34;softmax&#34;,
+    pt_fc=[],
+    pt_ps=[],
+):
 
     if name in PREDEFINED_MODELS:
-        model = build_predefined(name, num_classes,
-                                  input_shape=input_shape,
-                                  freeze_layers=freeze_layers,
-                                  activation=activation,
-                                  pt_fc = pt_fc,
-                                  pt_ps = pt_ps)
+        model = build_predefined(
+            name,
+            num_classes,
+            input_shape=input_shape,
+            freeze_layers=freeze_layers,
+            activation=activation,
+            pt_fc=pt_fc,
+            pt_ps=pt_ps,
+        )
     elif name == CNN:
-        model = build_cnn(num_classes,
-                           input_shape=input_shape,
-                           activation=activation)
+        model = build_cnn(num_classes, input_shape=input_shape, activation=activation)
     elif name == WRN22:
-        model = create_wide_residual_network(input_shape, nb_classes=num_classes, 
-                                             N=3, k=6, dropout=0.00,
-                                             activation=activation, verbose=0)
+        model = create_wide_residual_network(
+            input_shape,
+            nb_classes=num_classes,
+            N=3,
+            k=6,
+            dropout=0.00,
+            activation=activation,
+            verbose=0,
+        )
     else:
-        raise ValueError(&#39;Unknown model: %s&#39; % (name))
-    U.vprint(&#39;%s model created.&#39; % (name))
+        raise ValueError(&#34;Unknown model: %s&#34; % (name))
+    U.vprint(&#34;%s model created.&#34; % (name))
 
     return model
 
 
-
-def build_cnn(num_classes, 
-              input_shape=(28,28,1),
-              activation=&#39;softmax&#39;):
+def build_cnn(num_classes, input_shape=(28, 28, 1), activation=&#34;softmax&#34;):
     model = keras.models.Sequential()
-    model.add(keras.layers.Conv2D(32, kernel_size=(3, 3),activation=&#39;relu&#39;,
-                     kernel_initializer=&#39;he_normal&#39;,input_shape=input_shape))
-    model.add(keras.layers.Conv2D(32, kernel_size=(3, 3),activation=&#39;relu&#39;,
-                     kernel_initializer=&#39;he_normal&#39;))
+    model.add(
+        keras.layers.Conv2D(
+            32,
+            kernel_size=(3, 3),
+            activation=&#34;relu&#34;,
+            kernel_initializer=&#34;he_normal&#34;,
+            input_shape=input_shape,
+        )
+    )
+    model.add(
+        keras.layers.Conv2D(
+            32, kernel_size=(3, 3), activation=&#34;relu&#34;, kernel_initializer=&#34;he_normal&#34;
+        )
+    )
     model.add(keras.layers.MaxPooling2D((2, 2)))
     model.add(keras.layers.Dropout(0.20))
-    model.add(keras.layers.Conv2D(64, (3, 3), activation=&#39;relu&#39;,padding=&#39;same&#39;,
-                      kernel_initializer=&#39;he_normal&#39;))
-    model.add(keras.layers.Conv2D(64, (3, 3), activation=&#39;relu&#39;,padding=&#39;same&#39;,
-                     kernel_initializer=&#39;he_normal&#39;))
+    model.add(
+        keras.layers.Conv2D(
+            64,
+            (3, 3),
+            activation=&#34;relu&#34;,
+            padding=&#34;same&#34;,
+            kernel_initializer=&#34;he_normal&#34;,
+        )
+    )
+    model.add(
+        keras.layers.Conv2D(
+            64,
+            (3, 3),
+            activation=&#34;relu&#34;,
+            padding=&#34;same&#34;,
+            kernel_initializer=&#34;he_normal&#34;,
+        )
+    )
     model.add(keras.layers.MaxPooling2D(pool_size=(2, 2)))
     model.add(keras.layers.Dropout(0.25))
-    model.add(keras.layers.Conv2D(128, (3, 3), activation=&#39;relu&#39;,padding=&#39;same&#39;,
-                     kernel_initializer=&#39;he_normal&#39;))
+    model.add(
+        keras.layers.Conv2D(
+            128,
+            (3, 3),
+            activation=&#34;relu&#34;,
+            padding=&#34;same&#34;,
+            kernel_initializer=&#34;he_normal&#34;,
+        )
+    )
     model.add(keras.layers.Dropout(0.25))
     model.add(keras.layers.Flatten())
-    model.add(keras.layers.Dense(128, activation=&#39;relu&#39;))
+    model.add(keras.layers.Dense(128, activation=&#34;relu&#34;))
     model.add(keras.layers.BatchNormalization())
     model.add(keras.layers.Dropout(0.25))
     model.add(keras.layers.Dense(num_classes, activation=activation))
@@ -413,13 +491,14 @@ def build_cnn(num_classes,
 
 
 def build_predefined(
-                   name,
-                   num_classes, 
-                   input_shape=(224,224,3),
-                   freeze_layers=None, 
-                   activation=&#39;softmax&#39;,
-                   pt_fc=[],
-                   pt_ps=[]):
+    name,
+    num_classes,
+    input_shape=(224, 224, 3),
+    freeze_layers=None,
+    activation=&#34;softmax&#34;,
+    pt_fc=[],
+    pt_ps=[],
+):
     &#34;&#34;&#34;
     ```
     Builds a pre-defined architecture supported in Keras.
@@ -431,7 +510,7 @@ def build_predefined(
         freeze_layers (int): number of early layers to freeze.
                              Only takes effect if name in PRETRAINED_MODELS.
                              If None and name in PRETRAINED_MODELS,
-                             all layers except the &#34;custom head&#34; 
+                             all layers except the &#34;custom head&#34;
                              fully-connected (Dense) layers are frozen.
         activation (str):    name of the Keras activation to use in final layer
         pt_fc (list of ints): number of hidden units in extra Dense layers
@@ -444,47 +523,58 @@ def build_predefined(
     # default parameters
     include_top = False
     input_tensor = None
-    dropout = 0.5 # final dropout
+    dropout = 0.5  # final dropout
 
     # setup pretrained
-    weights = &#39;imagenet&#39; if name in PRETRAINED_MODELS else None
+    weights = &#34;imagenet&#34; if name in PRETRAINED_MODELS else None
 
     # setup the pretrained network
     if name in [RESNET50, PRETRAINED_RESNET50]:
         with warnings.catch_warnings():
-            warnings.simplefilter(&#39;ignore&#39;)
-            net = keras.applications.ResNet50(include_top=include_top, 
-                           weights=weights,
-                           input_tensor=input_tensor,
-                           input_shape = input_shape)
+            warnings.simplefilter(&#34;ignore&#34;)
+            net = keras.applications.ResNet50(
+                include_top=include_top,
+                weights=weights,
+                input_tensor=input_tensor,
+                input_shape=input_shape,
+            )
     elif name in [MOBILENET, PRETRAINED_MOBILENET]:
-        net = keras.applications.MobileNet(include_top=include_top, 
-                        weights=weights,
-                        input_tensor=input_tensor,
-                        input_shape = input_shape)
+        net = keras.applications.MobileNet(
+            include_top=include_top,
+            weights=weights,
+            input_tensor=input_tensor,
+            input_shape=input_shape,
+        )
     elif name in [MOBILENETV3, PRETRAINED_MOBILENETV3]:
-        net = keras.applications.MobileNetV3Small(include_top=include_top, 
-                               weights=weights,
-                               input_tensor=input_tensor,
-                               input_shape = input_shape)
+        net = keras.applications.MobileNetV3Small(
+            include_top=include_top,
+            weights=weights,
+            input_tensor=input_tensor,
+            input_shape=input_shape,
+        )
     elif name in [INCEPTION, PRETRAINED_INCEPTION]:
-        net = keras.applications.InceptionV3(include_top=include_top, 
-                          weights=weights,
-                          input_tensor=input_tensor,
-                           input_shape = input_shape)
+        net = keras.applications.InceptionV3(
+            include_top=include_top,
+            weights=weights,
+            input_tensor=input_tensor,
+            input_shape=input_shape,
+        )
     elif name in [EFFICIENTNETB1, PRETRAINED_EFFICIENTNETB1]:
-        net = keras.applications.EfficientNetB1(include_top=include_top, 
-                          weights=weights,
-                          input_tensor=input_tensor,
-                          input_shape = input_shape)
+        net = keras.applications.EfficientNetB1(
+            include_top=include_top,
+            weights=weights,
+            input_tensor=input_tensor,
+            input_shape=input_shape,
+        )
     elif name in [EFFICIENTNETB7, PRETRAINED_EFFICIENTNETB7]:
-        net = keras.applications.EfficientNetB7(include_top=include_top, 
-                          weights=weights,
-                          input_tensor=input_tensor,
-                          input_shape = input_shape)
+        net = keras.applications.EfficientNetB7(
+            include_top=include_top,
+            weights=weights,
+            input_tensor=input_tensor,
+            input_shape=input_shape,
+        )
     else:
-        raise ValueError(&#39;Unsupported model: %s&#39; % (name))
-
+        raise ValueError(&#34;Unsupported model: %s&#34; % (name))
 
     if freeze_layers is None:
         for layer in net.layers:
@@ -496,19 +586,21 @@ def build_predefined(
     # xtra FCs in pretrained model
     if name in PRETRAINED_MODELS:
         if len(pt_fc) != len(pt_ps):
-            raise ValueError(&#39;size off xtra_fc must match size of fc_dropouts&#39;)
+            raise ValueError(&#34;size off xtra_fc must match size of fc_dropouts&#34;)
         for i, fc in enumerate(pt_fc):
             p = pt_ps[i]
             fc_name = &#34;fc%s&#34; % (i)
             if p is not None:
                 x = keras.layers.Dropout(p)(x)
-            x = keras.layers.Dense(fc, activation=&#39;relu&#39;, 
-                      kernel_initializer=&#39;he_normal&#39;, name=fc_name)(x)
-
+            x = keras.layers.Dense(
+                fc, activation=&#34;relu&#34;, kernel_initializer=&#34;he_normal&#34;, name=fc_name
+            )(x)
 
     # final FC
     x = keras.layers.Dropout(dropout)(x)
-    output_layer = keras.layers.Dense(num_classes, activation=activation, name=activation)(x)
+    output_layer = keras.layers.Dense(
+        num_classes, activation=activation, name=activation
+    )(x)
     model = keras.Model(inputs=net.input, outputs=output_layer)
 
     if freeze_layers is not None:
@@ -538,27 +630,56 @@ def build_predefined(
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def build_cnn(num_classes, 
-              input_shape=(28,28,1),
-              activation=&#39;softmax&#39;):
+<pre><code class="python">def build_cnn(num_classes, input_shape=(28, 28, 1), activation=&#34;softmax&#34;):
     model = keras.models.Sequential()
-    model.add(keras.layers.Conv2D(32, kernel_size=(3, 3),activation=&#39;relu&#39;,
-                     kernel_initializer=&#39;he_normal&#39;,input_shape=input_shape))
-    model.add(keras.layers.Conv2D(32, kernel_size=(3, 3),activation=&#39;relu&#39;,
-                     kernel_initializer=&#39;he_normal&#39;))
+    model.add(
+        keras.layers.Conv2D(
+            32,
+            kernel_size=(3, 3),
+            activation=&#34;relu&#34;,
+            kernel_initializer=&#34;he_normal&#34;,
+            input_shape=input_shape,
+        )
+    )
+    model.add(
+        keras.layers.Conv2D(
+            32, kernel_size=(3, 3), activation=&#34;relu&#34;, kernel_initializer=&#34;he_normal&#34;
+        )
+    )
     model.add(keras.layers.MaxPooling2D((2, 2)))
     model.add(keras.layers.Dropout(0.20))
-    model.add(keras.layers.Conv2D(64, (3, 3), activation=&#39;relu&#39;,padding=&#39;same&#39;,
-                      kernel_initializer=&#39;he_normal&#39;))
-    model.add(keras.layers.Conv2D(64, (3, 3), activation=&#39;relu&#39;,padding=&#39;same&#39;,
-                     kernel_initializer=&#39;he_normal&#39;))
+    model.add(
+        keras.layers.Conv2D(
+            64,
+            (3, 3),
+            activation=&#34;relu&#34;,
+            padding=&#34;same&#34;,
+            kernel_initializer=&#34;he_normal&#34;,
+        )
+    )
+    model.add(
+        keras.layers.Conv2D(
+            64,
+            (3, 3),
+            activation=&#34;relu&#34;,
+            padding=&#34;same&#34;,
+            kernel_initializer=&#34;he_normal&#34;,
+        )
+    )
     model.add(keras.layers.MaxPooling2D(pool_size=(2, 2)))
     model.add(keras.layers.Dropout(0.25))
-    model.add(keras.layers.Conv2D(128, (3, 3), activation=&#39;relu&#39;,padding=&#39;same&#39;,
-                     kernel_initializer=&#39;he_normal&#39;))
+    model.add(
+        keras.layers.Conv2D(
+            128,
+            (3, 3),
+            activation=&#34;relu&#34;,
+            padding=&#34;same&#34;,
+            kernel_initializer=&#34;he_normal&#34;,
+        )
+    )
     model.add(keras.layers.Dropout(0.25))
     model.add(keras.layers.Flatten())
-    model.add(keras.layers.Dense(128, activation=&#39;relu&#39;))
+    model.add(keras.layers.Dense(128, activation=&#34;relu&#34;))
     model.add(keras.layers.BatchNormalization())
     model.add(keras.layers.Dropout(0.25))
     model.add(keras.layers.Dense(num_classes, activation=activation))
@@ -578,7 +699,7 @@ Args:
     freeze_layers (int): number of early layers to freeze.
                          Only takes effect if name in PRETRAINED_MODELS.
                          If None and name in PRETRAINED_MODELS,
-                         all layers except the &quot;custom head&quot; 
+                         all layers except the &quot;custom head&quot;
                          fully-connected (Dense) layers are frozen.
     activation (str):    name of the Keras activation to use in final layer
     pt_fc (list of ints): number of hidden units in extra Dense layers
@@ -591,13 +712,14 @@ Args:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def build_predefined(
-                   name,
-                   num_classes, 
-                   input_shape=(224,224,3),
-                   freeze_layers=None, 
-                   activation=&#39;softmax&#39;,
-                   pt_fc=[],
-                   pt_ps=[]):
+    name,
+    num_classes,
+    input_shape=(224, 224, 3),
+    freeze_layers=None,
+    activation=&#34;softmax&#34;,
+    pt_fc=[],
+    pt_ps=[],
+):
     &#34;&#34;&#34;
     ```
     Builds a pre-defined architecture supported in Keras.
@@ -609,7 +731,7 @@ Args:
         freeze_layers (int): number of early layers to freeze.
                              Only takes effect if name in PRETRAINED_MODELS.
                              If None and name in PRETRAINED_MODELS,
-                             all layers except the &#34;custom head&#34; 
+                             all layers except the &#34;custom head&#34;
                              fully-connected (Dense) layers are frozen.
         activation (str):    name of the Keras activation to use in final layer
         pt_fc (list of ints): number of hidden units in extra Dense layers
@@ -622,47 +744,58 @@ Args:
     # default parameters
     include_top = False
     input_tensor = None
-    dropout = 0.5 # final dropout
+    dropout = 0.5  # final dropout
 
     # setup pretrained
-    weights = &#39;imagenet&#39; if name in PRETRAINED_MODELS else None
+    weights = &#34;imagenet&#34; if name in PRETRAINED_MODELS else None
 
     # setup the pretrained network
     if name in [RESNET50, PRETRAINED_RESNET50]:
         with warnings.catch_warnings():
-            warnings.simplefilter(&#39;ignore&#39;)
-            net = keras.applications.ResNet50(include_top=include_top, 
-                           weights=weights,
-                           input_tensor=input_tensor,
-                           input_shape = input_shape)
+            warnings.simplefilter(&#34;ignore&#34;)
+            net = keras.applications.ResNet50(
+                include_top=include_top,
+                weights=weights,
+                input_tensor=input_tensor,
+                input_shape=input_shape,
+            )
     elif name in [MOBILENET, PRETRAINED_MOBILENET]:
-        net = keras.applications.MobileNet(include_top=include_top, 
-                        weights=weights,
-                        input_tensor=input_tensor,
-                        input_shape = input_shape)
+        net = keras.applications.MobileNet(
+            include_top=include_top,
+            weights=weights,
+            input_tensor=input_tensor,
+            input_shape=input_shape,
+        )
     elif name in [MOBILENETV3, PRETRAINED_MOBILENETV3]:
-        net = keras.applications.MobileNetV3Small(include_top=include_top, 
-                               weights=weights,
-                               input_tensor=input_tensor,
-                               input_shape = input_shape)
+        net = keras.applications.MobileNetV3Small(
+            include_top=include_top,
+            weights=weights,
+            input_tensor=input_tensor,
+            input_shape=input_shape,
+        )
     elif name in [INCEPTION, PRETRAINED_INCEPTION]:
-        net = keras.applications.InceptionV3(include_top=include_top, 
-                          weights=weights,
-                          input_tensor=input_tensor,
-                           input_shape = input_shape)
+        net = keras.applications.InceptionV3(
+            include_top=include_top,
+            weights=weights,
+            input_tensor=input_tensor,
+            input_shape=input_shape,
+        )
     elif name in [EFFICIENTNETB1, PRETRAINED_EFFICIENTNETB1]:
-        net = keras.applications.EfficientNetB1(include_top=include_top, 
-                          weights=weights,
-                          input_tensor=input_tensor,
-                          input_shape = input_shape)
+        net = keras.applications.EfficientNetB1(
+            include_top=include_top,
+            weights=weights,
+            input_tensor=input_tensor,
+            input_shape=input_shape,
+        )
     elif name in [EFFICIENTNETB7, PRETRAINED_EFFICIENTNETB7]:
-        net = keras.applications.EfficientNetB7(include_top=include_top, 
-                          weights=weights,
-                          input_tensor=input_tensor,
-                          input_shape = input_shape)
+        net = keras.applications.EfficientNetB7(
+            include_top=include_top,
+            weights=weights,
+            input_tensor=input_tensor,
+            input_shape=input_shape,
+        )
     else:
-        raise ValueError(&#39;Unsupported model: %s&#39; % (name))
-
+        raise ValueError(&#34;Unsupported model: %s&#34; % (name))
 
     if freeze_layers is None:
         for layer in net.layers:
@@ -674,19 +807,21 @@ Args:
     # xtra FCs in pretrained model
     if name in PRETRAINED_MODELS:
         if len(pt_fc) != len(pt_ps):
-            raise ValueError(&#39;size off xtra_fc must match size of fc_dropouts&#39;)
+            raise ValueError(&#34;size off xtra_fc must match size of fc_dropouts&#34;)
         for i, fc in enumerate(pt_fc):
             p = pt_ps[i]
             fc_name = &#34;fc%s&#34; % (i)
             if p is not None:
                 x = keras.layers.Dropout(p)(x)
-            x = keras.layers.Dense(fc, activation=&#39;relu&#39;, 
-                      kernel_initializer=&#39;he_normal&#39;, name=fc_name)(x)
-
+            x = keras.layers.Dense(
+                fc, activation=&#34;relu&#34;, kernel_initializer=&#34;he_normal&#34;, name=fc_name
+            )(x)
 
     # final FC
     x = keras.layers.Dropout(dropout)(x)
-    output_layer = keras.layers.Dense(num_classes, activation=activation, name=activation)(x)
+    output_layer = keras.layers.Dense(
+        num_classes, activation=activation, name=activation
+    )(x)
     model = keras.Model(inputs=net.input, outputs=output_layer)
 
     if freeze_layers is not None:
@@ -709,32 +844,41 @@ Args:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def build_visionmodel(name,
-                      num_classes, 
-                      input_shape=(224,224,3),
-                      freeze_layers=2, 
-                      activation=&#39;softmax&#39;,
-                      pt_fc=[],
-                      pt_ps = []):
+<pre><code class="python">def build_visionmodel(
+    name,
+    num_classes,
+    input_shape=(224, 224, 3),
+    freeze_layers=2,
+    activation=&#34;softmax&#34;,
+    pt_fc=[],
+    pt_ps=[],
+):
 
     if name in PREDEFINED_MODELS:
-        model = build_predefined(name, num_classes,
-                                  input_shape=input_shape,
-                                  freeze_layers=freeze_layers,
-                                  activation=activation,
-                                  pt_fc = pt_fc,
-                                  pt_ps = pt_ps)
+        model = build_predefined(
+            name,
+            num_classes,
+            input_shape=input_shape,
+            freeze_layers=freeze_layers,
+            activation=activation,
+            pt_fc=pt_fc,
+            pt_ps=pt_ps,
+        )
     elif name == CNN:
-        model = build_cnn(num_classes,
-                           input_shape=input_shape,
-                           activation=activation)
+        model = build_cnn(num_classes, input_shape=input_shape, activation=activation)
     elif name == WRN22:
-        model = create_wide_residual_network(input_shape, nb_classes=num_classes, 
-                                             N=3, k=6, dropout=0.00,
-                                             activation=activation, verbose=0)
+        model = create_wide_residual_network(
+            input_shape,
+            nb_classes=num_classes,
+            N=3,
+            k=6,
+            dropout=0.00,
+            activation=activation,
+            verbose=0,
+        )
     else:
-        raise ValueError(&#39;Unknown model: %s&#39; % (name))
-    U.vprint(&#39;%s model created.&#39; % (name))
+        raise ValueError(&#34;Unknown model: %s&#34; % (name))
+    U.vprint(&#34;%s model created.&#34; % (name))
 
     return model</code></pre>
 </details>
@@ -776,16 +920,18 @@ Return:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def image_classifier(name,
-                     train_data,
-                     val_data=None,
-                     freeze_layers=None, 
-                     metrics=[&#39;accuracy&#39;],
-                     optimizer_name = U.DEFAULT_OPT,
-                     multilabel=None,
-                     pt_fc = [],
-                     pt_ps = [],
-                     verbose=1):
+<pre><code class="python">def image_classifier(
+    name,
+    train_data,
+    val_data=None,
+    freeze_layers=None,
+    metrics=[&#34;accuracy&#34;],
+    optimizer_name=U.DEFAULT_OPT,
+    multilabel=None,
+    pt_fc=[],
+    pt_ps=[],
+    verbose=1,
+):
 
     &#34;&#34;&#34;
     ```
@@ -819,9 +965,18 @@ Return:
 
     ```
     &#34;&#34;&#34;
-    return image_model(name, train_data, val_data=val_data, freeze_layers=freeze_layers,
-                       metrics=metrics, optimizer_name=optimizer_name, multilabel=multilabel,
-                       pt_fc=pt_fc, pt_ps=pt_ps, verbose=verbose)</code></pre>
+    return image_model(
+        name,
+        train_data,
+        val_data=val_data,
+        freeze_layers=freeze_layers,
+        metrics=metrics,
+        optimizer_name=optimizer_name,
+        multilabel=multilabel,
+        pt_fc=pt_fc,
+        pt_ps=pt_ps,
+        verbose=verbose,
+    )</code></pre>
 </details>
 </dd>
 <dt id="ktrain.vision.models.image_model"><code class="name flex">
@@ -861,16 +1016,18 @@ Return:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def image_model( name,
-                 train_data,
-                 val_data=None,
-                 freeze_layers=None, 
-                 metrics=[&#39;accuracy&#39;],
-                 optimizer_name = U.DEFAULT_OPT,
-                 multilabel=None,
-                 pt_fc = [],
-                 pt_ps = [],
-                 verbose=1):
+<pre><code class="python">def image_model(
+    name,
+    train_data,
+    val_data=None,
+    freeze_layers=None,
+    metrics=[&#34;accuracy&#34;],
+    optimizer_name=U.DEFAULT_OPT,
+    multilabel=None,
+    pt_fc=[],
+    pt_ps=[],
+    verbose=1,
+):
 
     &#34;&#34;&#34;
     ```
@@ -902,82 +1059,94 @@ Return:
     Return:
         model(Model):  the compiled model ready to be fine-tuned/trained
 
-    ```   
+    ```
     &#34;&#34;&#34;
     # arg check
     U.data_arg_check(train_data=train_data, train_required=True)
     if name not in list(IMAGE_CLASSIFIERS.keys()):
-        raise ValueError(&#39;Unknown or unsupported model: %s&#39; % (name))
-
+        raise ValueError(&#34;Unknown or unsupported model: %s&#34; % (name))
 
     if not U.is_iter(train_data):
-        raise ValueError(&#39;train_data must be an Keras iterator &#39; +\
-                         &#39;(e.g., DirectoryIterator, DataframIterator, &#39;+ \
-                         &#39;NumpyArrayIterator) - please use the ktrain.data.images_from* &#39; +\
-                         &#39;functions&#39;)
+        raise ValueError(
+            &#34;train_data must be an Keras iterator &#34;
+            + &#34;(e.g., DirectoryIterator, DataframIterator, &#34;
+            + &#34;NumpyArrayIterator) - please use the ktrain.data.images_from* &#34;
+            + &#34;functions&#34;
+        )
 
     # check for MobileNetV3
     if name in [PRETRAINED_MOBILENETV3, MOBILENETV3] and not HAS_MOBILENETV3:
-        raise ValueError(f&#39;You chose {name}, but it does not appear to be available in your version of TensorFlow.&#39;)
-
+        raise ValueError(
+            f&#34;You chose {name}, but it does not appear to be available in your version of TensorFlow.&#34;
+        )
 
     # set pretrained flag
     pretrained = True if name in PRETRAINED_MODELS else False
 
     # adjust freeze_layers with warning
     if not pretrained and freeze_layers is not None and freeze_layers &gt; 0:
-        warnings.warn(&#39;Only pretrained models (e.g., pretrained_resnet50) support freeze_layers. &#39; +\
-                      &#39;Setting freeze_layers to 0. Use one of the following models if&#39; +\
-                      &#39;desiring a model pretrained on ImageNet: %s&#39; % (PRETRAINED_MODELS))
+        warnings.warn(
+            &#34;Only pretrained models (e.g., pretrained_resnet50) support freeze_layers. &#34;
+            + &#34;Setting freeze_layers to 0. Use one of the following models if&#34;
+            + &#34;desiring a model pretrained on ImageNet: %s&#34; % (PRETRAINED_MODELS)
+        )
         freeze_layers = 0
 
     if pretrained and val_data is None:
-        raise ValueError(&#39;val_data is required if selecting a pretrained model, &#39;+\
-                         &#39;as normalization scheme will be altered.&#39;)
+        raise ValueError(
+            &#34;val_data is required if selecting a pretrained model, &#34;
+            + &#34;as normalization scheme will be altered.&#34;
+        )
 
     # adjust the data augmentation based on model selected
     if pretrained:
         pretrained_datagen(train_data, name)
         pretrained_datagen(val_data, name)
-        U.vprint(&#39;The normalization scheme has been changed for use with a %s&#39; % (name) +\
-                &#39; model. If you decide to use a different model, please reload your&#39; +\
-                &#39; dataset with a ktrain.vision.data.images_from* function.\n&#39;, verbose=verbose)
+        U.vprint(
+            &#34;The normalization scheme has been changed for use with a %s&#34; % (name)
+            + &#34; model. If you decide to use a different model, please reload your&#34;
+            + &#34; dataset with a ktrain.vision.data.images_from* function.\n&#34;,
+            verbose=verbose,
+        )
 
     # determine if multilabel
     if multilabel is None:
         multilabel = U.is_multilabel(train_data)
-    is_regression=False
-    if not multilabel and len(train_data[0][-1].shape) == 1: is_regression=True
+    is_regression = False
+    if not multilabel and len(train_data[0][-1].shape) == 1:
+        is_regression = True
 
     # set loss and acivations
-    loss_func = &#39;categorical_crossentropy&#39;
-    activation = &#39;softmax&#39;
+    loss_func = &#34;categorical_crossentropy&#34;
+    activation = &#34;softmax&#34;
     if multilabel:
-        loss_func = &#39;binary_crossentropy&#39;
-        activation = &#39;sigmoid&#39;
+        loss_func = &#34;binary_crossentropy&#34;
+        activation = &#34;sigmoid&#34;
     elif is_regression:
-        loss_func = &#39;mse&#39;
+        loss_func = &#34;mse&#34;
         activation = None
-        if metrics == [&#39;accuracy&#39;]: metrics = [&#39;mae&#39;]
+        if metrics == [&#34;accuracy&#34;]:
+            metrics = [&#34;mae&#34;]
 
     U.vprint(&#34;Is Multi-Label? %s&#34; % (multilabel), verbose=verbose)
     U.vprint(&#34;Is Regression? %s&#34; % (is_regression), verbose=verbose)
-
 
     # determine number of classes and shape
     num_classes = 1 if is_regression else U.nclasses_from_data(train_data)
     input_shape = U.shape_from_data(train_data)
 
-    #------------
+    # ------------
     # build model
-    #------------
-    model = build_visionmodel(name,
-                              num_classes,
-                              input_shape=input_shape,
-                              freeze_layers=freeze_layers,
-                              activation=activation,
-                              pt_fc = pt_fc,
-                              pt_ps = pt_ps)
+    # ------------
+    model = build_visionmodel(
+        name,
+        num_classes,
+        input_shape=input_shape,
+        freeze_layers=freeze_layers,
+        activation=activation,
+        pt_fc=pt_fc,
+        pt_ps=pt_ps,
+    )
     model.compile(optimizer=optimizer_name, loss=loss_func, metrics=metrics)
     return model</code></pre>
 </details>
@@ -1019,15 +1188,17 @@ Return:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def image_regression_model(name,
-                          train_data,
-                          val_data=None,
-                          freeze_layers=None, 
-                          metrics=[&#39;mae&#39;],
-                          optimizer_name = U.DEFAULT_OPT,
-                          pt_fc = [],
-                          pt_ps = [],
-                          verbose=1):
+<pre><code class="python">def image_regression_model(
+    name,
+    train_data,
+    val_data=None,
+    freeze_layers=None,
+    metrics=[&#34;mae&#34;],
+    optimizer_name=U.DEFAULT_OPT,
+    pt_fc=[],
+    pt_ps=[],
+    verbose=1,
+):
 
     &#34;&#34;&#34;
     ```
@@ -1059,13 +1230,21 @@ Return:
     Return:
         model(Model):  the compiled model ready to be fine-tuned/trained
 
-    ```   
+    ```
     &#34;&#34;&#34;
 
-
-    return image_model(name, train_data, val_data=val_data, freeze_layers=freeze_layers,
-                       metrics=metrics, optimizer_name=optimizer_name, multilabel=False,
-                       pt_fc=pt_fc, pt_ps=pt_ps, verbose=verbose)</code></pre>
+    return image_model(
+        name,
+        train_data,
+        val_data=val_data,
+        freeze_layers=freeze_layers,
+        metrics=metrics,
+        optimizer_name=optimizer_name,
+        multilabel=False,
+        pt_fc=pt_fc,
+        pt_ps=pt_ps,
+        verbose=verbose,
+    )</code></pre>
 </details>
 </dd>
 <dt id="ktrain.vision.models.pretrained_datagen"><code class="name flex">
@@ -1078,52 +1257,53 @@ Return:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def pretrained_datagen(data, name):
-    if not data or not U.is_iter(data): return
+    if not data or not U.is_iter(data):
+        return
     idg = data.image_data_generator
     if name == PRETRAINED_RESNET50:
         idg.preprocessing_function = keras.applications.resnet50.preprocess_input
-        idg.ktrain_preproc = &#39;resnet50&#39;
-        idg.rescale=None
-        idg.featurewise_center=False
-        idg.samplewise_center=False
-        idg.featurewise_std_normalization=False
-        idg.samplewise_std_normalization=False
+        idg.ktrain_preproc = &#34;resnet50&#34;
+        idg.rescale = None
+        idg.featurewise_center = False
+        idg.samplewise_center = False
+        idg.featurewise_std_normalization = False
+        idg.samplewise_std_normalization = False
         idg.zca_whitening = False
     elif name == PRETRAINED_MOBILENET:
         idg.preprocessing_function = keras.applications.mobilenet.preprocess_input
-        idg.ktrain_preproc = &#39;mobilenet&#39;
-        idg.rescale=None
-        idg.featurewise_center=False
-        idg.samplewise_center=False
-        idg.featurewise_std_normalization=False
-        idg.samplewise_std_normalization=False
+        idg.ktrain_preproc = &#34;mobilenet&#34;
+        idg.rescale = None
+        idg.featurewise_center = False
+        idg.samplewise_center = False
+        idg.featurewise_std_normalization = False
+        idg.samplewise_std_normalization = False
         idg.zca_whitening = False
     elif name == PRETRAINED_MOBILENETV3:
         idg.preprocessing_function = keras.applications.mobilenet_v3.preprocess_input
-        idg.ktrain_preproc = &#39;mobilenetv3&#39;
-        idg.rescale=None
-        idg.featurewise_center=False
-        idg.samplewise_center=False
-        idg.featurewise_std_normalization=False
-        idg.samplewise_std_normalization=False
+        idg.ktrain_preproc = &#34;mobilenetv3&#34;
+        idg.rescale = None
+        idg.featurewise_center = False
+        idg.samplewise_center = False
+        idg.featurewise_std_normalization = False
+        idg.samplewise_std_normalization = False
         idg.zca_whitening = False
     elif name == PRETRAINED_INCEPTION:
         idg.preprocessing_function = keras.applications.inception_v3.preprocess_input
-        idg.ktrain_preproc = &#39;inception&#39;
-        idg.rescale=None
-        idg.featurewise_center=False
-        idg.samplewise_center=False
-        idg.featurewise_std_normalization=False
-        idg.samplewise_std_normalization=False
+        idg.ktrain_preproc = &#34;inception&#34;
+        idg.rescale = None
+        idg.featurewise_center = False
+        idg.samplewise_center = False
+        idg.featurewise_std_normalization = False
+        idg.samplewise_std_normalization = False
         idg.zca_whitening = False
     elif name == PRETRAINED_EFFICIENTNETB1 or name == PRETRAINED_EFFICIENTNETB7:
         idg.preprocessing_function = keras.applications.efficientnet.preprocess_input
-        idg.ktrain_preproc = &#39;efficientnet&#39;
-        idg.rescale=None
-        idg.featurewise_center=False
-        idg.samplewise_center=False
-        idg.featurewise_std_normalization=False
-        idg.samplewise_std_normalization=False
+        idg.ktrain_preproc = &#34;efficientnet&#34;
+        idg.rescale = None
+        idg.featurewise_center = False
+        idg.samplewise_center = False
+        idg.featurewise_std_normalization = False
+        idg.samplewise_std_normalization = False
         idg.zca_whitening = False
 
     return</code></pre>
@@ -1139,8 +1319,8 @@ Return:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def print_image_classifiers():
-    for k,v in IMAGE_CLASSIFIERS.items():
-        print(&#34;%s: %s&#34; % (k,v))</code></pre>
+    for k, v in IMAGE_CLASSIFIERS.items():
+        print(&#34;%s: %s&#34; % (k, v))</code></pre>
 </details>
 </dd>
 <dt id="ktrain.vision.models.print_image_regression_models"><code class="name flex">
@@ -1153,8 +1333,8 @@ Return:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def print_image_regression_models():
-    for k,v in IMAGE_CLASSIFIERS.items():
-        print(&#34;%s: %s&#34; % (k,v))</code></pre>
+    for k, v in IMAGE_CLASSIFIERS.items():
+        print(&#34;%s: %s&#34; % (k, v))</code></pre>
 </details>
 </dd>
 </dl>

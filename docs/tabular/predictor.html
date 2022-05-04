@@ -31,6 +31,7 @@ from ..predictor import Predictor
 from .. import utils as U
 from .preprocessor import TabularPreprocessor
 
+
 class TabularPredictor(Predictor):
     &#34;&#34;&#34;
     ```
@@ -41,18 +42,19 @@ class TabularPredictor(Predictor):
     def __init__(self, model, preproc, batch_size=U.DEFAULT_BS):
 
         if not isinstance(model, keras.Model):
-            raise ValueError(&#39;model must be of instance keras.Model&#39;)
-        if not isinstance(preproc, TabularPreprocessor) and type(preproc).__name__ != &#39;TabularPreprocessor&#39;:
-            raise ValueError(&#39;preproc must be a TabularPreprocessor object&#39;)
+            raise ValueError(&#34;model must be of instance keras.Model&#34;)
+        if (
+            not isinstance(preproc, TabularPreprocessor)
+            and type(preproc).__name__ != &#34;TabularPreprocessor&#34;
+        ):
+            raise ValueError(&#34;preproc must be a TabularPreprocessor object&#34;)
         self.model = model
         self.preproc = preproc
         self.c = self.preproc.get_classes()
-        self.batch_size = batch_size 
-
+        self.batch_size = batch_size
 
     def get_classes(self):
         return self.c
-
 
     def predict(self, df, return_proba=False):
         &#34;&#34;&#34;
@@ -64,7 +66,7 @@ class TabularPredictor(Predictor):
         ```
         &#34;&#34;&#34;
         if not isinstance(df, pd.DataFrame):
-            raise ValueError(&#39;df must be a pd.DataFrame&#39;)
+            raise ValueError(&#34;df must be a pd.DataFrame&#34;)
         df = df.copy()
 
         classification, multilabel = U.is_classifier(self.model)
@@ -73,9 +75,13 @@ class TabularPredictor(Predictor):
         tseq = self.preproc.preprocess_test(df, verbose=0)
         tseq.batch_size = self.batch_size
         preds = self.model.predict(tseq)
-        result =  preds if return_proba or multilabel or not self.c else [self.c[np.argmax(pred)] for pred in preds] 
+        result = (
+            preds
+            if return_proba or multilabel or not self.c
+            else [self.c[np.argmax(pred)] for pred in preds]
+        )
         if multilabel and not return_proba:
-            result =  [list(zip(self.c, r)) for r in result]
+            result = [list(zip(self.c, r)) for r in result]
         return result
 
     def _predict_shap(self, X):
@@ -83,12 +89,19 @@ class TabularPredictor(Predictor):
         n_conts = len(self.preproc.cont_names)
 
         # reformat for model
-        batch_x = [X[:,i:i+1] for i in range(n_cats)] + [X[:,-n_conts:]]
+        batch_x = [X[:, i : i + 1] for i in range(n_cats)] + [X[:, -n_conts:]]
         result = self.model.predict(batch_x)
-        return result   
+        return result
 
-
-    def explain(self, test_df, row_index=None, row_num=None, class_id=None, background_size=50, nsamples=500):
+    def explain(
+        self,
+        test_df,
+        row_index=None,
+        row_num=None,
+        class_id=None,
+        background_size=50,
+        nsamples=500,
+    ):
         &#34;&#34;&#34;
         ```
         Explain the prediction of an example using SHAP.
@@ -110,22 +123,26 @@ class TabularPredictor(Predictor):
         try:
             import shap
         except ImportError:
-            msg = &#39;TabularPredictor.explain requires shap library. Please install with: pip install shap. &#39;+\
-                    &#39;Conda users should use this command instead: conda install -c conda-forge shap&#39;
+            msg = (
+                &#34;TabularPredictor.explain requires shap library. Please install with: pip install shap. &#34;
+                + &#34;Conda users should use this command instead: conda install -c conda-forge shap&#34;
+            )
             warnings.warn(msg)
             return
 
         classification, multilabel = U.is_classifier(self.model)
         if classification and class_id is None:
-            raise ValueError(&#39;For classification models, please supply the class_id of the class you would like to explain.&#39; + \
-                             &#39;It should be an index into the list returned by predictor.get_classes().&#39;)
+            raise ValueError(
+                &#34;For classification models, please supply the class_id of the class you would like to explain.&#34;
+                + &#34;It should be an index into the list returned by predictor.get_classes().&#34;
+            )
 
         f = self._predict_shap
 
         # prune dataframe
         df_display = test_df.copy()
         df_display = df_display[self.preproc.pc]
-        
+
         # add synthetic labels
         for lab in self.preproc.lc:
             df_display[lab] = np.zeros(df_display.shape[0], dtype=int)
@@ -133,46 +150,60 @@ class TabularPredictor(Predictor):
         # convert DataFrame to TabularDataset with processed/normalized independent variables
         tabseq = self.preproc.preprocess_test(df_display, verbose=0)
         tabseq.batch_size = df_display.shape[0]
-        df = pd.DataFrame(data=np.concatenate(tabseq[0][0], axis=1), 
-                          columns=tabseq.cat_columns + tabseq.cont_columns,
-                          index=df_display.index) 
+        df = pd.DataFrame(
+            data=np.concatenate(tabseq[0][0], axis=1),
+            columns=tabseq.cat_columns + tabseq.cont_columns,
+            index=df_display.index,
+        )
 
         # add new auto-engineered feature columns
         for col in [self.preproc.na_names + self.preproc.date_names]:
             df_display[col] = df[col]
-            
+
         # sort display df correctly
         df_display = df_display[tabseq.cat_columns + tabseq.cont_columns]
 
         # select row
         if row_num is not None and row_index is not None:
-            raise ValueError(&#39;row_num and row_index are mutually exclusive with eachother.&#39;)
+            raise ValueError(
+                &#34;row_num and row_index are mutually exclusive with eachother.&#34;
+            )
 
         if row_index is not None:
-            df_row = df[df.index.isin([row_index])].iloc[0,:]
-            df_display_row = df_display[df_display.index.isin([row_index])].iloc[0,:]
-            r_key = &#39;row_index&#39; if df.index.name is None else df.index.name
+            df_row = df[df.index.isin([row_index])].iloc[0, :]
+            df_display_row = df_display[df_display.index.isin([row_index])].iloc[0, :]
+            r_key = &#34;row_index&#34; if df.index.name is None else df.index.name
             r_val = row_index
         elif row_num is not None:
-            df_row = df.iloc[row_num,:]
-            df_display_row = df_display.iloc[row_num,:]
-            r_key = &#39;row_num&#39;
-            r_val = row_num 
-        #print(df_row)
-        #print(df_display_row)
+            df_row = df.iloc[row_num, :]
+            df_display_row = df_display.iloc[row_num, :]
+            r_key = &#34;row_num&#34;
+            r_val = row_num
+        # print(df_row)
+        # print(df_display_row)
 
         # shap
-        explainer = shap.KernelExplainer(f, df.iloc[:background_size,:])
-        shap_values = explainer.shap_values(df_row, nsamples=nsamples, l1_reg=&#39;aic&#39;)
+        explainer = shap.KernelExplainer(f, df.iloc[:background_size, :])
+        shap_values = explainer.shap_values(df_row, nsamples=nsamples, l1_reg=&#34;aic&#34;)
         expected_value = explainer.expected_value
 
         if not np.issubdtype(type(explainer.expected_value), np.floating):
-            expected_value = explainer.expected_value[0 if class_id is None else class_id]
+            expected_value = explainer.expected_value[
+                0 if class_id is None else class_id
+            ]
         if type(shap_values) == list:
             shap_values = shap_values[0 if class_id is None else class_id]
 
-        if classification:  print(&#39;Explanation for class = %s (%s=%s): &#39; % (self.get_classes()[class_id], r_key, r_val))
-        plt.show(shap.force_plot(expected_value, shap_values, df_display_row, matplotlib=True))</code></pre>
+        if classification:
+            print(
+                &#34;Explanation for class = %s (%s=%s): &#34;
+                % (self.get_classes()[class_id], r_key, r_val)
+            )
+        plt.show(
+            shap.force_plot(
+                expected_value, shap_values, df_display_row, matplotlib=True
+            )
+        )</code></pre>
 </details>
 </section>
 <section>
@@ -205,18 +236,19 @@ class TabularPredictor(Predictor):
     def __init__(self, model, preproc, batch_size=U.DEFAULT_BS):
 
         if not isinstance(model, keras.Model):
-            raise ValueError(&#39;model must be of instance keras.Model&#39;)
-        if not isinstance(preproc, TabularPreprocessor) and type(preproc).__name__ != &#39;TabularPreprocessor&#39;:
-            raise ValueError(&#39;preproc must be a TabularPreprocessor object&#39;)
+            raise ValueError(&#34;model must be of instance keras.Model&#34;)
+        if (
+            not isinstance(preproc, TabularPreprocessor)
+            and type(preproc).__name__ != &#34;TabularPreprocessor&#34;
+        ):
+            raise ValueError(&#34;preproc must be a TabularPreprocessor object&#34;)
         self.model = model
         self.preproc = preproc
         self.c = self.preproc.get_classes()
-        self.batch_size = batch_size 
-
+        self.batch_size = batch_size
 
     def get_classes(self):
         return self.c
-
 
     def predict(self, df, return_proba=False):
         &#34;&#34;&#34;
@@ -228,7 +260,7 @@ class TabularPredictor(Predictor):
         ```
         &#34;&#34;&#34;
         if not isinstance(df, pd.DataFrame):
-            raise ValueError(&#39;df must be a pd.DataFrame&#39;)
+            raise ValueError(&#34;df must be a pd.DataFrame&#34;)
         df = df.copy()
 
         classification, multilabel = U.is_classifier(self.model)
@@ -237,9 +269,13 @@ class TabularPredictor(Predictor):
         tseq = self.preproc.preprocess_test(df, verbose=0)
         tseq.batch_size = self.batch_size
         preds = self.model.predict(tseq)
-        result =  preds if return_proba or multilabel or not self.c else [self.c[np.argmax(pred)] for pred in preds] 
+        result = (
+            preds
+            if return_proba or multilabel or not self.c
+            else [self.c[np.argmax(pred)] for pred in preds]
+        )
         if multilabel and not return_proba:
-            result =  [list(zip(self.c, r)) for r in result]
+            result = [list(zip(self.c, r)) for r in result]
         return result
 
     def _predict_shap(self, X):
@@ -247,12 +283,19 @@ class TabularPredictor(Predictor):
         n_conts = len(self.preproc.cont_names)
 
         # reformat for model
-        batch_x = [X[:,i:i+1] for i in range(n_cats)] + [X[:,-n_conts:]]
+        batch_x = [X[:, i : i + 1] for i in range(n_cats)] + [X[:, -n_conts:]]
         result = self.model.predict(batch_x)
-        return result   
+        return result
 
-
-    def explain(self, test_df, row_index=None, row_num=None, class_id=None, background_size=50, nsamples=500):
+    def explain(
+        self,
+        test_df,
+        row_index=None,
+        row_num=None,
+        class_id=None,
+        background_size=50,
+        nsamples=500,
+    ):
         &#34;&#34;&#34;
         ```
         Explain the prediction of an example using SHAP.
@@ -274,22 +317,26 @@ class TabularPredictor(Predictor):
         try:
             import shap
         except ImportError:
-            msg = &#39;TabularPredictor.explain requires shap library. Please install with: pip install shap. &#39;+\
-                    &#39;Conda users should use this command instead: conda install -c conda-forge shap&#39;
+            msg = (
+                &#34;TabularPredictor.explain requires shap library. Please install with: pip install shap. &#34;
+                + &#34;Conda users should use this command instead: conda install -c conda-forge shap&#34;
+            )
             warnings.warn(msg)
             return
 
         classification, multilabel = U.is_classifier(self.model)
         if classification and class_id is None:
-            raise ValueError(&#39;For classification models, please supply the class_id of the class you would like to explain.&#39; + \
-                             &#39;It should be an index into the list returned by predictor.get_classes().&#39;)
+            raise ValueError(
+                &#34;For classification models, please supply the class_id of the class you would like to explain.&#34;
+                + &#34;It should be an index into the list returned by predictor.get_classes().&#34;
+            )
 
         f = self._predict_shap
 
         # prune dataframe
         df_display = test_df.copy()
         df_display = df_display[self.preproc.pc]
-        
+
         # add synthetic labels
         for lab in self.preproc.lc:
             df_display[lab] = np.zeros(df_display.shape[0], dtype=int)
@@ -297,46 +344,60 @@ class TabularPredictor(Predictor):
         # convert DataFrame to TabularDataset with processed/normalized independent variables
         tabseq = self.preproc.preprocess_test(df_display, verbose=0)
         tabseq.batch_size = df_display.shape[0]
-        df = pd.DataFrame(data=np.concatenate(tabseq[0][0], axis=1), 
-                          columns=tabseq.cat_columns + tabseq.cont_columns,
-                          index=df_display.index) 
+        df = pd.DataFrame(
+            data=np.concatenate(tabseq[0][0], axis=1),
+            columns=tabseq.cat_columns + tabseq.cont_columns,
+            index=df_display.index,
+        )
 
         # add new auto-engineered feature columns
         for col in [self.preproc.na_names + self.preproc.date_names]:
             df_display[col] = df[col]
-            
+
         # sort display df correctly
         df_display = df_display[tabseq.cat_columns + tabseq.cont_columns]
 
         # select row
         if row_num is not None and row_index is not None:
-            raise ValueError(&#39;row_num and row_index are mutually exclusive with eachother.&#39;)
+            raise ValueError(
+                &#34;row_num and row_index are mutually exclusive with eachother.&#34;
+            )
 
         if row_index is not None:
-            df_row = df[df.index.isin([row_index])].iloc[0,:]
-            df_display_row = df_display[df_display.index.isin([row_index])].iloc[0,:]
-            r_key = &#39;row_index&#39; if df.index.name is None else df.index.name
+            df_row = df[df.index.isin([row_index])].iloc[0, :]
+            df_display_row = df_display[df_display.index.isin([row_index])].iloc[0, :]
+            r_key = &#34;row_index&#34; if df.index.name is None else df.index.name
             r_val = row_index
         elif row_num is not None:
-            df_row = df.iloc[row_num,:]
-            df_display_row = df_display.iloc[row_num,:]
-            r_key = &#39;row_num&#39;
-            r_val = row_num 
-        #print(df_row)
-        #print(df_display_row)
+            df_row = df.iloc[row_num, :]
+            df_display_row = df_display.iloc[row_num, :]
+            r_key = &#34;row_num&#34;
+            r_val = row_num
+        # print(df_row)
+        # print(df_display_row)
 
         # shap
-        explainer = shap.KernelExplainer(f, df.iloc[:background_size,:])
-        shap_values = explainer.shap_values(df_row, nsamples=nsamples, l1_reg=&#39;aic&#39;)
+        explainer = shap.KernelExplainer(f, df.iloc[:background_size, :])
+        shap_values = explainer.shap_values(df_row, nsamples=nsamples, l1_reg=&#34;aic&#34;)
         expected_value = explainer.expected_value
 
         if not np.issubdtype(type(explainer.expected_value), np.floating):
-            expected_value = explainer.expected_value[0 if class_id is None else class_id]
+            expected_value = explainer.expected_value[
+                0 if class_id is None else class_id
+            ]
         if type(shap_values) == list:
             shap_values = shap_values[0 if class_id is None else class_id]
 
-        if classification:  print(&#39;Explanation for class = %s (%s=%s): &#39; % (self.get_classes()[class_id], r_key, r_val))
-        plt.show(shap.force_plot(expected_value, shap_values, df_display_row, matplotlib=True))</code></pre>
+        if classification:
+            print(
+                &#34;Explanation for class = %s (%s=%s): &#34;
+                % (self.get_classes()[class_id], r_key, r_val)
+            )
+        plt.show(
+            shap.force_plot(
+                expected_value, shap_values, df_display_row, matplotlib=True
+            )
+        )</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -368,7 +429,15 @@ Args:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def explain(self, test_df, row_index=None, row_num=None, class_id=None, background_size=50, nsamples=500):
+<pre><code class="python">def explain(
+    self,
+    test_df,
+    row_index=None,
+    row_num=None,
+    class_id=None,
+    background_size=50,
+    nsamples=500,
+):
     &#34;&#34;&#34;
     ```
     Explain the prediction of an example using SHAP.
@@ -390,22 +459,26 @@ Args:
     try:
         import shap
     except ImportError:
-        msg = &#39;TabularPredictor.explain requires shap library. Please install with: pip install shap. &#39;+\
-                &#39;Conda users should use this command instead: conda install -c conda-forge shap&#39;
+        msg = (
+            &#34;TabularPredictor.explain requires shap library. Please install with: pip install shap. &#34;
+            + &#34;Conda users should use this command instead: conda install -c conda-forge shap&#34;
+        )
         warnings.warn(msg)
         return
 
     classification, multilabel = U.is_classifier(self.model)
     if classification and class_id is None:
-        raise ValueError(&#39;For classification models, please supply the class_id of the class you would like to explain.&#39; + \
-                         &#39;It should be an index into the list returned by predictor.get_classes().&#39;)
+        raise ValueError(
+            &#34;For classification models, please supply the class_id of the class you would like to explain.&#34;
+            + &#34;It should be an index into the list returned by predictor.get_classes().&#34;
+        )
 
     f = self._predict_shap
 
     # prune dataframe
     df_display = test_df.copy()
     df_display = df_display[self.preproc.pc]
-    
+
     # add synthetic labels
     for lab in self.preproc.lc:
         df_display[lab] = np.zeros(df_display.shape[0], dtype=int)
@@ -413,46 +486,60 @@ Args:
     # convert DataFrame to TabularDataset with processed/normalized independent variables
     tabseq = self.preproc.preprocess_test(df_display, verbose=0)
     tabseq.batch_size = df_display.shape[0]
-    df = pd.DataFrame(data=np.concatenate(tabseq[0][0], axis=1), 
-                      columns=tabseq.cat_columns + tabseq.cont_columns,
-                      index=df_display.index) 
+    df = pd.DataFrame(
+        data=np.concatenate(tabseq[0][0], axis=1),
+        columns=tabseq.cat_columns + tabseq.cont_columns,
+        index=df_display.index,
+    )
 
     # add new auto-engineered feature columns
     for col in [self.preproc.na_names + self.preproc.date_names]:
         df_display[col] = df[col]
-        
+
     # sort display df correctly
     df_display = df_display[tabseq.cat_columns + tabseq.cont_columns]
 
     # select row
     if row_num is not None and row_index is not None:
-        raise ValueError(&#39;row_num and row_index are mutually exclusive with eachother.&#39;)
+        raise ValueError(
+            &#34;row_num and row_index are mutually exclusive with eachother.&#34;
+        )
 
     if row_index is not None:
-        df_row = df[df.index.isin([row_index])].iloc[0,:]
-        df_display_row = df_display[df_display.index.isin([row_index])].iloc[0,:]
-        r_key = &#39;row_index&#39; if df.index.name is None else df.index.name
+        df_row = df[df.index.isin([row_index])].iloc[0, :]
+        df_display_row = df_display[df_display.index.isin([row_index])].iloc[0, :]
+        r_key = &#34;row_index&#34; if df.index.name is None else df.index.name
         r_val = row_index
     elif row_num is not None:
-        df_row = df.iloc[row_num,:]
-        df_display_row = df_display.iloc[row_num,:]
-        r_key = &#39;row_num&#39;
-        r_val = row_num 
-    #print(df_row)
-    #print(df_display_row)
+        df_row = df.iloc[row_num, :]
+        df_display_row = df_display.iloc[row_num, :]
+        r_key = &#34;row_num&#34;
+        r_val = row_num
+    # print(df_row)
+    # print(df_display_row)
 
     # shap
-    explainer = shap.KernelExplainer(f, df.iloc[:background_size,:])
-    shap_values = explainer.shap_values(df_row, nsamples=nsamples, l1_reg=&#39;aic&#39;)
+    explainer = shap.KernelExplainer(f, df.iloc[:background_size, :])
+    shap_values = explainer.shap_values(df_row, nsamples=nsamples, l1_reg=&#34;aic&#34;)
     expected_value = explainer.expected_value
 
     if not np.issubdtype(type(explainer.expected_value), np.floating):
-        expected_value = explainer.expected_value[0 if class_id is None else class_id]
+        expected_value = explainer.expected_value[
+            0 if class_id is None else class_id
+        ]
     if type(shap_values) == list:
         shap_values = shap_values[0 if class_id is None else class_id]
 
-    if classification:  print(&#39;Explanation for class = %s (%s=%s): &#39; % (self.get_classes()[class_id], r_key, r_val))
-    plt.show(shap.force_plot(expected_value, shap_values, df_display_row, matplotlib=True))</code></pre>
+    if classification:
+        print(
+            &#34;Explanation for class = %s (%s=%s): &#34;
+            % (self.get_classes()[class_id], r_key, r_val)
+        )
+    plt.show(
+        shap.force_plot(
+            expected_value, shap_values, df_display_row, matplotlib=True
+        )
+    )</code></pre>
 </details>
 </dd>
 <dt id="ktrain.tabular.predictor.TabularPredictor.get_classes"><code class="name flex">
@@ -491,7 +578,7 @@ Args:
     ```
     &#34;&#34;&#34;
     if not isinstance(df, pd.DataFrame):
-        raise ValueError(&#39;df must be a pd.DataFrame&#39;)
+        raise ValueError(&#34;df must be a pd.DataFrame&#34;)
     df = df.copy()
 
     classification, multilabel = U.is_classifier(self.model)
@@ -500,9 +587,13 @@ Args:
     tseq = self.preproc.preprocess_test(df, verbose=0)
     tseq.batch_size = self.batch_size
     preds = self.model.predict(tseq)
-    result =  preds if return_proba or multilabel or not self.c else [self.c[np.argmax(pred)] for pred in preds] 
+    result = (
+        preds
+        if return_proba or multilabel or not self.c
+        else [self.c[np.argmax(pred)] for pred in preds]
+    )
     if multilabel and not return_proba:
-        result =  [list(zip(self.c, r)) for r in result]
+        result = [list(zip(self.c, r)) for r in result]
     return result</code></pre>
 </details>
 </dd>

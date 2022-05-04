@@ -30,9 +30,10 @@
 from subprocess import Popen, PIPE, DEVNULL
 
 
-DEFAULT_TOKEN_PATTERN = (r&#34;\b[a-zA-Z][a-zA-Z0-9]*(?:[_/&amp;-][a-zA-Z0-9]+)+\b|&#34;
-                         r&#34;\b\d*[a-zA-Z][a-zA-Z0-9][a-zA-Z0-9]+\b&#34;)
-
+DEFAULT_TOKEN_PATTERN = (
+    r&#34;\b[a-zA-Z][a-zA-Z0-9]*(?:[_/&amp;-][a-zA-Z0-9]+)+\b|&#34;
+    r&#34;\b\d*[a-zA-Z][a-zA-Z0-9][a-zA-Z0-9]+\b&#34;
+)
 
 
 def extract_copy(corpus_path, output_path, verbose=0):
@@ -53,65 +54,69 @@ def extract_copy(corpus_path, output_path, verbose=0):
         # TODO: change this to use TextExtractor
         import textract
     except ImportError:
-        raise Exception(&#39;extract_copy requires textract: pip install textract&#39;)
+        raise Exception(&#34;extract_copy requires textract: pip install textract&#34;)
 
     skipped = set()
     num_skipped = 0
     corpus_path = os.path.normpath(corpus_path)
     output_path = os.path.normpath(output_path)
     for idx, filename in enumerate(extract_filenames(corpus_path)):
-        if idx %1000 == 0: print(&#39;processed %s doc(s)&#39; % (idx+1))
+        if idx % 1000 == 0:
+            print(&#34;processed %s doc(s)&#34; % (idx + 1))
         mtype = get_mimetype(filename)
         try:
-            if mtype and mtype.split(&#39;/&#39;)[0] == &#39;text&#39;:
-                with open(filename, &#39;r&#39;) as f:
+            if mtype and mtype.split(&#34;/&#34;)[0] == &#34;text&#34;:
+                with open(filename, &#34;r&#34;) as f:
                     text = f.read()
                     text = str.encode(text)
             else:
                 text = textract.process(filename)
         except Exception as e:
             if verbose:
-                print(&#39;ERROR on %s:\n%s&#39; % (filename, e))
+                print(&#34;ERROR on %s:\n%s&#34; % (filename, e))
             num_skipped += 1
             if not mtype:
-                mtype =  os.path.splitext(filename)[1]
-                if not mtype: mtype == &#39;unknown&#39;
+                mtype = os.path.splitext(filename)[1]
+                if not mtype:
+                    mtype == &#34;unknown&#34;
             skipped.add(mtype)
             continue
 
-        if not text: 
+        if not text:
             num_skipped += 1
             continue
         fpath, fname = os.path.split(filename)
-        if mtype and mtype.split(&#39;/&#39;)[0] != &#39;text&#39;: fname = fname+&#39;.txt&#39;
-        relfpath = fpath.replace(corpus_path, &#39;&#39;)
+        if mtype and mtype.split(&#34;/&#34;)[0] != &#34;text&#34;:
+            fname = fname + &#34;.txt&#34;
+        relfpath = fpath.replace(corpus_path, &#34;&#34;)
         relfpath = relfpath[1:] if relfpath and relfpath[0] == os.sep else relfpath
         opath = os.path.join(output_path, relfpath)
         if not os.path.exists(opath):
             os.makedirs(opath)
         ofilename = os.path.join(opath, fname)
-        with open(ofilename, &#39;wb&#39;) as f:
+        with open(ofilename, &#34;wb&#34;) as f:
             f.write(text)
-    print(&#39;processed %s docs&#39; % (idx+1))
-    print(&#39;done.&#39;)
-    print(&#39;skipped %s docs&#39; % (num_skipped))
-    if skipped: print(&#39;%s&#39; %(skipped))
+    print(&#34;processed %s docs&#34; % (idx + 1))
+    print(&#34;done.&#34;)
+    print(&#34;skipped %s docs&#34; % (num_skipped))
+    if skipped:
+        print(&#34;%s&#34; % (skipped))
 
 
 def get_mimetype(filepath):
     return mimetypes.guess_type(filepath)[0]
 
+
 def is_txt(filepath, strict=False):
     if strict:
-        return mimetypes.guess_type(filepath)[0] == &#39;text/plain&#39;
+        return mimetypes.guess_type(filepath)[0] == &#34;text/plain&#34;
     else:
         mtype = get_mimetype(filepath)
-        return mtype is not None and mtype.split(&#39;/&#39;)[0] == &#39;text&#39;
+        return mtype is not None and mtype.split(&#34;/&#34;)[0] == &#34;text&#34;
 
 
 def is_pdf(filepath):
-    return mimetypes.guess_type(filepath)[0] == &#39;application/pdf&#39;
-
+    return mimetypes.guess_type(filepath)[0] == &#34;application/pdf&#34;
 
 
 def pdftotext(filename):
@@ -122,11 +127,9 @@ def pdftotext(filename):
     :return: text from file, or empty string if failure
     ```
     &#34;&#34;&#34;
-    output = Popen([&#39;pdftotext&#39;, &#39;-q&#39;, filename, &#39;-&#39;],
-                   stdout=PIPE).communicate()[0]
+    output = Popen([&#34;pdftotext&#34;, &#34;-q&#34;, filename, &#34;-&#34;], stdout=PIPE).communicate()[0]
     # None may indicate damage, but convert for consistency
-    return &#39;&#39; if output is None else output
-
+    return &#34;&#34; if output is None else output
 
 
 def requires_ocr(filename):
@@ -138,9 +141,8 @@ def requires_ocr(filename):
     :return: True if requires OCR, False if not
     ```
     &#34;&#34;&#34;
-    output = Popen([&#39;pdffonts&#39;, filename], stdout=PIPE,
-                   stderr=DEVNULL).communicate()[0]
-    return len(output.split(&#39;\n&#39;)) &lt; 4
+    output = Popen([&#34;pdffonts&#34;, filename], stdout=PIPE, stderr=DEVNULL).communicate()[0]
+    return len(output.split(&#34;\n&#34;)) &lt; 4
 
 
 def extract_filenames(corpus_path, follow_links=False):
@@ -159,20 +161,30 @@ def strip_control_characters(data):
     if data:
         # unicode invalid characters
         re_xml_illegal = (
-            &#39;([\u0000-\u0008\u000b-\u000c\u000e-\u001f\ufffe-\uffff])|&#39;
-            &#39;([%s-%s][^%s-%s])|([^%s-%s][%s-%s])|([%s-%s]$)|(^[%s-%s])&#39;
-            % (chr(0xd800), chr(0xdbff), chr(0xdc00), chr(0xdfff), chr(0xd800),
-               chr(0xdbff), chr(0xdc00), chr(0xdfff), chr(0xd800), chr(0xdbff),
-               chr(0xdc00), chr(0xdfff))
+            &#34;([\u0000-\u0008\u000b-\u000c\u000e-\u001f\ufffe-\uffff])|&#34;
+            &#34;([%s-%s][^%s-%s])|([^%s-%s][%s-%s])|([%s-%s]$)|(^[%s-%s])&#34;
+            % (
+                chr(0xD800),
+                chr(0xDBFF),
+                chr(0xDC00),
+                chr(0xDFFF),
+                chr(0xD800),
+                chr(0xDBFF),
+                chr(0xDC00),
+                chr(0xDFFF),
+                chr(0xD800),
+                chr(0xDBFF),
+                chr(0xDC00),
+                chr(0xDFFF),
+            )
         )
         data = re.sub(re_xml_illegal, &#34;&#34;, data)
         # ascii control characters
-        #data = re.sub(r&#34;[\x01-\x1F\x7F]&#34;, &#34;&#34;, data)
+        # data = re.sub(r&#34;[\x01-\x1F\x7F]&#34;, &#34;&#34;, data)
         # See:  http://w3.org/International/questions/qa-forms-utf-8.html
         # Printable utf-8 does not include any of these chars below x7F
         data = re.sub(r&#34;[\x00-\x08\x0B\x0C\x0E-\x1F]&#34;, &#34;&#34;, data)
     return data
-
 
 
 def to_ascii(data):
@@ -188,30 +200,29 @@ def to_ascii(data):
 
     &#34;&#34;&#34;
     import unicodedata
+
     if isinstance(data, bytes):
         data = data.decode()
-    nkfd_form = unicodedata.normalize(&#39;NFKD&#39;, data)
-    only_ascii = nkfd_form.encode(&#39;ASCII&#39;, &#39;ignore&#39;)
+    nkfd_form = unicodedata.normalize(&#34;NFKD&#34;, data)
+    only_ascii = nkfd_form.encode(&#34;ASCII&#34;, &#34;ignore&#34;)
 
     # Return a string
-    return only_ascii.decode(&#39;ascii&#39;)
+    return only_ascii.decode(&#34;ascii&#34;)
 
 
-
-def load_text_files(corpus_path, truncate_len=None, 
-                    clean=True, return_fnames=False):
+def load_text_files(corpus_path, truncate_len=None, clean=True, return_fnames=False):
     &#34;&#34;&#34;
     ```
     load text files
     ```
     &#34;&#34;&#34;
-    
+
     texts = []
     filenames = []
     mb = master_bar(range(1))
     for i in mb:
         for filename in progress_bar(list(extract_filenames(corpus_path)), parent=mb):
-            with open(filename, &#39;r&#39;) as f:
+            with open(filename, &#34;r&#34;) as f:
                 text = f.read()
             if clean:
                 text = strip_control_characters(text)
@@ -220,7 +231,7 @@ def load_text_files(corpus_path, truncate_len=None,
                 text = &#34; &#34;.join(text.split()[:truncate_len])
             texts.append(text)
             filenames.append(filename)
-        mb.write(&#39;done.&#39;)
+        mb.write(&#34;done.&#34;)
     if return_fnames:
         return (texts, filenames)
     else:
@@ -233,16 +244,19 @@ def filter_by_id(lst, ids=[]):
     filter list by supplied IDs
     ```
     &#34;&#34;&#34;
-    return [x for i,x in enumerate(lst) if i in ids]
+    return [x for i, x in enumerate(lst) if i in ids]
 
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Language-Handling
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 
 def chinese_stopwords():
-    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), &#39;stopwords-zh.txt&#39;), &#39;r&#39;) as f:
+    with open(
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), &#34;stopwords-zh.txt&#34;),
+        &#34;r&#34;,
+    ) as f:
         return [line.strip() for line in f]
 
 
@@ -256,29 +270,35 @@ def detect_lang(texts, sample_size=32):
     # convert sentence pairs
     if isinstance(texts, (tuple, list, np.ndarray)) and len(texts) == 2:
         texts = [texts[0], texts[1]]
-    elif isinstance(texts, (tuple, list, np.ndarray)) and isinstance(texts[0], (tuple, list, np.ndarray)) and len(texts[0]) == 2:
+    elif (
+        isinstance(texts, (tuple, list, np.ndarray))
+        and isinstance(texts[0], (tuple, list, np.ndarray))
+        and len(texts[0]) == 2
+    ):
         texts = [t[0] for t in texts]
 
     if isinstance(texts, (pd.Series, pd.DataFrame)):
         texts = texts.values
-    if isinstance(texts, str): texts = [texts]
+    if isinstance(texts, str):
+        texts = [texts]
     if not isinstance(texts, (list, np.ndarray)):
-        raise ValueError(&#39;texts must be a list or NumPy array of strings&#39;)
+        raise ValueError(&#34;texts must be a list or NumPy array of strings&#34;)
     lst = []
     for doc in texts[:sample_size]:
         try:
             lst.append(langdetect.detect(doc))
         except:
             continue
-    if len(lst) == 0: 
-        warnings.warn(&#39;Defaulting to English for language detection: could not detect language from documents. &#39;+\
-                      &#39;This may be due to empty or invalid texts being provided to detect_lang.&#39;)
-        lang = &#39;en&#39;
+    if len(lst) == 0:
+        warnings.warn(
+            &#34;Defaulting to English for language detection: could not detect language from documents. &#34;
+            + &#34;This may be due to empty or invalid texts being provided to detect_lang.&#34;
+        )
+        lang = &#34;en&#34;
     else:
         lang = max(set(lst), key=lst.count)
-    #return max(set(lst), key=lst.count)
+    # return max(set(lst), key=lst.count)
     return lang
-
 
 
 def is_chinese(lang, strict=True):
@@ -292,12 +312,13 @@ def is_chinese(lang, strict=True):
     if strict:
         extra_clause = False
     else:
-        extra_clause = lang in [&#39;ja&#39;, &#39;ko&#39;]
-    return lang is not None and lang.startswith(&#39;zh-&#39;) or extra_clause
+        extra_clause = lang in [&#34;ja&#34;, &#34;ko&#34;]
+    return lang is not None and lang.startswith(&#34;zh-&#34;) or extra_clause
 
 
 def split_chinese(texts):
-    if isinstance(texts, str): texts=[texts]
+    if isinstance(texts, str):
+        texts = [texts]
 
     split_texts = []
     for doc in texts:
@@ -307,73 +328,79 @@ def split_chinese(texts):
     return [&#34; &#34;.join(tokens) for tokens in split_texts]
 
 
-NOSPACE_LANGS = [&#39;zh-cn&#39;, &#39;zh-tw&#39;, &#39;ja&#39;]
+NOSPACE_LANGS = [&#34;zh-cn&#34;, &#34;zh-tw&#34;, &#34;ja&#34;]
 
 
 def is_nospace_lang(lang):
     return lang in NOSPACE_LANGS
 
 
-def decode_by_line(texts, encoding=&#39;utf-8&#39;, verbose=1):
+def decode_by_line(texts, encoding=&#34;utf-8&#34;, verbose=1):
     &#34;&#34;&#34;
     ```
     Decode text line by line and skip over errors.
     ```
     &#34;&#34;&#34;
 
-    if isinstance(texts, str): texts = [texts]
+    if isinstance(texts, str):
+        texts = [texts]
     new_texts = []
-    skips=0
+    skips = 0
     num_lines = 0
     for doc in texts:
         text = &#34;&#34;
         for line in doc.splitlines():
-            num_lines +=1
+            num_lines += 1
             try:
                 line = line.decode(encoding)
             except:
-                skips +=1
+                skips += 1
                 continue
             text += line
         new_texts.append(text)
-    pct = round((skips*1./num_lines) * 100, 1)
+    pct = round((skips * 1.0 / num_lines) * 100, 1)
     if verbose:
-        print(&#39;skipped %s lines (%s%%) due to character decoding errors&#39; % (skips, pct))
+        print(&#34;skipped %s lines (%s%%) due to character decoding errors&#34; % (skips, pct))
         if pct &gt; 10:
-            print(&#39;If this is too many, try a different encoding&#39;)
+            print(&#34;If this is too many, try a different encoding&#34;)
     return new_texts
 
 
 def detect_encoding(texts, sample_size=32):
-    if not isinstance(texts, list): texts = [texts] # check for instance of list as bytes are supplied as input
-    lst = [chardet.detect(doc)[&#39;encoding&#39;] for doc in texts[:sample_size]]
+    if not isinstance(texts, list):
+        texts = [texts]  # check for instance of list as bytes are supplied as input
+    lst = [chardet.detect(doc)[&#34;encoding&#34;] for doc in texts[:sample_size]]
     encoding = max(set(lst), key=lst.count)
     # standardize to utf-8 to prevent BERT problems
-    encoding = &#39;utf-8&#39; if encoding.lower() in [&#39;ascii&#39;, &#39;utf8&#39;, &#39;utf-8&#39;] else encoding
+    encoding = &#34;utf-8&#34; if encoding.lower() in [&#34;ascii&#34;, &#34;utf8&#34;, &#34;utf-8&#34;] else encoding
     return encoding
 
 
 def read_text(filename):
-    with open(filename, &#39;rb&#39;) as f:
+    with open(filename, &#34;rb&#34;) as f:
         text = f.read()
     encoding = detect_encoding([text])
     try:
         decoded_text = text.decode(encoding)
     except:
-        U.vprint(&#39;Decoding with %s failed 1st attempt - using %s with skips&#39; % (encoding,
-                                                                                encoding),
-                                                                                verbose=verbose)
+        U.vprint(
+            &#34;Decoding with %s failed 1st attempt - using %s with skips&#34;
+            % (encoding, encoding),
+            verbose=verbose,
+        )
         decoded_text = decode_by_line(text, encoding=encoding)
     return decoded_text.strip()
 
 
-#tokenizer_filter = rs=&#39;!&#34;#$%&amp;()*+,-./:;&lt;=&gt;?@[\\]^_`{|}~\t\n&#39;
-re_tok = re.compile(f&#39;([{string.punctuation}“”¨«»®´·º½¾¿¡§£₤‘’])&#39;)
-def tokenize(s, join_tokens=False, join_char=&#39; &#39;): 
-    tokens = re_tok.sub(r&#39; \1 &#39;, s).split()
-    if join_tokens: tokens = join_char.join(tokens)
-    return tokens
+# tokenizer_filter = rs=&#39;!&#34;#$%&amp;()*+,-./:;&lt;=&gt;?@[\\]^_`{|}~\t\n&#39;
+re_tok = re.compile(f&#34;([{string.punctuation}“”¨«»®´·º½¾¿¡§£₤‘’])&#34;)
 
+
+def tokenize(s, join_tokens=False, join_char=&#34; &#34;):
+    tokens = re_tok.sub(r&#34; \1 &#34;, s).split()
+    if join_tokens:
+        tokens = join_char.join(tokens)
+    return tokens
 
 
 def sent_tokenize(text, lang=None):
@@ -385,14 +412,13 @@ def sent_tokenize(text, lang=None):
     lang = detect_lang(text) if lang is None else lang
     sents = []
     if is_chinese(lang):
-        for sent in re.findall(u&#39;[^!?。\.\!\?]+[!?。\.\!\?]?&#39;, text, flags=re.U):
+        for sent in re.findall(&#34;[^!?。\.\!\?]+[!?。\.\!\?]?&#34;, text, flags=re.U):
             sents.append(sent)
     else:
         for paragraph in segmenter.process(text):
             for sentence in paragraph:
                 sents.append(&#34; &#34;.join([t.value for t in sentence]))
     return sents
-
 
 
 def paragraph_tokenize(text, join_sentences=False, lang=None):
@@ -403,14 +429,15 @@ def paragraph_tokenize(text, join_sentences=False, lang=None):
     &#34;&#34;&#34;
     lang = detect_lang(text) if lang is None else lang
     if is_chinese(lang):
-        raise ValueError(&#39;paragraph_tokenize does not currently support Chinese.&#39;)
+        raise ValueError(&#34;paragraph_tokenize does not currently support Chinese.&#34;)
     paragraphs = []
     sents = []
     for paragraph in segmenter.process(text):
         sents = []
         for sentence in paragraph:
             sents.append(&#34; &#34;.join([t.value for t in sentence]))
-        if join_sentences: sents = &#39; &#39;.join(sents)
+        if join_sentences:
+            sents = &#34; &#34;.join(sents)
         paragraphs.append(sents)
     return paragraphs
 
@@ -424,22 +451,25 @@ def extract_noun_phrases(text):
     try:
         from textblob import TextBlob
     except:
-        raise Exception(&#39;extract_noun_phrases require TextBlob: pip install textblob&#39;)
+        raise Exception(&#34;extract_noun_phrases require TextBlob: pip install textblob&#34;)
     blob = TextBlob(text)
-    stop_words = [&#39;which&#39;, &#39;what&#39;]
+    stop_words = [&#34;which&#34;, &#34;what&#34;]
     curr_phrase = []
     np_list = []
     start = False
     for token in blob.tags:
-        if token[1].startswith(&#39;J&#39;) or token[1].startswith(&#39;N&#39;):
-            if not start: start = True
-            if token[0].lower() not in stop_words: curr_phrase.append(token[0])
+        if token[1].startswith(&#34;J&#34;) or token[1].startswith(&#34;N&#34;):
+            if not start:
+                start = True
+            if token[0].lower() not in stop_words:
+                curr_phrase.append(token[0])
         else:
             if start:
                 np_list.append(&#34; &#34;.join(curr_phrase))
                 curr_phrase = []
                 start = False
-    if start: np_list.append(&#34; &#34;.join(curr_phrase))
+    if start:
+        np_list.append(&#34; &#34;.join(curr_phrase))
     return np_list
 
 
@@ -463,14 +493,17 @@ def extract_offsets(sentence, tokens=None, tokenizer=tokenize):
     for t in tokens:
         # find start of current token
         for start_ind in range(last_end, len(sentence)):
-            if sentence[start_ind] == t[0]: break
-        end_ind = len(sentence)
-        for end_ind in range(start_ind+1, len(sentence)):
-            if (end_ind-start_ind) &gt;= len(t): 
+            if sentence[start_ind] == t[0]:
                 break
-        d = {&#39;token&#39;: t, 
-             &#39;start&#39; : start_ind, &#39;end&#39; : end_ind,
-            }
+        end_ind = len(sentence)
+        for end_ind in range(start_ind + 1, len(sentence)):
+            if (end_ind - start_ind) &gt;= len(t):
+                break
+        d = {
+            &#34;token&#34;: t,
+            &#34;start&#34;: start_ind,
+            &#34;end&#34;: end_ind,
+        }
         offsets.append(d)
         last_end = end_ind
     return offsets</code></pre>
@@ -493,7 +526,10 @@ def extract_offsets(sentence, tokens=None, tokenizer=tokenize):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def chinese_stopwords():
-    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), &#39;stopwords-zh.txt&#39;), &#39;r&#39;) as f:
+    with open(
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), &#34;stopwords-zh.txt&#34;),
+        &#34;r&#34;,
+    ) as f:
         return [line.strip() for line in f]</code></pre>
 </details>
 </dd>
@@ -507,33 +543,34 @@ def extract_offsets(sentence, tokens=None, tokenizer=tokenize):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def decode_by_line(texts, encoding=&#39;utf-8&#39;, verbose=1):
+<pre><code class="python">def decode_by_line(texts, encoding=&#34;utf-8&#34;, verbose=1):
     &#34;&#34;&#34;
     ```
     Decode text line by line and skip over errors.
     ```
     &#34;&#34;&#34;
 
-    if isinstance(texts, str): texts = [texts]
+    if isinstance(texts, str):
+        texts = [texts]
     new_texts = []
-    skips=0
+    skips = 0
     num_lines = 0
     for doc in texts:
         text = &#34;&#34;
         for line in doc.splitlines():
-            num_lines +=1
+            num_lines += 1
             try:
                 line = line.decode(encoding)
             except:
-                skips +=1
+                skips += 1
                 continue
             text += line
         new_texts.append(text)
-    pct = round((skips*1./num_lines) * 100, 1)
+    pct = round((skips * 1.0 / num_lines) * 100, 1)
     if verbose:
-        print(&#39;skipped %s lines (%s%%) due to character decoding errors&#39; % (skips, pct))
+        print(&#34;skipped %s lines (%s%%) due to character decoding errors&#34; % (skips, pct))
         if pct &gt; 10:
-            print(&#39;If this is too many, try a different encoding&#39;)
+            print(&#34;If this is too many, try a different encoding&#34;)
     return new_texts</code></pre>
 </details>
 </dd>
@@ -547,11 +584,12 @@ def extract_offsets(sentence, tokens=None, tokenizer=tokenize):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def detect_encoding(texts, sample_size=32):
-    if not isinstance(texts, list): texts = [texts] # check for instance of list as bytes are supplied as input
-    lst = [chardet.detect(doc)[&#39;encoding&#39;] for doc in texts[:sample_size]]
+    if not isinstance(texts, list):
+        texts = [texts]  # check for instance of list as bytes are supplied as input
+    lst = [chardet.detect(doc)[&#34;encoding&#34;] for doc in texts[:sample_size]]
     encoding = max(set(lst), key=lst.count)
     # standardize to utf-8 to prevent BERT problems
-    encoding = &#39;utf-8&#39; if encoding.lower() in [&#39;ascii&#39;, &#39;utf8&#39;, &#39;utf-8&#39;] else encoding
+    encoding = &#34;utf-8&#34; if encoding.lower() in [&#34;ascii&#34;, &#34;utf8&#34;, &#34;utf-8&#34;] else encoding
     return encoding</code></pre>
 </details>
 </dd>
@@ -575,27 +613,34 @@ def extract_offsets(sentence, tokens=None, tokenizer=tokenize):
     # convert sentence pairs
     if isinstance(texts, (tuple, list, np.ndarray)) and len(texts) == 2:
         texts = [texts[0], texts[1]]
-    elif isinstance(texts, (tuple, list, np.ndarray)) and isinstance(texts[0], (tuple, list, np.ndarray)) and len(texts[0]) == 2:
+    elif (
+        isinstance(texts, (tuple, list, np.ndarray))
+        and isinstance(texts[0], (tuple, list, np.ndarray))
+        and len(texts[0]) == 2
+    ):
         texts = [t[0] for t in texts]
 
     if isinstance(texts, (pd.Series, pd.DataFrame)):
         texts = texts.values
-    if isinstance(texts, str): texts = [texts]
+    if isinstance(texts, str):
+        texts = [texts]
     if not isinstance(texts, (list, np.ndarray)):
-        raise ValueError(&#39;texts must be a list or NumPy array of strings&#39;)
+        raise ValueError(&#34;texts must be a list or NumPy array of strings&#34;)
     lst = []
     for doc in texts[:sample_size]:
         try:
             lst.append(langdetect.detect(doc))
         except:
             continue
-    if len(lst) == 0: 
-        warnings.warn(&#39;Defaulting to English for language detection: could not detect language from documents. &#39;+\
-                      &#39;This may be due to empty or invalid texts being provided to detect_lang.&#39;)
-        lang = &#39;en&#39;
+    if len(lst) == 0:
+        warnings.warn(
+            &#34;Defaulting to English for language detection: could not detect language from documents. &#34;
+            + &#34;This may be due to empty or invalid texts being provided to detect_lang.&#34;
+        )
+        lang = &#34;en&#34;
     else:
         lang = max(set(lst), key=lst.count)
-    #return max(set(lst), key=lst.count)
+    # return max(set(lst), key=lst.count)
     return lang</code></pre>
 </details>
 </dd>
@@ -635,49 +680,53 @@ Returns:
         # TODO: change this to use TextExtractor
         import textract
     except ImportError:
-        raise Exception(&#39;extract_copy requires textract: pip install textract&#39;)
+        raise Exception(&#34;extract_copy requires textract: pip install textract&#34;)
 
     skipped = set()
     num_skipped = 0
     corpus_path = os.path.normpath(corpus_path)
     output_path = os.path.normpath(output_path)
     for idx, filename in enumerate(extract_filenames(corpus_path)):
-        if idx %1000 == 0: print(&#39;processed %s doc(s)&#39; % (idx+1))
+        if idx % 1000 == 0:
+            print(&#34;processed %s doc(s)&#34; % (idx + 1))
         mtype = get_mimetype(filename)
         try:
-            if mtype and mtype.split(&#39;/&#39;)[0] == &#39;text&#39;:
-                with open(filename, &#39;r&#39;) as f:
+            if mtype and mtype.split(&#34;/&#34;)[0] == &#34;text&#34;:
+                with open(filename, &#34;r&#34;) as f:
                     text = f.read()
                     text = str.encode(text)
             else:
                 text = textract.process(filename)
         except Exception as e:
             if verbose:
-                print(&#39;ERROR on %s:\n%s&#39; % (filename, e))
+                print(&#34;ERROR on %s:\n%s&#34; % (filename, e))
             num_skipped += 1
             if not mtype:
-                mtype =  os.path.splitext(filename)[1]
-                if not mtype: mtype == &#39;unknown&#39;
+                mtype = os.path.splitext(filename)[1]
+                if not mtype:
+                    mtype == &#34;unknown&#34;
             skipped.add(mtype)
             continue
 
-        if not text: 
+        if not text:
             num_skipped += 1
             continue
         fpath, fname = os.path.split(filename)
-        if mtype and mtype.split(&#39;/&#39;)[0] != &#39;text&#39;: fname = fname+&#39;.txt&#39;
-        relfpath = fpath.replace(corpus_path, &#39;&#39;)
+        if mtype and mtype.split(&#34;/&#34;)[0] != &#34;text&#34;:
+            fname = fname + &#34;.txt&#34;
+        relfpath = fpath.replace(corpus_path, &#34;&#34;)
         relfpath = relfpath[1:] if relfpath and relfpath[0] == os.sep else relfpath
         opath = os.path.join(output_path, relfpath)
         if not os.path.exists(opath):
             os.makedirs(opath)
         ofilename = os.path.join(opath, fname)
-        with open(ofilename, &#39;wb&#39;) as f:
+        with open(ofilename, &#34;wb&#34;) as f:
             f.write(text)
-    print(&#39;processed %s docs&#39; % (idx+1))
-    print(&#39;done.&#39;)
-    print(&#39;skipped %s docs&#39; % (num_skipped))
-    if skipped: print(&#39;%s&#39; %(skipped))</code></pre>
+    print(&#34;processed %s docs&#34; % (idx + 1))
+    print(&#34;done.&#34;)
+    print(&#34;skipped %s docs&#34; % (num_skipped))
+    if skipped:
+        print(&#34;%s&#34; % (skipped))</code></pre>
 </details>
 </dd>
 <dt id="ktrain.text.textutils.extract_filenames"><code class="name flex">
@@ -720,22 +769,25 @@ Returns:
     try:
         from textblob import TextBlob
     except:
-        raise Exception(&#39;extract_noun_phrases require TextBlob: pip install textblob&#39;)
+        raise Exception(&#34;extract_noun_phrases require TextBlob: pip install textblob&#34;)
     blob = TextBlob(text)
-    stop_words = [&#39;which&#39;, &#39;what&#39;]
+    stop_words = [&#34;which&#34;, &#34;what&#34;]
     curr_phrase = []
     np_list = []
     start = False
     for token in blob.tags:
-        if token[1].startswith(&#39;J&#39;) or token[1].startswith(&#39;N&#39;):
-            if not start: start = True
-            if token[0].lower() not in stop_words: curr_phrase.append(token[0])
+        if token[1].startswith(&#34;J&#34;) or token[1].startswith(&#34;N&#34;):
+            if not start:
+                start = True
+            if token[0].lower() not in stop_words:
+                curr_phrase.append(token[0])
         else:
             if start:
                 np_list.append(&#34; &#34;.join(curr_phrase))
                 curr_phrase = []
                 start = False
-    if start: np_list.append(&#34; &#34;.join(curr_phrase))
+    if start:
+        np_list.append(&#34; &#34;.join(curr_phrase))
     return np_list</code></pre>
 </details>
 </dd>
@@ -776,14 +828,17 @@ Return:
     for t in tokens:
         # find start of current token
         for start_ind in range(last_end, len(sentence)):
-            if sentence[start_ind] == t[0]: break
-        end_ind = len(sentence)
-        for end_ind in range(start_ind+1, len(sentence)):
-            if (end_ind-start_ind) &gt;= len(t): 
+            if sentence[start_ind] == t[0]:
                 break
-        d = {&#39;token&#39;: t, 
-             &#39;start&#39; : start_ind, &#39;end&#39; : end_ind,
-            }
+        end_ind = len(sentence)
+        for end_ind in range(start_ind + 1, len(sentence)):
+            if (end_ind - start_ind) &gt;= len(t):
+                break
+        d = {
+            &#34;token&#34;: t,
+            &#34;start&#34;: start_ind,
+            &#34;end&#34;: end_ind,
+        }
         offsets.append(d)
         last_end = end_ind
     return offsets</code></pre>
@@ -805,7 +860,7 @@ Return:
     filter list by supplied IDs
     ```
     &#34;&#34;&#34;
-    return [x for i,x in enumerate(lst) if i in ids]</code></pre>
+    return [x for i, x in enumerate(lst) if i in ids]</code></pre>
 </details>
 </dd>
 <dt id="ktrain.text.textutils.get_mimetype"><code class="name flex">
@@ -844,8 +899,8 @@ Return:
     if strict:
         extra_clause = False
     else:
-        extra_clause = lang in [&#39;ja&#39;, &#39;ko&#39;]
-    return lang is not None and lang.startswith(&#39;zh-&#39;) or extra_clause</code></pre>
+        extra_clause = lang in [&#34;ja&#34;, &#34;ko&#34;]
+    return lang is not None and lang.startswith(&#34;zh-&#34;) or extra_clause</code></pre>
 </details>
 </dd>
 <dt id="ktrain.text.textutils.is_nospace_lang"><code class="name flex">
@@ -871,7 +926,7 @@ Return:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def is_pdf(filepath):
-    return mimetypes.guess_type(filepath)[0] == &#39;application/pdf&#39;</code></pre>
+    return mimetypes.guess_type(filepath)[0] == &#34;application/pdf&#34;</code></pre>
 </details>
 </dd>
 <dt id="ktrain.text.textutils.is_txt"><code class="name flex">
@@ -885,10 +940,10 @@ Return:
 </summary>
 <pre><code class="python">def is_txt(filepath, strict=False):
     if strict:
-        return mimetypes.guess_type(filepath)[0] == &#39;text/plain&#39;
+        return mimetypes.guess_type(filepath)[0] == &#34;text/plain&#34;
     else:
         mtype = get_mimetype(filepath)
-        return mtype is not None and mtype.split(&#39;/&#39;)[0] == &#39;text&#39;</code></pre>
+        return mtype is not None and mtype.split(&#34;/&#34;)[0] == &#34;text&#34;</code></pre>
 </details>
 </dd>
 <dt id="ktrain.text.textutils.load_text_files"><code class="name flex">
@@ -901,20 +956,19 @@ Return:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def load_text_files(corpus_path, truncate_len=None, 
-                    clean=True, return_fnames=False):
+<pre><code class="python">def load_text_files(corpus_path, truncate_len=None, clean=True, return_fnames=False):
     &#34;&#34;&#34;
     ```
     load text files
     ```
     &#34;&#34;&#34;
-    
+
     texts = []
     filenames = []
     mb = master_bar(range(1))
     for i in mb:
         for filename in progress_bar(list(extract_filenames(corpus_path)), parent=mb):
-            with open(filename, &#39;r&#39;) as f:
+            with open(filename, &#34;r&#34;) as f:
                 text = f.read()
             if clean:
                 text = strip_control_characters(text)
@@ -923,7 +977,7 @@ Return:
                 text = &#34; &#34;.join(text.split()[:truncate_len])
             texts.append(text)
             filenames.append(filename)
-        mb.write(&#39;done.&#39;)
+        mb.write(&#34;done.&#34;)
     if return_fnames:
         return (texts, filenames)
     else:
@@ -948,14 +1002,15 @@ Return:
     &#34;&#34;&#34;
     lang = detect_lang(text) if lang is None else lang
     if is_chinese(lang):
-        raise ValueError(&#39;paragraph_tokenize does not currently support Chinese.&#39;)
+        raise ValueError(&#34;paragraph_tokenize does not currently support Chinese.&#34;)
     paragraphs = []
     sents = []
     for paragraph in segmenter.process(text):
         sents = []
         for sentence in paragraph:
             sents.append(&#34; &#34;.join([t.value for t in sentence]))
-        if join_sentences: sents = &#39; &#39;.join(sents)
+        if join_sentences:
+            sents = &#34; &#34;.join(sents)
         paragraphs.append(sents)
     return paragraphs</code></pre>
 </details>
@@ -980,10 +1035,9 @@ Return:
     :return: text from file, or empty string if failure
     ```
     &#34;&#34;&#34;
-    output = Popen([&#39;pdftotext&#39;, &#39;-q&#39;, filename, &#39;-&#39;],
-                   stdout=PIPE).communicate()[0]
+    output = Popen([&#34;pdftotext&#34;, &#34;-q&#34;, filename, &#34;-&#34;], stdout=PIPE).communicate()[0]
     # None may indicate damage, but convert for consistency
-    return &#39;&#39; if output is None else output</code></pre>
+    return &#34;&#34; if output is None else output</code></pre>
 </details>
 </dd>
 <dt id="ktrain.text.textutils.read_text"><code class="name flex">
@@ -996,15 +1050,17 @@ Return:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def read_text(filename):
-    with open(filename, &#39;rb&#39;) as f:
+    with open(filename, &#34;rb&#34;) as f:
         text = f.read()
     encoding = detect_encoding([text])
     try:
         decoded_text = text.decode(encoding)
     except:
-        U.vprint(&#39;Decoding with %s failed 1st attempt - using %s with skips&#39; % (encoding,
-                                                                                encoding),
-                                                                                verbose=verbose)
+        U.vprint(
+            &#34;Decoding with %s failed 1st attempt - using %s with skips&#34;
+            % (encoding, encoding),
+            verbose=verbose,
+        )
         decoded_text = decode_by_line(text, encoding=encoding)
     return decoded_text.strip()</code></pre>
 </details>
@@ -1031,9 +1087,8 @@ doesn't contain any fonts.
     :return: True if requires OCR, False if not
     ```
     &#34;&#34;&#34;
-    output = Popen([&#39;pdffonts&#39;, filename], stdout=PIPE,
-                   stderr=DEVNULL).communicate()[0]
-    return len(output.split(&#39;\n&#39;)) &lt; 4</code></pre>
+    output = Popen([&#34;pdffonts&#34;, filename], stdout=PIPE, stderr=DEVNULL).communicate()[0]
+    return len(output.split(&#34;\n&#34;)) &lt; 4</code></pre>
 </details>
 </dd>
 <dt id="ktrain.text.textutils.sent_tokenize"><code class="name flex">
@@ -1055,7 +1110,7 @@ doesn't contain any fonts.
     lang = detect_lang(text) if lang is None else lang
     sents = []
     if is_chinese(lang):
-        for sent in re.findall(u&#39;[^!?。\.\!\?]+[!?。\.\!\?]?&#39;, text, flags=re.U):
+        for sent in re.findall(&#34;[^!?。\.\!\?]+[!?。\.\!\?]?&#34;, text, flags=re.U):
             sents.append(sent)
     else:
         for paragraph in segmenter.process(text):
@@ -1074,7 +1129,8 @@ doesn't contain any fonts.
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def split_chinese(texts):
-    if isinstance(texts, str): texts=[texts]
+    if isinstance(texts, str):
+        texts = [texts]
 
     split_texts = []
     for doc in texts:
@@ -1097,15 +1153,26 @@ doesn't contain any fonts.
     if data:
         # unicode invalid characters
         re_xml_illegal = (
-            &#39;([\u0000-\u0008\u000b-\u000c\u000e-\u001f\ufffe-\uffff])|&#39;
-            &#39;([%s-%s][^%s-%s])|([^%s-%s][%s-%s])|([%s-%s]$)|(^[%s-%s])&#39;
-            % (chr(0xd800), chr(0xdbff), chr(0xdc00), chr(0xdfff), chr(0xd800),
-               chr(0xdbff), chr(0xdc00), chr(0xdfff), chr(0xd800), chr(0xdbff),
-               chr(0xdc00), chr(0xdfff))
+            &#34;([\u0000-\u0008\u000b-\u000c\u000e-\u001f\ufffe-\uffff])|&#34;
+            &#34;([%s-%s][^%s-%s])|([^%s-%s][%s-%s])|([%s-%s]$)|(^[%s-%s])&#34;
+            % (
+                chr(0xD800),
+                chr(0xDBFF),
+                chr(0xDC00),
+                chr(0xDFFF),
+                chr(0xD800),
+                chr(0xDBFF),
+                chr(0xDC00),
+                chr(0xDFFF),
+                chr(0xD800),
+                chr(0xDBFF),
+                chr(0xDC00),
+                chr(0xDFFF),
+            )
         )
         data = re.sub(re_xml_illegal, &#34;&#34;, data)
         # ascii control characters
-        #data = re.sub(r&#34;[\x01-\x1F\x7F]&#34;, &#34;&#34;, data)
+        # data = re.sub(r&#34;[\x01-\x1F\x7F]&#34;, &#34;&#34;, data)
         # See:  http://w3.org/International/questions/qa-forms-utf-8.html
         # Printable utf-8 does not include any of these chars below x7F
         data = re.sub(r&#34;[\x00-\x08\x0B\x0C\x0E-\x1F]&#34;, &#34;&#34;, data)
@@ -1140,13 +1207,14 @@ unidecode map to be used by translate as explained here:</p>
 
     &#34;&#34;&#34;
     import unicodedata
+
     if isinstance(data, bytes):
         data = data.decode()
-    nkfd_form = unicodedata.normalize(&#39;NFKD&#39;, data)
-    only_ascii = nkfd_form.encode(&#39;ASCII&#39;, &#39;ignore&#39;)
+    nkfd_form = unicodedata.normalize(&#34;NFKD&#34;, data)
+    only_ascii = nkfd_form.encode(&#34;ASCII&#34;, &#34;ignore&#34;)
 
     # Return a string
-    return only_ascii.decode(&#39;ascii&#39;)</code></pre>
+    return only_ascii.decode(&#34;ascii&#34;)</code></pre>
 </details>
 </dd>
 <dt id="ktrain.text.textutils.tokenize"><code class="name flex">
@@ -1158,9 +1226,10 @@ unidecode map to be used by translate as explained here:</p>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def tokenize(s, join_tokens=False, join_char=&#39; &#39;): 
-    tokens = re_tok.sub(r&#39; \1 &#39;, s).split()
-    if join_tokens: tokens = join_char.join(tokens)
+<pre><code class="python">def tokenize(s, join_tokens=False, join_char=&#34; &#34;):
+    tokens = re_tok.sub(r&#34; \1 &#34;, s).split()
+    if join_tokens:
+        tokens = join_char.join(tokens)
     return tokens</code></pre>
 </details>
 </dd>

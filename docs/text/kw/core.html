@@ -31,84 +31,104 @@ import warnings
 
 from ... import imports as I
 from .. import textutils as TU
+
 try:
     import textblob
+
     TEXTBLOB_INSTALLED = True
 except ImportError:
     TEXTBLOB_INSTALLED = False
 
-SUPPORTED_LANGS = {&#39;en&#39; : &#39;english&#39;,
-                   &#39;ar&#39; : &#39;arabic&#39;,
-                   &#39;az&#39; : &#39;azerbaijani&#39;,
-                   &#39;da&#39; : &#39;danish&#39;,
-                   &#39;nl&#39; : &#39;dutch&#39;,
-                   &#39;fi&#39; : &#39;finnish&#39;,
-                   &#39;fr&#39; : &#39;french&#39;,
-                   &#39;de&#39; : &#39;german&#39;,
-                   &#39;el&#39; : &#39;greek&#39;,
-                   &#39;hu&#39; : &#39;hungarian&#39;,
-                   &#39;id&#39; : &#39;indonesian&#39;,
-                   &#39;it&#39; : &#39;italian&#39;,
-                   &#39;kk&#39; : &#39;kazakh&#39;,
-                   &#39;ne&#39; : &#39;nepali&#39;,
-                   &#39;no&#39; : &#39;norwegian&#39;,
-                   &#39;pt&#39; : &#39;portuguese&#39;,
-                   &#39;ro&#39; : &#39;romanian&#39;,
-                   &#39;ru&#39; : &#39;russian&#39;,
-                   &#39;sl&#39; : &#39;slovene&#39;,
-                   &#39;es&#39; : &#39;spanish&#39;,
-                   &#39;sv&#39; : &#39;swedish&#39;,
-                   &#39;tg&#39; : &#39;tajik&#39;,
-                   &#39;tr&#39; : &#39;turkish&#39;,
-                   &#39;zh&#39; : &#39;chinese&#39;}
+SUPPORTED_LANGS = {
+    &#34;en&#34;: &#34;english&#34;,
+    &#34;ar&#34;: &#34;arabic&#34;,
+    &#34;az&#34;: &#34;azerbaijani&#34;,
+    &#34;da&#34;: &#34;danish&#34;,
+    &#34;nl&#34;: &#34;dutch&#34;,
+    &#34;fi&#34;: &#34;finnish&#34;,
+    &#34;fr&#34;: &#34;french&#34;,
+    &#34;de&#34;: &#34;german&#34;,
+    &#34;el&#34;: &#34;greek&#34;,
+    &#34;hu&#34;: &#34;hungarian&#34;,
+    &#34;id&#34;: &#34;indonesian&#34;,
+    &#34;it&#34;: &#34;italian&#34;,
+    &#34;kk&#34;: &#34;kazakh&#34;,
+    &#34;ne&#34;: &#34;nepali&#34;,
+    &#34;no&#34;: &#34;norwegian&#34;,
+    &#34;pt&#34;: &#34;portuguese&#34;,
+    &#34;ro&#34;: &#34;romanian&#34;,
+    &#34;ru&#34;: &#34;russian&#34;,
+    &#34;sl&#34;: &#34;slovene&#34;,
+    &#34;es&#34;: &#34;spanish&#34;,
+    &#34;sv&#34;: &#34;swedish&#34;,
+    &#34;tg&#34;: &#34;tajik&#34;,
+    &#34;tr&#34;: &#34;turkish&#34;,
+    &#34;zh&#34;: &#34;chinese&#34;,
+}
+
 
 class KeywordExtractor:
     &#34;&#34;&#34;
     Keyphrase Extraction
     &#34;&#34;&#34;
 
-    def __init__(self, lang=&#39;en&#39;, custom_stopwords = [&#39;et al&#39;, &#39;et&#39;, &#39;al&#39;, &#34;n&#39;t&#34;, &#39;did&#39;, &#39;does&#39;]):
+    def __init__(
+        self, lang=&#34;en&#34;, custom_stopwords=[&#34;et al&#34;, &#34;et&#34;, &#34;al&#34;, &#34;n&#39;t&#34;, &#34;did&#34;, &#34;does&#34;]
+    ):
         &#34;&#34;&#34;
         ```
         Keyphrase Extraction
 
         Args:
-          lang(str):  2-character language code: 
+          lang(str):  2-character language code:
           custom_stopwords(list): list of custom stopwords to ignore
         ```
         &#34;&#34;&#34;
         # error checks
         if not TEXTBLOB_INSTALLED:
-            raise Exception(&#39;The textblob package is required for keyphrase extraction: pip install textblob; python -m textblob.download_corpora&#39;)
+            raise Exception(
+                &#34;The textblob package is required for keyphrase extraction: pip install textblob; python -m textblob.download_corpora&#34;
+            )
         if lang not in SUPPORTED_LANGS:
-            raise ValueError(f&#39;lang=&#34;{lang}&#34; is not supported. Supported 2-character ISO 639-1 language codes are: {SUPPORTED_LANGS}&#39;)
+            raise ValueError(
+                f&#39;lang=&#34;{lang}&#34; is not supported. Supported 2-character ISO 639-1 language codes are: {SUPPORTED_LANGS}&#39;
+            )
         self.lang = lang
 
         # build blacklist
         from nltk.corpus import stopwords as nltk_stopwords
         from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
-        if lang == &#39;en&#39;:
-            stopwords = list(ENGLISH_STOP_WORDS)+custom_stopwords
-        elif lang == &#39;zh&#39;:
-            stopwords = TU.chinese_stopwords()+custom_stopwords
+
+        if lang == &#34;en&#34;:
+            stopwords = list(ENGLISH_STOP_WORDS) + custom_stopwords
+        elif lang == &#34;zh&#34;:
+            stopwords = TU.chinese_stopwords() + custom_stopwords
         elif lang in SUPPORTED_LANGS:
             stopwords = nltk_stopwords.words(SUPPORTED_LANGS[lang])
         else:
             stopwords = []
-        blacklist = stopwords+custom_stopwords
+        blacklist = stopwords + custom_stopwords
         self.blacklist = blacklist
 
-
-    def extract_keywords(self, text, ngram_range=(1,3), top_n=10, n_candidates=50, omit_scores=False,
-                         candidate_generator=&#39;ngrams&#39;, constrain_unigram_case=True, maxlen=64):
+    def extract_keywords(
+        self,
+        text,
+        ngram_range=(1, 3),
+        top_n=10,
+        n_candidates=50,
+        omit_scores=False,
+        candidate_generator=&#34;ngrams&#34;,
+        constrain_unigram_case=True,
+        maxlen=64,
+    ):
         &#34;&#34;&#34;
         ```
         simple keyword extraction
-        
+
         This is a simplified TextBlob implementation of the KERA algorithm from:
           https://arxiv.org/pdf/1308.2359.pdf
         Args:
-          text (str): the text as unicode string
+          text(str): the text as unicode string
           ngram_range(tuple): the ngram range.  Example: (1,3) considers unigrams, bigrams, and trigrams as candidates
           top_n(int): number of keyphrases to return
           n_candidates(int): number of candidates considered, when ranking
@@ -123,25 +143,29 @@ class KeywordExtractor:
           Returns:
             list
           ```
-                                        
+
         &#34;&#34;&#34;
-        if candidate_generator not in [&#39;noun_phrases&#39;, &#39;ngrams&#39;]: 
-            raise ValueError(&#39;candidate_generator must be one of {&#34;noun_phrases&#34;, &#34;ngrams&#34;}&#39;)
-        if self.lang == &#39;zh&#39;:
-            text = &#39; &#39;.join(I.jieba.cut(text, HMM=False))
-        if candidate_generator == &#39;noun_phrases&#39; and self.lang != &#39;en&#39;:
-            warnings.warn(f&#39;lang={self.lang} but candidate_generator=&#34;noun_phrases&#34; is not supported. &#39;+\
-                          &#39;Falling back to candidate_generator=&#34;ngrams&#34;&#39;)
-            candidate_generator = &#39;ngrams&#39;
+        if candidate_generator not in [&#34;noun_phrases&#34;, &#34;ngrams&#34;]:
+            raise ValueError(
+                &#39;candidate_generator must be one of {&#34;noun_phrases&#34;, &#34;ngrams&#34;}&#39;
+            )
+        if self.lang == &#34;zh&#34;:
+            text = &#34; &#34;.join(I.jieba.cut(text, HMM=False))
+        if candidate_generator == &#34;noun_phrases&#34; and self.lang != &#34;en&#34;:
+            warnings.warn(
+                f&#39;lang={self.lang} but candidate_generator=&#34;noun_phrases&#34; is not supported. &#39;
+                + &#39;Falling back to candidate_generator=&#34;ngrams&#34;&#39;
+            )
+            candidate_generator = &#34;ngrams&#34;
 
         blob = textblob.TextBlob(text)
         candidates = []
         min_n, max_n = ngram_range
-        ngram_lens = list(range(min_n, max_n+1))
+        ngram_lens = list(range(min_n, max_n + 1))
 
         # generate ngrams or noun phrases
         ngrams = {}
-        if candidate_generator == &#39;ngrams&#39;:
+        if candidate_generator == &#34;ngrams&#34;:
             for n in ngram_lens:
                 ngrams[n] = blob.ngrams(n=n)
         else:
@@ -149,30 +173,55 @@ class KeywordExtractor:
             for np in noun_phrases:
                 words = np.split()
                 n = len(words)
-                if n not in ngram_lens: continue
+                if n not in ngram_lens:
+                    continue
                 lst = ngrams.get(n, [])
                 lst.append(words)
                 ngrams[n] = lst
-                
 
         # generate candidates
-        for n in range(min_n, max_n+1):
+        for n in range(min_n, max_n + 1):
             if n == 1:
-                grams = [k[0].lower() for k in ngrams.get(n, []) if not any(w.lower() in self.blacklist for w in k) \
-                         and (not constrain_unigram_case or\
-                             (candidate_generator==&#39;ngrams&#39; and constrain_unigram_case and k[0].isupper()))]
+                grams = [
+                    k[0].lower()
+                    for k in ngrams.get(n, [])
+                    if not any(w.lower() in self.blacklist for w in k)
+                    and (
+                        not constrain_unigram_case
+                        or (
+                            candidate_generator == &#34;ngrams&#34;
+                            and constrain_unigram_case
+                            and k[0].isupper()
+                        )
+                    )
+                ]
             else:
-                grams = [&#34; &#34;.join(k).lower() for k in ngrams.get(n, []) if not any(w.lower() in self.blacklist for w in k) \
-                          and len(set(k)) != 1 and len(k[0])&gt;1 and len(k[1])&gt;1]
-            candidates.extend([kw for kw in grams if kw[0].isalpha() and len([w for w in kw if not w.isspace() and w not in [&#39;-&#39;, &#39;.&#39;]]) &gt;= 3 and\
-                               (kw[-1].isalpha() or kw[-1].isdigit()) and &#39;@&#39; not in kw])
+                grams = [
+                    &#34; &#34;.join(k).lower()
+                    for k in ngrams.get(n, [])
+                    if not any(w.lower() in self.blacklist for w in k)
+                    and len(set(k)) != 1
+                    and len(k[0]) &gt; 1
+                    and len(k[1]) &gt; 1
+                ]
+            candidates.extend(
+                [
+                    kw
+                    for kw in grams
+                    if kw[0].isalpha()
+                    and len([w for w in kw if not w.isspace() and w not in [&#34;-&#34;, &#34;.&#34;]])
+                    &gt;= 3
+                    and (kw[-1].isalpha() or kw[-1].isdigit())
+                    and &#34;@&#34; not in kw
+                ]
+            )
         cnt = Counter(candidates)
         tups = cnt.most_common(n_candidates)
 
         # normalize and return
         keywords = [tup[0] for tup in tups if len(tup[0]) &lt;= maxlen]
-        scores =   [tup[1] for tup in tups if len(tup[0]) &lt;= maxlen]
-        scores = [float(i)/sum(scores) for i in scores]
+        scores = [tup[1] for tup in tups if len(tup[0]) &lt;= maxlen]
+        scores = [float(i) / sum(scores) for i in scores]
         result = list(zip(keywords, scores))
         return [r[0] for r in result[:top_n]] if omit_scores else result[:top_n]</code></pre>
 </details>
@@ -195,7 +244,7 @@ class KeywordExtractor:
 <pre><code>Keyphrase Extraction
 
 Args:
-  lang(str):  2-character language code: 
+  lang(str):  2-character language code:
   custom_stopwords(list): list of custom stopwords to ignore
 </code></pre></div>
 <details class="source">
@@ -207,48 +256,63 @@ Args:
     Keyphrase Extraction
     &#34;&#34;&#34;
 
-    def __init__(self, lang=&#39;en&#39;, custom_stopwords = [&#39;et al&#39;, &#39;et&#39;, &#39;al&#39;, &#34;n&#39;t&#34;, &#39;did&#39;, &#39;does&#39;]):
+    def __init__(
+        self, lang=&#34;en&#34;, custom_stopwords=[&#34;et al&#34;, &#34;et&#34;, &#34;al&#34;, &#34;n&#39;t&#34;, &#34;did&#34;, &#34;does&#34;]
+    ):
         &#34;&#34;&#34;
         ```
         Keyphrase Extraction
 
         Args:
-          lang(str):  2-character language code: 
+          lang(str):  2-character language code:
           custom_stopwords(list): list of custom stopwords to ignore
         ```
         &#34;&#34;&#34;
         # error checks
         if not TEXTBLOB_INSTALLED:
-            raise Exception(&#39;The textblob package is required for keyphrase extraction: pip install textblob; python -m textblob.download_corpora&#39;)
+            raise Exception(
+                &#34;The textblob package is required for keyphrase extraction: pip install textblob; python -m textblob.download_corpora&#34;
+            )
         if lang not in SUPPORTED_LANGS:
-            raise ValueError(f&#39;lang=&#34;{lang}&#34; is not supported. Supported 2-character ISO 639-1 language codes are: {SUPPORTED_LANGS}&#39;)
+            raise ValueError(
+                f&#39;lang=&#34;{lang}&#34; is not supported. Supported 2-character ISO 639-1 language codes are: {SUPPORTED_LANGS}&#39;
+            )
         self.lang = lang
 
         # build blacklist
         from nltk.corpus import stopwords as nltk_stopwords
         from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
-        if lang == &#39;en&#39;:
-            stopwords = list(ENGLISH_STOP_WORDS)+custom_stopwords
-        elif lang == &#39;zh&#39;:
-            stopwords = TU.chinese_stopwords()+custom_stopwords
+
+        if lang == &#34;en&#34;:
+            stopwords = list(ENGLISH_STOP_WORDS) + custom_stopwords
+        elif lang == &#34;zh&#34;:
+            stopwords = TU.chinese_stopwords() + custom_stopwords
         elif lang in SUPPORTED_LANGS:
             stopwords = nltk_stopwords.words(SUPPORTED_LANGS[lang])
         else:
             stopwords = []
-        blacklist = stopwords+custom_stopwords
+        blacklist = stopwords + custom_stopwords
         self.blacklist = blacklist
 
-
-    def extract_keywords(self, text, ngram_range=(1,3), top_n=10, n_candidates=50, omit_scores=False,
-                         candidate_generator=&#39;ngrams&#39;, constrain_unigram_case=True, maxlen=64):
+    def extract_keywords(
+        self,
+        text,
+        ngram_range=(1, 3),
+        top_n=10,
+        n_candidates=50,
+        omit_scores=False,
+        candidate_generator=&#34;ngrams&#34;,
+        constrain_unigram_case=True,
+        maxlen=64,
+    ):
         &#34;&#34;&#34;
         ```
         simple keyword extraction
-        
+
         This is a simplified TextBlob implementation of the KERA algorithm from:
           https://arxiv.org/pdf/1308.2359.pdf
         Args:
-          text (str): the text as unicode string
+          text(str): the text as unicode string
           ngram_range(tuple): the ngram range.  Example: (1,3) considers unigrams, bigrams, and trigrams as candidates
           top_n(int): number of keyphrases to return
           n_candidates(int): number of candidates considered, when ranking
@@ -263,25 +327,29 @@ Args:
           Returns:
             list
           ```
-                                        
+
         &#34;&#34;&#34;
-        if candidate_generator not in [&#39;noun_phrases&#39;, &#39;ngrams&#39;]: 
-            raise ValueError(&#39;candidate_generator must be one of {&#34;noun_phrases&#34;, &#34;ngrams&#34;}&#39;)
-        if self.lang == &#39;zh&#39;:
-            text = &#39; &#39;.join(I.jieba.cut(text, HMM=False))
-        if candidate_generator == &#39;noun_phrases&#39; and self.lang != &#39;en&#39;:
-            warnings.warn(f&#39;lang={self.lang} but candidate_generator=&#34;noun_phrases&#34; is not supported. &#39;+\
-                          &#39;Falling back to candidate_generator=&#34;ngrams&#34;&#39;)
-            candidate_generator = &#39;ngrams&#39;
+        if candidate_generator not in [&#34;noun_phrases&#34;, &#34;ngrams&#34;]:
+            raise ValueError(
+                &#39;candidate_generator must be one of {&#34;noun_phrases&#34;, &#34;ngrams&#34;}&#39;
+            )
+        if self.lang == &#34;zh&#34;:
+            text = &#34; &#34;.join(I.jieba.cut(text, HMM=False))
+        if candidate_generator == &#34;noun_phrases&#34; and self.lang != &#34;en&#34;:
+            warnings.warn(
+                f&#39;lang={self.lang} but candidate_generator=&#34;noun_phrases&#34; is not supported. &#39;
+                + &#39;Falling back to candidate_generator=&#34;ngrams&#34;&#39;
+            )
+            candidate_generator = &#34;ngrams&#34;
 
         blob = textblob.TextBlob(text)
         candidates = []
         min_n, max_n = ngram_range
-        ngram_lens = list(range(min_n, max_n+1))
+        ngram_lens = list(range(min_n, max_n + 1))
 
         # generate ngrams or noun phrases
         ngrams = {}
-        if candidate_generator == &#39;ngrams&#39;:
+        if candidate_generator == &#34;ngrams&#34;:
             for n in ngram_lens:
                 ngrams[n] = blob.ngrams(n=n)
         else:
@@ -289,30 +357,55 @@ Args:
             for np in noun_phrases:
                 words = np.split()
                 n = len(words)
-                if n not in ngram_lens: continue
+                if n not in ngram_lens:
+                    continue
                 lst = ngrams.get(n, [])
                 lst.append(words)
                 ngrams[n] = lst
-                
 
         # generate candidates
-        for n in range(min_n, max_n+1):
+        for n in range(min_n, max_n + 1):
             if n == 1:
-                grams = [k[0].lower() for k in ngrams.get(n, []) if not any(w.lower() in self.blacklist for w in k) \
-                         and (not constrain_unigram_case or\
-                             (candidate_generator==&#39;ngrams&#39; and constrain_unigram_case and k[0].isupper()))]
+                grams = [
+                    k[0].lower()
+                    for k in ngrams.get(n, [])
+                    if not any(w.lower() in self.blacklist for w in k)
+                    and (
+                        not constrain_unigram_case
+                        or (
+                            candidate_generator == &#34;ngrams&#34;
+                            and constrain_unigram_case
+                            and k[0].isupper()
+                        )
+                    )
+                ]
             else:
-                grams = [&#34; &#34;.join(k).lower() for k in ngrams.get(n, []) if not any(w.lower() in self.blacklist for w in k) \
-                          and len(set(k)) != 1 and len(k[0])&gt;1 and len(k[1])&gt;1]
-            candidates.extend([kw for kw in grams if kw[0].isalpha() and len([w for w in kw if not w.isspace() and w not in [&#39;-&#39;, &#39;.&#39;]]) &gt;= 3 and\
-                               (kw[-1].isalpha() or kw[-1].isdigit()) and &#39;@&#39; not in kw])
+                grams = [
+                    &#34; &#34;.join(k).lower()
+                    for k in ngrams.get(n, [])
+                    if not any(w.lower() in self.blacklist for w in k)
+                    and len(set(k)) != 1
+                    and len(k[0]) &gt; 1
+                    and len(k[1]) &gt; 1
+                ]
+            candidates.extend(
+                [
+                    kw
+                    for kw in grams
+                    if kw[0].isalpha()
+                    and len([w for w in kw if not w.isspace() and w not in [&#34;-&#34;, &#34;.&#34;]])
+                    &gt;= 3
+                    and (kw[-1].isalpha() or kw[-1].isdigit())
+                    and &#34;@&#34; not in kw
+                ]
+            )
         cnt = Counter(candidates)
         tups = cnt.most_common(n_candidates)
 
         # normalize and return
         keywords = [tup[0] for tup in tups if len(tup[0]) &lt;= maxlen]
-        scores =   [tup[1] for tup in tups if len(tup[0]) &lt;= maxlen]
-        scores = [float(i)/sum(scores) for i in scores]
+        scores = [tup[1] for tup in tups if len(tup[0]) &lt;= maxlen]
+        scores = [float(i) / sum(scores) for i in scores]
         result = list(zip(keywords, scores))
         return [r[0] for r in result[:top_n]] if omit_scores else result[:top_n]</code></pre>
 </details>
@@ -329,10 +422,7 @@ This is a simplified TextBlob implementation of the KERA algorithm from:
 
 Args
 -----=
-**```text```** :&amp;ensp;&lt;code&gt;str&lt;/code&gt;
-:   the text as unicode string
-
-
+text(str): the text as unicode string
 ngram_range(tuple): the ngram range.  Example: (1,3) considers unigrams, bigrams, and trigrams as candidates
 top_n(int): number of keyphrases to return
 n_candidates(int): number of candidates considered, when ranking
@@ -351,16 +441,25 @@ Returns:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def extract_keywords(self, text, ngram_range=(1,3), top_n=10, n_candidates=50, omit_scores=False,
-                     candidate_generator=&#39;ngrams&#39;, constrain_unigram_case=True, maxlen=64):
+<pre><code class="python">def extract_keywords(
+    self,
+    text,
+    ngram_range=(1, 3),
+    top_n=10,
+    n_candidates=50,
+    omit_scores=False,
+    candidate_generator=&#34;ngrams&#34;,
+    constrain_unigram_case=True,
+    maxlen=64,
+):
     &#34;&#34;&#34;
     ```
     simple keyword extraction
-    
+
     This is a simplified TextBlob implementation of the KERA algorithm from:
       https://arxiv.org/pdf/1308.2359.pdf
     Args:
-      text (str): the text as unicode string
+      text(str): the text as unicode string
       ngram_range(tuple): the ngram range.  Example: (1,3) considers unigrams, bigrams, and trigrams as candidates
       top_n(int): number of keyphrases to return
       n_candidates(int): number of candidates considered, when ranking
@@ -375,25 +474,29 @@ Returns:
       Returns:
         list
       ```
-                                    
+
     &#34;&#34;&#34;
-    if candidate_generator not in [&#39;noun_phrases&#39;, &#39;ngrams&#39;]: 
-        raise ValueError(&#39;candidate_generator must be one of {&#34;noun_phrases&#34;, &#34;ngrams&#34;}&#39;)
-    if self.lang == &#39;zh&#39;:
-        text = &#39; &#39;.join(I.jieba.cut(text, HMM=False))
-    if candidate_generator == &#39;noun_phrases&#39; and self.lang != &#39;en&#39;:
-        warnings.warn(f&#39;lang={self.lang} but candidate_generator=&#34;noun_phrases&#34; is not supported. &#39;+\
-                      &#39;Falling back to candidate_generator=&#34;ngrams&#34;&#39;)
-        candidate_generator = &#39;ngrams&#39;
+    if candidate_generator not in [&#34;noun_phrases&#34;, &#34;ngrams&#34;]:
+        raise ValueError(
+            &#39;candidate_generator must be one of {&#34;noun_phrases&#34;, &#34;ngrams&#34;}&#39;
+        )
+    if self.lang == &#34;zh&#34;:
+        text = &#34; &#34;.join(I.jieba.cut(text, HMM=False))
+    if candidate_generator == &#34;noun_phrases&#34; and self.lang != &#34;en&#34;:
+        warnings.warn(
+            f&#39;lang={self.lang} but candidate_generator=&#34;noun_phrases&#34; is not supported. &#39;
+            + &#39;Falling back to candidate_generator=&#34;ngrams&#34;&#39;
+        )
+        candidate_generator = &#34;ngrams&#34;
 
     blob = textblob.TextBlob(text)
     candidates = []
     min_n, max_n = ngram_range
-    ngram_lens = list(range(min_n, max_n+1))
+    ngram_lens = list(range(min_n, max_n + 1))
 
     # generate ngrams or noun phrases
     ngrams = {}
-    if candidate_generator == &#39;ngrams&#39;:
+    if candidate_generator == &#34;ngrams&#34;:
         for n in ngram_lens:
             ngrams[n] = blob.ngrams(n=n)
     else:
@@ -401,30 +504,55 @@ Returns:
         for np in noun_phrases:
             words = np.split()
             n = len(words)
-            if n not in ngram_lens: continue
+            if n not in ngram_lens:
+                continue
             lst = ngrams.get(n, [])
             lst.append(words)
             ngrams[n] = lst
-            
 
     # generate candidates
-    for n in range(min_n, max_n+1):
+    for n in range(min_n, max_n + 1):
         if n == 1:
-            grams = [k[0].lower() for k in ngrams.get(n, []) if not any(w.lower() in self.blacklist for w in k) \
-                     and (not constrain_unigram_case or\
-                         (candidate_generator==&#39;ngrams&#39; and constrain_unigram_case and k[0].isupper()))]
+            grams = [
+                k[0].lower()
+                for k in ngrams.get(n, [])
+                if not any(w.lower() in self.blacklist for w in k)
+                and (
+                    not constrain_unigram_case
+                    or (
+                        candidate_generator == &#34;ngrams&#34;
+                        and constrain_unigram_case
+                        and k[0].isupper()
+                    )
+                )
+            ]
         else:
-            grams = [&#34; &#34;.join(k).lower() for k in ngrams.get(n, []) if not any(w.lower() in self.blacklist for w in k) \
-                      and len(set(k)) != 1 and len(k[0])&gt;1 and len(k[1])&gt;1]
-        candidates.extend([kw for kw in grams if kw[0].isalpha() and len([w for w in kw if not w.isspace() and w not in [&#39;-&#39;, &#39;.&#39;]]) &gt;= 3 and\
-                           (kw[-1].isalpha() or kw[-1].isdigit()) and &#39;@&#39; not in kw])
+            grams = [
+                &#34; &#34;.join(k).lower()
+                for k in ngrams.get(n, [])
+                if not any(w.lower() in self.blacklist for w in k)
+                and len(set(k)) != 1
+                and len(k[0]) &gt; 1
+                and len(k[1]) &gt; 1
+            ]
+        candidates.extend(
+            [
+                kw
+                for kw in grams
+                if kw[0].isalpha()
+                and len([w for w in kw if not w.isspace() and w not in [&#34;-&#34;, &#34;.&#34;]])
+                &gt;= 3
+                and (kw[-1].isalpha() or kw[-1].isdigit())
+                and &#34;@&#34; not in kw
+            ]
+        )
     cnt = Counter(candidates)
     tups = cnt.most_common(n_candidates)
 
     # normalize and return
     keywords = [tup[0] for tup in tups if len(tup[0]) &lt;= maxlen]
-    scores =   [tup[1] for tup in tups if len(tup[0]) &lt;= maxlen]
-    scores = [float(i)/sum(scores) for i in scores]
+    scores = [tup[1] for tup in tups if len(tup[0]) &lt;= maxlen]
+    scores = [float(i) / sum(scores) for i in scores]
     result = list(zip(keywords, scores))
     return [r[0] for r in result[:top_n]] if omit_scores else result[:top_n]</code></pre>
 </details>

@@ -28,8 +28,9 @@
 </summary>
 <pre><code class="python">from ..imports import *
 
+
 class SGDRScheduler(keras.callbacks.Callback):
-    &#39;&#39;&#39;Cosine annealing learning rate scheduler with periodic restarts.
+    &#34;&#34;&#34;Cosine annealing learning rate scheduler with periodic restarts.
     # Usage
         ```python
             schedule = SGDRScheduler(min_lr=1e-7,
@@ -43,7 +44,7 @@ class SGDRScheduler(keras.callbacks.Callback):
     # Arguments
         min_lr: The lower bound of the learning rate range for the experiment.
         max_lr: The upper bound of the learning rate range for the experiment.
-        steps_per_epoch: Number of mini-batches in the dataset. Calculated as `np.ceil(epoch_size/batch_size)`. 
+        steps_per_epoch: Number of mini-batches in the dataset. Calculated as `np.ceil(epoch_size/batch_size)`.
         lr_decay: Reduce the max_lr after the completion of each cycle.
                   Ex. To reduce the max_lr by 20% after each cycle, set this value to 0.8.
         cycle_length: Initial number of epochs in a cycle.
@@ -51,14 +52,17 @@ class SGDRScheduler(keras.callbacks.Callback):
     # References
         Original paper: http://arxiv.org/abs/1608.03983
         Blog Post:      http://www.jeremyjordan.me/nn-learning-rate/
-    &#39;&#39;&#39;
-    def __init__(self,
-                 min_lr,
-                 max_lr,
-                 steps_per_epoch,
-                 lr_decay=0.9,
-                 cycle_length=10,
-                 mult_factor=2):
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        min_lr,
+        max_lr,
+        steps_per_epoch,
+        lr_decay=0.9,
+        cycle_length=10,
+        mult_factor=2,
+    ):
 
         super(keras.callbacks.Callback, self).__init__()
         self.min_lr = min_lr
@@ -76,50 +80,50 @@ class SGDRScheduler(keras.callbacks.Callback):
         self.history = {}
 
     def clr(self):
-        &#39;&#39;&#39;Calculate the learning rate.&#39;&#39;&#39;
-        fraction_to_restart = self.batch_since_restart / (self.steps_per_epoch * self.cycle_length)
-        lr = self.min_lr + 0.5 * (self.max_lr - self.min_lr) * (1 + np.cos(fraction_to_restart * np.pi))
+        &#34;&#34;&#34;Calculate the learning rate.&#34;&#34;&#34;
+        fraction_to_restart = self.batch_since_restart / (
+            self.steps_per_epoch * self.cycle_length
+        )
+        lr = self.min_lr + 0.5 * (self.max_lr - self.min_lr) * (
+            1 + np.cos(fraction_to_restart * np.pi)
+        )
         return lr
 
     def on_train_begin(self, logs={}):
-        &#39;&#39;&#39;Initialize the learning rate to the minimum value at the start of training.&#39;&#39;&#39;
+        &#34;&#34;&#34;Initialize the learning rate to the minimum value at the start of training.&#34;&#34;&#34;
         logs = logs or {}
         K.set_value(self.model.optimizer.lr, self.max_lr)
 
-
     def on_batch_end(self, batch, logs={}):
-        &#39;&#39;&#39;Record previous batch statistics and update the learning rate.&#39;&#39;&#39;
+        &#34;&#34;&#34;Record previous batch statistics and update the learning rate.&#34;&#34;&#34;
         logs = logs or {}
-        self.history.setdefault(&#39;lr&#39;, []).append(K.get_value(self.model.optimizer.lr))
+        self.history.setdefault(&#34;lr&#34;, []).append(K.get_value(self.model.optimizer.lr))
         for k, v in logs.items():
             self.history.setdefault(k, []).append(v)
 
         self.batch_since_restart += 1
         K.set_value(self.model.optimizer.lr, self.clr())
-        #print(K.eval(self.model.optimizer.lr))
-
+        # print(K.eval(self.model.optimizer.lr))
 
     def on_epoch_end(self, epoch, logs={}):
-        &#39;&#39;&#39;Check for end of current cycle, apply restarts when necessary.&#39;&#39;&#39;
-        #print(K.eval(self.model.optimizer.lr))
+        &#34;&#34;&#34;Check for end of current cycle, apply restarts when necessary.&#34;&#34;&#34;
+        # print(K.eval(self.model.optimizer.lr))
         if epoch + 1 == self.next_restart:
             self.batch_since_restart = 0
             self.cycle_length = np.ceil(self.cycle_length * self.mult_factor)
             self.next_restart += self.cycle_length
             self.max_lr *= self.lr_decay
             # no longer needed as kauto completes cycles/epochs
-            #self.best_weights = self.model.get_weights()
-
+            # self.best_weights = self.model.get_weights()
 
     def on_train_end(self, logs={}):
-        &#39;&#39;&#39;Set weights to the values from the end of the most recent cycle for best performance.&#39;&#39;&#39;
+        &#34;&#34;&#34;Set weights to the values from the end of the most recent cycle for best performance.&#34;&#34;&#34;
         # no longer needed as kauto completes cycles/epochs
-        #self.model.set_weights(self.best_weights)
+        # self.model.set_weights(self.best_weights)
         pass
 
-
     def on_epoch_begin(self, epoch, logs={}):
-        &#39;&#39;&#39;Initialize the learning rate to the minimum value at the start of training.&#39;&#39;&#39;
+        &#34;&#34;&#34;Initialize the learning rate to the minimum value at the start of training.&#34;&#34;&#34;
         logs = logs or {}</code></pre>
 </details>
 </section>
@@ -152,7 +156,7 @@ class SGDRScheduler(keras.callbacks.Callback):
 <h1 id="arguments">Arguments</h1>
 <pre><code>min_lr: The lower bound of the learning rate range for the experiment.
 max_lr: The upper bound of the learning rate range for the experiment.
-steps_per_epoch: Number of mini-batches in the dataset. Calculated as `np.ceil(epoch_size/batch_size)`. 
+steps_per_epoch: Number of mini-batches in the dataset. Calculated as `np.ceil(epoch_size/batch_size)`.
 lr_decay: Reduce the max_lr after the completion of each cycle.
           Ex. To reduce the max_lr by 20% after each cycle, set this value to 0.8.
 cycle_length: Initial number of epochs in a cycle.
@@ -167,7 +171,7 @@ Blog Post:      &lt;http://www.jeremyjordan.me/nn-learning-rate/&gt;
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class SGDRScheduler(keras.callbacks.Callback):
-    &#39;&#39;&#39;Cosine annealing learning rate scheduler with periodic restarts.
+    &#34;&#34;&#34;Cosine annealing learning rate scheduler with periodic restarts.
     # Usage
         ```python
             schedule = SGDRScheduler(min_lr=1e-7,
@@ -181,7 +185,7 @@ Blog Post:      &lt;http://www.jeremyjordan.me/nn-learning-rate/&gt;
     # Arguments
         min_lr: The lower bound of the learning rate range for the experiment.
         max_lr: The upper bound of the learning rate range for the experiment.
-        steps_per_epoch: Number of mini-batches in the dataset. Calculated as `np.ceil(epoch_size/batch_size)`. 
+        steps_per_epoch: Number of mini-batches in the dataset. Calculated as `np.ceil(epoch_size/batch_size)`.
         lr_decay: Reduce the max_lr after the completion of each cycle.
                   Ex. To reduce the max_lr by 20% after each cycle, set this value to 0.8.
         cycle_length: Initial number of epochs in a cycle.
@@ -189,14 +193,17 @@ Blog Post:      &lt;http://www.jeremyjordan.me/nn-learning-rate/&gt;
     # References
         Original paper: http://arxiv.org/abs/1608.03983
         Blog Post:      http://www.jeremyjordan.me/nn-learning-rate/
-    &#39;&#39;&#39;
-    def __init__(self,
-                 min_lr,
-                 max_lr,
-                 steps_per_epoch,
-                 lr_decay=0.9,
-                 cycle_length=10,
-                 mult_factor=2):
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        min_lr,
+        max_lr,
+        steps_per_epoch,
+        lr_decay=0.9,
+        cycle_length=10,
+        mult_factor=2,
+    ):
 
         super(keras.callbacks.Callback, self).__init__()
         self.min_lr = min_lr
@@ -214,50 +221,50 @@ Blog Post:      &lt;http://www.jeremyjordan.me/nn-learning-rate/&gt;
         self.history = {}
 
     def clr(self):
-        &#39;&#39;&#39;Calculate the learning rate.&#39;&#39;&#39;
-        fraction_to_restart = self.batch_since_restart / (self.steps_per_epoch * self.cycle_length)
-        lr = self.min_lr + 0.5 * (self.max_lr - self.min_lr) * (1 + np.cos(fraction_to_restart * np.pi))
+        &#34;&#34;&#34;Calculate the learning rate.&#34;&#34;&#34;
+        fraction_to_restart = self.batch_since_restart / (
+            self.steps_per_epoch * self.cycle_length
+        )
+        lr = self.min_lr + 0.5 * (self.max_lr - self.min_lr) * (
+            1 + np.cos(fraction_to_restart * np.pi)
+        )
         return lr
 
     def on_train_begin(self, logs={}):
-        &#39;&#39;&#39;Initialize the learning rate to the minimum value at the start of training.&#39;&#39;&#39;
+        &#34;&#34;&#34;Initialize the learning rate to the minimum value at the start of training.&#34;&#34;&#34;
         logs = logs or {}
         K.set_value(self.model.optimizer.lr, self.max_lr)
 
-
     def on_batch_end(self, batch, logs={}):
-        &#39;&#39;&#39;Record previous batch statistics and update the learning rate.&#39;&#39;&#39;
+        &#34;&#34;&#34;Record previous batch statistics and update the learning rate.&#34;&#34;&#34;
         logs = logs or {}
-        self.history.setdefault(&#39;lr&#39;, []).append(K.get_value(self.model.optimizer.lr))
+        self.history.setdefault(&#34;lr&#34;, []).append(K.get_value(self.model.optimizer.lr))
         for k, v in logs.items():
             self.history.setdefault(k, []).append(v)
 
         self.batch_since_restart += 1
         K.set_value(self.model.optimizer.lr, self.clr())
-        #print(K.eval(self.model.optimizer.lr))
-
+        # print(K.eval(self.model.optimizer.lr))
 
     def on_epoch_end(self, epoch, logs={}):
-        &#39;&#39;&#39;Check for end of current cycle, apply restarts when necessary.&#39;&#39;&#39;
-        #print(K.eval(self.model.optimizer.lr))
+        &#34;&#34;&#34;Check for end of current cycle, apply restarts when necessary.&#34;&#34;&#34;
+        # print(K.eval(self.model.optimizer.lr))
         if epoch + 1 == self.next_restart:
             self.batch_since_restart = 0
             self.cycle_length = np.ceil(self.cycle_length * self.mult_factor)
             self.next_restart += self.cycle_length
             self.max_lr *= self.lr_decay
             # no longer needed as kauto completes cycles/epochs
-            #self.best_weights = self.model.get_weights()
-
+            # self.best_weights = self.model.get_weights()
 
     def on_train_end(self, logs={}):
-        &#39;&#39;&#39;Set weights to the values from the end of the most recent cycle for best performance.&#39;&#39;&#39;
+        &#34;&#34;&#34;Set weights to the values from the end of the most recent cycle for best performance.&#34;&#34;&#34;
         # no longer needed as kauto completes cycles/epochs
-        #self.model.set_weights(self.best_weights)
+        # self.model.set_weights(self.best_weights)
         pass
 
-
     def on_epoch_begin(self, epoch, logs={}):
-        &#39;&#39;&#39;Initialize the learning rate to the minimum value at the start of training.&#39;&#39;&#39;
+        &#34;&#34;&#34;Initialize the learning rate to the minimum value at the start of training.&#34;&#34;&#34;
         logs = logs or {}</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -276,9 +283,13 @@ Blog Post:      &lt;http://www.jeremyjordan.me/nn-learning-rate/&gt;
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def clr(self):
-    &#39;&#39;&#39;Calculate the learning rate.&#39;&#39;&#39;
-    fraction_to_restart = self.batch_since_restart / (self.steps_per_epoch * self.cycle_length)
-    lr = self.min_lr + 0.5 * (self.max_lr - self.min_lr) * (1 + np.cos(fraction_to_restart * np.pi))
+    &#34;&#34;&#34;Calculate the learning rate.&#34;&#34;&#34;
+    fraction_to_restart = self.batch_since_restart / (
+        self.steps_per_epoch * self.cycle_length
+    )
+    lr = self.min_lr + 0.5 * (self.max_lr - self.min_lr) * (
+        1 + np.cos(fraction_to_restart * np.pi)
+    )
     return lr</code></pre>
 </details>
 </dd>
@@ -292,9 +303,9 @@ Blog Post:      &lt;http://www.jeremyjordan.me/nn-learning-rate/&gt;
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def on_batch_end(self, batch, logs={}):
-    &#39;&#39;&#39;Record previous batch statistics and update the learning rate.&#39;&#39;&#39;
+    &#34;&#34;&#34;Record previous batch statistics and update the learning rate.&#34;&#34;&#34;
     logs = logs or {}
-    self.history.setdefault(&#39;lr&#39;, []).append(K.get_value(self.model.optimizer.lr))
+    self.history.setdefault(&#34;lr&#34;, []).append(K.get_value(self.model.optimizer.lr))
     for k, v in logs.items():
         self.history.setdefault(k, []).append(v)
 
@@ -312,7 +323,7 @@ Blog Post:      &lt;http://www.jeremyjordan.me/nn-learning-rate/&gt;
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def on_epoch_begin(self, epoch, logs={}):
-    &#39;&#39;&#39;Initialize the learning rate to the minimum value at the start of training.&#39;&#39;&#39;
+    &#34;&#34;&#34;Initialize the learning rate to the minimum value at the start of training.&#34;&#34;&#34;
     logs = logs or {}</code></pre>
 </details>
 </dd>
@@ -326,8 +337,8 @@ Blog Post:      &lt;http://www.jeremyjordan.me/nn-learning-rate/&gt;
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def on_epoch_end(self, epoch, logs={}):
-    &#39;&#39;&#39;Check for end of current cycle, apply restarts when necessary.&#39;&#39;&#39;
-    #print(K.eval(self.model.optimizer.lr))
+    &#34;&#34;&#34;Check for end of current cycle, apply restarts when necessary.&#34;&#34;&#34;
+    # print(K.eval(self.model.optimizer.lr))
     if epoch + 1 == self.next_restart:
         self.batch_since_restart = 0
         self.cycle_length = np.ceil(self.cycle_length * self.mult_factor)
@@ -345,7 +356,7 @@ Blog Post:      &lt;http://www.jeremyjordan.me/nn-learning-rate/&gt;
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def on_train_begin(self, logs={}):
-    &#39;&#39;&#39;Initialize the learning rate to the minimum value at the start of training.&#39;&#39;&#39;
+    &#34;&#34;&#34;Initialize the learning rate to the minimum value at the start of training.&#34;&#34;&#34;
     logs = logs or {}
     K.set_value(self.model.optimizer.lr, self.max_lr)</code></pre>
 </details>
@@ -360,9 +371,9 @@ Blog Post:      &lt;http://www.jeremyjordan.me/nn-learning-rate/&gt;
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def on_train_end(self, logs={}):
-    &#39;&#39;&#39;Set weights to the values from the end of the most recent cycle for best performance.&#39;&#39;&#39;
+    &#34;&#34;&#34;Set weights to the values from the end of the most recent cycle for best performance.&#34;&#34;&#34;
     # no longer needed as kauto completes cycles/epochs
-    #self.model.set_weights(self.best_weights)
+    # self.model.set_weights(self.best_weights)
     pass</code></pre>
 </details>
 </dd>

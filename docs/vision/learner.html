@@ -32,8 +32,6 @@ from ..core import GenLearner
 from .data import show_image
 
 
-
-
 class ImageClassLearner(GenLearner):
     &#34;&#34;&#34;
     ```
@@ -46,16 +44,27 @@ class ImageClassLearner(GenLearner):
     ```
     &#34;&#34;&#34;
 
-
-    def __init__(self, model, train_data=None, val_data=None, 
-                 batch_size=U.DEFAULT_BS, eval_batch_size=U.DEFAULT_BS,
-                 workers=1, use_multiprocessing=False):
-        super().__init__(model, train_data=train_data, val_data=val_data,
-                         batch_size=batch_size, eval_batch_size=eval_batch_size,
-                         workers=workers, use_multiprocessing=use_multiprocessing)
+    def __init__(
+        self,
+        model,
+        train_data=None,
+        val_data=None,
+        batch_size=U.DEFAULT_BS,
+        eval_batch_size=U.DEFAULT_BS,
+        workers=1,
+        use_multiprocessing=False,
+    ):
+        super().__init__(
+            model,
+            train_data=train_data,
+            val_data=val_data,
+            batch_size=batch_size,
+            eval_batch_size=eval_batch_size,
+            workers=workers,
+            use_multiprocessing=use_multiprocessing,
+        )
         return
 
-    
     def view_top_losses(self, n=4, preproc=None, val_data=None):
         &#34;&#34;&#34;
         ```
@@ -69,7 +78,7 @@ class ImageClassLearner(GenLearner):
                                  to correctly view raw data.
           val_data:  optional val_data to use instead of self.val_data
         Returns:
-            list of n tuples where first element is either 
+            list of n tuples where first element is either
             filepath or id of validation example and second element
             is loss.
         ```
@@ -81,7 +90,10 @@ class ImageClassLearner(GenLearner):
             val = val_data
         else:
             val = self.val_data
-        if val is None: raise Exception(&#39;val_data must be supplied to get_learner or view_top_losses&#39;)
+        if val is None:
+            raise Exception(
+                &#34;val_data must be supplied to get_learner or view_top_losses&#34;
+            )
 
         # get top losses and associated data
         tups = self.top_losses(n=n, val_data=val, preproc=preproc)
@@ -99,22 +111,32 @@ class ImageClassLearner(GenLearner):
             pred = tup[3]
 
             # Image Classification
-            if type(val).__name__ in [&#39;DirectoryIterator&#39;, &#39;DataFrameIterator&#39;]:
+            if type(val).__name__ in [&#34;DirectoryIterator&#34;, &#34;DataFrameIterator&#34;]:
                 fpath = val.filepaths[tup[0]]
-                fp = os.path.join(os.path.basename(os.path.dirname(fpath)), os.path.basename(fpath))
+                fp = os.path.join(
+                    os.path.basename(os.path.dirname(fpath)), os.path.basename(fpath)
+                )
                 plt.figure()
-                plt.title(&#34;%s | loss:%s | true:%s | pred:%s)&#34; % (fp, round(loss,2), truth, pred))
+                plt.title(
+                    &#34;%s | loss:%s | true:%s | pred:%s)&#34;
+                    % (fp, round(loss, 2), truth, pred)
+                )
                 show_image(fpath)
-            elif type(val).__name__ in [&#39;NumpyArrayIterator&#39;]:
+            elif type(val).__name__ in [&#34;NumpyArrayIterator&#34;]:
                 obs = val.x[idx]
-                #if preproc is not None: obs = preproc.undo(obs)
+                # if preproc is not None: obs = preproc.undo(obs)
                 plt.figure()
-                plt.title(&#34;id:%s | loss:%s | true:%s | pred:%s)&#34; % (idx, round(loss,2), truth, pred))
+                plt.title(
+                    &#34;id:%s | loss:%s | true:%s | pred:%s)&#34;
+                    % (idx, round(loss, 2), truth, pred)
+                )
                 plt.imshow(np.squeeze(obs))
                 # everything else including text classification
             else:
-                raise Exception(&#39;ImageClassLearner.view_top_losses only supports &#39; +
-                                &#39;DirectoryIterators, DataFrameIterators, and NumpyArrayIterators&#39;)
+                raise Exception(
+                    &#34;ImageClassLearner.view_top_losses only supports &#34;
+                    + &#34;DirectoryIterators, DataFrameIterators, and NumpyArrayIterators&#34;
+                )
         return</code></pre>
 </details>
 </section>
@@ -155,16 +177,27 @@ val_data (Iterator):   A Iterator instance for validation set
     ```
     &#34;&#34;&#34;
 
-
-    def __init__(self, model, train_data=None, val_data=None, 
-                 batch_size=U.DEFAULT_BS, eval_batch_size=U.DEFAULT_BS,
-                 workers=1, use_multiprocessing=False):
-        super().__init__(model, train_data=train_data, val_data=val_data,
-                         batch_size=batch_size, eval_batch_size=eval_batch_size,
-                         workers=workers, use_multiprocessing=use_multiprocessing)
+    def __init__(
+        self,
+        model,
+        train_data=None,
+        val_data=None,
+        batch_size=U.DEFAULT_BS,
+        eval_batch_size=U.DEFAULT_BS,
+        workers=1,
+        use_multiprocessing=False,
+    ):
+        super().__init__(
+            model,
+            train_data=train_data,
+            val_data=val_data,
+            batch_size=batch_size,
+            eval_batch_size=eval_batch_size,
+            workers=workers,
+            use_multiprocessing=use_multiprocessing,
+        )
         return
 
-    
     def view_top_losses(self, n=4, preproc=None, val_data=None):
         &#34;&#34;&#34;
         ```
@@ -178,7 +211,7 @@ val_data (Iterator):   A Iterator instance for validation set
                                  to correctly view raw data.
           val_data:  optional val_data to use instead of self.val_data
         Returns:
-            list of n tuples where first element is either 
+            list of n tuples where first element is either
             filepath or id of validation example and second element
             is loss.
         ```
@@ -190,7 +223,10 @@ val_data (Iterator):   A Iterator instance for validation set
             val = val_data
         else:
             val = self.val_data
-        if val is None: raise Exception(&#39;val_data must be supplied to get_learner or view_top_losses&#39;)
+        if val is None:
+            raise Exception(
+                &#34;val_data must be supplied to get_learner or view_top_losses&#34;
+            )
 
         # get top losses and associated data
         tups = self.top_losses(n=n, val_data=val, preproc=preproc)
@@ -208,22 +244,32 @@ val_data (Iterator):   A Iterator instance for validation set
             pred = tup[3]
 
             # Image Classification
-            if type(val).__name__ in [&#39;DirectoryIterator&#39;, &#39;DataFrameIterator&#39;]:
+            if type(val).__name__ in [&#34;DirectoryIterator&#34;, &#34;DataFrameIterator&#34;]:
                 fpath = val.filepaths[tup[0]]
-                fp = os.path.join(os.path.basename(os.path.dirname(fpath)), os.path.basename(fpath))
+                fp = os.path.join(
+                    os.path.basename(os.path.dirname(fpath)), os.path.basename(fpath)
+                )
                 plt.figure()
-                plt.title(&#34;%s | loss:%s | true:%s | pred:%s)&#34; % (fp, round(loss,2), truth, pred))
+                plt.title(
+                    &#34;%s | loss:%s | true:%s | pred:%s)&#34;
+                    % (fp, round(loss, 2), truth, pred)
+                )
                 show_image(fpath)
-            elif type(val).__name__ in [&#39;NumpyArrayIterator&#39;]:
+            elif type(val).__name__ in [&#34;NumpyArrayIterator&#34;]:
                 obs = val.x[idx]
-                #if preproc is not None: obs = preproc.undo(obs)
+                # if preproc is not None: obs = preproc.undo(obs)
                 plt.figure()
-                plt.title(&#34;id:%s | loss:%s | true:%s | pred:%s)&#34; % (idx, round(loss,2), truth, pred))
+                plt.title(
+                    &#34;id:%s | loss:%s | true:%s | pred:%s)&#34;
+                    % (idx, round(loss, 2), truth, pred)
+                )
                 plt.imshow(np.squeeze(obs))
                 # everything else including text classification
             else:
-                raise Exception(&#39;ImageClassLearner.view_top_losses only supports &#39; +
-                                &#39;DirectoryIterators, DataFrameIterators, and NumpyArrayIterators&#39;)
+                raise Exception(
+                    &#34;ImageClassLearner.view_top_losses only supports &#34;
+                    + &#34;DirectoryIterators, DataFrameIterators, and NumpyArrayIterators&#34;
+                )
         return</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -248,7 +294,7 @@ Args:
                          to correctly view raw data.
   val_data:  optional val_data to use instead of self.val_data
 Returns:
-    list of n tuples where first element is either 
+    list of n tuples where first element is either
     filepath or id of validation example and second element
     is loss.
 </code></pre></div>
@@ -269,7 +315,7 @@ Returns:
                              to correctly view raw data.
       val_data:  optional val_data to use instead of self.val_data
     Returns:
-        list of n tuples where first element is either 
+        list of n tuples where first element is either
         filepath or id of validation example and second element
         is loss.
     ```
@@ -281,7 +327,10 @@ Returns:
         val = val_data
     else:
         val = self.val_data
-    if val is None: raise Exception(&#39;val_data must be supplied to get_learner or view_top_losses&#39;)
+    if val is None:
+        raise Exception(
+            &#34;val_data must be supplied to get_learner or view_top_losses&#34;
+        )
 
     # get top losses and associated data
     tups = self.top_losses(n=n, val_data=val, preproc=preproc)
@@ -299,22 +348,32 @@ Returns:
         pred = tup[3]
 
         # Image Classification
-        if type(val).__name__ in [&#39;DirectoryIterator&#39;, &#39;DataFrameIterator&#39;]:
+        if type(val).__name__ in [&#34;DirectoryIterator&#34;, &#34;DataFrameIterator&#34;]:
             fpath = val.filepaths[tup[0]]
-            fp = os.path.join(os.path.basename(os.path.dirname(fpath)), os.path.basename(fpath))
+            fp = os.path.join(
+                os.path.basename(os.path.dirname(fpath)), os.path.basename(fpath)
+            )
             plt.figure()
-            plt.title(&#34;%s | loss:%s | true:%s | pred:%s)&#34; % (fp, round(loss,2), truth, pred))
+            plt.title(
+                &#34;%s | loss:%s | true:%s | pred:%s)&#34;
+                % (fp, round(loss, 2), truth, pred)
+            )
             show_image(fpath)
-        elif type(val).__name__ in [&#39;NumpyArrayIterator&#39;]:
+        elif type(val).__name__ in [&#34;NumpyArrayIterator&#34;]:
             obs = val.x[idx]
-            #if preproc is not None: obs = preproc.undo(obs)
+            # if preproc is not None: obs = preproc.undo(obs)
             plt.figure()
-            plt.title(&#34;id:%s | loss:%s | true:%s | pred:%s)&#34; % (idx, round(loss,2), truth, pred))
+            plt.title(
+                &#34;id:%s | loss:%s | true:%s | pred:%s)&#34;
+                % (idx, round(loss, 2), truth, pred)
+            )
             plt.imshow(np.squeeze(obs))
             # everything else including text classification
         else:
-            raise Exception(&#39;ImageClassLearner.view_top_losses only supports &#39; +
-                            &#39;DirectoryIterators, DataFrameIterators, and NumpyArrayIterators&#39;)
+            raise Exception(
+                &#34;ImageClassLearner.view_top_losses only supports &#34;
+                + &#34;DirectoryIterators, DataFrameIterators, and NumpyArrayIterators&#34;
+            )
     return</code></pre>
 </details>
 </dd>

@@ -34,22 +34,23 @@ Utility functions.
 
 from ....imports import *
 
+
 def download(url):
     &#34;&#34;&#34;Download a trained weights, config and preprocessor.
 
     Args:
         url (str): target url.
     &#34;&#34;&#34;
-    filepath = keras.utils.get_file(fname=&#39;tmp.zip&#39;, origin=url, extract=True)
+    filepath = keras.utils.get_file(fname=&#34;tmp.zip&#34;, origin=url, extract=True)
     base_dir = os.path.dirname(filepath)
-    weights_file = os.path.join(base_dir, &#39;weights.h5&#39;)
-    params_file = os.path.join(base_dir, &#39;params.json&#39;)
-    preprocessor_file = os.path.join(base_dir, &#39;preprocessor.pickle&#39;)
+    weights_file = os.path.join(base_dir, &#34;weights.h5&#34;)
+    params_file = os.path.join(base_dir, &#34;params.json&#34;)
+    preprocessor_file = os.path.join(base_dir, &#34;preprocessor.pickle&#34;)
 
     return weights_file, params_file, preprocessor_file
 
 
-def load_data_and_labels(filename, encoding=&#39;utf-8&#39;):
+def load_data_and_labels(filename, encoding=&#34;utf-8&#34;):
     &#34;&#34;&#34;Loads data and label from a file.
 
     Args:
@@ -89,7 +90,7 @@ def load_data_and_labels(filename, encoding=&#39;utf-8&#39;):
         for line in f:
             line = line.rstrip()
             if line:
-                word, tag = line.split(&#39;\t&#39;)
+                word, tag = line.split(&#34;\t&#34;)
                 words.append(word)
                 tags.append(tag)
             else:
@@ -101,7 +102,6 @@ def load_data_and_labels(filename, encoding=&#39;utf-8&#39;):
 
 
 class AnagoNERSequence(keras.utils.Sequence):
-
     def __init__(self, x, y, batch_size=1, preprocess=None):
         self.x = x
         self.y = y
@@ -109,8 +109,8 @@ class AnagoNERSequence(keras.utils.Sequence):
         self.preprocess = preprocess
 
     def __getitem__(self, idx):
-        batch_x = self.x[idx * self.batch_size: (idx + 1) * self.batch_size]
-        batch_y = self.y[idx * self.batch_size: (idx + 1) * self.batch_size]
+        batch_x = self.x[idx * self.batch_size : (idx + 1) * self.batch_size]
+        batch_y = self.y[idx * self.batch_size : (idx + 1) * self.batch_size]
 
         return self.preprocess(batch_x, batch_y)
 
@@ -129,7 +129,7 @@ class Vocabulary(object):
         _id2token: A list of token strings indexed by their numerical identifiers.
     &#34;&#34;&#34;
 
-    def __init__(self, max_size=None, lower=True, unk_token=True, specials=(&#39;&lt;pad&gt;&#39;,)):
+    def __init__(self, max_size=None, lower=True, unk_token=True, specials=(&#34;&lt;pad&gt;&#34;,)):
         &#34;&#34;&#34;Create a Vocabulary object.
 
         Args:
@@ -204,7 +204,7 @@ class Vocabulary(object):
             self._id2token.append(token)
             idx += 1
         if self._unk:
-            unk = &#39;&lt;unk&gt;&#39;
+            unk = &#34;&lt;unk&gt;&#34;
             self._token2id[unk] = idx
             self._id2token.append(unk)
 
@@ -301,7 +301,7 @@ def load_glove(file):
     model = {}
     with open(file) as f:
         for line in f:
-            line = line.split(&#39; &#39;)
+            line = line.split(&#34; &#34;)
             word = line[0]
             vector = np.array([float(val) for val in line[1:]])
             model[word] = vector
@@ -336,11 +336,11 @@ def load_glove(file):
     Args:
         url (str): target url.
     &#34;&#34;&#34;
-    filepath = keras.utils.get_file(fname=&#39;tmp.zip&#39;, origin=url, extract=True)
+    filepath = keras.utils.get_file(fname=&#34;tmp.zip&#34;, origin=url, extract=True)
     base_dir = os.path.dirname(filepath)
-    weights_file = os.path.join(base_dir, &#39;weights.h5&#39;)
-    params_file = os.path.join(base_dir, &#39;params.json&#39;)
-    preprocessor_file = os.path.join(base_dir, &#39;preprocessor.pickle&#39;)
+    weights_file = os.path.join(base_dir, &#34;weights.h5&#34;)
+    params_file = os.path.join(base_dir, &#34;params.json&#34;)
+    preprocessor_file = os.path.join(base_dir, &#34;preprocessor.pickle&#34;)
 
     return weights_file, params_file, preprocessor_file</code></pre>
 </details>
@@ -426,7 +426,7 @@ Blackburn       I-PER
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def load_data_and_labels(filename, encoding=&#39;utf-8&#39;):
+<pre><code class="python">def load_data_and_labels(filename, encoding=&#34;utf-8&#34;):
     &#34;&#34;&#34;Loads data and label from a file.
 
     Args:
@@ -466,7 +466,7 @@ Blackburn       I-PER
         for line in f:
             line = line.rstrip()
             if line:
-                word, tag = line.split(&#39;\t&#39;)
+                word, tag = line.split(&#34;\t&#34;)
                 words.append(word)
                 tags.append(tag)
             else:
@@ -505,7 +505,7 @@ Blackburn       I-PER
     model = {}
     with open(file) as f:
         for line in f:
-            line = line.split(&#39; &#39;)
+            line = line.split(&#34; &#34;)
             word = line[0]
             vector = np.array([float(val) for val in line[1:]])
             model[word] = vector
@@ -565,7 +565,6 @@ class CIFAR10Sequence(Sequence):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class AnagoNERSequence(keras.utils.Sequence):
-
     def __init__(self, x, y, batch_size=1, preprocess=None):
         self.x = x
         self.y = y
@@ -573,8 +572,8 @@ class CIFAR10Sequence(Sequence):
         self.preprocess = preprocess
 
     def __getitem__(self, idx):
-        batch_x = self.x[idx * self.batch_size: (idx + 1) * self.batch_size]
-        batch_y = self.y[idx * self.batch_size: (idx + 1) * self.batch_size]
+        batch_x = self.x[idx * self.batch_size : (idx + 1) * self.batch_size]
+        batch_y = self.y[idx * self.batch_size : (idx + 1) * self.batch_size]
 
         return self.preprocess(batch_x, batch_y)
 
@@ -632,7 +631,7 @@ will be prepended to the vocabulary. Default: ('<pad>',)</dd>
         _id2token: A list of token strings indexed by their numerical identifiers.
     &#34;&#34;&#34;
 
-    def __init__(self, max_size=None, lower=True, unk_token=True, specials=(&#39;&lt;pad&gt;&#39;,)):
+    def __init__(self, max_size=None, lower=True, unk_token=True, specials=(&#34;&lt;pad&gt;&#34;,)):
         &#34;&#34;&#34;Create a Vocabulary object.
 
         Args:
@@ -707,7 +706,7 @@ will be prepended to the vocabulary. Default: ('<pad>',)</dd>
             self._id2token.append(token)
             idx += 1
         if self._unk:
-            unk = &#39;&lt;unk&gt;&#39;
+            unk = &#34;&lt;unk&gt;&#34;
             self._token2id[unk] = idx
             self._id2token.append(unk)
 
@@ -890,7 +889,7 @@ of tokens.</p>
         self._id2token.append(token)
         idx += 1
     if self._unk:
-        unk = &#39;&lt;unk&gt;&#39;
+        unk = &#34;&lt;unk&gt;&#34;
         self._token2id[unk] = idx
         self._id2token.append(unk)</code></pre>
 </details>

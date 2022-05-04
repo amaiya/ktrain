@@ -32,10 +32,19 @@ from .ner import NER
 from .utils import sent_tokenize, extract_filenames, read_text
 
 
-__all__ = [&#39;Classifier&#39;, 
-           &#39;Searcher&#39;, &#39;search&#39;, &#39;find_chinese&#39;, &#39;find_arabic&#39;, &#39;find_russian&#39;, &#39;read_text&#39;,
-           &#39;NER&#39;,
-           &#39;sent_tokenize&#39;, &#39;extract_filenames&#39;, &#39;read_text&#39;]</code></pre>
+__all__ = [
+    &#34;Classifier&#34;,
+    &#34;Searcher&#34;,
+    &#34;search&#34;,
+    &#34;find_chinese&#34;,
+    &#34;find_arabic&#34;,
+    &#34;find_russian&#34;,
+    &#34;read_text&#34;,
+    &#34;NER&#34;,
+    &#34;sent_tokenize&#34;,
+    &#34;extract_filenames&#34;,
+    &#34;read_text&#34;,
+]</code></pre>
 </details>
 </section>
 <section>
@@ -97,7 +106,8 @@ __all__ = [&#39;Classifier&#39;,
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def find_arabic(s): return re.findall(r&#39;[\u0600-\u06FF]+&#39;, s)</code></pre>
+<pre><code class="python">def find_arabic(s):
+    return re.findall(r&#34;[\u0600-\u06FF]+&#34;, s)</code></pre>
 </details>
 </dd>
 <dt id="ktrain.text.shallownlp.find_chinese"><code class="name flex">
@@ -109,7 +119,8 @@ __all__ = [&#39;Classifier&#39;,
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def find_chinese(s): return re.findall(r&#39;[\u4e00-\u9fff]+&#39;, s)</code></pre>
+<pre><code class="python">def find_chinese(s):
+    return re.findall(r&#34;[\u4e00-\u9fff]+&#34;, s)</code></pre>
 </details>
 </dd>
 <dt id="ktrain.text.shallownlp.find_russian"><code class="name flex">
@@ -121,7 +132,8 @@ __all__ = [&#39;Classifier&#39;,
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def find_russian(s): return find_cyrillic(s)</code></pre>
+<pre><code class="python">def find_russian(s):
+    return find_cyrillic(s)</code></pre>
 </details>
 </dd>
 <dt id="ktrain.text.shallownlp.read_text"><code class="name flex">
@@ -134,15 +146,17 @@ __all__ = [&#39;Classifier&#39;,
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def read_text(filename):
-    with open(filename, &#39;rb&#39;) as f:
+    with open(filename, &#34;rb&#34;) as f:
         text = f.read()
     encoding = detect_encoding([text])
     try:
-        decoded_text = text.decode(encoding) 
+        decoded_text = text.decode(encoding)
     except:
-        U.vprint(&#39;Decoding with %s failed 1st attempt - using %s with skips&#39; % (encoding,
-                                                                                encoding),
-                                                                                verbose=verbose)
+        U.vprint(
+            &#34;Decoding with %s failed 1st attempt - using %s with skips&#34;
+            % (encoding, encoding),
+            verbose=verbose,
+        )
         decoded_text = decode_by_line(text, encoding=encoding)
     return decoded_text.strip()</code></pre>
 </details>
@@ -158,7 +172,9 @@ __all__ = [&#39;Classifier&#39;,
 </summary>
 <pre><code class="python">def search(query, doc, case_sensitive=False, keys=[], progress=False):
     searcher = Searcher(query)
-    return searcher.search(doc, case_sensitive=case_sensitive, keys=keys, progress=progress)</code></pre>
+    return searcher.search(
+        doc, case_sensitive=case_sensitive, keys=keys, progress=progress
+    )</code></pre>
 </details>
 </dd>
 <dt id="ktrain.text.shallownlp.sent_tokenize"><code class="name flex">
@@ -177,7 +193,7 @@ __all__ = [&#39;Classifier&#39;,
     lang = detect_lang(text)
     sents = []
     if is_chinese(lang):
-        for sent in re.findall(u&#39;[^!?。\.\!\?]+[!?。\.\!\?]?&#39;, text, flags=re.U):
+        for sent in re.findall(&#34;[^!?。\.\!\?]+[!?。\.\!\?]?&#34;, text, flags=re.U):
             sents.append(sent)
     else:
         for paragraph in segmenter.process(text):
@@ -208,8 +224,7 @@ __all__ = [&#39;Classifier&#39;,
         &#34;&#34;&#34;
         self.model = None
 
-
-    def create_model(self, ctype, texts, hp_dict={}, ngram_range=(1,3), binary=True):
+    def create_model(self, ctype, texts, hp_dict={}, ngram_range=(1, 3), binary=True):
         &#34;&#34;&#34;
         ```
         create a model
@@ -226,72 +241,83 @@ __all__ = [&#39;Classifier&#39;,
         &#34;&#34;&#34;
         lang = U.detect_lang(texts)
         if U.is_chinese(lang):
-            token_pattern = r&#39;(?u)\b\w+\b&#39;
+            token_pattern = r&#34;(?u)\b\w+\b&#34;
         else:
-            token_pattern = r&#39;\w+|[%s]&#39; % string.punctuation
-        if ctype == &#39;nbsvm&#39;:
-            clf = NBSVM(C=hp_dict.get(&#39;C&#39;, 0.01), 
-                        alpha=hp_dict.get(&#39;alpha&#39;, 0.75), 
-                        beta=hp_dict.get(&#39;beta&#39;, 0.25), 
-                        fit_intercept=hp_dict.get(&#39;fit_intercept&#39;, False))
-        elif ctype==&#39;logreg&#39;:
-            clf = LogisticRegression(C=hp_dict.get(&#39;C&#39;, 0.1), 
-                                     dual=hp_dict.get(&#39;dual&#39;, True),
-                                     penalty=hp_dict.get(&#39;penalty&#39;, &#39;l2&#39;),
-                                     tol=hp_dict.get(&#39;tol&#39;, 1e-4),
-                                     intercept_scaling=hp_dict.get(&#39;intercept_scaling&#39;, 1),
-                                     solver=hp_dict.get(&#39;solver&#39;, &#39;liblinear&#39;),
-                                     max_iter=hp_dict.get(&#39;max_iter&#39;, 100),
-                                     multi_class=hp_dict.get(&#39;multi_class&#39;, &#39;auto&#39;),
-                                     warm_start=hp_dict.get(&#39;warm_start&#39;, False),
-                                     n_jobs=hp_dict.get(&#39;n_jobs&#39;, None),
-                                     l1_ratio=hp_dict.get(&#39;l1_ratio&#39;, None),
-                                     random_state=hp_dict.get(&#39;random_state&#39;, 42),
-                                     class_weight=hp_dict.get(&#39;class_weight&#39;, None)
-                                     )
-        elif ctype == &#39;sgdclassifier&#39;:
-            clf = SGDClassifier(loss=hp_dict.get(&#39;loss&#39;, &#39;hinge&#39;), 
-                                penalty=hp_dict.get(&#39;penalty&#39;, &#39;l2&#39;), 
-                                alpha=hp_dict.get(&#39;alpha&#39;, 1e-3), 
-                                random_state=hp_dict.get(&#39;random_state&#39;, 42), 
-                                max_iter=hp_dict.get(&#39;max_iter&#39;, 5),  # scikit-learn default is 1000
-                                tol=hp_dict.get(&#39;tol&#39;, None),
-                                l1_ratio=hp_dict.get(&#39;l1_ratio&#39;, 0.15),
-                                fit_intercept=hp_dict.get(&#39;fit_intercept&#39;, True),
-                                episilon=hp_dict.get(&#39;epsilon&#39;, 0.1),
-                                n_jobs=hp_dict.get(&#39;n_jobs&#39;, None),
-                                learning_rate=hp_dict.get(&#39;learning_rate&#39;, &#39;optimal&#39;),
-                                eta0=hp_dict.get(&#39;eta0&#39;, 0.0),
-                                power_t=hp_dict.get(&#39;power_t&#39;, 0.5),
-                                early_stopping=hp_dict.get(&#39;early_stopping&#39;, False),
-                                validation_fraction=hp_dict.get(&#39;validation_fraction&#39;, 0.1),
-                                n_iter_no_change=hp_dict.get(&#39;n_iter_no_change&#39;, 5),
-                                warm_start=hp_dict.get(&#39;warm_start&#39;, False),
-                                average=hp_dict.get(&#39;average&#39;, False),
-                                class_weight=hp_dict.get(&#39;class_weight&#39;, None))
+            token_pattern = r&#34;\w+|[%s]&#34; % string.punctuation
+        if ctype == &#34;nbsvm&#34;:
+            clf = NBSVM(
+                C=hp_dict.get(&#34;C&#34;, 0.01),
+                alpha=hp_dict.get(&#34;alpha&#34;, 0.75),
+                beta=hp_dict.get(&#34;beta&#34;, 0.25),
+                fit_intercept=hp_dict.get(&#34;fit_intercept&#34;, False),
+            )
+        elif ctype == &#34;logreg&#34;:
+            clf = LogisticRegression(
+                C=hp_dict.get(&#34;C&#34;, 0.1),
+                dual=hp_dict.get(&#34;dual&#34;, True),
+                penalty=hp_dict.get(&#34;penalty&#34;, &#34;l2&#34;),
+                tol=hp_dict.get(&#34;tol&#34;, 1e-4),
+                intercept_scaling=hp_dict.get(&#34;intercept_scaling&#34;, 1),
+                solver=hp_dict.get(&#34;solver&#34;, &#34;liblinear&#34;),
+                max_iter=hp_dict.get(&#34;max_iter&#34;, 100),
+                multi_class=hp_dict.get(&#34;multi_class&#34;, &#34;auto&#34;),
+                warm_start=hp_dict.get(&#34;warm_start&#34;, False),
+                n_jobs=hp_dict.get(&#34;n_jobs&#34;, None),
+                l1_ratio=hp_dict.get(&#34;l1_ratio&#34;, None),
+                random_state=hp_dict.get(&#34;random_state&#34;, 42),
+                class_weight=hp_dict.get(&#34;class_weight&#34;, None),
+            )
+        elif ctype == &#34;sgdclassifier&#34;:
+            clf = SGDClassifier(
+                loss=hp_dict.get(&#34;loss&#34;, &#34;hinge&#34;),
+                penalty=hp_dict.get(&#34;penalty&#34;, &#34;l2&#34;),
+                alpha=hp_dict.get(&#34;alpha&#34;, 1e-3),
+                random_state=hp_dict.get(&#34;random_state&#34;, 42),
+                max_iter=hp_dict.get(&#34;max_iter&#34;, 5),  # scikit-learn default is 1000
+                tol=hp_dict.get(&#34;tol&#34;, None),
+                l1_ratio=hp_dict.get(&#34;l1_ratio&#34;, 0.15),
+                fit_intercept=hp_dict.get(&#34;fit_intercept&#34;, True),
+                episilon=hp_dict.get(&#34;epsilon&#34;, 0.1),
+                n_jobs=hp_dict.get(&#34;n_jobs&#34;, None),
+                learning_rate=hp_dict.get(&#34;learning_rate&#34;, &#34;optimal&#34;),
+                eta0=hp_dict.get(&#34;eta0&#34;, 0.0),
+                power_t=hp_dict.get(&#34;power_t&#34;, 0.5),
+                early_stopping=hp_dict.get(&#34;early_stopping&#34;, False),
+                validation_fraction=hp_dict.get(&#34;validation_fraction&#34;, 0.1),
+                n_iter_no_change=hp_dict.get(&#34;n_iter_no_change&#34;, 5),
+                warm_start=hp_dict.get(&#34;warm_start&#34;, False),
+                average=hp_dict.get(&#34;average&#34;, False),
+                class_weight=hp_dict.get(&#34;class_weight&#34;, None),
+            )
         else:
-            raise ValueError(&#39;Unknown ctype: %s&#39; % (ctype))
+            raise ValueError(&#34;Unknown ctype: %s&#34; % (ctype))
 
-        self.model = Pipeline([ (&#39;vect&#39;, CountVectorizer(ngram_range=hp_dict.get(&#39;ngram_range&#39;, ngram_range), 
-                                                         binary=hp_dict.get(&#39;binary&#39;, binary), 
-                                                         token_pattern=token_pattern,
-                                                         max_features=hp_dict.get(&#39;max_features&#39;, None),
-                                                         max_df=hp_dict.get(&#39;max_df&#39;, 1.0),
-                                                         min_df=hp_dict.get(&#39;min_df&#39;, 1),
-                                                         stop_words=hp_dict.get(&#39;stop_words&#39;, None),
-                                                         lowercase=hp_dict.get(&#39;lowercase&#39;, True),
-                                                         strip_accents=hp_dict.get(&#39;strip_accents&#39;, None),
-                                                         encoding=hp_dict.get(&#39;encoding&#39;, &#39;utf-8&#39;)
-                                                         )),
-                              (&#39;clf&#39;, clf) ])
+        self.model = Pipeline(
+            [
+                (
+                    &#34;vect&#34;,
+                    CountVectorizer(
+                        ngram_range=hp_dict.get(&#34;ngram_range&#34;, ngram_range),
+                        binary=hp_dict.get(&#34;binary&#34;, binary),
+                        token_pattern=token_pattern,
+                        max_features=hp_dict.get(&#34;max_features&#34;, None),
+                        max_df=hp_dict.get(&#34;max_df&#34;, 1.0),
+                        min_df=hp_dict.get(&#34;min_df&#34;, 1),
+                        stop_words=hp_dict.get(&#34;stop_words&#34;, None),
+                        lowercase=hp_dict.get(&#34;lowercase&#34;, True),
+                        strip_accents=hp_dict.get(&#34;strip_accents&#34;, None),
+                        encoding=hp_dict.get(&#34;encoding&#34;, &#34;utf-8&#34;),
+                    ),
+                ),
+                (&#34;clf&#34;, clf),
+            ]
+        )
         return
 
-
     @classmethod
-    def load_texts_from_folder(cls, folder_path, 
-                              subfolders=None, 
-                              shuffle=True,
-                              encoding=None):
+    def load_texts_from_folder(
+        cls, folder_path, subfolders=None, shuffle=True, encoding=None
+    ):
         &#34;&#34;&#34;
         ```
         load text files from folder
@@ -301,7 +327,7 @@ __all__ = [&#39;Classifier&#39;,
                             The supplied folder should contain a subfolder
                             for each category, which will be used as the class label
           subfolders(list): list of subfolders under folder_path to consider
-                            Example: If folder_path contains subfolders pos, neg, and 
+                            Example: If folder_path contains subfolders pos, neg, and
                             unlabeled, then unlabeled folder can be ignored by
                             setting subfolders=[&#39;pos&#39;, &#39;neg&#39;]
           shuffle(bool):  If True, list of texts will be shuffled
@@ -314,29 +340,35 @@ __all__ = [&#39;Classifier&#39;,
         texts = bunch.data
         labels = bunch.target
         label_names = bunch.target_names
-        #print(&#39;target names:&#39;)
-        #for idx, label_name in enumerate(bunch.target_names):
-            #print(&#39;\t%s:%s&#39; % (idx, label_name))
+        # print(&#39;target names:&#39;)
+        # for idx, label_name in enumerate(bunch.target_names):
+        # print(&#39;\t%s:%s&#39; % (idx, label_name))
 
         # decode based on supplied encoding
         if encoding is None:
             encoding = U.detect_encoding(texts)
-            if encoding != &#39;utf-8&#39;:
-                print(&#39;detected encoding: %s&#39; % (encoding))
+            if encoding != &#34;utf-8&#34;:
+                print(&#34;detected encoding: %s&#34; % (encoding))
 
         try:
             texts = [text.decode(encoding) for text in texts]
         except:
-            print(&#39;Decoding with %s failed 1st attempt - using %s with skips&#39; % (encoding,
-                                                                                 encoding))
+            print(
+                &#34;Decoding with %s failed 1st attempt - using %s with skips&#34;
+                % (encoding, encoding)
+            )
             texts = U.decode_by_line(texts, encoding=encoding)
         return (texts, labels, label_names)
 
-
-
     @classmethod
-    def load_texts_from_csv(cls, csv_filepath, text_column=&#39;text&#39;, label_column=&#39;label&#39;,
-                            sep=&#39;,&#39;, encoding=None):
+    def load_texts_from_csv(
+        cls,
+        csv_filepath,
+        text_column=&#34;text&#34;,
+        label_column=&#34;label&#34;,
+        sep=&#34;,&#34;,
+        encoding=None,
+    ):
         &#34;&#34;&#34;
         ```
         load text files from csv file
@@ -359,21 +391,21 @@ __all__ = [&#39;Classifier&#39;,
         ```
         &#34;&#34;&#34;
         if encoding is None:
-            with open(csv_filepath, &#39;rb&#39;) as f:
+            with open(csv_filepath, &#34;rb&#34;) as f:
                 encoding = U.detect_encoding([f.read()])
-                if encoding != &#39;utf-8&#39;:
-                    print(&#39;detected encoding: %s (if wrong, set manually)&#39; % (encoding))
+                if encoding != &#34;utf-8&#34;:
+                    print(&#34;detected encoding: %s (if wrong, set manually)&#34; % (encoding))
         import pandas as pd
+
         df = pd.read_csv(csv_filepath, encoding=encoding, sep=sep)
-        texts = df[text_column].fillna(&#39;fillna&#39;).values
+        texts = df[text_column].fillna(&#34;fillna&#34;).values
         labels = df[label_column].values
         le = LabelEncoder()
         le.fit(labels)
         labels = le.transform(labels)
         return (texts, labels, le.classes_)
 
-
-    def fit(self, x_train, y_train, ctype=&#39;logreg&#39;):
+    def fit(self, x_train, y_train, ctype=&#34;logreg&#34;):
         &#34;&#34;&#34;
         ```
         train a classifier
@@ -391,8 +423,6 @@ __all__ = [&#39;Classifier&#39;,
         self.model.fit(x_train, y_train)
         return self
 
-
-
     def predict(self, x_test, return_proba=False):
         &#34;&#34;&#34;
         ```
@@ -401,26 +431,30 @@ __all__ = [&#39;Classifier&#39;,
           x_test(list or np.ndarray or str): array of texts on which to make predictions or a string representing text
         ```
         &#34;&#34;&#34;
-        if return_proba and not hasattr(self.model[&#39;clf&#39;], &#39;predict_proba&#39;): 
-            raise ValueError(&#39;%s does not support predict_proba&#39; % (type(self.model[&#39;clf&#39;]).__name__))
-        if isinstance(x_test, str): x_test = [x_test]
+        if return_proba and not hasattr(self.model[&#34;clf&#34;], &#34;predict_proba&#34;):
+            raise ValueError(
+                &#34;%s does not support predict_proba&#34; % (type(self.model[&#34;clf&#34;]).__name__)
+            )
+        if isinstance(x_test, str):
+            x_test = [x_test]
         lang = U.detect_lang(x_test)
-        if U.is_chinese(lang): x_test = U.split_chinese(x_test)
-        if self.model is None: raise ValueError(&#39;model is None - call fit or load to set the model&#39;)
+        if U.is_chinese(lang):
+            x_test = U.split_chinese(x_test)
+        if self.model is None:
+            raise ValueError(&#34;model is None - call fit or load to set the model&#34;)
         if return_proba:
             predicted = self.model.predict_proba(x_test)
         else:
             predicted = self.model.predict(x_test)
-        if len(predicted) == 1: predicted = predicted[0]
+        if len(predicted) == 1:
+            predicted = predicted[0]
         return predicted
-
 
     def predict_proba(self, x_test):
         &#34;&#34;&#34;
         predict_proba
         &#34;&#34;&#34;
         return self.predict(x_test, return_proba=True)
-
 
     def evaluate(self, x_test, y_test):
         &#34;&#34;&#34;
@@ -434,13 +468,11 @@ __all__ = [&#39;Classifier&#39;,
         predicted = self.predict(x_test)
         return np.mean(predicted == y_test)
 
-
     def save(self, filename):
         &#34;&#34;&#34;
         save model
         &#34;&#34;&#34;
         dump(self.model, filename)
-
 
     def load(self, filename):
         &#34;&#34;&#34;
@@ -459,14 +491,14 @@ __all__ = [&#39;Classifier&#39;,
                                       #&#39;clf__C&#39;: (1e0, 1e-1, 1e-2),
                                       &#39;clf__alpha&#39;: (0.1, 0.2, 0.4, 0.5, 0.75, 0.9, 1.0),
                                       #&#39;clf__fit_intercept&#39;: (True, False),
-                                      #&#39;clf__beta&#39; : (0.1, 0.25, 0.5, 0.9) 
+                                      #&#39;clf__beta&#39; : (0.1, 0.25, 0.5, 0.9)
                                       }
           n_jobs(int): number of jobs to run in parallel.  default:-1 (use all processors)
         ```
         &#34;&#34;&#34;
         gs_clf = GridSearchCV(self.model, params, n_jobs=n_jobs)
         gs_clf = gs_clf.fit(x_train, y_train)
-        #gs_clf.best_score_                                  
+        # gs_clf.best_score_
         for param_name in sorted(params.keys()):
             print(&#34;%s: %r&#34; % (param_name, gs_clf.best_params_[param_name]))
         return</code></pre>
@@ -500,8 +532,14 @@ Returns:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@classmethod
-def load_texts_from_csv(cls, csv_filepath, text_column=&#39;text&#39;, label_column=&#39;label&#39;,
-                        sep=&#39;,&#39;, encoding=None):
+def load_texts_from_csv(
+    cls,
+    csv_filepath,
+    text_column=&#34;text&#34;,
+    label_column=&#34;label&#34;,
+    sep=&#34;,&#34;,
+    encoding=None,
+):
     &#34;&#34;&#34;
     ```
     load text files from csv file
@@ -524,13 +562,14 @@ def load_texts_from_csv(cls, csv_filepath, text_column=&#39;text&#39;, label_col
     ```
     &#34;&#34;&#34;
     if encoding is None:
-        with open(csv_filepath, &#39;rb&#39;) as f:
+        with open(csv_filepath, &#34;rb&#34;) as f:
             encoding = U.detect_encoding([f.read()])
-            if encoding != &#39;utf-8&#39;:
-                print(&#39;detected encoding: %s (if wrong, set manually)&#39; % (encoding))
+            if encoding != &#34;utf-8&#34;:
+                print(&#34;detected encoding: %s (if wrong, set manually)&#34; % (encoding))
     import pandas as pd
+
     df = pd.read_csv(csv_filepath, encoding=encoding, sep=sep)
-    texts = df[text_column].fillna(&#39;fillna&#39;).values
+    texts = df[text_column].fillna(&#34;fillna&#34;).values
     labels = df[label_column].values
     le = LabelEncoder()
     le.fit(labels)
@@ -549,7 +588,7 @@ Args:
                     The supplied folder should contain a subfolder
                     for each category, which will be used as the class label
   subfolders(list): list of subfolders under folder_path to consider
-                    Example: If folder_path contains subfolders pos, neg, and 
+                    Example: If folder_path contains subfolders pos, neg, and
                     unlabeled, then unlabeled folder can be ignored by
                     setting subfolders=['pos', 'neg']
   shuffle(bool):  If True, list of texts will be shuffled
@@ -562,10 +601,9 @@ Returns:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@classmethod
-def load_texts_from_folder(cls, folder_path, 
-                          subfolders=None, 
-                          shuffle=True,
-                          encoding=None):
+def load_texts_from_folder(
+    cls, folder_path, subfolders=None, shuffle=True, encoding=None
+):
     &#34;&#34;&#34;
     ```
     load text files from folder
@@ -575,7 +613,7 @@ def load_texts_from_folder(cls, folder_path,
                         The supplied folder should contain a subfolder
                         for each category, which will be used as the class label
       subfolders(list): list of subfolders under folder_path to consider
-                        Example: If folder_path contains subfolders pos, neg, and 
+                        Example: If folder_path contains subfolders pos, neg, and
                         unlabeled, then unlabeled folder can be ignored by
                         setting subfolders=[&#39;pos&#39;, &#39;neg&#39;]
       shuffle(bool):  If True, list of texts will be shuffled
@@ -588,21 +626,23 @@ def load_texts_from_folder(cls, folder_path,
     texts = bunch.data
     labels = bunch.target
     label_names = bunch.target_names
-    #print(&#39;target names:&#39;)
-    #for idx, label_name in enumerate(bunch.target_names):
-        #print(&#39;\t%s:%s&#39; % (idx, label_name))
+    # print(&#39;target names:&#39;)
+    # for idx, label_name in enumerate(bunch.target_names):
+    # print(&#39;\t%s:%s&#39; % (idx, label_name))
 
     # decode based on supplied encoding
     if encoding is None:
         encoding = U.detect_encoding(texts)
-        if encoding != &#39;utf-8&#39;:
-            print(&#39;detected encoding: %s&#39; % (encoding))
+        if encoding != &#34;utf-8&#34;:
+            print(&#34;detected encoding: %s&#34; % (encoding))
 
     try:
         texts = [text.decode(encoding) for text in texts]
     except:
-        print(&#39;Decoding with %s failed 1st attempt - using %s with skips&#39; % (encoding,
-                                                                             encoding))
+        print(
+            &#34;Decoding with %s failed 1st attempt - using %s with skips&#34;
+            % (encoding, encoding)
+        )
         texts = U.decode_by_line(texts, encoding=encoding)
     return (texts, labels, label_names)</code></pre>
 </details>
@@ -629,7 +669,7 @@ Args:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def create_model(self, ctype, texts, hp_dict={}, ngram_range=(1,3), binary=True):
+<pre><code class="python">def create_model(self, ctype, texts, hp_dict={}, ngram_range=(1, 3), binary=True):
     &#34;&#34;&#34;
     ```
     create a model
@@ -646,64 +686,77 @@ Args:
     &#34;&#34;&#34;
     lang = U.detect_lang(texts)
     if U.is_chinese(lang):
-        token_pattern = r&#39;(?u)\b\w+\b&#39;
+        token_pattern = r&#34;(?u)\b\w+\b&#34;
     else:
-        token_pattern = r&#39;\w+|[%s]&#39; % string.punctuation
-    if ctype == &#39;nbsvm&#39;:
-        clf = NBSVM(C=hp_dict.get(&#39;C&#39;, 0.01), 
-                    alpha=hp_dict.get(&#39;alpha&#39;, 0.75), 
-                    beta=hp_dict.get(&#39;beta&#39;, 0.25), 
-                    fit_intercept=hp_dict.get(&#39;fit_intercept&#39;, False))
-    elif ctype==&#39;logreg&#39;:
-        clf = LogisticRegression(C=hp_dict.get(&#39;C&#39;, 0.1), 
-                                 dual=hp_dict.get(&#39;dual&#39;, True),
-                                 penalty=hp_dict.get(&#39;penalty&#39;, &#39;l2&#39;),
-                                 tol=hp_dict.get(&#39;tol&#39;, 1e-4),
-                                 intercept_scaling=hp_dict.get(&#39;intercept_scaling&#39;, 1),
-                                 solver=hp_dict.get(&#39;solver&#39;, &#39;liblinear&#39;),
-                                 max_iter=hp_dict.get(&#39;max_iter&#39;, 100),
-                                 multi_class=hp_dict.get(&#39;multi_class&#39;, &#39;auto&#39;),
-                                 warm_start=hp_dict.get(&#39;warm_start&#39;, False),
-                                 n_jobs=hp_dict.get(&#39;n_jobs&#39;, None),
-                                 l1_ratio=hp_dict.get(&#39;l1_ratio&#39;, None),
-                                 random_state=hp_dict.get(&#39;random_state&#39;, 42),
-                                 class_weight=hp_dict.get(&#39;class_weight&#39;, None)
-                                 )
-    elif ctype == &#39;sgdclassifier&#39;:
-        clf = SGDClassifier(loss=hp_dict.get(&#39;loss&#39;, &#39;hinge&#39;), 
-                            penalty=hp_dict.get(&#39;penalty&#39;, &#39;l2&#39;), 
-                            alpha=hp_dict.get(&#39;alpha&#39;, 1e-3), 
-                            random_state=hp_dict.get(&#39;random_state&#39;, 42), 
-                            max_iter=hp_dict.get(&#39;max_iter&#39;, 5),  # scikit-learn default is 1000
-                            tol=hp_dict.get(&#39;tol&#39;, None),
-                            l1_ratio=hp_dict.get(&#39;l1_ratio&#39;, 0.15),
-                            fit_intercept=hp_dict.get(&#39;fit_intercept&#39;, True),
-                            episilon=hp_dict.get(&#39;epsilon&#39;, 0.1),
-                            n_jobs=hp_dict.get(&#39;n_jobs&#39;, None),
-                            learning_rate=hp_dict.get(&#39;learning_rate&#39;, &#39;optimal&#39;),
-                            eta0=hp_dict.get(&#39;eta0&#39;, 0.0),
-                            power_t=hp_dict.get(&#39;power_t&#39;, 0.5),
-                            early_stopping=hp_dict.get(&#39;early_stopping&#39;, False),
-                            validation_fraction=hp_dict.get(&#39;validation_fraction&#39;, 0.1),
-                            n_iter_no_change=hp_dict.get(&#39;n_iter_no_change&#39;, 5),
-                            warm_start=hp_dict.get(&#39;warm_start&#39;, False),
-                            average=hp_dict.get(&#39;average&#39;, False),
-                            class_weight=hp_dict.get(&#39;class_weight&#39;, None))
+        token_pattern = r&#34;\w+|[%s]&#34; % string.punctuation
+    if ctype == &#34;nbsvm&#34;:
+        clf = NBSVM(
+            C=hp_dict.get(&#34;C&#34;, 0.01),
+            alpha=hp_dict.get(&#34;alpha&#34;, 0.75),
+            beta=hp_dict.get(&#34;beta&#34;, 0.25),
+            fit_intercept=hp_dict.get(&#34;fit_intercept&#34;, False),
+        )
+    elif ctype == &#34;logreg&#34;:
+        clf = LogisticRegression(
+            C=hp_dict.get(&#34;C&#34;, 0.1),
+            dual=hp_dict.get(&#34;dual&#34;, True),
+            penalty=hp_dict.get(&#34;penalty&#34;, &#34;l2&#34;),
+            tol=hp_dict.get(&#34;tol&#34;, 1e-4),
+            intercept_scaling=hp_dict.get(&#34;intercept_scaling&#34;, 1),
+            solver=hp_dict.get(&#34;solver&#34;, &#34;liblinear&#34;),
+            max_iter=hp_dict.get(&#34;max_iter&#34;, 100),
+            multi_class=hp_dict.get(&#34;multi_class&#34;, &#34;auto&#34;),
+            warm_start=hp_dict.get(&#34;warm_start&#34;, False),
+            n_jobs=hp_dict.get(&#34;n_jobs&#34;, None),
+            l1_ratio=hp_dict.get(&#34;l1_ratio&#34;, None),
+            random_state=hp_dict.get(&#34;random_state&#34;, 42),
+            class_weight=hp_dict.get(&#34;class_weight&#34;, None),
+        )
+    elif ctype == &#34;sgdclassifier&#34;:
+        clf = SGDClassifier(
+            loss=hp_dict.get(&#34;loss&#34;, &#34;hinge&#34;),
+            penalty=hp_dict.get(&#34;penalty&#34;, &#34;l2&#34;),
+            alpha=hp_dict.get(&#34;alpha&#34;, 1e-3),
+            random_state=hp_dict.get(&#34;random_state&#34;, 42),
+            max_iter=hp_dict.get(&#34;max_iter&#34;, 5),  # scikit-learn default is 1000
+            tol=hp_dict.get(&#34;tol&#34;, None),
+            l1_ratio=hp_dict.get(&#34;l1_ratio&#34;, 0.15),
+            fit_intercept=hp_dict.get(&#34;fit_intercept&#34;, True),
+            episilon=hp_dict.get(&#34;epsilon&#34;, 0.1),
+            n_jobs=hp_dict.get(&#34;n_jobs&#34;, None),
+            learning_rate=hp_dict.get(&#34;learning_rate&#34;, &#34;optimal&#34;),
+            eta0=hp_dict.get(&#34;eta0&#34;, 0.0),
+            power_t=hp_dict.get(&#34;power_t&#34;, 0.5),
+            early_stopping=hp_dict.get(&#34;early_stopping&#34;, False),
+            validation_fraction=hp_dict.get(&#34;validation_fraction&#34;, 0.1),
+            n_iter_no_change=hp_dict.get(&#34;n_iter_no_change&#34;, 5),
+            warm_start=hp_dict.get(&#34;warm_start&#34;, False),
+            average=hp_dict.get(&#34;average&#34;, False),
+            class_weight=hp_dict.get(&#34;class_weight&#34;, None),
+        )
     else:
-        raise ValueError(&#39;Unknown ctype: %s&#39; % (ctype))
+        raise ValueError(&#34;Unknown ctype: %s&#34; % (ctype))
 
-    self.model = Pipeline([ (&#39;vect&#39;, CountVectorizer(ngram_range=hp_dict.get(&#39;ngram_range&#39;, ngram_range), 
-                                                     binary=hp_dict.get(&#39;binary&#39;, binary), 
-                                                     token_pattern=token_pattern,
-                                                     max_features=hp_dict.get(&#39;max_features&#39;, None),
-                                                     max_df=hp_dict.get(&#39;max_df&#39;, 1.0),
-                                                     min_df=hp_dict.get(&#39;min_df&#39;, 1),
-                                                     stop_words=hp_dict.get(&#39;stop_words&#39;, None),
-                                                     lowercase=hp_dict.get(&#39;lowercase&#39;, True),
-                                                     strip_accents=hp_dict.get(&#39;strip_accents&#39;, None),
-                                                     encoding=hp_dict.get(&#39;encoding&#39;, &#39;utf-8&#39;)
-                                                     )),
-                          (&#39;clf&#39;, clf) ])
+    self.model = Pipeline(
+        [
+            (
+                &#34;vect&#34;,
+                CountVectorizer(
+                    ngram_range=hp_dict.get(&#34;ngram_range&#34;, ngram_range),
+                    binary=hp_dict.get(&#34;binary&#34;, binary),
+                    token_pattern=token_pattern,
+                    max_features=hp_dict.get(&#34;max_features&#34;, None),
+                    max_df=hp_dict.get(&#34;max_df&#34;, 1.0),
+                    min_df=hp_dict.get(&#34;min_df&#34;, 1),
+                    stop_words=hp_dict.get(&#34;stop_words&#34;, None),
+                    lowercase=hp_dict.get(&#34;lowercase&#34;, True),
+                    strip_accents=hp_dict.get(&#34;strip_accents&#34;, None),
+                    encoding=hp_dict.get(&#34;encoding&#34;, &#34;utf-8&#34;),
+                ),
+            ),
+            (&#34;clf&#34;, clf),
+        ]
+    )
     return</code></pre>
 </details>
 </dd>
@@ -747,7 +800,7 @@ Args:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def fit(self, x_train, y_train, ctype=&#39;logreg&#39;):
+<pre><code class="python">def fit(self, x_train, y_train, ctype=&#34;logreg&#34;):
     &#34;&#34;&#34;
     ```
     train a classifier
@@ -778,7 +831,7 @@ Args:
                               #'clf__C': (1e0, 1e-1, 1e-2),
                               'clf__alpha': (0.1, 0.2, 0.4, 0.5, 0.75, 0.9, 1.0),
                               #'clf__fit_intercept': (True, False),
-                              #'clf__beta' : (0.1, 0.25, 0.5, 0.9) 
+                              #'clf__beta' : (0.1, 0.25, 0.5, 0.9)
                               }
   n_jobs(int): number of jobs to run in parallel.  default:-1 (use all processors)
 </code></pre></div>
@@ -797,14 +850,14 @@ Args:
                                   #&#39;clf__C&#39;: (1e0, 1e-1, 1e-2),
                                   &#39;clf__alpha&#39;: (0.1, 0.2, 0.4, 0.5, 0.75, 0.9, 1.0),
                                   #&#39;clf__fit_intercept&#39;: (True, False),
-                                  #&#39;clf__beta&#39; : (0.1, 0.25, 0.5, 0.9) 
+                                  #&#39;clf__beta&#39; : (0.1, 0.25, 0.5, 0.9)
                                   }
       n_jobs(int): number of jobs to run in parallel.  default:-1 (use all processors)
     ```
     &#34;&#34;&#34;
     gs_clf = GridSearchCV(self.model, params, n_jobs=n_jobs)
     gs_clf = gs_clf.fit(x_train, y_train)
-    #gs_clf.best_score_                                  
+    # gs_clf.best_score_
     for param_name in sorted(params.keys()):
         print(&#34;%s: %r&#34; % (param_name, gs_clf.best_params_[param_name]))
     return</code></pre>
@@ -846,17 +899,23 @@ Args:
       x_test(list or np.ndarray or str): array of texts on which to make predictions or a string representing text
     ```
     &#34;&#34;&#34;
-    if return_proba and not hasattr(self.model[&#39;clf&#39;], &#39;predict_proba&#39;): 
-        raise ValueError(&#39;%s does not support predict_proba&#39; % (type(self.model[&#39;clf&#39;]).__name__))
-    if isinstance(x_test, str): x_test = [x_test]
+    if return_proba and not hasattr(self.model[&#34;clf&#34;], &#34;predict_proba&#34;):
+        raise ValueError(
+            &#34;%s does not support predict_proba&#34; % (type(self.model[&#34;clf&#34;]).__name__)
+        )
+    if isinstance(x_test, str):
+        x_test = [x_test]
     lang = U.detect_lang(x_test)
-    if U.is_chinese(lang): x_test = U.split_chinese(x_test)
-    if self.model is None: raise ValueError(&#39;model is None - call fit or load to set the model&#39;)
+    if U.is_chinese(lang):
+        x_test = U.split_chinese(x_test)
+    if self.model is None:
+        raise ValueError(&#34;model is None - call fit or load to set the model&#34;)
     if return_proba:
         predicted = self.model.predict_proba(x_test)
     else:
         predicted = self.model.predict(x_test)
-    if len(predicted) == 1: predicted = predicted[0]
+    if len(predicted) == 1:
+        predicted = predicted[0]
     return predicted</code></pre>
 </details>
 </dd>
@@ -910,7 +969,7 @@ Args:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class NER:
-    def __init__(self, lang=&#39;en&#39;, predictor_path=None):
+    def __init__(self, lang=&#34;en&#34;, predictor_path=None):
         &#34;&#34;&#34;
         ```
         pretrained NER.
@@ -921,51 +980,69 @@ Args:
         ```
         &#34;&#34;&#34;
         if lang is None:
-            raise ValueError(&#39;lang is required (e.g., &#34;en&#34; for English, &#34;zh&#34; for Chinese, &#34;ru&#34; for Russian, etc.&#39;)
-        if predictor_path is None and lang not in [&#39;en&#39;, &#39;zh&#39;, &#39;ru&#39;]:
-            raise ValueError(&#34;Unsupported language: if predictor_path is None,  then lang must be &#34; +\
-                             &#34;&#39;en&#39; for English, &#39;zh&#39; for Chinese, or &#39;ru&#39; for Chinese&#34;)
+            raise ValueError(
+                &#39;lang is required (e.g., &#34;en&#34; for English, &#34;zh&#34; for Chinese, &#34;ru&#34; for Russian, etc.&#39;
+            )
+        if predictor_path is None and lang not in [&#34;en&#34;, &#34;zh&#34;, &#34;ru&#34;]:
+            raise ValueError(
+                &#34;Unsupported language: if predictor_path is None,  then lang must be &#34;
+                + &#34;&#39;en&#39; for English, &#39;zh&#39; for Chinese, or &#39;ru&#39; for Chinese&#34;
+            )
         self.lang = lang
-        if os.environ.get(&#39;DISABLE_V2_BEHAVIOR&#39;, None) != &#39;1&#39;:
-            warnings.warn(&#34;Please add os.environ[&#39;DISABLE_V2_BEHAVIOR&#39;] = &#39;1&#39; at top of your script or notebook&#34;)
-            msg = &#34;\nNER in ktrain uses the CRF module from keras_contrib, which is not yet\n&#34; +\
-                    &#34;fully compatible with TensorFlow 2. To use NER, you must add the following to the top of your\n&#34; +\
-                    &#34;script or notebook BEFORE you import ktrain (after restarting runtime):\n\n&#34; +\
-                  &#34;import os\n&#34; +\
-                  &#34;os.environ[&#39;DISABLE_V2_BEHAVIOR&#39;] = &#39;1&#39;\n&#34;
+        if os.environ.get(&#34;DISABLE_V2_BEHAVIOR&#34;, None) != &#34;1&#34;:
+            warnings.warn(
+                &#34;Please add os.environ[&#39;DISABLE_V2_BEHAVIOR&#39;] = &#39;1&#39; at top of your script or notebook&#34;
+            )
+            msg = (
+                &#34;\nNER in ktrain uses the CRF module from keras_contrib, which is not yet\n&#34;
+                + &#34;fully compatible with TensorFlow 2. To use NER, you must add the following to the top of your\n&#34;
+                + &#34;script or notebook BEFORE you import ktrain (after restarting runtime):\n\n&#34;
+                + &#34;import os\n&#34;
+                + &#34;os.environ[&#39;DISABLE_V2_BEHAVIOR&#39;] = &#39;1&#39;\n&#34;
+            )
             print(msg)
             return
         else:
             import tensorflow.compat.v1 as tf
+
             tf.disable_v2_behavior()
 
-        if predictor_path is None and self.lang == &#39;zh&#39;:
+        if predictor_path is None and self.lang == &#34;zh&#34;:
             dirpath = os.path.dirname(os.path.abspath(__file__))
-            fpath = os.path.join(dirpath, &#39;ner_models/ner_chinese&#39;)
-        elif predictor_path is None and self.lang == &#39;ru&#39;:
+            fpath = os.path.join(dirpath, &#34;ner_models/ner_chinese&#34;)
+        elif predictor_path is None and self.lang == &#34;ru&#34;:
             dirpath = os.path.dirname(os.path.abspath(__file__))
-            fpath = os.path.join(dirpath, &#39;ner_models/ner_russian&#39;)
-        elif predictor_path is None and self.lang==&#39;en&#39;:
+            fpath = os.path.join(dirpath, &#34;ner_models/ner_russian&#34;)
+        elif predictor_path is None and self.lang == &#34;en&#34;:
             dirpath = os.path.dirname(os.path.abspath(__file__))
-            fpath = os.path.join(dirpath, &#39;ner_models/ner_english&#39;)
+            fpath = os.path.join(dirpath, &#34;ner_models/ner_english&#34;)
         elif predictor_path is None:
-            raise ValueError(&#34;Unsupported language: if predictor_path is None,  then lang must be &#34; +\
-                             &#34;&#39;en&#39; for English, &#39;zh&#39; for Chinese, or &#39;ru&#39; for Chinese&#34;)
+            raise ValueError(
+                &#34;Unsupported language: if predictor_path is None,  then lang must be &#34;
+                + &#34;&#39;en&#39; for English, &#39;zh&#39; for Chinese, or &#39;ru&#39; for Chinese&#34;
+            )
         else:
-            if not os.path.isfile(predictor_path) or not os.path.isfile(predictor_path +&#39;.preproc&#39;):
-                raise ValueError(&#39;could not find a valid predictor model &#39;+\
-                                 &#39;%s or valid Preprocessor %s at specified path&#39; % (predictor_path, predictor_path+&#39;.preproc&#39;))
+            if not os.path.isfile(predictor_path) or not os.path.isfile(
+                predictor_path + &#34;.preproc&#34;
+            ):
+                raise ValueError(
+                    &#34;could not find a valid predictor model &#34;
+                    + &#34;%s or valid Preprocessor %s at specified path&#34;
+                    % (predictor_path, predictor_path + &#34;.preproc&#34;)
+                )
             fpath = predictor_path
         try:
-           import io
-           from contextlib import redirect_stdout
-           f = io.StringIO()
-           with redirect_stdout(f):
-               import ktrain
-        except:
-           raise ValueError(&#39;ktrain could not be imported. Install with: pip install ktrain&#39;)
-        self.predictor = ktrain.load_predictor(fpath)
+            import io
+            from contextlib import redirect_stdout
 
+            f = io.StringIO()
+            with redirect_stdout(f):
+                import ktrain
+        except:
+            raise ValueError(
+                &#34;ktrain could not be imported. Install with: pip install ktrain&#34;
+            )
+        self.predictor = ktrain.load_predictor(fpath)
 
     def predict(self, texts, merge_tokens=True, batch_size=32):
         &#34;&#34;&#34;
@@ -980,11 +1057,13 @@ Args:
           batch_size(int):    Batch size to use for predictions (default:32)
         ```
         &#34;&#34;&#34;
-        if isinstance(texts, str): texts = [texts]
+        if isinstance(texts, str):
+            texts = [texts]
         self.predictor.batch_size = batch_size
         texts = [t.strip() for t in texts]
         results = self.predictor.predict(texts, merge_tokens=merge_tokens)
-        if len(results) == 1: results = results[0]
+        if len(results) == 1:
+            results = results[0]
         return results</code></pre>
 </details>
 <h3>Methods</h3>
@@ -1019,11 +1098,13 @@ Args:
       batch_size(int):    Batch size to use for predictions (default:32)
     ```
     &#34;&#34;&#34;
-    if isinstance(texts, str): texts = [texts]
+    if isinstance(texts, str):
+        texts = [texts]
     self.predictor.batch_size = batch_size
     texts = [t.strip() for t in texts]
     results = self.predictor.predict(texts, merge_tokens=merge_tokens)
-    if len(results) == 1: results = results[0]
+    if len(results) == 1:
+        results = results[0]
     return results</code></pre>
 </details>
 </dd>
@@ -1047,6 +1128,7 @@ Args:
     &#34;&#34;&#34;
     Search for keywords in text documents
     &#34;&#34;&#34;
+
     def __init__(self, queries, lang=None):
         &#34;&#34;&#34;
         ```
@@ -1056,13 +1138,12 @@ Args:
         ```
         &#34;&#34;&#34;
         self.queries = queries
-        if isinstance(self.queries, str): self.queries = [self.queries]
+        if isinstance(self.queries, str):
+            self.queries = [self.queries]
         self.lang = lang
         if self.lang is None:
             self.lang = U.detect_lang(queries)
-        #print(&#34;lang:%s&#34; %(self.lang))
-
-
+        # print(&#34;lang:%s&#34; %(self.lang))
 
     def search(self, docs, case_sensitive=False, keys=[], min_matches=1, progress=True):
         &#34;&#34;&#34;
@@ -1081,35 +1162,59 @@ Args:
           For Chinese, no. of matches will be number of unique Jieba-extracted character sequences that match
         ```
         &#34;&#34;&#34;
-        if isinstance(docs, str): 
+        if isinstance(docs, str):
             docs = [docs]
         if keys and len(keys) != len(docs):
-            raise ValueError(&#39;lengths of keys and docs must be the same&#39;)
+            raise ValueError(&#34;lengths of keys and docs must be the same&#34;)
         results = []
         l = len(docs)
         for idx, text in enumerate(docs):
             for q in self.queries:
                 if U.is_chinese(self.lang):
-                    r = self._search_chinese(q, [text], min_matches=min_matches, parse=1, progress=False)
-                elif self.lang == &#39;ar&#39;:
-                    r = self._search(q, [text], case_sensitive=case_sensitive, min_matches=min_matches, 
-                                     progress=False, substrings_on=True)
+                    r = self._search_chinese(
+                        q, [text], min_matches=min_matches, parse=1, progress=False
+                    )
+                elif self.lang == &#34;ar&#34;:
+                    r = self._search(
+                        q,
+                        [text],
+                        case_sensitive=case_sensitive,
+                        min_matches=min_matches,
+                        progress=False,
+                        substrings_on=True,
+                    )
                 else:
-                    r = self._search(q, [text], case_sensitive=case_sensitive, min_matches=min_matches, 
-                                     progress=False, substrings_on=False)
-                if not r: continue
+                    r = self._search(
+                        q,
+                        [text],
+                        case_sensitive=case_sensitive,
+                        min_matches=min_matches,
+                        progress=False,
+                        substrings_on=False,
+                    )
+                if not r:
+                    continue
                 r = r[0]
                 k = idx
-                if keys: k = keys[idx]
+                if keys:
+                    k = keys[idx]
                 num_matches = len(set(r[2])) if U.is_chinese(self.lang) else len(r[2])
                 results.append((k, q, num_matches))
-            if progress: printProgressBar(idx+1, l, prefix=&#39;progress: &#39;, suffix =&#39;complete&#39;, length=50)
+            if progress:
+                printProgressBar(
+                    idx + 1, l, prefix=&#34;progress: &#34;, suffix=&#34;complete&#34;, length=50
+                )
         return results
 
-
-    def _search(self, query, docs,
-                case_sensitive=False, substrings_on=False, 
-                min_matches=1, progress=True):
+    def _search(
+        self,
+        query,
+        docs,
+        case_sensitive=False,
+        substrings_on=False,
+        min_matches=1,
+        progress=True,
+    ):
         &#34;&#34;&#34;
         ```
         search documents for query string.
@@ -1124,40 +1229,48 @@ Args:
             list or tuple:  Returns list of results if len(docs) &gt; 1.  Otherwise, returns tuple of results
         ```
         &#34;&#34;&#34;
-        if not isinstance(query, (list, tuple, str)): raise ValueError(&#39;query must be str or list of str&#39;)
-        if isinstance(query, str): query = [query]
-        if not isinstance(docs, (list, np.ndarray)): raise ValueError(&#39;docs must be list of str&#39;)
+        if not isinstance(query, (list, tuple, str)):
+            raise ValueError(&#34;query must be str or list of str&#34;)
+        if isinstance(query, str):
+            query = [query]
+        if not isinstance(docs, (list, np.ndarray)):
+            raise ValueError(&#34;docs must be list of str&#34;)
 
         flag = 0
         if not case_sensitive:
             flag = re.I
-        qlist =[]
+        qlist = []
         for q in query:
-            qlist.append(&#39;\s+&#39;.join(q.split()))
+            qlist.append(&#34;\s+&#34;.join(q.split()))
         original_query = query
-        query = &#39;|&#39;.join(qlist)
-        bound = r&#39;\b&#39;
-        if substrings_on: bound = &#39;&#39;
-        pattern_str = r&#39;%s(?:%s)%s&#39; % (bound, query, bound)
-        pattern = re.compile( pattern_str, flag)
+        query = &#34;|&#34;.join(qlist)
+        bound = r&#34;\b&#34;
+        if substrings_on:
+            bound = &#34;&#34;
+        pattern_str = r&#34;%s(?:%s)%s&#34; % (bound, query, bound)
+        pattern = re.compile(pattern_str, flag)
 
         results = []
         l = len(docs)
         for idx, text in enumerate(docs):
             matches = pattern.findall(text)
-            if matches and len(matches)&gt;=min_matches: results.append((idx, text, matches))
+            if matches and len(matches) &gt;= min_matches:
+                results.append((idx, text, matches))
             if progress:
-                printProgressBar(idx+1, l, prefix=&#39;progress: &#39;, suffix =&#39;complete&#39;, length=50)
+                printProgressBar(
+                    idx + 1, l, prefix=&#34;progress: &#34;, suffix=&#34;complete&#34;, length=50
+                )
         return results
 
-
-    def _search_chinese(self, query, docs, 
-                        substrings_on=True, parse=1, min_matches=1, progress=False):
+    def _search_chinese(
+        self, query, docs, substrings_on=True, parse=1, min_matches=1, progress=False
+    ):
         &#34;&#34;&#34;
         convenience method to search chinese text
         &#34;&#34;&#34;
         original_query = query
-        if not isinstance(query, str): raise ValueError(&#39;query must be str&#39;)
+        if not isinstance(query, str):
+            raise ValueError(&#34;query must be str&#34;)
         if parse &gt; 0:
             q = U.split_chinese(query)[0]
             num_words = len(q.split())
@@ -1205,29 +1318,48 @@ Returns:
       For Chinese, no. of matches will be number of unique Jieba-extracted character sequences that match
     ```
     &#34;&#34;&#34;
-    if isinstance(docs, str): 
+    if isinstance(docs, str):
         docs = [docs]
     if keys and len(keys) != len(docs):
-        raise ValueError(&#39;lengths of keys and docs must be the same&#39;)
+        raise ValueError(&#34;lengths of keys and docs must be the same&#34;)
     results = []
     l = len(docs)
     for idx, text in enumerate(docs):
         for q in self.queries:
             if U.is_chinese(self.lang):
-                r = self._search_chinese(q, [text], min_matches=min_matches, parse=1, progress=False)
-            elif self.lang == &#39;ar&#39;:
-                r = self._search(q, [text], case_sensitive=case_sensitive, min_matches=min_matches, 
-                                 progress=False, substrings_on=True)
+                r = self._search_chinese(
+                    q, [text], min_matches=min_matches, parse=1, progress=False
+                )
+            elif self.lang == &#34;ar&#34;:
+                r = self._search(
+                    q,
+                    [text],
+                    case_sensitive=case_sensitive,
+                    min_matches=min_matches,
+                    progress=False,
+                    substrings_on=True,
+                )
             else:
-                r = self._search(q, [text], case_sensitive=case_sensitive, min_matches=min_matches, 
-                                 progress=False, substrings_on=False)
-            if not r: continue
+                r = self._search(
+                    q,
+                    [text],
+                    case_sensitive=case_sensitive,
+                    min_matches=min_matches,
+                    progress=False,
+                    substrings_on=False,
+                )
+            if not r:
+                continue
             r = r[0]
             k = idx
-            if keys: k = keys[idx]
+            if keys:
+                k = keys[idx]
             num_matches = len(set(r[2])) if U.is_chinese(self.lang) else len(r[2])
             results.append((k, q, num_matches))
-        if progress: printProgressBar(idx+1, l, prefix=&#39;progress: &#39;, suffix =&#39;complete&#39;, length=50)
+        if progress:
+            printProgressBar(
+                idx + 1, l, prefix=&#34;progress: &#34;, suffix=&#34;complete&#34;, length=50
+            )
     return results</code></pre>
 </details>
 </dd>

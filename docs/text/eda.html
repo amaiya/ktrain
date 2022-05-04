@@ -32,20 +32,28 @@ from . import textutils as TU
 from . import preprocessor as pp
 import time
 
-class TopicModel():
 
-
-    def __init__(self,texts=None, n_topics=None, n_features=10000, 
-                 min_df=5, max_df=0.5,  stop_words=&#39;english&#39;,
-                 model_type=&#39;lda&#39;,
-                 max_iter=5, lda_max_iter=None, lda_mode=&#39;online&#39;,
-                 token_pattern=None, verbose=1,
-                 hyperparam_kwargs=None
+class TopicModel:
+    def __init__(
+        self,
+        texts=None,
+        n_topics=None,
+        n_features=10000,
+        min_df=5,
+        max_df=0.5,
+        stop_words=&#34;english&#34;,
+        model_type=&#34;lda&#34;,
+        max_iter=5,
+        lda_max_iter=None,
+        lda_mode=&#34;online&#34;,
+        token_pattern=None,
+        verbose=1,
+        hyperparam_kwargs=None,
     ):
         &#34;&#34;&#34;
         Fits a topic model to documents in &lt;texts&gt;.
         Example:
-            tm = ktrain.text.get_topic_model(docs, n_topics=20, 
+            tm = ktrain.text.get_topic_model(docs, n_topics=20,
                                             n_features=1000, min_df=2, max_df=0.95)
         Args:
             texts (list of str): list of texts
@@ -60,7 +68,7 @@ class TopicModel():
                                 If lda_mode=&#39;batch&#39;, this should be increased (e.g., 1500).
             lda_max_iter (int): alias for max_iter for backwards compatilibity
             lda_mode (str):  one of {&#39;online&#39;, &#39;batch&#39;}. Ignored if model_type !=&#39;lda&#39;
-            token_pattern(str): regex pattern to use to tokenize documents. 
+            token_pattern(str): regex pattern to use to tokenize documents.
             verbose(bool): verbosity
             hyperparam_kwargs(dict): hyperparameters for LDA/NMF
                                      Keys in this dict can be any of the following:
@@ -68,60 +76,75 @@ class TopicModel():
                                          beta: beta for LDA.  default:0.01
                                          nmf_alpha: alias for alpha for backwars compatilibity
                                          l1_ratio: l1_ratio for NMF. default: 0
-                                         ngram_range:  whether to consider bigrams, trigrams. default: (1,1) 
+                                         ngram_range:  whether to consider bigrams, trigrams. default: (1,1)
 
         &#34;&#34;&#34;
-        self.verbose=verbose
+        self.verbose = verbose
 
         # estimate n_topics
         if n_topics is None:
             if texts is None:
-                raise ValueError(&#39;If n_topics is None, texts must be supplied&#39;)
+                raise ValueError(&#34;If n_topics is None, texts must be supplied&#34;)
             estimated = max(1, int(math.floor(math.sqrt(len(texts) / 2))))
             n_topics = min(400, estimated)
-            print(&#39;n_topics automatically set to %s&#39; % (n_topics))
+            print(&#34;n_topics automatically set to %s&#34; % (n_topics))
 
         # train model
         if texts is not None:
-            (model, vectorizer) = self.train(texts, model_type=model_type,
-                                             n_topics=n_topics, n_features=n_features,
-                                             min_df = min_df, max_df = max_df, 
-                                             stop_words=stop_words,
-                                             max_iter=max_iter,
-                                             lda_max_iter=lda_max_iter, lda_mode=lda_mode,
-                                             token_pattern=token_pattern,
-                                             hyperparam_kwargs=hyperparam_kwargs)
+            (model, vectorizer) = self.train(
+                texts,
+                model_type=model_type,
+                n_topics=n_topics,
+                n_features=n_features,
+                min_df=min_df,
+                max_df=max_df,
+                stop_words=stop_words,
+                max_iter=max_iter,
+                lda_max_iter=lda_max_iter,
+                lda_mode=lda_mode,
+                token_pattern=token_pattern,
+                hyperparam_kwargs=hyperparam_kwargs,
+            )
         else:
             vectorizer = None
             model = None
-
-
 
         # save model and vectorizer and hyperparameter settings
         self.vectorizer = vectorizer
         self.model = model
         self.n_topics = n_topics
         self.n_features = n_features
-        if verbose: print(&#39;done.&#39;)
+        if verbose:
+            print(&#34;done.&#34;)
 
         # these variables are set by self.build():
         self.topic_dict = None
         self.doc_topics = None
         self.bool_array = None
 
-        self.scorer = None       # set by self.train_scorer()
+        self.scorer = None  # set by self.train_scorer()
         self.recommender = None  # set by self.train_recommender()
         return
 
-
-    def train(self,texts, model_type=&#39;lda&#39;, n_topics=None, n_features=10000,
-              min_df=5, max_df=0.5,  stop_words=&#39;english&#39;,
-              max_iter=5, lda_max_iter=None, lda_mode=&#39;online&#39;,
-              token_pattern=None, hyperparam_kwargs=None):
+    def train(
+        self,
+        texts,
+        model_type=&#34;lda&#34;,
+        n_topics=None,
+        n_features=10000,
+        min_df=5,
+        max_df=0.5,
+        stop_words=&#34;english&#34;,
+        max_iter=5,
+        lda_max_iter=None,
+        lda_mode=&#34;online&#34;,
+        token_pattern=None,
+        hyperparam_kwargs=None,
+    ):
         &#34;&#34;&#34;
         Fits a topic model to documents in &lt;texts&gt;.
         Example:
-            tm = ktrain.text.get_topic_model(docs, n_topics=20, 
+            tm = ktrain.text.get_topic_model(docs, n_topics=20,
                                             n_features=1000, min_df=2, max_df=0.95)
         Args:
             texts (list of str): list of texts
@@ -136,7 +159,7 @@ class TopicModel():
                                 If lda_mode=&#39;batch&#39;, this should be increased (e.g., 1500).
                                 Ignored if model_type != &#39;lda&#39;
             lda_mode (str):  one of {&#39;online&#39;, &#39;batch&#39;}. Ignored of model_type !=&#39;lda&#39;
-            token_pattern(str): regex pattern to use to tokenize documents. 
+            token_pattern(str): regex pattern to use to tokenize documents.
                                 If None, a default tokenizer will be used
             hyperparam_kwargs(dict): hyperparameters for LDA/NMF
                                      Keys in this dict can be any of the following:
@@ -144,63 +167,78 @@ class TopicModel():
                                          beta: beta for LDA.  default:0.01
                                          nmf_alpha: alias for alpha for backwars compatilibity
                                          l1_ratio: l1_ratio for NMF. default: 0
-                                         ngram_range:  whether to consider bigrams, trigrams. default: (1,1) 
-                                    
+                                         ngram_range:  whether to consider bigrams, trigrams. default: (1,1)
+
         Returns:
             tuple: (model, vectorizer)
         &#34;&#34;&#34;
         max_iter = lda_max_iter if lda_max_iter is not None else max_iter
         if hyperparam_kwargs is None:
             hyperparam_kwargs = {}
-        alpha = hyperparam_kwargs.get(&#39;alpha&#39;, 5.0 / n_topics)
-        nmf_alpha = hyperparam_kwargs.get(&#39;nmf_alpha&#39;, None)
+        alpha = hyperparam_kwargs.get(&#34;alpha&#34;, 5.0 / n_topics)
+        nmf_alpha = hyperparam_kwargs.get(&#34;nmf_alpha&#34;, None)
         alpha = nmf_alpha if nmf_alpha is not None else alpha
-        beta = hyperparam_kwargs.get(&#39;beta&#39;, 0.01)
-        l1_ratio = hyperparam_kwargs.get(&#39;l1_ratio&#39;, 0)
-        ngram_range = hyperparam_kwargs.get(&#39;ngram_range&#39;, (1,1))
+        beta = hyperparam_kwargs.get(&#34;beta&#34;, 0.01)
+        l1_ratio = hyperparam_kwargs.get(&#34;l1_ratio&#34;, 0)
+        ngram_range = hyperparam_kwargs.get(&#34;ngram_range&#34;, (1, 1))
 
         # adjust defaults based on language detected
         if texts is not None:
             lang = TU.detect_lang(texts)
-            if lang != &#39;en&#39;:
-                stopwords = None if stop_words==&#39;english&#39; else stop_words
-                token_pattern = r&#39;(?u)\b\w+\b&#39; if token_pattern is None else token_pattern
+            if lang != &#34;en&#34;:
+                stopwords = None if stop_words == &#34;english&#34; else stop_words
+                token_pattern = (
+                    r&#34;(?u)\b\w+\b&#34; if token_pattern is None else token_pattern
+                )
             if pp.is_nospace_lang(lang):
                 text_list = []
                 for t in texts:
-                    text_list.append(&#39; &#39;.join(jieba.cut(t, HMM=False)))
+                    text_list.append(&#34; &#34;.join(jieba.cut(t, HMM=False)))
                 texts = text_list
-            if self.verbose: print(&#39;lang: %s&#39; % (lang))
-
+            if self.verbose:
+                print(&#34;lang: %s&#34; % (lang))
 
         # preprocess texts
-        if self.verbose: print(&#39;preprocessing texts...&#39;)
-        if token_pattern is None: token_pattern = TU.DEFAULT_TOKEN_PATTERN
-        #if token_pattern is None: token_pattern = r&#39;(?u)\b\w\w+\b&#39;
-        vectorizer = CountVectorizer(max_df=max_df, min_df=min_df,
-                                 max_features=n_features, stop_words=stop_words,
-                                 token_pattern=token_pattern, ngram_range=ngram_range)
-        
+        if self.verbose:
+            print(&#34;preprocessing texts...&#34;)
+        if token_pattern is None:
+            token_pattern = TU.DEFAULT_TOKEN_PATTERN
+        # if token_pattern is None: token_pattern = r&#39;(?u)\b\w\w+\b&#39;
+        vectorizer = CountVectorizer(
+            max_df=max_df,
+            min_df=min_df,
+            max_features=n_features,
+            stop_words=stop_words,
+            token_pattern=token_pattern,
+            ngram_range=ngram_range,
+        )
 
         x_train = vectorizer.fit_transform(texts)
 
         # fit model
 
-        if self.verbose: print(&#39;fitting model...&#39;)
-        if model_type == &#39;lda&#39;:
-            model = LatentDirichletAllocation(n_components=n_topics, max_iter=max_iter,
-                                              learning_method=lda_mode, learning_offset=50.,
-                                              doc_topic_prior=alpha,
-                                              topic_word_prior=beta,
-                                              verbose=self.verbose, random_state=0)
-        elif model_type == &#39;nmf&#39;:
+        if self.verbose:
+            print(&#34;fitting model...&#34;)
+        if model_type == &#34;lda&#34;:
+            model = LatentDirichletAllocation(
+                n_components=n_topics,
+                max_iter=max_iter,
+                learning_method=lda_mode,
+                learning_offset=50.0,
+                doc_topic_prior=alpha,
+                topic_word_prior=beta,
+                verbose=self.verbose,
+                random_state=0,
+            )
+        elif model_type == &#34;nmf&#34;:
             model = NMF(
                 n_components=n_topics,
                 max_iter=max_iter,
                 verbose=self.verbose,
                 alpha=alpha,
                 l1_ratio=l1_ratio,
-                random_state=0)
+                random_state=0,
+            )
         else:
             raise ValueError(&#34;unknown model type:&#34;, str(model_type))
         model.fit(x_train)
@@ -208,14 +246,12 @@ class TopicModel():
         # save model and vectorizer and hyperparameter settings
         return (model, vectorizer)
 
-
     @property
     def topics(self):
         &#34;&#34;&#34;
         convenience method/property
         &#34;&#34;&#34;
         return self.get_topics()
-
 
     def get_document_topic_distribution(self):
         &#34;&#34;&#34;
@@ -226,7 +262,6 @@ class TopicModel():
         self._check_build()
         return self.doc_topics
 
-
     def get_sorted_docs(self, topic_id):
         &#34;&#34;&#34;
         Returns all docs sorted by relevance to &lt;topic_id&gt;.
@@ -235,12 +270,11 @@ class TopicModel():
         &#34;&#34;&#34;
         docs = self.get_docs()
         d = {}
-        for doc in docs: d[doc[&#39;doc_id&#39;]] = doc
+        for doc in docs:
+            d[doc[&#34;doc_id&#34;]] = doc
         m = self.get_document_topic_distribution()
-        doc_ids = (-m[:,topic_id]).argsort()
+        doc_ids = (-m[:, topic_id]).argsort()
         return [d[doc_id] for doc_id in doc_ids]
-
-
 
     def get_word_weights(self, topic_id, n_words=100):
         &#34;&#34;&#34;
@@ -252,15 +286,16 @@ class TopicModel():
             n_words=int): number of top words
         &#34;&#34;&#34;
         self._check_model()
-        if topic_id+1 &gt; len(self.model.components_): 
-            raise ValueError(&#39;topic_id must be less than %s&#39; % (len(self.model.components_)))
+        if topic_id + 1 &gt; len(self.model.components_):
+            raise ValueError(
+                &#34;topic_id must be less than %s&#34; % (len(self.model.components_))
+            )
         feature_names = self.vectorizer.get_feature_names()
         word_probs = self.model.components_[topic_id]
-        word_ids = [i for i in word_probs.argsort()[:-n_words - 1:-1]]
+        word_ids = [i for i in word_probs.argsort()[: -n_words - 1 : -1]]
         words = [feature_names[i] for i in word_ids]
         probs = [word_probs[i] for i in word_ids]
-        return list( zip(words, probs) )
-
+        return list(zip(words, probs))
 
     def get_topics(self, n_words=10, as_string=True, show_counts=False):
         &#34;&#34;&#34;
@@ -268,7 +303,7 @@ class TopicModel():
         Args:
             n_words(int): number of words to use in topic summary
             as_string(bool): If True, each summary is a space-delimited string instead of list of words
-            show_counts(bool): If True, returns list of tuples of form (id, topic summary, count). 
+            show_counts(bool): If True, returns list of tuples of form (id, topic summary, count).
                                Otherwise, a list of topic summaries.
         Returns:
           List of topic summaries if  show_count is False
@@ -279,18 +314,21 @@ class TopicModel():
         feature_names = self.vectorizer.get_feature_names()
         topic_summaries = []
         for topic_idx, topic in enumerate(self.model.components_):
-            summary = [feature_names[i] for i in topic.argsort()[:-n_words - 1:-1]]
-            if as_string: summary = &#34; &#34;.join(summary)
+            summary = [feature_names[i] for i in topic.argsort()[: -n_words - 1 : -1]]
+            if as_string:
+                summary = &#34; &#34;.join(summary)
             topic_summaries.append(summary)
 
         if show_counts:
             self._check_build()
-            topic_counts = sorted([ (k, topic_summaries[k], len(v)) for k,v in self.topic_dict.items()], 
-                                    key=lambda kv:kv[-1], reverse=True)
+            topic_counts = sorted(
+                [(k, topic_summaries[k], len(v)) for k, v in self.topic_dict.items()],
+                key=lambda kv: kv[-1],
+                reverse=True,
+            )
             return dict((t[0], t[1:]) for t in topic_counts)
 
         return topic_summaries
-
 
     def print_topics(self, n_words=10, show_counts=False):
         &#34;&#34;&#34;
@@ -302,15 +340,17 @@ class TopicModel():
         topics = self.get_topics(n_words=n_words, as_string=True)
         if show_counts:
             self._check_build()
-            topic_counts = sorted([ (k, topics[k], len(v)) for k,v in self.topic_dict.items()], 
-                                    key=lambda kv:kv[-1], reverse=True)
+            topic_counts = sorted(
+                [(k, topics[k], len(v)) for k, v in self.topic_dict.items()],
+                key=lambda kv: kv[-1],
+                reverse=True,
+            )
             for (idx, topic, count) in topic_counts:
-                print(&#34;topic:%s | count:%s | %s&#34; %(idx, count, topic))
+                print(&#34;topic:%s | count:%s | %s&#34; % (idx, count, topic))
         else:
             for i, t in enumerate(topics):
-                print(&#39;topic %s | %s&#39; % (i, t))
+                print(&#34;topic %s | %s&#34; % (i, t))
         return
-
 
     def build(self, texts, threshold=None):
         &#34;&#34;&#34;
@@ -334,7 +374,6 @@ class TopicModel():
         self.topic_dict = self._rank_documents(texts, doc_topics=doc_topics)
         return
 
-
     def filter(self, obj):
         &#34;&#34;&#34;
         The build method may prune documents based on threshold.
@@ -346,13 +385,16 @@ class TopicModel():
         Returns:
             filtered obj
         &#34;&#34;&#34;
-        length = obj.shape[0] if isinstance(obj, (pd.DataFrame, np.ndarray)) else len(obj)
+        length = (
+            obj.shape[0] if isinstance(obj, (pd.DataFrame, np.ndarray)) else len(obj)
+        )
         if length != self.bool_array.shape[0]:
-            raise ValueError(&#39;Length of obj is not consistent with the number of documents &#39; +
-                             &#39;supplied to get_topic_model&#39;)
+            raise ValueError(
+                &#34;Length of obj is not consistent with the number of documents &#34;
+                + &#34;supplied to get_topic_model&#34;
+            )
         obj = np.array(obj) if isinstance(obj, list) else obj
         return obj[self.bool_array]
-
 
     def get_docs(self, topic_ids=[], doc_ids=[], rank=False):
         &#34;&#34;&#34;
@@ -374,23 +416,31 @@ class TopicModel():
                             &#39;doc_id&#39;: ID of document
                             &#39;topic_proba&#39;: topic probability (or score)
                             &#39;topic_id&#39;: ID of topic
-            
+
         &#34;&#34;&#34;
         self._check_build()
         if not topic_ids:
             topic_ids = list(range(self.n_topics))
         result_texts = []
         for topic_id in topic_ids:
-            if topic_id not in self.topic_dict: continue
-            texts = [{&#39;text&#39;:tup[0], &#39;doc_id&#39;:tup[1], &#39;topic_proba&#39;:tup[2], &#39;topic_id&#39;:topic_id} for tup in self.topic_dict[topic_id] 
-                                                                                                     if not doc_ids or tup[1] in doc_ids]
+            if topic_id not in self.topic_dict:
+                continue
+            texts = [
+                {
+                    &#34;text&#34;: tup[0],
+                    &#34;doc_id&#34;: tup[1],
+                    &#34;topic_proba&#34;: tup[2],
+                    &#34;topic_id&#34;: topic_id,
+                }
+                for tup in self.topic_dict[topic_id]
+                if not doc_ids or tup[1] in doc_ids
+            ]
             result_texts.extend(texts)
         if not rank:
-            result_texts = sorted(result_texts, key=lambda x:x[&#39;doc_id&#39;])
+            result_texts = sorted(result_texts, key=lambda x: x[&#34;doc_id&#34;])
         return result_texts
 
-
-    def get_doctopics(self,  topic_ids=[], doc_ids=[]):
+    def get_doctopics(self, topic_ids=[], doc_ids=[]):
         &#34;&#34;&#34;
         Returns a topic probability distribution for documents
         with primary topic that is one of &lt;topic_ids&gt; and with doc_id in &lt;doc_ids&gt;.
@@ -406,13 +456,12 @@ class TopicModel():
         Returns:
             np.ndarray: Each row is the topic probability distribution of a document.
                         Array is sorted in the order returned by self.get_docs.
-                        
+
         &#34;&#34;&#34;
         docs = self.get_docs(topic_ids=topic_ids, doc_ids=doc_ids)
-        return np.array([self.doc_topics[idx] for idx in [x[&#39;doc_id&#39;] for x in docs]])
+        return np.array([self.doc_topics[idx] for idx in [x[&#34;doc_id&#34;] for x in docs]])
 
-
-    def get_texts(self,  topic_ids=[]):
+    def get_texts(self, topic_ids=[]):
         &#34;&#34;&#34;
         Returns texts for documents
         with primary topic that is one of &lt;topic_ids&gt;
@@ -421,11 +470,10 @@ class TopicModel():
         Returns:
             list of str
         &#34;&#34;&#34;
-        if not topic_ids: topic_ids = list(range(self.n_topics))
+        if not topic_ids:
+            topic_ids = list(range(self.n_topics))
         docs = self.get_docs(topic_ids)
         return [x[0] for x in docs]
-
-
 
     def predict(self, texts, threshold=None, harden=False):
         &#34;&#34;&#34;
@@ -444,27 +492,36 @@ class TopicModel():
         self._check_model()
         transformed_texts = self.vectorizer.transform(texts)
         X_topics = self.model.transform(transformed_texts)
-        #if self.model_type == &#39;nmf&#39;:
-            #scores = np.matrix(X_topics)
-            #scores_normalized= scores/scores.sum(axis=1)
-            #X_topics = scores_normalized
+        # if self.model_type == &#39;nmf&#39;:
+        # scores = np.matrix(X_topics)
+        # scores_normalized= scores/scores.sum(axis=1)
+        # X_topics = scores_normalized
         _idx = np.array([True] * len(texts))
         if threshold is not None:
-            _idx = np.amax(X_topics, axis=1) &gt; threshold  # idx of doc that above the threshold
+            _idx = (
+                np.amax(X_topics, axis=1) &gt; threshold
+            )  # idx of doc that above the threshold
             _idx = np.array(_idx)
             X_topics = X_topics[_idx]
-        if harden: X_topics = self._harden_topics(X_topics)
+        if harden:
+            X_topics = self._harden_topics(X_topics)
         if threshold is not None:
             return (X_topics, _idx)
         else:
             return X_topics
 
-
-    def visualize_documents(self, texts=None, doc_topics=None, 
-                            width=700, height=700, point_size=5, title=&#39;Document Visualization&#39;,
-                            extra_info={},
-                            colors=None,
-                            filepath=None,):
+    def visualize_documents(
+        self,
+        texts=None,
+        doc_topics=None,
+        width=700,
+        height=700,
+        point_size=5,
+        title=&#34;Document Visualization&#34;,
+        extra_info={},
+        colors=None,
+        filepath=None,
+    ):
         &#34;&#34;&#34;
         Generates a visualization of a set of documents based on model.
         If &lt;texts&gt; is supplied, raw documents will be first transformed into document-topic
@@ -487,22 +544,26 @@ class TopicModel():
         &#34;&#34;&#34;
 
         # error-checking
-        if texts is not None: length = len(texts)
-        else: length = doc_topics.shape[0]
+        if texts is not None:
+            length = len(texts)
+        else:
+            length = doc_topics.shape[0]
         if colors is not None and len(colors) != length:
-            raise ValueError(&#39;length of colors is not consistent with length of texts or doctopics&#39;)
+            raise ValueError(
+                &#34;length of colors is not consistent with length of texts or doctopics&#34;
+            )
         if texts is not None and doc_topics is not None:
-            raise ValueError(&#39;texts is mutually-exclusive with doc_topics&#39;)
+            raise ValueError(&#34;texts is mutually-exclusive with doc_topics&#34;)
         if texts is None and doc_topics is None:
-            raise ValueError(&#39;One of texts or doc_topics is required.&#39;)
+            raise ValueError(&#34;One of texts or doc_topics is required.&#34;)
         if extra_info:
-            invalid_keys = [&#39;x&#39;, &#39;y&#39;, &#39;topic&#39;, &#39;fill_color&#39;]
+            invalid_keys = [&#34;x&#34;, &#34;y&#34;, &#34;topic&#34;, &#34;fill_color&#34;]
             for k in extra_info.keys():
                 if k in invalid_keys:
-                    raise ValueError(&#39;cannot use &#34;%s&#34; as key in extra_info&#39; %(k))
+                    raise ValueError(&#39;cannot use &#34;%s&#34; as key in extra_info&#39; % (k))
                 lst = extra_info[k]
                 if len(lst) != length:
-                    raise ValueError(&#39;texts and extra_info lists must be same size&#39;)
+                    raise ValueError(&#34;texts and extra_info lists must be same size&#34;)
 
         # check fo bokeh
         try:
@@ -511,86 +572,94 @@ class TopicModel():
             from bokeh.models import HoverTool
             from bokeh.io import output_notebook
         except:
-            warnings.warn(&#39;visualize_documents method requires bokeh package: pip install bokeh&#39;)
+            warnings.warn(
+                &#34;visualize_documents method requires bokeh package: pip install bokeh&#34;
+            )
             return
 
         # prepare data
         if doc_topics is not None:
             X_topics = doc_topics
         else:
-            if self.verbose:  print(&#39;transforming texts...&#39;, end=&#39;&#39;)
+            if self.verbose:
+                print(&#34;transforming texts...&#34;, end=&#34;&#34;)
             X_topics = self.predict(texts, harden=False)
-            if self.verbose: print(&#39;done.&#39;)
+            if self.verbose:
+                print(&#34;done.&#34;)
 
         # reduce to 2-D
-        if self.verbose:  print(&#39;reducing to 2 dimensions...&#39;, end=&#39;&#39;)
-        tsne_model = TSNE(n_components=2, verbose=self.verbose, random_state=0, angle=.99, init=&#39;pca&#39;)
+        if self.verbose:
+            print(&#34;reducing to 2 dimensions...&#34;, end=&#34;&#34;)
+        tsne_model = TSNE(
+            n_components=2, verbose=self.verbose, random_state=0, angle=0.99, init=&#34;pca&#34;
+        )
         tsne_lda = tsne_model.fit_transform(X_topics)
-        print(&#39;done.&#39;)
+        print(&#34;done.&#34;)
 
         # get random colormap
         colormap = U.get_random_colors(self.n_topics)
 
         # generate inline visualization in Jupyter notebook
         lda_keys = self._harden_topics(X_topics)
-        if colors is None: colors = colormap[lda_keys]
+        if colors is None:
+            colors = colormap[lda_keys]
         topic_summaries = self.get_topics(n_words=5)
-        os.environ[&#34;BOKEH_RESOURCES&#34;]=&#34;inline&#34;
+        os.environ[&#34;BOKEH_RESOURCES&#34;] = &#34;inline&#34;
         output_notebook()
-        dct = { 
-                &#39;x&#39;:tsne_lda[:,0],
-                &#39;y&#39;:tsne_lda[:, 1],
-                &#39;topic&#39;:[topic_summaries[tid] for tid in lda_keys],
-                &#39;fill_color&#39;:colors,}
-        tool_tups = [(&#39;index&#39;, &#39;$index&#39;),
-                     (&#39;(x,y)&#39;,&#39;($x,$y)&#39;),
-                     (&#39;topic&#39;, &#39;@topic&#39;)]
+        dct = {
+            &#34;x&#34;: tsne_lda[:, 0],
+            &#34;y&#34;: tsne_lda[:, 1],
+            &#34;topic&#34;: [topic_summaries[tid] for tid in lda_keys],
+            &#34;fill_color&#34;: colors,
+        }
+        tool_tups = [(&#34;index&#34;, &#34;$index&#34;), (&#34;(x,y)&#34;, &#34;($x,$y)&#34;), (&#34;topic&#34;, &#34;@topic&#34;)]
         for k in extra_info.keys():
             dct[k] = extra_info[k]
-            tool_tups.append((k, &#39;@&#39;+k))
+            tool_tups.append((k, &#34;@&#34; + k))
 
         source = bp.ColumnDataSource(data=dct)
-        hover = HoverTool( tooltips=tool_tups)
-        p = bp.figure(plot_width=width, plot_height=height, 
-                      tools=[hover, &#39;save&#39;, &#39;pan&#39;, &#39;wheel_zoom&#39;, &#39;box_zoom&#39;, &#39;reset&#39;],
-                      #tools=&#34;pan,wheel_zoom,box_zoom,reset,hover,previewsave&#34;,
-                      title=title)
-        #plot_lda = bp.figure(plot_width=1400, plot_height=1100,
-                           #title=title,
-                           #tools=&#34;pan,wheel_zoom,box_zoom,reset,hover,previewsave&#34;,
-                           #x_axis_type=None, y_axis_type=None, min_border=1)
-        p.circle(&#39;x&#39;, &#39;y&#39;, size=point_size, source=source, fill_color= &#39;fill_color&#39;)
+        hover = HoverTool(tooltips=tool_tups)
+        p = bp.figure(
+            plot_width=width,
+            plot_height=height,
+            tools=[hover, &#34;save&#34;, &#34;pan&#34;, &#34;wheel_zoom&#34;, &#34;box_zoom&#34;, &#34;reset&#34;],
+            # tools=&#34;pan,wheel_zoom,box_zoom,reset,hover,previewsave&#34;,
+            title=title,
+        )
+        # plot_lda = bp.figure(plot_width=1400, plot_height=1100,
+        # title=title,
+        # tools=&#34;pan,wheel_zoom,box_zoom,reset,hover,previewsave&#34;,
+        # x_axis_type=None, y_axis_type=None, min_border=1)
+        p.circle(&#34;x&#34;, &#34;y&#34;, size=point_size, source=source, fill_color=&#34;fill_color&#34;)
         bp.show(p)
         if filepath is not None:
             bp.output_file(filepath)
             bp.save(p)
         return
 
-
-    def train_recommender(self, n_neighbors=20, metric=&#39;minkowski&#39;, p=2):
+    def train_recommender(self, n_neighbors=20, metric=&#34;minkowski&#34;, p=2):
         &#34;&#34;&#34;
         Trains a recommender that, given a single document, will return
         documents in the corpus that are semantically similar to it.
 
         Args:
-            n_neighbors (int): 
+            n_neighbors (int):
         Returns:
             None
         &#34;&#34;&#34;
         from sklearn.neighbors import NearestNeighbors
+
         rec = NearestNeighbors(n_neighbors=n_neighbors, metric=metric, p=p)
         probs = self.get_doctopics()
         rec.fit(probs)
         self.recommender = rec
         return
 
-
-
     def recommend(self, text=None, doc_topic=None, n=5, n_neighbors=100):
         &#34;&#34;&#34;
         Given an example document, recommends documents similar to it
         from the set of documents supplied to build().
- 
+
         Args:
             texts(list of str): list of document texts.  Mutually-exclusive with &lt;doc_topics&gt;
             doc_topics(ndarray): pre-computed topic distribution for each document in texts.
@@ -603,26 +672,26 @@ class TopicModel():
         &#34;&#34;&#34;
         # error-checks
         if text is not None and doc_topic is not None:
-            raise ValueError(&#39;text is mutually-exclusive with doc_topic&#39;)
+            raise ValueError(&#34;text is mutually-exclusive with doc_topic&#34;)
         if text is None and doc_topic is None:
-            raise ValueError(&#39;One of text or doc_topic is required.&#39;)
+            raise ValueError(&#34;One of text or doc_topic is required.&#34;)
         if text is not None and type(text) not in [str]:
-            raise ValueError(&#39;text must be a str &#39;)
-        if  doc_topic is not None and type(doc_topic) not in [np.ndarray]:
-            raise ValueError(&#39;doc_topic must be a np.ndarray&#39;)
+            raise ValueError(&#34;text must be a str &#34;)
+        if doc_topic is not None and type(doc_topic) not in [np.ndarray]:
+            raise ValueError(&#34;doc_topic must be a np.ndarray&#34;)
 
-        if n &gt; n_neighbors: n_neighbors = n
+        if n &gt; n_neighbors:
+            n_neighbors = n
 
         x_test = [doc_topic]
         if text:
             x_test = self.predict([text])
         docs = self.get_docs()
-        indices = self.recommender.kneighbors(x_test, return_distance=False, n_neighbors=n_neighbors)
+        indices = self.recommender.kneighbors(
+            x_test, return_distance=False, n_neighbors=n_neighbors
+        )
         results = [doc for i, doc in enumerate(docs) if i in indices]
         return results[:n]
-
-
-
 
     def train_scorer(self, topic_ids=[], doc_ids=[], n_neighbors=20):
         &#34;&#34;&#34;
@@ -631,8 +700,8 @@ class TopicModel():
 
         NOTE: The score method currently employs the use of LocalOutLierFactor, which
         means you should not try to score documents that were used in training. Only
-        new, unseen documents should be scored for similarity. 
-        REFERENCE: 
+        new, unseen documents should be scored for similarity.
+        REFERENCE:
         https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.LocalOutlierFactor.html#sklearn.neighbors.LocalOutlierFactor
 
         Args:
@@ -640,19 +709,20 @@ class TopicModel():
                                      of range(self.n_topics).  Documents associated
                                      with these topic_ids will be used as seed set.
             doc_ids (list of ints): list of document IDs where each id is an index
-                                    into self.doctopics.  Documents associated 
+                                    into self.doctopics.  Documents associated
                                     with these doc_ids will be used as seed set.
         Returns:
             None
         &#34;&#34;&#34;
         from sklearn.neighbors import LocalOutlierFactor
-        clf = LocalOutlierFactor(n_neighbors=n_neighbors, novelty=True, contamination=0.1)
+
+        clf = LocalOutlierFactor(
+            n_neighbors=n_neighbors, novelty=True, contamination=0.1
+        )
         probs = self.get_doctopics(topic_ids=topic_ids, doc_ids=doc_ids)
         clf.fit(probs)
         self.scorer = clf
         return
-
-
 
     def score(self, texts=None, doc_topics=None):
         &#34;&#34;&#34;
@@ -671,7 +741,7 @@ class TopicModel():
         NOTE: The score method currently employs the use of LocalOutLierFactor, which
         means you should not try to score documents that were used in training. Only
         new, unseen documents should be scored for similarity.
- 
+
         Args:
             texts(list of str): list of document texts.  Mutually-exclusive with &lt;doc_topics&gt;
             doc_topics(ndarray): pre-computed topic distribution for each document in texts.
@@ -680,26 +750,25 @@ class TopicModel():
             list of floats:  larger values indicate higher degree of similarity
                              positive values indicate a binary decision of similar
                              negative values indicate binary decision of dissimilar
-                             In practice, negative scores closer to zero will also 
+                             In practice, negative scores closer to zero will also
                              be similar as One-class classifiers are more strict
                              than traditional binary classifiers.
 
         &#34;&#34;&#34;
         # error-checks
         if texts is not None and doc_topics is not None:
-            raise ValueError(&#39;texts is mutually-exclusive with doc_topics&#39;)
+            raise ValueError(&#34;texts is mutually-exclusive with doc_topics&#34;)
         if texts is None and doc_topics is None:
-            raise ValueError(&#39;One of texts or doc_topics is required.&#39;)
+            raise ValueError(&#34;One of texts or doc_topics is required.&#34;)
         if texts is not None and type(texts) not in [list, np.ndarray]:
-            raise ValueError(&#39;texts must be either a list or numpy ndarray&#39;)
-        if  doc_topics is not None and type(doc_topics) not in [np.ndarray]:
-            raise ValueError(&#39;doc_topics must be a np.ndarray&#39;)
+            raise ValueError(&#34;texts must be either a list or numpy ndarray&#34;)
+        if doc_topics is not None and type(doc_topics) not in [np.ndarray]:
+            raise ValueError(&#34;doc_topics must be a np.ndarray&#34;)
 
         x_test = doc_topics
         if texts:
             x_test = self.predict(texts)
         return self.scorer.decision_function(x_test)
-
 
     def search(self, query, topic_ids=[], doc_ids=[], case_sensitive=False):
         &#34;&#34;&#34;
@@ -714,8 +783,9 @@ class TopicModel():
         &#34;&#34;&#34;
 
         # setup pattern
-        if not case_sensitive: query = query.lower()
-        pattern = re.compile(r&#39;\b%s\b&#39; % query)
+        if not case_sensitive:
+            query = query.lower()
+        pattern = re.compile(r&#34;\b%s\b&#34; % query)
 
         # retrive docs
         docs = self.get_docs(topic_ids=topic_ids, doc_ids=doc_ids)
@@ -725,18 +795,17 @@ class TopicModel():
         results = []
         for i in mb:
             for doc in progress_bar(docs, parent=mb):
-                text = doc[&#39;text&#39;]
-                if not case_sensitive: text = text.lower()
+                text = doc[&#34;text&#34;]
+                if not case_sensitive:
+                    text = text.lower()
                 matches = pattern.findall(text)
-                if matches: results.append(doc)
-            if self.verbose: mb.write(&#39;done.&#39;)
+                if matches:
+                    results.append(doc)
+            if self.verbose:
+                mb.write(&#34;done.&#34;)
         return results
 
-
-
-    def _rank_documents(self, 
-                       texts,
-                       doc_topics=None):
+    def _rank_documents(self, texts, doc_topics=None):
         &#34;&#34;&#34;
         Rank documents by topic score.
         If topic_index is supplied, rank documents based on relevance to supplied topic.
@@ -745,21 +814,23 @@ class TopicModel():
             texts(list of str): list of document texts.
             doc_topics(ndarray): pre-computed topic distribution for each document
                                  If None, re-computed from texts.
-                              
+
         Returns:
             dict of lists: each element in list is a tuple of (doc_index, topic_index, score)
-            ... where doc_index is an index into either texts 
+            ... where doc_index is an index into either texts
         &#34;&#34;&#34;
         if doc_topics is not None:
             X_topics = doc_topics
         else:
-            if self.verbose: print(&#39;transforming texts to topic space...&#39;)
+            if self.verbose:
+                print(&#34;transforming texts to topic space...&#34;)
             X_topics = self.predict(texts)
         topics = np.argmax(X_topics, axis=1)
         scores = np.amax(X_topics, axis=1)
         doc_ids = np.array([i for i, x in enumerate(texts)])
         result = list(zip(texts, doc_ids, topics, scores))
-        if self.verbose: print(&#39;done.&#39;)
+        if self.verbose:
+            print(&#34;done.&#34;)
         result = sorted(result, key=lambda x: x[-1], reverse=True)
         result_dict = {}
         for r in result:
@@ -772,7 +843,6 @@ class TopicModel():
             result_dict[topic_id] = lst
         return result_dict
 
-
     def _harden_topics(self, X_topics):
         &#34;&#34;&#34;
         Transforms soft-clustering to hard-clustering
@@ -783,46 +853,44 @@ class TopicModel():
         X_topics = np.array(max_topics)
         return X_topics
 
-
     def _check_build(self):
         self._check_model()
-        if self.topic_dict is None: 
-            raise Exception(&#39;Must call build() method.&#39;)
+        if self.topic_dict is None:
+            raise Exception(&#34;Must call build() method.&#34;)
 
     def _check_scorer(self):
         if self.scorer is None:
-            raise Exception(&#39;Must call train_scorer()&#39;)
+            raise Exception(&#34;Must call train_scorer()&#34;)
 
     def _check_recommender(self):
         if self.recommender is None:
-            raise Exception(&#39;Must call train_recommender()&#39;)
-
+            raise Exception(&#34;Must call train_recommender()&#34;)
 
     def _check_model(self):
         if self.model is None or self.vectorizer is None:
-            raise Exception(&#39;Must call train()&#39;)
-
-
+            raise Exception(&#34;Must call train()&#34;)
 
     def save(self, fname):
         &#34;&#34;&#34;
         save TopicModel object
         &#34;&#34;&#34;
 
-        
-        with open(fname+&#39;.tm_vect&#39;, &#39;wb&#39;) as f:
+        with open(fname + &#34;.tm_vect&#34;, &#34;wb&#34;) as f:
             pickle.dump(self.vectorizer, f)
-        with open(fname+&#39;.tm_model&#39;, &#39;wb&#39;) as f:
+        with open(fname + &#34;.tm_model&#34;, &#34;wb&#34;) as f:
             pickle.dump(self.model, f)
-        params = {&#39;n_topics&#39;: self.n_topics,
-                  &#39;n_features&#39;: self.n_features,
-                  &#39;verbose&#39;: self.verbose}
-        with open(fname+&#39;.tm_params&#39;, &#39;wb&#39;) as f:
+        params = {
+            &#34;n_topics&#34;: self.n_topics,
+            &#34;n_features&#34;: self.n_features,
+            &#34;verbose&#34;: self.verbose,
+        }
+        with open(fname + &#34;.tm_params&#34;, &#34;wb&#34;) as f:
             pickle.dump(params, f)
 
         return
 
-get_topic_model = TopicModel </code></pre>
+
+get_topic_model = TopicModel</code></pre>
 </details>
 </section>
 <section>
@@ -884,20 +952,27 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class TopicModel():
-
-
-    def __init__(self,texts=None, n_topics=None, n_features=10000, 
-                 min_df=5, max_df=0.5,  stop_words=&#39;english&#39;,
-                 model_type=&#39;lda&#39;,
-                 max_iter=5, lda_max_iter=None, lda_mode=&#39;online&#39;,
-                 token_pattern=None, verbose=1,
-                 hyperparam_kwargs=None
+<pre><code class="python">class TopicModel:
+    def __init__(
+        self,
+        texts=None,
+        n_topics=None,
+        n_features=10000,
+        min_df=5,
+        max_df=0.5,
+        stop_words=&#34;english&#34;,
+        model_type=&#34;lda&#34;,
+        max_iter=5,
+        lda_max_iter=None,
+        lda_mode=&#34;online&#34;,
+        token_pattern=None,
+        verbose=1,
+        hyperparam_kwargs=None,
     ):
         &#34;&#34;&#34;
         Fits a topic model to documents in &lt;texts&gt;.
         Example:
-            tm = ktrain.text.get_topic_model(docs, n_topics=20, 
+            tm = ktrain.text.get_topic_model(docs, n_topics=20,
                                             n_features=1000, min_df=2, max_df=0.95)
         Args:
             texts (list of str): list of texts
@@ -912,7 +987,7 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
                                 If lda_mode=&#39;batch&#39;, this should be increased (e.g., 1500).
             lda_max_iter (int): alias for max_iter for backwards compatilibity
             lda_mode (str):  one of {&#39;online&#39;, &#39;batch&#39;}. Ignored if model_type !=&#39;lda&#39;
-            token_pattern(str): regex pattern to use to tokenize documents. 
+            token_pattern(str): regex pattern to use to tokenize documents.
             verbose(bool): verbosity
             hyperparam_kwargs(dict): hyperparameters for LDA/NMF
                                      Keys in this dict can be any of the following:
@@ -920,60 +995,75 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
                                          beta: beta for LDA.  default:0.01
                                          nmf_alpha: alias for alpha for backwars compatilibity
                                          l1_ratio: l1_ratio for NMF. default: 0
-                                         ngram_range:  whether to consider bigrams, trigrams. default: (1,1) 
+                                         ngram_range:  whether to consider bigrams, trigrams. default: (1,1)
 
         &#34;&#34;&#34;
-        self.verbose=verbose
+        self.verbose = verbose
 
         # estimate n_topics
         if n_topics is None:
             if texts is None:
-                raise ValueError(&#39;If n_topics is None, texts must be supplied&#39;)
+                raise ValueError(&#34;If n_topics is None, texts must be supplied&#34;)
             estimated = max(1, int(math.floor(math.sqrt(len(texts) / 2))))
             n_topics = min(400, estimated)
-            print(&#39;n_topics automatically set to %s&#39; % (n_topics))
+            print(&#34;n_topics automatically set to %s&#34; % (n_topics))
 
         # train model
         if texts is not None:
-            (model, vectorizer) = self.train(texts, model_type=model_type,
-                                             n_topics=n_topics, n_features=n_features,
-                                             min_df = min_df, max_df = max_df, 
-                                             stop_words=stop_words,
-                                             max_iter=max_iter,
-                                             lda_max_iter=lda_max_iter, lda_mode=lda_mode,
-                                             token_pattern=token_pattern,
-                                             hyperparam_kwargs=hyperparam_kwargs)
+            (model, vectorizer) = self.train(
+                texts,
+                model_type=model_type,
+                n_topics=n_topics,
+                n_features=n_features,
+                min_df=min_df,
+                max_df=max_df,
+                stop_words=stop_words,
+                max_iter=max_iter,
+                lda_max_iter=lda_max_iter,
+                lda_mode=lda_mode,
+                token_pattern=token_pattern,
+                hyperparam_kwargs=hyperparam_kwargs,
+            )
         else:
             vectorizer = None
             model = None
-
-
 
         # save model and vectorizer and hyperparameter settings
         self.vectorizer = vectorizer
         self.model = model
         self.n_topics = n_topics
         self.n_features = n_features
-        if verbose: print(&#39;done.&#39;)
+        if verbose:
+            print(&#34;done.&#34;)
 
         # these variables are set by self.build():
         self.topic_dict = None
         self.doc_topics = None
         self.bool_array = None
 
-        self.scorer = None       # set by self.train_scorer()
+        self.scorer = None  # set by self.train_scorer()
         self.recommender = None  # set by self.train_recommender()
         return
 
-
-    def train(self,texts, model_type=&#39;lda&#39;, n_topics=None, n_features=10000,
-              min_df=5, max_df=0.5,  stop_words=&#39;english&#39;,
-              max_iter=5, lda_max_iter=None, lda_mode=&#39;online&#39;,
-              token_pattern=None, hyperparam_kwargs=None):
+    def train(
+        self,
+        texts,
+        model_type=&#34;lda&#34;,
+        n_topics=None,
+        n_features=10000,
+        min_df=5,
+        max_df=0.5,
+        stop_words=&#34;english&#34;,
+        max_iter=5,
+        lda_max_iter=None,
+        lda_mode=&#34;online&#34;,
+        token_pattern=None,
+        hyperparam_kwargs=None,
+    ):
         &#34;&#34;&#34;
         Fits a topic model to documents in &lt;texts&gt;.
         Example:
-            tm = ktrain.text.get_topic_model(docs, n_topics=20, 
+            tm = ktrain.text.get_topic_model(docs, n_topics=20,
                                             n_features=1000, min_df=2, max_df=0.95)
         Args:
             texts (list of str): list of texts
@@ -988,7 +1078,7 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
                                 If lda_mode=&#39;batch&#39;, this should be increased (e.g., 1500).
                                 Ignored if model_type != &#39;lda&#39;
             lda_mode (str):  one of {&#39;online&#39;, &#39;batch&#39;}. Ignored of model_type !=&#39;lda&#39;
-            token_pattern(str): regex pattern to use to tokenize documents. 
+            token_pattern(str): regex pattern to use to tokenize documents.
                                 If None, a default tokenizer will be used
             hyperparam_kwargs(dict): hyperparameters for LDA/NMF
                                      Keys in this dict can be any of the following:
@@ -996,63 +1086,78 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
                                          beta: beta for LDA.  default:0.01
                                          nmf_alpha: alias for alpha for backwars compatilibity
                                          l1_ratio: l1_ratio for NMF. default: 0
-                                         ngram_range:  whether to consider bigrams, trigrams. default: (1,1) 
-                                    
+                                         ngram_range:  whether to consider bigrams, trigrams. default: (1,1)
+
         Returns:
             tuple: (model, vectorizer)
         &#34;&#34;&#34;
         max_iter = lda_max_iter if lda_max_iter is not None else max_iter
         if hyperparam_kwargs is None:
             hyperparam_kwargs = {}
-        alpha = hyperparam_kwargs.get(&#39;alpha&#39;, 5.0 / n_topics)
-        nmf_alpha = hyperparam_kwargs.get(&#39;nmf_alpha&#39;, None)
+        alpha = hyperparam_kwargs.get(&#34;alpha&#34;, 5.0 / n_topics)
+        nmf_alpha = hyperparam_kwargs.get(&#34;nmf_alpha&#34;, None)
         alpha = nmf_alpha if nmf_alpha is not None else alpha
-        beta = hyperparam_kwargs.get(&#39;beta&#39;, 0.01)
-        l1_ratio = hyperparam_kwargs.get(&#39;l1_ratio&#39;, 0)
-        ngram_range = hyperparam_kwargs.get(&#39;ngram_range&#39;, (1,1))
+        beta = hyperparam_kwargs.get(&#34;beta&#34;, 0.01)
+        l1_ratio = hyperparam_kwargs.get(&#34;l1_ratio&#34;, 0)
+        ngram_range = hyperparam_kwargs.get(&#34;ngram_range&#34;, (1, 1))
 
         # adjust defaults based on language detected
         if texts is not None:
             lang = TU.detect_lang(texts)
-            if lang != &#39;en&#39;:
-                stopwords = None if stop_words==&#39;english&#39; else stop_words
-                token_pattern = r&#39;(?u)\b\w+\b&#39; if token_pattern is None else token_pattern
+            if lang != &#34;en&#34;:
+                stopwords = None if stop_words == &#34;english&#34; else stop_words
+                token_pattern = (
+                    r&#34;(?u)\b\w+\b&#34; if token_pattern is None else token_pattern
+                )
             if pp.is_nospace_lang(lang):
                 text_list = []
                 for t in texts:
-                    text_list.append(&#39; &#39;.join(jieba.cut(t, HMM=False)))
+                    text_list.append(&#34; &#34;.join(jieba.cut(t, HMM=False)))
                 texts = text_list
-            if self.verbose: print(&#39;lang: %s&#39; % (lang))
-
+            if self.verbose:
+                print(&#34;lang: %s&#34; % (lang))
 
         # preprocess texts
-        if self.verbose: print(&#39;preprocessing texts...&#39;)
-        if token_pattern is None: token_pattern = TU.DEFAULT_TOKEN_PATTERN
-        #if token_pattern is None: token_pattern = r&#39;(?u)\b\w\w+\b&#39;
-        vectorizer = CountVectorizer(max_df=max_df, min_df=min_df,
-                                 max_features=n_features, stop_words=stop_words,
-                                 token_pattern=token_pattern, ngram_range=ngram_range)
-        
+        if self.verbose:
+            print(&#34;preprocessing texts...&#34;)
+        if token_pattern is None:
+            token_pattern = TU.DEFAULT_TOKEN_PATTERN
+        # if token_pattern is None: token_pattern = r&#39;(?u)\b\w\w+\b&#39;
+        vectorizer = CountVectorizer(
+            max_df=max_df,
+            min_df=min_df,
+            max_features=n_features,
+            stop_words=stop_words,
+            token_pattern=token_pattern,
+            ngram_range=ngram_range,
+        )
 
         x_train = vectorizer.fit_transform(texts)
 
         # fit model
 
-        if self.verbose: print(&#39;fitting model...&#39;)
-        if model_type == &#39;lda&#39;:
-            model = LatentDirichletAllocation(n_components=n_topics, max_iter=max_iter,
-                                              learning_method=lda_mode, learning_offset=50.,
-                                              doc_topic_prior=alpha,
-                                              topic_word_prior=beta,
-                                              verbose=self.verbose, random_state=0)
-        elif model_type == &#39;nmf&#39;:
+        if self.verbose:
+            print(&#34;fitting model...&#34;)
+        if model_type == &#34;lda&#34;:
+            model = LatentDirichletAllocation(
+                n_components=n_topics,
+                max_iter=max_iter,
+                learning_method=lda_mode,
+                learning_offset=50.0,
+                doc_topic_prior=alpha,
+                topic_word_prior=beta,
+                verbose=self.verbose,
+                random_state=0,
+            )
+        elif model_type == &#34;nmf&#34;:
             model = NMF(
                 n_components=n_topics,
                 max_iter=max_iter,
                 verbose=self.verbose,
                 alpha=alpha,
                 l1_ratio=l1_ratio,
-                random_state=0)
+                random_state=0,
+            )
         else:
             raise ValueError(&#34;unknown model type:&#34;, str(model_type))
         model.fit(x_train)
@@ -1060,14 +1165,12 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
         # save model and vectorizer and hyperparameter settings
         return (model, vectorizer)
 
-
     @property
     def topics(self):
         &#34;&#34;&#34;
         convenience method/property
         &#34;&#34;&#34;
         return self.get_topics()
-
 
     def get_document_topic_distribution(self):
         &#34;&#34;&#34;
@@ -1078,7 +1181,6 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
         self._check_build()
         return self.doc_topics
 
-
     def get_sorted_docs(self, topic_id):
         &#34;&#34;&#34;
         Returns all docs sorted by relevance to &lt;topic_id&gt;.
@@ -1087,12 +1189,11 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
         &#34;&#34;&#34;
         docs = self.get_docs()
         d = {}
-        for doc in docs: d[doc[&#39;doc_id&#39;]] = doc
+        for doc in docs:
+            d[doc[&#34;doc_id&#34;]] = doc
         m = self.get_document_topic_distribution()
-        doc_ids = (-m[:,topic_id]).argsort()
+        doc_ids = (-m[:, topic_id]).argsort()
         return [d[doc_id] for doc_id in doc_ids]
-
-
 
     def get_word_weights(self, topic_id, n_words=100):
         &#34;&#34;&#34;
@@ -1104,15 +1205,16 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
             n_words=int): number of top words
         &#34;&#34;&#34;
         self._check_model()
-        if topic_id+1 &gt; len(self.model.components_): 
-            raise ValueError(&#39;topic_id must be less than %s&#39; % (len(self.model.components_)))
+        if topic_id + 1 &gt; len(self.model.components_):
+            raise ValueError(
+                &#34;topic_id must be less than %s&#34; % (len(self.model.components_))
+            )
         feature_names = self.vectorizer.get_feature_names()
         word_probs = self.model.components_[topic_id]
-        word_ids = [i for i in word_probs.argsort()[:-n_words - 1:-1]]
+        word_ids = [i for i in word_probs.argsort()[: -n_words - 1 : -1]]
         words = [feature_names[i] for i in word_ids]
         probs = [word_probs[i] for i in word_ids]
-        return list( zip(words, probs) )
-
+        return list(zip(words, probs))
 
     def get_topics(self, n_words=10, as_string=True, show_counts=False):
         &#34;&#34;&#34;
@@ -1120,7 +1222,7 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
         Args:
             n_words(int): number of words to use in topic summary
             as_string(bool): If True, each summary is a space-delimited string instead of list of words
-            show_counts(bool): If True, returns list of tuples of form (id, topic summary, count). 
+            show_counts(bool): If True, returns list of tuples of form (id, topic summary, count).
                                Otherwise, a list of topic summaries.
         Returns:
           List of topic summaries if  show_count is False
@@ -1131,18 +1233,21 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
         feature_names = self.vectorizer.get_feature_names()
         topic_summaries = []
         for topic_idx, topic in enumerate(self.model.components_):
-            summary = [feature_names[i] for i in topic.argsort()[:-n_words - 1:-1]]
-            if as_string: summary = &#34; &#34;.join(summary)
+            summary = [feature_names[i] for i in topic.argsort()[: -n_words - 1 : -1]]
+            if as_string:
+                summary = &#34; &#34;.join(summary)
             topic_summaries.append(summary)
 
         if show_counts:
             self._check_build()
-            topic_counts = sorted([ (k, topic_summaries[k], len(v)) for k,v in self.topic_dict.items()], 
-                                    key=lambda kv:kv[-1], reverse=True)
+            topic_counts = sorted(
+                [(k, topic_summaries[k], len(v)) for k, v in self.topic_dict.items()],
+                key=lambda kv: kv[-1],
+                reverse=True,
+            )
             return dict((t[0], t[1:]) for t in topic_counts)
 
         return topic_summaries
-
 
     def print_topics(self, n_words=10, show_counts=False):
         &#34;&#34;&#34;
@@ -1154,15 +1259,17 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
         topics = self.get_topics(n_words=n_words, as_string=True)
         if show_counts:
             self._check_build()
-            topic_counts = sorted([ (k, topics[k], len(v)) for k,v in self.topic_dict.items()], 
-                                    key=lambda kv:kv[-1], reverse=True)
+            topic_counts = sorted(
+                [(k, topics[k], len(v)) for k, v in self.topic_dict.items()],
+                key=lambda kv: kv[-1],
+                reverse=True,
+            )
             for (idx, topic, count) in topic_counts:
-                print(&#34;topic:%s | count:%s | %s&#34; %(idx, count, topic))
+                print(&#34;topic:%s | count:%s | %s&#34; % (idx, count, topic))
         else:
             for i, t in enumerate(topics):
-                print(&#39;topic %s | %s&#39; % (i, t))
+                print(&#34;topic %s | %s&#34; % (i, t))
         return
-
 
     def build(self, texts, threshold=None):
         &#34;&#34;&#34;
@@ -1186,7 +1293,6 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
         self.topic_dict = self._rank_documents(texts, doc_topics=doc_topics)
         return
 
-
     def filter(self, obj):
         &#34;&#34;&#34;
         The build method may prune documents based on threshold.
@@ -1198,13 +1304,16 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
         Returns:
             filtered obj
         &#34;&#34;&#34;
-        length = obj.shape[0] if isinstance(obj, (pd.DataFrame, np.ndarray)) else len(obj)
+        length = (
+            obj.shape[0] if isinstance(obj, (pd.DataFrame, np.ndarray)) else len(obj)
+        )
         if length != self.bool_array.shape[0]:
-            raise ValueError(&#39;Length of obj is not consistent with the number of documents &#39; +
-                             &#39;supplied to get_topic_model&#39;)
+            raise ValueError(
+                &#34;Length of obj is not consistent with the number of documents &#34;
+                + &#34;supplied to get_topic_model&#34;
+            )
         obj = np.array(obj) if isinstance(obj, list) else obj
         return obj[self.bool_array]
-
 
     def get_docs(self, topic_ids=[], doc_ids=[], rank=False):
         &#34;&#34;&#34;
@@ -1226,23 +1335,31 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
                             &#39;doc_id&#39;: ID of document
                             &#39;topic_proba&#39;: topic probability (or score)
                             &#39;topic_id&#39;: ID of topic
-            
+
         &#34;&#34;&#34;
         self._check_build()
         if not topic_ids:
             topic_ids = list(range(self.n_topics))
         result_texts = []
         for topic_id in topic_ids:
-            if topic_id not in self.topic_dict: continue
-            texts = [{&#39;text&#39;:tup[0], &#39;doc_id&#39;:tup[1], &#39;topic_proba&#39;:tup[2], &#39;topic_id&#39;:topic_id} for tup in self.topic_dict[topic_id] 
-                                                                                                     if not doc_ids or tup[1] in doc_ids]
+            if topic_id not in self.topic_dict:
+                continue
+            texts = [
+                {
+                    &#34;text&#34;: tup[0],
+                    &#34;doc_id&#34;: tup[1],
+                    &#34;topic_proba&#34;: tup[2],
+                    &#34;topic_id&#34;: topic_id,
+                }
+                for tup in self.topic_dict[topic_id]
+                if not doc_ids or tup[1] in doc_ids
+            ]
             result_texts.extend(texts)
         if not rank:
-            result_texts = sorted(result_texts, key=lambda x:x[&#39;doc_id&#39;])
+            result_texts = sorted(result_texts, key=lambda x: x[&#34;doc_id&#34;])
         return result_texts
 
-
-    def get_doctopics(self,  topic_ids=[], doc_ids=[]):
+    def get_doctopics(self, topic_ids=[], doc_ids=[]):
         &#34;&#34;&#34;
         Returns a topic probability distribution for documents
         with primary topic that is one of &lt;topic_ids&gt; and with doc_id in &lt;doc_ids&gt;.
@@ -1258,13 +1375,12 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
         Returns:
             np.ndarray: Each row is the topic probability distribution of a document.
                         Array is sorted in the order returned by self.get_docs.
-                        
+
         &#34;&#34;&#34;
         docs = self.get_docs(topic_ids=topic_ids, doc_ids=doc_ids)
-        return np.array([self.doc_topics[idx] for idx in [x[&#39;doc_id&#39;] for x in docs]])
+        return np.array([self.doc_topics[idx] for idx in [x[&#34;doc_id&#34;] for x in docs]])
 
-
-    def get_texts(self,  topic_ids=[]):
+    def get_texts(self, topic_ids=[]):
         &#34;&#34;&#34;
         Returns texts for documents
         with primary topic that is one of &lt;topic_ids&gt;
@@ -1273,11 +1389,10 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
         Returns:
             list of str
         &#34;&#34;&#34;
-        if not topic_ids: topic_ids = list(range(self.n_topics))
+        if not topic_ids:
+            topic_ids = list(range(self.n_topics))
         docs = self.get_docs(topic_ids)
         return [x[0] for x in docs]
-
-
 
     def predict(self, texts, threshold=None, harden=False):
         &#34;&#34;&#34;
@@ -1296,27 +1411,36 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
         self._check_model()
         transformed_texts = self.vectorizer.transform(texts)
         X_topics = self.model.transform(transformed_texts)
-        #if self.model_type == &#39;nmf&#39;:
-            #scores = np.matrix(X_topics)
-            #scores_normalized= scores/scores.sum(axis=1)
-            #X_topics = scores_normalized
+        # if self.model_type == &#39;nmf&#39;:
+        # scores = np.matrix(X_topics)
+        # scores_normalized= scores/scores.sum(axis=1)
+        # X_topics = scores_normalized
         _idx = np.array([True] * len(texts))
         if threshold is not None:
-            _idx = np.amax(X_topics, axis=1) &gt; threshold  # idx of doc that above the threshold
+            _idx = (
+                np.amax(X_topics, axis=1) &gt; threshold
+            )  # idx of doc that above the threshold
             _idx = np.array(_idx)
             X_topics = X_topics[_idx]
-        if harden: X_topics = self._harden_topics(X_topics)
+        if harden:
+            X_topics = self._harden_topics(X_topics)
         if threshold is not None:
             return (X_topics, _idx)
         else:
             return X_topics
 
-
-    def visualize_documents(self, texts=None, doc_topics=None, 
-                            width=700, height=700, point_size=5, title=&#39;Document Visualization&#39;,
-                            extra_info={},
-                            colors=None,
-                            filepath=None,):
+    def visualize_documents(
+        self,
+        texts=None,
+        doc_topics=None,
+        width=700,
+        height=700,
+        point_size=5,
+        title=&#34;Document Visualization&#34;,
+        extra_info={},
+        colors=None,
+        filepath=None,
+    ):
         &#34;&#34;&#34;
         Generates a visualization of a set of documents based on model.
         If &lt;texts&gt; is supplied, raw documents will be first transformed into document-topic
@@ -1339,22 +1463,26 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
         &#34;&#34;&#34;
 
         # error-checking
-        if texts is not None: length = len(texts)
-        else: length = doc_topics.shape[0]
+        if texts is not None:
+            length = len(texts)
+        else:
+            length = doc_topics.shape[0]
         if colors is not None and len(colors) != length:
-            raise ValueError(&#39;length of colors is not consistent with length of texts or doctopics&#39;)
+            raise ValueError(
+                &#34;length of colors is not consistent with length of texts or doctopics&#34;
+            )
         if texts is not None and doc_topics is not None:
-            raise ValueError(&#39;texts is mutually-exclusive with doc_topics&#39;)
+            raise ValueError(&#34;texts is mutually-exclusive with doc_topics&#34;)
         if texts is None and doc_topics is None:
-            raise ValueError(&#39;One of texts or doc_topics is required.&#39;)
+            raise ValueError(&#34;One of texts or doc_topics is required.&#34;)
         if extra_info:
-            invalid_keys = [&#39;x&#39;, &#39;y&#39;, &#39;topic&#39;, &#39;fill_color&#39;]
+            invalid_keys = [&#34;x&#34;, &#34;y&#34;, &#34;topic&#34;, &#34;fill_color&#34;]
             for k in extra_info.keys():
                 if k in invalid_keys:
-                    raise ValueError(&#39;cannot use &#34;%s&#34; as key in extra_info&#39; %(k))
+                    raise ValueError(&#39;cannot use &#34;%s&#34; as key in extra_info&#39; % (k))
                 lst = extra_info[k]
                 if len(lst) != length:
-                    raise ValueError(&#39;texts and extra_info lists must be same size&#39;)
+                    raise ValueError(&#34;texts and extra_info lists must be same size&#34;)
 
         # check fo bokeh
         try:
@@ -1363,86 +1491,94 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
             from bokeh.models import HoverTool
             from bokeh.io import output_notebook
         except:
-            warnings.warn(&#39;visualize_documents method requires bokeh package: pip install bokeh&#39;)
+            warnings.warn(
+                &#34;visualize_documents method requires bokeh package: pip install bokeh&#34;
+            )
             return
 
         # prepare data
         if doc_topics is not None:
             X_topics = doc_topics
         else:
-            if self.verbose:  print(&#39;transforming texts...&#39;, end=&#39;&#39;)
+            if self.verbose:
+                print(&#34;transforming texts...&#34;, end=&#34;&#34;)
             X_topics = self.predict(texts, harden=False)
-            if self.verbose: print(&#39;done.&#39;)
+            if self.verbose:
+                print(&#34;done.&#34;)
 
         # reduce to 2-D
-        if self.verbose:  print(&#39;reducing to 2 dimensions...&#39;, end=&#39;&#39;)
-        tsne_model = TSNE(n_components=2, verbose=self.verbose, random_state=0, angle=.99, init=&#39;pca&#39;)
+        if self.verbose:
+            print(&#34;reducing to 2 dimensions...&#34;, end=&#34;&#34;)
+        tsne_model = TSNE(
+            n_components=2, verbose=self.verbose, random_state=0, angle=0.99, init=&#34;pca&#34;
+        )
         tsne_lda = tsne_model.fit_transform(X_topics)
-        print(&#39;done.&#39;)
+        print(&#34;done.&#34;)
 
         # get random colormap
         colormap = U.get_random_colors(self.n_topics)
 
         # generate inline visualization in Jupyter notebook
         lda_keys = self._harden_topics(X_topics)
-        if colors is None: colors = colormap[lda_keys]
+        if colors is None:
+            colors = colormap[lda_keys]
         topic_summaries = self.get_topics(n_words=5)
-        os.environ[&#34;BOKEH_RESOURCES&#34;]=&#34;inline&#34;
+        os.environ[&#34;BOKEH_RESOURCES&#34;] = &#34;inline&#34;
         output_notebook()
-        dct = { 
-                &#39;x&#39;:tsne_lda[:,0],
-                &#39;y&#39;:tsne_lda[:, 1],
-                &#39;topic&#39;:[topic_summaries[tid] for tid in lda_keys],
-                &#39;fill_color&#39;:colors,}
-        tool_tups = [(&#39;index&#39;, &#39;$index&#39;),
-                     (&#39;(x,y)&#39;,&#39;($x,$y)&#39;),
-                     (&#39;topic&#39;, &#39;@topic&#39;)]
+        dct = {
+            &#34;x&#34;: tsne_lda[:, 0],
+            &#34;y&#34;: tsne_lda[:, 1],
+            &#34;topic&#34;: [topic_summaries[tid] for tid in lda_keys],
+            &#34;fill_color&#34;: colors,
+        }
+        tool_tups = [(&#34;index&#34;, &#34;$index&#34;), (&#34;(x,y)&#34;, &#34;($x,$y)&#34;), (&#34;topic&#34;, &#34;@topic&#34;)]
         for k in extra_info.keys():
             dct[k] = extra_info[k]
-            tool_tups.append((k, &#39;@&#39;+k))
+            tool_tups.append((k, &#34;@&#34; + k))
 
         source = bp.ColumnDataSource(data=dct)
-        hover = HoverTool( tooltips=tool_tups)
-        p = bp.figure(plot_width=width, plot_height=height, 
-                      tools=[hover, &#39;save&#39;, &#39;pan&#39;, &#39;wheel_zoom&#39;, &#39;box_zoom&#39;, &#39;reset&#39;],
-                      #tools=&#34;pan,wheel_zoom,box_zoom,reset,hover,previewsave&#34;,
-                      title=title)
-        #plot_lda = bp.figure(plot_width=1400, plot_height=1100,
-                           #title=title,
-                           #tools=&#34;pan,wheel_zoom,box_zoom,reset,hover,previewsave&#34;,
-                           #x_axis_type=None, y_axis_type=None, min_border=1)
-        p.circle(&#39;x&#39;, &#39;y&#39;, size=point_size, source=source, fill_color= &#39;fill_color&#39;)
+        hover = HoverTool(tooltips=tool_tups)
+        p = bp.figure(
+            plot_width=width,
+            plot_height=height,
+            tools=[hover, &#34;save&#34;, &#34;pan&#34;, &#34;wheel_zoom&#34;, &#34;box_zoom&#34;, &#34;reset&#34;],
+            # tools=&#34;pan,wheel_zoom,box_zoom,reset,hover,previewsave&#34;,
+            title=title,
+        )
+        # plot_lda = bp.figure(plot_width=1400, plot_height=1100,
+        # title=title,
+        # tools=&#34;pan,wheel_zoom,box_zoom,reset,hover,previewsave&#34;,
+        # x_axis_type=None, y_axis_type=None, min_border=1)
+        p.circle(&#34;x&#34;, &#34;y&#34;, size=point_size, source=source, fill_color=&#34;fill_color&#34;)
         bp.show(p)
         if filepath is not None:
             bp.output_file(filepath)
             bp.save(p)
         return
 
-
-    def train_recommender(self, n_neighbors=20, metric=&#39;minkowski&#39;, p=2):
+    def train_recommender(self, n_neighbors=20, metric=&#34;minkowski&#34;, p=2):
         &#34;&#34;&#34;
         Trains a recommender that, given a single document, will return
         documents in the corpus that are semantically similar to it.
 
         Args:
-            n_neighbors (int): 
+            n_neighbors (int):
         Returns:
             None
         &#34;&#34;&#34;
         from sklearn.neighbors import NearestNeighbors
+
         rec = NearestNeighbors(n_neighbors=n_neighbors, metric=metric, p=p)
         probs = self.get_doctopics()
         rec.fit(probs)
         self.recommender = rec
         return
 
-
-
     def recommend(self, text=None, doc_topic=None, n=5, n_neighbors=100):
         &#34;&#34;&#34;
         Given an example document, recommends documents similar to it
         from the set of documents supplied to build().
- 
+
         Args:
             texts(list of str): list of document texts.  Mutually-exclusive with &lt;doc_topics&gt;
             doc_topics(ndarray): pre-computed topic distribution for each document in texts.
@@ -1455,26 +1591,26 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
         &#34;&#34;&#34;
         # error-checks
         if text is not None and doc_topic is not None:
-            raise ValueError(&#39;text is mutually-exclusive with doc_topic&#39;)
+            raise ValueError(&#34;text is mutually-exclusive with doc_topic&#34;)
         if text is None and doc_topic is None:
-            raise ValueError(&#39;One of text or doc_topic is required.&#39;)
+            raise ValueError(&#34;One of text or doc_topic is required.&#34;)
         if text is not None and type(text) not in [str]:
-            raise ValueError(&#39;text must be a str &#39;)
-        if  doc_topic is not None and type(doc_topic) not in [np.ndarray]:
-            raise ValueError(&#39;doc_topic must be a np.ndarray&#39;)
+            raise ValueError(&#34;text must be a str &#34;)
+        if doc_topic is not None and type(doc_topic) not in [np.ndarray]:
+            raise ValueError(&#34;doc_topic must be a np.ndarray&#34;)
 
-        if n &gt; n_neighbors: n_neighbors = n
+        if n &gt; n_neighbors:
+            n_neighbors = n
 
         x_test = [doc_topic]
         if text:
             x_test = self.predict([text])
         docs = self.get_docs()
-        indices = self.recommender.kneighbors(x_test, return_distance=False, n_neighbors=n_neighbors)
+        indices = self.recommender.kneighbors(
+            x_test, return_distance=False, n_neighbors=n_neighbors
+        )
         results = [doc for i, doc in enumerate(docs) if i in indices]
         return results[:n]
-
-
-
 
     def train_scorer(self, topic_ids=[], doc_ids=[], n_neighbors=20):
         &#34;&#34;&#34;
@@ -1483,8 +1619,8 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
 
         NOTE: The score method currently employs the use of LocalOutLierFactor, which
         means you should not try to score documents that were used in training. Only
-        new, unseen documents should be scored for similarity. 
-        REFERENCE: 
+        new, unseen documents should be scored for similarity.
+        REFERENCE:
         https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.LocalOutlierFactor.html#sklearn.neighbors.LocalOutlierFactor
 
         Args:
@@ -1492,19 +1628,20 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
                                      of range(self.n_topics).  Documents associated
                                      with these topic_ids will be used as seed set.
             doc_ids (list of ints): list of document IDs where each id is an index
-                                    into self.doctopics.  Documents associated 
+                                    into self.doctopics.  Documents associated
                                     with these doc_ids will be used as seed set.
         Returns:
             None
         &#34;&#34;&#34;
         from sklearn.neighbors import LocalOutlierFactor
-        clf = LocalOutlierFactor(n_neighbors=n_neighbors, novelty=True, contamination=0.1)
+
+        clf = LocalOutlierFactor(
+            n_neighbors=n_neighbors, novelty=True, contamination=0.1
+        )
         probs = self.get_doctopics(topic_ids=topic_ids, doc_ids=doc_ids)
         clf.fit(probs)
         self.scorer = clf
         return
-
-
 
     def score(self, texts=None, doc_topics=None):
         &#34;&#34;&#34;
@@ -1523,7 +1660,7 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
         NOTE: The score method currently employs the use of LocalOutLierFactor, which
         means you should not try to score documents that were used in training. Only
         new, unseen documents should be scored for similarity.
- 
+
         Args:
             texts(list of str): list of document texts.  Mutually-exclusive with &lt;doc_topics&gt;
             doc_topics(ndarray): pre-computed topic distribution for each document in texts.
@@ -1532,26 +1669,25 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
             list of floats:  larger values indicate higher degree of similarity
                              positive values indicate a binary decision of similar
                              negative values indicate binary decision of dissimilar
-                             In practice, negative scores closer to zero will also 
+                             In practice, negative scores closer to zero will also
                              be similar as One-class classifiers are more strict
                              than traditional binary classifiers.
 
         &#34;&#34;&#34;
         # error-checks
         if texts is not None and doc_topics is not None:
-            raise ValueError(&#39;texts is mutually-exclusive with doc_topics&#39;)
+            raise ValueError(&#34;texts is mutually-exclusive with doc_topics&#34;)
         if texts is None and doc_topics is None:
-            raise ValueError(&#39;One of texts or doc_topics is required.&#39;)
+            raise ValueError(&#34;One of texts or doc_topics is required.&#34;)
         if texts is not None and type(texts) not in [list, np.ndarray]:
-            raise ValueError(&#39;texts must be either a list or numpy ndarray&#39;)
-        if  doc_topics is not None and type(doc_topics) not in [np.ndarray]:
-            raise ValueError(&#39;doc_topics must be a np.ndarray&#39;)
+            raise ValueError(&#34;texts must be either a list or numpy ndarray&#34;)
+        if doc_topics is not None and type(doc_topics) not in [np.ndarray]:
+            raise ValueError(&#34;doc_topics must be a np.ndarray&#34;)
 
         x_test = doc_topics
         if texts:
             x_test = self.predict(texts)
         return self.scorer.decision_function(x_test)
-
 
     def search(self, query, topic_ids=[], doc_ids=[], case_sensitive=False):
         &#34;&#34;&#34;
@@ -1566,8 +1702,9 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
         &#34;&#34;&#34;
 
         # setup pattern
-        if not case_sensitive: query = query.lower()
-        pattern = re.compile(r&#39;\b%s\b&#39; % query)
+        if not case_sensitive:
+            query = query.lower()
+        pattern = re.compile(r&#34;\b%s\b&#34; % query)
 
         # retrive docs
         docs = self.get_docs(topic_ids=topic_ids, doc_ids=doc_ids)
@@ -1577,18 +1714,17 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
         results = []
         for i in mb:
             for doc in progress_bar(docs, parent=mb):
-                text = doc[&#39;text&#39;]
-                if not case_sensitive: text = text.lower()
+                text = doc[&#34;text&#34;]
+                if not case_sensitive:
+                    text = text.lower()
                 matches = pattern.findall(text)
-                if matches: results.append(doc)
-            if self.verbose: mb.write(&#39;done.&#39;)
+                if matches:
+                    results.append(doc)
+            if self.verbose:
+                mb.write(&#34;done.&#34;)
         return results
 
-
-
-    def _rank_documents(self, 
-                       texts,
-                       doc_topics=None):
+    def _rank_documents(self, texts, doc_topics=None):
         &#34;&#34;&#34;
         Rank documents by topic score.
         If topic_index is supplied, rank documents based on relevance to supplied topic.
@@ -1597,21 +1733,23 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
             texts(list of str): list of document texts.
             doc_topics(ndarray): pre-computed topic distribution for each document
                                  If None, re-computed from texts.
-                              
+
         Returns:
             dict of lists: each element in list is a tuple of (doc_index, topic_index, score)
-            ... where doc_index is an index into either texts 
+            ... where doc_index is an index into either texts
         &#34;&#34;&#34;
         if doc_topics is not None:
             X_topics = doc_topics
         else:
-            if self.verbose: print(&#39;transforming texts to topic space...&#39;)
+            if self.verbose:
+                print(&#34;transforming texts to topic space...&#34;)
             X_topics = self.predict(texts)
         topics = np.argmax(X_topics, axis=1)
         scores = np.amax(X_topics, axis=1)
         doc_ids = np.array([i for i, x in enumerate(texts)])
         result = list(zip(texts, doc_ids, topics, scores))
-        if self.verbose: print(&#39;done.&#39;)
+        if self.verbose:
+            print(&#34;done.&#34;)
         result = sorted(result, key=lambda x: x[-1], reverse=True)
         result_dict = {}
         for r in result:
@@ -1624,7 +1762,6 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
             result_dict[topic_id] = lst
         return result_dict
 
-
     def _harden_topics(self, X_topics):
         &#34;&#34;&#34;
         Transforms soft-clustering to hard-clustering
@@ -1635,41 +1772,38 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
         X_topics = np.array(max_topics)
         return X_topics
 
-
     def _check_build(self):
         self._check_model()
-        if self.topic_dict is None: 
-            raise Exception(&#39;Must call build() method.&#39;)
+        if self.topic_dict is None:
+            raise Exception(&#34;Must call build() method.&#34;)
 
     def _check_scorer(self):
         if self.scorer is None:
-            raise Exception(&#39;Must call train_scorer()&#39;)
+            raise Exception(&#34;Must call train_scorer()&#34;)
 
     def _check_recommender(self):
         if self.recommender is None:
-            raise Exception(&#39;Must call train_recommender()&#39;)
-
+            raise Exception(&#34;Must call train_recommender()&#34;)
 
     def _check_model(self):
         if self.model is None or self.vectorizer is None:
-            raise Exception(&#39;Must call train()&#39;)
-
-
+            raise Exception(&#34;Must call train()&#34;)
 
     def save(self, fname):
         &#34;&#34;&#34;
         save TopicModel object
         &#34;&#34;&#34;
 
-        
-        with open(fname+&#39;.tm_vect&#39;, &#39;wb&#39;) as f:
+        with open(fname + &#34;.tm_vect&#34;, &#34;wb&#34;) as f:
             pickle.dump(self.vectorizer, f)
-        with open(fname+&#39;.tm_model&#39;, &#39;wb&#39;) as f:
+        with open(fname + &#34;.tm_model&#34;, &#34;wb&#34;) as f:
             pickle.dump(self.model, f)
-        params = {&#39;n_topics&#39;: self.n_topics,
-                  &#39;n_features&#39;: self.n_features,
-                  &#39;verbose&#39;: self.verbose}
-        with open(fname+&#39;.tm_params&#39;, &#39;wb&#39;) as f:
+        params = {
+            &#34;n_topics&#34;: self.n_topics,
+            &#34;n_features&#34;: self.n_features,
+            &#34;verbose&#34;: self.verbose,
+        }
+        with open(fname + &#34;.tm_params&#34;, &#34;wb&#34;) as f:
             pickle.dump(params, f)
 
         return</code></pre>
@@ -1762,10 +1896,14 @@ for use with visualize_documents.</p>
     Returns:
         filtered obj
     &#34;&#34;&#34;
-    length = obj.shape[0] if isinstance(obj, (pd.DataFrame, np.ndarray)) else len(obj)
+    length = (
+        obj.shape[0] if isinstance(obj, (pd.DataFrame, np.ndarray)) else len(obj)
+    )
     if length != self.bool_array.shape[0]:
-        raise ValueError(&#39;Length of obj is not consistent with the number of documents &#39; +
-                         &#39;supplied to get_topic_model&#39;)
+        raise ValueError(
+            &#34;Length of obj is not consistent with the number of documents &#34;
+            + &#34;supplied to get_topic_model&#34;
+        )
     obj = np.array(obj) if isinstance(obj, list) else obj
     return obj[self.bool_array]</code></pre>
 </details>
@@ -1821,19 +1959,28 @@ of texts supplied to self.build (which is the order of self.doc_topics).</p>
                         &#39;doc_id&#39;: ID of document
                         &#39;topic_proba&#39;: topic probability (or score)
                         &#39;topic_id&#39;: ID of topic
-        
+
     &#34;&#34;&#34;
     self._check_build()
     if not topic_ids:
         topic_ids = list(range(self.n_topics))
     result_texts = []
     for topic_id in topic_ids:
-        if topic_id not in self.topic_dict: continue
-        texts = [{&#39;text&#39;:tup[0], &#39;doc_id&#39;:tup[1], &#39;topic_proba&#39;:tup[2], &#39;topic_id&#39;:topic_id} for tup in self.topic_dict[topic_id] 
-                                                                                                 if not doc_ids or tup[1] in doc_ids]
+        if topic_id not in self.topic_dict:
+            continue
+        texts = [
+            {
+                &#34;text&#34;: tup[0],
+                &#34;doc_id&#34;: tup[1],
+                &#34;topic_proba&#34;: tup[2],
+                &#34;topic_id&#34;: topic_id,
+            }
+            for tup in self.topic_dict[topic_id]
+            if not doc_ids or tup[1] in doc_ids
+        ]
         result_texts.extend(texts)
     if not rank:
-        result_texts = sorted(result_texts, key=lambda x:x[&#39;doc_id&#39;])
+        result_texts = sorted(result_texts, key=lambda x: x[&#34;doc_id&#34;])
     return result_texts</code></pre>
 </details>
 </dd>
@@ -1863,7 +2010,7 @@ Array is sorted in the order returned by self.get_docs.</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_doctopics(self,  topic_ids=[], doc_ids=[]):
+<pre><code class="python">def get_doctopics(self, topic_ids=[], doc_ids=[]):
     &#34;&#34;&#34;
     Returns a topic probability distribution for documents
     with primary topic that is one of &lt;topic_ids&gt; and with doc_id in &lt;doc_ids&gt;.
@@ -1879,10 +2026,10 @@ Array is sorted in the order returned by self.get_docs.</dd>
     Returns:
         np.ndarray: Each row is the topic probability distribution of a document.
                     Array is sorted in the order returned by self.get_docs.
-                    
+
     &#34;&#34;&#34;
     docs = self.get_docs(topic_ids=topic_ids, doc_ids=doc_ids)
-    return np.array([self.doc_topics[idx] for idx in [x[&#39;doc_id&#39;] for x in docs]])</code></pre>
+    return np.array([self.doc_topics[idx] for idx in [x[&#34;doc_id&#34;] for x in docs]])</code></pre>
 </details>
 </dd>
 <dt id="ktrain.text.eda.TopicModel.get_document_topic_distribution"><code class="name flex">
@@ -1925,9 +2072,10 @@ than the topic_id to which document is most relevant.</p></div>
     &#34;&#34;&#34;
     docs = self.get_docs()
     d = {}
-    for doc in docs: d[doc[&#39;doc_id&#39;]] = doc
+    for doc in docs:
+        d[doc[&#34;doc_id&#34;]] = doc
     m = self.get_document_topic_distribution()
-    doc_ids = (-m[:,topic_id]).argsort()
+    doc_ids = (-m[:, topic_id]).argsort()
     return [d[doc_id] for doc_id in doc_ids]</code></pre>
 </details>
 </dd>
@@ -1945,7 +2093,7 @@ with primary topic that is one of <topic_ids></p>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_texts(self,  topic_ids=[]):
+<pre><code class="python">def get_texts(self, topic_ids=[]):
     &#34;&#34;&#34;
     Returns texts for documents
     with primary topic that is one of &lt;topic_ids&gt;
@@ -1954,7 +2102,8 @@ with primary topic that is one of <topic_ids></p>
     Returns:
         list of str
     &#34;&#34;&#34;
-    if not topic_ids: topic_ids = list(range(self.n_topics))
+    if not topic_ids:
+        topic_ids = list(range(self.n_topics))
     docs = self.get_docs(topic_ids)
     return [x[0] for x in docs]</code></pre>
 </details>
@@ -1983,7 +2132,7 @@ Dictionary where key is topic ID and value is a tuple of form (topic summary, co
     Args:
         n_words(int): number of words to use in topic summary
         as_string(bool): If True, each summary is a space-delimited string instead of list of words
-        show_counts(bool): If True, returns list of tuples of form (id, topic summary, count). 
+        show_counts(bool): If True, returns list of tuples of form (id, topic summary, count).
                            Otherwise, a list of topic summaries.
     Returns:
       List of topic summaries if  show_count is False
@@ -1994,14 +2143,18 @@ Dictionary where key is topic ID and value is a tuple of form (topic summary, co
     feature_names = self.vectorizer.get_feature_names()
     topic_summaries = []
     for topic_idx, topic in enumerate(self.model.components_):
-        summary = [feature_names[i] for i in topic.argsort()[:-n_words - 1:-1]]
-        if as_string: summary = &#34; &#34;.join(summary)
+        summary = [feature_names[i] for i in topic.argsort()[: -n_words - 1 : -1]]
+        if as_string:
+            summary = &#34; &#34;.join(summary)
         topic_summaries.append(summary)
 
     if show_counts:
         self._check_build()
-        topic_counts = sorted([ (k, topic_summaries[k], len(v)) for k,v in self.topic_dict.items()], 
-                                key=lambda kv:kv[-1], reverse=True)
+        topic_counts = sorted(
+            [(k, topic_summaries[k], len(v)) for k, v in self.topic_dict.items()],
+            key=lambda kv: kv[-1],
+            reverse=True,
+        )
         return dict((t[0], t[1:]) for t in topic_counts)
 
     return topic_summaries</code></pre>
@@ -2031,14 +2184,16 @@ n_words=int): number of top words</p></div>
         n_words=int): number of top words
     &#34;&#34;&#34;
     self._check_model()
-    if topic_id+1 &gt; len(self.model.components_): 
-        raise ValueError(&#39;topic_id must be less than %s&#39; % (len(self.model.components_)))
+    if topic_id + 1 &gt; len(self.model.components_):
+        raise ValueError(
+            &#34;topic_id must be less than %s&#34; % (len(self.model.components_))
+        )
     feature_names = self.vectorizer.get_feature_names()
     word_probs = self.model.components_[topic_id]
-    word_ids = [i for i in word_probs.argsort()[:-n_words - 1:-1]]
+    word_ids = [i for i in word_probs.argsort()[: -n_words - 1 : -1]]
     words = [feature_names[i] for i in word_ids]
     probs = [word_probs[i] for i in word_ids]
-    return list( zip(words, probs) )</code></pre>
+    return list(zip(words, probs))</code></pre>
 </details>
 </dd>
 <dt id="ktrain.text.eda.TopicModel.predict"><code class="name flex">
@@ -2085,16 +2240,19 @@ np.ndarray</code></dt>
     self._check_model()
     transformed_texts = self.vectorizer.transform(texts)
     X_topics = self.model.transform(transformed_texts)
-    #if self.model_type == &#39;nmf&#39;:
-        #scores = np.matrix(X_topics)
-        #scores_normalized= scores/scores.sum(axis=1)
-        #X_topics = scores_normalized
+    # if self.model_type == &#39;nmf&#39;:
+    # scores = np.matrix(X_topics)
+    # scores_normalized= scores/scores.sum(axis=1)
+    # X_topics = scores_normalized
     _idx = np.array([True] * len(texts))
     if threshold is not None:
-        _idx = np.amax(X_topics, axis=1) &gt; threshold  # idx of doc that above the threshold
+        _idx = (
+            np.amax(X_topics, axis=1) &gt; threshold
+        )  # idx of doc that above the threshold
         _idx = np.array(_idx)
         X_topics = X_topics[_idx]
-    if harden: X_topics = self._harden_topics(X_topics)
+    if harden:
+        X_topics = self._harden_topics(X_topics)
     if threshold is not None:
         return (X_topics, _idx)
     else:
@@ -2123,13 +2281,16 @@ the count is the number of documents with that topic as primary.</p></div>
     topics = self.get_topics(n_words=n_words, as_string=True)
     if show_counts:
         self._check_build()
-        topic_counts = sorted([ (k, topics[k], len(v)) for k,v in self.topic_dict.items()], 
-                                key=lambda kv:kv[-1], reverse=True)
+        topic_counts = sorted(
+            [(k, topics[k], len(v)) for k, v in self.topic_dict.items()],
+            key=lambda kv: kv[-1],
+            reverse=True,
+        )
         for (idx, topic, count) in topic_counts:
-            print(&#34;topic:%s | count:%s | %s&#34; %(idx, count, topic))
+            print(&#34;topic:%s | count:%s | %s&#34; % (idx, count, topic))
     else:
         for i, t in enumerate(topics):
-            print(&#39;topic %s | %s&#39; % (i, t))
+            print(&#34;topic %s | %s&#34; % (i, t))
     return</code></pre>
 </details>
 </dd>
@@ -2175,21 +2336,24 @@ Mutually-exclusive with <doc_topics></dt>
     &#34;&#34;&#34;
     # error-checks
     if text is not None and doc_topic is not None:
-        raise ValueError(&#39;text is mutually-exclusive with doc_topic&#39;)
+        raise ValueError(&#34;text is mutually-exclusive with doc_topic&#34;)
     if text is None and doc_topic is None:
-        raise ValueError(&#39;One of text or doc_topic is required.&#39;)
+        raise ValueError(&#34;One of text or doc_topic is required.&#34;)
     if text is not None and type(text) not in [str]:
-        raise ValueError(&#39;text must be a str &#39;)
-    if  doc_topic is not None and type(doc_topic) not in [np.ndarray]:
-        raise ValueError(&#39;doc_topic must be a np.ndarray&#39;)
+        raise ValueError(&#34;text must be a str &#34;)
+    if doc_topic is not None and type(doc_topic) not in [np.ndarray]:
+        raise ValueError(&#34;doc_topic must be a np.ndarray&#34;)
 
-    if n &gt; n_neighbors: n_neighbors = n
+    if n &gt; n_neighbors:
+        n_neighbors = n
 
     x_test = [doc_topic]
     if text:
         x_test = self.predict([text])
     docs = self.get_docs()
-    indices = self.recommender.kneighbors(x_test, return_distance=False, n_neighbors=n_neighbors)
+    indices = self.recommender.kneighbors(
+        x_test, return_distance=False, n_neighbors=n_neighbors
+    )
     results = [doc for i, doc in enumerate(docs) if i in indices]
     return results[:n]</code></pre>
 </details>
@@ -2208,15 +2372,16 @@ Mutually-exclusive with <doc_topics></dt>
     save TopicModel object
     &#34;&#34;&#34;
 
-    
-    with open(fname+&#39;.tm_vect&#39;, &#39;wb&#39;) as f:
+    with open(fname + &#34;.tm_vect&#34;, &#34;wb&#34;) as f:
         pickle.dump(self.vectorizer, f)
-    with open(fname+&#39;.tm_model&#39;, &#39;wb&#39;) as f:
+    with open(fname + &#34;.tm_model&#34;, &#34;wb&#34;) as f:
         pickle.dump(self.model, f)
-    params = {&#39;n_topics&#39;: self.n_topics,
-              &#39;n_features&#39;: self.n_features,
-              &#39;verbose&#39;: self.verbose}
-    with open(fname+&#39;.tm_params&#39;, &#39;wb&#39;) as f:
+    params = {
+        &#34;n_topics&#34;: self.n_topics,
+        &#34;n_features&#34;: self.n_features,
+        &#34;verbose&#34;: self.verbose,
+    }
+    with open(fname + &#34;.tm_params&#34;, &#34;wb&#34;) as f:
         pickle.dump(params, f)
 
     return</code></pre>
@@ -2284,20 +2449,20 @@ than traditional binary classifiers.</dd>
         list of floats:  larger values indicate higher degree of similarity
                          positive values indicate a binary decision of similar
                          negative values indicate binary decision of dissimilar
-                         In practice, negative scores closer to zero will also 
+                         In practice, negative scores closer to zero will also
                          be similar as One-class classifiers are more strict
                          than traditional binary classifiers.
 
     &#34;&#34;&#34;
     # error-checks
     if texts is not None and doc_topics is not None:
-        raise ValueError(&#39;texts is mutually-exclusive with doc_topics&#39;)
+        raise ValueError(&#34;texts is mutually-exclusive with doc_topics&#34;)
     if texts is None and doc_topics is None:
-        raise ValueError(&#39;One of texts or doc_topics is required.&#39;)
+        raise ValueError(&#34;One of texts or doc_topics is required.&#34;)
     if texts is not None and type(texts) not in [list, np.ndarray]:
-        raise ValueError(&#39;texts must be either a list or numpy ndarray&#39;)
-    if  doc_topics is not None and type(doc_topics) not in [np.ndarray]:
-        raise ValueError(&#39;doc_topics must be a np.ndarray&#39;)
+        raise ValueError(&#34;texts must be either a list or numpy ndarray&#34;)
+    if doc_topics is not None and type(doc_topics) not in [np.ndarray]:
+        raise ValueError(&#34;doc_topics must be a np.ndarray&#34;)
 
     x_test = doc_topics
     if texts:
@@ -2339,8 +2504,9 @@ If True, case sensitive search</p></div>
     &#34;&#34;&#34;
 
     # setup pattern
-    if not case_sensitive: query = query.lower()
-    pattern = re.compile(r&#39;\b%s\b&#39; % query)
+    if not case_sensitive:
+        query = query.lower()
+    pattern = re.compile(r&#34;\b%s\b&#34; % query)
 
     # retrive docs
     docs = self.get_docs(topic_ids=topic_ids, doc_ids=doc_ids)
@@ -2350,11 +2516,14 @@ If True, case sensitive search</p></div>
     results = []
     for i in mb:
         for doc in progress_bar(docs, parent=mb):
-            text = doc[&#39;text&#39;]
-            if not case_sensitive: text = text.lower()
+            text = doc[&#34;text&#34;]
+            if not case_sensitive:
+                text = text.lower()
             matches = pattern.findall(text)
-            if matches: results.append(doc)
-        if self.verbose: mb.write(&#39;done.&#39;)
+            if matches:
+                results.append(doc)
+        if self.verbose:
+            mb.write(&#34;done.&#34;)
     return results</code></pre>
 </details>
 </dd>
@@ -2401,7 +2570,7 @@ default:0.01
 nmf_alpha: alias for alpha for backwars compatilibity
 l1_ratio: l1_ratio for NMF. default: 0
 ngram_range:
-whether to consider bigrams, trigrams. default: (1,1) </p>
+whether to consider bigrams, trigrams. default: (1,1)</p>
 <h2 id="returns">Returns</h2>
 <dl>
 <dt><code>tuple</code></dt>
@@ -2411,14 +2580,25 @@ whether to consider bigrams, trigrams. default: (1,1) </p>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def train(self,texts, model_type=&#39;lda&#39;, n_topics=None, n_features=10000,
-          min_df=5, max_df=0.5,  stop_words=&#39;english&#39;,
-          max_iter=5, lda_max_iter=None, lda_mode=&#39;online&#39;,
-          token_pattern=None, hyperparam_kwargs=None):
+<pre><code class="python">def train(
+    self,
+    texts,
+    model_type=&#34;lda&#34;,
+    n_topics=None,
+    n_features=10000,
+    min_df=5,
+    max_df=0.5,
+    stop_words=&#34;english&#34;,
+    max_iter=5,
+    lda_max_iter=None,
+    lda_mode=&#34;online&#34;,
+    token_pattern=None,
+    hyperparam_kwargs=None,
+):
     &#34;&#34;&#34;
     Fits a topic model to documents in &lt;texts&gt;.
     Example:
-        tm = ktrain.text.get_topic_model(docs, n_topics=20, 
+        tm = ktrain.text.get_topic_model(docs, n_topics=20,
                                         n_features=1000, min_df=2, max_df=0.95)
     Args:
         texts (list of str): list of texts
@@ -2433,7 +2613,7 @@ whether to consider bigrams, trigrams. default: (1,1) </p>
                             If lda_mode=&#39;batch&#39;, this should be increased (e.g., 1500).
                             Ignored if model_type != &#39;lda&#39;
         lda_mode (str):  one of {&#39;online&#39;, &#39;batch&#39;}. Ignored of model_type !=&#39;lda&#39;
-        token_pattern(str): regex pattern to use to tokenize documents. 
+        token_pattern(str): regex pattern to use to tokenize documents.
                             If None, a default tokenizer will be used
         hyperparam_kwargs(dict): hyperparameters for LDA/NMF
                                  Keys in this dict can be any of the following:
@@ -2441,63 +2621,78 @@ whether to consider bigrams, trigrams. default: (1,1) </p>
                                      beta: beta for LDA.  default:0.01
                                      nmf_alpha: alias for alpha for backwars compatilibity
                                      l1_ratio: l1_ratio for NMF. default: 0
-                                     ngram_range:  whether to consider bigrams, trigrams. default: (1,1) 
-                                
+                                     ngram_range:  whether to consider bigrams, trigrams. default: (1,1)
+
     Returns:
         tuple: (model, vectorizer)
     &#34;&#34;&#34;
     max_iter = lda_max_iter if lda_max_iter is not None else max_iter
     if hyperparam_kwargs is None:
         hyperparam_kwargs = {}
-    alpha = hyperparam_kwargs.get(&#39;alpha&#39;, 5.0 / n_topics)
-    nmf_alpha = hyperparam_kwargs.get(&#39;nmf_alpha&#39;, None)
+    alpha = hyperparam_kwargs.get(&#34;alpha&#34;, 5.0 / n_topics)
+    nmf_alpha = hyperparam_kwargs.get(&#34;nmf_alpha&#34;, None)
     alpha = nmf_alpha if nmf_alpha is not None else alpha
-    beta = hyperparam_kwargs.get(&#39;beta&#39;, 0.01)
-    l1_ratio = hyperparam_kwargs.get(&#39;l1_ratio&#39;, 0)
-    ngram_range = hyperparam_kwargs.get(&#39;ngram_range&#39;, (1,1))
+    beta = hyperparam_kwargs.get(&#34;beta&#34;, 0.01)
+    l1_ratio = hyperparam_kwargs.get(&#34;l1_ratio&#34;, 0)
+    ngram_range = hyperparam_kwargs.get(&#34;ngram_range&#34;, (1, 1))
 
     # adjust defaults based on language detected
     if texts is not None:
         lang = TU.detect_lang(texts)
-        if lang != &#39;en&#39;:
-            stopwords = None if stop_words==&#39;english&#39; else stop_words
-            token_pattern = r&#39;(?u)\b\w+\b&#39; if token_pattern is None else token_pattern
+        if lang != &#34;en&#34;:
+            stopwords = None if stop_words == &#34;english&#34; else stop_words
+            token_pattern = (
+                r&#34;(?u)\b\w+\b&#34; if token_pattern is None else token_pattern
+            )
         if pp.is_nospace_lang(lang):
             text_list = []
             for t in texts:
-                text_list.append(&#39; &#39;.join(jieba.cut(t, HMM=False)))
+                text_list.append(&#34; &#34;.join(jieba.cut(t, HMM=False)))
             texts = text_list
-        if self.verbose: print(&#39;lang: %s&#39; % (lang))
-
+        if self.verbose:
+            print(&#34;lang: %s&#34; % (lang))
 
     # preprocess texts
-    if self.verbose: print(&#39;preprocessing texts...&#39;)
-    if token_pattern is None: token_pattern = TU.DEFAULT_TOKEN_PATTERN
-    #if token_pattern is None: token_pattern = r&#39;(?u)\b\w\w+\b&#39;
-    vectorizer = CountVectorizer(max_df=max_df, min_df=min_df,
-                             max_features=n_features, stop_words=stop_words,
-                             token_pattern=token_pattern, ngram_range=ngram_range)
-    
+    if self.verbose:
+        print(&#34;preprocessing texts...&#34;)
+    if token_pattern is None:
+        token_pattern = TU.DEFAULT_TOKEN_PATTERN
+    # if token_pattern is None: token_pattern = r&#39;(?u)\b\w\w+\b&#39;
+    vectorizer = CountVectorizer(
+        max_df=max_df,
+        min_df=min_df,
+        max_features=n_features,
+        stop_words=stop_words,
+        token_pattern=token_pattern,
+        ngram_range=ngram_range,
+    )
 
     x_train = vectorizer.fit_transform(texts)
 
     # fit model
 
-    if self.verbose: print(&#39;fitting model...&#39;)
-    if model_type == &#39;lda&#39;:
-        model = LatentDirichletAllocation(n_components=n_topics, max_iter=max_iter,
-                                          learning_method=lda_mode, learning_offset=50.,
-                                          doc_topic_prior=alpha,
-                                          topic_word_prior=beta,
-                                          verbose=self.verbose, random_state=0)
-    elif model_type == &#39;nmf&#39;:
+    if self.verbose:
+        print(&#34;fitting model...&#34;)
+    if model_type == &#34;lda&#34;:
+        model = LatentDirichletAllocation(
+            n_components=n_topics,
+            max_iter=max_iter,
+            learning_method=lda_mode,
+            learning_offset=50.0,
+            doc_topic_prior=alpha,
+            topic_word_prior=beta,
+            verbose=self.verbose,
+            random_state=0,
+        )
+    elif model_type == &#34;nmf&#34;:
         model = NMF(
             n_components=n_topics,
             max_iter=max_iter,
             verbose=self.verbose,
             alpha=alpha,
             l1_ratio=l1_ratio,
-            random_state=0)
+            random_state=0,
+        )
     else:
         raise ValueError(&#34;unknown model type:&#34;, str(model_type))
     model.fit(x_train)
@@ -2513,27 +2708,25 @@ whether to consider bigrams, trigrams. default: (1,1) </p>
 <div class="desc"><p>Trains a recommender that, given a single document, will return
 documents in the corpus that are semantically similar to it.</p>
 <h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>n_neighbors</code></strong> :&ensp;<code>int</code></dt>
-<dd>&nbsp;</dd>
-</dl>
+<p>n_neighbors (int):</p>
 <h2 id="returns">Returns</h2>
 <p>None</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def train_recommender(self, n_neighbors=20, metric=&#39;minkowski&#39;, p=2):
+<pre><code class="python">def train_recommender(self, n_neighbors=20, metric=&#34;minkowski&#34;, p=2):
     &#34;&#34;&#34;
     Trains a recommender that, given a single document, will return
     documents in the corpus that are semantically similar to it.
 
     Args:
-        n_neighbors (int): 
+        n_neighbors (int):
     Returns:
         None
     &#34;&#34;&#34;
     from sklearn.neighbors import NearestNeighbors
+
     rec = NearestNeighbors(n_neighbors=n_neighbors, metric=metric, p=p)
     probs = self.get_doctopics()
     rec.fit(probs)
@@ -2577,8 +2770,8 @@ with these doc_ids will be used as seed set.</dd>
 
     NOTE: The score method currently employs the use of LocalOutLierFactor, which
     means you should not try to score documents that were used in training. Only
-    new, unseen documents should be scored for similarity. 
-    REFERENCE: 
+    new, unseen documents should be scored for similarity.
+    REFERENCE:
     https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.LocalOutlierFactor.html#sklearn.neighbors.LocalOutlierFactor
 
     Args:
@@ -2586,13 +2779,16 @@ with these doc_ids will be used as seed set.</dd>
                                  of range(self.n_topics).  Documents associated
                                  with these topic_ids will be used as seed set.
         doc_ids (list of ints): list of document IDs where each id is an index
-                                into self.doctopics.  Documents associated 
+                                into self.doctopics.  Documents associated
                                 with these doc_ids will be used as seed set.
     Returns:
         None
     &#34;&#34;&#34;
     from sklearn.neighbors import LocalOutlierFactor
-    clf = LocalOutlierFactor(n_neighbors=n_neighbors, novelty=True, contamination=0.1)
+
+    clf = LocalOutlierFactor(
+        n_neighbors=n_neighbors, novelty=True, contamination=0.1
+    )
     probs = self.get_doctopics(topic_ids=topic_ids, doc_ids=doc_ids)
     clf.fit(probs)
     self.scorer = clf
@@ -2631,11 +2827,18 @@ Optional filepath to save the interactive visualization</p></div>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def visualize_documents(self, texts=None, doc_topics=None, 
-                        width=700, height=700, point_size=5, title=&#39;Document Visualization&#39;,
-                        extra_info={},
-                        colors=None,
-                        filepath=None,):
+<pre><code class="python">def visualize_documents(
+    self,
+    texts=None,
+    doc_topics=None,
+    width=700,
+    height=700,
+    point_size=5,
+    title=&#34;Document Visualization&#34;,
+    extra_info={},
+    colors=None,
+    filepath=None,
+):
     &#34;&#34;&#34;
     Generates a visualization of a set of documents based on model.
     If &lt;texts&gt; is supplied, raw documents will be first transformed into document-topic
@@ -2658,22 +2861,26 @@ Optional filepath to save the interactive visualization</p></div>
     &#34;&#34;&#34;
 
     # error-checking
-    if texts is not None: length = len(texts)
-    else: length = doc_topics.shape[0]
+    if texts is not None:
+        length = len(texts)
+    else:
+        length = doc_topics.shape[0]
     if colors is not None and len(colors) != length:
-        raise ValueError(&#39;length of colors is not consistent with length of texts or doctopics&#39;)
+        raise ValueError(
+            &#34;length of colors is not consistent with length of texts or doctopics&#34;
+        )
     if texts is not None and doc_topics is not None:
-        raise ValueError(&#39;texts is mutually-exclusive with doc_topics&#39;)
+        raise ValueError(&#34;texts is mutually-exclusive with doc_topics&#34;)
     if texts is None and doc_topics is None:
-        raise ValueError(&#39;One of texts or doc_topics is required.&#39;)
+        raise ValueError(&#34;One of texts or doc_topics is required.&#34;)
     if extra_info:
-        invalid_keys = [&#39;x&#39;, &#39;y&#39;, &#39;topic&#39;, &#39;fill_color&#39;]
+        invalid_keys = [&#34;x&#34;, &#34;y&#34;, &#34;topic&#34;, &#34;fill_color&#34;]
         for k in extra_info.keys():
             if k in invalid_keys:
-                raise ValueError(&#39;cannot use &#34;%s&#34; as key in extra_info&#39; %(k))
+                raise ValueError(&#39;cannot use &#34;%s&#34; as key in extra_info&#39; % (k))
             lst = extra_info[k]
             if len(lst) != length:
-                raise ValueError(&#39;texts and extra_info lists must be same size&#39;)
+                raise ValueError(&#34;texts and extra_info lists must be same size&#34;)
 
     # check fo bokeh
     try:
@@ -2682,55 +2889,65 @@ Optional filepath to save the interactive visualization</p></div>
         from bokeh.models import HoverTool
         from bokeh.io import output_notebook
     except:
-        warnings.warn(&#39;visualize_documents method requires bokeh package: pip install bokeh&#39;)
+        warnings.warn(
+            &#34;visualize_documents method requires bokeh package: pip install bokeh&#34;
+        )
         return
 
     # prepare data
     if doc_topics is not None:
         X_topics = doc_topics
     else:
-        if self.verbose:  print(&#39;transforming texts...&#39;, end=&#39;&#39;)
+        if self.verbose:
+            print(&#34;transforming texts...&#34;, end=&#34;&#34;)
         X_topics = self.predict(texts, harden=False)
-        if self.verbose: print(&#39;done.&#39;)
+        if self.verbose:
+            print(&#34;done.&#34;)
 
     # reduce to 2-D
-    if self.verbose:  print(&#39;reducing to 2 dimensions...&#39;, end=&#39;&#39;)
-    tsne_model = TSNE(n_components=2, verbose=self.verbose, random_state=0, angle=.99, init=&#39;pca&#39;)
+    if self.verbose:
+        print(&#34;reducing to 2 dimensions...&#34;, end=&#34;&#34;)
+    tsne_model = TSNE(
+        n_components=2, verbose=self.verbose, random_state=0, angle=0.99, init=&#34;pca&#34;
+    )
     tsne_lda = tsne_model.fit_transform(X_topics)
-    print(&#39;done.&#39;)
+    print(&#34;done.&#34;)
 
     # get random colormap
     colormap = U.get_random_colors(self.n_topics)
 
     # generate inline visualization in Jupyter notebook
     lda_keys = self._harden_topics(X_topics)
-    if colors is None: colors = colormap[lda_keys]
+    if colors is None:
+        colors = colormap[lda_keys]
     topic_summaries = self.get_topics(n_words=5)
-    os.environ[&#34;BOKEH_RESOURCES&#34;]=&#34;inline&#34;
+    os.environ[&#34;BOKEH_RESOURCES&#34;] = &#34;inline&#34;
     output_notebook()
-    dct = { 
-            &#39;x&#39;:tsne_lda[:,0],
-            &#39;y&#39;:tsne_lda[:, 1],
-            &#39;topic&#39;:[topic_summaries[tid] for tid in lda_keys],
-            &#39;fill_color&#39;:colors,}
-    tool_tups = [(&#39;index&#39;, &#39;$index&#39;),
-                 (&#39;(x,y)&#39;,&#39;($x,$y)&#39;),
-                 (&#39;topic&#39;, &#39;@topic&#39;)]
+    dct = {
+        &#34;x&#34;: tsne_lda[:, 0],
+        &#34;y&#34;: tsne_lda[:, 1],
+        &#34;topic&#34;: [topic_summaries[tid] for tid in lda_keys],
+        &#34;fill_color&#34;: colors,
+    }
+    tool_tups = [(&#34;index&#34;, &#34;$index&#34;), (&#34;(x,y)&#34;, &#34;($x,$y)&#34;), (&#34;topic&#34;, &#34;@topic&#34;)]
     for k in extra_info.keys():
         dct[k] = extra_info[k]
-        tool_tups.append((k, &#39;@&#39;+k))
+        tool_tups.append((k, &#34;@&#34; + k))
 
     source = bp.ColumnDataSource(data=dct)
-    hover = HoverTool( tooltips=tool_tups)
-    p = bp.figure(plot_width=width, plot_height=height, 
-                  tools=[hover, &#39;save&#39;, &#39;pan&#39;, &#39;wheel_zoom&#39;, &#39;box_zoom&#39;, &#39;reset&#39;],
-                  #tools=&#34;pan,wheel_zoom,box_zoom,reset,hover,previewsave&#34;,
-                  title=title)
-    #plot_lda = bp.figure(plot_width=1400, plot_height=1100,
-                       #title=title,
-                       #tools=&#34;pan,wheel_zoom,box_zoom,reset,hover,previewsave&#34;,
-                       #x_axis_type=None, y_axis_type=None, min_border=1)
-    p.circle(&#39;x&#39;, &#39;y&#39;, size=point_size, source=source, fill_color= &#39;fill_color&#39;)
+    hover = HoverTool(tooltips=tool_tups)
+    p = bp.figure(
+        plot_width=width,
+        plot_height=height,
+        tools=[hover, &#34;save&#34;, &#34;pan&#34;, &#34;wheel_zoom&#34;, &#34;box_zoom&#34;, &#34;reset&#34;],
+        # tools=&#34;pan,wheel_zoom,box_zoom,reset,hover,previewsave&#34;,
+        title=title,
+    )
+    # plot_lda = bp.figure(plot_width=1400, plot_height=1100,
+    # title=title,
+    # tools=&#34;pan,wheel_zoom,box_zoom,reset,hover,previewsave&#34;,
+    # x_axis_type=None, y_axis_type=None, min_border=1)
+    p.circle(&#34;x&#34;, &#34;y&#34;, size=point_size, source=source, fill_color=&#34;fill_color&#34;)
     bp.show(p)
     if filepath is not None:
         bp.output_file(filepath)
@@ -2790,20 +3007,27 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class TopicModel():
-
-
-    def __init__(self,texts=None, n_topics=None, n_features=10000, 
-                 min_df=5, max_df=0.5,  stop_words=&#39;english&#39;,
-                 model_type=&#39;lda&#39;,
-                 max_iter=5, lda_max_iter=None, lda_mode=&#39;online&#39;,
-                 token_pattern=None, verbose=1,
-                 hyperparam_kwargs=None
+<pre><code class="python">class TopicModel:
+    def __init__(
+        self,
+        texts=None,
+        n_topics=None,
+        n_features=10000,
+        min_df=5,
+        max_df=0.5,
+        stop_words=&#34;english&#34;,
+        model_type=&#34;lda&#34;,
+        max_iter=5,
+        lda_max_iter=None,
+        lda_mode=&#34;online&#34;,
+        token_pattern=None,
+        verbose=1,
+        hyperparam_kwargs=None,
     ):
         &#34;&#34;&#34;
         Fits a topic model to documents in &lt;texts&gt;.
         Example:
-            tm = ktrain.text.get_topic_model(docs, n_topics=20, 
+            tm = ktrain.text.get_topic_model(docs, n_topics=20,
                                             n_features=1000, min_df=2, max_df=0.95)
         Args:
             texts (list of str): list of texts
@@ -2818,7 +3042,7 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
                                 If lda_mode=&#39;batch&#39;, this should be increased (e.g., 1500).
             lda_max_iter (int): alias for max_iter for backwards compatilibity
             lda_mode (str):  one of {&#39;online&#39;, &#39;batch&#39;}. Ignored if model_type !=&#39;lda&#39;
-            token_pattern(str): regex pattern to use to tokenize documents. 
+            token_pattern(str): regex pattern to use to tokenize documents.
             verbose(bool): verbosity
             hyperparam_kwargs(dict): hyperparameters for LDA/NMF
                                      Keys in this dict can be any of the following:
@@ -2826,60 +3050,75 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
                                          beta: beta for LDA.  default:0.01
                                          nmf_alpha: alias for alpha for backwars compatilibity
                                          l1_ratio: l1_ratio for NMF. default: 0
-                                         ngram_range:  whether to consider bigrams, trigrams. default: (1,1) 
+                                         ngram_range:  whether to consider bigrams, trigrams. default: (1,1)
 
         &#34;&#34;&#34;
-        self.verbose=verbose
+        self.verbose = verbose
 
         # estimate n_topics
         if n_topics is None:
             if texts is None:
-                raise ValueError(&#39;If n_topics is None, texts must be supplied&#39;)
+                raise ValueError(&#34;If n_topics is None, texts must be supplied&#34;)
             estimated = max(1, int(math.floor(math.sqrt(len(texts) / 2))))
             n_topics = min(400, estimated)
-            print(&#39;n_topics automatically set to %s&#39; % (n_topics))
+            print(&#34;n_topics automatically set to %s&#34; % (n_topics))
 
         # train model
         if texts is not None:
-            (model, vectorizer) = self.train(texts, model_type=model_type,
-                                             n_topics=n_topics, n_features=n_features,
-                                             min_df = min_df, max_df = max_df, 
-                                             stop_words=stop_words,
-                                             max_iter=max_iter,
-                                             lda_max_iter=lda_max_iter, lda_mode=lda_mode,
-                                             token_pattern=token_pattern,
-                                             hyperparam_kwargs=hyperparam_kwargs)
+            (model, vectorizer) = self.train(
+                texts,
+                model_type=model_type,
+                n_topics=n_topics,
+                n_features=n_features,
+                min_df=min_df,
+                max_df=max_df,
+                stop_words=stop_words,
+                max_iter=max_iter,
+                lda_max_iter=lda_max_iter,
+                lda_mode=lda_mode,
+                token_pattern=token_pattern,
+                hyperparam_kwargs=hyperparam_kwargs,
+            )
         else:
             vectorizer = None
             model = None
-
-
 
         # save model and vectorizer and hyperparameter settings
         self.vectorizer = vectorizer
         self.model = model
         self.n_topics = n_topics
         self.n_features = n_features
-        if verbose: print(&#39;done.&#39;)
+        if verbose:
+            print(&#34;done.&#34;)
 
         # these variables are set by self.build():
         self.topic_dict = None
         self.doc_topics = None
         self.bool_array = None
 
-        self.scorer = None       # set by self.train_scorer()
+        self.scorer = None  # set by self.train_scorer()
         self.recommender = None  # set by self.train_recommender()
         return
 
-
-    def train(self,texts, model_type=&#39;lda&#39;, n_topics=None, n_features=10000,
-              min_df=5, max_df=0.5,  stop_words=&#39;english&#39;,
-              max_iter=5, lda_max_iter=None, lda_mode=&#39;online&#39;,
-              token_pattern=None, hyperparam_kwargs=None):
+    def train(
+        self,
+        texts,
+        model_type=&#34;lda&#34;,
+        n_topics=None,
+        n_features=10000,
+        min_df=5,
+        max_df=0.5,
+        stop_words=&#34;english&#34;,
+        max_iter=5,
+        lda_max_iter=None,
+        lda_mode=&#34;online&#34;,
+        token_pattern=None,
+        hyperparam_kwargs=None,
+    ):
         &#34;&#34;&#34;
         Fits a topic model to documents in &lt;texts&gt;.
         Example:
-            tm = ktrain.text.get_topic_model(docs, n_topics=20, 
+            tm = ktrain.text.get_topic_model(docs, n_topics=20,
                                             n_features=1000, min_df=2, max_df=0.95)
         Args:
             texts (list of str): list of texts
@@ -2894,7 +3133,7 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
                                 If lda_mode=&#39;batch&#39;, this should be increased (e.g., 1500).
                                 Ignored if model_type != &#39;lda&#39;
             lda_mode (str):  one of {&#39;online&#39;, &#39;batch&#39;}. Ignored of model_type !=&#39;lda&#39;
-            token_pattern(str): regex pattern to use to tokenize documents. 
+            token_pattern(str): regex pattern to use to tokenize documents.
                                 If None, a default tokenizer will be used
             hyperparam_kwargs(dict): hyperparameters for LDA/NMF
                                      Keys in this dict can be any of the following:
@@ -2902,63 +3141,78 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
                                          beta: beta for LDA.  default:0.01
                                          nmf_alpha: alias for alpha for backwars compatilibity
                                          l1_ratio: l1_ratio for NMF. default: 0
-                                         ngram_range:  whether to consider bigrams, trigrams. default: (1,1) 
-                                    
+                                         ngram_range:  whether to consider bigrams, trigrams. default: (1,1)
+
         Returns:
             tuple: (model, vectorizer)
         &#34;&#34;&#34;
         max_iter = lda_max_iter if lda_max_iter is not None else max_iter
         if hyperparam_kwargs is None:
             hyperparam_kwargs = {}
-        alpha = hyperparam_kwargs.get(&#39;alpha&#39;, 5.0 / n_topics)
-        nmf_alpha = hyperparam_kwargs.get(&#39;nmf_alpha&#39;, None)
+        alpha = hyperparam_kwargs.get(&#34;alpha&#34;, 5.0 / n_topics)
+        nmf_alpha = hyperparam_kwargs.get(&#34;nmf_alpha&#34;, None)
         alpha = nmf_alpha if nmf_alpha is not None else alpha
-        beta = hyperparam_kwargs.get(&#39;beta&#39;, 0.01)
-        l1_ratio = hyperparam_kwargs.get(&#39;l1_ratio&#39;, 0)
-        ngram_range = hyperparam_kwargs.get(&#39;ngram_range&#39;, (1,1))
+        beta = hyperparam_kwargs.get(&#34;beta&#34;, 0.01)
+        l1_ratio = hyperparam_kwargs.get(&#34;l1_ratio&#34;, 0)
+        ngram_range = hyperparam_kwargs.get(&#34;ngram_range&#34;, (1, 1))
 
         # adjust defaults based on language detected
         if texts is not None:
             lang = TU.detect_lang(texts)
-            if lang != &#39;en&#39;:
-                stopwords = None if stop_words==&#39;english&#39; else stop_words
-                token_pattern = r&#39;(?u)\b\w+\b&#39; if token_pattern is None else token_pattern
+            if lang != &#34;en&#34;:
+                stopwords = None if stop_words == &#34;english&#34; else stop_words
+                token_pattern = (
+                    r&#34;(?u)\b\w+\b&#34; if token_pattern is None else token_pattern
+                )
             if pp.is_nospace_lang(lang):
                 text_list = []
                 for t in texts:
-                    text_list.append(&#39; &#39;.join(jieba.cut(t, HMM=False)))
+                    text_list.append(&#34; &#34;.join(jieba.cut(t, HMM=False)))
                 texts = text_list
-            if self.verbose: print(&#39;lang: %s&#39; % (lang))
-
+            if self.verbose:
+                print(&#34;lang: %s&#34; % (lang))
 
         # preprocess texts
-        if self.verbose: print(&#39;preprocessing texts...&#39;)
-        if token_pattern is None: token_pattern = TU.DEFAULT_TOKEN_PATTERN
-        #if token_pattern is None: token_pattern = r&#39;(?u)\b\w\w+\b&#39;
-        vectorizer = CountVectorizer(max_df=max_df, min_df=min_df,
-                                 max_features=n_features, stop_words=stop_words,
-                                 token_pattern=token_pattern, ngram_range=ngram_range)
-        
+        if self.verbose:
+            print(&#34;preprocessing texts...&#34;)
+        if token_pattern is None:
+            token_pattern = TU.DEFAULT_TOKEN_PATTERN
+        # if token_pattern is None: token_pattern = r&#39;(?u)\b\w\w+\b&#39;
+        vectorizer = CountVectorizer(
+            max_df=max_df,
+            min_df=min_df,
+            max_features=n_features,
+            stop_words=stop_words,
+            token_pattern=token_pattern,
+            ngram_range=ngram_range,
+        )
 
         x_train = vectorizer.fit_transform(texts)
 
         # fit model
 
-        if self.verbose: print(&#39;fitting model...&#39;)
-        if model_type == &#39;lda&#39;:
-            model = LatentDirichletAllocation(n_components=n_topics, max_iter=max_iter,
-                                              learning_method=lda_mode, learning_offset=50.,
-                                              doc_topic_prior=alpha,
-                                              topic_word_prior=beta,
-                                              verbose=self.verbose, random_state=0)
-        elif model_type == &#39;nmf&#39;:
+        if self.verbose:
+            print(&#34;fitting model...&#34;)
+        if model_type == &#34;lda&#34;:
+            model = LatentDirichletAllocation(
+                n_components=n_topics,
+                max_iter=max_iter,
+                learning_method=lda_mode,
+                learning_offset=50.0,
+                doc_topic_prior=alpha,
+                topic_word_prior=beta,
+                verbose=self.verbose,
+                random_state=0,
+            )
+        elif model_type == &#34;nmf&#34;:
             model = NMF(
                 n_components=n_topics,
                 max_iter=max_iter,
                 verbose=self.verbose,
                 alpha=alpha,
                 l1_ratio=l1_ratio,
-                random_state=0)
+                random_state=0,
+            )
         else:
             raise ValueError(&#34;unknown model type:&#34;, str(model_type))
         model.fit(x_train)
@@ -2966,14 +3220,12 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
         # save model and vectorizer and hyperparameter settings
         return (model, vectorizer)
 
-
     @property
     def topics(self):
         &#34;&#34;&#34;
         convenience method/property
         &#34;&#34;&#34;
         return self.get_topics()
-
 
     def get_document_topic_distribution(self):
         &#34;&#34;&#34;
@@ -2984,7 +3236,6 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
         self._check_build()
         return self.doc_topics
 
-
     def get_sorted_docs(self, topic_id):
         &#34;&#34;&#34;
         Returns all docs sorted by relevance to &lt;topic_id&gt;.
@@ -2993,12 +3244,11 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
         &#34;&#34;&#34;
         docs = self.get_docs()
         d = {}
-        for doc in docs: d[doc[&#39;doc_id&#39;]] = doc
+        for doc in docs:
+            d[doc[&#34;doc_id&#34;]] = doc
         m = self.get_document_topic_distribution()
-        doc_ids = (-m[:,topic_id]).argsort()
+        doc_ids = (-m[:, topic_id]).argsort()
         return [d[doc_id] for doc_id in doc_ids]
-
-
 
     def get_word_weights(self, topic_id, n_words=100):
         &#34;&#34;&#34;
@@ -3010,15 +3260,16 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
             n_words=int): number of top words
         &#34;&#34;&#34;
         self._check_model()
-        if topic_id+1 &gt; len(self.model.components_): 
-            raise ValueError(&#39;topic_id must be less than %s&#39; % (len(self.model.components_)))
+        if topic_id + 1 &gt; len(self.model.components_):
+            raise ValueError(
+                &#34;topic_id must be less than %s&#34; % (len(self.model.components_))
+            )
         feature_names = self.vectorizer.get_feature_names()
         word_probs = self.model.components_[topic_id]
-        word_ids = [i for i in word_probs.argsort()[:-n_words - 1:-1]]
+        word_ids = [i for i in word_probs.argsort()[: -n_words - 1 : -1]]
         words = [feature_names[i] for i in word_ids]
         probs = [word_probs[i] for i in word_ids]
-        return list( zip(words, probs) )
-
+        return list(zip(words, probs))
 
     def get_topics(self, n_words=10, as_string=True, show_counts=False):
         &#34;&#34;&#34;
@@ -3026,7 +3277,7 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
         Args:
             n_words(int): number of words to use in topic summary
             as_string(bool): If True, each summary is a space-delimited string instead of list of words
-            show_counts(bool): If True, returns list of tuples of form (id, topic summary, count). 
+            show_counts(bool): If True, returns list of tuples of form (id, topic summary, count).
                                Otherwise, a list of topic summaries.
         Returns:
           List of topic summaries if  show_count is False
@@ -3037,18 +3288,21 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
         feature_names = self.vectorizer.get_feature_names()
         topic_summaries = []
         for topic_idx, topic in enumerate(self.model.components_):
-            summary = [feature_names[i] for i in topic.argsort()[:-n_words - 1:-1]]
-            if as_string: summary = &#34; &#34;.join(summary)
+            summary = [feature_names[i] for i in topic.argsort()[: -n_words - 1 : -1]]
+            if as_string:
+                summary = &#34; &#34;.join(summary)
             topic_summaries.append(summary)
 
         if show_counts:
             self._check_build()
-            topic_counts = sorted([ (k, topic_summaries[k], len(v)) for k,v in self.topic_dict.items()], 
-                                    key=lambda kv:kv[-1], reverse=True)
+            topic_counts = sorted(
+                [(k, topic_summaries[k], len(v)) for k, v in self.topic_dict.items()],
+                key=lambda kv: kv[-1],
+                reverse=True,
+            )
             return dict((t[0], t[1:]) for t in topic_counts)
 
         return topic_summaries
-
 
     def print_topics(self, n_words=10, show_counts=False):
         &#34;&#34;&#34;
@@ -3060,15 +3314,17 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
         topics = self.get_topics(n_words=n_words, as_string=True)
         if show_counts:
             self._check_build()
-            topic_counts = sorted([ (k, topics[k], len(v)) for k,v in self.topic_dict.items()], 
-                                    key=lambda kv:kv[-1], reverse=True)
+            topic_counts = sorted(
+                [(k, topics[k], len(v)) for k, v in self.topic_dict.items()],
+                key=lambda kv: kv[-1],
+                reverse=True,
+            )
             for (idx, topic, count) in topic_counts:
-                print(&#34;topic:%s | count:%s | %s&#34; %(idx, count, topic))
+                print(&#34;topic:%s | count:%s | %s&#34; % (idx, count, topic))
         else:
             for i, t in enumerate(topics):
-                print(&#39;topic %s | %s&#39; % (i, t))
+                print(&#34;topic %s | %s&#34; % (i, t))
         return
-
 
     def build(self, texts, threshold=None):
         &#34;&#34;&#34;
@@ -3092,7 +3348,6 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
         self.topic_dict = self._rank_documents(texts, doc_topics=doc_topics)
         return
 
-
     def filter(self, obj):
         &#34;&#34;&#34;
         The build method may prune documents based on threshold.
@@ -3104,13 +3359,16 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
         Returns:
             filtered obj
         &#34;&#34;&#34;
-        length = obj.shape[0] if isinstance(obj, (pd.DataFrame, np.ndarray)) else len(obj)
+        length = (
+            obj.shape[0] if isinstance(obj, (pd.DataFrame, np.ndarray)) else len(obj)
+        )
         if length != self.bool_array.shape[0]:
-            raise ValueError(&#39;Length of obj is not consistent with the number of documents &#39; +
-                             &#39;supplied to get_topic_model&#39;)
+            raise ValueError(
+                &#34;Length of obj is not consistent with the number of documents &#34;
+                + &#34;supplied to get_topic_model&#34;
+            )
         obj = np.array(obj) if isinstance(obj, list) else obj
         return obj[self.bool_array]
-
 
     def get_docs(self, topic_ids=[], doc_ids=[], rank=False):
         &#34;&#34;&#34;
@@ -3132,23 +3390,31 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
                             &#39;doc_id&#39;: ID of document
                             &#39;topic_proba&#39;: topic probability (or score)
                             &#39;topic_id&#39;: ID of topic
-            
+
         &#34;&#34;&#34;
         self._check_build()
         if not topic_ids:
             topic_ids = list(range(self.n_topics))
         result_texts = []
         for topic_id in topic_ids:
-            if topic_id not in self.topic_dict: continue
-            texts = [{&#39;text&#39;:tup[0], &#39;doc_id&#39;:tup[1], &#39;topic_proba&#39;:tup[2], &#39;topic_id&#39;:topic_id} for tup in self.topic_dict[topic_id] 
-                                                                                                     if not doc_ids or tup[1] in doc_ids]
+            if topic_id not in self.topic_dict:
+                continue
+            texts = [
+                {
+                    &#34;text&#34;: tup[0],
+                    &#34;doc_id&#34;: tup[1],
+                    &#34;topic_proba&#34;: tup[2],
+                    &#34;topic_id&#34;: topic_id,
+                }
+                for tup in self.topic_dict[topic_id]
+                if not doc_ids or tup[1] in doc_ids
+            ]
             result_texts.extend(texts)
         if not rank:
-            result_texts = sorted(result_texts, key=lambda x:x[&#39;doc_id&#39;])
+            result_texts = sorted(result_texts, key=lambda x: x[&#34;doc_id&#34;])
         return result_texts
 
-
-    def get_doctopics(self,  topic_ids=[], doc_ids=[]):
+    def get_doctopics(self, topic_ids=[], doc_ids=[]):
         &#34;&#34;&#34;
         Returns a topic probability distribution for documents
         with primary topic that is one of &lt;topic_ids&gt; and with doc_id in &lt;doc_ids&gt;.
@@ -3164,13 +3430,12 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
         Returns:
             np.ndarray: Each row is the topic probability distribution of a document.
                         Array is sorted in the order returned by self.get_docs.
-                        
+
         &#34;&#34;&#34;
         docs = self.get_docs(topic_ids=topic_ids, doc_ids=doc_ids)
-        return np.array([self.doc_topics[idx] for idx in [x[&#39;doc_id&#39;] for x in docs]])
+        return np.array([self.doc_topics[idx] for idx in [x[&#34;doc_id&#34;] for x in docs]])
 
-
-    def get_texts(self,  topic_ids=[]):
+    def get_texts(self, topic_ids=[]):
         &#34;&#34;&#34;
         Returns texts for documents
         with primary topic that is one of &lt;topic_ids&gt;
@@ -3179,11 +3444,10 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
         Returns:
             list of str
         &#34;&#34;&#34;
-        if not topic_ids: topic_ids = list(range(self.n_topics))
+        if not topic_ids:
+            topic_ids = list(range(self.n_topics))
         docs = self.get_docs(topic_ids)
         return [x[0] for x in docs]
-
-
 
     def predict(self, texts, threshold=None, harden=False):
         &#34;&#34;&#34;
@@ -3202,27 +3466,36 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
         self._check_model()
         transformed_texts = self.vectorizer.transform(texts)
         X_topics = self.model.transform(transformed_texts)
-        #if self.model_type == &#39;nmf&#39;:
-            #scores = np.matrix(X_topics)
-            #scores_normalized= scores/scores.sum(axis=1)
-            #X_topics = scores_normalized
+        # if self.model_type == &#39;nmf&#39;:
+        # scores = np.matrix(X_topics)
+        # scores_normalized= scores/scores.sum(axis=1)
+        # X_topics = scores_normalized
         _idx = np.array([True] * len(texts))
         if threshold is not None:
-            _idx = np.amax(X_topics, axis=1) &gt; threshold  # idx of doc that above the threshold
+            _idx = (
+                np.amax(X_topics, axis=1) &gt; threshold
+            )  # idx of doc that above the threshold
             _idx = np.array(_idx)
             X_topics = X_topics[_idx]
-        if harden: X_topics = self._harden_topics(X_topics)
+        if harden:
+            X_topics = self._harden_topics(X_topics)
         if threshold is not None:
             return (X_topics, _idx)
         else:
             return X_topics
 
-
-    def visualize_documents(self, texts=None, doc_topics=None, 
-                            width=700, height=700, point_size=5, title=&#39;Document Visualization&#39;,
-                            extra_info={},
-                            colors=None,
-                            filepath=None,):
+    def visualize_documents(
+        self,
+        texts=None,
+        doc_topics=None,
+        width=700,
+        height=700,
+        point_size=5,
+        title=&#34;Document Visualization&#34;,
+        extra_info={},
+        colors=None,
+        filepath=None,
+    ):
         &#34;&#34;&#34;
         Generates a visualization of a set of documents based on model.
         If &lt;texts&gt; is supplied, raw documents will be first transformed into document-topic
@@ -3245,22 +3518,26 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
         &#34;&#34;&#34;
 
         # error-checking
-        if texts is not None: length = len(texts)
-        else: length = doc_topics.shape[0]
+        if texts is not None:
+            length = len(texts)
+        else:
+            length = doc_topics.shape[0]
         if colors is not None and len(colors) != length:
-            raise ValueError(&#39;length of colors is not consistent with length of texts or doctopics&#39;)
+            raise ValueError(
+                &#34;length of colors is not consistent with length of texts or doctopics&#34;
+            )
         if texts is not None and doc_topics is not None:
-            raise ValueError(&#39;texts is mutually-exclusive with doc_topics&#39;)
+            raise ValueError(&#34;texts is mutually-exclusive with doc_topics&#34;)
         if texts is None and doc_topics is None:
-            raise ValueError(&#39;One of texts or doc_topics is required.&#39;)
+            raise ValueError(&#34;One of texts or doc_topics is required.&#34;)
         if extra_info:
-            invalid_keys = [&#39;x&#39;, &#39;y&#39;, &#39;topic&#39;, &#39;fill_color&#39;]
+            invalid_keys = [&#34;x&#34;, &#34;y&#34;, &#34;topic&#34;, &#34;fill_color&#34;]
             for k in extra_info.keys():
                 if k in invalid_keys:
-                    raise ValueError(&#39;cannot use &#34;%s&#34; as key in extra_info&#39; %(k))
+                    raise ValueError(&#39;cannot use &#34;%s&#34; as key in extra_info&#39; % (k))
                 lst = extra_info[k]
                 if len(lst) != length:
-                    raise ValueError(&#39;texts and extra_info lists must be same size&#39;)
+                    raise ValueError(&#34;texts and extra_info lists must be same size&#34;)
 
         # check fo bokeh
         try:
@@ -3269,86 +3546,94 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
             from bokeh.models import HoverTool
             from bokeh.io import output_notebook
         except:
-            warnings.warn(&#39;visualize_documents method requires bokeh package: pip install bokeh&#39;)
+            warnings.warn(
+                &#34;visualize_documents method requires bokeh package: pip install bokeh&#34;
+            )
             return
 
         # prepare data
         if doc_topics is not None:
             X_topics = doc_topics
         else:
-            if self.verbose:  print(&#39;transforming texts...&#39;, end=&#39;&#39;)
+            if self.verbose:
+                print(&#34;transforming texts...&#34;, end=&#34;&#34;)
             X_topics = self.predict(texts, harden=False)
-            if self.verbose: print(&#39;done.&#39;)
+            if self.verbose:
+                print(&#34;done.&#34;)
 
         # reduce to 2-D
-        if self.verbose:  print(&#39;reducing to 2 dimensions...&#39;, end=&#39;&#39;)
-        tsne_model = TSNE(n_components=2, verbose=self.verbose, random_state=0, angle=.99, init=&#39;pca&#39;)
+        if self.verbose:
+            print(&#34;reducing to 2 dimensions...&#34;, end=&#34;&#34;)
+        tsne_model = TSNE(
+            n_components=2, verbose=self.verbose, random_state=0, angle=0.99, init=&#34;pca&#34;
+        )
         tsne_lda = tsne_model.fit_transform(X_topics)
-        print(&#39;done.&#39;)
+        print(&#34;done.&#34;)
 
         # get random colormap
         colormap = U.get_random_colors(self.n_topics)
 
         # generate inline visualization in Jupyter notebook
         lda_keys = self._harden_topics(X_topics)
-        if colors is None: colors = colormap[lda_keys]
+        if colors is None:
+            colors = colormap[lda_keys]
         topic_summaries = self.get_topics(n_words=5)
-        os.environ[&#34;BOKEH_RESOURCES&#34;]=&#34;inline&#34;
+        os.environ[&#34;BOKEH_RESOURCES&#34;] = &#34;inline&#34;
         output_notebook()
-        dct = { 
-                &#39;x&#39;:tsne_lda[:,0],
-                &#39;y&#39;:tsne_lda[:, 1],
-                &#39;topic&#39;:[topic_summaries[tid] for tid in lda_keys],
-                &#39;fill_color&#39;:colors,}
-        tool_tups = [(&#39;index&#39;, &#39;$index&#39;),
-                     (&#39;(x,y)&#39;,&#39;($x,$y)&#39;),
-                     (&#39;topic&#39;, &#39;@topic&#39;)]
+        dct = {
+            &#34;x&#34;: tsne_lda[:, 0],
+            &#34;y&#34;: tsne_lda[:, 1],
+            &#34;topic&#34;: [topic_summaries[tid] for tid in lda_keys],
+            &#34;fill_color&#34;: colors,
+        }
+        tool_tups = [(&#34;index&#34;, &#34;$index&#34;), (&#34;(x,y)&#34;, &#34;($x,$y)&#34;), (&#34;topic&#34;, &#34;@topic&#34;)]
         for k in extra_info.keys():
             dct[k] = extra_info[k]
-            tool_tups.append((k, &#39;@&#39;+k))
+            tool_tups.append((k, &#34;@&#34; + k))
 
         source = bp.ColumnDataSource(data=dct)
-        hover = HoverTool( tooltips=tool_tups)
-        p = bp.figure(plot_width=width, plot_height=height, 
-                      tools=[hover, &#39;save&#39;, &#39;pan&#39;, &#39;wheel_zoom&#39;, &#39;box_zoom&#39;, &#39;reset&#39;],
-                      #tools=&#34;pan,wheel_zoom,box_zoom,reset,hover,previewsave&#34;,
-                      title=title)
-        #plot_lda = bp.figure(plot_width=1400, plot_height=1100,
-                           #title=title,
-                           #tools=&#34;pan,wheel_zoom,box_zoom,reset,hover,previewsave&#34;,
-                           #x_axis_type=None, y_axis_type=None, min_border=1)
-        p.circle(&#39;x&#39;, &#39;y&#39;, size=point_size, source=source, fill_color= &#39;fill_color&#39;)
+        hover = HoverTool(tooltips=tool_tups)
+        p = bp.figure(
+            plot_width=width,
+            plot_height=height,
+            tools=[hover, &#34;save&#34;, &#34;pan&#34;, &#34;wheel_zoom&#34;, &#34;box_zoom&#34;, &#34;reset&#34;],
+            # tools=&#34;pan,wheel_zoom,box_zoom,reset,hover,previewsave&#34;,
+            title=title,
+        )
+        # plot_lda = bp.figure(plot_width=1400, plot_height=1100,
+        # title=title,
+        # tools=&#34;pan,wheel_zoom,box_zoom,reset,hover,previewsave&#34;,
+        # x_axis_type=None, y_axis_type=None, min_border=1)
+        p.circle(&#34;x&#34;, &#34;y&#34;, size=point_size, source=source, fill_color=&#34;fill_color&#34;)
         bp.show(p)
         if filepath is not None:
             bp.output_file(filepath)
             bp.save(p)
         return
 
-
-    def train_recommender(self, n_neighbors=20, metric=&#39;minkowski&#39;, p=2):
+    def train_recommender(self, n_neighbors=20, metric=&#34;minkowski&#34;, p=2):
         &#34;&#34;&#34;
         Trains a recommender that, given a single document, will return
         documents in the corpus that are semantically similar to it.
 
         Args:
-            n_neighbors (int): 
+            n_neighbors (int):
         Returns:
             None
         &#34;&#34;&#34;
         from sklearn.neighbors import NearestNeighbors
+
         rec = NearestNeighbors(n_neighbors=n_neighbors, metric=metric, p=p)
         probs = self.get_doctopics()
         rec.fit(probs)
         self.recommender = rec
         return
 
-
-
     def recommend(self, text=None, doc_topic=None, n=5, n_neighbors=100):
         &#34;&#34;&#34;
         Given an example document, recommends documents similar to it
         from the set of documents supplied to build().
- 
+
         Args:
             texts(list of str): list of document texts.  Mutually-exclusive with &lt;doc_topics&gt;
             doc_topics(ndarray): pre-computed topic distribution for each document in texts.
@@ -3361,26 +3646,26 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
         &#34;&#34;&#34;
         # error-checks
         if text is not None and doc_topic is not None:
-            raise ValueError(&#39;text is mutually-exclusive with doc_topic&#39;)
+            raise ValueError(&#34;text is mutually-exclusive with doc_topic&#34;)
         if text is None and doc_topic is None:
-            raise ValueError(&#39;One of text or doc_topic is required.&#39;)
+            raise ValueError(&#34;One of text or doc_topic is required.&#34;)
         if text is not None and type(text) not in [str]:
-            raise ValueError(&#39;text must be a str &#39;)
-        if  doc_topic is not None and type(doc_topic) not in [np.ndarray]:
-            raise ValueError(&#39;doc_topic must be a np.ndarray&#39;)
+            raise ValueError(&#34;text must be a str &#34;)
+        if doc_topic is not None and type(doc_topic) not in [np.ndarray]:
+            raise ValueError(&#34;doc_topic must be a np.ndarray&#34;)
 
-        if n &gt; n_neighbors: n_neighbors = n
+        if n &gt; n_neighbors:
+            n_neighbors = n
 
         x_test = [doc_topic]
         if text:
             x_test = self.predict([text])
         docs = self.get_docs()
-        indices = self.recommender.kneighbors(x_test, return_distance=False, n_neighbors=n_neighbors)
+        indices = self.recommender.kneighbors(
+            x_test, return_distance=False, n_neighbors=n_neighbors
+        )
         results = [doc for i, doc in enumerate(docs) if i in indices]
         return results[:n]
-
-
-
 
     def train_scorer(self, topic_ids=[], doc_ids=[], n_neighbors=20):
         &#34;&#34;&#34;
@@ -3389,8 +3674,8 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
 
         NOTE: The score method currently employs the use of LocalOutLierFactor, which
         means you should not try to score documents that were used in training. Only
-        new, unseen documents should be scored for similarity. 
-        REFERENCE: 
+        new, unseen documents should be scored for similarity.
+        REFERENCE:
         https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.LocalOutlierFactor.html#sklearn.neighbors.LocalOutlierFactor
 
         Args:
@@ -3398,19 +3683,20 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
                                      of range(self.n_topics).  Documents associated
                                      with these topic_ids will be used as seed set.
             doc_ids (list of ints): list of document IDs where each id is an index
-                                    into self.doctopics.  Documents associated 
+                                    into self.doctopics.  Documents associated
                                     with these doc_ids will be used as seed set.
         Returns:
             None
         &#34;&#34;&#34;
         from sklearn.neighbors import LocalOutlierFactor
-        clf = LocalOutlierFactor(n_neighbors=n_neighbors, novelty=True, contamination=0.1)
+
+        clf = LocalOutlierFactor(
+            n_neighbors=n_neighbors, novelty=True, contamination=0.1
+        )
         probs = self.get_doctopics(topic_ids=topic_ids, doc_ids=doc_ids)
         clf.fit(probs)
         self.scorer = clf
         return
-
-
 
     def score(self, texts=None, doc_topics=None):
         &#34;&#34;&#34;
@@ -3429,7 +3715,7 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
         NOTE: The score method currently employs the use of LocalOutLierFactor, which
         means you should not try to score documents that were used in training. Only
         new, unseen documents should be scored for similarity.
- 
+
         Args:
             texts(list of str): list of document texts.  Mutually-exclusive with &lt;doc_topics&gt;
             doc_topics(ndarray): pre-computed topic distribution for each document in texts.
@@ -3438,26 +3724,25 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
             list of floats:  larger values indicate higher degree of similarity
                              positive values indicate a binary decision of similar
                              negative values indicate binary decision of dissimilar
-                             In practice, negative scores closer to zero will also 
+                             In practice, negative scores closer to zero will also
                              be similar as One-class classifiers are more strict
                              than traditional binary classifiers.
 
         &#34;&#34;&#34;
         # error-checks
         if texts is not None and doc_topics is not None:
-            raise ValueError(&#39;texts is mutually-exclusive with doc_topics&#39;)
+            raise ValueError(&#34;texts is mutually-exclusive with doc_topics&#34;)
         if texts is None and doc_topics is None:
-            raise ValueError(&#39;One of texts or doc_topics is required.&#39;)
+            raise ValueError(&#34;One of texts or doc_topics is required.&#34;)
         if texts is not None and type(texts) not in [list, np.ndarray]:
-            raise ValueError(&#39;texts must be either a list or numpy ndarray&#39;)
-        if  doc_topics is not None and type(doc_topics) not in [np.ndarray]:
-            raise ValueError(&#39;doc_topics must be a np.ndarray&#39;)
+            raise ValueError(&#34;texts must be either a list or numpy ndarray&#34;)
+        if doc_topics is not None and type(doc_topics) not in [np.ndarray]:
+            raise ValueError(&#34;doc_topics must be a np.ndarray&#34;)
 
         x_test = doc_topics
         if texts:
             x_test = self.predict(texts)
         return self.scorer.decision_function(x_test)
-
 
     def search(self, query, topic_ids=[], doc_ids=[], case_sensitive=False):
         &#34;&#34;&#34;
@@ -3472,8 +3757,9 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
         &#34;&#34;&#34;
 
         # setup pattern
-        if not case_sensitive: query = query.lower()
-        pattern = re.compile(r&#39;\b%s\b&#39; % query)
+        if not case_sensitive:
+            query = query.lower()
+        pattern = re.compile(r&#34;\b%s\b&#34; % query)
 
         # retrive docs
         docs = self.get_docs(topic_ids=topic_ids, doc_ids=doc_ids)
@@ -3483,18 +3769,17 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
         results = []
         for i in mb:
             for doc in progress_bar(docs, parent=mb):
-                text = doc[&#39;text&#39;]
-                if not case_sensitive: text = text.lower()
+                text = doc[&#34;text&#34;]
+                if not case_sensitive:
+                    text = text.lower()
                 matches = pattern.findall(text)
-                if matches: results.append(doc)
-            if self.verbose: mb.write(&#39;done.&#39;)
+                if matches:
+                    results.append(doc)
+            if self.verbose:
+                mb.write(&#34;done.&#34;)
         return results
 
-
-
-    def _rank_documents(self, 
-                       texts,
-                       doc_topics=None):
+    def _rank_documents(self, texts, doc_topics=None):
         &#34;&#34;&#34;
         Rank documents by topic score.
         If topic_index is supplied, rank documents based on relevance to supplied topic.
@@ -3503,21 +3788,23 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
             texts(list of str): list of document texts.
             doc_topics(ndarray): pre-computed topic distribution for each document
                                  If None, re-computed from texts.
-                              
+
         Returns:
             dict of lists: each element in list is a tuple of (doc_index, topic_index, score)
-            ... where doc_index is an index into either texts 
+            ... where doc_index is an index into either texts
         &#34;&#34;&#34;
         if doc_topics is not None:
             X_topics = doc_topics
         else:
-            if self.verbose: print(&#39;transforming texts to topic space...&#39;)
+            if self.verbose:
+                print(&#34;transforming texts to topic space...&#34;)
             X_topics = self.predict(texts)
         topics = np.argmax(X_topics, axis=1)
         scores = np.amax(X_topics, axis=1)
         doc_ids = np.array([i for i, x in enumerate(texts)])
         result = list(zip(texts, doc_ids, topics, scores))
-        if self.verbose: print(&#39;done.&#39;)
+        if self.verbose:
+            print(&#34;done.&#34;)
         result = sorted(result, key=lambda x: x[-1], reverse=True)
         result_dict = {}
         for r in result:
@@ -3530,7 +3817,6 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
             result_dict[topic_id] = lst
         return result_dict
 
-
     def _harden_topics(self, X_topics):
         &#34;&#34;&#34;
         Transforms soft-clustering to hard-clustering
@@ -3541,41 +3827,38 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
         X_topics = np.array(max_topics)
         return X_topics
 
-
     def _check_build(self):
         self._check_model()
-        if self.topic_dict is None: 
-            raise Exception(&#39;Must call build() method.&#39;)
+        if self.topic_dict is None:
+            raise Exception(&#34;Must call build() method.&#34;)
 
     def _check_scorer(self):
         if self.scorer is None:
-            raise Exception(&#39;Must call train_scorer()&#39;)
+            raise Exception(&#34;Must call train_scorer()&#34;)
 
     def _check_recommender(self):
         if self.recommender is None:
-            raise Exception(&#39;Must call train_recommender()&#39;)
-
+            raise Exception(&#34;Must call train_recommender()&#34;)
 
     def _check_model(self):
         if self.model is None or self.vectorizer is None:
-            raise Exception(&#39;Must call train()&#39;)
-
-
+            raise Exception(&#34;Must call train()&#34;)
 
     def save(self, fname):
         &#34;&#34;&#34;
         save TopicModel object
         &#34;&#34;&#34;
 
-        
-        with open(fname+&#39;.tm_vect&#39;, &#39;wb&#39;) as f:
+        with open(fname + &#34;.tm_vect&#34;, &#34;wb&#34;) as f:
             pickle.dump(self.vectorizer, f)
-        with open(fname+&#39;.tm_model&#39;, &#39;wb&#39;) as f:
+        with open(fname + &#34;.tm_model&#34;, &#34;wb&#34;) as f:
             pickle.dump(self.model, f)
-        params = {&#39;n_topics&#39;: self.n_topics,
-                  &#39;n_features&#39;: self.n_features,
-                  &#39;verbose&#39;: self.verbose}
-        with open(fname+&#39;.tm_params&#39;, &#39;wb&#39;) as f:
+        params = {
+            &#34;n_topics&#34;: self.n_topics,
+            &#34;n_features&#34;: self.n_features,
+            &#34;verbose&#34;: self.verbose,
+        }
+        with open(fname + &#34;.tm_params&#34;, &#34;wb&#34;) as f:
             pickle.dump(params, f)
 
         return</code></pre>
@@ -3668,10 +3951,14 @@ for use with visualize_documents.</p>
     Returns:
         filtered obj
     &#34;&#34;&#34;
-    length = obj.shape[0] if isinstance(obj, (pd.DataFrame, np.ndarray)) else len(obj)
+    length = (
+        obj.shape[0] if isinstance(obj, (pd.DataFrame, np.ndarray)) else len(obj)
+    )
     if length != self.bool_array.shape[0]:
-        raise ValueError(&#39;Length of obj is not consistent with the number of documents &#39; +
-                         &#39;supplied to get_topic_model&#39;)
+        raise ValueError(
+            &#34;Length of obj is not consistent with the number of documents &#34;
+            + &#34;supplied to get_topic_model&#34;
+        )
     obj = np.array(obj) if isinstance(obj, list) else obj
     return obj[self.bool_array]</code></pre>
 </details>
@@ -3727,19 +4014,28 @@ of texts supplied to self.build (which is the order of self.doc_topics).</p>
                         &#39;doc_id&#39;: ID of document
                         &#39;topic_proba&#39;: topic probability (or score)
                         &#39;topic_id&#39;: ID of topic
-        
+
     &#34;&#34;&#34;
     self._check_build()
     if not topic_ids:
         topic_ids = list(range(self.n_topics))
     result_texts = []
     for topic_id in topic_ids:
-        if topic_id not in self.topic_dict: continue
-        texts = [{&#39;text&#39;:tup[0], &#39;doc_id&#39;:tup[1], &#39;topic_proba&#39;:tup[2], &#39;topic_id&#39;:topic_id} for tup in self.topic_dict[topic_id] 
-                                                                                                 if not doc_ids or tup[1] in doc_ids]
+        if topic_id not in self.topic_dict:
+            continue
+        texts = [
+            {
+                &#34;text&#34;: tup[0],
+                &#34;doc_id&#34;: tup[1],
+                &#34;topic_proba&#34;: tup[2],
+                &#34;topic_id&#34;: topic_id,
+            }
+            for tup in self.topic_dict[topic_id]
+            if not doc_ids or tup[1] in doc_ids
+        ]
         result_texts.extend(texts)
     if not rank:
-        result_texts = sorted(result_texts, key=lambda x:x[&#39;doc_id&#39;])
+        result_texts = sorted(result_texts, key=lambda x: x[&#34;doc_id&#34;])
     return result_texts</code></pre>
 </details>
 </dd>
@@ -3769,7 +4065,7 @@ Array is sorted in the order returned by self.get_docs.</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_doctopics(self,  topic_ids=[], doc_ids=[]):
+<pre><code class="python">def get_doctopics(self, topic_ids=[], doc_ids=[]):
     &#34;&#34;&#34;
     Returns a topic probability distribution for documents
     with primary topic that is one of &lt;topic_ids&gt; and with doc_id in &lt;doc_ids&gt;.
@@ -3785,10 +4081,10 @@ Array is sorted in the order returned by self.get_docs.</dd>
     Returns:
         np.ndarray: Each row is the topic probability distribution of a document.
                     Array is sorted in the order returned by self.get_docs.
-                    
+
     &#34;&#34;&#34;
     docs = self.get_docs(topic_ids=topic_ids, doc_ids=doc_ids)
-    return np.array([self.doc_topics[idx] for idx in [x[&#39;doc_id&#39;] for x in docs]])</code></pre>
+    return np.array([self.doc_topics[idx] for idx in [x[&#34;doc_id&#34;] for x in docs]])</code></pre>
 </details>
 </dd>
 <dt id="ktrain.text.eda.TopicModel.get_document_topic_distribution"><code class="name flex">
@@ -3831,9 +4127,10 @@ than the topic_id to which document is most relevant.</p></div>
     &#34;&#34;&#34;
     docs = self.get_docs()
     d = {}
-    for doc in docs: d[doc[&#39;doc_id&#39;]] = doc
+    for doc in docs:
+        d[doc[&#34;doc_id&#34;]] = doc
     m = self.get_document_topic_distribution()
-    doc_ids = (-m[:,topic_id]).argsort()
+    doc_ids = (-m[:, topic_id]).argsort()
     return [d[doc_id] for doc_id in doc_ids]</code></pre>
 </details>
 </dd>
@@ -3851,7 +4148,7 @@ with primary topic that is one of <topic_ids></p>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_texts(self,  topic_ids=[]):
+<pre><code class="python">def get_texts(self, topic_ids=[]):
     &#34;&#34;&#34;
     Returns texts for documents
     with primary topic that is one of &lt;topic_ids&gt;
@@ -3860,7 +4157,8 @@ with primary topic that is one of <topic_ids></p>
     Returns:
         list of str
     &#34;&#34;&#34;
-    if not topic_ids: topic_ids = list(range(self.n_topics))
+    if not topic_ids:
+        topic_ids = list(range(self.n_topics))
     docs = self.get_docs(topic_ids)
     return [x[0] for x in docs]</code></pre>
 </details>
@@ -3889,7 +4187,7 @@ Dictionary where key is topic ID and value is a tuple of form (topic summary, co
     Args:
         n_words(int): number of words to use in topic summary
         as_string(bool): If True, each summary is a space-delimited string instead of list of words
-        show_counts(bool): If True, returns list of tuples of form (id, topic summary, count). 
+        show_counts(bool): If True, returns list of tuples of form (id, topic summary, count).
                            Otherwise, a list of topic summaries.
     Returns:
       List of topic summaries if  show_count is False
@@ -3900,14 +4198,18 @@ Dictionary where key is topic ID and value is a tuple of form (topic summary, co
     feature_names = self.vectorizer.get_feature_names()
     topic_summaries = []
     for topic_idx, topic in enumerate(self.model.components_):
-        summary = [feature_names[i] for i in topic.argsort()[:-n_words - 1:-1]]
-        if as_string: summary = &#34; &#34;.join(summary)
+        summary = [feature_names[i] for i in topic.argsort()[: -n_words - 1 : -1]]
+        if as_string:
+            summary = &#34; &#34;.join(summary)
         topic_summaries.append(summary)
 
     if show_counts:
         self._check_build()
-        topic_counts = sorted([ (k, topic_summaries[k], len(v)) for k,v in self.topic_dict.items()], 
-                                key=lambda kv:kv[-1], reverse=True)
+        topic_counts = sorted(
+            [(k, topic_summaries[k], len(v)) for k, v in self.topic_dict.items()],
+            key=lambda kv: kv[-1],
+            reverse=True,
+        )
         return dict((t[0], t[1:]) for t in topic_counts)
 
     return topic_summaries</code></pre>
@@ -3937,14 +4239,16 @@ n_words=int): number of top words</p></div>
         n_words=int): number of top words
     &#34;&#34;&#34;
     self._check_model()
-    if topic_id+1 &gt; len(self.model.components_): 
-        raise ValueError(&#39;topic_id must be less than %s&#39; % (len(self.model.components_)))
+    if topic_id + 1 &gt; len(self.model.components_):
+        raise ValueError(
+            &#34;topic_id must be less than %s&#34; % (len(self.model.components_))
+        )
     feature_names = self.vectorizer.get_feature_names()
     word_probs = self.model.components_[topic_id]
-    word_ids = [i for i in word_probs.argsort()[:-n_words - 1:-1]]
+    word_ids = [i for i in word_probs.argsort()[: -n_words - 1 : -1]]
     words = [feature_names[i] for i in word_ids]
     probs = [word_probs[i] for i in word_ids]
-    return list( zip(words, probs) )</code></pre>
+    return list(zip(words, probs))</code></pre>
 </details>
 </dd>
 <dt id="ktrain.text.eda.TopicModel.predict"><code class="name flex">
@@ -3991,16 +4295,19 @@ np.ndarray</code></dt>
     self._check_model()
     transformed_texts = self.vectorizer.transform(texts)
     X_topics = self.model.transform(transformed_texts)
-    #if self.model_type == &#39;nmf&#39;:
-        #scores = np.matrix(X_topics)
-        #scores_normalized= scores/scores.sum(axis=1)
-        #X_topics = scores_normalized
+    # if self.model_type == &#39;nmf&#39;:
+    # scores = np.matrix(X_topics)
+    # scores_normalized= scores/scores.sum(axis=1)
+    # X_topics = scores_normalized
     _idx = np.array([True] * len(texts))
     if threshold is not None:
-        _idx = np.amax(X_topics, axis=1) &gt; threshold  # idx of doc that above the threshold
+        _idx = (
+            np.amax(X_topics, axis=1) &gt; threshold
+        )  # idx of doc that above the threshold
         _idx = np.array(_idx)
         X_topics = X_topics[_idx]
-    if harden: X_topics = self._harden_topics(X_topics)
+    if harden:
+        X_topics = self._harden_topics(X_topics)
     if threshold is not None:
         return (X_topics, _idx)
     else:
@@ -4029,13 +4336,16 @@ the count is the number of documents with that topic as primary.</p></div>
     topics = self.get_topics(n_words=n_words, as_string=True)
     if show_counts:
         self._check_build()
-        topic_counts = sorted([ (k, topics[k], len(v)) for k,v in self.topic_dict.items()], 
-                                key=lambda kv:kv[-1], reverse=True)
+        topic_counts = sorted(
+            [(k, topics[k], len(v)) for k, v in self.topic_dict.items()],
+            key=lambda kv: kv[-1],
+            reverse=True,
+        )
         for (idx, topic, count) in topic_counts:
-            print(&#34;topic:%s | count:%s | %s&#34; %(idx, count, topic))
+            print(&#34;topic:%s | count:%s | %s&#34; % (idx, count, topic))
     else:
         for i, t in enumerate(topics):
-            print(&#39;topic %s | %s&#39; % (i, t))
+            print(&#34;topic %s | %s&#34; % (i, t))
     return</code></pre>
 </details>
 </dd>
@@ -4081,21 +4391,24 @@ Mutually-exclusive with <doc_topics></dt>
     &#34;&#34;&#34;
     # error-checks
     if text is not None and doc_topic is not None:
-        raise ValueError(&#39;text is mutually-exclusive with doc_topic&#39;)
+        raise ValueError(&#34;text is mutually-exclusive with doc_topic&#34;)
     if text is None and doc_topic is None:
-        raise ValueError(&#39;One of text or doc_topic is required.&#39;)
+        raise ValueError(&#34;One of text or doc_topic is required.&#34;)
     if text is not None and type(text) not in [str]:
-        raise ValueError(&#39;text must be a str &#39;)
-    if  doc_topic is not None and type(doc_topic) not in [np.ndarray]:
-        raise ValueError(&#39;doc_topic must be a np.ndarray&#39;)
+        raise ValueError(&#34;text must be a str &#34;)
+    if doc_topic is not None and type(doc_topic) not in [np.ndarray]:
+        raise ValueError(&#34;doc_topic must be a np.ndarray&#34;)
 
-    if n &gt; n_neighbors: n_neighbors = n
+    if n &gt; n_neighbors:
+        n_neighbors = n
 
     x_test = [doc_topic]
     if text:
         x_test = self.predict([text])
     docs = self.get_docs()
-    indices = self.recommender.kneighbors(x_test, return_distance=False, n_neighbors=n_neighbors)
+    indices = self.recommender.kneighbors(
+        x_test, return_distance=False, n_neighbors=n_neighbors
+    )
     results = [doc for i, doc in enumerate(docs) if i in indices]
     return results[:n]</code></pre>
 </details>
@@ -4114,15 +4427,16 @@ Mutually-exclusive with <doc_topics></dt>
     save TopicModel object
     &#34;&#34;&#34;
 
-    
-    with open(fname+&#39;.tm_vect&#39;, &#39;wb&#39;) as f:
+    with open(fname + &#34;.tm_vect&#34;, &#34;wb&#34;) as f:
         pickle.dump(self.vectorizer, f)
-    with open(fname+&#39;.tm_model&#39;, &#39;wb&#39;) as f:
+    with open(fname + &#34;.tm_model&#34;, &#34;wb&#34;) as f:
         pickle.dump(self.model, f)
-    params = {&#39;n_topics&#39;: self.n_topics,
-              &#39;n_features&#39;: self.n_features,
-              &#39;verbose&#39;: self.verbose}
-    with open(fname+&#39;.tm_params&#39;, &#39;wb&#39;) as f:
+    params = {
+        &#34;n_topics&#34;: self.n_topics,
+        &#34;n_features&#34;: self.n_features,
+        &#34;verbose&#34;: self.verbose,
+    }
+    with open(fname + &#34;.tm_params&#34;, &#34;wb&#34;) as f:
         pickle.dump(params, f)
 
     return</code></pre>
@@ -4190,20 +4504,20 @@ than traditional binary classifiers.</dd>
         list of floats:  larger values indicate higher degree of similarity
                          positive values indicate a binary decision of similar
                          negative values indicate binary decision of dissimilar
-                         In practice, negative scores closer to zero will also 
+                         In practice, negative scores closer to zero will also
                          be similar as One-class classifiers are more strict
                          than traditional binary classifiers.
 
     &#34;&#34;&#34;
     # error-checks
     if texts is not None and doc_topics is not None:
-        raise ValueError(&#39;texts is mutually-exclusive with doc_topics&#39;)
+        raise ValueError(&#34;texts is mutually-exclusive with doc_topics&#34;)
     if texts is None and doc_topics is None:
-        raise ValueError(&#39;One of texts or doc_topics is required.&#39;)
+        raise ValueError(&#34;One of texts or doc_topics is required.&#34;)
     if texts is not None and type(texts) not in [list, np.ndarray]:
-        raise ValueError(&#39;texts must be either a list or numpy ndarray&#39;)
-    if  doc_topics is not None and type(doc_topics) not in [np.ndarray]:
-        raise ValueError(&#39;doc_topics must be a np.ndarray&#39;)
+        raise ValueError(&#34;texts must be either a list or numpy ndarray&#34;)
+    if doc_topics is not None and type(doc_topics) not in [np.ndarray]:
+        raise ValueError(&#34;doc_topics must be a np.ndarray&#34;)
 
     x_test = doc_topics
     if texts:
@@ -4245,8 +4559,9 @@ If True, case sensitive search</p></div>
     &#34;&#34;&#34;
 
     # setup pattern
-    if not case_sensitive: query = query.lower()
-    pattern = re.compile(r&#39;\b%s\b&#39; % query)
+    if not case_sensitive:
+        query = query.lower()
+    pattern = re.compile(r&#34;\b%s\b&#34; % query)
 
     # retrive docs
     docs = self.get_docs(topic_ids=topic_ids, doc_ids=doc_ids)
@@ -4256,11 +4571,14 @@ If True, case sensitive search</p></div>
     results = []
     for i in mb:
         for doc in progress_bar(docs, parent=mb):
-            text = doc[&#39;text&#39;]
-            if not case_sensitive: text = text.lower()
+            text = doc[&#34;text&#34;]
+            if not case_sensitive:
+                text = text.lower()
             matches = pattern.findall(text)
-            if matches: results.append(doc)
-        if self.verbose: mb.write(&#39;done.&#39;)
+            if matches:
+                results.append(doc)
+        if self.verbose:
+            mb.write(&#34;done.&#34;)
     return results</code></pre>
 </details>
 </dd>
@@ -4307,7 +4625,7 @@ default:0.01
 nmf_alpha: alias for alpha for backwars compatilibity
 l1_ratio: l1_ratio for NMF. default: 0
 ngram_range:
-whether to consider bigrams, trigrams. default: (1,1) </p>
+whether to consider bigrams, trigrams. default: (1,1)</p>
 <h2 id="returns">Returns</h2>
 <dl>
 <dt><code>tuple</code></dt>
@@ -4317,14 +4635,25 @@ whether to consider bigrams, trigrams. default: (1,1) </p>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def train(self,texts, model_type=&#39;lda&#39;, n_topics=None, n_features=10000,
-          min_df=5, max_df=0.5,  stop_words=&#39;english&#39;,
-          max_iter=5, lda_max_iter=None, lda_mode=&#39;online&#39;,
-          token_pattern=None, hyperparam_kwargs=None):
+<pre><code class="python">def train(
+    self,
+    texts,
+    model_type=&#34;lda&#34;,
+    n_topics=None,
+    n_features=10000,
+    min_df=5,
+    max_df=0.5,
+    stop_words=&#34;english&#34;,
+    max_iter=5,
+    lda_max_iter=None,
+    lda_mode=&#34;online&#34;,
+    token_pattern=None,
+    hyperparam_kwargs=None,
+):
     &#34;&#34;&#34;
     Fits a topic model to documents in &lt;texts&gt;.
     Example:
-        tm = ktrain.text.get_topic_model(docs, n_topics=20, 
+        tm = ktrain.text.get_topic_model(docs, n_topics=20,
                                         n_features=1000, min_df=2, max_df=0.95)
     Args:
         texts (list of str): list of texts
@@ -4339,7 +4668,7 @@ whether to consider bigrams, trigrams. default: (1,1) </p>
                             If lda_mode=&#39;batch&#39;, this should be increased (e.g., 1500).
                             Ignored if model_type != &#39;lda&#39;
         lda_mode (str):  one of {&#39;online&#39;, &#39;batch&#39;}. Ignored of model_type !=&#39;lda&#39;
-        token_pattern(str): regex pattern to use to tokenize documents. 
+        token_pattern(str): regex pattern to use to tokenize documents.
                             If None, a default tokenizer will be used
         hyperparam_kwargs(dict): hyperparameters for LDA/NMF
                                  Keys in this dict can be any of the following:
@@ -4347,63 +4676,78 @@ whether to consider bigrams, trigrams. default: (1,1) </p>
                                      beta: beta for LDA.  default:0.01
                                      nmf_alpha: alias for alpha for backwars compatilibity
                                      l1_ratio: l1_ratio for NMF. default: 0
-                                     ngram_range:  whether to consider bigrams, trigrams. default: (1,1) 
-                                
+                                     ngram_range:  whether to consider bigrams, trigrams. default: (1,1)
+
     Returns:
         tuple: (model, vectorizer)
     &#34;&#34;&#34;
     max_iter = lda_max_iter if lda_max_iter is not None else max_iter
     if hyperparam_kwargs is None:
         hyperparam_kwargs = {}
-    alpha = hyperparam_kwargs.get(&#39;alpha&#39;, 5.0 / n_topics)
-    nmf_alpha = hyperparam_kwargs.get(&#39;nmf_alpha&#39;, None)
+    alpha = hyperparam_kwargs.get(&#34;alpha&#34;, 5.0 / n_topics)
+    nmf_alpha = hyperparam_kwargs.get(&#34;nmf_alpha&#34;, None)
     alpha = nmf_alpha if nmf_alpha is not None else alpha
-    beta = hyperparam_kwargs.get(&#39;beta&#39;, 0.01)
-    l1_ratio = hyperparam_kwargs.get(&#39;l1_ratio&#39;, 0)
-    ngram_range = hyperparam_kwargs.get(&#39;ngram_range&#39;, (1,1))
+    beta = hyperparam_kwargs.get(&#34;beta&#34;, 0.01)
+    l1_ratio = hyperparam_kwargs.get(&#34;l1_ratio&#34;, 0)
+    ngram_range = hyperparam_kwargs.get(&#34;ngram_range&#34;, (1, 1))
 
     # adjust defaults based on language detected
     if texts is not None:
         lang = TU.detect_lang(texts)
-        if lang != &#39;en&#39;:
-            stopwords = None if stop_words==&#39;english&#39; else stop_words
-            token_pattern = r&#39;(?u)\b\w+\b&#39; if token_pattern is None else token_pattern
+        if lang != &#34;en&#34;:
+            stopwords = None if stop_words == &#34;english&#34; else stop_words
+            token_pattern = (
+                r&#34;(?u)\b\w+\b&#34; if token_pattern is None else token_pattern
+            )
         if pp.is_nospace_lang(lang):
             text_list = []
             for t in texts:
-                text_list.append(&#39; &#39;.join(jieba.cut(t, HMM=False)))
+                text_list.append(&#34; &#34;.join(jieba.cut(t, HMM=False)))
             texts = text_list
-        if self.verbose: print(&#39;lang: %s&#39; % (lang))
-
+        if self.verbose:
+            print(&#34;lang: %s&#34; % (lang))
 
     # preprocess texts
-    if self.verbose: print(&#39;preprocessing texts...&#39;)
-    if token_pattern is None: token_pattern = TU.DEFAULT_TOKEN_PATTERN
-    #if token_pattern is None: token_pattern = r&#39;(?u)\b\w\w+\b&#39;
-    vectorizer = CountVectorizer(max_df=max_df, min_df=min_df,
-                             max_features=n_features, stop_words=stop_words,
-                             token_pattern=token_pattern, ngram_range=ngram_range)
-    
+    if self.verbose:
+        print(&#34;preprocessing texts...&#34;)
+    if token_pattern is None:
+        token_pattern = TU.DEFAULT_TOKEN_PATTERN
+    # if token_pattern is None: token_pattern = r&#39;(?u)\b\w\w+\b&#39;
+    vectorizer = CountVectorizer(
+        max_df=max_df,
+        min_df=min_df,
+        max_features=n_features,
+        stop_words=stop_words,
+        token_pattern=token_pattern,
+        ngram_range=ngram_range,
+    )
 
     x_train = vectorizer.fit_transform(texts)
 
     # fit model
 
-    if self.verbose: print(&#39;fitting model...&#39;)
-    if model_type == &#39;lda&#39;:
-        model = LatentDirichletAllocation(n_components=n_topics, max_iter=max_iter,
-                                          learning_method=lda_mode, learning_offset=50.,
-                                          doc_topic_prior=alpha,
-                                          topic_word_prior=beta,
-                                          verbose=self.verbose, random_state=0)
-    elif model_type == &#39;nmf&#39;:
+    if self.verbose:
+        print(&#34;fitting model...&#34;)
+    if model_type == &#34;lda&#34;:
+        model = LatentDirichletAllocation(
+            n_components=n_topics,
+            max_iter=max_iter,
+            learning_method=lda_mode,
+            learning_offset=50.0,
+            doc_topic_prior=alpha,
+            topic_word_prior=beta,
+            verbose=self.verbose,
+            random_state=0,
+        )
+    elif model_type == &#34;nmf&#34;:
         model = NMF(
             n_components=n_topics,
             max_iter=max_iter,
             verbose=self.verbose,
             alpha=alpha,
             l1_ratio=l1_ratio,
-            random_state=0)
+            random_state=0,
+        )
     else:
         raise ValueError(&#34;unknown model type:&#34;, str(model_type))
     model.fit(x_train)
@@ -4419,27 +4763,25 @@ whether to consider bigrams, trigrams. default: (1,1) </p>
 <div class="desc"><p>Trains a recommender that, given a single document, will return
 documents in the corpus that are semantically similar to it.</p>
 <h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>n_neighbors</code></strong> :&ensp;<code>int</code></dt>
-<dd>&nbsp;</dd>
-</dl>
+<p>n_neighbors (int):</p>
 <h2 id="returns">Returns</h2>
 <p>None</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def train_recommender(self, n_neighbors=20, metric=&#39;minkowski&#39;, p=2):
+<pre><code class="python">def train_recommender(self, n_neighbors=20, metric=&#34;minkowski&#34;, p=2):
     &#34;&#34;&#34;
     Trains a recommender that, given a single document, will return
     documents in the corpus that are semantically similar to it.
 
     Args:
-        n_neighbors (int): 
+        n_neighbors (int):
     Returns:
         None
     &#34;&#34;&#34;
     from sklearn.neighbors import NearestNeighbors
+
     rec = NearestNeighbors(n_neighbors=n_neighbors, metric=metric, p=p)
     probs = self.get_doctopics()
     rec.fit(probs)
@@ -4483,8 +4825,8 @@ with these doc_ids will be used as seed set.</dd>
 
     NOTE: The score method currently employs the use of LocalOutLierFactor, which
     means you should not try to score documents that were used in training. Only
-    new, unseen documents should be scored for similarity. 
-    REFERENCE: 
+    new, unseen documents should be scored for similarity.
+    REFERENCE:
     https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.LocalOutlierFactor.html#sklearn.neighbors.LocalOutlierFactor
 
     Args:
@@ -4492,13 +4834,16 @@ with these doc_ids will be used as seed set.</dd>
                                  of range(self.n_topics).  Documents associated
                                  with these topic_ids will be used as seed set.
         doc_ids (list of ints): list of document IDs where each id is an index
-                                into self.doctopics.  Documents associated 
+                                into self.doctopics.  Documents associated
                                 with these doc_ids will be used as seed set.
     Returns:
         None
     &#34;&#34;&#34;
     from sklearn.neighbors import LocalOutlierFactor
-    clf = LocalOutlierFactor(n_neighbors=n_neighbors, novelty=True, contamination=0.1)
+
+    clf = LocalOutlierFactor(
+        n_neighbors=n_neighbors, novelty=True, contamination=0.1
+    )
     probs = self.get_doctopics(topic_ids=topic_ids, doc_ids=doc_ids)
     clf.fit(probs)
     self.scorer = clf
@@ -4537,11 +4882,18 @@ Optional filepath to save the interactive visualization</p></div>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def visualize_documents(self, texts=None, doc_topics=None, 
-                        width=700, height=700, point_size=5, title=&#39;Document Visualization&#39;,
-                        extra_info={},
-                        colors=None,
-                        filepath=None,):
+<pre><code class="python">def visualize_documents(
+    self,
+    texts=None,
+    doc_topics=None,
+    width=700,
+    height=700,
+    point_size=5,
+    title=&#34;Document Visualization&#34;,
+    extra_info={},
+    colors=None,
+    filepath=None,
+):
     &#34;&#34;&#34;
     Generates a visualization of a set of documents based on model.
     If &lt;texts&gt; is supplied, raw documents will be first transformed into document-topic
@@ -4564,22 +4916,26 @@ Optional filepath to save the interactive visualization</p></div>
     &#34;&#34;&#34;
 
     # error-checking
-    if texts is not None: length = len(texts)
-    else: length = doc_topics.shape[0]
+    if texts is not None:
+        length = len(texts)
+    else:
+        length = doc_topics.shape[0]
     if colors is not None and len(colors) != length:
-        raise ValueError(&#39;length of colors is not consistent with length of texts or doctopics&#39;)
+        raise ValueError(
+            &#34;length of colors is not consistent with length of texts or doctopics&#34;
+        )
     if texts is not None and doc_topics is not None:
-        raise ValueError(&#39;texts is mutually-exclusive with doc_topics&#39;)
+        raise ValueError(&#34;texts is mutually-exclusive with doc_topics&#34;)
     if texts is None and doc_topics is None:
-        raise ValueError(&#39;One of texts or doc_topics is required.&#39;)
+        raise ValueError(&#34;One of texts or doc_topics is required.&#34;)
     if extra_info:
-        invalid_keys = [&#39;x&#39;, &#39;y&#39;, &#39;topic&#39;, &#39;fill_color&#39;]
+        invalid_keys = [&#34;x&#34;, &#34;y&#34;, &#34;topic&#34;, &#34;fill_color&#34;]
         for k in extra_info.keys():
             if k in invalid_keys:
-                raise ValueError(&#39;cannot use &#34;%s&#34; as key in extra_info&#39; %(k))
+                raise ValueError(&#39;cannot use &#34;%s&#34; as key in extra_info&#39; % (k))
             lst = extra_info[k]
             if len(lst) != length:
-                raise ValueError(&#39;texts and extra_info lists must be same size&#39;)
+                raise ValueError(&#34;texts and extra_info lists must be same size&#34;)
 
     # check fo bokeh
     try:
@@ -4588,55 +4944,65 @@ Optional filepath to save the interactive visualization</p></div>
         from bokeh.models import HoverTool
         from bokeh.io import output_notebook
     except:
-        warnings.warn(&#39;visualize_documents method requires bokeh package: pip install bokeh&#39;)
+        warnings.warn(
+            &#34;visualize_documents method requires bokeh package: pip install bokeh&#34;
+        )
         return
 
     # prepare data
     if doc_topics is not None:
         X_topics = doc_topics
     else:
-        if self.verbose:  print(&#39;transforming texts...&#39;, end=&#39;&#39;)
+        if self.verbose:
+            print(&#34;transforming texts...&#34;, end=&#34;&#34;)
         X_topics = self.predict(texts, harden=False)
-        if self.verbose: print(&#39;done.&#39;)
+        if self.verbose:
+            print(&#34;done.&#34;)
 
     # reduce to 2-D
-    if self.verbose:  print(&#39;reducing to 2 dimensions...&#39;, end=&#39;&#39;)
-    tsne_model = TSNE(n_components=2, verbose=self.verbose, random_state=0, angle=.99, init=&#39;pca&#39;)
+    if self.verbose:
+        print(&#34;reducing to 2 dimensions...&#34;, end=&#34;&#34;)
+    tsne_model = TSNE(
+        n_components=2, verbose=self.verbose, random_state=0, angle=0.99, init=&#34;pca&#34;
+    )
     tsne_lda = tsne_model.fit_transform(X_topics)
-    print(&#39;done.&#39;)
+    print(&#34;done.&#34;)
 
     # get random colormap
     colormap = U.get_random_colors(self.n_topics)
 
     # generate inline visualization in Jupyter notebook
     lda_keys = self._harden_topics(X_topics)
-    if colors is None: colors = colormap[lda_keys]
+    if colors is None:
+        colors = colormap[lda_keys]
     topic_summaries = self.get_topics(n_words=5)
-    os.environ[&#34;BOKEH_RESOURCES&#34;]=&#34;inline&#34;
+    os.environ[&#34;BOKEH_RESOURCES&#34;] = &#34;inline&#34;
     output_notebook()
-    dct = { 
-            &#39;x&#39;:tsne_lda[:,0],
-            &#39;y&#39;:tsne_lda[:, 1],
-            &#39;topic&#39;:[topic_summaries[tid] for tid in lda_keys],
-            &#39;fill_color&#39;:colors,}
-    tool_tups = [(&#39;index&#39;, &#39;$index&#39;),
-                 (&#39;(x,y)&#39;,&#39;($x,$y)&#39;),
-                 (&#39;topic&#39;, &#39;@topic&#39;)]
+    dct = {
+        &#34;x&#34;: tsne_lda[:, 0],
+        &#34;y&#34;: tsne_lda[:, 1],
+        &#34;topic&#34;: [topic_summaries[tid] for tid in lda_keys],
+        &#34;fill_color&#34;: colors,
+    }
+    tool_tups = [(&#34;index&#34;, &#34;$index&#34;), (&#34;(x,y)&#34;, &#34;($x,$y)&#34;), (&#34;topic&#34;, &#34;@topic&#34;)]
     for k in extra_info.keys():
         dct[k] = extra_info[k]
-        tool_tups.append((k, &#39;@&#39;+k))
+        tool_tups.append((k, &#34;@&#34; + k))
 
     source = bp.ColumnDataSource(data=dct)
-    hover = HoverTool( tooltips=tool_tups)
-    p = bp.figure(plot_width=width, plot_height=height, 
-                  tools=[hover, &#39;save&#39;, &#39;pan&#39;, &#39;wheel_zoom&#39;, &#39;box_zoom&#39;, &#39;reset&#39;],
-                  #tools=&#34;pan,wheel_zoom,box_zoom,reset,hover,previewsave&#34;,
-                  title=title)
-    #plot_lda = bp.figure(plot_width=1400, plot_height=1100,
-                       #title=title,
-                       #tools=&#34;pan,wheel_zoom,box_zoom,reset,hover,previewsave&#34;,
-                       #x_axis_type=None, y_axis_type=None, min_border=1)
-    p.circle(&#39;x&#39;, &#39;y&#39;, size=point_size, source=source, fill_color= &#39;fill_color&#39;)
+    hover = HoverTool(tooltips=tool_tups)
+    p = bp.figure(
+        plot_width=width,
+        plot_height=height,
+        tools=[hover, &#34;save&#34;, &#34;pan&#34;, &#34;wheel_zoom&#34;, &#34;box_zoom&#34;, &#34;reset&#34;],
+        # tools=&#34;pan,wheel_zoom,box_zoom,reset,hover,previewsave&#34;,
+        title=title,
+    )
+    # plot_lda = bp.figure(plot_width=1400, plot_height=1100,
+    # title=title,
+    # tools=&#34;pan,wheel_zoom,box_zoom,reset,hover,previewsave&#34;,
+    # x_axis_type=None, y_axis_type=None, min_border=1)
+    p.circle(&#34;x&#34;, &#34;y&#34;, size=point_size, source=source, fill_color=&#34;fill_color&#34;)
     bp.show(p)
     if filepath is not None:
         bp.output_file(filepath)

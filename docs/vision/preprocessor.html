@@ -29,6 +29,8 @@
 <pre><code class="python">from ..imports import *
 from ..preprocessor import Preprocessor
 from .. import utils as U
+
+
 class ImagePreprocessor(Preprocessor):
     &#34;&#34;&#34;
     ```
@@ -36,22 +38,20 @@ class ImagePreprocessor(Preprocessor):
     ```
     &#34;&#34;&#34;
 
-    def __init__(self, datagen, classes, target_size=(224,224), color_mode=&#39;rgb&#39;):
+    def __init__(self, datagen, classes, target_size=(224, 224), color_mode=&#34;rgb&#34;):
 
         if not isinstance(datagen, keras.preprocessing.image.ImageDataGenerator):
-            raise ValueError(&#39;datagen must be instance of ImageDataGenerator&#39;)
+            raise ValueError(&#34;datagen must be instance of ImageDataGenerator&#34;)
         self.datagen = datagen
         self.c = classes
         self.target_size = target_size
         self.color_mode = color_mode
-
 
     def get_preprocessor(self):
         return self.datagen
 
     def get_classes(self):
         return self.c
-
 
     def preprocess_test(self, data, batch_size=U.DEFAULT_BS):
         &#34;&#34;&#34;
@@ -61,11 +61,10 @@ class ImagePreprocessor(Preprocessor):
         &#34;&#34;&#34;
         return self.preprocess(data, batch_size=batch_size)
 
-
     def preprocess(self, data, batch_size=U.DEFAULT_BS):
         &#34;&#34;&#34;
         ```
-        Receives raw data and returns 
+        Receives raw data and returns
         tuple containing the generator and steps
         argument for model.predict.
         ```
@@ -75,45 +74,56 @@ class ImagePreprocessor(Preprocessor):
             generator = self.datagen.flow(data, shuffle=False)
             generator.batch_size = batch_size
             nsamples = len(data)
-            steps = math.ceil(nsamples/batch_size)
+            steps = math.ceil(nsamples / batch_size)
             return (generator, steps)
 
         # input is a folder of images
         elif os.path.isdir(data):
             folder = data
-            if folder[-1] != os.sep: folder += os.sep
+            if folder[-1] != os.sep:
+                folder += os.sep
             parent = os.path.dirname(os.path.dirname(folder))
             folder_name = os.path.basename(os.path.dirname(folder))
             if self.target_size is None or self.color_mode is None:
-                raise Exception(&#39;To use predict_folder, you must load the data using either &#39;+\
-                                &#39;the images_from_folder function or the images_from_csv function.&#39;)
-            generator= self.datagen.flow_from_directory(parent,
-                                                       classes=[folder_name],
-                                                       target_size=self.target_size,
-                                                       class_mode=&#39;categorical&#39;,
-                                                       shuffle=False,
-                                                       interpolation=&#39;bicubic&#39;,
-                                                       color_mode = self.color_mode)
+                raise Exception(
+                    &#34;To use predict_folder, you must load the data using either &#34;
+                    + &#34;the images_from_folder function or the images_from_csv function.&#34;
+                )
+            generator = self.datagen.flow_from_directory(
+                parent,
+                classes=[folder_name],
+                target_size=self.target_size,
+                class_mode=&#34;categorical&#34;,
+                shuffle=False,
+                interpolation=&#34;bicubic&#34;,
+                color_mode=self.color_mode,
+            )
             generator.batch_size = batch_size
             nsamples = generator.samples
-            steps = math.ceil(nsamples/batch_size)
+            steps = math.ceil(nsamples / batch_size)
             return (generator, steps)
         # input is the path to an image file
         elif os.path.isfile(data):
             if self.target_size is None or self.color_mode is None:
-                raise Exception(&#39;To use predict_filename, you must load the data using either &#39;+\
-                                &#39;the ktrain.vision.images_from_folder function or the &#39; +\
-                                &#39;ktrain.vision.images_from_csv function.&#39;)
-            img = keras.preprocessing.image.load_img(data, target_size=self.target_size, color_mode=self.color_mode)
+                raise Exception(
+                    &#34;To use predict_filename, you must load the data using either &#34;
+                    + &#34;the ktrain.vision.images_from_folder function or the &#34;
+                    + &#34;ktrain.vision.images_from_csv function.&#34;
+                )
+            img = keras.preprocessing.image.load_img(
+                data, target_size=self.target_size, color_mode=self.color_mode
+            )
             x = keras.preprocessing.image.img_to_array(img)
             x = np.expand_dims(x, axis=0)
-            generator =  self.datagen.flow(np.array(x), shuffle=False)
+            generator = self.datagen.flow(np.array(x), shuffle=False)
             generator.batch_size = batch_size
             nsamples = 1
-            steps = math.ceil(nsamples/batch_size)
+            steps = math.ceil(nsamples / batch_size)
             return (generator, steps)
         else:
-            raise ValueError(&#39;data argument is not valid file, folder, or numpy.ndarray&#39;)</code></pre>
+            raise ValueError(
+                &#34;data argument is not valid file, folder, or numpy.ndarray&#34;
+            )</code></pre>
 </details>
 </section>
 <section>
@@ -143,22 +153,20 @@ class ImagePreprocessor(Preprocessor):
     ```
     &#34;&#34;&#34;
 
-    def __init__(self, datagen, classes, target_size=(224,224), color_mode=&#39;rgb&#39;):
+    def __init__(self, datagen, classes, target_size=(224, 224), color_mode=&#34;rgb&#34;):
 
         if not isinstance(datagen, keras.preprocessing.image.ImageDataGenerator):
-            raise ValueError(&#39;datagen must be instance of ImageDataGenerator&#39;)
+            raise ValueError(&#34;datagen must be instance of ImageDataGenerator&#34;)
         self.datagen = datagen
         self.c = classes
         self.target_size = target_size
         self.color_mode = color_mode
-
 
     def get_preprocessor(self):
         return self.datagen
 
     def get_classes(self):
         return self.c
-
 
     def preprocess_test(self, data, batch_size=U.DEFAULT_BS):
         &#34;&#34;&#34;
@@ -168,11 +176,10 @@ class ImagePreprocessor(Preprocessor):
         &#34;&#34;&#34;
         return self.preprocess(data, batch_size=batch_size)
 
-
     def preprocess(self, data, batch_size=U.DEFAULT_BS):
         &#34;&#34;&#34;
         ```
-        Receives raw data and returns 
+        Receives raw data and returns
         tuple containing the generator and steps
         argument for model.predict.
         ```
@@ -182,45 +189,56 @@ class ImagePreprocessor(Preprocessor):
             generator = self.datagen.flow(data, shuffle=False)
             generator.batch_size = batch_size
             nsamples = len(data)
-            steps = math.ceil(nsamples/batch_size)
+            steps = math.ceil(nsamples / batch_size)
             return (generator, steps)
 
         # input is a folder of images
         elif os.path.isdir(data):
             folder = data
-            if folder[-1] != os.sep: folder += os.sep
+            if folder[-1] != os.sep:
+                folder += os.sep
             parent = os.path.dirname(os.path.dirname(folder))
             folder_name = os.path.basename(os.path.dirname(folder))
             if self.target_size is None or self.color_mode is None:
-                raise Exception(&#39;To use predict_folder, you must load the data using either &#39;+\
-                                &#39;the images_from_folder function or the images_from_csv function.&#39;)
-            generator= self.datagen.flow_from_directory(parent,
-                                                       classes=[folder_name],
-                                                       target_size=self.target_size,
-                                                       class_mode=&#39;categorical&#39;,
-                                                       shuffle=False,
-                                                       interpolation=&#39;bicubic&#39;,
-                                                       color_mode = self.color_mode)
+                raise Exception(
+                    &#34;To use predict_folder, you must load the data using either &#34;
+                    + &#34;the images_from_folder function or the images_from_csv function.&#34;
+                )
+            generator = self.datagen.flow_from_directory(
+                parent,
+                classes=[folder_name],
+                target_size=self.target_size,
+                class_mode=&#34;categorical&#34;,
+                shuffle=False,
+                interpolation=&#34;bicubic&#34;,
+                color_mode=self.color_mode,
+            )
             generator.batch_size = batch_size
             nsamples = generator.samples
-            steps = math.ceil(nsamples/batch_size)
+            steps = math.ceil(nsamples / batch_size)
             return (generator, steps)
         # input is the path to an image file
         elif os.path.isfile(data):
             if self.target_size is None or self.color_mode is None:
-                raise Exception(&#39;To use predict_filename, you must load the data using either &#39;+\
-                                &#39;the ktrain.vision.images_from_folder function or the &#39; +\
-                                &#39;ktrain.vision.images_from_csv function.&#39;)
-            img = keras.preprocessing.image.load_img(data, target_size=self.target_size, color_mode=self.color_mode)
+                raise Exception(
+                    &#34;To use predict_filename, you must load the data using either &#34;
+                    + &#34;the ktrain.vision.images_from_folder function or the &#34;
+                    + &#34;ktrain.vision.images_from_csv function.&#34;
+                )
+            img = keras.preprocessing.image.load_img(
+                data, target_size=self.target_size, color_mode=self.color_mode
+            )
             x = keras.preprocessing.image.img_to_array(img)
             x = np.expand_dims(x, axis=0)
-            generator =  self.datagen.flow(np.array(x), shuffle=False)
+            generator = self.datagen.flow(np.array(x), shuffle=False)
             generator.batch_size = batch_size
             nsamples = 1
-            steps = math.ceil(nsamples/batch_size)
+            steps = math.ceil(nsamples / batch_size)
             return (generator, steps)
         else:
-            raise ValueError(&#39;data argument is not valid file, folder, or numpy.ndarray&#39;)</code></pre>
+            raise ValueError(
+                &#34;data argument is not valid file, folder, or numpy.ndarray&#34;
+            )</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -259,7 +277,7 @@ class ImagePreprocessor(Preprocessor):
 <span>def <span class="ident">preprocess</span></span>(<span>self, data, batch_size=32)</span>
 </code></dt>
 <dd>
-<div class="desc"><pre><code>Receives raw data and returns 
+<div class="desc"><pre><code>Receives raw data and returns
 tuple containing the generator and steps
 argument for model.predict.
 </code></pre></div>
@@ -270,7 +288,7 @@ argument for model.predict.
 <pre><code class="python">def preprocess(self, data, batch_size=U.DEFAULT_BS):
     &#34;&#34;&#34;
     ```
-    Receives raw data and returns 
+    Receives raw data and returns
     tuple containing the generator and steps
     argument for model.predict.
     ```
@@ -280,45 +298,56 @@ argument for model.predict.
         generator = self.datagen.flow(data, shuffle=False)
         generator.batch_size = batch_size
         nsamples = len(data)
-        steps = math.ceil(nsamples/batch_size)
+        steps = math.ceil(nsamples / batch_size)
         return (generator, steps)
 
     # input is a folder of images
     elif os.path.isdir(data):
         folder = data
-        if folder[-1] != os.sep: folder += os.sep
+        if folder[-1] != os.sep:
+            folder += os.sep
         parent = os.path.dirname(os.path.dirname(folder))
         folder_name = os.path.basename(os.path.dirname(folder))
         if self.target_size is None or self.color_mode is None:
-            raise Exception(&#39;To use predict_folder, you must load the data using either &#39;+\
-                            &#39;the images_from_folder function or the images_from_csv function.&#39;)
-        generator= self.datagen.flow_from_directory(parent,
-                                                   classes=[folder_name],
-                                                   target_size=self.target_size,
-                                                   class_mode=&#39;categorical&#39;,
-                                                   shuffle=False,
-                                                   interpolation=&#39;bicubic&#39;,
-                                                   color_mode = self.color_mode)
+            raise Exception(
+                &#34;To use predict_folder, you must load the data using either &#34;
+                + &#34;the images_from_folder function or the images_from_csv function.&#34;
+            )
+        generator = self.datagen.flow_from_directory(
+            parent,
+            classes=[folder_name],
+            target_size=self.target_size,
+            class_mode=&#34;categorical&#34;,
+            shuffle=False,
+            interpolation=&#34;bicubic&#34;,
+            color_mode=self.color_mode,
+        )
         generator.batch_size = batch_size
         nsamples = generator.samples
-        steps = math.ceil(nsamples/batch_size)
+        steps = math.ceil(nsamples / batch_size)
         return (generator, steps)
     # input is the path to an image file
     elif os.path.isfile(data):
         if self.target_size is None or self.color_mode is None:
-            raise Exception(&#39;To use predict_filename, you must load the data using either &#39;+\
-                            &#39;the ktrain.vision.images_from_folder function or the &#39; +\
-                            &#39;ktrain.vision.images_from_csv function.&#39;)
-        img = keras.preprocessing.image.load_img(data, target_size=self.target_size, color_mode=self.color_mode)
+            raise Exception(
+                &#34;To use predict_filename, you must load the data using either &#34;
+                + &#34;the ktrain.vision.images_from_folder function or the &#34;
+                + &#34;ktrain.vision.images_from_csv function.&#34;
+            )
+        img = keras.preprocessing.image.load_img(
+            data, target_size=self.target_size, color_mode=self.color_mode
+        )
         x = keras.preprocessing.image.img_to_array(img)
         x = np.expand_dims(x, axis=0)
-        generator =  self.datagen.flow(np.array(x), shuffle=False)
+        generator = self.datagen.flow(np.array(x), shuffle=False)
         generator.batch_size = batch_size
         nsamples = 1
-        steps = math.ceil(nsamples/batch_size)
+        steps = math.ceil(nsamples / batch_size)
         return (generator, steps)
     else:
-        raise ValueError(&#39;data argument is not valid file, folder, or numpy.ndarray&#39;)</code></pre>
+        raise ValueError(
+            &#34;data argument is not valid file, folder, or numpy.ndarray&#34;
+        )</code></pre>
 </details>
 </dd>
 <dt id="ktrain.vision.preprocessor.ImagePreprocessor.preprocess_test"><code class="name flex">

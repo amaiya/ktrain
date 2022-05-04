@@ -33,8 +33,8 @@ Custom callbacks.
 from ....imports import *
 from .. import metrics
 
-class F1score(keras.callbacks.Callback):
 
+class F1score(keras.callbacks.Callback):
     def __init__(self, seq, preprocessor=None):
         super(F1score, self).__init__()
         self.seq = seq
@@ -66,9 +66,9 @@ class F1score(keras.callbacks.Callback):
             label_pred.extend(y_pred)
 
         score = metrics.f1_score(label_true, label_pred)
-        print(&#39; - f1: {:04.2f}&#39;.format(score * 100))
+        print(&#34; - f1: {:04.2f}&#34;.format(score * 100))
         print(metrics.classification_report(label_true, label_pred))
-        logs[&#39;f1&#39;] = score</code></pre>
+        logs[&#34;f1&#34;] = score</code></pre>
 </details>
 </section>
 <section>
@@ -103,7 +103,6 @@ the current batch or epoch (see method-specific docstrings).</p></div>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class F1score(keras.callbacks.Callback):
-
     def __init__(self, seq, preprocessor=None):
         super(F1score, self).__init__()
         self.seq = seq
@@ -135,9 +134,9 @@ the current batch or epoch (see method-specific docstrings).</p></div>
             label_pred.extend(y_pred)
 
         score = metrics.f1_score(label_true, label_pred)
-        print(&#39; - f1: {:04.2f}&#39;.format(score * 100))
+        print(&#34; - f1: {:04.2f}&#34;.format(score * 100))
         print(metrics.classification_report(label_true, label_pred))
-        logs[&#39;f1&#39;] = score</code></pre>
+        logs[&#34;f1&#34;] = score</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -197,9 +196,9 @@ are prefixed with <code>val_</code>.</p></div>
         label_pred.extend(y_pred)
 
     score = metrics.f1_score(label_true, label_pred)
-    print(&#39; - f1: {:04.2f}&#39;.format(score * 100))
+    print(&#34; - f1: {:04.2f}&#34;.format(score * 100))
     print(metrics.classification_report(label_true, label_pred))
-    logs[&#39;f1&#39;] = score</code></pre>
+    logs[&#34;f1&#34;] = score</code></pre>
 </details>
 </dd>
 </dl>

@@ -30,23 +30,33 @@
 from .. import utils as U
 from ..models import bn_drop_lin
 
-MLP = &#39;mlp&#39;
+MLP = &#34;mlp&#34;
 TABULAR_MODELS = {
-                    MLP: &#34;a configurable multilayer perceptron with categorical variable embeddings [https://arxiv.org/abs/1604.06737]&#34;,
-                    } 
+    MLP: &#34;a configurable multilayer perceptron with categorical variable embeddings [https://arxiv.org/abs/1604.06737]&#34;,
+}
+
 
 def print_tabular_classifiers():
-    for k,v in TABULAR_MODELS.items():
-        print(&#34;%s: %s&#34; % (k,v))
+    for k, v in TABULAR_MODELS.items():
+        print(&#34;%s: %s&#34; % (k, v))
+
 
 def print_tabular_regression_models():
-    for k,v in TABULAR_MODELS.items():
-        print(&#34;%s: %s&#34; % (k,v))
+    for k, v in TABULAR_MODELS.items():
+        print(&#34;%s: %s&#34; % (k, v))
 
 
-
-def _tabular_model(name, train_data, multilabel=None, is_regression=False, metrics=[&#39;accuracy&#39;], 
-                   hidden_layers=[1000, 500], hidden_dropouts=[0., 0.5], bn=False, verbose=1):
+def _tabular_model(
+    name,
+    train_data,
+    multilabel=None,
+    is_regression=False,
+    metrics=[&#34;accuracy&#34;],
+    hidden_layers=[1000, 500],
+    hidden_dropouts=[0.0, 0.5],
+    bn=False,
+    verbose=1,
+):
     &#34;&#34;&#34;
     ```
     Build and return a classification or regression model for tabular data
@@ -70,26 +80,29 @@ def _tabular_model(name, train_data, multilabel=None, is_regression=False, metri
 
     # check arguments
     if not U.is_tabular_from_data(train_data):
-        err =&#34;&#34;&#34;
+        err = &#34;&#34;&#34;
             Please pass training data in the form of data returned from a ktrain tabular_from* function.
             &#34;&#34;&#34;
         raise Exception(err)
-    if len(hidden_layers) != len(hidden_dropouts): raise ValueError(&#39;len(hidden_layers) must equal len(hidden_dropouts)&#39;)
+    if len(hidden_layers) != len(hidden_dropouts):
+        raise ValueError(&#34;len(hidden_layers) must equal len(hidden_dropouts)&#34;)
 
     # reformat dropouts for each of construction
     output_dropout = hidden_dropouts[1]
     hidden_dropouts[1] = hidden_dropouts[0]
-    hidden_dropouts[0] = 0.
+    hidden_dropouts[0] = 0.0
 
     # set model configuration values
-    if is_regression: # regression
-        if metrics is None or metrics==[&#39;accuracy&#39;]: metrics=[&#39;mae&#39;]
+    if is_regression:  # regression
+        if metrics is None or metrics == [&#34;accuracy&#34;]:
+            metrics = [&#34;mae&#34;]
         num_classes = 1
         multilabel = False
-        loss_func = &#39;mse&#39;
-        activation = &#39;linear&#39;
-    else:             # classification
-        if metrics is None: metrics = [&#39;accuracy&#39;]
+        loss_func = &#34;mse&#34;
+        activation = &#34;linear&#34;
+    else:  # classification
+        if metrics is None:
+            metrics = [&#34;accuracy&#34;]
         # set number of classes and multilabel flag
         num_classes = U.nclasses_from_data(train_data)
 
@@ -99,32 +112,35 @@ def _tabular_model(name, train_data, multilabel=None, is_regression=False, metri
         U.vprint(&#34;Is Multi-Label? %s&#34; % (multilabel), verbose=verbose)
 
         # set loss and activations
-        loss_func = &#39;categorical_crossentropy&#39;
-        activation = &#39;softmax&#39;
+        loss_func = &#34;categorical_crossentropy&#34;
+        activation = &#34;softmax&#34;
         if multilabel:
-            loss_func = &#39;binary_crossentropy&#39;
-            activation = &#39;sigmoid&#39;
-
+            loss_func = &#34;binary_crossentropy&#34;
+            activation = &#34;sigmoid&#34;
 
     # construct model
 
     ilayers = []
     n_cat = len(train_data.cat_columns)
     n_cont = len(train_data.cont_columns)
-    if n_cat ==0 and n_cont == 0: raise ValueError(&#39;There are zero continuous and cateorical variables.&#39;)
+    if n_cat == 0 and n_cont == 0:
+        raise ValueError(&#34;There are zero continuous and cateorical variables.&#34;)
 
     # categorical inputs and embeddings
     if n_cat &gt; 0:
         emblayers = []
-        num_uniques = [max(c.cat.codes.values+1)+1 for n, c in train_data.df[train_data.cat_columns].items()]
+        num_uniques = [
+            max(c.cat.codes.values + 1) + 1
+            for n, c in train_data.df[train_data.cat_columns].items()
+        ]
         for i in range(n_cat):
             inp = keras.layers.Input(shape=(1,))
             ilayers.append(inp)
-            emb_size = min(50, (num_uniques[i]//2)+1)
-            #emb_size = min(600, round(1.6 * num_uniques[i]**0.56))
+            emb_size = min(50, (num_uniques[i] // 2) + 1)
+            # emb_size = min(600, round(1.6 * num_uniques[i]**0.56))
             emb = keras.layers.Embedding(num_uniques[i], emb_size, input_length=1)(inp)
             emblayers.append(emb)
-        x = keras.layers.concatenate(emblayers)if len(emblayers) &gt; 1 else emblayers[0]
+        x = keras.layers.concatenate(emblayers) if len(emblayers) &gt; 1 else emblayers[0]
         x = keras.layers.Flatten()(x)
 
     # continuous inputs
@@ -136,21 +152,28 @@ def _tabular_model(name, train_data, multilabel=None, is_regression=False, metri
     # hidden layers
     output = x
     for i, n_out in enumerate(hidden_layers):
-        output = bn_drop_lin(output, n_out, bn=bn, p=hidden_dropouts[i], actn=&#39;relu&#39;)
+        output = bn_drop_lin(output, n_out, bn=bn, p=hidden_dropouts[i], actn=&#34;relu&#34;)
 
     # output layer
-    output = bn_drop_lin(output, num_classes , bn=bn, p=output_dropout, actn=activation)
+    output = bn_drop_lin(output, num_classes, bn=bn, p=output_dropout, actn=activation)
 
     # construct and compile model
     model = keras.Model(inputs=ilayers, outputs=output)
     model.compile(optimizer=U.DEFAULT_OPT, loss=loss_func, metrics=metrics)
-    U.vprint(&#39;done.&#39;, verbose=verbose)
+    U.vprint(&#34;done.&#34;, verbose=verbose)
     return model
 
 
-
-def tabular_classifier(name, train_data, multilabel=None, metrics=[&#39;accuracy&#39;], 
-                       hidden_layers=[1000, 500], hidden_dropouts=[0., 0.5], bn=False, verbose=1):
+def tabular_classifier(
+    name,
+    train_data,
+    multilabel=None,
+    metrics=[&#34;accuracy&#34;],
+    hidden_layers=[1000, 500],
+    hidden_dropouts=[0.0, 0.5],
+    bn=False,
+    verbose=1,
+):
     &#34;&#34;&#34;
     ```
     Build and return a classification model for tabular data
@@ -171,14 +194,28 @@ def tabular_classifier(name, train_data, multilabel=None, metrics=[&#39;accuracy
     ```
     &#34;&#34;&#34;
 
+    return _tabular_model(
+        name,
+        train_data,
+        multilabel=multilabel,
+        metrics=metrics,
+        hidden_layers=hidden_layers,
+        hidden_dropouts=hidden_dropouts,
+        bn=bn,
+        verbose=verbose,
+        is_regression=False,
+    )
 
-    return _tabular_model(name, train_data, multilabel=multilabel, metrics=metrics,
-                          hidden_layers=hidden_layers, hidden_dropouts=hidden_dropouts, bn=bn,
-                          verbose=verbose, is_regression=False)
 
-
-def tabular_regression_model(name, train_data,  metrics=[&#39;mae&#39;], 
-                             hidden_layers=[1000, 500], hidden_dropouts=[0., 0.5], bn=False, verbose=1):
+def tabular_regression_model(
+    name,
+    train_data,
+    metrics=[&#34;mae&#34;],
+    hidden_layers=[1000, 500],
+    hidden_dropouts=[0.0, 0.5],
+    bn=False,
+    verbose=1,
+):
     &#34;&#34;&#34;
     ```
     Build and return a regression model for tabular data
@@ -196,10 +233,17 @@ def tabular_regression_model(name, train_data,  metrics=[&#39;mae&#39;],
     ```
     &#34;&#34;&#34;
 
-
-    return _tabular_model(name, train_data, multilabel=None, metrics=metrics, 
-                          hidden_layers=hidden_layers, hidden_dropouts=hidden_dropouts, bn=bn,
-                          verbose=verbose, is_regression=True)</code></pre>
+    return _tabular_model(
+        name,
+        train_data,
+        multilabel=None,
+        metrics=metrics,
+        hidden_layers=hidden_layers,
+        hidden_dropouts=hidden_dropouts,
+        bn=bn,
+        verbose=verbose,
+        is_regression=True,
+    )</code></pre>
 </details>
 </section>
 <section>
@@ -219,8 +263,8 @@ def tabular_regression_model(name, train_data,  metrics=[&#39;mae&#39;],
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def print_tabular_classifiers():
-    for k,v in TABULAR_MODELS.items():
-        print(&#34;%s: %s&#34; % (k,v))</code></pre>
+    for k, v in TABULAR_MODELS.items():
+        print(&#34;%s: %s&#34; % (k, v))</code></pre>
 </details>
 </dd>
 <dt id="ktrain.tabular.models.print_tabular_regression_models"><code class="name flex">
@@ -233,8 +277,8 @@ def tabular_regression_model(name, train_data,  metrics=[&#39;mae&#39;],
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def print_tabular_regression_models():
-    for k,v in TABULAR_MODELS.items():
-        print(&#34;%s: %s&#34; % (k,v))</code></pre>
+    for k, v in TABULAR_MODELS.items():
+        print(&#34;%s: %s&#34; % (k, v))</code></pre>
 </details>
 </dd>
 <dt id="ktrain.tabular.models.tabular_classifier"><code class="name flex">
@@ -261,8 +305,16 @@ Return:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def tabular_classifier(name, train_data, multilabel=None, metrics=[&#39;accuracy&#39;], 
-                       hidden_layers=[1000, 500], hidden_dropouts=[0., 0.5], bn=False, verbose=1):
+<pre><code class="python">def tabular_classifier(
+    name,
+    train_data,
+    multilabel=None,
+    metrics=[&#34;accuracy&#34;],
+    hidden_layers=[1000, 500],
+    hidden_dropouts=[0.0, 0.5],
+    bn=False,
+    verbose=1,
+):
     &#34;&#34;&#34;
     ```
     Build and return a classification model for tabular data
@@ -283,10 +335,17 @@ Return:
     ```
     &#34;&#34;&#34;
 
-
-    return _tabular_model(name, train_data, multilabel=multilabel, metrics=metrics,
-                          hidden_layers=hidden_layers, hidden_dropouts=hidden_dropouts, bn=bn,
-                          verbose=verbose, is_regression=False)</code></pre>
+    return _tabular_model(
+        name,
+        train_data,
+        multilabel=multilabel,
+        metrics=metrics,
+        hidden_layers=hidden_layers,
+        hidden_dropouts=hidden_dropouts,
+        bn=bn,
+        verbose=verbose,
+        is_regression=False,
+    )</code></pre>
 </details>
 </dd>
 <dt id="ktrain.tabular.models.tabular_regression_model"><code class="name flex">
@@ -310,8 +369,15 @@ Return:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def tabular_regression_model(name, train_data,  metrics=[&#39;mae&#39;], 
-                             hidden_layers=[1000, 500], hidden_dropouts=[0., 0.5], bn=False, verbose=1):
+<pre><code class="python">def tabular_regression_model(
+    name,
+    train_data,
+    metrics=[&#34;mae&#34;],
+    hidden_layers=[1000, 500],
+    hidden_dropouts=[0.0, 0.5],
+    bn=False,
+    verbose=1,
+):
     &#34;&#34;&#34;
     ```
     Build and return a regression model for tabular data
@@ -329,10 +395,17 @@ Return:
     ```
     &#34;&#34;&#34;
 
-
-    return _tabular_model(name, train_data, multilabel=None, metrics=metrics, 
-                          hidden_layers=hidden_layers, hidden_dropouts=hidden_dropouts, bn=bn,
-                          verbose=verbose, is_regression=True)</code></pre>
+    return _tabular_model(
+        name,
+        train_data,
+        multilabel=None,
+        metrics=metrics,
+        hidden_layers=hidden_layers,
+        hidden_dropouts=hidden_dropouts,
+        bn=bn,
+        verbose=verbose,
+        is_regression=True,
+    )</code></pre>
 </details>
 </dd>
 </dl>

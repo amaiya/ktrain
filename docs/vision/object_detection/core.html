@@ -30,6 +30,7 @@
 from ... import imports as I
 from transformers import pipeline
 
+
 class ObjectDetector(TorchBase):
     &#34;&#34;&#34;
     interface to Image Captioner
@@ -48,13 +49,19 @@ class ObjectDetector(TorchBase):
         ```
         &#34;&#34;&#34;
         if not I.PIL_INSTALLED:
-            raise Exception(&#39;PIL is not installed. Please install with: pip install pillow&gt;=9.0.1&#39;)
+            raise Exception(
+                &#34;PIL is not installed. Please install with: pip install pillow&gt;=9.0.1&#34;
+            )
 
-        super().__init__(device=device, quantize=False, min_transformers_version=&#39;4.12.3&#39;)
-        self.pipeline = pipeline(&#39;image-classification&#39; if classification else &#39;object-detection&#39;, device=self.device_to_id())
+        super().__init__(
+            device=device, quantize=False, min_transformers_version=&#34;4.12.3&#34;
+        )
+        self.pipeline = pipeline(
+            &#34;image-classification&#34; if classification else &#34;object-detection&#34;,
+            device=self.device_to_id(),
+        )
         self.threshold = threshold
         self.classification = classification
-
 
     def detect(self, images, flatten=False, workers=0):
         &#34;&#34;&#34;
@@ -76,8 +83,9 @@ class ObjectDetector(TorchBase):
         values = [images] if not isinstance(images, list) else images
 
         # Open images if file strings
-        values = [I.Image.open(image) if isinstance(image, str) else image for image in values]
-
+        values = [
+            I.Image.open(image) if isinstance(image, str) else image for image in values
+        ]
 
         # Run pipeline
         results = (
@@ -90,7 +98,9 @@ class ObjectDetector(TorchBase):
         outputs = []
         for result in results:
             # Convert to (label, score) tuples
-            result = [(x[&#34;label&#34;], x[&#34;score&#34;]) for x in result if x[&#34;score&#34;] &gt; self.threshold]
+            result = [
+                (x[&#34;label&#34;], x[&#34;score&#34;]) for x in result if x[&#34;score&#34;] &gt; self.threshold
+            ]
 
             # Sort by score descending
             result = sorted(result, key=lambda x: x[1], reverse=True)
@@ -154,13 +164,19 @@ Args:
         ```
         &#34;&#34;&#34;
         if not I.PIL_INSTALLED:
-            raise Exception(&#39;PIL is not installed. Please install with: pip install pillow&gt;=9.0.1&#39;)
+            raise Exception(
+                &#34;PIL is not installed. Please install with: pip install pillow&gt;=9.0.1&#34;
+            )
 
-        super().__init__(device=device, quantize=False, min_transformers_version=&#39;4.12.3&#39;)
-        self.pipeline = pipeline(&#39;image-classification&#39; if classification else &#39;object-detection&#39;, device=self.device_to_id())
+        super().__init__(
+            device=device, quantize=False, min_transformers_version=&#34;4.12.3&#34;
+        )
+        self.pipeline = pipeline(
+            &#34;image-classification&#34; if classification else &#34;object-detection&#34;,
+            device=self.device_to_id(),
+        )
         self.threshold = threshold
         self.classification = classification
-
 
     def detect(self, images, flatten=False, workers=0):
         &#34;&#34;&#34;
@@ -182,8 +198,9 @@ Args:
         values = [images] if not isinstance(images, list) else images
 
         # Open images if file strings
-        values = [I.Image.open(image) if isinstance(image, str) else image for image in values]
-
+        values = [
+            I.Image.open(image) if isinstance(image, str) else image for image in values
+        ]
 
         # Run pipeline
         results = (
@@ -196,7 +213,9 @@ Args:
         outputs = []
         for result in results:
             # Convert to (label, score) tuples
-            result = [(x[&#34;label&#34;], x[&#34;score&#34;]) for x in result if x[&#34;score&#34;] &gt; self.threshold]
+            result = [
+                (x[&#34;label&#34;], x[&#34;score&#34;]) for x in result if x[&#34;score&#34;] &gt; self.threshold
+            ]
 
             # Sort by score descending
             result = sorted(result, key=lambda x: x[1], reverse=True)
@@ -260,8 +279,9 @@ Returns:
     values = [images] if not isinstance(images, list) else images
 
     # Open images if file strings
-    values = [I.Image.open(image) if isinstance(image, str) else image for image in values]
-
+    values = [
+        I.Image.open(image) if isinstance(image, str) else image for image in values
+    ]
 
     # Run pipeline
     results = (
@@ -274,7 +294,9 @@ Returns:
     outputs = []
     for result in results:
         # Convert to (label, score) tuples
-        result = [(x[&#34;label&#34;], x[&#34;score&#34;]) for x in result if x[&#34;score&#34;] &gt; self.threshold]
+        result = [
+            (x[&#34;label&#34;], x[&#34;score&#34;]) for x in result if x[&#34;score&#34;] &gt; self.threshold
+        ]
 
         # Sort by score descending
         result = sorted(result, key=lambda x: x[1], reverse=True)

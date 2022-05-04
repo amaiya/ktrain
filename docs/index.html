@@ -28,7 +28,13 @@
 </summary>
 <pre><code class="python">from .version import __version__
 from . import imports as I
-from .core import ArrayLearner, GenLearner, get_predictor, load_predictor, release_gpu_memory
+from .core import (
+    ArrayLearner,
+    GenLearner,
+    get_predictor,
+    load_predictor,
+    release_gpu_memory,
+)
 from .vision.learner import ImageClassLearner
 from .text.learner import BERTTextClassLearner, TransformerTextClassLearner
 from .text.ner.learner import NERLearner
@@ -36,55 +42,59 @@ from .graph.learner import NodeClassLearner, LinkPredLearner
 
 from . import utils as U
 
-__all__ = [&#39;get_learner&#39;, &#39;get_predictor&#39;, &#39;load_predictor&#39;, &#39;release_gpu_memory&#39; ]
+__all__ = [&#34;get_learner&#34;, &#34;get_predictor&#34;, &#34;load_predictor&#34;, &#34;release_gpu_memory&#34;]
 
 
-
-
-def get_learner(model, train_data=None, val_data=None, 
-                batch_size=U.DEFAULT_BS, eval_batch_size=U.DEFAULT_BS,
-                workers=1, use_multiprocessing=False):
+def get_learner(
+    model,
+    train_data=None,
+    val_data=None,
+    batch_size=U.DEFAULT_BS,
+    eval_batch_size=U.DEFAULT_BS,
+    workers=1,
+    use_multiprocessing=False,
+):
     &#34;&#34;&#34;
     ```
-    Returns a Learner instance that can be used to tune and train Keras models.  
+    Returns a Learner instance that can be used to tune and train Keras models.
 
-    model (Model):        A compiled instance of keras.engine.training.Model  
-    train_data (tuple or generator): Either a:   
-                                   1) tuple of (x_train, y_train), where x_train and   
-                                      y_train are numpy.ndarrays or   
-                                   2) Iterator  
-    val_data (tuple or generator): Either a:   
-                                   1) tuple of (x_test, y_test), where x_testand   
-                                      y_test are numpy.ndarrays or    
-                                   2) Iterator  
-                                   Note: Should be same type as train_data.  
-    batch_size (int):              Batch size to use in training. default:32  
-    eval_batch_size(int):  batch size used by learner.predict  
-                           only applies to validaton data during training if  
-                           val_data is instance of utils.Sequence.  
-                           default:32  
-    workers (int): number of cpu processes used to load data.  
-                   This is ignored unless train_data/val_data is an instance of   
-                   tf.keras.preprocessing.image.DirectoryIterator or tf.keras.preprocessing.image.DataFrameIterator.   
-    use_multiprocessing(bool):  whether or not to use multiprocessing for workers  
-                               This is ignored unless train_data/val_data is an instance of   
-                               tf.keras.preprocessing.image.DirectoryIterator or tf.keras.preprocessing.image.DataFrameIterator.   
+    model (Model):        A compiled instance of keras.engine.training.Model
+    train_data (tuple or generator): Either a:
+                                   1) tuple of (x_train, y_train), where x_train and
+                                      y_train are numpy.ndarrays or
+                                   2) Iterator
+    val_data (tuple or generator): Either a:
+                                   1) tuple of (x_test, y_test), where x_testand
+                                      y_test are numpy.ndarrays or
+                                   2) Iterator
+                                   Note: Should be same type as train_data.
+    batch_size (int):              Batch size to use in training. default:32
+    eval_batch_size(int):  batch size used by learner.predict
+                           only applies to validaton data during training if
+                           val_data is instance of utils.Sequence.
+                           default:32
+    workers (int): number of cpu processes used to load data.
+                   This is ignored unless train_data/val_data is an instance of
+                   tf.keras.preprocessing.image.DirectoryIterator or tf.keras.preprocessing.image.DataFrameIterator.
+    use_multiprocessing(bool):  whether or not to use multiprocessing for workers
+                               This is ignored unless train_data/val_data is an instance of
+                               tf.keras.preprocessing.image.DirectoryIterator or tf.keras.preprocessing.image.DataFrameIterator.
     ```
     &#34;&#34;&#34;
 
     # check arguments
     if not isinstance(model, I.keras.Model):
-        raise ValueError(&#39;model must be of instance Model&#39;)
+        raise ValueError(&#34;model must be of instance Model&#34;)
     U.data_arg_check(train_data=train_data, val_data=val_data)
     if type(workers) != type(1) or workers &lt; 1:
-        workers =1
-    # check for NumpyArrayIterator 
+        workers = 1
+    # check for NumpyArrayIterator
     if train_data and not U.ondisk(train_data):
         if workers &gt; 1 and not use_multiprocessing:
             use_multiprocessing = True
-            wrn_msg = &#39;Changed use_multiprocessing to True because NumpyArrayIterator with workers&gt;1&#39;
-            wrn_msg +=&#39; is slow when use_multiprocessing=False.&#39;
-            wrn_msg += &#39; If you experience issues with this, please set workers=1 and use_multiprocessing=False.&#39;
+            wrn_msg = &#34;Changed use_multiprocessing to True because NumpyArrayIterator with workers&gt;1&#34;
+            wrn_msg += &#34; is slow when use_multiprocessing=False.&#34;
+            wrn_msg += &#34; If you experience issues with this, please set workers=1 and use_multiprocessing=False.&#34;
             I.warnings.warn(wrn_msg)
 
     # verify BERT
@@ -104,19 +114,19 @@ def get_learner(model, train_data=None, val_data=None,
         If necessary, adjust sequence length or batch size based on above.&#34;&#34;&#34;
         wrn = False
         if maxlen &gt; 64 and batch_size &gt; 64:
-            wrn=True
-        elif maxlen &gt; 128 and batch_size&gt;32:
-            wrn=True
-        elif maxlen&gt;256 and batch_size&gt;16:
-            wrn=True
-        elif maxlen&gt;320 and batch_size&gt;14:
-            wrn=True
-        elif maxlen&gt;384 and batch_size&gt;12:
-            wrn=True
-        elif maxlen &gt; 512 and batch_size&gt;6:
-            wrn=True
-        if wrn: I.warnings.warn(msg)
-
+            wrn = True
+        elif maxlen &gt; 128 and batch_size &gt; 32:
+            wrn = True
+        elif maxlen &gt; 256 and batch_size &gt; 16:
+            wrn = True
+        elif maxlen &gt; 320 and batch_size &gt; 14:
+            wrn = True
+        elif maxlen &gt; 384 and batch_size &gt; 12:
+            wrn = True
+        elif maxlen &gt; 512 and batch_size &gt; 6:
+            wrn = True
+        if wrn:
+            I.warnings.warn(msg)
 
     # return the appropriate trainer
     if U.is_iter(train_data):
@@ -133,13 +143,19 @@ def get_learner(model, train_data=None, val_data=None,
         else:
             learner = GenLearner
     else:
-        if is_bert: 
+        if is_bert:
             learner = BERTTextClassLearner
-        else: # vanilla text classifiers use standard ArrayLearners
+        else:  # vanilla text classifiers use standard ArrayLearners
             learner = ArrayLearner
-    return learner(model, train_data=train_data, val_data=val_data, 
-                   batch_size=batch_size, eval_batch_size=eval_batch_size, 
-                   workers=workers, use_multiprocessing=use_multiprocessing)
+    return learner(
+        model,
+        train_data=train_data,
+        val_data=val_data,
+        batch_size=batch_size,
+        eval_batch_size=eval_batch_size,
+        workers=workers,
+        use_multiprocessing=use_multiprocessing,
+    )
 
 
 # keys
@@ -223,78 +239,84 @@ def get_learner(model, train_data=None, val_data=None,
 <span>def <span class="ident">get_learner</span></span>(<span>model, train_data=None, val_data=None, batch_size=32, eval_batch_size=32, workers=1, use_multiprocessing=False)</span>
 </code></dt>
 <dd>
-<div class="desc"><pre><code>Returns a Learner instance that can be used to tune and train Keras models.  
+<div class="desc"><pre><code>Returns a Learner instance that can be used to tune and train Keras models.
 
-model (Model):        A compiled instance of keras.engine.training.Model  
-train_data (tuple or generator): Either a:   
-                               1) tuple of (x_train, y_train), where x_train and   
-                                  y_train are numpy.ndarrays or   
-                               2) Iterator  
-val_data (tuple or generator): Either a:   
-                               1) tuple of (x_test, y_test), where x_testand   
-                                  y_test are numpy.ndarrays or    
-                               2) Iterator  
-                               Note: Should be same type as train_data.  
-batch_size (int):              Batch size to use in training. default:32  
-eval_batch_size(int):  batch size used by learner.predict  
-                       only applies to validaton data during training if  
-                       val_data is instance of utils.Sequence.  
-                       default:32  
-workers (int): number of cpu processes used to load data.  
-               This is ignored unless train_data/val_data is an instance of   
-               tf.keras.preprocessing.image.DirectoryIterator or tf.keras.preprocessing.image.DataFrameIterator.   
-use_multiprocessing(bool):  whether or not to use multiprocessing for workers  
-                           This is ignored unless train_data/val_data is an instance of   
-                           tf.keras.preprocessing.image.DirectoryIterator or tf.keras.preprocessing.image.DataFrameIterator.   
+model (Model):        A compiled instance of keras.engine.training.Model
+train_data (tuple or generator): Either a:
+                               1) tuple of (x_train, y_train), where x_train and
+                                  y_train are numpy.ndarrays or
+                               2) Iterator
+val_data (tuple or generator): Either a:
+                               1) tuple of (x_test, y_test), where x_testand
+                                  y_test are numpy.ndarrays or
+                               2) Iterator
+                               Note: Should be same type as train_data.
+batch_size (int):              Batch size to use in training. default:32
+eval_batch_size(int):  batch size used by learner.predict
+                       only applies to validaton data during training if
+                       val_data is instance of utils.Sequence.
+                       default:32
+workers (int): number of cpu processes used to load data.
+               This is ignored unless train_data/val_data is an instance of
+               tf.keras.preprocessing.image.DirectoryIterator or tf.keras.preprocessing.image.DataFrameIterator.
+use_multiprocessing(bool):  whether or not to use multiprocessing for workers
+                           This is ignored unless train_data/val_data is an instance of
+                           tf.keras.preprocessing.image.DirectoryIterator or tf.keras.preprocessing.image.DataFrameIterator.
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_learner(model, train_data=None, val_data=None, 
-                batch_size=U.DEFAULT_BS, eval_batch_size=U.DEFAULT_BS,
-                workers=1, use_multiprocessing=False):
+<pre><code class="python">def get_learner(
+    model,
+    train_data=None,
+    val_data=None,
+    batch_size=U.DEFAULT_BS,
+    eval_batch_size=U.DEFAULT_BS,
+    workers=1,
+    use_multiprocessing=False,
+):
     &#34;&#34;&#34;
     ```
-    Returns a Learner instance that can be used to tune and train Keras models.  
+    Returns a Learner instance that can be used to tune and train Keras models.
 
-    model (Model):        A compiled instance of keras.engine.training.Model  
-    train_data (tuple or generator): Either a:   
-                                   1) tuple of (x_train, y_train), where x_train and   
-                                      y_train are numpy.ndarrays or   
-                                   2) Iterator  
-    val_data (tuple or generator): Either a:   
-                                   1) tuple of (x_test, y_test), where x_testand   
-                                      y_test are numpy.ndarrays or    
-                                   2) Iterator  
-                                   Note: Should be same type as train_data.  
-    batch_size (int):              Batch size to use in training. default:32  
-    eval_batch_size(int):  batch size used by learner.predict  
-                           only applies to validaton data during training if  
-                           val_data is instance of utils.Sequence.  
-                           default:32  
-    workers (int): number of cpu processes used to load data.  
-                   This is ignored unless train_data/val_data is an instance of   
-                   tf.keras.preprocessing.image.DirectoryIterator or tf.keras.preprocessing.image.DataFrameIterator.   
-    use_multiprocessing(bool):  whether or not to use multiprocessing for workers  
-                               This is ignored unless train_data/val_data is an instance of   
-                               tf.keras.preprocessing.image.DirectoryIterator or tf.keras.preprocessing.image.DataFrameIterator.   
+    model (Model):        A compiled instance of keras.engine.training.Model
+    train_data (tuple or generator): Either a:
+                                   1) tuple of (x_train, y_train), where x_train and
+                                      y_train are numpy.ndarrays or
+                                   2) Iterator
+    val_data (tuple or generator): Either a:
+                                   1) tuple of (x_test, y_test), where x_testand
+                                      y_test are numpy.ndarrays or
+                                   2) Iterator
+                                   Note: Should be same type as train_data.
+    batch_size (int):              Batch size to use in training. default:32
+    eval_batch_size(int):  batch size used by learner.predict
+                           only applies to validaton data during training if
+                           val_data is instance of utils.Sequence.
+                           default:32
+    workers (int): number of cpu processes used to load data.
+                   This is ignored unless train_data/val_data is an instance of
+                   tf.keras.preprocessing.image.DirectoryIterator or tf.keras.preprocessing.image.DataFrameIterator.
+    use_multiprocessing(bool):  whether or not to use multiprocessing for workers
+                               This is ignored unless train_data/val_data is an instance of
+                               tf.keras.preprocessing.image.DirectoryIterator or tf.keras.preprocessing.image.DataFrameIterator.
     ```
     &#34;&#34;&#34;
 
     # check arguments
     if not isinstance(model, I.keras.Model):
-        raise ValueError(&#39;model must be of instance Model&#39;)
+        raise ValueError(&#34;model must be of instance Model&#34;)
     U.data_arg_check(train_data=train_data, val_data=val_data)
     if type(workers) != type(1) or workers &lt; 1:
-        workers =1
-    # check for NumpyArrayIterator 
+        workers = 1
+    # check for NumpyArrayIterator
     if train_data and not U.ondisk(train_data):
         if workers &gt; 1 and not use_multiprocessing:
             use_multiprocessing = True
-            wrn_msg = &#39;Changed use_multiprocessing to True because NumpyArrayIterator with workers&gt;1&#39;
-            wrn_msg +=&#39; is slow when use_multiprocessing=False.&#39;
-            wrn_msg += &#39; If you experience issues with this, please set workers=1 and use_multiprocessing=False.&#39;
+            wrn_msg = &#34;Changed use_multiprocessing to True because NumpyArrayIterator with workers&gt;1&#34;
+            wrn_msg += &#34; is slow when use_multiprocessing=False.&#34;
+            wrn_msg += &#34; If you experience issues with this, please set workers=1 and use_multiprocessing=False.&#34;
             I.warnings.warn(wrn_msg)
 
     # verify BERT
@@ -314,19 +336,19 @@ use_multiprocessing(bool):  whether or not to use multiprocessing for workers
         If necessary, adjust sequence length or batch size based on above.&#34;&#34;&#34;
         wrn = False
         if maxlen &gt; 64 and batch_size &gt; 64:
-            wrn=True
-        elif maxlen &gt; 128 and batch_size&gt;32:
-            wrn=True
-        elif maxlen&gt;256 and batch_size&gt;16:
-            wrn=True
-        elif maxlen&gt;320 and batch_size&gt;14:
-            wrn=True
-        elif maxlen&gt;384 and batch_size&gt;12:
-            wrn=True
-        elif maxlen &gt; 512 and batch_size&gt;6:
-            wrn=True
-        if wrn: I.warnings.warn(msg)
-
+            wrn = True
+        elif maxlen &gt; 128 and batch_size &gt; 32:
+            wrn = True
+        elif maxlen &gt; 256 and batch_size &gt; 16:
+            wrn = True
+        elif maxlen &gt; 320 and batch_size &gt; 14:
+            wrn = True
+        elif maxlen &gt; 384 and batch_size &gt; 12:
+            wrn = True
+        elif maxlen &gt; 512 and batch_size &gt; 6:
+            wrn = True
+        if wrn:
+            I.warnings.warn(msg)
 
     # return the appropriate trainer
     if U.is_iter(train_data):
@@ -343,13 +365,19 @@ use_multiprocessing(bool):  whether or not to use multiprocessing for workers
         else:
             learner = GenLearner
     else:
-        if is_bert: 
+        if is_bert:
             learner = BERTTextClassLearner
-        else: # vanilla text classifiers use standard ArrayLearners
+        else:  # vanilla text classifiers use standard ArrayLearners
             learner = ArrayLearner
-    return learner(model, train_data=train_data, val_data=val_data, 
-                   batch_size=batch_size, eval_batch_size=eval_batch_size, 
-                   workers=workers, use_multiprocessing=use_multiprocessing)</code></pre>
+    return learner(
+        model,
+        train_data=train_data,
+        val_data=val_data,
+        batch_size=batch_size,
+        eval_batch_size=eval_batch_size,
+        workers=workers,
+        use_multiprocessing=use_multiprocessing,
+    )</code></pre>
 </details>
 </dd>
 <dt id="ktrain.get_predictor"><code class="name flex">
@@ -357,7 +385,7 @@ use_multiprocessing(bool):  whether or not to use multiprocessing for workers
 </code></dt>
 <dd>
 <div class="desc"><pre><code>Returns a Predictor instance that can be used to make predictions on
-unlabeled examples.  Can be saved to disk and reloaded as part of a 
+unlabeled examples.  Can be saved to disk and reloaded as part of a
 larger application.
 
 Args
@@ -383,7 +411,7 @@ Args
     &#34;&#34;&#34;
     ```
     Returns a Predictor instance that can be used to make predictions on
-    unlabeled examples.  Can be saved to disk and reloaded as part of a 
+    unlabeled examples.  Can be saved to disk and reloaded as part of a
     larger application.
 
     Args
@@ -405,13 +433,23 @@ Args
 
     # check arguments
     if not isinstance(model, keras.Model):
-        raise ValueError(&#39;model must be of instance keras.Model&#39;)
-    if not isinstance(preproc, (ImagePreprocessor,TextPreprocessor, NERPreprocessor, NodePreprocessor, LinkPreprocessor, TabularPreprocessor)):
-        raise ValueError(&#39;preproc must be instance of ktrain.preprocessor.Preprocessor&#39;)
+        raise ValueError(&#34;model must be of instance keras.Model&#34;)
+    if not isinstance(
+        preproc,
+        (
+            ImagePreprocessor,
+            TextPreprocessor,
+            NERPreprocessor,
+            NodePreprocessor,
+            LinkPreprocessor,
+            TabularPreprocessor,
+        ),
+    ):
+        raise ValueError(&#34;preproc must be instance of ktrain.preprocessor.Preprocessor&#34;)
     if isinstance(preproc, ImagePreprocessor):
         return ImagePredictor(model, preproc, batch_size=batch_size)
     elif isinstance(preproc, TextPreprocessor):
-    #elif type(preproc).__name__ == &#39;TextPreprocessor&#39;:
+        # elif type(preproc).__name__ == &#39;TextPreprocessor&#39;:
         return TextPredictor(model, preproc, batch_size=batch_size)
     elif isinstance(preproc, NERPreprocessor):
         return NERPredictor(model, preproc, batch_size=batch_size)
@@ -423,7 +461,7 @@ Args
         return TabularPredictor(model, preproc, batch_size=batch_size)
 
     else:
-        raise Exception(&#39;preproc of type %s not currently supported&#39; % (type(preproc)))</code></pre>
+        raise Exception(&#34;preproc of type %s not currently supported&#34; % (type(preproc)))</code></pre>
 </details>
 </dd>
 <dt id="ktrain.load_predictor"><code class="name flex">
@@ -439,7 +477,7 @@ Args
   custom_objects(dict): custom objects required to load model.
                         This is useful if you compiled the model with a custom loss function, for example.
                         For models included with ktrain as is, this is populated automatically
-                        and can be disregarded.  
+                        and can be disregarded.
 </code></pre></div>
 <details class="source">
 <summary>
@@ -457,7 +495,7 @@ Args
       custom_objects(dict): custom objects required to load model.
                             This is useful if you compiled the model with a custom loss function, for example.
                             For models included with ktrain as is, this is populated automatically
-                            and can be disregarded.  
+                            and can be disregarded.
     ```
     &#34;&#34;&#34;
 
@@ -465,41 +503,65 @@ Args
     preproc = None
     try:
         preproc_name = os.path.join(fpath, U.PREPROC_NAME)
-        with open(preproc_name, &#39;rb&#39;) as f: preproc = pickle.load(f)
+        with open(preproc_name, &#34;rb&#34;) as f:
+            preproc = pickle.load(f)
     except:
         try:
-            preproc_name = fpath +&#39;.preproc&#39;
-            #warnings.warn(&#39;could not load .preproc file as %s - attempting to load as %s&#39; % (os.path.join(fpath, U.PREPROC_NAME), preproc_name))
-            with open(preproc_name, &#39;rb&#39;) as f: preproc = pickle.load(f)
+            preproc_name = fpath + &#34;.preproc&#34;
+            # warnings.warn(&#39;could not load .preproc file as %s - attempting to load as %s&#39; % (os.path.join(fpath, U.PREPROC_NAME), preproc_name))
+            with open(preproc_name, &#34;rb&#34;) as f:
+                preproc = pickle.load(f)
         except:
-            raise Exception(&#39;Failed to load .preproc file in either the post v0.16.x loction (%s) or pre v0.16.x location (%s)&#39; % (os.path.join(fpath, U.PREPROC_NAME), fpath+&#39;.preproc&#39;))
+            raise Exception(
+                &#34;Failed to load .preproc file in either the post v0.16.x loction (%s) or pre v0.16.x location (%s)&#34;
+                % (os.path.join(fpath, U.PREPROC_NAME), fpath + &#34;.preproc&#34;)
+            )
 
     # load the model
     model = _load_model(fpath, preproc=preproc, custom_objects=custom_objects)
 
-
     # preprocessing functions in ImageDataGenerators are not pickable
     # so, we must reconstruct
-    if hasattr(preproc, &#39;datagen&#39;) and hasattr(preproc.datagen, &#39;ktrain_preproc&#39;):
+    if hasattr(preproc, &#34;datagen&#34;) and hasattr(preproc.datagen, &#34;ktrain_preproc&#34;):
         preproc_name = preproc.datagen.ktrain_preproc
-        if preproc_name == &#39;resnet50&#39;:
-            preproc.datagen.preprocessing_function = keras.applications.resnet50.preprocess_input
-        elif preproc_name == &#39;mobilenet&#39;:
-            preproc.datagen.preprocessing_function = keras.applications.mobilenet.preprocess_input
-        elif preproc_name == &#39;mobilenetv3&#39;:
-            preproc.datagen.preprocessing_function = keras.applications.mobilenet_v3.preprocess_input
-        elif preproc_name == &#39;inception&#39;:
-            preproc.datagen.preprocessing_function = keras.applications.inception_v3.preprocess_input
-        elif preproc_name == &#39;efficientnet&#39;:
-            preproc.datagen.preprocessing_function = keras.applications.efficientnet.preprocess_input
+        if preproc_name == &#34;resnet50&#34;:
+            preproc.datagen.preprocessing_function = (
+                keras.applications.resnet50.preprocess_input
+            )
+        elif preproc_name == &#34;mobilenet&#34;:
+            preproc.datagen.preprocessing_function = (
+                keras.applications.mobilenet.preprocess_input
+            )
+        elif preproc_name == &#34;mobilenetv3&#34;:
+            preproc.datagen.preprocessing_function = (
+                keras.applications.mobilenet_v3.preprocess_input
+            )
+        elif preproc_name == &#34;inception&#34;:
+            preproc.datagen.preprocessing_function = (
+                keras.applications.inception_v3.preprocess_input
+            )
+        elif preproc_name == &#34;efficientnet&#34;:
+            preproc.datagen.preprocessing_function = (
+                keras.applications.efficientnet.preprocess_input
+            )
         else:
-            raise Exception(&#39;Uknown preprocessing_function name: %s&#39; % (preproc_name))
-    
+            raise Exception(&#34;Uknown preprocessing_function name: %s&#34; % (preproc_name))
+
     # return the appropriate predictor
     if not isinstance(model, keras.Model):
-        raise ValueError(&#39;model must be of instance keras.Model&#39;)
-    if not isinstance(preproc, (ImagePreprocessor, TextPreprocessor, NERPreprocessor, NodePreprocessor, LinkPreprocessor, TabularPreprocessor)):
-        raise ValueError(&#39;preproc must be instance of ktrain.preprocessor.Preprocessor&#39;)
+        raise ValueError(&#34;model must be of instance keras.Model&#34;)
+    if not isinstance(
+        preproc,
+        (
+            ImagePreprocessor,
+            TextPreprocessor,
+            NERPreprocessor,
+            NodePreprocessor,
+            LinkPreprocessor,
+            TabularPreprocessor,
+        ),
+    ):
+        raise ValueError(&#34;preproc must be instance of ktrain.preprocessor.Preprocessor&#34;)
     if isinstance(preproc, ImagePreprocessor):
         return ImagePredictor(model, preproc, batch_size=batch_size)
     elif isinstance(preproc, TextPreprocessor):
@@ -513,7 +575,7 @@ Args
     elif isinstance(preproc, TabularPreprocessor):
         return TabularPredictor(model, preproc, batch_size=batch_size)
     else:
-        raise Exception(&#39;preprocessor not currently supported&#39;)</code></pre>
+        raise Exception(&#34;preprocessor not currently supported&#34;)</code></pre>
 </details>
 </dd>
 <dt id="ktrain.release_gpu_memory"><code class="name flex">
@@ -521,7 +583,7 @@ Args
 </code></dt>
 <dd>
 <div class="desc"><pre><code>Relase GPU memory allocated by Tensorflow
-Source: 
+Source:
 https://stackoverflow.com/questions/51005147/keras-release-memory-after-finish-training-process
 </code></pre></div>
 <details class="source">
@@ -532,11 +594,12 @@ https://stackoverflow.com/questions/51005147/keras-release-memory-after-finish-t
     &#34;&#34;&#34;
     ```
     Relase GPU memory allocated by Tensorflow
-    Source: 
+    Source:
     https://stackoverflow.com/questions/51005147/keras-release-memory-after-finish-training-process
     ```
     &#34;&#34;&#34;
     from numba import cuda
+
     K.clear_session()
     cuda.select_device(device)
     cuda.close()

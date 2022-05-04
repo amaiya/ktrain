@@ -83,24 +83,19 @@ class Tagger(object):
 
     def _build_response(self, sent, tags, prob):
         words = self.tokenizer(sent)
-        res = {
-            &#39;words&#39;: words,
-            &#39;entities&#39;: [
-
-            ]
-        }
+        res = {&#34;words&#34;: words, &#34;entities&#34;: []}
         chunks = metrics.get_entities(tags)
 
         for chunk_type, chunk_start, chunk_end in chunks:
             chunk_end += 1
             entity = {
-                &#39;text&#39;: &#39; &#39;.join(words[chunk_start: chunk_end]),
-                &#39;type&#39;: chunk_type,
-                &#39;score&#39;: float(np.average(prob[chunk_start: chunk_end])),
-                &#39;beginOffset&#39;: chunk_start,
-                &#39;endOffset&#39;: chunk_end
+                &#34;text&#34;: &#34; &#34;.join(words[chunk_start:chunk_end]),
+                &#34;type&#34;: chunk_type,
+                &#34;score&#34;: float(np.average(prob[chunk_start:chunk_end])),
+                &#34;beginOffset&#34;: chunk_start,
+                &#34;endOffset&#34;: chunk_end,
             }
-            res[&#39;entities&#39;].append(entity)
+            res[&#34;entities&#34;].append(entity)
 
         return res
 
@@ -245,24 +240,19 @@ class Tagger(object):
 
     def _build_response(self, sent, tags, prob):
         words = self.tokenizer(sent)
-        res = {
-            &#39;words&#39;: words,
-            &#39;entities&#39;: [
-
-            ]
-        }
+        res = {&#34;words&#34;: words, &#34;entities&#34;: []}
         chunks = metrics.get_entities(tags)
 
         for chunk_type, chunk_start, chunk_end in chunks:
             chunk_end += 1
             entity = {
-                &#39;text&#39;: &#39; &#39;.join(words[chunk_start: chunk_end]),
-                &#39;type&#39;: chunk_type,
-                &#39;score&#39;: float(np.average(prob[chunk_start: chunk_end])),
-                &#39;beginOffset&#39;: chunk_start,
-                &#39;endOffset&#39;: chunk_end
+                &#34;text&#34;: &#34; &#34;.join(words[chunk_start:chunk_end]),
+                &#34;type&#34;: chunk_type,
+                &#34;score&#34;: float(np.average(prob[chunk_start:chunk_end])),
+                &#34;beginOffset&#34;: chunk_start,
+                &#34;endOffset&#34;: chunk_end,
             }
-            res[&#39;entities&#39;].append(entity)
+            res[&#34;entities&#34;].append(entity)
 
         return res
 

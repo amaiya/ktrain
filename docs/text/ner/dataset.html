@@ -29,9 +29,8 @@
 <pre><code class="python">from ...imports import *
 from ...dataset import SequenceDataset
 
+
 class NERSequence(SequenceDataset):
-
-
     def __init__(self, x, y, batch_size=1, p=None):
         self.x = x
         self.y = y
@@ -45,16 +44,14 @@ class NERSequence(SequenceDataset):
         self.prepare_called = True
         return
 
-
     def __getitem__(self, idx):
-        batch_x = self.x[idx * self.batch_size: (idx + 1) * self.batch_size]
-        batch_y = self.y[idx * self.batch_size: (idx + 1) * self.batch_size]
+        batch_x = self.x[idx * self.batch_size : (idx + 1) * self.batch_size]
+        batch_y = self.y[idx * self.batch_size : (idx + 1) * self.batch_size]
 
         return self.p.transform(batch_x, batch_y)
 
     def __len__(self):
         return math.ceil(len(self.x) / self.batch_size)
-
 
     def get_lengths(self, idx):
         x_true, y_true = self[idx]
@@ -69,19 +66,16 @@ class NERSequence(SequenceDataset):
         return lengths
 
     def nsamples(self):
-        return len(self.x)   
-
+        return len(self.x)
 
     def get_y(self):
         return self.y
 
-
     def xshape(self):
-        return (len(self.x), self[0][0][0].shape[1]) 
-
+        return (len(self.x), self[0][0][0].shape[1])
 
     def nclasses(self):
-        return len(self.p._label_vocab._id2token) </code></pre>
+        return len(self.p._label_vocab._id2token)</code></pre>
 </details>
 </section>
 <section>
@@ -118,8 +112,6 @@ See ktrain.text.preprocess.TransformerDataset as an example.
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class NERSequence(SequenceDataset):
-
-
     def __init__(self, x, y, batch_size=1, p=None):
         self.x = x
         self.y = y
@@ -133,16 +125,14 @@ See ktrain.text.preprocess.TransformerDataset as an example.
         self.prepare_called = True
         return
 
-
     def __getitem__(self, idx):
-        batch_x = self.x[idx * self.batch_size: (idx + 1) * self.batch_size]
-        batch_y = self.y[idx * self.batch_size: (idx + 1) * self.batch_size]
+        batch_x = self.x[idx * self.batch_size : (idx + 1) * self.batch_size]
+        batch_y = self.y[idx * self.batch_size : (idx + 1) * self.batch_size]
 
         return self.p.transform(batch_x, batch_y)
 
     def __len__(self):
         return math.ceil(len(self.x) / self.batch_size)
-
 
     def get_lengths(self, idx):
         x_true, y_true = self[idx]
@@ -157,19 +147,16 @@ See ktrain.text.preprocess.TransformerDataset as an example.
         return lengths
 
     def nsamples(self):
-        return len(self.x)   
-
+        return len(self.x)
 
     def get_y(self):
         return self.y
 
-
     def xshape(self):
-        return (len(self.x), self[0][0][0].shape[1]) 
-
+        return (len(self.x), self[0][0][0].shape[1])
 
     def nclasses(self):
-        return len(self.p._label_vocab._id2token) </code></pre>
+        return len(self.p._label_vocab._id2token)</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -224,7 +211,7 @@ See ktrain.text.preprocess.TransformerDataset as an example.
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def nsamples(self):
-    return len(self.x)   </code></pre>
+    return len(self.x)</code></pre>
 </details>
 </dd>
 <dt id="ktrain.text.ner.dataset.NERSequence.prepare"><code class="name flex">

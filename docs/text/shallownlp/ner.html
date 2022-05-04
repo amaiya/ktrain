@@ -30,7 +30,7 @@
 
 
 class NER:
-    def __init__(self, lang=&#39;en&#39;, predictor_path=None):
+    def __init__(self, lang=&#34;en&#34;, predictor_path=None):
         &#34;&#34;&#34;
         ```
         pretrained NER.
@@ -41,51 +41,69 @@ class NER:
         ```
         &#34;&#34;&#34;
         if lang is None:
-            raise ValueError(&#39;lang is required (e.g., &#34;en&#34; for English, &#34;zh&#34; for Chinese, &#34;ru&#34; for Russian, etc.&#39;)
-        if predictor_path is None and lang not in [&#39;en&#39;, &#39;zh&#39;, &#39;ru&#39;]:
-            raise ValueError(&#34;Unsupported language: if predictor_path is None,  then lang must be &#34; +\
-                             &#34;&#39;en&#39; for English, &#39;zh&#39; for Chinese, or &#39;ru&#39; for Chinese&#34;)
+            raise ValueError(
+                &#39;lang is required (e.g., &#34;en&#34; for English, &#34;zh&#34; for Chinese, &#34;ru&#34; for Russian, etc.&#39;
+            )
+        if predictor_path is None and lang not in [&#34;en&#34;, &#34;zh&#34;, &#34;ru&#34;]:
+            raise ValueError(
+                &#34;Unsupported language: if predictor_path is None,  then lang must be &#34;
+                + &#34;&#39;en&#39; for English, &#39;zh&#39; for Chinese, or &#39;ru&#39; for Chinese&#34;
+            )
         self.lang = lang
-        if os.environ.get(&#39;DISABLE_V2_BEHAVIOR&#39;, None) != &#39;1&#39;:
-            warnings.warn(&#34;Please add os.environ[&#39;DISABLE_V2_BEHAVIOR&#39;] = &#39;1&#39; at top of your script or notebook&#34;)
-            msg = &#34;\nNER in ktrain uses the CRF module from keras_contrib, which is not yet\n&#34; +\
-                    &#34;fully compatible with TensorFlow 2. To use NER, you must add the following to the top of your\n&#34; +\
-                    &#34;script or notebook BEFORE you import ktrain (after restarting runtime):\n\n&#34; +\
-                  &#34;import os\n&#34; +\
-                  &#34;os.environ[&#39;DISABLE_V2_BEHAVIOR&#39;] = &#39;1&#39;\n&#34;
+        if os.environ.get(&#34;DISABLE_V2_BEHAVIOR&#34;, None) != &#34;1&#34;:
+            warnings.warn(
+                &#34;Please add os.environ[&#39;DISABLE_V2_BEHAVIOR&#39;] = &#39;1&#39; at top of your script or notebook&#34;
+            )
+            msg = (
+                &#34;\nNER in ktrain uses the CRF module from keras_contrib, which is not yet\n&#34;
+                + &#34;fully compatible with TensorFlow 2. To use NER, you must add the following to the top of your\n&#34;
+                + &#34;script or notebook BEFORE you import ktrain (after restarting runtime):\n\n&#34;
+                + &#34;import os\n&#34;
+                + &#34;os.environ[&#39;DISABLE_V2_BEHAVIOR&#39;] = &#39;1&#39;\n&#34;
+            )
             print(msg)
             return
         else:
             import tensorflow.compat.v1 as tf
+
             tf.disable_v2_behavior()
 
-        if predictor_path is None and self.lang == &#39;zh&#39;:
+        if predictor_path is None and self.lang == &#34;zh&#34;:
             dirpath = os.path.dirname(os.path.abspath(__file__))
-            fpath = os.path.join(dirpath, &#39;ner_models/ner_chinese&#39;)
-        elif predictor_path is None and self.lang == &#39;ru&#39;:
+            fpath = os.path.join(dirpath, &#34;ner_models/ner_chinese&#34;)
+        elif predictor_path is None and self.lang == &#34;ru&#34;:
             dirpath = os.path.dirname(os.path.abspath(__file__))
-            fpath = os.path.join(dirpath, &#39;ner_models/ner_russian&#39;)
-        elif predictor_path is None and self.lang==&#39;en&#39;:
+            fpath = os.path.join(dirpath, &#34;ner_models/ner_russian&#34;)
+        elif predictor_path is None and self.lang == &#34;en&#34;:
             dirpath = os.path.dirname(os.path.abspath(__file__))
-            fpath = os.path.join(dirpath, &#39;ner_models/ner_english&#39;)
+            fpath = os.path.join(dirpath, &#34;ner_models/ner_english&#34;)
         elif predictor_path is None:
-            raise ValueError(&#34;Unsupported language: if predictor_path is None,  then lang must be &#34; +\
-                             &#34;&#39;en&#39; for English, &#39;zh&#39; for Chinese, or &#39;ru&#39; for Chinese&#34;)
+            raise ValueError(
+                &#34;Unsupported language: if predictor_path is None,  then lang must be &#34;
+                + &#34;&#39;en&#39; for English, &#39;zh&#39; for Chinese, or &#39;ru&#39; for Chinese&#34;
+            )
         else:
-            if not os.path.isfile(predictor_path) or not os.path.isfile(predictor_path +&#39;.preproc&#39;):
-                raise ValueError(&#39;could not find a valid predictor model &#39;+\
-                                 &#39;%s or valid Preprocessor %s at specified path&#39; % (predictor_path, predictor_path+&#39;.preproc&#39;))
+            if not os.path.isfile(predictor_path) or not os.path.isfile(
+                predictor_path + &#34;.preproc&#34;
+            ):
+                raise ValueError(
+                    &#34;could not find a valid predictor model &#34;
+                    + &#34;%s or valid Preprocessor %s at specified path&#34;
+                    % (predictor_path, predictor_path + &#34;.preproc&#34;)
+                )
             fpath = predictor_path
         try:
-           import io
-           from contextlib import redirect_stdout
-           f = io.StringIO()
-           with redirect_stdout(f):
-               import ktrain
-        except:
-           raise ValueError(&#39;ktrain could not be imported. Install with: pip install ktrain&#39;)
-        self.predictor = ktrain.load_predictor(fpath)
+            import io
+            from contextlib import redirect_stdout
 
+            f = io.StringIO()
+            with redirect_stdout(f):
+                import ktrain
+        except:
+            raise ValueError(
+                &#34;ktrain could not be imported. Install with: pip install ktrain&#34;
+            )
+        self.predictor = ktrain.load_predictor(fpath)
 
     def predict(self, texts, merge_tokens=True, batch_size=32):
         &#34;&#34;&#34;
@@ -100,16 +118,17 @@ class NER:
           batch_size(int):    Batch size to use for predictions (default:32)
         ```
         &#34;&#34;&#34;
-        if isinstance(texts, str): texts = [texts]
+        if isinstance(texts, str):
+            texts = [texts]
         self.predictor.batch_size = batch_size
         texts = [t.strip() for t in texts]
         results = self.predictor.predict(texts, merge_tokens=merge_tokens)
-        if len(results) == 1: results = results[0]
+        if len(results) == 1:
+            results = results[0]
         return results
 
-
     # 2020-04-30: moved to text.ner.predictor
-    #def merge_tokens(self, annotated_sentence):
+    # def merge_tokens(self, annotated_sentence):
     #    if self.lang.startswith(&#39;zh&#39;):
     #        sep = &#39;&#39;
     #    else:
@@ -145,7 +164,7 @@ class NER:
     #        elif tag and current_token:  #  prefix I
     #            current_token = current_token + sep + token
     #            current_tag = tag
-    #    return entities  </code></pre>
+    #    return entities</code></pre>
 </details>
 </section>
 <section>
@@ -173,7 +192,7 @@ Args:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class NER:
-    def __init__(self, lang=&#39;en&#39;, predictor_path=None):
+    def __init__(self, lang=&#34;en&#34;, predictor_path=None):
         &#34;&#34;&#34;
         ```
         pretrained NER.
@@ -184,51 +203,69 @@ Args:
         ```
         &#34;&#34;&#34;
         if lang is None:
-            raise ValueError(&#39;lang is required (e.g., &#34;en&#34; for English, &#34;zh&#34; for Chinese, &#34;ru&#34; for Russian, etc.&#39;)
-        if predictor_path is None and lang not in [&#39;en&#39;, &#39;zh&#39;, &#39;ru&#39;]:
-            raise ValueError(&#34;Unsupported language: if predictor_path is None,  then lang must be &#34; +\
-                             &#34;&#39;en&#39; for English, &#39;zh&#39; for Chinese, or &#39;ru&#39; for Chinese&#34;)
+            raise ValueError(
+                &#39;lang is required (e.g., &#34;en&#34; for English, &#34;zh&#34; for Chinese, &#34;ru&#34; for Russian, etc.&#39;
+            )
+        if predictor_path is None and lang not in [&#34;en&#34;, &#34;zh&#34;, &#34;ru&#34;]:
+            raise ValueError(
+                &#34;Unsupported language: if predictor_path is None,  then lang must be &#34;
+                + &#34;&#39;en&#39; for English, &#39;zh&#39; for Chinese, or &#39;ru&#39; for Chinese&#34;
+            )
         self.lang = lang
-        if os.environ.get(&#39;DISABLE_V2_BEHAVIOR&#39;, None) != &#39;1&#39;:
-            warnings.warn(&#34;Please add os.environ[&#39;DISABLE_V2_BEHAVIOR&#39;] = &#39;1&#39; at top of your script or notebook&#34;)
-            msg = &#34;\nNER in ktrain uses the CRF module from keras_contrib, which is not yet\n&#34; +\
-                    &#34;fully compatible with TensorFlow 2. To use NER, you must add the following to the top of your\n&#34; +\
-                    &#34;script or notebook BEFORE you import ktrain (after restarting runtime):\n\n&#34; +\
-                  &#34;import os\n&#34; +\
-                  &#34;os.environ[&#39;DISABLE_V2_BEHAVIOR&#39;] = &#39;1&#39;\n&#34;
+        if os.environ.get(&#34;DISABLE_V2_BEHAVIOR&#34;, None) != &#34;1&#34;:
+            warnings.warn(
+                &#34;Please add os.environ[&#39;DISABLE_V2_BEHAVIOR&#39;] = &#39;1&#39; at top of your script or notebook&#34;
+            )
+            msg = (
+                &#34;\nNER in ktrain uses the CRF module from keras_contrib, which is not yet\n&#34;
+                + &#34;fully compatible with TensorFlow 2. To use NER, you must add the following to the top of your\n&#34;
+                + &#34;script or notebook BEFORE you import ktrain (after restarting runtime):\n\n&#34;
+                + &#34;import os\n&#34;
+                + &#34;os.environ[&#39;DISABLE_V2_BEHAVIOR&#39;] = &#39;1&#39;\n&#34;
+            )
             print(msg)
             return
         else:
             import tensorflow.compat.v1 as tf
+
             tf.disable_v2_behavior()
 
-        if predictor_path is None and self.lang == &#39;zh&#39;:
+        if predictor_path is None and self.lang == &#34;zh&#34;:
             dirpath = os.path.dirname(os.path.abspath(__file__))
-            fpath = os.path.join(dirpath, &#39;ner_models/ner_chinese&#39;)
-        elif predictor_path is None and self.lang == &#39;ru&#39;:
+            fpath = os.path.join(dirpath, &#34;ner_models/ner_chinese&#34;)
+        elif predictor_path is None and self.lang == &#34;ru&#34;:
             dirpath = os.path.dirname(os.path.abspath(__file__))
-            fpath = os.path.join(dirpath, &#39;ner_models/ner_russian&#39;)
-        elif predictor_path is None and self.lang==&#39;en&#39;:
+            fpath = os.path.join(dirpath, &#34;ner_models/ner_russian&#34;)
+        elif predictor_path is None and self.lang == &#34;en&#34;:
             dirpath = os.path.dirname(os.path.abspath(__file__))
-            fpath = os.path.join(dirpath, &#39;ner_models/ner_english&#39;)
+            fpath = os.path.join(dirpath, &#34;ner_models/ner_english&#34;)
         elif predictor_path is None:
-            raise ValueError(&#34;Unsupported language: if predictor_path is None,  then lang must be &#34; +\
-                             &#34;&#39;en&#39; for English, &#39;zh&#39; for Chinese, or &#39;ru&#39; for Chinese&#34;)
+            raise ValueError(
+                &#34;Unsupported language: if predictor_path is None,  then lang must be &#34;
+                + &#34;&#39;en&#39; for English, &#39;zh&#39; for Chinese, or &#39;ru&#39; for Chinese&#34;
+            )
         else:
-            if not os.path.isfile(predictor_path) or not os.path.isfile(predictor_path +&#39;.preproc&#39;):
-                raise ValueError(&#39;could not find a valid predictor model &#39;+\
-                                 &#39;%s or valid Preprocessor %s at specified path&#39; % (predictor_path, predictor_path+&#39;.preproc&#39;))
+            if not os.path.isfile(predictor_path) or not os.path.isfile(
+                predictor_path + &#34;.preproc&#34;
+            ):
+                raise ValueError(
+                    &#34;could not find a valid predictor model &#34;
+                    + &#34;%s or valid Preprocessor %s at specified path&#34;
+                    % (predictor_path, predictor_path + &#34;.preproc&#34;)
+                )
             fpath = predictor_path
         try:
-           import io
-           from contextlib import redirect_stdout
-           f = io.StringIO()
-           with redirect_stdout(f):
-               import ktrain
-        except:
-           raise ValueError(&#39;ktrain could not be imported. Install with: pip install ktrain&#39;)
-        self.predictor = ktrain.load_predictor(fpath)
+            import io
+            from contextlib import redirect_stdout
 
+            f = io.StringIO()
+            with redirect_stdout(f):
+                import ktrain
+        except:
+            raise ValueError(
+                &#34;ktrain could not be imported. Install with: pip install ktrain&#34;
+            )
+        self.predictor = ktrain.load_predictor(fpath)
 
     def predict(self, texts, merge_tokens=True, batch_size=32):
         &#34;&#34;&#34;
@@ -243,11 +280,13 @@ Args:
           batch_size(int):    Batch size to use for predictions (default:32)
         ```
         &#34;&#34;&#34;
-        if isinstance(texts, str): texts = [texts]
+        if isinstance(texts, str):
+            texts = [texts]
         self.predictor.batch_size = batch_size
         texts = [t.strip() for t in texts]
         results = self.predictor.predict(texts, merge_tokens=merge_tokens)
-        if len(results) == 1: results = results[0]
+        if len(results) == 1:
+            results = results[0]
         return results</code></pre>
 </details>
 <h3>Methods</h3>
@@ -282,11 +321,13 @@ Args:
       batch_size(int):    Batch size to use for predictions (default:32)
     ```
     &#34;&#34;&#34;
-    if isinstance(texts, str): texts = [texts]
+    if isinstance(texts, str):
+        texts = [texts]
     self.predictor.batch_size = batch_size
     texts = [t.strip() for t in texts]
     results = self.predictor.predict(texts, merge_tokens=merge_tokens)
-    if len(results) == 1: results = results[0]
+    if len(results) == 1:
+        results = results[0]
     return results</code></pre>
 </details>
 </dd>

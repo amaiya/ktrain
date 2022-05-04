@@ -30,29 +30,23 @@
 from .. import utils as U
 
 
+GRAPHSAGE = &#34;graphsage&#34;
+NODE_CLASSIFIERS = {GRAPHSAGE: &#34;GraphSAGE:  https://arxiv.org/pdf/1706.02216.pdf&#34;}
 
-
-
-
-
-GRAPHSAGE = &#39;graphsage&#39;
-NODE_CLASSIFIERS = {
-        GRAPHSAGE: &#39;GraphSAGE:  https://arxiv.org/pdf/1706.02216.pdf&#39;}
-
-LINK_PREDICTORS = {
-        GRAPHSAGE: &#39;GraphSAGE:  https://arxiv.org/pdf/1706.02216.pdf&#39;}
+LINK_PREDICTORS = {GRAPHSAGE: &#34;GraphSAGE:  https://arxiv.org/pdf/1706.02216.pdf&#34;}
 
 
 def print_node_classifiers():
-    for k,v in NODE_CLASSIFIERS.items():
-        print(&#34;%s: %s&#34; % (k,v))
+    for k, v in NODE_CLASSIFIERS.items():
+        print(&#34;%s: %s&#34; % (k, v))
+
 
 def print_link_predictors():
-    for k,v in LINK_PREDICTORS.items():
-        print(&#34;%s: %s&#34; % (k,v))
+    for k, v in LINK_PREDICTORS.items():
+        print(&#34;%s: %s&#34; % (k, v))
 
 
-def graph_node_classifier(name, train_data, layer_sizes=[32,32], verbose=1):
+def graph_node_classifier(name, train_data, layer_sizes=[32, 32], verbose=1):
     &#34;&#34;&#34;
     ```
     Build and return a neural node classification model.
@@ -60,7 +54,7 @@ def graph_node_classifier(name, train_data, layer_sizes=[32,32], verbose=1):
 
     Args:
         name (string): one of:
-                      - &#39;graphsage&#39; for GraphSAGE model 
+                      - &#39;graphsage&#39; for GraphSAGE model
                       (only GraphSAGE currently supported)
 
         train_data (NodeSequenceWrapper): a ktrain.graph.sg_wrappers.NodeSequenceWrapper object
@@ -73,24 +67,26 @@ def graph_node_classifier(name, train_data, layer_sizes=[32,32], verbose=1):
 
     # check argument
     if not isinstance(train_data, NodeSequenceWrapper):
-        err =&#34;&#34;&#34;
+        err = &#34;&#34;&#34;
             train_data must be a ktrain.graph.sg_wrappers.NodeSequenceWrapper object
             &#34;&#34;&#34;
         raise Exception(err)
     if len(layer_sizes) != 2:
-        raise ValueError(&#39;layer_sizes must be of length 2&#39;)
+        raise ValueError(&#34;layer_sizes must be of length 2&#34;)
 
     num_classes = U.nclasses_from_data(train_data)
 
     # determine multilabel
     multilabel = U.is_multilabel(train_data)
     if multilabel:
-        raise ValueError(&#39;Multi-label classification not currently supported for graphs.&#39;)
+        raise ValueError(
+            &#34;Multi-label classification not currently supported for graphs.&#34;
+        )
     U.vprint(&#34;Is Multi-Label? %s&#34; % (multilabel), verbose=verbose)
 
     # set loss and activations
-    loss_func = &#39;categorical_crossentropy&#39;
-    activation = &#39;softmax&#39;
+    loss_func = &#34;categorical_crossentropy&#34;
+    activation = &#34;softmax&#34;
 
     # import stellargraph
     try:
@@ -98,12 +94,8 @@ def graph_node_classifier(name, train_data, layer_sizes=[32,32], verbose=1):
         from stellargraph.layer import GraphSAGE
     except:
         raise Exception(SG_ERRMSG)
-    if version.parse(sg.__version__) &lt; version.parse(&#39;0.8&#39;):
+    if version.parse(sg.__version__) &lt; version.parse(&#34;0.8&#34;):
         raise Exception(SG_ERRMSG)
-
-
-
-
 
     # build a GraphSAGE node classification model
     graphsage_model = GraphSAGE(
@@ -111,27 +103,24 @@ def graph_node_classifier(name, train_data, layer_sizes=[32,32], verbose=1):
         generator=train_data,
         bias=True,
         dropout=0.5,
-        )
-    #x_inp, x_out = graphsage_model.default_model(flatten_output=True)
+    )
+    # x_inp, x_out = graphsage_model.default_model(flatten_output=True)
     x_inp, x_out = graphsage_model.build()
     prediction = keras.layers.Dense(units=num_classes, activation=activation)(x_out)
     model = keras.Model(inputs=x_inp, outputs=prediction)
-    model.compile(optimizer=&#39;adam&#39;,
-                  loss=loss_func,
-                  metrics=[&#34;accuracy&#34;])
-    U.vprint(&#39;done&#39;, verbose=verbose)
+    model.compile(optimizer=&#34;adam&#34;, loss=loss_func, metrics=[&#34;accuracy&#34;])
+    U.vprint(&#34;done&#34;, verbose=verbose)
     return model
 
 
-
-def graph_link_predictor(name, train_data, preproc, layer_sizes=[20,20], verbose=1):
+def graph_link_predictor(name, train_data, preproc, layer_sizes=[20, 20], verbose=1):
     &#34;&#34;&#34;
     ```
     Build and return a neural link prediction model.
 
     Args:
         name (string): one of:
-                      - &#39;graphsage&#39; for GraphSAGE model 
+                      - &#39;graphsage&#39; for GraphSAGE model
                       (only GraphSAGE currently supported)
 
         train_data (LinkSequenceWrapper): a ktrain.graph.sg_wrappers.LinkSequenceWrapper object
@@ -145,19 +134,18 @@ def graph_link_predictor(name, train_data, preproc, layer_sizes=[20,20], verbose
 
     # check argument
     if not isinstance(train_data, LinkSequenceWrapper):
-        err =&#34;&#34;&#34;
+        err = &#34;&#34;&#34;
             train_data must be a ktrain.graph.sg_wrappers.LinkSequenceWrapper object
             &#34;&#34;&#34;
         raise Exception(err)
     if len(layer_sizes) != len(preproc.sample_sizes):
-        raise ValueError(&#39;number of layer_sizes must match len(preproc.sample_sizes)&#39;)
+        raise ValueError(&#34;number of layer_sizes must match len(preproc.sample_sizes)&#34;)
 
     num_classes = U.nclasses_from_data(train_data)
 
-
     # set loss and activations
-    loss_func = &#39;categorical_crossentropy&#39;
-    activation = &#39;softmax&#39;
+    loss_func = &#34;categorical_crossentropy&#34;
+    activation = &#34;softmax&#34;
 
     # import stellargraph
     try:
@@ -165,17 +153,21 @@ def graph_link_predictor(name, train_data, preproc, layer_sizes=[20,20], verbose
         from stellargraph.layer import GraphSAGE, link_classification
     except:
         raise Exception(SG_ERRMSG)
-    if version.parse(sg.__version__) &lt; version.parse(&#39;0.8&#39;):
+    if version.parse(sg.__version__) &lt; version.parse(&#34;0.8&#34;):
         raise Exception(SG_ERRMSG)
 
-
-
     # build a GraphSAGE link prediction model
-    graphsage = GraphSAGE(layer_sizes=layer_sizes, generator=train_data, bias=True, dropout=0.3) 
+    graphsage = GraphSAGE(
+        layer_sizes=layer_sizes, generator=train_data, bias=True, dropout=0.3
+    )
     x_inp, x_out = graphsage.build()
-    prediction = link_classification( output_dim=1, output_act=&#34;relu&#34;, edge_embedding_method=&#39;ip&#39;)(x_out)
+    prediction = link_classification(
+        output_dim=1, output_act=&#34;relu&#34;, edge_embedding_method=&#34;ip&#34;
+    )(x_out)
     model = keras.Model(inputs=x_inp, outputs=prediction)
-    model.compile( optimizer=U.DEFAULT_OPT, loss=&#39;binary_crossentropy&#39;, metrics=[&#34;accuracy&#34;])
+    model.compile(
+        optimizer=U.DEFAULT_OPT, loss=&#34;binary_crossentropy&#34;, metrics=[&#34;accuracy&#34;]
+    )
     return model</code></pre>
 </details>
 </section>
@@ -194,7 +186,7 @@ def graph_link_predictor(name, train_data, preproc, layer_sizes=[20,20], verbose
 
 Args:
     name (string): one of:
-                  - 'graphsage' for GraphSAGE model 
+                  - 'graphsage' for GraphSAGE model
                   (only GraphSAGE currently supported)
 
     train_data (LinkSequenceWrapper): a ktrain.graph.sg_wrappers.LinkSequenceWrapper object
@@ -207,14 +199,14 @@ Return:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def graph_link_predictor(name, train_data, preproc, layer_sizes=[20,20], verbose=1):
+<pre><code class="python">def graph_link_predictor(name, train_data, preproc, layer_sizes=[20, 20], verbose=1):
     &#34;&#34;&#34;
     ```
     Build and return a neural link prediction model.
 
     Args:
         name (string): one of:
-                      - &#39;graphsage&#39; for GraphSAGE model 
+                      - &#39;graphsage&#39; for GraphSAGE model
                       (only GraphSAGE currently supported)
 
         train_data (LinkSequenceWrapper): a ktrain.graph.sg_wrappers.LinkSequenceWrapper object
@@ -228,19 +220,18 @@ Return:
 
     # check argument
     if not isinstance(train_data, LinkSequenceWrapper):
-        err =&#34;&#34;&#34;
+        err = &#34;&#34;&#34;
             train_data must be a ktrain.graph.sg_wrappers.LinkSequenceWrapper object
             &#34;&#34;&#34;
         raise Exception(err)
     if len(layer_sizes) != len(preproc.sample_sizes):
-        raise ValueError(&#39;number of layer_sizes must match len(preproc.sample_sizes)&#39;)
+        raise ValueError(&#34;number of layer_sizes must match len(preproc.sample_sizes)&#34;)
 
     num_classes = U.nclasses_from_data(train_data)
 
-
     # set loss and activations
-    loss_func = &#39;categorical_crossentropy&#39;
-    activation = &#39;softmax&#39;
+    loss_func = &#34;categorical_crossentropy&#34;
+    activation = &#34;softmax&#34;
 
     # import stellargraph
     try:
@@ -248,17 +239,21 @@ Return:
         from stellargraph.layer import GraphSAGE, link_classification
     except:
         raise Exception(SG_ERRMSG)
-    if version.parse(sg.__version__) &lt; version.parse(&#39;0.8&#39;):
+    if version.parse(sg.__version__) &lt; version.parse(&#34;0.8&#34;):
         raise Exception(SG_ERRMSG)
 
-
-
     # build a GraphSAGE link prediction model
-    graphsage = GraphSAGE(layer_sizes=layer_sizes, generator=train_data, bias=True, dropout=0.3) 
+    graphsage = GraphSAGE(
+        layer_sizes=layer_sizes, generator=train_data, bias=True, dropout=0.3
+    )
     x_inp, x_out = graphsage.build()
-    prediction = link_classification( output_dim=1, output_act=&#34;relu&#34;, edge_embedding_method=&#39;ip&#39;)(x_out)
+    prediction = link_classification(
+        output_dim=1, output_act=&#34;relu&#34;, edge_embedding_method=&#34;ip&#34;
+    )(x_out)
     model = keras.Model(inputs=x_inp, outputs=prediction)
-    model.compile( optimizer=U.DEFAULT_OPT, loss=&#39;binary_crossentropy&#39;, metrics=[&#34;accuracy&#34;])
+    model.compile(
+        optimizer=U.DEFAULT_OPT, loss=&#34;binary_crossentropy&#34;, metrics=[&#34;accuracy&#34;]
+    )
     return model</code></pre>
 </details>
 </dd>
@@ -271,7 +266,7 @@ Notes: Only mutually-exclusive class labels are supported.
 
 Args:
     name (string): one of:
-                  - 'graphsage' for GraphSAGE model 
+                  - 'graphsage' for GraphSAGE model
                   (only GraphSAGE currently supported)
 
     train_data (NodeSequenceWrapper): a ktrain.graph.sg_wrappers.NodeSequenceWrapper object
@@ -283,7 +278,7 @@ Return:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def graph_node_classifier(name, train_data, layer_sizes=[32,32], verbose=1):
+<pre><code class="python">def graph_node_classifier(name, train_data, layer_sizes=[32, 32], verbose=1):
     &#34;&#34;&#34;
     ```
     Build and return a neural node classification model.
@@ -291,7 +286,7 @@ Return:
 
     Args:
         name (string): one of:
-                      - &#39;graphsage&#39; for GraphSAGE model 
+                      - &#39;graphsage&#39; for GraphSAGE model
                       (only GraphSAGE currently supported)
 
         train_data (NodeSequenceWrapper): a ktrain.graph.sg_wrappers.NodeSequenceWrapper object
@@ -304,24 +299,26 @@ Return:
 
     # check argument
     if not isinstance(train_data, NodeSequenceWrapper):
-        err =&#34;&#34;&#34;
+        err = &#34;&#34;&#34;
             train_data must be a ktrain.graph.sg_wrappers.NodeSequenceWrapper object
             &#34;&#34;&#34;
         raise Exception(err)
     if len(layer_sizes) != 2:
-        raise ValueError(&#39;layer_sizes must be of length 2&#39;)
+        raise ValueError(&#34;layer_sizes must be of length 2&#34;)
 
     num_classes = U.nclasses_from_data(train_data)
 
     # determine multilabel
     multilabel = U.is_multilabel(train_data)
     if multilabel:
-        raise ValueError(&#39;Multi-label classification not currently supported for graphs.&#39;)
+        raise ValueError(
+            &#34;Multi-label classification not currently supported for graphs.&#34;
+        )
     U.vprint(&#34;Is Multi-Label? %s&#34; % (multilabel), verbose=verbose)
 
     # set loss and activations
-    loss_func = &#39;categorical_crossentropy&#39;
-    activation = &#39;softmax&#39;
+    loss_func = &#34;categorical_crossentropy&#34;
+    activation = &#34;softmax&#34;
 
     # import stellargraph
     try:
@@ -329,12 +326,8 @@ Return:
         from stellargraph.layer import GraphSAGE
     except:
         raise Exception(SG_ERRMSG)
-    if version.parse(sg.__version__) &lt; version.parse(&#39;0.8&#39;):
+    if version.parse(sg.__version__) &lt; version.parse(&#34;0.8&#34;):
         raise Exception(SG_ERRMSG)
-
-
-
-
 
     # build a GraphSAGE node classification model
     graphsage_model = GraphSAGE(
@@ -342,15 +335,13 @@ Return:
         generator=train_data,
         bias=True,
         dropout=0.5,
-        )
-    #x_inp, x_out = graphsage_model.default_model(flatten_output=True)
+    )
+    # x_inp, x_out = graphsage_model.default_model(flatten_output=True)
     x_inp, x_out = graphsage_model.build()
     prediction = keras.layers.Dense(units=num_classes, activation=activation)(x_out)
     model = keras.Model(inputs=x_inp, outputs=prediction)
-    model.compile(optimizer=&#39;adam&#39;,
-                  loss=loss_func,
-                  metrics=[&#34;accuracy&#34;])
-    U.vprint(&#39;done&#39;, verbose=verbose)
+    model.compile(optimizer=&#34;adam&#34;, loss=loss_func, metrics=[&#34;accuracy&#34;])
+    U.vprint(&#34;done&#34;, verbose=verbose)
     return model</code></pre>
 </details>
 </dd>
@@ -364,8 +355,8 @@ Return:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def print_link_predictors():
-    for k,v in LINK_PREDICTORS.items():
-        print(&#34;%s: %s&#34; % (k,v))</code></pre>
+    for k, v in LINK_PREDICTORS.items():
+        print(&#34;%s: %s&#34; % (k, v))</code></pre>
 </details>
 </dd>
 <dt id="ktrain.graph.models.print_node_classifiers"><code class="name flex">
@@ -378,8 +369,8 @@ Return:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def print_node_classifiers():
-    for k,v in NODE_CLASSIFIERS.items():
-        print(&#34;%s: %s&#34; % (k,v))</code></pre>
+    for k, v in NODE_CLASSIFIERS.items():
+        print(&#34;%s: %s&#34; % (k, v))</code></pre>
 </details>
 </dd>
 </dl>

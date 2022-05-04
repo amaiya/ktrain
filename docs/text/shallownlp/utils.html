@@ -50,11 +50,12 @@ def detect_lang(texts, sample_size=32):
     detect language
     &#34;&#34;&#34;
     if not LANGDETECT:
-        raise ValueError(&#39;langdetect is missing - install with pip install langdetect&#39;)
+        raise ValueError(&#34;langdetect is missing - install with pip install langdetect&#34;)
 
-    if isinstance(texts, str): texts = [texts]
+    if isinstance(texts, str):
+        texts = [texts]
     if not isinstance(texts, (list, np.ndarray)):
-        raise ValueError(&#39;texts must be a list or NumPy array of strings&#39;)
+        raise ValueError(&#34;texts must be a list or NumPy array of strings&#34;)
     lst = []
     for doc in texts[:sample_size]:
         try:
@@ -62,7 +63,9 @@ def detect_lang(texts, sample_size=32):
         except:
             continue
     if len(lst) == 0:
-        raise Exception(&#39;could not detect language in random sample of %s docs.&#39;  % (sample_size))
+        raise Exception(
+            &#34;could not detect language in random sample of %s docs.&#34; % (sample_size)
+        )
     return max(set(lst), key=lst.count)
 
 
@@ -70,14 +73,14 @@ def is_chinese(lang):
     &#34;&#34;&#34;
     include additional languages due to mistakes on short texts by langdetect
     &#34;&#34;&#34;
-    return lang is not None and lang.startswith(&#39;zh-&#39;) or lang in [&#39;ja&#39;, &#39;ko&#39;]
-
+    return lang is not None and lang.startswith(&#34;zh-&#34;) or lang in [&#34;ja&#34;, &#34;ko&#34;]
 
 
 def split_chinese(texts):
     if not JIEBA:
-        raise ValueError(&#39;jieba is missing - install with pip install jieba&#39;)
-    if isinstance(texts, str): texts=[texts]
+        raise ValueError(&#34;jieba is missing - install with pip install jieba&#34;)
+    if isinstance(texts, str):
+        texts = [texts]
 
     split_texts = []
     for doc in texts:
@@ -87,53 +90,57 @@ def split_chinese(texts):
     return [&#34; &#34;.join(tokens) for tokens in split_texts]
 
 
-def decode_by_line(texts, encoding=&#39;utf-8&#39;, verbose=1):
+def decode_by_line(texts, encoding=&#34;utf-8&#34;, verbose=1):
     &#34;&#34;&#34;
     Decode text line by line and skip over errors.
     &#34;&#34;&#34;
-    if isinstance(texts, str): texts = [texts]
+    if isinstance(texts, str):
+        texts = [texts]
     new_texts = []
-    skips=0
+    skips = 0
     num_lines = 0
     for doc in texts:
         text = &#34;&#34;
         for line in doc.splitlines():
-            num_lines +=1
+            num_lines += 1
             try:
                 line = line.decode(encoding)
             except:
-                skips +=1
+                skips += 1
                 continue
             text += line
         new_texts.append(text)
-    pct = round((skips*1./num_lines) * 100, 1)
+    pct = round((skips * 1.0 / num_lines) * 100, 1)
     if verbose:
-        print(&#39;skipped %s lines (%s%%) due to character decoding errors&#39; % (skips, pct))
+        print(&#34;skipped %s lines (%s%%) due to character decoding errors&#34; % (skips, pct))
         if pct &gt; 10:
-            print(&#39;If this is too many, try a different encoding&#39;)
+            print(&#34;If this is too many, try a different encoding&#34;)
     return new_texts
 
 
 def detect_encoding(texts, sample_size=32):
     if not CHARDET:
-        raise ValueError(&#39;cchardet is missing - install with pip install cchardet&#39;)
-    if isinstance(texts, str): texts = [texts]
-    lst = [chardet.detect(doc)[&#39;encoding&#39;] for doc in texts[:sample_size]]
+        raise ValueError(&#34;cchardet is missing - install with pip install cchardet&#34;)
+    if isinstance(texts, str):
+        texts = [texts]
+    lst = [chardet.detect(doc)[&#34;encoding&#34;] for doc in texts[:sample_size]]
     encoding = max(set(lst), key=lst.count)
-    encoding = &#39;utf-8&#39; if encoding.lower() in [&#39;ascii&#39;, &#39;utf8&#39;, &#39;utf-8&#39;] else encoding
+    encoding = &#34;utf-8&#34; if encoding.lower() in [&#34;ascii&#34;, &#34;utf8&#34;, &#34;utf-8&#34;] else encoding
     return encoding
 
 
 def read_text(filename):
-    with open(filename, &#39;rb&#39;) as f:
+    with open(filename, &#34;rb&#34;) as f:
         text = f.read()
     encoding = detect_encoding([text])
     try:
-        decoded_text = text.decode(encoding) 
+        decoded_text = text.decode(encoding)
     except:
-        U.vprint(&#39;Decoding with %s failed 1st attempt - using %s with skips&#39; % (encoding,
-                                                                                encoding),
-                                                                                verbose=verbose)
+        U.vprint(
+            &#34;Decoding with %s failed 1st attempt - using %s with skips&#34;
+            % (encoding, encoding),
+            verbose=verbose,
+        )
         decoded_text = decode_by_line(text, encoding=encoding)
     return decoded_text.strip()
 
@@ -145,7 +152,7 @@ def sent_tokenize(text):
     lang = detect_lang(text)
     sents = []
     if is_chinese(lang):
-        for sent in re.findall(u&#39;[^!?。\.\!\?]+[!?。\.\!\?]?&#39;, text, flags=re.U):
+        for sent in re.findall(&#34;[^!?。\.\!\?]+[!?。\.\!\?]?&#34;, text, flags=re.U):
             sents.append(sent)
     else:
         for paragraph in segmenter.process(text):
@@ -170,30 +177,31 @@ def sent_tokenize(text):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def decode_by_line(texts, encoding=&#39;utf-8&#39;, verbose=1):
+<pre><code class="python">def decode_by_line(texts, encoding=&#34;utf-8&#34;, verbose=1):
     &#34;&#34;&#34;
     Decode text line by line and skip over errors.
     &#34;&#34;&#34;
-    if isinstance(texts, str): texts = [texts]
+    if isinstance(texts, str):
+        texts = [texts]
     new_texts = []
-    skips=0
+    skips = 0
     num_lines = 0
     for doc in texts:
         text = &#34;&#34;
         for line in doc.splitlines():
-            num_lines +=1
+            num_lines += 1
             try:
                 line = line.decode(encoding)
             except:
-                skips +=1
+                skips += 1
                 continue
             text += line
         new_texts.append(text)
-    pct = round((skips*1./num_lines) * 100, 1)
+    pct = round((skips * 1.0 / num_lines) * 100, 1)
     if verbose:
-        print(&#39;skipped %s lines (%s%%) due to character decoding errors&#39; % (skips, pct))
+        print(&#34;skipped %s lines (%s%%) due to character decoding errors&#34; % (skips, pct))
         if pct &gt; 10:
-            print(&#39;If this is too many, try a different encoding&#39;)
+            print(&#34;If this is too many, try a different encoding&#34;)
     return new_texts</code></pre>
 </details>
 </dd>
@@ -208,11 +216,12 @@ def sent_tokenize(text):
 </summary>
 <pre><code class="python">def detect_encoding(texts, sample_size=32):
     if not CHARDET:
-        raise ValueError(&#39;cchardet is missing - install with pip install cchardet&#39;)
-    if isinstance(texts, str): texts = [texts]
-    lst = [chardet.detect(doc)[&#39;encoding&#39;] for doc in texts[:sample_size]]
+        raise ValueError(&#34;cchardet is missing - install with pip install cchardet&#34;)
+    if isinstance(texts, str):
+        texts = [texts]
+    lst = [chardet.detect(doc)[&#34;encoding&#34;] for doc in texts[:sample_size]]
     encoding = max(set(lst), key=lst.count)
-    encoding = &#39;utf-8&#39; if encoding.lower() in [&#39;ascii&#39;, &#39;utf8&#39;, &#39;utf-8&#39;] else encoding
+    encoding = &#34;utf-8&#34; if encoding.lower() in [&#34;ascii&#34;, &#34;utf8&#34;, &#34;utf-8&#34;] else encoding
     return encoding</code></pre>
 </details>
 </dd>
@@ -230,11 +239,12 @@ def sent_tokenize(text):
     detect language
     &#34;&#34;&#34;
     if not LANGDETECT:
-        raise ValueError(&#39;langdetect is missing - install with pip install langdetect&#39;)
+        raise ValueError(&#34;langdetect is missing - install with pip install langdetect&#34;)
 
-    if isinstance(texts, str): texts = [texts]
+    if isinstance(texts, str):
+        texts = [texts]
     if not isinstance(texts, (list, np.ndarray)):
-        raise ValueError(&#39;texts must be a list or NumPy array of strings&#39;)
+        raise ValueError(&#34;texts must be a list or NumPy array of strings&#34;)
     lst = []
     for doc in texts[:sample_size]:
         try:
@@ -242,7 +252,9 @@ def sent_tokenize(text):
         except:
             continue
     if len(lst) == 0:
-        raise Exception(&#39;could not detect language in random sample of %s docs.&#39;  % (sample_size))
+        raise Exception(
+            &#34;could not detect language in random sample of %s docs.&#34; % (sample_size)
+        )
     return max(set(lst), key=lst.count)</code></pre>
 </details>
 </dd>
@@ -279,7 +291,7 @@ def sent_tokenize(text):
     &#34;&#34;&#34;
     include additional languages due to mistakes on short texts by langdetect
     &#34;&#34;&#34;
-    return lang is not None and lang.startswith(&#39;zh-&#39;) or lang in [&#39;ja&#39;, &#39;ko&#39;]</code></pre>
+    return lang is not None and lang.startswith(&#34;zh-&#34;) or lang in [&#34;ja&#34;, &#34;ko&#34;]</code></pre>
 </details>
 </dd>
 <dt id="ktrain.text.shallownlp.utils.read_text"><code class="name flex">
@@ -292,15 +304,17 @@ def sent_tokenize(text):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def read_text(filename):
-    with open(filename, &#39;rb&#39;) as f:
+    with open(filename, &#34;rb&#34;) as f:
         text = f.read()
     encoding = detect_encoding([text])
     try:
-        decoded_text = text.decode(encoding) 
+        decoded_text = text.decode(encoding)
     except:
-        U.vprint(&#39;Decoding with %s failed 1st attempt - using %s with skips&#39; % (encoding,
-                                                                                encoding),
-                                                                                verbose=verbose)
+        U.vprint(
+            &#34;Decoding with %s failed 1st attempt - using %s with skips&#34;
+            % (encoding, encoding),
+            verbose=verbose,
+        )
         decoded_text = decode_by_line(text, encoding=encoding)
     return decoded_text.strip()</code></pre>
 </details>
@@ -321,7 +335,7 @@ def sent_tokenize(text):
     lang = detect_lang(text)
     sents = []
     if is_chinese(lang):
-        for sent in re.findall(u&#39;[^!?。\.\!\?]+[!?。\.\!\?]?&#39;, text, flags=re.U):
+        for sent in re.findall(&#34;[^!?。\.\!\?]+[!?。\.\!\?]?&#34;, text, flags=re.U):
             sents.append(sent)
     else:
         for paragraph in segmenter.process(text):
@@ -341,8 +355,9 @@ def sent_tokenize(text):
 </summary>
 <pre><code class="python">def split_chinese(texts):
     if not JIEBA:
-        raise ValueError(&#39;jieba is missing - install with pip install jieba&#39;)
-    if isinstance(texts, str): texts=[texts]
+        raise ValueError(&#34;jieba is missing - install with pip install jieba&#34;)
+    if isinstance(texts, str):
+        texts = [texts]
 
     split_texts = []
     for doc in texts:

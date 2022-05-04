@@ -31,7 +31,8 @@ from ... import utils as U
 from .. import textutils as TU
 from ...torch_base import TorchBase
 
-SUPPORTED_SRC_LANGS = [&#39;zh&#39;, &#39;ar&#39;, &#39;ru&#39;, &#39;de&#39;, &#39;af&#39;, &#39;es&#39;, &#39;fr&#39;, &#39;it&#39;, &#39;pt&#39;]
+SUPPORTED_SRC_LANGS = [&#34;zh&#34;, &#34;ar&#34;, &#34;ru&#34;, &#34;de&#34;, &#34;af&#34;, &#34;es&#34;, &#34;fr&#34;, &#34;it&#34;, &#34;pt&#34;]
+
 
 class Translator(TorchBase):
     &#34;&#34;&#34;
@@ -49,16 +50,19 @@ class Translator(TorchBase):
           quantize(bool): If True, use quantization.
         ```
         &#34;&#34;&#34;
-        if &#39;Helsinki-NLP&#39; not in model_name:
-            warnings.warn(&#39;Translator requires a Helsinki-NLP model: https://huggingface.co/Helsinki-NLP&#39;)
+        if &#34;Helsinki-NLP&#34; not in model_name:
+            warnings.warn(
+                &#34;Translator requires a Helsinki-NLP model: https://huggingface.co/Helsinki-NLP&#34;
+            )
         super().__init__(device=device, quantize=quantize)
         from transformers import MarianMTModel, MarianTokenizer
+
         self.tokenizer = MarianTokenizer.from_pretrained(model_name)
         self.model = MarianMTModel.from_pretrained(model_name).to(self.torch_device)
-        if quantize: self.model = self.quantize_model(self.model)
+        if quantize:
+            self.model = self.quantize_model(self.model)
 
-
-    def translate(self, src_text, join_with=&#39;\n&#39;, num_beams=None, early_stopping=None):
+    def translate(self, src_text, join_with=&#34;\n&#34;, num_beams=None, early_stopping=None):
         &#34;&#34;&#34;
         ```
         Translate document (src_text).
@@ -66,16 +70,16 @@ class Translator(TorchBase):
         Args:
           src_text(str): source text.
                          The source text can either be a single sentence or an entire document with multiple sentences
-                         and paragraphs. 
+                         and paragraphs.
                          IMPORTANT NOTE: Sentences are joined together and fed to model as single batch.
                                          If the input text is very large (e.g., an entire book), you should
-                                         break it up into reasonbly-sized chunks (e.g., pages, paragraphs, or sentences) and 
+                                         break it up into reasonbly-sized chunks (e.g., pages, paragraphs, or sentences) and
                                          feed each chunk separately into translate to avoid out-of-memory issues.
           join_with(str):  list of translated sentences will be delimited with this character.
                            default: each sentence on separate line
-          num_beams(int): Number of beams for beam search. Defaults to None.  If None, the transformers library defaults this to 1, 
+          num_beams(int): Number of beams for beam search. Defaults to None.  If None, the transformers library defaults this to 1,
                           whicn means no beam search.
-          early_stopping(bool):  Whether to stop the beam search when at least ``num_beams`` sentences 
+          early_stopping(bool):  Whether to stop the beam search when at least ``num_beams`` sentences
                                  are finished per batch or not. Defaults to None.  If None, the transformers library
                                  sets this to False.
         Returns:
@@ -83,9 +87,10 @@ class Translator(TorchBase):
         ```
         &#34;&#34;&#34;
         sentences = TU.sent_tokenize(src_text)
-        tgt_sentences = self.translate_sentences(sentences, num_beams=num_beams, early_stopping=early_stopping)
+        tgt_sentences = self.translate_sentences(
+            sentences, num_beams=num_beams, early_stopping=early_stopping
+        )
         return join_with.join(tgt_sentences)
-
 
     def translate_sentences(self, sentences, num_beams=None, early_stopping=None):
         &#34;&#34;&#34;
@@ -96,11 +101,11 @@ class Translator(TorchBase):
           sentences(list): list of strings representing sentences that need to be translated
                          IMPORTANT NOTE: Sentences are joined together and fed to model as single batch.
                                          If the input text is very large (e.g., an entire book), you should
-                                         break it up into reasonbly-sized chunks (e.g., pages, paragraphs, or sentences) and 
+                                         break it up into reasonbly-sized chunks (e.g., pages, paragraphs, or sentences) and
                                          feed each chunk separately into translate to avoid out-of-memory issues.
-          num_beams(int): Number of beams for beam search. Defaults to None.  If None, the transformers library defaults this to 1, 
+          num_beams(int): Number of beams for beam search. Defaults to None.  If None, the transformers library defaults this to 1,
                           whicn means no beam search.
-          early_stopping(bool):  Whether to stop the beam search when at least ``num_beams`` sentences 
+          early_stopping(bool):  Whether to stop the beam search when at least ``num_beams`` sentences
                                  are finished per batch or not. Defaults to None.  If None, the transformers library
                                  sets this to False.
         Returns:
@@ -108,15 +113,22 @@ class Translator(TorchBase):
         ```
         &#34;&#34;&#34;
         import torch
+
         with torch.no_grad():
-            translated = self.model.generate(**self.tokenizer.prepare_seq2seq_batch(sentences, return_tensors=&#39;pt&#39;).to(self.torch_device), 
-                                             num_beams=num_beams, early_stopping=early_stopping)
-            tgt_sentences = [self.tokenizer.decode(t, skip_special_tokens=True) for t in translated]
+            translated = self.model.generate(
+                **self.tokenizer.prepare_seq2seq_batch(
+                    sentences, return_tensors=&#34;pt&#34;
+                ).to(self.torch_device),
+                num_beams=num_beams,
+                early_stopping=early_stopping
+            )
+            tgt_sentences = [
+                self.tokenizer.decode(t, skip_special_tokens=True) for t in translated
+            ]
         return tgt_sentences
 
 
-
-class EnglishTranslator():
+class EnglishTranslator:
     &#34;&#34;&#34;
     Class to translate text in various languages to English.
     &#34;&#34;&#34;
@@ -144,29 +156,66 @@ class EnglishTranslator():
         &#34;&#34;&#34;
 
         if src_lang is None or src_lang not in SUPPORTED_SRC_LANGS:
-            raise ValueError(&#39;A src_lang must be supplied and be one of: %s&#39; % (SUPPORED_SRC_LANG))
+            raise ValueError(
+                &#34;A src_lang must be supplied and be one of: %s&#34; % (SUPPORED_SRC_LANG)
+            )
         self.src_lang = src_lang
         self.translators = []
-        if src_lang == &#39;ar&#39;:
-            self.translators.append(Translator(model_name=&#39;Helsinki-NLP/opus-mt-ar-en&#39;, device=device, quantize=quantize))
-        elif src_lang == &#39;ru&#39;:
-            self.translators.append(Translator(model_name=&#39;Helsinki-NLP/opus-mt-ru-en&#39;, device=device, quantize=quantize))
-        elif src_lang == &#39;de&#39;:
-            self.translators.append(Translator(model_name=&#39;Helsinki-NLP/opus-mt-de-en&#39;, device=device, quantize=quantize))
-        elif src_lang == &#39;af&#39;:
-            self.translators.append(Translator(model_name=&#39;Helsinki-NLP/opus-mt-af-en&#39;, device=device, quantize=quantize))
-        elif src_lang in [&#39;es&#39;, &#39;fr&#39;, &#39;it&#39;, &#39;pt&#39;]:
-            self.translators.append(Translator(model_name=&#39;Helsinki-NLP/opus-mt-ROMANCE-en&#39;, device=device, quantize=quantize))
-        #elif src_lang == &#39;zh&#39;: # could not find zh-&gt;en model, so currently doing two-step translation to English via German
-            #self.translators.append(Translator(model_name=&#39;Helsinki-NLP/opus-mt-ZH-de&#39;, device=device))
-            #self.translators.append(Translator(model_name=&#39;Helsinki-NLP/opus-mt-de-en&#39;, device=device))
-        elif src_lang == &#39;zh&#39;:
-            self.translators.append(Translator(model_name=&#39;Helsinki-NLP/opus-mt-zh-en&#39;, device=device, quantize=quantize))
+        if src_lang == &#34;ar&#34;:
+            self.translators.append(
+                Translator(
+                    model_name=&#34;Helsinki-NLP/opus-mt-ar-en&#34;,
+                    device=device,
+                    quantize=quantize,
+                )
+            )
+        elif src_lang == &#34;ru&#34;:
+            self.translators.append(
+                Translator(
+                    model_name=&#34;Helsinki-NLP/opus-mt-ru-en&#34;,
+                    device=device,
+                    quantize=quantize,
+                )
+            )
+        elif src_lang == &#34;de&#34;:
+            self.translators.append(
+                Translator(
+                    model_name=&#34;Helsinki-NLP/opus-mt-de-en&#34;,
+                    device=device,
+                    quantize=quantize,
+                )
+            )
+        elif src_lang == &#34;af&#34;:
+            self.translators.append(
+                Translator(
+                    model_name=&#34;Helsinki-NLP/opus-mt-af-en&#34;,
+                    device=device,
+                    quantize=quantize,
+                )
+            )
+        elif src_lang in [&#34;es&#34;, &#34;fr&#34;, &#34;it&#34;, &#34;pt&#34;]:
+            self.translators.append(
+                Translator(
+                    model_name=&#34;Helsinki-NLP/opus-mt-ROMANCE-en&#34;,
+                    device=device,
+                    quantize=quantize,
+                )
+            )
+        # elif src_lang == &#39;zh&#39;: # could not find zh-&gt;en model, so currently doing two-step translation to English via German
+        # self.translators.append(Translator(model_name=&#39;Helsinki-NLP/opus-mt-ZH-de&#39;, device=device))
+        # self.translators.append(Translator(model_name=&#39;Helsinki-NLP/opus-mt-de-en&#39;, device=device))
+        elif src_lang == &#34;zh&#34;:
+            self.translators.append(
+                Translator(
+                    model_name=&#34;Helsinki-NLP/opus-mt-zh-en&#34;,
+                    device=device,
+                    quantize=quantize,
+                )
+            )
         else:
-            raise ValueError(&#39;lang:%s is currently not supported.&#39; % (src_lang))
+            raise ValueError(&#34;lang:%s is currently not supported.&#34; % (src_lang))
 
-
-    def translate(self, src_text, join_with=&#39;\n&#39;, num_beams=None, early_stopping=None):
+    def translate(self, src_text, join_with=&#34;\n&#34;, num_beams=None, early_stopping=None):
         &#34;&#34;&#34;
         ```
         Translate source document to English.
@@ -175,16 +224,16 @@ class EnglishTranslator():
         Args:
           src_text(str): source text. Must be in language specified by src_lang (language code) supplied to constructor
                          The source text can either be a single sentence or an entire document with multiple sentences
-                         and paragraphs. 
+                         and paragraphs.
                          IMPORTANT NOTE: Sentences are joined together and fed to model as single batch.
                                          If the input text is very large (e.g., an entire book), you should
-                                         break it up into reasonbly-sized chunks (e.g., pages, paragraphs, or sentences) and 
+                                         break it up into reasonbly-sized chunks (e.g., pages, paragraphs, or sentences) and
                                          feed each chunk separately into translate to avoid out-of-memory issues.
           join_with(str):  list of translated sentences will be delimited with this character.
                            default: each sentence on separate line
-          num_beams(int): Number of beams for beam search. Defaults to None.  If None, the transformers library defaults this to 1, 
+          num_beams(int): Number of beams for beam search. Defaults to None.  If None, the transformers library defaults this to 1,
                           whicn means no beam search.
-          early_stopping(bool):  Whether to stop the beam search when at least ``num_beams`` sentences 
+          early_stopping(bool):  Whether to stop the beam search when at least ``num_beams`` sentences
                                  are finished per batch or not. Defaults to None.  If None, the transformers library
                                  sets this to False.
         Returns:
@@ -193,9 +242,13 @@ class EnglishTranslator():
         &#34;&#34;&#34;
         text = src_text
         for t in self.translators:
-             text = t.translate(text, join_with=join_with, num_beams=num_beams, early_stopping=early_stopping)
-        return text
-            </code></pre>
+            text = t.translate(
+                text,
+                join_with=join_with,
+                num_beams=num_beams,
+                early_stopping=early_stopping,
+            )
+        return text</code></pre>
 </details>
 </section>
 <section>
@@ -234,7 +287,7 @@ Args:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class EnglishTranslator():
+<pre><code class="python">class EnglishTranslator:
     &#34;&#34;&#34;
     Class to translate text in various languages to English.
     &#34;&#34;&#34;
@@ -262,29 +315,66 @@ Args:
         &#34;&#34;&#34;
 
         if src_lang is None or src_lang not in SUPPORTED_SRC_LANGS:
-            raise ValueError(&#39;A src_lang must be supplied and be one of: %s&#39; % (SUPPORED_SRC_LANG))
+            raise ValueError(
+                &#34;A src_lang must be supplied and be one of: %s&#34; % (SUPPORED_SRC_LANG)
+            )
         self.src_lang = src_lang
         self.translators = []
-        if src_lang == &#39;ar&#39;:
-            self.translators.append(Translator(model_name=&#39;Helsinki-NLP/opus-mt-ar-en&#39;, device=device, quantize=quantize))
-        elif src_lang == &#39;ru&#39;:
-            self.translators.append(Translator(model_name=&#39;Helsinki-NLP/opus-mt-ru-en&#39;, device=device, quantize=quantize))
-        elif src_lang == &#39;de&#39;:
-            self.translators.append(Translator(model_name=&#39;Helsinki-NLP/opus-mt-de-en&#39;, device=device, quantize=quantize))
-        elif src_lang == &#39;af&#39;:
-            self.translators.append(Translator(model_name=&#39;Helsinki-NLP/opus-mt-af-en&#39;, device=device, quantize=quantize))
-        elif src_lang in [&#39;es&#39;, &#39;fr&#39;, &#39;it&#39;, &#39;pt&#39;]:
-            self.translators.append(Translator(model_name=&#39;Helsinki-NLP/opus-mt-ROMANCE-en&#39;, device=device, quantize=quantize))
-        #elif src_lang == &#39;zh&#39;: # could not find zh-&gt;en model, so currently doing two-step translation to English via German
-            #self.translators.append(Translator(model_name=&#39;Helsinki-NLP/opus-mt-ZH-de&#39;, device=device))
-            #self.translators.append(Translator(model_name=&#39;Helsinki-NLP/opus-mt-de-en&#39;, device=device))
-        elif src_lang == &#39;zh&#39;:
-            self.translators.append(Translator(model_name=&#39;Helsinki-NLP/opus-mt-zh-en&#39;, device=device, quantize=quantize))
+        if src_lang == &#34;ar&#34;:
+            self.translators.append(
+                Translator(
+                    model_name=&#34;Helsinki-NLP/opus-mt-ar-en&#34;,
+                    device=device,
+                    quantize=quantize,
+                )
+            )
+        elif src_lang == &#34;ru&#34;:
+            self.translators.append(
+                Translator(
+                    model_name=&#34;Helsinki-NLP/opus-mt-ru-en&#34;,
+                    device=device,
+                    quantize=quantize,
+                )
+            )
+        elif src_lang == &#34;de&#34;:
+            self.translators.append(
+                Translator(
+                    model_name=&#34;Helsinki-NLP/opus-mt-de-en&#34;,
+                    device=device,
+                    quantize=quantize,
+                )
+            )
+        elif src_lang == &#34;af&#34;:
+            self.translators.append(
+                Translator(
+                    model_name=&#34;Helsinki-NLP/opus-mt-af-en&#34;,
+                    device=device,
+                    quantize=quantize,
+                )
+            )
+        elif src_lang in [&#34;es&#34;, &#34;fr&#34;, &#34;it&#34;, &#34;pt&#34;]:
+            self.translators.append(
+                Translator(
+                    model_name=&#34;Helsinki-NLP/opus-mt-ROMANCE-en&#34;,
+                    device=device,
+                    quantize=quantize,
+                )
+            )
+        # elif src_lang == &#39;zh&#39;: # could not find zh-&gt;en model, so currently doing two-step translation to English via German
+        # self.translators.append(Translator(model_name=&#39;Helsinki-NLP/opus-mt-ZH-de&#39;, device=device))
+        # self.translators.append(Translator(model_name=&#39;Helsinki-NLP/opus-mt-de-en&#39;, device=device))
+        elif src_lang == &#34;zh&#34;:
+            self.translators.append(
+                Translator(
+                    model_name=&#34;Helsinki-NLP/opus-mt-zh-en&#34;,
+                    device=device,
+                    quantize=quantize,
+                )
+            )
         else:
-            raise ValueError(&#39;lang:%s is currently not supported.&#39; % (src_lang))
+            raise ValueError(&#34;lang:%s is currently not supported.&#34; % (src_lang))
 
-
-    def translate(self, src_text, join_with=&#39;\n&#39;, num_beams=None, early_stopping=None):
+    def translate(self, src_text, join_with=&#34;\n&#34;, num_beams=None, early_stopping=None):
         &#34;&#34;&#34;
         ```
         Translate source document to English.
@@ -293,16 +383,16 @@ Args:
         Args:
           src_text(str): source text. Must be in language specified by src_lang (language code) supplied to constructor
                          The source text can either be a single sentence or an entire document with multiple sentences
-                         and paragraphs. 
+                         and paragraphs.
                          IMPORTANT NOTE: Sentences are joined together and fed to model as single batch.
                                          If the input text is very large (e.g., an entire book), you should
-                                         break it up into reasonbly-sized chunks (e.g., pages, paragraphs, or sentences) and 
+                                         break it up into reasonbly-sized chunks (e.g., pages, paragraphs, or sentences) and
                                          feed each chunk separately into translate to avoid out-of-memory issues.
           join_with(str):  list of translated sentences will be delimited with this character.
                            default: each sentence on separate line
-          num_beams(int): Number of beams for beam search. Defaults to None.  If None, the transformers library defaults this to 1, 
+          num_beams(int): Number of beams for beam search. Defaults to None.  If None, the transformers library defaults this to 1,
                           whicn means no beam search.
-          early_stopping(bool):  Whether to stop the beam search when at least ``num_beams`` sentences 
+          early_stopping(bool):  Whether to stop the beam search when at least ``num_beams`` sentences
                                  are finished per batch or not. Defaults to None.  If None, the transformers library
                                  sets this to False.
         Returns:
@@ -311,7 +401,12 @@ Args:
         &#34;&#34;&#34;
         text = src_text
         for t in self.translators:
-             text = t.translate(text, join_with=join_with, num_beams=num_beams, early_stopping=early_stopping)
+            text = t.translate(
+                text,
+                join_with=join_with,
+                num_beams=num_beams,
+                early_stopping=early_stopping,
+            )
         return text</code></pre>
 </details>
 <h3>Methods</h3>
@@ -326,16 +421,16 @@ To speed up translations, you can set num_beams and early_stopping (e.g., num_be
 Args:
   src_text(str): source text. Must be in language specified by src_lang (language code) supplied to constructor
                  The source text can either be a single sentence or an entire document with multiple sentences
-                 and paragraphs. 
+                 and paragraphs.
                  IMPORTANT NOTE: Sentences are joined together and fed to model as single batch.
                                  If the input text is very large (e.g., an entire book), you should
-                                 break it up into reasonbly-sized chunks (e.g., pages, paragraphs, or sentences) and 
+                                 break it up into reasonbly-sized chunks (e.g., pages, paragraphs, or sentences) and
                                  feed each chunk separately into translate to avoid out-of-memory issues.
   join_with(str):  list of translated sentences will be delimited with this character.
                    default: each sentence on separate line
-  num_beams(int): Number of beams for beam search. Defaults to None.  If None, the transformers library defaults this to 1, 
+  num_beams(int): Number of beams for beam search. Defaults to None.  If None, the transformers library defaults this to 1,
                   whicn means no beam search.
-  early_stopping(bool):  Whether to stop the beam search when at least ``num_beams`` sentences 
+  early_stopping(bool):  Whether to stop the beam search when at least ``num_beams`` sentences
                          are finished per batch or not. Defaults to None.  If None, the transformers library
                          sets this to False.
 Returns:
@@ -345,7 +440,7 @@ Returns:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def translate(self, src_text, join_with=&#39;\n&#39;, num_beams=None, early_stopping=None):
+<pre><code class="python">def translate(self, src_text, join_with=&#34;\n&#34;, num_beams=None, early_stopping=None):
     &#34;&#34;&#34;
     ```
     Translate source document to English.
@@ -354,16 +449,16 @@ Returns:
     Args:
       src_text(str): source text. Must be in language specified by src_lang (language code) supplied to constructor
                      The source text can either be a single sentence or an entire document with multiple sentences
-                     and paragraphs. 
+                     and paragraphs.
                      IMPORTANT NOTE: Sentences are joined together and fed to model as single batch.
                                      If the input text is very large (e.g., an entire book), you should
-                                     break it up into reasonbly-sized chunks (e.g., pages, paragraphs, or sentences) and 
+                                     break it up into reasonbly-sized chunks (e.g., pages, paragraphs, or sentences) and
                                      feed each chunk separately into translate to avoid out-of-memory issues.
       join_with(str):  list of translated sentences will be delimited with this character.
                        default: each sentence on separate line
-      num_beams(int): Number of beams for beam search. Defaults to None.  If None, the transformers library defaults this to 1, 
+      num_beams(int): Number of beams for beam search. Defaults to None.  If None, the transformers library defaults this to 1,
                       whicn means no beam search.
-      early_stopping(bool):  Whether to stop the beam search when at least ``num_beams`` sentences 
+      early_stopping(bool):  Whether to stop the beam search when at least ``num_beams`` sentences
                              are finished per batch or not. Defaults to None.  If None, the transformers library
                              sets this to False.
     Returns:
@@ -372,7 +467,12 @@ Returns:
     &#34;&#34;&#34;
     text = src_text
     for t in self.translators:
-         text = t.translate(text, join_with=join_with, num_beams=num_beams, early_stopping=early_stopping)
+        text = t.translate(
+            text,
+            join_with=join_with,
+            num_beams=num_beams,
+            early_stopping=early_stopping,
+        )
     return text</code></pre>
 </details>
 </dd>
@@ -411,16 +511,19 @@ Args:
           quantize(bool): If True, use quantization.
         ```
         &#34;&#34;&#34;
-        if &#39;Helsinki-NLP&#39; not in model_name:
-            warnings.warn(&#39;Translator requires a Helsinki-NLP model: https://huggingface.co/Helsinki-NLP&#39;)
+        if &#34;Helsinki-NLP&#34; not in model_name:
+            warnings.warn(
+                &#34;Translator requires a Helsinki-NLP model: https://huggingface.co/Helsinki-NLP&#34;
+            )
         super().__init__(device=device, quantize=quantize)
         from transformers import MarianMTModel, MarianTokenizer
+
         self.tokenizer = MarianTokenizer.from_pretrained(model_name)
         self.model = MarianMTModel.from_pretrained(model_name).to(self.torch_device)
-        if quantize: self.model = self.quantize_model(self.model)
+        if quantize:
+            self.model = self.quantize_model(self.model)
 
-
-    def translate(self, src_text, join_with=&#39;\n&#39;, num_beams=None, early_stopping=None):
+    def translate(self, src_text, join_with=&#34;\n&#34;, num_beams=None, early_stopping=None):
         &#34;&#34;&#34;
         ```
         Translate document (src_text).
@@ -428,16 +531,16 @@ Args:
         Args:
           src_text(str): source text.
                          The source text can either be a single sentence or an entire document with multiple sentences
-                         and paragraphs. 
+                         and paragraphs.
                          IMPORTANT NOTE: Sentences are joined together and fed to model as single batch.
                                          If the input text is very large (e.g., an entire book), you should
-                                         break it up into reasonbly-sized chunks (e.g., pages, paragraphs, or sentences) and 
+                                         break it up into reasonbly-sized chunks (e.g., pages, paragraphs, or sentences) and
                                          feed each chunk separately into translate to avoid out-of-memory issues.
           join_with(str):  list of translated sentences will be delimited with this character.
                            default: each sentence on separate line
-          num_beams(int): Number of beams for beam search. Defaults to None.  If None, the transformers library defaults this to 1, 
+          num_beams(int): Number of beams for beam search. Defaults to None.  If None, the transformers library defaults this to 1,
                           whicn means no beam search.
-          early_stopping(bool):  Whether to stop the beam search when at least ``num_beams`` sentences 
+          early_stopping(bool):  Whether to stop the beam search when at least ``num_beams`` sentences
                                  are finished per batch or not. Defaults to None.  If None, the transformers library
                                  sets this to False.
         Returns:
@@ -445,9 +548,10 @@ Args:
         ```
         &#34;&#34;&#34;
         sentences = TU.sent_tokenize(src_text)
-        tgt_sentences = self.translate_sentences(sentences, num_beams=num_beams, early_stopping=early_stopping)
+        tgt_sentences = self.translate_sentences(
+            sentences, num_beams=num_beams, early_stopping=early_stopping
+        )
         return join_with.join(tgt_sentences)
-
 
     def translate_sentences(self, sentences, num_beams=None, early_stopping=None):
         &#34;&#34;&#34;
@@ -458,11 +562,11 @@ Args:
           sentences(list): list of strings representing sentences that need to be translated
                          IMPORTANT NOTE: Sentences are joined together and fed to model as single batch.
                                          If the input text is very large (e.g., an entire book), you should
-                                         break it up into reasonbly-sized chunks (e.g., pages, paragraphs, or sentences) and 
+                                         break it up into reasonbly-sized chunks (e.g., pages, paragraphs, or sentences) and
                                          feed each chunk separately into translate to avoid out-of-memory issues.
-          num_beams(int): Number of beams for beam search. Defaults to None.  If None, the transformers library defaults this to 1, 
+          num_beams(int): Number of beams for beam search. Defaults to None.  If None, the transformers library defaults this to 1,
                           whicn means no beam search.
-          early_stopping(bool):  Whether to stop the beam search when at least ``num_beams`` sentences 
+          early_stopping(bool):  Whether to stop the beam search when at least ``num_beams`` sentences
                                  are finished per batch or not. Defaults to None.  If None, the transformers library
                                  sets this to False.
         Returns:
@@ -470,10 +574,18 @@ Args:
         ```
         &#34;&#34;&#34;
         import torch
+
         with torch.no_grad():
-            translated = self.model.generate(**self.tokenizer.prepare_seq2seq_batch(sentences, return_tensors=&#39;pt&#39;).to(self.torch_device), 
-                                             num_beams=num_beams, early_stopping=early_stopping)
-            tgt_sentences = [self.tokenizer.decode(t, skip_special_tokens=True) for t in translated]
+            translated = self.model.generate(
+                **self.tokenizer.prepare_seq2seq_batch(
+                    sentences, return_tensors=&#34;pt&#34;
+                ).to(self.torch_device),
+                num_beams=num_beams,
+                early_stopping=early_stopping
+            )
+            tgt_sentences = [
+                self.tokenizer.decode(t, skip_special_tokens=True) for t in translated
+            ]
         return tgt_sentences</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -491,16 +603,16 @@ To speed up translations, you can set num_beams and early_stopping (e.g., num_be
 Args:
   src_text(str): source text.
                  The source text can either be a single sentence or an entire document with multiple sentences
-                 and paragraphs. 
+                 and paragraphs.
                  IMPORTANT NOTE: Sentences are joined together and fed to model as single batch.
                                  If the input text is very large (e.g., an entire book), you should
-                                 break it up into reasonbly-sized chunks (e.g., pages, paragraphs, or sentences) and 
+                                 break it up into reasonbly-sized chunks (e.g., pages, paragraphs, or sentences) and
                                  feed each chunk separately into translate to avoid out-of-memory issues.
   join_with(str):  list of translated sentences will be delimited with this character.
                    default: each sentence on separate line
-  num_beams(int): Number of beams for beam search. Defaults to None.  If None, the transformers library defaults this to 1, 
+  num_beams(int): Number of beams for beam search. Defaults to None.  If None, the transformers library defaults this to 1,
                   whicn means no beam search.
-  early_stopping(bool):  Whether to stop the beam search when at least ``num_beams`` sentences 
+  early_stopping(bool):  Whether to stop the beam search when at least ``num_beams`` sentences
                          are finished per batch or not. Defaults to None.  If None, the transformers library
                          sets this to False.
 Returns:
@@ -510,7 +622,7 @@ Returns:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def translate(self, src_text, join_with=&#39;\n&#39;, num_beams=None, early_stopping=None):
+<pre><code class="python">def translate(self, src_text, join_with=&#34;\n&#34;, num_beams=None, early_stopping=None):
     &#34;&#34;&#34;
     ```
     Translate document (src_text).
@@ -518,16 +630,16 @@ Returns:
     Args:
       src_text(str): source text.
                      The source text can either be a single sentence or an entire document with multiple sentences
-                     and paragraphs. 
+                     and paragraphs.
                      IMPORTANT NOTE: Sentences are joined together and fed to model as single batch.
                                      If the input text is very large (e.g., an entire book), you should
-                                     break it up into reasonbly-sized chunks (e.g., pages, paragraphs, or sentences) and 
+                                     break it up into reasonbly-sized chunks (e.g., pages, paragraphs, or sentences) and
                                      feed each chunk separately into translate to avoid out-of-memory issues.
       join_with(str):  list of translated sentences will be delimited with this character.
                        default: each sentence on separate line
-      num_beams(int): Number of beams for beam search. Defaults to None.  If None, the transformers library defaults this to 1, 
+      num_beams(int): Number of beams for beam search. Defaults to None.  If None, the transformers library defaults this to 1,
                       whicn means no beam search.
-      early_stopping(bool):  Whether to stop the beam search when at least ``num_beams`` sentences 
+      early_stopping(bool):  Whether to stop the beam search when at least ``num_beams`` sentences
                              are finished per batch or not. Defaults to None.  If None, the transformers library
                              sets this to False.
     Returns:
@@ -535,7 +647,9 @@ Returns:
     ```
     &#34;&#34;&#34;
     sentences = TU.sent_tokenize(src_text)
-    tgt_sentences = self.translate_sentences(sentences, num_beams=num_beams, early_stopping=early_stopping)
+    tgt_sentences = self.translate_sentences(
+        sentences, num_beams=num_beams, early_stopping=early_stopping
+    )
     return join_with.join(tgt_sentences)</code></pre>
 </details>
 </dd>
@@ -549,11 +663,11 @@ Args:
   sentences(list): list of strings representing sentences that need to be translated
                  IMPORTANT NOTE: Sentences are joined together and fed to model as single batch.
                                  If the input text is very large (e.g., an entire book), you should
-                                 break it up into reasonbly-sized chunks (e.g., pages, paragraphs, or sentences) and 
+                                 break it up into reasonbly-sized chunks (e.g., pages, paragraphs, or sentences) and
                                  feed each chunk separately into translate to avoid out-of-memory issues.
-  num_beams(int): Number of beams for beam search. Defaults to None.  If None, the transformers library defaults this to 1, 
+  num_beams(int): Number of beams for beam search. Defaults to None.  If None, the transformers library defaults this to 1,
                   whicn means no beam search.
-  early_stopping(bool):  Whether to stop the beam search when at least ``num_beams`` sentences 
+  early_stopping(bool):  Whether to stop the beam search when at least ``num_beams`` sentences
                          are finished per batch or not. Defaults to None.  If None, the transformers library
                          sets this to False.
 Returns:
@@ -572,11 +686,11 @@ Returns:
       sentences(list): list of strings representing sentences that need to be translated
                      IMPORTANT NOTE: Sentences are joined together and fed to model as single batch.
                                      If the input text is very large (e.g., an entire book), you should
-                                     break it up into reasonbly-sized chunks (e.g., pages, paragraphs, or sentences) and 
+                                     break it up into reasonbly-sized chunks (e.g., pages, paragraphs, or sentences) and
                                      feed each chunk separately into translate to avoid out-of-memory issues.
-      num_beams(int): Number of beams for beam search. Defaults to None.  If None, the transformers library defaults this to 1, 
+      num_beams(int): Number of beams for beam search. Defaults to None.  If None, the transformers library defaults this to 1,
                       whicn means no beam search.
-      early_stopping(bool):  Whether to stop the beam search when at least ``num_beams`` sentences 
+      early_stopping(bool):  Whether to stop the beam search when at least ``num_beams`` sentences
                              are finished per batch or not. Defaults to None.  If None, the transformers library
                              sets this to False.
     Returns:
@@ -584,10 +698,18 @@ Returns:
     ```
     &#34;&#34;&#34;
     import torch
+
     with torch.no_grad():
-        translated = self.model.generate(**self.tokenizer.prepare_seq2seq_batch(sentences, return_tensors=&#39;pt&#39;).to(self.torch_device), 
-                                         num_beams=num_beams, early_stopping=early_stopping)
-        tgt_sentences = [self.tokenizer.decode(t, skip_special_tokens=True) for t in translated]
+        translated = self.model.generate(
+            **self.tokenizer.prepare_seq2seq_batch(
+                sentences, return_tensors=&#34;pt&#34;
+            ).to(self.torch_device),
+            num_beams=num_beams,
+            early_stopping=early_stopping
+        )
+        tgt_sentences = [
+            self.tokenizer.decode(t, skip_special_tokens=True) for t in translated
+        ]
     return tgt_sentences</code></pre>
 </details>
 </dd>

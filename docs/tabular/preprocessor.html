@@ -38,10 +38,17 @@ class TabularPreprocessor(Preprocessor):
     ```
     &#34;&#34;&#34;
 
-    def __init__(self, predictor_columns, label_columns, date_columns=[], 
-                 is_regression=False, procs=[], max_card=20):
-        self.is_regression=is_regression
-        self.c  = None
+    def __init__(
+        self,
+        predictor_columns,
+        label_columns,
+        date_columns=[],
+        is_regression=False,
+        procs=[],
+        max_card=20,
+    ):
+        self.is_regression = is_regression
+        self.c = None
         self.pc = predictor_columns
         self.lc = label_columns
         self.lc = [self.lc] if isinstance(self.lc, str) else self.lc
@@ -56,19 +63,16 @@ class TabularPreprocessor(Preprocessor):
 
     @property
     def na_names(self):
-        return [n for n in self.cat_names if n[-3:] == &#39;_na&#39;]
-        
+        return [n for n in self.cat_names if n[-3:] == &#34;_na&#34;]
+
     def get_preprocessor(self):
         return (self.label_transform, self.procs)
-
 
     def get_classes(self):
         return self.label_columns if not self.is_regression else []
 
-
     def preprocess(self, df):
         return self.preprocess_test(df)
-
 
     def _validate_columns(self, df):
         missing_columns = []
@@ -76,28 +80,26 @@ class TabularPreprocessor(Preprocessor):
             if col not in self.lc and col not in self.pc:
                 missing_columns.append(col)
         if len(missing_columns) &gt; 0:
-            raise ValueError(&#39;df is missing columns: %s&#39; % (missing_columns))
+            raise ValueError(&#34;df is missing columns: %s&#34; % (missing_columns))
         return
-
 
     def denormalize(self, df):
         normalizer = None
         for proc in self.procs:
-            if type(proc).__name__ == &#39;Normalize&#39;:
+            if type(proc).__name__ == &#34;Normalize&#34;:
                 normalizer = proc
                 break
-        if normalizer is None: return df
+        if normalizer is None:
+            return df
         return normalizer.revert(df)
 
-    #def codify(self, df):
-        #df = df.copy()
-        #for lab in self.lc:
-            #df[lab] = df[lab].cat.codes
-        #return df
+    # def codify(self, df):
+    # df = df.copy()
+    # for lab in self.lc:
+    # df[lab] = df[lab].cat.codes
+    # return df
 
-
-
-    def preprocess_train(self, df, mode=&#39;train&#39;, verbose=1):
+    def preprocess_train(self, df, mode=&#34;train&#34;, verbose=1):
         &#34;&#34;&#34;
         ```
         preprocess training set
@@ -105,21 +107,23 @@ class TabularPreprocessor(Preprocessor):
         &#34;&#34;&#34;
         df = df.copy()
 
-        clean_df(df, pc=self.pc, lc=self.lc, check_labels=mode==&#39;train&#39;)
+        clean_df(df, pc=self.pc, lc=self.lc, check_labels=mode == &#34;train&#34;)
 
         if not isinstance(df, pd.DataFrame):
-            raise ValueError(&#39;df must be a pd.DataFrame&#39;)
+            raise ValueError(&#34;df must be a pd.DataFrame&#34;)
 
         # validate columns
         self._validate_columns(df)
 
         # validate mode
-        #if mode != &#39;train&#39; and self.label_transform is None:
-            #raise ValueError(&#39;self.label_transform is None but mode is %s: are you sure preprocess_train was invoked first?&#39; % (mode))
+        # if mode != &#39;train&#39; and self.label_transform is None:
+        # raise ValueError(&#39;self.label_transform is None but mode is %s: are you sure preprocess_train was invoked first?&#39; % (mode))
 
         # verbose
         if verbose:
-            print(&#39;processing %s: %s rows x %s columns&#39; % (mode, df.shape[0], df.shape[1]))
+            print(
+                &#34;processing %s: %s rows x %s columns&#34; % (mode, df.shape[0], df.shape[1])
+            )
 
         # convert date fields
         for field in self.dc:
@@ -128,21 +132,31 @@ class TabularPreprocessor(Preprocessor):
             self.date_names = date_names
 
         # preprocess labels and data
-        if mode == &#39;train&#39;:
+        if mode == &#34;train&#34;:
             label_columns = self.lc[:]
-            #label_columns.sort() # leave label columns sorted in same order as in DataFrame
-            self.label_transform = U.YTransformDataFrame(label_columns, is_regression=self.is_regression)
+            # label_columns.sort() # leave label columns sorted in same order as in DataFrame
+            self.label_transform = U.YTransformDataFrame(
+                label_columns, is_regression=self.is_regression
+            )
             df = self.label_transform.apply_train(df)
-            self.label_columns = self.label_transform.get_classes() if not self.is_regression else self.label_transform.label_columns
-            self.cont_names, self.cat_names = cont_cat_split(df, label_columns=self.label_columns, max_card=self.max_card)
-            self.procs = [proc(self.cat_names, self.cont_names) for proc in self.procs] # &#34;objectivy&#34;
+            self.label_columns = (
+                self.label_transform.get_classes()
+                if not self.is_regression
+                else self.label_transform.label_columns
+            )
+            self.cont_names, self.cat_names = cont_cat_split(
+                df, label_columns=self.label_columns, max_card=self.max_card
+            )
+            self.procs = [
+                proc(self.cat_names, self.cont_names) for proc in self.procs
+            ]  # &#34;objectivy&#34;
         else:
             df = self.label_transform.apply_test(df)
-        for proc in self.procs: proc(df, test=mode!=&#39;train&#39;)  # apply processors
+        for proc in self.procs:
+            proc(df, test=mode != &#34;train&#34;)  # apply processors
         from .dataset import TabularDataset
+
         return TabularDataset(df, self.cat_names, self.cont_names, self.label_columns)
-
-
 
     def preprocess_valid(self, df, verbose=1):
         &#34;&#34;&#34;
@@ -150,9 +164,7 @@ class TabularPreprocessor(Preprocessor):
         preprocess validation set
         ```
         &#34;&#34;&#34;
-        return self.preprocess_train(df, mode=&#39;valid&#39;, verbose=verbose)
-
-
+        return self.preprocess_train(df, mode=&#34;valid&#34;, verbose=verbose)
 
     def preprocess_test(self, df, verbose=1):
         &#34;&#34;&#34;
@@ -160,8 +172,7 @@ class TabularPreprocessor(Preprocessor):
         preprocess test set
         ```
         &#34;&#34;&#34;
-        return self.preprocess_train(df, mode=&#39;test&#39;, verbose=verbose)
-
+        return self.preprocess_train(df, mode=&#34;test&#34;, verbose=verbose)
 
 
 def pd_data_types(df, return_df=False):
@@ -170,7 +181,7 @@ def pd_data_types(df, return_df=False):
     infers data type of each column in Pandas DataFrame
     Args:
       df(pd.DataFrame): pandas DataFrame
-      return_df(bool): If True, returns columns and types in DataFrame. 
+      return_df(bool): If True, returns columns and types in DataFrame.
                        Otherwise, a dictionary is returned.
     ```
     &#34;&#34;&#34;
@@ -179,43 +190,69 @@ def pd_data_types(df, return_df=False):
     df.apply(infer_type, axis=0)
 
     # DataFrame with column names &amp; new types
-    df_types = pd.DataFrame(df.apply(pd.api.types.infer_dtype, axis=0)).reset_index().rename(columns={&#39;index&#39;: &#39;column&#39;, 0: &#39;type&#39;})
-    if return_df: return df_types
-    cols = list(df_types[&#39;column&#39;].values)
-    col_types = list(df_types[&#39;type&#39;].values)
+    df_types = (
+        pd.DataFrame(df.apply(pd.api.types.infer_dtype, axis=0))
+        .reset_index()
+        .rename(columns={&#34;index&#34;: &#34;column&#34;, 0: &#34;type&#34;})
+    )
+    if return_df:
+        return df_types
+    cols = list(df_types[&#34;column&#34;].values)
+    col_types = list(df_types[&#34;type&#34;].values)
     return dict(list(zip(cols, col_types)))
 
 
-
-
-
-def clean_df(train_df, val_df=None, pc=[], lc=[], check_labels=True, return_types=False):
+def clean_df(
+    train_df, val_df=None, pc=[], lc=[], check_labels=True, return_types=False
+):
     train_type_dict = pd_data_types(train_df)
-    for k,v in train_type_dict.items():
-        if v != &#39;string&#39;: continue
+    for k, v in train_type_dict.items():
+        if v != &#34;string&#34;:
+            continue
         train_df[k] = train_df[k].str.strip()
         if val_df is not None:
-            if k not in val_df.columns: raise ValueError(&#39;val_df is missing %s column&#39; % (k))
+            if k not in val_df.columns:
+                raise ValueError(&#34;val_df is missing %s column&#34; % (k))
             val_df[k] = val_df[k].str.strip()
-    if (pc and not lc) or (not pc and lc): raise ValueError(&#39;pc and lc: both or neither must exist&#39;)
+    if (pc and not lc) or (not pc and lc):
+        raise ValueError(&#34;pc and lc: both or neither must exist&#34;)
     if pc and lc:
-        inp_cols = train_df.columns.values if check_labels else [col for col in train_df.columns.values if col not in lc]
+        inp_cols = (
+            train_df.columns.values
+            if check_labels
+            else [col for col in train_df.columns.values if col not in lc]
+        )
         original_cols = pc + lc if check_labels else pc
         if set(original_cols) != set(inp_cols):
-            raise ValueError(&#39;DataFrame is either missing columns or includes extra columns: \n&#39;+\
-                    &#39;expected: %s\nactual: %s&#39; % (original_cols, inp_cols))
-    if return_types: return train_type_dict
+            raise ValueError(
+                &#34;DataFrame is either missing columns or includes extra columns: \n&#34;
+                + &#34;expected: %s\nactual: %s&#34; % (original_cols, inp_cols)
+            )
+    if return_types:
+        return train_type_dict
     return
 
 
-#--------------------------------------------------------------------
+# --------------------------------------------------------------------
 # These are helper functions adapted from fastai:
 # https://github.com/fastai/fastai
 # -------------------------------------------------------------------
 
 
 from numbers import Number
-from typing import Any, AnyStr, Callable, Collection, Dict, Hashable, Iterator, List, Mapping, NewType, Optional
+from typing import (
+    Any,
+    AnyStr,
+    Callable,
+    Collection,
+    Dict,
+    Hashable,
+    Iterator,
+    List,
+    Mapping,
+    NewType,
+    Optional,
+)
 from typing import Sequence, Tuple, TypeVar, Union
 from types import SimpleNamespace
 
@@ -223,9 +260,10 @@ from types import SimpleNamespace
 from pandas.api.types import is_numeric_dtype, is_categorical_dtype
 
 
-def ifnone(a,b):
+def ifnone(a, b):
     &#34;`a` if `a` is not None, otherwise `b`.&#34;
     return b if a is None else a
+
 
 def make_date(df, date_field):
     &#34;&#34;&#34;
@@ -244,73 +282,126 @@ def cont_cat_split(df, max_card=20, label_columns=[]):
     &#34;Helper function that returns column names of cont and cat variables from given df.&#34;
     cont_names, cat_names = [], []
     for col in df:
-        if col in label_columns: continue
-        if df[col].dtype == int and df[col].unique().shape[0] &gt; max_card or df[col].dtype == float: cont_names.append(col)
-        else: cat_names.append(col)
+        if col in label_columns:
+            continue
+        if (
+            df[col].dtype == int
+            and df[col].unique().shape[0] &gt; max_card
+            or df[col].dtype == float
+        ):
+            cont_names.append(col)
+        else:
+            cat_names.append(col)
     return cont_names, cat_names
 
 
-def add_datepart(df:pd.DataFrame, field_name:str, prefix:str=None, drop:bool=True, time:bool=False, return_added_columns=True):
+def add_datepart(
+    df: pd.DataFrame,
+    field_name: str,
+    prefix: str = None,
+    drop: bool = True,
+    time: bool = False,
+    return_added_columns=True,
+):
     &#34;Helper function that adds columns relevant to a date in the column `field_name` of `df`.&#34;
     make_date(df, field_name)
     field = df[field_name]
-    prefix = ifnone(prefix, re.sub(&#39;[Dd]ate$&#39;, &#39;&#39;, field_name))
-    attr = [&#39;Year&#39;, &#39;Month&#39;, &#39;Week&#39;, &#39;Day&#39;, &#39;Dayofweek&#39;, &#39;Dayofyear&#39;, &#39;Is_month_end&#39;, &#39;Is_month_start&#39;,
-            &#39;Is_quarter_end&#39;, &#39;Is_quarter_start&#39;, &#39;Is_year_end&#39;, &#39;Is_year_start&#39;]
-    if time: attr = attr + [&#39;Hour&#39;, &#39;Minute&#39;, &#39;Second&#39;]
+    prefix = ifnone(prefix, re.sub(&#34;[Dd]ate$&#34;, &#34;&#34;, field_name))
+    attr = [
+        &#34;Year&#34;,
+        &#34;Month&#34;,
+        &#34;Week&#34;,
+        &#34;Day&#34;,
+        &#34;Dayofweek&#34;,
+        &#34;Dayofyear&#34;,
+        &#34;Is_month_end&#34;,
+        &#34;Is_month_start&#34;,
+        &#34;Is_quarter_end&#34;,
+        &#34;Is_quarter_start&#34;,
+        &#34;Is_year_end&#34;,
+        &#34;Is_year_start&#34;,
+    ]
+    if time:
+        attr = attr + [&#34;Hour&#34;, &#34;Minute&#34;, &#34;Second&#34;]
     added_columns = []
-    for n in attr: 
+    for n in attr:
         df[prefix + n] = getattr(field.dt, n.lower())
-        added_columns.append(prefix+n)
-    df[prefix + &#39;Elapsed&#39;] = field.astype(np.int64) // 10 ** 9
-    if drop: df.drop(field_name, axis=1, inplace=True)
+        added_columns.append(prefix + n)
+    df[prefix + &#34;Elapsed&#34;] = field.astype(np.int64) // 10**9
+    if drop:
+        df.drop(field_name, axis=1, inplace=True)
     if return_added_columns:
         return (df, added_columns)
     else:
         return df
 
 
-def cyclic_dt_feat_names(time:bool=True, add_linear:bool=False)-&gt;List[str]:
+def cyclic_dt_feat_names(time: bool = True, add_linear: bool = False) -&gt; List[str]:
     &#34;Return feature names of date/time cycles as produced by `cyclic_dt_features`.&#34;
-    fs = [&#39;cos&#39;,&#39;sin&#39;]
-    attr = [f&#39;{r}_{f}&#39; for r in &#39;weekday day_month month_year day_year&#39;.split() for f in fs]
-    if time: attr += [f&#39;{r}_{f}&#39; for r in &#39;hour clock min sec&#39;.split() for f in fs]
-    if add_linear: attr.append(&#39;year_lin&#39;)
+    fs = [&#34;cos&#34;, &#34;sin&#34;]
+    attr = [
+        f&#34;{r}_{f}&#34; for r in &#34;weekday day_month month_year day_year&#34;.split() for f in fs
+    ]
+    if time:
+        attr += [f&#34;{r}_{f}&#34; for r in &#34;hour clock min sec&#34;.split() for f in fs]
+    if add_linear:
+        attr.append(&#34;year_lin&#34;)
     return attr
 
 
-def cyclic_dt_features(d, time:bool=True, add_linear:bool=False)-&gt;List[float]:
+def cyclic_dt_features(d, time: bool = True, add_linear: bool = False) -&gt; List[float]:
     &#34;Calculate the cos and sin of date/time cycles.&#34;
-    tt,fs = d.timetuple(), [np.cos, np.sin]
-    day_year,days_month = tt.tm_yday, calendar.monthrange(d.year, d.month)[1]
+    tt, fs = d.timetuple(), [np.cos, np.sin]
+    day_year, days_month = tt.tm_yday, calendar.monthrange(d.year, d.month)[1]
     days_year = 366 if calendar.isleap(d.year) else 365
-    rs = d.weekday()/7, (d.day-1)/days_month, (d.month-1)/12, (day_year-1)/days_year
+    rs = (
+        d.weekday() / 7,
+        (d.day - 1) / days_month,
+        (d.month - 1) / 12,
+        (day_year - 1) / days_year,
+    )
     feats = [f(r * 2 * np.pi) for r in rs for f in fs]
     if time and isinstance(d, datetime) and type(d) != date:
-        rs = tt.tm_hour/24, tt.tm_hour%12/12, tt.tm_min/60, tt.tm_sec/60
+        rs = tt.tm_hour / 24, tt.tm_hour % 12 / 12, tt.tm_min / 60, tt.tm_sec / 60
         feats += [f(r * 2 * np.pi) for r in rs for f in fs]
     if add_linear:
-        if type(d) == date: feats.append(d.year + rs[-1])
+        if type(d) == date:
+            feats.append(d.year + rs[-1])
         else:
-            secs_in_year = (datetime(d.year+1, 1, 1) - datetime(d.year, 1, 1)).total_seconds()
-            feats.append(d.year + ((d - datetime(d.year, 1, 1)).total_seconds() / secs_in_year))
+            secs_in_year = (
+                datetime(d.year + 1, 1, 1) - datetime(d.year, 1, 1)
+            ).total_seconds()
+            feats.append(
+                d.year + ((d - datetime(d.year, 1, 1)).total_seconds() / secs_in_year)
+            )
     return feats
 
-def add_cyclic_datepart(df:pd.DataFrame, field_name:str, prefix:str=None, drop:bool=True, time:bool=False, add_linear:bool=False):
+
+def add_cyclic_datepart(
+    df: pd.DataFrame,
+    field_name: str,
+    prefix: str = None,
+    drop: bool = True,
+    time: bool = False,
+    add_linear: bool = False,
+):
     &#34;Helper function that adds trigonometric date/time features to a date in the column `field_name` of `df`.&#34;
     make_date(df, field_name)
     field = df[field_name]
-    prefix = ifnone(prefix, re.sub(&#39;[Dd]ate$&#39;, &#39;&#39;, field_name))
+    prefix = ifnone(prefix, re.sub(&#34;[Dd]ate$&#34;, &#34;&#34;, field_name))
     series = field.apply(partial(cyclic_dt_features, time=time, add_linear=add_linear))
     columns = [prefix + c for c in cyclic_dt_feat_names(time, add_linear)]
-    df_feats = pd.DataFrame([item for item in series], columns=columns, index=series.index)
-    for column in columns: df[column] = df_feats[column]
-    if drop: df.drop(field_name, axis=1, inplace=True)
+    df_feats = pd.DataFrame(
+        [item for item in series], columns=columns, index=series.index
+    )
+    for column in columns:
+        df[column] = df_feats[column]
+    if drop:
+        df.drop(field_name, axis=1, inplace=True)
     return df
 
 
-
-class TabularProc():
+class TabularProc:
     &#34;A processor for tabular dataframes.&#34;
 
     def __init__(self, cat_names, cont_names):
@@ -325,6 +416,7 @@ class TabularProc():
     def apply_train(self, df):
         &#34;Function applied to `df` if it&#39;s the train set.&#34;
         raise NotImplementedError
+
     def apply_test(self, df):
         &#34;Function applied to `df` if it&#39;s the test set.&#34;
         self.apply_train(df)
@@ -338,18 +430,31 @@ class Categorify(TabularProc):
     def apply_train(self, df):
         self.categories = {}
         for n in self.cat_names:
-            df.loc[:,n] = df.loc[:,n].astype(&#39;category&#39;).cat.as_ordered()
+            df.loc[:, n] = df.loc[:, n].astype(&#34;category&#34;).cat.as_ordered()
             self.categories[n] = df[n].cat.categories
 
     def apply_test(self, df):
         for n in self.cat_names:
-            df.loc[:,n] = pd.Categorical(df[n], categories=self.categories[n], ordered=True)
+            df.loc[:, n] = pd.Categorical(
+                df[n], categories=self.categories[n], ordered=True
+            )
 
-FILL_MEDIAN = &#39;median&#39;
-FILL_CONSTANT = &#39;constant&#39;
+
+FILL_MEDIAN = &#34;median&#34;
+FILL_CONSTANT = &#34;constant&#34;
+
+
 class FillMissing(TabularProc):
     &#34;Fill the missing values in continuous columns.&#34;
-    def __init__(self, cat_names, cont_names, fill_strategy=FILL_MEDIAN, add_col=True, fill_val=0.):
+
+    def __init__(
+        self,
+        cat_names,
+        cont_names,
+        fill_strategy=FILL_MEDIAN,
+        add_col=True,
+        fill_val=0.0,
+    ):
         super().__init__(cat_names, cont_names)
         self.fill_strategy = fill_strategy
         self.add_col = add_col
@@ -360,14 +465,18 @@ class FillMissing(TabularProc):
         self.na_dict = {}
         self.filler_dict = {}
         for name in self.cont_names:
-            if self.fill_strategy == FILL_MEDIAN: filler = df[name].median()
-            elif self.fill_strategy == FILL_CONSTANT: filler = self.fill_val
-            else: filler = df[name].dropna().value_counts().idxmax()
+            if self.fill_strategy == FILL_MEDIAN:
+                filler = df[name].median()
+            elif self.fill_strategy == FILL_CONSTANT:
+                filler = self.fill_val
+            else:
+                filler = df[name].dropna().value_counts().idxmax()
             self.filler_dict[name] = filler
             if pd.isnull(df[name]).sum():
                 if self.add_col:
-                    df[name+&#39;_na&#39;] = pd.isnull(df[name])
-                    if name+&#39;_na&#39; not in self.cat_names: self.cat_names.append(name+&#39;_na&#39;)
+                    df[name + &#34;_na&#34;] = pd.isnull(df[name])
+                    if name + &#34;_na&#34; not in self.cat_names:
+                        self.cat_names.append(name + &#34;_na&#34;)
                 df[name] = df[name].fillna(filler)
                 self.na_dict[name] = True
 
@@ -376,19 +485,23 @@ class FillMissing(TabularProc):
         for name in self.cont_names:
             if name in self.na_dict:
                 if self.add_col:
-                    df[name+&#39;_na&#39;] = pd.isnull(df[name])
-                    if name+&#39;_na&#39; not in self.cat_names: self.cat_names.append(name+&#39;_na&#39;)
+                    df[name + &#34;_na&#34;] = pd.isnull(df[name])
+                    if name + &#34;_na&#34; not in self.cat_names:
+                        self.cat_names.append(name + &#34;_na&#34;)
                 df[name] = df[name].fillna(self.filler_dict[name])
             elif pd.isnull(df[name]).sum() != 0:
-                warnings.warn(f&#34;&#34;&#34;There are nan values in field {name} but there were none in the training set. 
-                Filled with {self.fill_strategy}.&#34;&#34;&#34;)
+                warnings.warn(
+                    f&#34;&#34;&#34;There are nan values in field {name} but there were none in the training set. 
+                Filled with {self.fill_strategy}.&#34;&#34;&#34;
+                )
                 df[name] = df[name].fillna(self.filler_dict[name])
-                #raise Exception(f&#34;&#34;&#34;There are nan values in field {name} but there were none in the training set. 
-                #Please fix those manually.&#34;&#34;&#34;)
-           
+                # raise Exception(f&#34;&#34;&#34;There are nan values in field {name} but there were none in the training set.
+                # Please fix those manually.&#34;&#34;&#34;)
+
 
 class Normalize(TabularProc):
     &#34;Normalize the continuous variables.&#34;
+
     def __init__(self, cat_names, cont_names):
         super().__init__(cat_names, cont_names)
         self.means = None
@@ -396,25 +509,27 @@ class Normalize(TabularProc):
 
     def apply_train(self, df):
         &#34;Compute the means and stds of `self.cont_names` columns to normalize them.&#34;
-        self.means,self.stds = {},{}
+        self.means, self.stds = {}, {}
         for n in self.cont_names:
-            assert is_numeric_dtype(df[n]), (f&#34;&#34;&#34;Cannot normalize &#39;{n}&#39; column as it isn&#39;t numerical.
-                Are you sure it doesn&#39;t belong in the categorical set of columns?&#34;&#34;&#34;)
-            self.means[n],self.stds[n] = df[n].mean(),df[n].std()
-            df[n] = (df[n]-self.means[n]) / (1e-7 + self.stds[n])
+            assert is_numeric_dtype(
+                df[n]
+            ), f&#34;&#34;&#34;Cannot normalize &#39;{n}&#39; column as it isn&#39;t numerical.
+                Are you sure it doesn&#39;t belong in the categorical set of columns?&#34;&#34;&#34;
+            self.means[n], self.stds[n] = df[n].mean(), df[n].std()
+            df[n] = (df[n] - self.means[n]) / (1e-7 + self.stds[n])
 
     def apply_test(self, df):
         &#34;Normalize `self.cont_names` with the same statistics as in `apply_train`.&#34;
         for n in self.cont_names:
-            df[n] = (df[n]-self.means[n]) / (1e-7 + self.stds[n])
+            df[n] = (df[n] - self.means[n]) / (1e-7 + self.stds[n])
 
-    def revert(self,df):
+    def revert(self, df):
         &#34;&#34;&#34;
         Undoes normalization and returns reverted dataframe
         &#34;&#34;&#34;
         out_df = df.copy()
         for n in self.cont_names:
-            out_df[n] =  (df[n] * (1e-7 + self.stds[n])) + self.means[n]
+            out_df[n] = (df[n] * (1e-7 + self.stds[n])) + self.means[n]
         return out_df</code></pre>
 </details>
 </section>
@@ -434,16 +549,27 @@ class Normalize(TabularProc):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def add_cyclic_datepart(df:pd.DataFrame, field_name:str, prefix:str=None, drop:bool=True, time:bool=False, add_linear:bool=False):
+<pre><code class="python">def add_cyclic_datepart(
+    df: pd.DataFrame,
+    field_name: str,
+    prefix: str = None,
+    drop: bool = True,
+    time: bool = False,
+    add_linear: bool = False,
+):
     &#34;Helper function that adds trigonometric date/time features to a date in the column `field_name` of `df`.&#34;
     make_date(df, field_name)
     field = df[field_name]
-    prefix = ifnone(prefix, re.sub(&#39;[Dd]ate$&#39;, &#39;&#39;, field_name))
+    prefix = ifnone(prefix, re.sub(&#34;[Dd]ate$&#34;, &#34;&#34;, field_name))
     series = field.apply(partial(cyclic_dt_features, time=time, add_linear=add_linear))
     columns = [prefix + c for c in cyclic_dt_feat_names(time, add_linear)]
-    df_feats = pd.DataFrame([item for item in series], columns=columns, index=series.index)
-    for column in columns: df[column] = df_feats[column]
-    if drop: df.drop(field_name, axis=1, inplace=True)
+    df_feats = pd.DataFrame(
+        [item for item in series], columns=columns, index=series.index
+    )
+    for column in columns:
+        df[column] = df_feats[column]
+    if drop:
+        df.drop(field_name, axis=1, inplace=True)
     return df</code></pre>
 </details>
 </dd>
@@ -456,20 +582,41 @@ class Normalize(TabularProc):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def add_datepart(df:pd.DataFrame, field_name:str, prefix:str=None, drop:bool=True, time:bool=False, return_added_columns=True):
+<pre><code class="python">def add_datepart(
+    df: pd.DataFrame,
+    field_name: str,
+    prefix: str = None,
+    drop: bool = True,
+    time: bool = False,
+    return_added_columns=True,
+):
     &#34;Helper function that adds columns relevant to a date in the column `field_name` of `df`.&#34;
     make_date(df, field_name)
     field = df[field_name]
-    prefix = ifnone(prefix, re.sub(&#39;[Dd]ate$&#39;, &#39;&#39;, field_name))
-    attr = [&#39;Year&#39;, &#39;Month&#39;, &#39;Week&#39;, &#39;Day&#39;, &#39;Dayofweek&#39;, &#39;Dayofyear&#39;, &#39;Is_month_end&#39;, &#39;Is_month_start&#39;,
-            &#39;Is_quarter_end&#39;, &#39;Is_quarter_start&#39;, &#39;Is_year_end&#39;, &#39;Is_year_start&#39;]
-    if time: attr = attr + [&#39;Hour&#39;, &#39;Minute&#39;, &#39;Second&#39;]
+    prefix = ifnone(prefix, re.sub(&#34;[Dd]ate$&#34;, &#34;&#34;, field_name))
+    attr = [
+        &#34;Year&#34;,
+        &#34;Month&#34;,
+        &#34;Week&#34;,
+        &#34;Day&#34;,
+        &#34;Dayofweek&#34;,
+        &#34;Dayofyear&#34;,
+        &#34;Is_month_end&#34;,
+        &#34;Is_month_start&#34;,
+        &#34;Is_quarter_end&#34;,
+        &#34;Is_quarter_start&#34;,
+        &#34;Is_year_end&#34;,
+        &#34;Is_year_start&#34;,
+    ]
+    if time:
+        attr = attr + [&#34;Hour&#34;, &#34;Minute&#34;, &#34;Second&#34;]
     added_columns = []
-    for n in attr: 
+    for n in attr:
         df[prefix + n] = getattr(field.dt, n.lower())
-        added_columns.append(prefix+n)
-    df[prefix + &#39;Elapsed&#39;] = field.astype(np.int64) // 10 ** 9
-    if drop: df.drop(field_name, axis=1, inplace=True)
+        added_columns.append(prefix + n)
+    df[prefix + &#34;Elapsed&#34;] = field.astype(np.int64) // 10**9
+    if drop:
+        df.drop(field_name, axis=1, inplace=True)
     if return_added_columns:
         return (df, added_columns)
     else:
@@ -485,22 +632,34 @@ class Normalize(TabularProc):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def clean_df(train_df, val_df=None, pc=[], lc=[], check_labels=True, return_types=False):
+<pre><code class="python">def clean_df(
+    train_df, val_df=None, pc=[], lc=[], check_labels=True, return_types=False
+):
     train_type_dict = pd_data_types(train_df)
-    for k,v in train_type_dict.items():
-        if v != &#39;string&#39;: continue
+    for k, v in train_type_dict.items():
+        if v != &#34;string&#34;:
+            continue
         train_df[k] = train_df[k].str.strip()
         if val_df is not None:
-            if k not in val_df.columns: raise ValueError(&#39;val_df is missing %s column&#39; % (k))
+            if k not in val_df.columns:
+                raise ValueError(&#34;val_df is missing %s column&#34; % (k))
             val_df[k] = val_df[k].str.strip()
-    if (pc and not lc) or (not pc and lc): raise ValueError(&#39;pc and lc: both or neither must exist&#39;)
+    if (pc and not lc) or (not pc and lc):
+        raise ValueError(&#34;pc and lc: both or neither must exist&#34;)
     if pc and lc:
-        inp_cols = train_df.columns.values if check_labels else [col for col in train_df.columns.values if col not in lc]
+        inp_cols = (
+            train_df.columns.values
+            if check_labels
+            else [col for col in train_df.columns.values if col not in lc]
+        )
         original_cols = pc + lc if check_labels else pc
         if set(original_cols) != set(inp_cols):
-            raise ValueError(&#39;DataFrame is either missing columns or includes extra columns: \n&#39;+\
-                    &#39;expected: %s\nactual: %s&#39; % (original_cols, inp_cols))
-    if return_types: return train_type_dict
+            raise ValueError(
+                &#34;DataFrame is either missing columns or includes extra columns: \n&#34;
+                + &#34;expected: %s\nactual: %s&#34; % (original_cols, inp_cols)
+            )
+    if return_types:
+        return train_type_dict
     return</code></pre>
 </details>
 </dd>
@@ -517,9 +676,16 @@ class Normalize(TabularProc):
     &#34;Helper function that returns column names of cont and cat variables from given df.&#34;
     cont_names, cat_names = [], []
     for col in df:
-        if col in label_columns: continue
-        if df[col].dtype == int and df[col].unique().shape[0] &gt; max_card or df[col].dtype == float: cont_names.append(col)
-        else: cat_names.append(col)
+        if col in label_columns:
+            continue
+        if (
+            df[col].dtype == int
+            and df[col].unique().shape[0] &gt; max_card
+            or df[col].dtype == float
+        ):
+            cont_names.append(col)
+        else:
+            cat_names.append(col)
     return cont_names, cat_names</code></pre>
 </details>
 </dd>
@@ -532,12 +698,16 @@ class Normalize(TabularProc):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def cyclic_dt_feat_names(time:bool=True, add_linear:bool=False)-&gt;List[str]:
+<pre><code class="python">def cyclic_dt_feat_names(time: bool = True, add_linear: bool = False) -&gt; List[str]:
     &#34;Return feature names of date/time cycles as produced by `cyclic_dt_features`.&#34;
-    fs = [&#39;cos&#39;,&#39;sin&#39;]
-    attr = [f&#39;{r}_{f}&#39; for r in &#39;weekday day_month month_year day_year&#39;.split() for f in fs]
-    if time: attr += [f&#39;{r}_{f}&#39; for r in &#39;hour clock min sec&#39;.split() for f in fs]
-    if add_linear: attr.append(&#39;year_lin&#39;)
+    fs = [&#34;cos&#34;, &#34;sin&#34;]
+    attr = [
+        f&#34;{r}_{f}&#34; for r in &#34;weekday day_month month_year day_year&#34;.split() for f in fs
+    ]
+    if time:
+        attr += [f&#34;{r}_{f}&#34; for r in &#34;hour clock min sec&#34;.split() for f in fs]
+    if add_linear:
+        attr.append(&#34;year_lin&#34;)
     return attr</code></pre>
 </details>
 </dd>
@@ -550,21 +720,31 @@ class Normalize(TabularProc):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def cyclic_dt_features(d, time:bool=True, add_linear:bool=False)-&gt;List[float]:
+<pre><code class="python">def cyclic_dt_features(d, time: bool = True, add_linear: bool = False) -&gt; List[float]:
     &#34;Calculate the cos and sin of date/time cycles.&#34;
-    tt,fs = d.timetuple(), [np.cos, np.sin]
-    day_year,days_month = tt.tm_yday, calendar.monthrange(d.year, d.month)[1]
+    tt, fs = d.timetuple(), [np.cos, np.sin]
+    day_year, days_month = tt.tm_yday, calendar.monthrange(d.year, d.month)[1]
     days_year = 366 if calendar.isleap(d.year) else 365
-    rs = d.weekday()/7, (d.day-1)/days_month, (d.month-1)/12, (day_year-1)/days_year
+    rs = (
+        d.weekday() / 7,
+        (d.day - 1) / days_month,
+        (d.month - 1) / 12,
+        (day_year - 1) / days_year,
+    )
     feats = [f(r * 2 * np.pi) for r in rs for f in fs]
     if time and isinstance(d, datetime) and type(d) != date:
-        rs = tt.tm_hour/24, tt.tm_hour%12/12, tt.tm_min/60, tt.tm_sec/60
+        rs = tt.tm_hour / 24, tt.tm_hour % 12 / 12, tt.tm_min / 60, tt.tm_sec / 60
         feats += [f(r * 2 * np.pi) for r in rs for f in fs]
     if add_linear:
-        if type(d) == date: feats.append(d.year + rs[-1])
+        if type(d) == date:
+            feats.append(d.year + rs[-1])
         else:
-            secs_in_year = (datetime(d.year+1, 1, 1) - datetime(d.year, 1, 1)).total_seconds()
-            feats.append(d.year + ((d - datetime(d.year, 1, 1)).total_seconds() / secs_in_year))
+            secs_in_year = (
+                datetime(d.year + 1, 1, 1) - datetime(d.year, 1, 1)
+            ).total_seconds()
+            feats.append(
+                d.year + ((d - datetime(d.year, 1, 1)).total_seconds() / secs_in_year)
+            )
     return feats</code></pre>
 </details>
 </dd>
@@ -577,7 +757,7 @@ class Normalize(TabularProc):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def ifnone(a,b):
+<pre><code class="python">def ifnone(a, b):
     &#34;`a` if `a` is not None, otherwise `b`.&#34;
     return b if a is None else a</code></pre>
 </details>
@@ -612,7 +792,7 @@ Reference: <a href="https://github.com/fastai/fastai">https://github.com/fastai/
 <div class="desc"><pre><code>infers data type of each column in Pandas DataFrame
 Args:
   df(pd.DataFrame): pandas DataFrame
-  return_df(bool): If True, returns columns and types in DataFrame. 
+  return_df(bool): If True, returns columns and types in DataFrame.
                    Otherwise, a dictionary is returned.
 </code></pre></div>
 <details class="source">
@@ -625,7 +805,7 @@ Args:
     infers data type of each column in Pandas DataFrame
     Args:
       df(pd.DataFrame): pandas DataFrame
-      return_df(bool): If True, returns columns and types in DataFrame. 
+      return_df(bool): If True, returns columns and types in DataFrame.
                        Otherwise, a dictionary is returned.
     ```
     &#34;&#34;&#34;
@@ -634,10 +814,15 @@ Args:
     df.apply(infer_type, axis=0)
 
     # DataFrame with column names &amp; new types
-    df_types = pd.DataFrame(df.apply(pd.api.types.infer_dtype, axis=0)).reset_index().rename(columns={&#39;index&#39;: &#39;column&#39;, 0: &#39;type&#39;})
-    if return_df: return df_types
-    cols = list(df_types[&#39;column&#39;].values)
-    col_types = list(df_types[&#39;type&#39;].values)
+    df_types = (
+        pd.DataFrame(df.apply(pd.api.types.infer_dtype, axis=0))
+        .reset_index()
+        .rename(columns={&#34;index&#34;: &#34;column&#34;, 0: &#34;type&#34;})
+    )
+    if return_df:
+        return df_types
+    cols = list(df_types[&#34;column&#34;].values)
+    col_types = list(df_types[&#34;type&#34;].values)
     return dict(list(zip(cols, col_types)))</code></pre>
 </details>
 </dd>
@@ -664,12 +849,14 @@ Args:
     def apply_train(self, df):
         self.categories = {}
         for n in self.cat_names:
-            df.loc[:,n] = df.loc[:,n].astype(&#39;category&#39;).cat.as_ordered()
+            df.loc[:, n] = df.loc[:, n].astype(&#34;category&#34;).cat.as_ordered()
             self.categories[n] = df[n].cat.categories
 
     def apply_test(self, df):
         for n in self.cat_names:
-            df.loc[:,n] = pd.Categorical(df[n], categories=self.categories[n], ordered=True)</code></pre>
+            df.loc[:, n] = pd.Categorical(
+                df[n], categories=self.categories[n], ordered=True
+            )</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -697,7 +884,15 @@ Args:
 </summary>
 <pre><code class="python">class FillMissing(TabularProc):
     &#34;Fill the missing values in continuous columns.&#34;
-    def __init__(self, cat_names, cont_names, fill_strategy=FILL_MEDIAN, add_col=True, fill_val=0.):
+
+    def __init__(
+        self,
+        cat_names,
+        cont_names,
+        fill_strategy=FILL_MEDIAN,
+        add_col=True,
+        fill_val=0.0,
+    ):
         super().__init__(cat_names, cont_names)
         self.fill_strategy = fill_strategy
         self.add_col = add_col
@@ -708,14 +903,18 @@ Args:
         self.na_dict = {}
         self.filler_dict = {}
         for name in self.cont_names:
-            if self.fill_strategy == FILL_MEDIAN: filler = df[name].median()
-            elif self.fill_strategy == FILL_CONSTANT: filler = self.fill_val
-            else: filler = df[name].dropna().value_counts().idxmax()
+            if self.fill_strategy == FILL_MEDIAN:
+                filler = df[name].median()
+            elif self.fill_strategy == FILL_CONSTANT:
+                filler = self.fill_val
+            else:
+                filler = df[name].dropna().value_counts().idxmax()
             self.filler_dict[name] = filler
             if pd.isnull(df[name]).sum():
                 if self.add_col:
-                    df[name+&#39;_na&#39;] = pd.isnull(df[name])
-                    if name+&#39;_na&#39; not in self.cat_names: self.cat_names.append(name+&#39;_na&#39;)
+                    df[name + &#34;_na&#34;] = pd.isnull(df[name])
+                    if name + &#34;_na&#34; not in self.cat_names:
+                        self.cat_names.append(name + &#34;_na&#34;)
                 df[name] = df[name].fillna(filler)
                 self.na_dict[name] = True
 
@@ -724,12 +923,15 @@ Args:
         for name in self.cont_names:
             if name in self.na_dict:
                 if self.add_col:
-                    df[name+&#39;_na&#39;] = pd.isnull(df[name])
-                    if name+&#39;_na&#39; not in self.cat_names: self.cat_names.append(name+&#39;_na&#39;)
+                    df[name + &#34;_na&#34;] = pd.isnull(df[name])
+                    if name + &#34;_na&#34; not in self.cat_names:
+                        self.cat_names.append(name + &#34;_na&#34;)
                 df[name] = df[name].fillna(self.filler_dict[name])
             elif pd.isnull(df[name]).sum() != 0:
-                warnings.warn(f&#34;&#34;&#34;There are nan values in field {name} but there were none in the training set. 
-                Filled with {self.fill_strategy}.&#34;&#34;&#34;)
+                warnings.warn(
+                    f&#34;&#34;&#34;There are nan values in field {name} but there were none in the training set. 
+                Filled with {self.fill_strategy}.&#34;&#34;&#34;
+                )
                 df[name] = df[name].fillna(self.filler_dict[name])</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -752,12 +954,15 @@ Args:
     for name in self.cont_names:
         if name in self.na_dict:
             if self.add_col:
-                df[name+&#39;_na&#39;] = pd.isnull(df[name])
-                if name+&#39;_na&#39; not in self.cat_names: self.cat_names.append(name+&#39;_na&#39;)
+                df[name + &#34;_na&#34;] = pd.isnull(df[name])
+                if name + &#34;_na&#34; not in self.cat_names:
+                    self.cat_names.append(name + &#34;_na&#34;)
             df[name] = df[name].fillna(self.filler_dict[name])
         elif pd.isnull(df[name]).sum() != 0:
-            warnings.warn(f&#34;&#34;&#34;There are nan values in field {name} but there were none in the training set. 
-            Filled with {self.fill_strategy}.&#34;&#34;&#34;)
+            warnings.warn(
+                f&#34;&#34;&#34;There are nan values in field {name} but there were none in the training set. 
+            Filled with {self.fill_strategy}.&#34;&#34;&#34;
+            )
             df[name] = df[name].fillna(self.filler_dict[name])</code></pre>
 </details>
 </dd>
@@ -783,6 +988,7 @@ Args:
 </summary>
 <pre><code class="python">class Normalize(TabularProc):
     &#34;Normalize the continuous variables.&#34;
+
     def __init__(self, cat_names, cont_names):
         super().__init__(cat_names, cont_names)
         self.means = None
@@ -790,25 +996,27 @@ Args:
 
     def apply_train(self, df):
         &#34;Compute the means and stds of `self.cont_names` columns to normalize them.&#34;
-        self.means,self.stds = {},{}
+        self.means, self.stds = {}, {}
         for n in self.cont_names:
-            assert is_numeric_dtype(df[n]), (f&#34;&#34;&#34;Cannot normalize &#39;{n}&#39; column as it isn&#39;t numerical.
-                Are you sure it doesn&#39;t belong in the categorical set of columns?&#34;&#34;&#34;)
-            self.means[n],self.stds[n] = df[n].mean(),df[n].std()
-            df[n] = (df[n]-self.means[n]) / (1e-7 + self.stds[n])
+            assert is_numeric_dtype(
+                df[n]
+            ), f&#34;&#34;&#34;Cannot normalize &#39;{n}&#39; column as it isn&#39;t numerical.
+                Are you sure it doesn&#39;t belong in the categorical set of columns?&#34;&#34;&#34;
+            self.means[n], self.stds[n] = df[n].mean(), df[n].std()
+            df[n] = (df[n] - self.means[n]) / (1e-7 + self.stds[n])
 
     def apply_test(self, df):
         &#34;Normalize `self.cont_names` with the same statistics as in `apply_train`.&#34;
         for n in self.cont_names:
-            df[n] = (df[n]-self.means[n]) / (1e-7 + self.stds[n])
+            df[n] = (df[n] - self.means[n]) / (1e-7 + self.stds[n])
 
-    def revert(self,df):
+    def revert(self, df):
         &#34;&#34;&#34;
         Undoes normalization and returns reverted dataframe
         &#34;&#34;&#34;
         out_df = df.copy()
         for n in self.cont_names:
-            out_df[n] =  (df[n] * (1e-7 + self.stds[n])) + self.means[n]
+            out_df[n] = (df[n] * (1e-7 + self.stds[n])) + self.means[n]
         return out_df</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -829,7 +1037,7 @@ Args:
 <pre><code class="python">def apply_test(self, df):
     &#34;Normalize `self.cont_names` with the same statistics as in `apply_train`.&#34;
     for n in self.cont_names:
-        df[n] = (df[n]-self.means[n]) / (1e-7 + self.stds[n])</code></pre>
+        df[n] = (df[n] - self.means[n]) / (1e-7 + self.stds[n])</code></pre>
 </details>
 </dd>
 <dt id="ktrain.tabular.preprocessor.Normalize.apply_train"><code class="name flex">
@@ -843,12 +1051,14 @@ Args:
 </summary>
 <pre><code class="python">def apply_train(self, df):
     &#34;Compute the means and stds of `self.cont_names` columns to normalize them.&#34;
-    self.means,self.stds = {},{}
+    self.means, self.stds = {}, {}
     for n in self.cont_names:
-        assert is_numeric_dtype(df[n]), (f&#34;&#34;&#34;Cannot normalize &#39;{n}&#39; column as it isn&#39;t numerical.
-            Are you sure it doesn&#39;t belong in the categorical set of columns?&#34;&#34;&#34;)
-        self.means[n],self.stds[n] = df[n].mean(),df[n].std()
-        df[n] = (df[n]-self.means[n]) / (1e-7 + self.stds[n])</code></pre>
+        assert is_numeric_dtype(
+            df[n]
+        ), f&#34;&#34;&#34;Cannot normalize &#39;{n}&#39; column as it isn&#39;t numerical.
+            Are you sure it doesn&#39;t belong in the categorical set of columns?&#34;&#34;&#34;
+        self.means[n], self.stds[n] = df[n].mean(), df[n].std()
+        df[n] = (df[n] - self.means[n]) / (1e-7 + self.stds[n])</code></pre>
 </details>
 </dd>
 <dt id="ktrain.tabular.preprocessor.Normalize.revert"><code class="name flex">
@@ -860,13 +1070,13 @@ Args:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def revert(self,df):
+<pre><code class="python">def revert(self, df):
     &#34;&#34;&#34;
     Undoes normalization and returns reverted dataframe
     &#34;&#34;&#34;
     out_df = df.copy()
     for n in self.cont_names:
-        out_df[n] =  (df[n] * (1e-7 + self.stds[n])) + self.means[n]
+        out_df[n] = (df[n] * (1e-7 + self.stds[n])) + self.means[n]
     return out_df</code></pre>
 </details>
 </dd>
@@ -890,10 +1100,17 @@ Args:
     ```
     &#34;&#34;&#34;
 
-    def __init__(self, predictor_columns, label_columns, date_columns=[], 
-                 is_regression=False, procs=[], max_card=20):
-        self.is_regression=is_regression
-        self.c  = None
+    def __init__(
+        self,
+        predictor_columns,
+        label_columns,
+        date_columns=[],
+        is_regression=False,
+        procs=[],
+        max_card=20,
+    ):
+        self.is_regression = is_regression
+        self.c = None
         self.pc = predictor_columns
         self.lc = label_columns
         self.lc = [self.lc] if isinstance(self.lc, str) else self.lc
@@ -908,19 +1125,16 @@ Args:
 
     @property
     def na_names(self):
-        return [n for n in self.cat_names if n[-3:] == &#39;_na&#39;]
-        
+        return [n for n in self.cat_names if n[-3:] == &#34;_na&#34;]
+
     def get_preprocessor(self):
         return (self.label_transform, self.procs)
-
 
     def get_classes(self):
         return self.label_columns if not self.is_regression else []
 
-
     def preprocess(self, df):
         return self.preprocess_test(df)
-
 
     def _validate_columns(self, df):
         missing_columns = []
@@ -928,28 +1142,26 @@ Args:
             if col not in self.lc and col not in self.pc:
                 missing_columns.append(col)
         if len(missing_columns) &gt; 0:
-            raise ValueError(&#39;df is missing columns: %s&#39; % (missing_columns))
+            raise ValueError(&#34;df is missing columns: %s&#34; % (missing_columns))
         return
-
 
     def denormalize(self, df):
         normalizer = None
         for proc in self.procs:
-            if type(proc).__name__ == &#39;Normalize&#39;:
+            if type(proc).__name__ == &#34;Normalize&#34;:
                 normalizer = proc
                 break
-        if normalizer is None: return df
+        if normalizer is None:
+            return df
         return normalizer.revert(df)
 
-    #def codify(self, df):
-        #df = df.copy()
-        #for lab in self.lc:
-            #df[lab] = df[lab].cat.codes
-        #return df
+    # def codify(self, df):
+    # df = df.copy()
+    # for lab in self.lc:
+    # df[lab] = df[lab].cat.codes
+    # return df
 
-
-
-    def preprocess_train(self, df, mode=&#39;train&#39;, verbose=1):
+    def preprocess_train(self, df, mode=&#34;train&#34;, verbose=1):
         &#34;&#34;&#34;
         ```
         preprocess training set
@@ -957,21 +1169,23 @@ Args:
         &#34;&#34;&#34;
         df = df.copy()
 
-        clean_df(df, pc=self.pc, lc=self.lc, check_labels=mode==&#39;train&#39;)
+        clean_df(df, pc=self.pc, lc=self.lc, check_labels=mode == &#34;train&#34;)
 
         if not isinstance(df, pd.DataFrame):
-            raise ValueError(&#39;df must be a pd.DataFrame&#39;)
+            raise ValueError(&#34;df must be a pd.DataFrame&#34;)
 
         # validate columns
         self._validate_columns(df)
 
         # validate mode
-        #if mode != &#39;train&#39; and self.label_transform is None:
-            #raise ValueError(&#39;self.label_transform is None but mode is %s: are you sure preprocess_train was invoked first?&#39; % (mode))
+        # if mode != &#39;train&#39; and self.label_transform is None:
+        # raise ValueError(&#39;self.label_transform is None but mode is %s: are you sure preprocess_train was invoked first?&#39; % (mode))
 
         # verbose
         if verbose:
-            print(&#39;processing %s: %s rows x %s columns&#39; % (mode, df.shape[0], df.shape[1]))
+            print(
+                &#34;processing %s: %s rows x %s columns&#34; % (mode, df.shape[0], df.shape[1])
+            )
 
         # convert date fields
         for field in self.dc:
@@ -980,21 +1194,31 @@ Args:
             self.date_names = date_names
 
         # preprocess labels and data
-        if mode == &#39;train&#39;:
+        if mode == &#34;train&#34;:
             label_columns = self.lc[:]
-            #label_columns.sort() # leave label columns sorted in same order as in DataFrame
-            self.label_transform = U.YTransformDataFrame(label_columns, is_regression=self.is_regression)
+            # label_columns.sort() # leave label columns sorted in same order as in DataFrame
+            self.label_transform = U.YTransformDataFrame(
+                label_columns, is_regression=self.is_regression
+            )
             df = self.label_transform.apply_train(df)
-            self.label_columns = self.label_transform.get_classes() if not self.is_regression else self.label_transform.label_columns
-            self.cont_names, self.cat_names = cont_cat_split(df, label_columns=self.label_columns, max_card=self.max_card)
-            self.procs = [proc(self.cat_names, self.cont_names) for proc in self.procs] # &#34;objectivy&#34;
+            self.label_columns = (
+                self.label_transform.get_classes()
+                if not self.is_regression
+                else self.label_transform.label_columns
+            )
+            self.cont_names, self.cat_names = cont_cat_split(
+                df, label_columns=self.label_columns, max_card=self.max_card
+            )
+            self.procs = [
+                proc(self.cat_names, self.cont_names) for proc in self.procs
+            ]  # &#34;objectivy&#34;
         else:
             df = self.label_transform.apply_test(df)
-        for proc in self.procs: proc(df, test=mode!=&#39;train&#39;)  # apply processors
+        for proc in self.procs:
+            proc(df, test=mode != &#34;train&#34;)  # apply processors
         from .dataset import TabularDataset
+
         return TabularDataset(df, self.cat_names, self.cont_names, self.label_columns)
-
-
 
     def preprocess_valid(self, df, verbose=1):
         &#34;&#34;&#34;
@@ -1002,9 +1226,7 @@ Args:
         preprocess validation set
         ```
         &#34;&#34;&#34;
-        return self.preprocess_train(df, mode=&#39;valid&#39;, verbose=verbose)
-
-
+        return self.preprocess_train(df, mode=&#34;valid&#34;, verbose=verbose)
 
     def preprocess_test(self, df, verbose=1):
         &#34;&#34;&#34;
@@ -1012,7 +1234,7 @@ Args:
         preprocess test set
         ```
         &#34;&#34;&#34;
-        return self.preprocess_train(df, mode=&#39;test&#39;, verbose=verbose)</code></pre>
+        return self.preprocess_train(df, mode=&#34;test&#34;, verbose=verbose)</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -1030,7 +1252,7 @@ Args:
 </summary>
 <pre><code class="python">@property
 def na_names(self):
-    return [n for n in self.cat_names if n[-3:] == &#39;_na&#39;]</code></pre>
+    return [n for n in self.cat_names if n[-3:] == &#34;_na&#34;]</code></pre>
 </details>
 </dd>
 </dl>
@@ -1048,10 +1270,11 @@ def na_names(self):
 <pre><code class="python">def denormalize(self, df):
     normalizer = None
     for proc in self.procs:
-        if type(proc).__name__ == &#39;Normalize&#39;:
+        if type(proc).__name__ == &#34;Normalize&#34;:
             normalizer = proc
             break
-    if normalizer is None: return df
+    if normalizer is None:
+        return df
     return normalizer.revert(df)</code></pre>
 </details>
 </dd>
@@ -1110,7 +1333,7 @@ def na_names(self):
     preprocess test set
     ```
     &#34;&#34;&#34;
-    return self.preprocess_train(df, mode=&#39;test&#39;, verbose=verbose)</code></pre>
+    return self.preprocess_train(df, mode=&#34;test&#34;, verbose=verbose)</code></pre>
 </details>
 </dd>
 <dt id="ktrain.tabular.preprocessor.TabularPreprocessor.preprocess_train"><code class="name flex">
@@ -1123,7 +1346,7 @@ def na_names(self):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def preprocess_train(self, df, mode=&#39;train&#39;, verbose=1):
+<pre><code class="python">def preprocess_train(self, df, mode=&#34;train&#34;, verbose=1):
     &#34;&#34;&#34;
     ```
     preprocess training set
@@ -1131,21 +1354,23 @@ def na_names(self):
     &#34;&#34;&#34;
     df = df.copy()
 
-    clean_df(df, pc=self.pc, lc=self.lc, check_labels=mode==&#39;train&#39;)
+    clean_df(df, pc=self.pc, lc=self.lc, check_labels=mode == &#34;train&#34;)
 
     if not isinstance(df, pd.DataFrame):
-        raise ValueError(&#39;df must be a pd.DataFrame&#39;)
+        raise ValueError(&#34;df must be a pd.DataFrame&#34;)
 
     # validate columns
     self._validate_columns(df)
 
     # validate mode
-    #if mode != &#39;train&#39; and self.label_transform is None:
-        #raise ValueError(&#39;self.label_transform is None but mode is %s: are you sure preprocess_train was invoked first?&#39; % (mode))
+    # if mode != &#39;train&#39; and self.label_transform is None:
+    # raise ValueError(&#39;self.label_transform is None but mode is %s: are you sure preprocess_train was invoked first?&#39; % (mode))
 
     # verbose
     if verbose:
-        print(&#39;processing %s: %s rows x %s columns&#39; % (mode, df.shape[0], df.shape[1]))
+        print(
+            &#34;processing %s: %s rows x %s columns&#34; % (mode, df.shape[0], df.shape[1])
+        )
 
     # convert date fields
     for field in self.dc:
@@ -1154,18 +1379,30 @@ def na_names(self):
         self.date_names = date_names
 
     # preprocess labels and data
-    if mode == &#39;train&#39;:
+    if mode == &#34;train&#34;:
         label_columns = self.lc[:]
-        #label_columns.sort() # leave label columns sorted in same order as in DataFrame
-        self.label_transform = U.YTransformDataFrame(label_columns, is_regression=self.is_regression)
+        # label_columns.sort() # leave label columns sorted in same order as in DataFrame
+        self.label_transform = U.YTransformDataFrame(
+            label_columns, is_regression=self.is_regression
+        )
         df = self.label_transform.apply_train(df)
-        self.label_columns = self.label_transform.get_classes() if not self.is_regression else self.label_transform.label_columns
-        self.cont_names, self.cat_names = cont_cat_split(df, label_columns=self.label_columns, max_card=self.max_card)
-        self.procs = [proc(self.cat_names, self.cont_names) for proc in self.procs] # &#34;objectivy&#34;
+        self.label_columns = (
+            self.label_transform.get_classes()
+            if not self.is_regression
+            else self.label_transform.label_columns
+        )
+        self.cont_names, self.cat_names = cont_cat_split(
+            df, label_columns=self.label_columns, max_card=self.max_card
+        )
+        self.procs = [
+            proc(self.cat_names, self.cont_names) for proc in self.procs
+        ]  # &#34;objectivy&#34;
     else:
         df = self.label_transform.apply_test(df)
-    for proc in self.procs: proc(df, test=mode!=&#39;train&#39;)  # apply processors
+    for proc in self.procs:
+        proc(df, test=mode != &#34;train&#34;)  # apply processors
     from .dataset import TabularDataset
+
     return TabularDataset(df, self.cat_names, self.cont_names, self.label_columns)</code></pre>
 </details>
 </dd>
@@ -1185,7 +1422,7 @@ def na_names(self):
     preprocess validation set
     ```
     &#34;&#34;&#34;
-    return self.preprocess_train(df, mode=&#39;valid&#39;, verbose=verbose)</code></pre>
+    return self.preprocess_train(df, mode=&#34;valid&#34;, verbose=verbose)</code></pre>
 </details>
 </dd>
 </dl>
@@ -1200,7 +1437,7 @@ def na_names(self):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class TabularProc():
+<pre><code class="python">class TabularProc:
     &#34;A processor for tabular dataframes.&#34;
 
     def __init__(self, cat_names, cont_names):
@@ -1215,6 +1452,7 @@ def na_names(self):
     def apply_train(self, df):
         &#34;Function applied to `df` if it&#39;s the train set.&#34;
         raise NotImplementedError
+
     def apply_test(self, df):
         &#34;Function applied to `df` if it&#39;s the test set.&#34;
         self.apply_train(df)</code></pre>

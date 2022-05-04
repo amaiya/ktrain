@@ -38,7 +38,7 @@ def show_image(img_path):
     ```
     &#34;&#34;&#34;
     if not os.path.isfile(img_path):
-        raise ValueError(&#39;%s is not valid file&#39; % (img_path))
+        raise ValueError(&#34;%s is not valid file&#34; % (img_path))
     img = plt.imread(img_path)
     out = plt.imshow(img)
     return out
@@ -51,14 +51,14 @@ def show_random_images(img_folder, n=4, rows=1):
     ```
     &#34;&#34;&#34;
     fnames = []
-    for ext in (&#39;*.gif&#39;, &#39;*.png&#39;, &#39;*.jpg&#39;):
+    for ext in (&#34;*.gif&#34;, &#34;*.png&#34;, &#34;*.jpg&#34;):
         fnames.extend(glob.glob(os.path.join(img_folder, ext)))
     ims = []
     for i in range(n):
         img_path = random.choice(fnames)
         img = keras.preprocessing.image.load_img(img_path)
         x = keras.preprocessing.image.img_to_array(img)
-        x = x/255.
+        x = x / 255.0
         ims.append(x)
     U.plots(ims, rows=rows)
     return
@@ -71,8 +71,8 @@ def preview_data_aug(img_path, data_aug, rows=1, n=4):
     on a supplied image.
     ```
     &#34;&#34;&#34;
-    if type(img_path) != type(&#39;&#39;) or not os.path.isfile(img_path):
-        raise ValueError(&#39;img_path must be valid file path to image&#39;)
+    if type(img_path) != type(&#34;&#34;) or not os.path.isfile(img_path):
+        raise ValueError(&#34;img_path must be valid file path to image&#34;)
     idg = copy.copy(data_aug)
     idg.featurewise_center = False
     idg.featurewise_std_normalization = False
@@ -84,14 +84,15 @@ def preview_data_aug(img_path, data_aug, rows=1, n=4):
 
     img = keras.preprocessing.image.load_img(img_path)
     x = keras.preprocessing.image.img_to_array(img)
-    x = x/255.
+    x = x / 255.0
     x = x.reshape((1,) + x.shape)
     i = 0
     ims = []
     for batch in idg.flow(x, batch_size=1):
         ims.append(np.squeeze(batch))
         i += 1
-        if i &gt;= n: break
+        if i &gt;= n:
+            break
     U.plots(ims, rows=rows)
     return
 
@@ -103,8 +104,8 @@ def preview_data_aug_OLD(img_path, data_aug, n=4):
     on a supplied image.
     ```
     &#34;&#34;&#34;
-    if type(img_path) != type(&#39;&#39;) or not os.path.isfile(img_path):
-        raise ValueError(&#39;img_path must be valid file path to image&#39;)
+    if type(img_path) != type(&#34;&#34;) or not os.path.isfile(img_path):
+        raise ValueError(&#34;img_path must be valid file path to image&#34;)
     idg = copy.copy(data_aug)
     idg.featurewise_center = False
     idg.featurewise_std_normalization = False
@@ -116,31 +117,32 @@ def preview_data_aug_OLD(img_path, data_aug, n=4):
 
     img = keras.preprocessing.image.load_img(img_path)
     x = keras.preprocessing.image.img_to_array(img)
-    x = x/255.
+    x = x / 255.0
     x = x.reshape((1,) + x.shape)
     i = 0
     for batch in idg.flow(x, batch_size=1):
         plt.figure()
         plt.imshow(np.squeeze(batch))
         i += 1
-        if i &gt;= n: break
+        if i &gt;= n:
+            break
     return
 
 
-
 def get_data_aug(
-                 rotation_range=40,
-                 zoom_range=0.2,
-                 width_shift_range=0.2,
-                 height_shift_range=0.2,
-                 horizontal_flip=False,
-                 vertical_flip=False,
-                 featurewise_center=True,
-                 featurewise_std_normalization=True,
-                 samplewise_center=False,
-                 samplewise_std_normalization=False,
-                 rescale=None,
-                 **kwargs):
+    rotation_range=40,
+    zoom_range=0.2,
+    width_shift_range=0.2,
+    height_shift_range=0.2,
+    horizontal_flip=False,
+    vertical_flip=False,
+    featurewise_center=True,
+    featurewise_std_normalization=True,
+    samplewise_center=False,
+    samplewise_std_normalization=False,
+    rescale=None,
+    **kwargs
+):
     &#34;&#34;&#34;
     ```
     This function is simply a wrapper around ImageDataGenerator
@@ -154,18 +156,19 @@ def get_data_aug(
     &#34;&#34;&#34;
 
     data_aug = keras.preprocessing.image.ImageDataGenerator(
-                                rotation_range=rotation_range,
-                                zoom_range=zoom_range,
-                                width_shift_range=width_shift_range,
-                                height_shift_range=height_shift_range,
-                                horizontal_flip=horizontal_flip,
-                                vertical_flip=vertical_flip,
-                                featurewise_center=featurewise_center,
-                                featurewise_std_normalization=featurewise_std_normalization,
-                                samplewise_center=samplewise_center,
-                                samplewise_std_normalization=samplewise_std_normalization,
-                                rescale=rescale,
-                                **kwargs)
+        rotation_range=rotation_range,
+        zoom_range=zoom_range,
+        width_shift_range=width_shift_range,
+        height_shift_range=height_shift_range,
+        horizontal_flip=horizontal_flip,
+        vertical_flip=vertical_flip,
+        featurewise_center=featurewise_center,
+        featurewise_std_normalization=featurewise_std_normalization,
+        samplewise_center=samplewise_center,
+        samplewise_std_normalization=samplewise_std_normalization,
+        rescale=rescale,
+        **kwargs
+    )
     return data_aug
 
 
@@ -178,22 +181,26 @@ def get_test_datagen(data_aug=None):
         rescale = data_aug.rescale
         zca_whitening = data_aug.zca_whitening
         test_datagen = keras.preprocessing.image.ImageDataGenerator(
-                                rescale=rescale,
-                                featurewise_center=featurewise_center,
-                                samplewise_center=samplewise_center,
-                                featurewise_std_normalization=featurewise_std_normalization,
-                                samplewise_std_normalization=samplewise_std_normalization,
-                                zca_whitening=zca_whitening)
+            rescale=rescale,
+            featurewise_center=featurewise_center,
+            samplewise_center=samplewise_center,
+            featurewise_std_normalization=featurewise_std_normalization,
+            samplewise_std_normalization=samplewise_std_normalization,
+            zca_whitening=zca_whitening,
+        )
     else:
         test_datagen = keras.preprocessing.image.ImageDataGenerator()
     return test_datagen
 
 
-
-def process_datagen(data_aug, train_array=None, train_directory=None,
-                    target_size=None,
-                    color_mode=&#39;rgb&#39;,
-                    flat_dir=False):
+def process_datagen(
+    data_aug,
+    train_array=None,
+    train_directory=None,
+    target_size=None,
+    color_mode=&#34;rgb&#34;,
+    flat_dir=False,
+):
     # set generators for train and test
     if data_aug is not None:
         train_datagen = data_aug
@@ -203,57 +210,70 @@ def process_datagen(data_aug, train_array=None, train_directory=None,
         test_datagen = get_test_datagen()
 
     # compute statistics for normalization
-    fit_datagens(train_datagen, test_datagen,
-                 train_array=train_array,
-                 train_directory=train_directory,
-                 target_size=target_size,
-                 color_mode=color_mode, flat_dir=flat_dir)
+    fit_datagens(
+        train_datagen,
+        test_datagen,
+        train_array=train_array,
+        train_directory=train_directory,
+        target_size=target_size,
+        color_mode=color_mode,
+        flat_dir=flat_dir,
+    )
 
     return (train_datagen, test_datagen)
 
 
-
-def fit_datagens(train_datagen, test_datagen,
-                 train_array=None, train_directory=None,
-                 target_size=None,
-                 color_mode=&#39;rgb&#39;, flat_dir=False):
+def fit_datagens(
+    train_datagen,
+    test_datagen,
+    train_array=None,
+    train_directory=None,
+    target_size=None,
+    color_mode=&#34;rgb&#34;,
+    flat_dir=False,
+):
     &#34;&#34;&#34;
     ```
     computes stats of images for normalization
     ```
     &#34;&#34;&#34;
-    if not datagen_needs_fit(train_datagen): return
+    if not datagen_needs_fit(train_datagen):
+        return
     if bool(train_array is not None) == bool(train_directory):
-        raise ValueError(&#39;only one of train_array or train_directory is required.&#39;)
+        raise ValueError(&#34;only one of train_array or train_directory is required.&#34;)
     if train_array is not None:
         train_datagen.fit(train_array)
         test_datagen.fit(train_array)
     else:
         if target_size is None:
-            raise ValueError(&#39;target_size is required when train_directory is supplied&#39;)
-        fit_samples = sample_image_folder(train_directory, target_size,
-                                          color_mode=color_mode, flat_dir=flat_dir)
+            raise ValueError(&#34;target_size is required when train_directory is supplied&#34;)
+        fit_samples = sample_image_folder(
+            train_directory, target_size, color_mode=color_mode, flat_dir=flat_dir
+        )
         train_datagen.fit(fit_samples)
         test_datagen.fit(fit_samples)
     return
 
 
 def datagen_needs_fit(datagen):
-    if datagen.featurewise_center or datagen.featurewise_std_normalization or \
-       datagen.zca_whitening:
-           return True
+    if (
+        datagen.featurewise_center
+        or datagen.featurewise_std_normalization
+        or datagen.zca_whitening
+    ):
+        return True
     else:
         return False
 
-def sample_image_folder(train_directory,
-                         target_size,
-                         color_mode=&#39;rgb&#39;, flat_dir=False):
+
+def sample_image_folder(train_directory, target_size, color_mode=&#34;rgb&#34;, flat_dir=False):
 
     # adjust train_directory
     classes = None
     if flat_dir and train_directory is not None:
         folder = train_directory
-        if folder[-1] != os.sep: folder += os.sep
+        if folder[-1] != os.sep:
+            folder += os.sep
         parent = os.path.dirname(os.path.dirname(folder))
         folder_name = os.path.basename(os.path.dirname(folder))
         train_directory = parent
@@ -263,15 +283,16 @@ def sample_image_folder(train_directory,
     batch_size = 100
     img_gen = keras.preprocessing.image.ImageDataGenerator()
     batches = img_gen.flow_from_directory(
-                directory=train_directory,
-                classes=classes,
-                target_size=target_size,
-                batch_size=batch_size,
-                color_mode=color_mode,
-                shuffle=True)
+        directory=train_directory,
+        classes=classes,
+        target_size=target_size,
+        batch_size=batch_size,
+        color_mode=color_mode,
+        shuffle=True,
+    )
     the_shape = batches[0][0].shape
     sample_size = the_shape[0]
-    if K.image_data_format() == &#39;channels_first&#39;:
+    if K.image_data_format() == &#34;channels_first&#34;:
         num_channels = the_shape[1]
     else:
         num_channels = the_shape[-1]
@@ -279,23 +300,32 @@ def sample_image_folder(train_directory,
     return imgs
 
 
-def detect_color_mode(train_directory,
-                     target_size=(32,32)):
+def detect_color_mode(train_directory, target_size=(32, 32)):
     try:
-        fname = glob.glob(os.path.join(train_directory, &#39;**/*&#39;))[0]
+        fname = glob.glob(os.path.join(train_directory, &#34;**/*&#34;))[0]
         img = Image.open(fname).resize(target_size)
         num_channels = len(img.getbands())
-        if num_channels == 3: return &#39;rgb&#39;
-        elif num_channels == 1: return &#39;grayscale&#39;
-        else: return &#39;rgby&#39;
+        if num_channels == 3:
+            return &#34;rgb&#34;
+        elif num_channels == 1:
+            return &#34;grayscale&#34;
+        else:
+            return &#34;rgby&#34;
     except:
-        warnings.warn(&#39;could not detect color_mode from %s&#39; % (train_directory))
+        warnings.warn(&#34;could not detect color_mode from %s&#34; % (train_directory))
         return
 
 
-
-def preprocess_csv(csv_in, csv_out, x_col=&#39;filename&#39;, y_col=None,
-                   sep=&#39;,&#39;, label_sep=&#39; &#39;, suffix=&#39;&#39;, split_by=None):
+def preprocess_csv(
+    csv_in,
+    csv_out,
+    x_col=&#34;filename&#34;,
+    y_col=None,
+    sep=&#34;,&#34;,
+    label_sep=&#34; &#34;,
+    suffix=&#34;&#34;,
+    split_by=None,
+):
     &#34;&#34;&#34;
     ```
     Takes a CSV where the one column contains a file name and a column
@@ -327,11 +357,12 @@ def preprocess_csv(csv_in, csv_out, x_col=&#39;filename&#39;, y_col=None,
     ```
     &#34;&#34;&#34;
     if not y_col and not suffix:
-        raise ValueError(&#39;one or both of y_col and suffix should be supplied&#39;)
+        raise ValueError(&#34;one or both of y_col and suffix should be supplied&#34;)
     df = pd.read_csv(csv_in, sep=sep)
-    f_csv_out = open(csv_out, &#39;w&#39;)
+    f_csv_out = open(csv_out, &#34;w&#34;)
     writer = csv.writer(f_csv_out, delimiter=sep)
-    if y_col: df[y_col] = df[y_col].apply(str)
+    if y_col:
+        df[y_col] = df[y_col].apply(str)
 
     # write header
     if y_col:
@@ -355,8 +386,10 @@ def preprocess_csv(csv_in, csv_out, x_col=&#39;filename&#39;, y_col=None,
             out = list(data[[x_col]].values)
             tags = set(data[y_col].strip().split(label_sep))
             for c in classes:
-                if c in tags: out.append(1)
-                else: out.append(0)
+                if c in tags:
+                    out.append(1)
+                else:
+                    out.append(0)
         else:
             out = data
         writer.writerow(out)
@@ -364,11 +397,15 @@ def preprocess_csv(csv_in, csv_out, x_col=&#39;filename&#39;, y_col=None,
     return classes
 
 
-def images_from_folder(datadir, target_size=(224,224),
-                       classes=None,
-                       color_mode=&#39;rgb&#39;,
-                       train_test_names=[&#39;train&#39;, &#39;test&#39;],
-                       data_aug=None, verbose=1):
+def images_from_folder(
+    datadir,
+    target_size=(224, 224),
+    classes=None,
+    color_mode=&#34;rgb&#34;,
+    train_test_names=[&#34;train&#34;, &#34;test&#34;],
+    data_aug=None,
+    verbose=1,
+):
 
     &#34;&#34;&#34;
     ```
@@ -415,51 +452,65 @@ def images_from_folder(datadir, target_size=(224,224),
     if PIL_INSTALLED:
         inferred_color_mode = detect_color_mode(train_dir)
         if inferred_color_mode is not None and (inferred_color_mode != color_mode):
-            U.vprint(&#39;color_mode detected (%s) different than color_mode selected (%s)&#39; % (inferred_color_mode, color_mode),
-                     verbose=verbose)
+            U.vprint(
+                &#34;color_mode detected (%s) different than color_mode selected (%s)&#34;
+                % (inferred_color_mode, color_mode),
+                verbose=verbose,
+            )
 
     # get train and test data generators
-    (train_datagen, test_datagen) = process_datagen(data_aug,
-                                        train_directory=train_dir,
-                                        target_size=target_size,
-                                        color_mode=color_mode)
-    batches_tr = train_datagen.flow_from_directory(train_dir,
-                                         target_size=target_size,
-                                         classes=classes,
-                                         class_mode=&#39;categorical&#39;,
-                                         shuffle=True,
-                                         interpolation=&#39;bicubic&#39;,
-                                         color_mode = color_mode)
+    (train_datagen, test_datagen) = process_datagen(
+        data_aug,
+        train_directory=train_dir,
+        target_size=target_size,
+        color_mode=color_mode,
+    )
+    batches_tr = train_datagen.flow_from_directory(
+        train_dir,
+        target_size=target_size,
+        classes=classes,
+        class_mode=&#34;categorical&#34;,
+        shuffle=True,
+        interpolation=&#34;bicubic&#34;,
+        color_mode=color_mode,
+    )
 
-    batches_te = test_datagen.flow_from_directory(test_dir,
-                                              target_size=target_size,
-                                              classes=classes,
-                                              class_mode=&#39;categorical&#39;,
-                                              shuffle=False,
-                                              interpolation=&#39;bicubic&#39;,
-                                              color_mode = color_mode)
+    batches_te = test_datagen.flow_from_directory(
+        test_dir,
+        target_size=target_size,
+        classes=classes,
+        class_mode=&#34;categorical&#34;,
+        shuffle=False,
+        interpolation=&#34;bicubic&#34;,
+        color_mode=color_mode,
+    )
 
     # setup preprocessor
     class_tup = sorted(batches_tr.class_indices.items(), key=operator.itemgetter(1))
-    preproc = ImagePreprocessor(test_datagen,
-                                [x[0] for x in class_tup],
-                                target_size=target_size,
-                                color_mode=color_mode)
+    preproc = ImagePreprocessor(
+        test_datagen,
+        [x[0] for x in class_tup],
+        target_size=target_size,
+        color_mode=color_mode,
+    )
     return (batches_tr, batches_te, preproc)
 
 
-def images_from_df(train_df,
-                   image_column,
-                   label_columns=[],
-                   directory=None,
-                   val_directory=None,
-                   suffix=&#39;&#39;,
-                   val_df=None,
-                   is_regression=False,
-                   target_size=(224,224),
-                    color_mode=&#39;rgb&#39;,
-                    data_aug=None,
-                    val_pct=0.1, random_state=None):
+def images_from_df(
+    train_df,
+    image_column,
+    label_columns=[],
+    directory=None,
+    val_directory=None,
+    suffix=&#34;&#34;,
+    val_df=None,
+    is_regression=False,
+    target_size=(224, 224),
+    color_mode=&#34;rgb&#34;,
+    data_aug=None,
+    val_pct=0.1,
+    random_state=None,
+):
 
     &#34;&#34;&#34;
     ```
@@ -469,7 +520,7 @@ def images_from_df(train_df,
           for a ResNet50 model.
 
     Args:
-    train_df (DataFrame):  pandas dataframe for training dataset 
+    train_df (DataFrame):  pandas dataframe for training dataset
     image_column (string): name of column containing the filenames of images
                            If values in image_column do not have a file extension,
                            the extension should be supplied with suffix argument.
@@ -506,7 +557,7 @@ def images_from_df(train_df,
                  The extension in suffx should include &#34;.&#34;.
     val_df (DataFrame): pandas dataframe for validation set
 
-    is_regression(bool): If True, task is treated as regression. 
+    is_regression(bool): If True, task is treated as regression.
                          Used when there is single column of numeric values and
                          numeric values should be treated as numeric targets as opposed to class labels
     target_size (tuple):  image dimensions
@@ -522,13 +573,14 @@ def images_from_df(train_df,
     ```
     &#34;&#34;&#34;
 
-
     # read in train and test data
     train_df = train_df.copy()
     if val_df is not None:
         val_df = val_df.copy()
     else:
-        train_df, val_df = train_test_split(train_df, test_size=val_pct, random_state=random_state)
+        train_df, val_df = train_test_split(
+            train_df, test_size=val_pct, random_state=random_state
+        )
 
     # transform labels
     ytransdf = U.YTransformDataFrame(label_columns, is_regression=is_regression)
@@ -536,73 +588,79 @@ def images_from_df(train_df,
     val_df = ytransdf.apply_test(val_df)
     class_names = ytransdf.get_classes()
     label_columns = ytransdf.get_label_columns(squeeze=True)
-   
-
 
     # get train and test data generators
     if directory:
         img_folder = directory
     else:
-        img_folder =  os.path.dirname(train_df[image_column].iloc[0])
-    (train_datagen, test_datagen) = process_datagen(data_aug,
-                                                    train_directory=img_folder,
-                                                    target_size=target_size,
-                                                    color_mode=color_mode,
-                                                    flat_dir=True)
+        img_folder = os.path.dirname(train_df[image_column].iloc[0])
+    (train_datagen, test_datagen) = process_datagen(
+        data_aug,
+        train_directory=img_folder,
+        target_size=target_size,
+        color_mode=color_mode,
+        flat_dir=True,
+    )
 
     # fix file extensions, if necessary
     if suffix:
         train_df = train_df.copy()
         val_df = val_df.copy()
-        train_df[image_column] = train_df.copy()[image_column].apply(lambda x : str(x)+suffix)
-        val_df[image_column] = val_df.copy()[image_column].apply(lambda x : str(x)+suffix)
-
+        train_df[image_column] = train_df.copy()[image_column].apply(
+            lambda x: str(x) + suffix
+        )
+        val_df[image_column] = val_df.copy()[image_column].apply(
+            lambda x: str(x) + suffix
+        )
 
     # get generators
     batches_tr = train_datagen.flow_from_dataframe(
-                                      train_df,
-                                      directory=directory,
-                                      x_col = image_column,
-                                      y_col=label_columns,
-                                      target_size=target_size,
-                                      class_mode=&#39;other&#39;,
-                                      shuffle=True,
-                                      interpolation=&#39;bicubic&#39;,
-                                      color_mode = color_mode)
+        train_df,
+        directory=directory,
+        x_col=image_column,
+        y_col=label_columns,
+        target_size=target_size,
+        class_mode=&#34;other&#34;,
+        shuffle=True,
+        interpolation=&#34;bicubic&#34;,
+        color_mode=color_mode,
+    )
     batches_te = None
     if val_df is not None:
-        d =  val_directory if val_directory is not None else directory
+        d = val_directory if val_directory is not None else directory
         batches_te = test_datagen.flow_from_dataframe(
-                                          val_df,
-                                          directory=d,
-                                          x_col = image_column,
-                                          y_col=label_columns,
-                                          target_size=target_size,
-                                          class_mode=&#39;other&#39;,
-                                          shuffle=False,
-                                          interpolation=&#39;bicubic&#39;,
-                                          color_mode = color_mode)
+            val_df,
+            directory=d,
+            x_col=image_column,
+            y_col=label_columns,
+            target_size=target_size,
+            class_mode=&#34;other&#34;,
+            shuffle=False,
+            interpolation=&#34;bicubic&#34;,
+            color_mode=color_mode,
+        )
 
     # setup preprocessor
-    preproc = ImagePreprocessor(test_datagen,
-                                class_names,
-                                target_size=target_size,
-                                color_mode=color_mode)
+    preproc = ImagePreprocessor(
+        test_datagen, class_names, target_size=target_size, color_mode=color_mode
+    )
     return (batches_tr, batches_te, preproc)
 
 
-
-def images_from_csv(train_filepath,
-                   image_column,
-                   label_columns=[],
-                   directory=None,
-                   suffix=&#39;&#39;,
-                   val_filepath=None,
-                   is_regression=False,
-                   target_size=(224,224),
-                    color_mode=&#39;rgb&#39;,
-                    data_aug=None,
-                    val_pct=0.1, random_state=None):
+def images_from_csv(
+    train_filepath,
+    image_column,
+    label_columns=[],
+    directory=None,
+    suffix=&#34;&#34;,
+    val_filepath=None,
+    is_regression=False,
+    target_size=(224, 224),
+    color_mode=&#34;rgb&#34;,
+    data_aug=None,
+    val_pct=0.1,
+    random_state=None,
+):
 
     &#34;&#34;&#34;
     ```
@@ -647,7 +705,7 @@ def images_from_csv(train_filepath,
                  The extension in suffx should include &#34;.&#34;.
     val_filepath (string): path to validation dataset in CSV format
     suffix(string): suffix to add to file names in image_column
-    is_regression(bool): If True, task is treated as regression. 
+    is_regression(bool): If True, task is treated as regression.
                          Used when there is single column of numeric values and
                          numeric values should be treated as numeric targets as opposed to class labels
     target_size (tuple):  image dimensions
@@ -669,31 +727,34 @@ def images_from_csv(train_filepath,
     if val_filepath is not None:
         val_df = pd.read_csv(val_filepath)
 
+    return images_from_df(
+        train_df,
+        image_column,
+        label_columns=label_columns,
+        directory=directory,
+        suffix=suffix,
+        val_df=val_df,
+        is_regression=is_regression,
+        target_size=target_size,
+        color_mode=color_mode,
+        data_aug=data_aug,
+        val_pct=val_pct,
+        random_state=random_state,
+    )
 
-    return images_from_df(train_df,
-                          image_column,
-                          label_columns=label_columns,
-                          directory=directory,
-                          suffix=suffix,
-                          val_df=val_df,
-                          is_regression=is_regression,
-                          target_size=target_size,
-                          color_mode=color_mode,
-                          data_aug=data_aug,
-                          val_pct=val_pct, random_state=random_state)
 
-
-
-
-def images_from_fname( train_folder,
-                      pattern=r&#39;([^/]+)_\d+.jpg$&#39;,
-                      val_folder=None,
-                      is_regression=False,
-                     target_size=(224,224),
-                     color_mode=&#39;rgb&#39;,
-                     data_aug=None,
-                     val_pct=0.1, random_state=None,
-                     verbose=1):
+def images_from_fname(
+    train_folder,
+    pattern=r&#34;([^/]+)_\d+.jpg$&#34;,
+    val_folder=None,
+    is_regression=False,
+    target_size=(224, 224),
+    color_mode=&#34;rgb&#34;,
+    data_aug=None,
+    val_pct=0.1,
+    random_state=None,
+    verbose=1,
+):
 
     &#34;&#34;&#34;
     ```
@@ -706,7 +767,7 @@ def images_from_fname( train_folder,
                 By default, it will extract classes from file names of the form:
                    &lt;class_name&gt;_&lt;numbers&gt;.jpg
     val_folder (str): directory containing validation images. default:None
-    is_regression(bool): If True, task is treated as regression. 
+    is_regression(bool): If True, task is treated as regression.
                          Used when there is single column of numeric values and
                          numeric values should be treated as numeric targets as opposed to class labels
     target_size (tuple):  image dimensions
@@ -723,32 +784,46 @@ def images_from_fname( train_folder,
     ```
     &#34;&#34;&#34;
 
-    image_column = &#39;image_name&#39;
-    label_column = &#39;label&#39;
-    train_df = _img_fnames_to_df(train_folder, pattern, 
-                                 image_column=image_column, label_column=label_column, verbose=verbose)
+    image_column = &#34;image_name&#34;
+    label_column = &#34;label&#34;
+    train_df = _img_fnames_to_df(
+        train_folder,
+        pattern,
+        image_column=image_column,
+        label_column=label_column,
+        verbose=verbose,
+    )
     val_df = None
     if val_folder is not None:
-        val_df = _img_fnames_to_df(val_folder, pattern, 
-                                   image_column=image_column, label_column=label_column, verbose=verbose)
-    return images_from_df(train_df,
-                          image_column,
-                          label_columns=label_column,
-                          directory=train_folder,
-                          val_directory=val_folder,
-                          val_df=val_df,
-                          is_regression=is_regression,
-                          target_size=target_size,
-                          color_mode=color_mode,
-                          data_aug=data_aug,
-                          val_pct=val_pct, random_state=random_state)
+        val_df = _img_fnames_to_df(
+            val_folder,
+            pattern,
+            image_column=image_column,
+            label_column=label_column,
+            verbose=verbose,
+        )
+    return images_from_df(
+        train_df,
+        image_column,
+        label_columns=label_column,
+        directory=train_folder,
+        val_directory=val_folder,
+        val_df=val_df,
+        is_regression=is_regression,
+        target_size=target_size,
+        color_mode=color_mode,
+        data_aug=data_aug,
+        val_pct=val_pct,
+        random_state=random_state,
+    )
 
 
-
-def _img_fnames_to_df(img_folder,pattern, image_column=&#39;image_name&#39;, label_column=&#39;label&#39;,  verbose=1):
+def _img_fnames_to_df(
+    img_folder, pattern, image_column=&#34;image_name&#34;, label_column=&#34;label&#34;, verbose=1
+):
     # get fnames
     fnames = []
-    for ext in (&#39;*.gif&#39;, &#39;*.png&#39;, &#39;*.jpg&#39;):
+    for ext in (&#34;*.gif&#34;, &#34;*.png&#34;, &#34;*.jpg&#34;):
         fnames.extend(glob.glob(os.path.join(img_folder, ext)))
 
     # process filenames and labels
@@ -761,10 +836,13 @@ def _img_fnames_to_df(img_folder,pattern, image_column=&#39;image_name&#39;, lab
             image_names.append(os.path.basename(fname))
             labels.append(r.group(1))
         else:
-            warnings.warn(&#39;Could not extract target for %s -  skipping this file&#39;% (fname))
-    dct = {&#39;image_name&#39;: image_names, &#39;label&#39;:labels}
+            warnings.warn(
+                &#34;Could not extract target for %s -  skipping this file&#34; % (fname)
+            )
+    dct = {&#34;image_name&#34;: image_names, &#34;label&#34;: labels}
     return pd.DataFrame(dct)
-    
+
+
 #    class_names = list(set(labels))
 #    class_names.sort()
 #    c2i = {k:v for v,k in enumerate(class_names)}
@@ -782,15 +860,17 @@ def _img_fnames_to_df(img_folder,pattern, image_column=&#39;image_name&#39;, lab
 #    return (df, class_names)
 
 
-
-def images_from_array(x_train, y_train,
-                      validation_data=None,
-                      val_pct=0.1,
-                      random_state=None,
-                      data_aug=None,
-                      classes=None,
-                      class_names=None,
-                      is_regression=False):
+def images_from_array(
+    x_train,
+    y_train,
+    validation_data=None,
+    val_pct=0.1,
+    random_state=None,
+    data_aug=None,
+    classes=None,
+    class_names=None,
+    is_regression=False,
+):
 
     &#34;&#34;&#34;
     ```
@@ -811,26 +891,28 @@ def images_from_array(x_train, y_train,
       data_aug(ImageDataGenerator):  a keras.preprocessing.image.ImageDataGenerator
       classes(str): old name for class_names - should no longer be used
       class_names(str): list of strings to use as class names
-      is_regression(bool): If True, task is treated as regression. 
+      is_regression(bool): If True, task is treated as regression.
                            Used when there is single column of numeric values and
                            numeric values should be treated as numeric targets as opposed to class labels
     Returns:
       batches: a tuple of two image.Iterator - one for train and one for test and ImagePreprocessor instance
     ```
     &#34;&#34;&#34;
-    if classes is not None: raise ValueError(&#39;Please use class_names argument instead of &#34;classes&#34;.&#39;)
+    if classes is not None:
+        raise ValueError(&#39;Please use class_names argument instead of &#34;classes&#34;.&#39;)
     if class_names and is_regression:
-        warnings.warn(&#39;is_regression=True, but class_names is not empty.  Task being treated as regression.&#39;)
-
+        warnings.warn(
+            &#34;is_regression=True, but class_names is not empty.  Task being treated as regression.&#34;
+        )
 
     # split out validation set if necessary
     if validation_data:
         x_test = validation_data[0]
         y_test = validation_data[1]
-    elif val_pct is not None and val_pct &gt;0:
-        x_train, x_test, y_train, y_test = train_test_split(x_train, y_train,
-                                                            test_size=val_pct,
-                                                            random_state=random_state)
+    elif val_pct is not None and val_pct &gt; 0:
+        x_train, x_test, y_train, y_test = train_test_split(
+            x_train, y_train, test_size=val_pct, random_state=random_state
+        )
     else:
         x_test = None
         y_test = None
@@ -845,7 +927,9 @@ def images_from_array(x_train, y_train,
     (train_datagen, test_datagen) = process_datagen(data_aug, train_array=x_train)
 
     # Image preprocessor
-    preproc = ImagePreprocessor(test_datagen, class_names, target_size=None, color_mode=None)
+    preproc = ImagePreprocessor(
+        test_datagen, class_names, target_size=None, color_mode=None
+    )
 
     # training data
     batches_tr = train_datagen.flow(x_train, y_train, shuffle=True)
@@ -853,8 +937,7 @@ def images_from_array(x_train, y_train,
     # validation data
     batches_te = None
     if x_test is not None and y_test is not None:
-        batches_te = test_datagen.flow(x_test, y_test,
-                                       shuffle=False)
+        batches_te = test_datagen.flow(x_test, y_test, shuffle=False)
     return (batches_tr, batches_te, preproc)</code></pre>
 </details>
 </section>
@@ -875,9 +958,12 @@ def images_from_array(x_train, y_train,
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def datagen_needs_fit(datagen):
-    if datagen.featurewise_center or datagen.featurewise_std_normalization or \
-       datagen.zca_whitening:
-           return True
+    if (
+        datagen.featurewise_center
+        or datagen.featurewise_std_normalization
+        or datagen.zca_whitening
+    ):
+        return True
     else:
         return False</code></pre>
 </details>
@@ -891,17 +977,19 @@ def images_from_array(x_train, y_train,
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def detect_color_mode(train_directory,
-                     target_size=(32,32)):
+<pre><code class="python">def detect_color_mode(train_directory, target_size=(32, 32)):
     try:
-        fname = glob.glob(os.path.join(train_directory, &#39;**/*&#39;))[0]
+        fname = glob.glob(os.path.join(train_directory, &#34;**/*&#34;))[0]
         img = Image.open(fname).resize(target_size)
         num_channels = len(img.getbands())
-        if num_channels == 3: return &#39;rgb&#39;
-        elif num_channels == 1: return &#39;grayscale&#39;
-        else: return &#39;rgby&#39;
+        if num_channels == 3:
+            return &#34;rgb&#34;
+        elif num_channels == 1:
+            return &#34;grayscale&#34;
+        else:
+            return &#34;rgby&#34;
     except:
-        warnings.warn(&#39;could not detect color_mode from %s&#39; % (train_directory))
+        warnings.warn(&#34;could not detect color_mode from %s&#34; % (train_directory))
         return</code></pre>
 </details>
 </dd>
@@ -915,26 +1003,33 @@ def images_from_array(x_train, y_train,
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def fit_datagens(train_datagen, test_datagen,
-                 train_array=None, train_directory=None,
-                 target_size=None,
-                 color_mode=&#39;rgb&#39;, flat_dir=False):
+<pre><code class="python">def fit_datagens(
+    train_datagen,
+    test_datagen,
+    train_array=None,
+    train_directory=None,
+    target_size=None,
+    color_mode=&#34;rgb&#34;,
+    flat_dir=False,
+):
     &#34;&#34;&#34;
     ```
     computes stats of images for normalization
     ```
     &#34;&#34;&#34;
-    if not datagen_needs_fit(train_datagen): return
+    if not datagen_needs_fit(train_datagen):
+        return
     if bool(train_array is not None) == bool(train_directory):
-        raise ValueError(&#39;only one of train_array or train_directory is required.&#39;)
+        raise ValueError(&#34;only one of train_array or train_directory is required.&#34;)
     if train_array is not None:
         train_datagen.fit(train_array)
         test_datagen.fit(train_array)
     else:
         if target_size is None:
-            raise ValueError(&#39;target_size is required when train_directory is supplied&#39;)
-        fit_samples = sample_image_folder(train_directory, target_size,
-                                          color_mode=color_mode, flat_dir=flat_dir)
+            raise ValueError(&#34;target_size is required when train_directory is supplied&#34;)
+        fit_samples = sample_image_folder(
+            train_directory, target_size, color_mode=color_mode, flat_dir=flat_dir
+        )
         train_datagen.fit(fit_samples)
         test_datagen.fit(fit_samples)
     return</code></pre>
@@ -957,18 +1052,19 @@ function may adjust these as needed.
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_data_aug(
-                 rotation_range=40,
-                 zoom_range=0.2,
-                 width_shift_range=0.2,
-                 height_shift_range=0.2,
-                 horizontal_flip=False,
-                 vertical_flip=False,
-                 featurewise_center=True,
-                 featurewise_std_normalization=True,
-                 samplewise_center=False,
-                 samplewise_std_normalization=False,
-                 rescale=None,
-                 **kwargs):
+    rotation_range=40,
+    zoom_range=0.2,
+    width_shift_range=0.2,
+    height_shift_range=0.2,
+    horizontal_flip=False,
+    vertical_flip=False,
+    featurewise_center=True,
+    featurewise_std_normalization=True,
+    samplewise_center=False,
+    samplewise_std_normalization=False,
+    rescale=None,
+    **kwargs
+):
     &#34;&#34;&#34;
     ```
     This function is simply a wrapper around ImageDataGenerator
@@ -982,18 +1078,19 @@ function may adjust these as needed.
     &#34;&#34;&#34;
 
     data_aug = keras.preprocessing.image.ImageDataGenerator(
-                                rotation_range=rotation_range,
-                                zoom_range=zoom_range,
-                                width_shift_range=width_shift_range,
-                                height_shift_range=height_shift_range,
-                                horizontal_flip=horizontal_flip,
-                                vertical_flip=vertical_flip,
-                                featurewise_center=featurewise_center,
-                                featurewise_std_normalization=featurewise_std_normalization,
-                                samplewise_center=samplewise_center,
-                                samplewise_std_normalization=samplewise_std_normalization,
-                                rescale=rescale,
-                                **kwargs)
+        rotation_range=rotation_range,
+        zoom_range=zoom_range,
+        width_shift_range=width_shift_range,
+        height_shift_range=height_shift_range,
+        horizontal_flip=horizontal_flip,
+        vertical_flip=vertical_flip,
+        featurewise_center=featurewise_center,
+        featurewise_std_normalization=featurewise_std_normalization,
+        samplewise_center=samplewise_center,
+        samplewise_std_normalization=samplewise_std_normalization,
+        rescale=rescale,
+        **kwargs
+    )
     return data_aug</code></pre>
 </details>
 </dd>
@@ -1015,12 +1112,13 @@ function may adjust these as needed.
         rescale = data_aug.rescale
         zca_whitening = data_aug.zca_whitening
         test_datagen = keras.preprocessing.image.ImageDataGenerator(
-                                rescale=rescale,
-                                featurewise_center=featurewise_center,
-                                samplewise_center=samplewise_center,
-                                featurewise_std_normalization=featurewise_std_normalization,
-                                samplewise_std_normalization=samplewise_std_normalization,
-                                zca_whitening=zca_whitening)
+            rescale=rescale,
+            featurewise_center=featurewise_center,
+            samplewise_center=samplewise_center,
+            featurewise_std_normalization=featurewise_std_normalization,
+            samplewise_std_normalization=samplewise_std_normalization,
+            zca_whitening=zca_whitening,
+        )
     else:
         test_datagen = keras.preprocessing.image.ImageDataGenerator()
     return test_datagen</code></pre>
@@ -1047,7 +1145,7 @@ Args:
   data_aug(ImageDataGenerator):  a keras.preprocessing.image.ImageDataGenerator
   classes(str): old name for class_names - should no longer be used
   class_names(str): list of strings to use as class names
-  is_regression(bool): If True, task is treated as regression. 
+  is_regression(bool): If True, task is treated as regression.
                        Used when there is single column of numeric values and
                        numeric values should be treated as numeric targets as opposed to class labels
 Returns:
@@ -1057,14 +1155,17 @@ Returns:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def images_from_array(x_train, y_train,
-                      validation_data=None,
-                      val_pct=0.1,
-                      random_state=None,
-                      data_aug=None,
-                      classes=None,
-                      class_names=None,
-                      is_regression=False):
+<pre><code class="python">def images_from_array(
+    x_train,
+    y_train,
+    validation_data=None,
+    val_pct=0.1,
+    random_state=None,
+    data_aug=None,
+    classes=None,
+    class_names=None,
+    is_regression=False,
+):
 
     &#34;&#34;&#34;
     ```
@@ -1085,26 +1186,28 @@ Returns:
       data_aug(ImageDataGenerator):  a keras.preprocessing.image.ImageDataGenerator
       classes(str): old name for class_names - should no longer be used
       class_names(str): list of strings to use as class names
-      is_regression(bool): If True, task is treated as regression. 
+      is_regression(bool): If True, task is treated as regression.
                            Used when there is single column of numeric values and
                            numeric values should be treated as numeric targets as opposed to class labels
     Returns:
       batches: a tuple of two image.Iterator - one for train and one for test and ImagePreprocessor instance
     ```
     &#34;&#34;&#34;
-    if classes is not None: raise ValueError(&#39;Please use class_names argument instead of &#34;classes&#34;.&#39;)
+    if classes is not None:
+        raise ValueError(&#39;Please use class_names argument instead of &#34;classes&#34;.&#39;)
     if class_names and is_regression:
-        warnings.warn(&#39;is_regression=True, but class_names is not empty.  Task being treated as regression.&#39;)
-
+        warnings.warn(
+            &#34;is_regression=True, but class_names is not empty.  Task being treated as regression.&#34;
+        )
 
     # split out validation set if necessary
     if validation_data:
         x_test = validation_data[0]
         y_test = validation_data[1]
-    elif val_pct is not None and val_pct &gt;0:
-        x_train, x_test, y_train, y_test = train_test_split(x_train, y_train,
-                                                            test_size=val_pct,
-                                                            random_state=random_state)
+    elif val_pct is not None and val_pct &gt; 0:
+        x_train, x_test, y_train, y_test = train_test_split(
+            x_train, y_train, test_size=val_pct, random_state=random_state
+        )
     else:
         x_test = None
         y_test = None
@@ -1119,7 +1222,9 @@ Returns:
     (train_datagen, test_datagen) = process_datagen(data_aug, train_array=x_train)
 
     # Image preprocessor
-    preproc = ImagePreprocessor(test_datagen, class_names, target_size=None, color_mode=None)
+    preproc = ImagePreprocessor(
+        test_datagen, class_names, target_size=None, color_mode=None
+    )
 
     # training data
     batches_tr = train_datagen.flow(x_train, y_train, shuffle=True)
@@ -1127,8 +1232,7 @@ Returns:
     # validation data
     batches_te = None
     if x_test is not None and y_test is not None:
-        batches_te = test_datagen.flow(x_test, y_test,
-                                       shuffle=False)
+        batches_te = test_datagen.flow(x_test, y_test, shuffle=False)
     return (batches_tr, batches_te, preproc)</code></pre>
 </details>
 </dd>
@@ -1177,7 +1281,7 @@ suffix(str): will be appended to each entry in image_column
              The extension in suffx should include &quot;.&quot;.
 val_filepath (string): path to validation dataset in CSV format
 suffix(string): suffix to add to file names in image_column
-is_regression(bool): If True, task is treated as regression. 
+is_regression(bool): If True, task is treated as regression.
                      Used when there is single column of numeric values and
                      numeric values should be treated as numeric targets as opposed to class labels
 target_size (tuple):  image dimensions
@@ -1195,17 +1299,20 @@ batches: a tuple of two Iterators - one for train and one for test
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def images_from_csv(train_filepath,
-                   image_column,
-                   label_columns=[],
-                   directory=None,
-                   suffix=&#39;&#39;,
-                   val_filepath=None,
-                   is_regression=False,
-                   target_size=(224,224),
-                    color_mode=&#39;rgb&#39;,
-                    data_aug=None,
-                    val_pct=0.1, random_state=None):
+<pre><code class="python">def images_from_csv(
+    train_filepath,
+    image_column,
+    label_columns=[],
+    directory=None,
+    suffix=&#34;&#34;,
+    val_filepath=None,
+    is_regression=False,
+    target_size=(224, 224),
+    color_mode=&#34;rgb&#34;,
+    data_aug=None,
+    val_pct=0.1,
+    random_state=None,
+):
 
     &#34;&#34;&#34;
     ```
@@ -1250,7 +1357,7 @@ batches: a tuple of two Iterators - one for train and one for test
                  The extension in suffx should include &#34;.&#34;.
     val_filepath (string): path to validation dataset in CSV format
     suffix(string): suffix to add to file names in image_column
-    is_regression(bool): If True, task is treated as regression. 
+    is_regression(bool): If True, task is treated as regression.
                          Used when there is single column of numeric values and
                          numeric values should be treated as numeric targets as opposed to class labels
     target_size (tuple):  image dimensions
@@ -1272,18 +1379,20 @@ batches: a tuple of two Iterators - one for train and one for test
     if val_filepath is not None:
         val_df = pd.read_csv(val_filepath)
 
-
-    return images_from_df(train_df,
-                          image_column,
-                          label_columns=label_columns,
-                          directory=directory,
-                          suffix=suffix,
-                          val_df=val_df,
-                          is_regression=is_regression,
-                          target_size=target_size,
-                          color_mode=color_mode,
-                          data_aug=data_aug,
-                          val_pct=val_pct, random_state=random_state)</code></pre>
+    return images_from_df(
+        train_df,
+        image_column,
+        label_columns=label_columns,
+        directory=directory,
+        suffix=suffix,
+        val_df=val_df,
+        is_regression=is_regression,
+        target_size=target_size,
+        color_mode=color_mode,
+        data_aug=data_aug,
+        val_pct=val_pct,
+        random_state=random_state,
+    )</code></pre>
 </details>
 </dd>
 <dt id="ktrain.vision.data.images_from_df"><code class="name flex">
@@ -1296,7 +1405,7 @@ Note: This function preprocesses the input in preparation
       for a ResNet50 model.
 
 Args:
-train_df (DataFrame):  pandas dataframe for training dataset 
+train_df (DataFrame):  pandas dataframe for training dataset
 image_column (string): name of column containing the filenames of images
                        If values in image_column do not have a file extension,
                        the extension should be supplied with suffix argument.
@@ -1333,7 +1442,7 @@ suffix(str): will be appended to each entry in image_column
              The extension in suffx should include &quot;.&quot;.
 val_df (DataFrame): pandas dataframe for validation set
 
-is_regression(bool): If True, task is treated as regression. 
+is_regression(bool): If True, task is treated as regression.
                      Used when there is single column of numeric values and
                      numeric values should be treated as numeric targets as opposed to class labels
 target_size (tuple):  image dimensions
@@ -1351,18 +1460,21 @@ batches: a tuple of two Iterators - one for train and one for test
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def images_from_df(train_df,
-                   image_column,
-                   label_columns=[],
-                   directory=None,
-                   val_directory=None,
-                   suffix=&#39;&#39;,
-                   val_df=None,
-                   is_regression=False,
-                   target_size=(224,224),
-                    color_mode=&#39;rgb&#39;,
-                    data_aug=None,
-                    val_pct=0.1, random_state=None):
+<pre><code class="python">def images_from_df(
+    train_df,
+    image_column,
+    label_columns=[],
+    directory=None,
+    val_directory=None,
+    suffix=&#34;&#34;,
+    val_df=None,
+    is_regression=False,
+    target_size=(224, 224),
+    color_mode=&#34;rgb&#34;,
+    data_aug=None,
+    val_pct=0.1,
+    random_state=None,
+):
 
     &#34;&#34;&#34;
     ```
@@ -1372,7 +1484,7 @@ batches: a tuple of two Iterators - one for train and one for test
           for a ResNet50 model.
 
     Args:
-    train_df (DataFrame):  pandas dataframe for training dataset 
+    train_df (DataFrame):  pandas dataframe for training dataset
     image_column (string): name of column containing the filenames of images
                            If values in image_column do not have a file extension,
                            the extension should be supplied with suffix argument.
@@ -1409,7 +1521,7 @@ batches: a tuple of two Iterators - one for train and one for test
                  The extension in suffx should include &#34;.&#34;.
     val_df (DataFrame): pandas dataframe for validation set
 
-    is_regression(bool): If True, task is treated as regression. 
+    is_regression(bool): If True, task is treated as regression.
                          Used when there is single column of numeric values and
                          numeric values should be treated as numeric targets as opposed to class labels
     target_size (tuple):  image dimensions
@@ -1425,13 +1537,14 @@ batches: a tuple of two Iterators - one for train and one for test
     ```
     &#34;&#34;&#34;
 
-
     # read in train and test data
     train_df = train_df.copy()
     if val_df is not None:
         val_df = val_df.copy()
     else:
-        train_df, val_df = train_test_split(train_df, test_size=val_pct, random_state=random_state)
+        train_df, val_df = train_test_split(
+            train_df, test_size=val_pct, random_state=random_state
+        )
 
     # transform labels
     ytransdf = U.YTransformDataFrame(label_columns, is_regression=is_regression)
@@ -1439,58 +1552,62 @@ batches: a tuple of two Iterators - one for train and one for test
     val_df = ytransdf.apply_test(val_df)
     class_names = ytransdf.get_classes()
     label_columns = ytransdf.get_label_columns(squeeze=True)
-   
-
 
     # get train and test data generators
     if directory:
         img_folder = directory
     else:
-        img_folder =  os.path.dirname(train_df[image_column].iloc[0])
-    (train_datagen, test_datagen) = process_datagen(data_aug,
-                                                    train_directory=img_folder,
-                                                    target_size=target_size,
-                                                    color_mode=color_mode,
-                                                    flat_dir=True)
+        img_folder = os.path.dirname(train_df[image_column].iloc[0])
+    (train_datagen, test_datagen) = process_datagen(
+        data_aug,
+        train_directory=img_folder,
+        target_size=target_size,
+        color_mode=color_mode,
+        flat_dir=True,
+    )
 
     # fix file extensions, if necessary
     if suffix:
         train_df = train_df.copy()
         val_df = val_df.copy()
-        train_df[image_column] = train_df.copy()[image_column].apply(lambda x : str(x)+suffix)
-        val_df[image_column] = val_df.copy()[image_column].apply(lambda x : str(x)+suffix)
-
+        train_df[image_column] = train_df.copy()[image_column].apply(
+            lambda x: str(x) + suffix
+        )
+        val_df[image_column] = val_df.copy()[image_column].apply(
+            lambda x: str(x) + suffix
+        )
 
     # get generators
     batches_tr = train_datagen.flow_from_dataframe(
-                                      train_df,
-                                      directory=directory,
-                                      x_col = image_column,
-                                      y_col=label_columns,
-                                      target_size=target_size,
-                                      class_mode=&#39;other&#39;,
-                                      shuffle=True,
-                                      interpolation=&#39;bicubic&#39;,
-                                      color_mode = color_mode)
+        train_df,
+        directory=directory,
+        x_col=image_column,
+        y_col=label_columns,
+        target_size=target_size,
+        class_mode=&#34;other&#34;,
+        shuffle=True,
+        interpolation=&#34;bicubic&#34;,
+        color_mode=color_mode,
+    )
     batches_te = None
     if val_df is not None:
-        d =  val_directory if val_directory is not None else directory
+        d = val_directory if val_directory is not None else directory
         batches_te = test_datagen.flow_from_dataframe(
-                                          val_df,
-                                          directory=d,
-                                          x_col = image_column,
-                                          y_col=label_columns,
-                                          target_size=target_size,
-                                          class_mode=&#39;other&#39;,
-                                          shuffle=False,
-                                          interpolation=&#39;bicubic&#39;,
-                                          color_mode = color_mode)
+            val_df,
+            directory=d,
+            x_col=image_column,
+            y_col=label_columns,
+            target_size=target_size,
+            class_mode=&#34;other&#34;,
+            shuffle=False,
+            interpolation=&#34;bicubic&#34;,
+            color_mode=color_mode,
+        )
 
     # setup preprocessor
-    preproc = ImagePreprocessor(test_datagen,
-                                class_names,
-                                target_size=target_size,
-                                color_mode=color_mode)
+    preproc = ImagePreprocessor(
+        test_datagen, class_names, target_size=target_size, color_mode=color_mode
+    )
     return (batches_tr, batches_te, preproc)</code></pre>
 </details>
 </dd>
@@ -1507,7 +1624,7 @@ pat (str):  regular expression to extract class from file name of each image
             By default, it will extract classes from file names of the form:
                &lt;class_name&gt;_&lt;numbers&gt;.jpg
 val_folder (str): directory containing validation images. default:None
-is_regression(bool): If True, task is treated as regression. 
+is_regression(bool): If True, task is treated as regression.
                      Used when there is single column of numeric values and
                      numeric values should be treated as numeric targets as opposed to class labels
 target_size (tuple):  image dimensions
@@ -1526,15 +1643,18 @@ batches: a tuple of two Iterators - one for train and one for test
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def images_from_fname( train_folder,
-                      pattern=r&#39;([^/]+)_\d+.jpg$&#39;,
-                      val_folder=None,
-                      is_regression=False,
-                     target_size=(224,224),
-                     color_mode=&#39;rgb&#39;,
-                     data_aug=None,
-                     val_pct=0.1, random_state=None,
-                     verbose=1):
+<pre><code class="python">def images_from_fname(
+    train_folder,
+    pattern=r&#34;([^/]+)_\d+.jpg$&#34;,
+    val_folder=None,
+    is_regression=False,
+    target_size=(224, 224),
+    color_mode=&#34;rgb&#34;,
+    data_aug=None,
+    val_pct=0.1,
+    random_state=None,
+    verbose=1,
+):
 
     &#34;&#34;&#34;
     ```
@@ -1547,7 +1667,7 @@ batches: a tuple of two Iterators - one for train and one for test
                 By default, it will extract classes from file names of the form:
                    &lt;class_name&gt;_&lt;numbers&gt;.jpg
     val_folder (str): directory containing validation images. default:None
-    is_regression(bool): If True, task is treated as regression. 
+    is_regression(bool): If True, task is treated as regression.
                          Used when there is single column of numeric values and
                          numeric values should be treated as numeric targets as opposed to class labels
     target_size (tuple):  image dimensions
@@ -1564,25 +1684,38 @@ batches: a tuple of two Iterators - one for train and one for test
     ```
     &#34;&#34;&#34;
 
-    image_column = &#39;image_name&#39;
-    label_column = &#39;label&#39;
-    train_df = _img_fnames_to_df(train_folder, pattern, 
-                                 image_column=image_column, label_column=label_column, verbose=verbose)
+    image_column = &#34;image_name&#34;
+    label_column = &#34;label&#34;
+    train_df = _img_fnames_to_df(
+        train_folder,
+        pattern,
+        image_column=image_column,
+        label_column=label_column,
+        verbose=verbose,
+    )
     val_df = None
     if val_folder is not None:
-        val_df = _img_fnames_to_df(val_folder, pattern, 
-                                   image_column=image_column, label_column=label_column, verbose=verbose)
-    return images_from_df(train_df,
-                          image_column,
-                          label_columns=label_column,
-                          directory=train_folder,
-                          val_directory=val_folder,
-                          val_df=val_df,
-                          is_regression=is_regression,
-                          target_size=target_size,
-                          color_mode=color_mode,
-                          data_aug=data_aug,
-                          val_pct=val_pct, random_state=random_state)</code></pre>
+        val_df = _img_fnames_to_df(
+            val_folder,
+            pattern,
+            image_column=image_column,
+            label_column=label_column,
+            verbose=verbose,
+        )
+    return images_from_df(
+        train_df,
+        image_column,
+        label_columns=label_column,
+        directory=train_folder,
+        val_directory=val_folder,
+        val_df=val_df,
+        is_regression=is_regression,
+        target_size=target_size,
+        color_mode=color_mode,
+        data_aug=data_aug,
+        val_pct=val_pct,
+        random_state=random_state,
+    )</code></pre>
 </details>
 </dd>
 <dt id="ktrain.vision.data.images_from_folder"><code class="name flex">
@@ -1624,11 +1757,15 @@ batches: a tuple of two Iterators - one for train and one for test
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def images_from_folder(datadir, target_size=(224,224),
-                       classes=None,
-                       color_mode=&#39;rgb&#39;,
-                       train_test_names=[&#39;train&#39;, &#39;test&#39;],
-                       data_aug=None, verbose=1):
+<pre><code class="python">def images_from_folder(
+    datadir,
+    target_size=(224, 224),
+    classes=None,
+    color_mode=&#34;rgb&#34;,
+    train_test_names=[&#34;train&#34;, &#34;test&#34;],
+    data_aug=None,
+    verbose=1,
+):
 
     &#34;&#34;&#34;
     ```
@@ -1675,36 +1812,47 @@ batches: a tuple of two Iterators - one for train and one for test
     if PIL_INSTALLED:
         inferred_color_mode = detect_color_mode(train_dir)
         if inferred_color_mode is not None and (inferred_color_mode != color_mode):
-            U.vprint(&#39;color_mode detected (%s) different than color_mode selected (%s)&#39; % (inferred_color_mode, color_mode),
-                     verbose=verbose)
+            U.vprint(
+                &#34;color_mode detected (%s) different than color_mode selected (%s)&#34;
+                % (inferred_color_mode, color_mode),
+                verbose=verbose,
+            )
 
     # get train and test data generators
-    (train_datagen, test_datagen) = process_datagen(data_aug,
-                                        train_directory=train_dir,
-                                        target_size=target_size,
-                                        color_mode=color_mode)
-    batches_tr = train_datagen.flow_from_directory(train_dir,
-                                         target_size=target_size,
-                                         classes=classes,
-                                         class_mode=&#39;categorical&#39;,
-                                         shuffle=True,
-                                         interpolation=&#39;bicubic&#39;,
-                                         color_mode = color_mode)
+    (train_datagen, test_datagen) = process_datagen(
+        data_aug,
+        train_directory=train_dir,
+        target_size=target_size,
+        color_mode=color_mode,
+    )
+    batches_tr = train_datagen.flow_from_directory(
+        train_dir,
+        target_size=target_size,
+        classes=classes,
+        class_mode=&#34;categorical&#34;,
+        shuffle=True,
+        interpolation=&#34;bicubic&#34;,
+        color_mode=color_mode,
+    )
 
-    batches_te = test_datagen.flow_from_directory(test_dir,
-                                              target_size=target_size,
-                                              classes=classes,
-                                              class_mode=&#39;categorical&#39;,
-                                              shuffle=False,
-                                              interpolation=&#39;bicubic&#39;,
-                                              color_mode = color_mode)
+    batches_te = test_datagen.flow_from_directory(
+        test_dir,
+        target_size=target_size,
+        classes=classes,
+        class_mode=&#34;categorical&#34;,
+        shuffle=False,
+        interpolation=&#34;bicubic&#34;,
+        color_mode=color_mode,
+    )
 
     # setup preprocessor
     class_tup = sorted(batches_tr.class_indices.items(), key=operator.itemgetter(1))
-    preproc = ImagePreprocessor(test_datagen,
-                                [x[0] for x in class_tup],
-                                target_size=target_size,
-                                color_mode=color_mode)
+    preproc = ImagePreprocessor(
+        test_datagen,
+        [x[0] for x in class_tup],
+        target_size=target_size,
+        color_mode=color_mode,
+    )
     return (batches_tr, batches_te, preproc)</code></pre>
 </details>
 </dd>
@@ -1743,8 +1891,16 @@ Return:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def preprocess_csv(csv_in, csv_out, x_col=&#39;filename&#39;, y_col=None,
-                   sep=&#39;,&#39;, label_sep=&#39; &#39;, suffix=&#39;&#39;, split_by=None):
+<pre><code class="python">def preprocess_csv(
+    csv_in,
+    csv_out,
+    x_col=&#34;filename&#34;,
+    y_col=None,
+    sep=&#34;,&#34;,
+    label_sep=&#34; &#34;,
+    suffix=&#34;&#34;,
+    split_by=None,
+):
     &#34;&#34;&#34;
     ```
     Takes a CSV where the one column contains a file name and a column
@@ -1776,11 +1932,12 @@ Return:
     ```
     &#34;&#34;&#34;
     if not y_col and not suffix:
-        raise ValueError(&#39;one or both of y_col and suffix should be supplied&#39;)
+        raise ValueError(&#34;one or both of y_col and suffix should be supplied&#34;)
     df = pd.read_csv(csv_in, sep=sep)
-    f_csv_out = open(csv_out, &#39;w&#39;)
+    f_csv_out = open(csv_out, &#34;w&#34;)
     writer = csv.writer(f_csv_out, delimiter=sep)
-    if y_col: df[y_col] = df[y_col].apply(str)
+    if y_col:
+        df[y_col] = df[y_col].apply(str)
 
     # write header
     if y_col:
@@ -1804,8 +1961,10 @@ Return:
             out = list(data[[x_col]].values)
             tags = set(data[y_col].strip().split(label_sep))
             for c in classes:
-                if c in tags: out.append(1)
-                else: out.append(0)
+                if c in tags:
+                    out.append(1)
+                else:
+                    out.append(0)
         else:
             out = data
         writer.writerow(out)
@@ -1831,8 +1990,8 @@ on a supplied image.
     on a supplied image.
     ```
     &#34;&#34;&#34;
-    if type(img_path) != type(&#39;&#39;) or not os.path.isfile(img_path):
-        raise ValueError(&#39;img_path must be valid file path to image&#39;)
+    if type(img_path) != type(&#34;&#34;) or not os.path.isfile(img_path):
+        raise ValueError(&#34;img_path must be valid file path to image&#34;)
     idg = copy.copy(data_aug)
     idg.featurewise_center = False
     idg.featurewise_std_normalization = False
@@ -1844,14 +2003,15 @@ on a supplied image.
 
     img = keras.preprocessing.image.load_img(img_path)
     x = keras.preprocessing.image.img_to_array(img)
-    x = x/255.
+    x = x / 255.0
     x = x.reshape((1,) + x.shape)
     i = 0
     ims = []
     for batch in idg.flow(x, batch_size=1):
         ims.append(np.squeeze(batch))
         i += 1
-        if i &gt;= n: break
+        if i &gt;= n:
+            break
     U.plots(ims, rows=rows)
     return</code></pre>
 </details>
@@ -1874,8 +2034,8 @@ on a supplied image.
     on a supplied image.
     ```
     &#34;&#34;&#34;
-    if type(img_path) != type(&#39;&#39;) or not os.path.isfile(img_path):
-        raise ValueError(&#39;img_path must be valid file path to image&#39;)
+    if type(img_path) != type(&#34;&#34;) or not os.path.isfile(img_path):
+        raise ValueError(&#34;img_path must be valid file path to image&#34;)
     idg = copy.copy(data_aug)
     idg.featurewise_center = False
     idg.featurewise_std_normalization = False
@@ -1887,14 +2047,15 @@ on a supplied image.
 
     img = keras.preprocessing.image.load_img(img_path)
     x = keras.preprocessing.image.img_to_array(img)
-    x = x/255.
+    x = x / 255.0
     x = x.reshape((1,) + x.shape)
     i = 0
     for batch in idg.flow(x, batch_size=1):
         plt.figure()
         plt.imshow(np.squeeze(batch))
         i += 1
-        if i &gt;= n: break
+        if i &gt;= n:
+            break
     return</code></pre>
 </details>
 </dd>
@@ -1907,10 +2068,14 @@ on a supplied image.
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def process_datagen(data_aug, train_array=None, train_directory=None,
-                    target_size=None,
-                    color_mode=&#39;rgb&#39;,
-                    flat_dir=False):
+<pre><code class="python">def process_datagen(
+    data_aug,
+    train_array=None,
+    train_directory=None,
+    target_size=None,
+    color_mode=&#34;rgb&#34;,
+    flat_dir=False,
+):
     # set generators for train and test
     if data_aug is not None:
         train_datagen = data_aug
@@ -1920,11 +2085,15 @@ on a supplied image.
         test_datagen = get_test_datagen()
 
     # compute statistics for normalization
-    fit_datagens(train_datagen, test_datagen,
-                 train_array=train_array,
-                 train_directory=train_directory,
-                 target_size=target_size,
-                 color_mode=color_mode, flat_dir=flat_dir)
+    fit_datagens(
+        train_datagen,
+        test_datagen,
+        train_array=train_array,
+        train_directory=train_directory,
+        target_size=target_size,
+        color_mode=color_mode,
+        flat_dir=flat_dir,
+    )
 
     return (train_datagen, test_datagen)</code></pre>
 </details>
@@ -1938,15 +2107,14 @@ on a supplied image.
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def sample_image_folder(train_directory,
-                         target_size,
-                         color_mode=&#39;rgb&#39;, flat_dir=False):
+<pre><code class="python">def sample_image_folder(train_directory, target_size, color_mode=&#34;rgb&#34;, flat_dir=False):
 
     # adjust train_directory
     classes = None
     if flat_dir and train_directory is not None:
         folder = train_directory
-        if folder[-1] != os.sep: folder += os.sep
+        if folder[-1] != os.sep:
+            folder += os.sep
         parent = os.path.dirname(os.path.dirname(folder))
         folder_name = os.path.basename(os.path.dirname(folder))
         train_directory = parent
@@ -1956,15 +2124,16 @@ on a supplied image.
     batch_size = 100
     img_gen = keras.preprocessing.image.ImageDataGenerator()
     batches = img_gen.flow_from_directory(
-                directory=train_directory,
-                classes=classes,
-                target_size=target_size,
-                batch_size=batch_size,
-                color_mode=color_mode,
-                shuffle=True)
+        directory=train_directory,
+        classes=classes,
+        target_size=target_size,
+        batch_size=batch_size,
+        color_mode=color_mode,
+        shuffle=True,
+    )
     the_shape = batches[0][0].shape
     sample_size = the_shape[0]
-    if K.image_data_format() == &#39;channels_first&#39;:
+    if K.image_data_format() == &#34;channels_first&#34;:
         num_channels = the_shape[1]
     else:
         num_channels = the_shape[-1]
@@ -1989,7 +2158,7 @@ on a supplied image.
     ```
     &#34;&#34;&#34;
     if not os.path.isfile(img_path):
-        raise ValueError(&#39;%s is not valid file&#39; % (img_path))
+        raise ValueError(&#34;%s is not valid file&#34; % (img_path))
     img = plt.imread(img_path)
     out = plt.imshow(img)
     return out</code></pre>
@@ -2012,14 +2181,14 @@ on a supplied image.
     ```
     &#34;&#34;&#34;
     fnames = []
-    for ext in (&#39;*.gif&#39;, &#39;*.png&#39;, &#39;*.jpg&#39;):
+    for ext in (&#34;*.gif&#34;, &#34;*.png&#34;, &#34;*.jpg&#34;):
         fnames.extend(glob.glob(os.path.join(img_folder, ext)))
     ims = []
     for i in range(n):
         img_path = random.choice(fnames)
         img = keras.preprocessing.image.load_img(img_path)
         x = keras.preprocessing.image.img_to_array(img)
-        x = x/255.
+        x = x / 255.0
         ims.append(x)
     U.plots(ims, rows=rows)
     return</code></pre>

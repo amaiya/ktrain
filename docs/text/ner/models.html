@@ -30,38 +30,42 @@
 from ... import utils as U
 from . import preprocessor as pp
 
-BILSTM_CRF = &#39;bilstm-crf&#39;
-BILSTM = &#39;bilstm&#39;
-BILSTM_ELMO = &#39;bilstm-elmo&#39;
-BILSTM_CRF_ELMO = &#39;bilstm-crf-elmo&#39;
-BILSTM_TRANSFORMER = &#39;bilstm-bert&#39;
+BILSTM_CRF = &#34;bilstm-crf&#34;
+BILSTM = &#34;bilstm&#34;
+BILSTM_ELMO = &#34;bilstm-elmo&#34;
+BILSTM_CRF_ELMO = &#34;bilstm-crf-elmo&#34;
+BILSTM_TRANSFORMER = &#34;bilstm-transformer&#34;
 SEQUENCE_TAGGERS = {
-                     BILSTM: &#39;Bidirectional LSTM (https://arxiv.org/abs/1603.01360)&#39;,
-                     BILSTM_TRANSFORMER: &#39;Bidirectional LSTM w/ BERT embeddings&#39;,
-                     BILSTM_CRF: &#39;Bidirectional LSTM-CRF  (https://arxiv.org/abs/1603.01360)&#39;,
-                     BILSTM_ELMO: &#39;Bidirectional LSTM w/ Elmo embeddings [English only]&#39;,
-                     BILSTM_CRF_ELMO: &#39;Bidirectional LSTM-CRF w/ Elmo embeddings [English only]&#39;,
-                     }
+    BILSTM: &#34;Bidirectional LSTM (https://arxiv.org/abs/1603.01360)&#34;,
+    BILSTM_TRANSFORMER: &#34;Bidirectional LSTM w/ transformer embeddings (multlingual BERT is default)&#34;,
+    BILSTM_CRF: &#34;Bidirectional LSTM-CRF  (https://arxiv.org/abs/1603.01360)&#34;,
+    BILSTM_ELMO: &#34;Bidirectional LSTM w/ Elmo embeddings [English only]&#34;,
+    BILSTM_CRF_ELMO: &#34;Bidirectional LSTM-CRF w/ Elmo embeddings [English only]&#34;,
+}
 V1_ONLY_MODELS = [BILSTM_CRF, BILSTM_CRF_ELMO]
 TRANSFORMER_MODELS = [BILSTM_TRANSFORMER]
 ELMO_MODELS = [BILSTM_ELMO, BILSTM_CRF_ELMO]
 
+
 def print_sequence_taggers():
-    for k,v in SEQUENCE_TAGGERS.items():
-        print(&#34;%s: %s&#34; % (k,v))
+    for k, v in SEQUENCE_TAGGERS.items():
+        print(&#34;%s: %s&#34; % (k, v))
 
 
-def sequence_tagger(name, preproc, 
-                    wv_path_or_url=None,
-                    bert_model = &#39;bert-base-multilingual-cased&#39;,
-                    bert_layers_to_use = U.DEFAULT_TRANSFORMER_LAYERS, 
-                    word_embedding_dim=100,
-                    char_embedding_dim=25,
-                    word_lstm_size=100,
-                    char_lstm_size=25,
-                    fc_dim=100,
-                    dropout=0.5,
-                    verbose=1):
+def sequence_tagger(
+    name,
+    preproc,
+    wv_path_or_url=None,
+    transformer_model=&#34;bert-base-multilingual-cased&#34;,
+    transformer_layers_to_use=U.DEFAULT_TRANSFORMER_LAYERS,
+    word_embedding_dim=100,
+    char_embedding_dim=25,
+    word_lstm_size=100,
+    char_lstm_size=25,
+    fc_dim=100,
+    dropout=0.5,
+    verbose=1,
+):
     &#34;&#34;&#34;
     Build and return a sequence tagger (i.e., named entity recognizer).
 
@@ -85,19 +89,19 @@ def sequence_tagger(name, preproc,
                                  https://dl.fbaipublicfiles.com/fasttext/vectors-crawl/cc.nl.300.vec.gz
 
 
-                             See these two Web pages for a full list of URLs to word vector files for 
+                             See these two Web pages for a full list of URLs to word vector files for
                              different languages:
                                 1.  https://fasttext.cc/docs/en/english-vectors.html (for English)
                                 2.  https://fasttext.cc/docs/en/crawl-vectors.html (for non-English langages)
 
                             Default:None (randomly-initialized word embeddings are used)
 
-        bert_model_name(str):  the name of the BERT model.  default: &#39;bert-base-multilingual-cased&#39;
-                               This parameter is only used if bilstm-bert is selected for name parameter.
-                               The value of this parameter is a name of BERT model from here:
-                                        https://huggingface.co/transformers/pretrained_models.html
-                               or a community-uploaded BERT model from here:
-                                        https://huggingface.co/models
+        transformer_model_name(str):  the name of the BERT model.  default: &#39;bert-base-multilingual-cased&#39;
+                                      This parameter is only used if bilstm-bert is selected for name parameter.
+                                       The value of this parameter is a name of BERT model from here:
+                                            https://huggingface.co/transformers/pretrained_models.html
+                                       or a community-uploaded BERT model from here:
+                                           https://huggingface.co/models
                                Example values:
                                  bert-base-multilingual-cased:  Multilingual BERT (157 languages) - this is the default
                                  bert-base-cased:  English BERT
@@ -106,8 +110,8 @@ def sequence_tagger(name, preproc,
                                  albert-base-v2: English ALBERT model
                                  monologg/biobert_v1.1_pubmed: community uploaded BioBERT (pretrained on PubMed)
 
-        bert_layers_to_use(list): indices of hidden layers to use.  default:[-2] # second-to-last layer
-                                  To use the concatenation of last 4 layers: use [-1, -2, -3, -4]
+        transformer_layers_to_use(list): indices of hidden layers to use.  default:[-2] # second-to-last layer
+                                         To use the concatenation of last 4 layers: use [-1, -2, -3, -4]
         word_embedding_dim (int): word embedding dimensions.
         char_embedding_dim (int): character embedding dimensions.
         word_lstm_size (int): character LSTM feature extractor output dimensions.
@@ -119,62 +123,78 @@ def sequence_tagger(name, preproc,
     Return:
         model (Model): A Keras Model instance
     &#34;&#34;&#34;
-    
+
     if name not in SEQUENCE_TAGGERS:
-        raise ValueError(&#39;invalid name: %s&#39; % (name))
+        raise ValueError(f&#34;Invalid model name {name}. {&#39;Did you mean bilstm-transformer?&#39; if name == &#39;bilstm-bert&#39; else &#39;&#39;}&#34;)
 
     # check BERT
-    if name in TRANSFORMER_MODELS and not bert_model:
-        raise ValueError(&#39;bert_model is required for bilstm-bert models&#39;)
+    if name in TRANSFORMER_MODELS and not transformer_model:
+        raise ValueError(f&#34;transformer_model is required for {BILSTM_TRANSFORMER} models&#34;)
     if name in TRANSFORMER_MODELS and DISABLE_V2_BEHAVIOR:
-        raise ValueError(&#39;BERT and other transformer models cannot be used with DISABLE_v2_BEHAVIOR&#39;)
+        raise ValueError(
+            &#34;BERT and other transformer models cannot be used with DISABLE_v2_BEHAVIOR&#34;
+        )
 
     # check CRF
     if not DISABLE_V2_BEHAVIOR and name in V1_ONLY_MODELS:
-        warnings.warn(&#39;Falling back to BiLSTM (no CRF) because DISABLE_V2_BEHAVIOR=False&#39;)
-        msg = &#34;\nIMPORTANT NOTE: ktrain uses the CRF module from keras_contrib, which is not yet\n&#34; +\
-              &#34;fully compatible with TensorFlow 2. You can still use the BiLSTM-CRF model\n&#34; +\
-              &#34;in ktrain for sequence tagging with TensorFlow 2, but you must add the\n&#34; +\
-              &#34;following to the top of your script or notebook BEFORE you import ktrain:\n\n&#34; +\
-              &#34;import os\n&#34; +\
-              &#34;os.environ[&#39;DISABLE_V2_BEHAVIOR&#39;] = &#39;1&#39;\n\n&#34; +\
-              &#34;For this run, a vanilla BiLSTM model (with no CRF layer) will be used.\n&#34;
+        warnings.warn(
+            &#34;Falling back to BiLSTM (no CRF) because DISABLE_V2_BEHAVIOR=False&#34;
+        )
+        msg = (
+            &#34;\nIMPORTANT NOTE: ktrain uses the CRF module from keras_contrib, which is not yet\n&#34;
+            + &#34;fully compatible with TensorFlow 2. You can still use the BiLSTM-CRF model\n&#34;
+            + &#34;in ktrain for sequence tagging with TensorFlow 2, but you must add the\n&#34;
+            + &#34;following to the top of your script or notebook BEFORE you import ktrain:\n\n&#34;
+            + &#34;import os\n&#34;
+            + &#34;os.environ[&#39;DISABLE_V2_BEHAVIOR&#39;] = &#39;1&#39;\n\n&#34;
+            + &#34;For this run, a vanilla BiLSTM model (with no CRF layer) will be used.\n&#34;
+        )
         print(msg)
         name = BILSTM if name == BILSTM_CRF else BILSTM_ELMO
 
     # check for use_char=True
     if not DISABLE_V2_BEHAVIOR and preproc.p._use_char:
         # turn off masking due to open TF2 issue ##33148: https://github.com/tensorflow/tensorflow/issues/33148
-        warnings.warn(&#39;Setting use_char=False:  character embeddings cannot be used in TF2 due to open TensorFlow 2 bug (#33148).\n&#39; +\
-                       &#39;Add os.environ[&#34;DISABLE_V2_BEHAVIOR&#34;] = &#34;1&#34; to the top of script if you really want to use it.&#39;)
-        preproc.p._use_char=False
+        warnings.warn(
+            &#34;Setting use_char=False:  character embeddings cannot be used in TF2 due to open TensorFlow 2 bug (#33148).\n&#34;
+            + &#39;Add os.environ[&#34;DISABLE_V2_BEHAVIOR&#34;] = &#34;1&#34; to the top of script if you really want to use it.&#39;
+        )
+        preproc.p._use_char = False
 
     if verbose:
         emb_names = []
-        if wv_path_or_url is not None: 
-            emb_names.append(&#39;word embeddings initialized with fasttext word vectors (%s)&#39; % (os.path.basename(wv_path_or_url)))
+        if wv_path_or_url is not None:
+            emb_names.append(
+                &#34;word embeddings initialized with fasttext word vectors (%s)&#34;
+                % (os.path.basename(wv_path_or_url))
+            )
         else:
-            emb_names.append(&#39;word embeddings initialized randomly&#39;)
-        if name in TRANSFORMER_MODELS: emb_names.append(&#39;BERT embeddings with &#39; + bert_model)
-        if name in ELMO_MODELS: emb_names.append(&#39;Elmo embeddings for English&#39;)
-        if preproc.p._use_char:  emb_names.append(&#39;character embeddings&#39;)
+            emb_names.append(&#34;word embeddings initialized randomly&#34;)
+        if name in TRANSFORMER_MODELS:
+            emb_names.append(&#34;Transformer embeddings with &#34; + transformer_model)
+        if name in ELMO_MODELS:
+            emb_names.append(&#34;Elmo embeddings for English&#34;)
+        if preproc.p._use_char:
+            emb_names.append(&#34;character embeddings&#34;)
         if len(emb_names) &gt; 1:
-            print(&#39;Embedding schemes employed (combined with concatenation):&#39;)
+            print(&#34;Embedding schemes employed (combined with concatenation):&#34;)
         else:
-            print(&#39;embedding schemes employed:&#39;)
+            print(&#34;embedding schemes employed:&#34;)
         for emb_name in emb_names:
-            print(&#39;\t%s&#39; % (emb_name))
+            print(&#34;\t%s&#34; % (emb_name))
         print()
 
     # setup embedding
     if wv_path_or_url is not None:
-        wv_model, word_embedding_dim = preproc.get_wv_model(wv_path_or_url, verbose=verbose)
+        wv_model, word_embedding_dim = preproc.get_wv_model(
+            wv_path_or_url, verbose=verbose
+        )
     else:
         wv_model = None
     if name == BILSTM_CRF:
-        use_crf = False if not DISABLE_V2_BEHAVIOR else True # fallback to bilstm 
+        use_crf = False if not DISABLE_V2_BEHAVIOR else True  # fallback to bilstm
     elif name == BILSTM_CRF_ELMO:
-        use_crf = False if not DISABLE_V2_BEHAVIOR else True # fallback to bilstm
+        use_crf = False if not DISABLE_V2_BEHAVIOR else True  # fallback to bilstm
         preproc.p.activate_elmo()
     elif name == BILSTM:
         use_crf = False
@@ -183,24 +203,29 @@ def sequence_tagger(name, preproc,
         preproc.p.activate_elmo()
     elif name == BILSTM_TRANSFORMER:
         use_crf = False
-        preproc.p.activate_transformer(bert_model, layers=bert_layers_to_use, force=True)
+        preproc.p.activate_transformer(
+            transformer_model, layers=transformer_layers_to_use, force=True
+        )
     else:
-        raise ValueError(&#39;Unsupported model name&#39;)
+        raise ValueError(&#34;Unsupported model name&#34;)
     from .anago.models import BiLSTMCRF
-    model = BiLSTMCRF(char_embedding_dim=char_embedding_dim,
-                      word_embedding_dim=word_embedding_dim,
-                      char_lstm_size=char_lstm_size,
-                      word_lstm_size=word_lstm_size,
-                      fc_dim=fc_dim,
-                      char_vocab_size=preproc.p.char_vocab_size,
-                      word_vocab_size=preproc.p.word_vocab_size,
-                      num_labels=preproc.p.label_size,
-                      dropout=dropout,
-                      use_crf=use_crf,
-                      use_char=preproc.p._use_char,
-                      embeddings=wv_model,
-                      use_elmo=preproc.p.elmo_is_activated(),
-                      use_transformer_with_dim=preproc.p.get_transformer_dim())
+
+    model = BiLSTMCRF(
+        char_embedding_dim=char_embedding_dim,
+        word_embedding_dim=word_embedding_dim,
+        char_lstm_size=char_lstm_size,
+        word_lstm_size=word_lstm_size,
+        fc_dim=fc_dim,
+        char_vocab_size=preproc.p.char_vocab_size,
+        word_vocab_size=preproc.p.word_vocab_size,
+        num_labels=preproc.p.label_size,
+        dropout=dropout,
+        use_crf=use_crf,
+        use_char=preproc.p._use_char,
+        embeddings=wv_model,
+        use_elmo=preproc.p.elmo_is_activated(),
+        use_transformer_with_dim=preproc.p.get_transformer_dim(),
+    )
     model, loss = model.build()
     model.compile(loss=loss, optimizer=U.DEFAULT_OPT)
     return model</code></pre>
@@ -223,12 +248,12 @@ def sequence_tagger(name, preproc,
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def print_sequence_taggers():
-    for k,v in SEQUENCE_TAGGERS.items():
-        print(&#34;%s: %s&#34; % (k,v))</code></pre>
+    for k, v in SEQUENCE_TAGGERS.items():
+        print(&#34;%s: %s&#34; % (k, v))</code></pre>
 </details>
 </dd>
 <dt id="ktrain.text.ner.models.sequence_tagger"><code class="name flex">
-<span>def <span class="ident">sequence_tagger</span></span>(<span>name, preproc, wv_path_or_url=None, bert_model='bert-base-multilingual-cased', bert_layers_to_use=[-2], word_embedding_dim=100, char_embedding_dim=25, word_lstm_size=100, char_lstm_size=25, fc_dim=100, dropout=0.5, verbose=1)</span>
+<span>def <span class="ident">sequence_tagger</span></span>(<span>name, preproc, wv_path_or_url=None, transformer_model='bert-base-multilingual-cased', transformer_layers_to_use=[-2], word_embedding_dim=100, char_embedding_dim=25, word_lstm_size=100, char_lstm_size=25, fc_dim=100, dropout=0.5, verbose=1)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Build and return a sequence tagger (i.e., named entity recognizer).</p>
@@ -255,14 +280,14 @@ Example valid values for wv_path_or_url:</p>
                      &lt;https://dl.fbaipublicfiles.com/fasttext/vectors-crawl/cc.nl.300.vec.gz&gt;
 
 
-                 See these two Web pages for a full list of URLs to word vector files for 
+                 See these two Web pages for a full list of URLs to word vector files for
                  different languages:
                     1.  &lt;https://fasttext.cc/docs/en/english-vectors.html&gt; (for English)
                     2.  &lt;https://fasttext.cc/docs/en/crawl-vectors.html&gt; (for non-English langages)
 
                 Default:None (randomly-initialized word embeddings are used)
 </code></pre>
-<p>bert_model_name(str):
+<p>transformer_model_name(str):
 the name of the BERT model.
 default: 'bert-base-multilingual-cased'
 This parameter is only used if bilstm-bert is selected for name parameter.
@@ -280,7 +305,7 @@ distilbert-base-german-cased: German DistilBert
 albert-base-v2: English ALBERT model
 monologg/biobert_v1.1_pubmed: community uploaded BioBERT (pretrained on PubMed)</p>
 <dl>
-<dt>bert_layers_to_use(list): indices of hidden layers to use.
+<dt>transformer_layers_to_use(list): indices of hidden layers to use.
 default:[-2] # second-to-last layer</dt>
 <dt>To use the concatenation of last 4 layers: use [-1, -2, -3, -4]</dt>
 <dt><strong><code>word_embedding_dim</code></strong> :&ensp;<code>int</code></dt>
@@ -304,17 +329,20 @@ default:[-2] # second-to-last layer</dt>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def sequence_tagger(name, preproc, 
-                    wv_path_or_url=None,
-                    bert_model = &#39;bert-base-multilingual-cased&#39;,
-                    bert_layers_to_use = U.DEFAULT_TRANSFORMER_LAYERS, 
-                    word_embedding_dim=100,
-                    char_embedding_dim=25,
-                    word_lstm_size=100,
-                    char_lstm_size=25,
-                    fc_dim=100,
-                    dropout=0.5,
-                    verbose=1):
+<pre><code class="python">def sequence_tagger(
+    name,
+    preproc,
+    wv_path_or_url=None,
+    transformer_model=&#34;bert-base-multilingual-cased&#34;,
+    transformer_layers_to_use=U.DEFAULT_TRANSFORMER_LAYERS,
+    word_embedding_dim=100,
+    char_embedding_dim=25,
+    word_lstm_size=100,
+    char_lstm_size=25,
+    fc_dim=100,
+    dropout=0.5,
+    verbose=1,
+):
     &#34;&#34;&#34;
     Build and return a sequence tagger (i.e., named entity recognizer).
 
@@ -338,19 +366,19 @@ default:[-2] # second-to-last layer</dt>
                                  https://dl.fbaipublicfiles.com/fasttext/vectors-crawl/cc.nl.300.vec.gz
 
 
-                             See these two Web pages for a full list of URLs to word vector files for 
+                             See these two Web pages for a full list of URLs to word vector files for
                              different languages:
                                 1.  https://fasttext.cc/docs/en/english-vectors.html (for English)
                                 2.  https://fasttext.cc/docs/en/crawl-vectors.html (for non-English langages)
 
                             Default:None (randomly-initialized word embeddings are used)
 
-        bert_model_name(str):  the name of the BERT model.  default: &#39;bert-base-multilingual-cased&#39;
-                               This parameter is only used if bilstm-bert is selected for name parameter.
-                               The value of this parameter is a name of BERT model from here:
-                                        https://huggingface.co/transformers/pretrained_models.html
-                               or a community-uploaded BERT model from here:
-                                        https://huggingface.co/models
+        transformer_model_name(str):  the name of the BERT model.  default: &#39;bert-base-multilingual-cased&#39;
+                                      This parameter is only used if bilstm-bert is selected for name parameter.
+                                       The value of this parameter is a name of BERT model from here:
+                                            https://huggingface.co/transformers/pretrained_models.html
+                                       or a community-uploaded BERT model from here:
+                                           https://huggingface.co/models
                                Example values:
                                  bert-base-multilingual-cased:  Multilingual BERT (157 languages) - this is the default
                                  bert-base-cased:  English BERT
@@ -359,8 +387,8 @@ default:[-2] # second-to-last layer</dt>
                                  albert-base-v2: English ALBERT model
                                  monologg/biobert_v1.1_pubmed: community uploaded BioBERT (pretrained on PubMed)
 
-        bert_layers_to_use(list): indices of hidden layers to use.  default:[-2] # second-to-last layer
-                                  To use the concatenation of last 4 layers: use [-1, -2, -3, -4]
+        transformer_layers_to_use(list): indices of hidden layers to use.  default:[-2] # second-to-last layer
+                                         To use the concatenation of last 4 layers: use [-1, -2, -3, -4]
         word_embedding_dim (int): word embedding dimensions.
         char_embedding_dim (int): character embedding dimensions.
         word_lstm_size (int): character LSTM feature extractor output dimensions.
@@ -372,62 +400,78 @@ default:[-2] # second-to-last layer</dt>
     Return:
         model (Model): A Keras Model instance
     &#34;&#34;&#34;
-    
+
     if name not in SEQUENCE_TAGGERS:
-        raise ValueError(&#39;invalid name: %s&#39; % (name))
+        raise ValueError(f&#34;Invalid model name {name}. {&#39;Did you mean bilstm-transformer?&#39; if name == &#39;bilstm-bert&#39; else &#39;&#39;}&#34;)
 
     # check BERT
-    if name in TRANSFORMER_MODELS and not bert_model:
-        raise ValueError(&#39;bert_model is required for bilstm-bert models&#39;)
+    if name in TRANSFORMER_MODELS and not transformer_model:
+        raise ValueError(f&#34;transformer_model is required for {BILSTM_TRANSFORMER} models&#34;)
     if name in TRANSFORMER_MODELS and DISABLE_V2_BEHAVIOR:
-        raise ValueError(&#39;BERT and other transformer models cannot be used with DISABLE_v2_BEHAVIOR&#39;)
+        raise ValueError(
+            &#34;BERT and other transformer models cannot be used with DISABLE_v2_BEHAVIOR&#34;
+        )
 
     # check CRF
     if not DISABLE_V2_BEHAVIOR and name in V1_ONLY_MODELS:
-        warnings.warn(&#39;Falling back to BiLSTM (no CRF) because DISABLE_V2_BEHAVIOR=False&#39;)
-        msg = &#34;\nIMPORTANT NOTE: ktrain uses the CRF module from keras_contrib, which is not yet\n&#34; +\
-              &#34;fully compatible with TensorFlow 2. You can still use the BiLSTM-CRF model\n&#34; +\
-              &#34;in ktrain for sequence tagging with TensorFlow 2, but you must add the\n&#34; +\
-              &#34;following to the top of your script or notebook BEFORE you import ktrain:\n\n&#34; +\
-              &#34;import os\n&#34; +\
-              &#34;os.environ[&#39;DISABLE_V2_BEHAVIOR&#39;] = &#39;1&#39;\n\n&#34; +\
-              &#34;For this run, a vanilla BiLSTM model (with no CRF layer) will be used.\n&#34;
+        warnings.warn(
+            &#34;Falling back to BiLSTM (no CRF) because DISABLE_V2_BEHAVIOR=False&#34;
+        )
+        msg = (
+            &#34;\nIMPORTANT NOTE: ktrain uses the CRF module from keras_contrib, which is not yet\n&#34;
+            + &#34;fully compatible with TensorFlow 2. You can still use the BiLSTM-CRF model\n&#34;
+            + &#34;in ktrain for sequence tagging with TensorFlow 2, but you must add the\n&#34;
+            + &#34;following to the top of your script or notebook BEFORE you import ktrain:\n\n&#34;
+            + &#34;import os\n&#34;
+            + &#34;os.environ[&#39;DISABLE_V2_BEHAVIOR&#39;] = &#39;1&#39;\n\n&#34;
+            + &#34;For this run, a vanilla BiLSTM model (with no CRF layer) will be used.\n&#34;
+        )
         print(msg)
         name = BILSTM if name == BILSTM_CRF else BILSTM_ELMO
 
     # check for use_char=True
     if not DISABLE_V2_BEHAVIOR and preproc.p._use_char:
         # turn off masking due to open TF2 issue ##33148: https://github.com/tensorflow/tensorflow/issues/33148
-        warnings.warn(&#39;Setting use_char=False:  character embeddings cannot be used in TF2 due to open TensorFlow 2 bug (#33148).\n&#39; +\
-                       &#39;Add os.environ[&#34;DISABLE_V2_BEHAVIOR&#34;] = &#34;1&#34; to the top of script if you really want to use it.&#39;)
-        preproc.p._use_char=False
+        warnings.warn(
+            &#34;Setting use_char=False:  character embeddings cannot be used in TF2 due to open TensorFlow 2 bug (#33148).\n&#34;
+            + &#39;Add os.environ[&#34;DISABLE_V2_BEHAVIOR&#34;] = &#34;1&#34; to the top of script if you really want to use it.&#39;
+        )
+        preproc.p._use_char = False
 
     if verbose:
         emb_names = []
-        if wv_path_or_url is not None: 
-            emb_names.append(&#39;word embeddings initialized with fasttext word vectors (%s)&#39; % (os.path.basename(wv_path_or_url)))
+        if wv_path_or_url is not None:
+            emb_names.append(
+                &#34;word embeddings initialized with fasttext word vectors (%s)&#34;
+                % (os.path.basename(wv_path_or_url))
+            )
         else:
-            emb_names.append(&#39;word embeddings initialized randomly&#39;)
-        if name in TRANSFORMER_MODELS: emb_names.append(&#39;BERT embeddings with &#39; + bert_model)
-        if name in ELMO_MODELS: emb_names.append(&#39;Elmo embeddings for English&#39;)
-        if preproc.p._use_char:  emb_names.append(&#39;character embeddings&#39;)
+            emb_names.append(&#34;word embeddings initialized randomly&#34;)
+        if name in TRANSFORMER_MODELS:
+            emb_names.append(&#34;Transformer embeddings with &#34; + transformer_model)
+        if name in ELMO_MODELS:
+            emb_names.append(&#34;Elmo embeddings for English&#34;)
+        if preproc.p._use_char:
+            emb_names.append(&#34;character embeddings&#34;)
         if len(emb_names) &gt; 1:
-            print(&#39;Embedding schemes employed (combined with concatenation):&#39;)
+            print(&#34;Embedding schemes employed (combined with concatenation):&#34;)
         else:
-            print(&#39;embedding schemes employed:&#39;)
+            print(&#34;embedding schemes employed:&#34;)
         for emb_name in emb_names:
-            print(&#39;\t%s&#39; % (emb_name))
+            print(&#34;\t%s&#34; % (emb_name))
         print()
 
     # setup embedding
     if wv_path_or_url is not None:
-        wv_model, word_embedding_dim = preproc.get_wv_model(wv_path_or_url, verbose=verbose)
+        wv_model, word_embedding_dim = preproc.get_wv_model(
+            wv_path_or_url, verbose=verbose
+        )
     else:
         wv_model = None
     if name == BILSTM_CRF:
-        use_crf = False if not DISABLE_V2_BEHAVIOR else True # fallback to bilstm 
+        use_crf = False if not DISABLE_V2_BEHAVIOR else True  # fallback to bilstm
     elif name == BILSTM_CRF_ELMO:
-        use_crf = False if not DISABLE_V2_BEHAVIOR else True # fallback to bilstm
+        use_crf = False if not DISABLE_V2_BEHAVIOR else True  # fallback to bilstm
         preproc.p.activate_elmo()
     elif name == BILSTM:
         use_crf = False
@@ -436,24 +480,29 @@ default:[-2] # second-to-last layer</dt>
         preproc.p.activate_elmo()
     elif name == BILSTM_TRANSFORMER:
         use_crf = False
-        preproc.p.activate_transformer(bert_model, layers=bert_layers_to_use, force=True)
+        preproc.p.activate_transformer(
+            transformer_model, layers=transformer_layers_to_use, force=True
+        )
     else:
-        raise ValueError(&#39;Unsupported model name&#39;)
+        raise ValueError(&#34;Unsupported model name&#34;)
     from .anago.models import BiLSTMCRF
-    model = BiLSTMCRF(char_embedding_dim=char_embedding_dim,
-                      word_embedding_dim=word_embedding_dim,
-                      char_lstm_size=char_lstm_size,
-                      word_lstm_size=word_lstm_size,
-                      fc_dim=fc_dim,
-                      char_vocab_size=preproc.p.char_vocab_size,
-                      word_vocab_size=preproc.p.word_vocab_size,
-                      num_labels=preproc.p.label_size,
-                      dropout=dropout,
-                      use_crf=use_crf,
-                      use_char=preproc.p._use_char,
-                      embeddings=wv_model,
-                      use_elmo=preproc.p.elmo_is_activated(),
-                      use_transformer_with_dim=preproc.p.get_transformer_dim())
+
+    model = BiLSTMCRF(
+        char_embedding_dim=char_embedding_dim,
+        word_embedding_dim=word_embedding_dim,
+        char_lstm_size=char_lstm_size,
+        word_lstm_size=word_lstm_size,
+        fc_dim=fc_dim,
+        char_vocab_size=preproc.p.char_vocab_size,
+        word_vocab_size=preproc.p.word_vocab_size,
+        num_labels=preproc.p.label_size,
+        dropout=dropout,
+        use_crf=use_crf,
+        use_char=preproc.p._use_char,
+        embeddings=wv_model,
+        use_elmo=preproc.p.elmo_is_activated(),
+        use_transformer_with_dim=preproc.p.get_transformer_dim(),
+    )
     model, loss = model.build()
     model.compile(loss=loss, optimizer=U.DEFAULT_OPT)
     return model</code></pre>

@@ -36,14 +36,14 @@ try:
     from stellargraph.mapper import node_mappers, link_mappers
 except:
     raise Exception(SG_ERRMSG)
-if version.parse(sg.__version__) &lt; version.parse(&#39;0.8&#39;):
+if version.parse(sg.__version__) &lt; version.parse(&#34;0.8&#34;):
     raise Exception(SG_ERRMSG)
 
 
 class NodeSequenceWrapper(node_mappers.NodeSequence, SequenceDataset):
     def __init__(self, node_seq):
         if not isinstance(node_seq, node_mappers.NodeSequence):
-            raise ValueError(&#39;node_seq must by a stellargraph NodeSequence object&#39;)
+            raise ValueError(&#34;node_seq must by a stellargraph NodeSequence object&#34;)
         self.node_seq = node_seq
         self.targets = node_seq.targets
         self.generator = node_seq.generator
@@ -53,73 +53,62 @@ class NodeSequenceWrapper(node_mappers.NodeSequence, SequenceDataset):
         self.on_epoch_end = node_seq.on_epoch_end
         self.indices = node_seq.indices
 
-
-
-
     def __setattr__(self, name, value):
-        if name == &#39;batch_size&#39;:
+        if name == &#34;batch_size&#34;:
             self.generator.batch_size = value
-        elif name == &#39;data_size&#39;:
+        elif name == &#34;data_size&#34;:
             self.node_seq.data_size = value
-        elif name == &#39;shuffle&#39;:
+        elif name == &#34;shuffle&#34;:
             self.node_seq.shuffle = value
-        elif name == &#39;head_node_types&#39;:
+        elif name == &#34;head_node_types&#34;:
             self.node_seq.head_node_types = value
-        elif name == &#39;_sampling_schema&#39;:
+        elif name == &#34;_sampling_schema&#34;:
             self.node_seq._sample_schema = value
         else:
             self.__dict__[name] = value
         return
 
-
-
     def __getattr__(self, name):
-        if name == &#39;batch_size&#39;:
+        if name == &#34;batch_size&#34;:
             return self.generator.batch_size
-        elif name == &#39;data_size&#39;:
+        elif name == &#34;data_size&#34;:
             return self.node_seq.data_size
-        elif name == &#39;shuffle&#39;:
+        elif name == &#34;shuffle&#34;:
             return self.node_seq.shuffle
-        elif name == &#39;head_node_types&#39;:
+        elif name == &#34;head_node_types&#34;:
             return self.node_seq.head_node_types
-        elif name == &#39;_sampling_schema&#39;:
+        elif name == &#34;_sampling_schema&#34;:
             return self.node_seq._sampling_schema
-        elif name == &#39;reset&#39;:
+        elif name == &#34;reset&#34;:
             # stellargraph did not implement reset for its generators
             # return a zero-argument lambda that returns None
-            return lambda:None 
-        elif name == &#39;graph&#39;:
+            return lambda: None
+        elif name == &#34;graph&#34;:
             return self.generator.graph
         else:
             try:
-                return self.__dict__[name] 
+                return self.__dict__[name]
             except:
                 raise AttributeError
         return
 
-
     def nsamples(self):
         return self.targets.shape[0]
-
 
     def get_y(self):
         return self.targets
 
-
     def xshape(self):
         return self[0][0][0].shape[1:]  # returns 1st neighborhood only
 
-
     def nclasses(self):
-        return self[0][1].shape[1]                                   
-
-
+        return self[0][1].shape[1]
 
 
 class LinkSequenceWrapper(link_mappers.LinkSequence, SequenceDataset):
     def __init__(self, link_seq):
         if not isinstance(link_seq, link_mappers.LinkSequence):
-            raise ValueError(&#39;link_seq must by a stellargraph LinkSequence object&#39;)
+            raise ValueError(&#34;link_seq must by a stellargraph LinkSequence object&#34;)
         self.link_seq = link_seq
         self.targets = link_seq.targets
         self.generator = link_seq.generator
@@ -129,65 +118,57 @@ class LinkSequenceWrapper(link_mappers.LinkSequence, SequenceDataset):
         self.on_epoch_end = link_seq.on_epoch_end
         self.indices = link_seq.indices
 
-
-
-
     def __setattr__(self, name, value):
-        if name == &#39;batch_size&#39;:
+        if name == &#34;batch_size&#34;:
             self.generator.batch_size = value
-        elif name == &#39;data_size&#39;:
+        elif name == &#34;data_size&#34;:
             self.link_seq.data_size = value
-        elif name == &#39;shuffle&#39;:
+        elif name == &#34;shuffle&#34;:
             self.link_seq.shuffle = value
-        elif name == &#39;head_node_types&#39;:
+        elif name == &#34;head_node_types&#34;:
             self.link_seq.head_node_types = value
-        elif name == &#39;_sampling_schema&#39;:
+        elif name == &#34;_sampling_schema&#34;:
             self.link_seq._sample_schema = value
         else:
             self.__dict__[name] = value
         return
 
-
-
     def __getattr__(self, name):
-        if name == &#39;batch_size&#39;:
+        if name == &#34;batch_size&#34;:
             return self.generator.batch_size
-        elif name == &#39;data_size&#39;:
+        elif name == &#34;data_size&#34;:
             return self.link_seq.data_size
-        elif name == &#39;shuffle&#39;:
+        elif name == &#34;shuffle&#34;:
             return self.link_seq.shuffle
-        elif name == &#39;head_node_types&#39;:
+        elif name == &#34;head_node_types&#34;:
             return self.link_seq.head_node_types
-        elif name == &#39;_sampling_schema&#39;:
+        elif name == &#34;_sampling_schema&#34;:
             return self.link_seq._sampling_schema
-        elif name == &#39;reset&#39;:
+        elif name == &#34;reset&#34;:
             # stellargraph did not implement reset for its generators
             # return a zero-argument lambda that returns None
-            return lambda:None 
-        elif name == &#39;graph&#39;:
+            return lambda: None
+        elif name == &#34;graph&#34;:
             return self.generator.graph
         else:
             try:
-                return self.__dict__[name] 
+                return self.__dict__[name]
             except:
                 raise AttributeError
         return
 
-
     def nsamples(self):
         return self.targets.shape[0]
 
-
     def get_y(self):
         return self.targets
-
 
     def xshape(self):
         return self[0][0][0].shape[1:]  # returns 1st neighborhood only
 
     def nclasses(self):
         return 2
-        return self[0][1].shape[1]                                   </code></pre>
+        return self[0][1].shape[1]</code></pre>
 </details>
 </section>
 <section>
@@ -234,7 +215,7 @@ The subgraphs are sampled from all nodes.</dd>
 <pre><code class="python">class LinkSequenceWrapper(link_mappers.LinkSequence, SequenceDataset):
     def __init__(self, link_seq):
         if not isinstance(link_seq, link_mappers.LinkSequence):
-            raise ValueError(&#39;link_seq must by a stellargraph LinkSequence object&#39;)
+            raise ValueError(&#34;link_seq must by a stellargraph LinkSequence object&#34;)
         self.link_seq = link_seq
         self.targets = link_seq.targets
         self.generator = link_seq.generator
@@ -244,65 +225,57 @@ The subgraphs are sampled from all nodes.</dd>
         self.on_epoch_end = link_seq.on_epoch_end
         self.indices = link_seq.indices
 
-
-
-
     def __setattr__(self, name, value):
-        if name == &#39;batch_size&#39;:
+        if name == &#34;batch_size&#34;:
             self.generator.batch_size = value
-        elif name == &#39;data_size&#39;:
+        elif name == &#34;data_size&#34;:
             self.link_seq.data_size = value
-        elif name == &#39;shuffle&#39;:
+        elif name == &#34;shuffle&#34;:
             self.link_seq.shuffle = value
-        elif name == &#39;head_node_types&#39;:
+        elif name == &#34;head_node_types&#34;:
             self.link_seq.head_node_types = value
-        elif name == &#39;_sampling_schema&#39;:
+        elif name == &#34;_sampling_schema&#34;:
             self.link_seq._sample_schema = value
         else:
             self.__dict__[name] = value
         return
 
-
-
     def __getattr__(self, name):
-        if name == &#39;batch_size&#39;:
+        if name == &#34;batch_size&#34;:
             return self.generator.batch_size
-        elif name == &#39;data_size&#39;:
+        elif name == &#34;data_size&#34;:
             return self.link_seq.data_size
-        elif name == &#39;shuffle&#39;:
+        elif name == &#34;shuffle&#34;:
             return self.link_seq.shuffle
-        elif name == &#39;head_node_types&#39;:
+        elif name == &#34;head_node_types&#34;:
             return self.link_seq.head_node_types
-        elif name == &#39;_sampling_schema&#39;:
+        elif name == &#34;_sampling_schema&#34;:
             return self.link_seq._sampling_schema
-        elif name == &#39;reset&#39;:
+        elif name == &#34;reset&#34;:
             # stellargraph did not implement reset for its generators
             # return a zero-argument lambda that returns None
-            return lambda:None 
-        elif name == &#39;graph&#39;:
+            return lambda: None
+        elif name == &#34;graph&#34;:
             return self.generator.graph
         else:
             try:
-                return self.__dict__[name] 
+                return self.__dict__[name]
             except:
                 raise AttributeError
         return
 
-
     def nsamples(self):
         return self.targets.shape[0]
 
-
     def get_y(self):
         return self.targets
-
 
     def xshape(self):
         return self[0][0][0].shape[1:]  # returns 1st neighborhood only
 
     def nclasses(self):
         return 2
-        return self[0][1].shape[1]                                   </code></pre>
+        return self[0][1].shape[1]</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -394,7 +367,7 @@ class.</dd>
 <pre><code class="python">class NodeSequenceWrapper(node_mappers.NodeSequence, SequenceDataset):
     def __init__(self, node_seq):
         if not isinstance(node_seq, node_mappers.NodeSequence):
-            raise ValueError(&#39;node_seq must by a stellargraph NodeSequence object&#39;)
+            raise ValueError(&#34;node_seq must by a stellargraph NodeSequence object&#34;)
         self.node_seq = node_seq
         self.targets = node_seq.targets
         self.generator = node_seq.generator
@@ -404,65 +377,56 @@ class.</dd>
         self.on_epoch_end = node_seq.on_epoch_end
         self.indices = node_seq.indices
 
-
-
-
     def __setattr__(self, name, value):
-        if name == &#39;batch_size&#39;:
+        if name == &#34;batch_size&#34;:
             self.generator.batch_size = value
-        elif name == &#39;data_size&#39;:
+        elif name == &#34;data_size&#34;:
             self.node_seq.data_size = value
-        elif name == &#39;shuffle&#39;:
+        elif name == &#34;shuffle&#34;:
             self.node_seq.shuffle = value
-        elif name == &#39;head_node_types&#39;:
+        elif name == &#34;head_node_types&#34;:
             self.node_seq.head_node_types = value
-        elif name == &#39;_sampling_schema&#39;:
+        elif name == &#34;_sampling_schema&#34;:
             self.node_seq._sample_schema = value
         else:
             self.__dict__[name] = value
         return
 
-
-
     def __getattr__(self, name):
-        if name == &#39;batch_size&#39;:
+        if name == &#34;batch_size&#34;:
             return self.generator.batch_size
-        elif name == &#39;data_size&#39;:
+        elif name == &#34;data_size&#34;:
             return self.node_seq.data_size
-        elif name == &#39;shuffle&#39;:
+        elif name == &#34;shuffle&#34;:
             return self.node_seq.shuffle
-        elif name == &#39;head_node_types&#39;:
+        elif name == &#34;head_node_types&#34;:
             return self.node_seq.head_node_types
-        elif name == &#39;_sampling_schema&#39;:
+        elif name == &#34;_sampling_schema&#34;:
             return self.node_seq._sampling_schema
-        elif name == &#39;reset&#39;:
+        elif name == &#34;reset&#34;:
             # stellargraph did not implement reset for its generators
             # return a zero-argument lambda that returns None
-            return lambda:None 
-        elif name == &#39;graph&#39;:
+            return lambda: None
+        elif name == &#34;graph&#34;:
             return self.generator.graph
         else:
             try:
-                return self.__dict__[name] 
+                return self.__dict__[name]
             except:
                 raise AttributeError
         return
 
-
     def nsamples(self):
         return self.targets.shape[0]
-
 
     def get_y(self):
         return self.targets
 
-
     def xshape(self):
         return self[0][0][0].shape[1:]  # returns 1st neighborhood only
 
-
     def nclasses(self):
-        return self[0][1].shape[1]                                   </code></pre>
+        return self[0][1].shape[1]</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">

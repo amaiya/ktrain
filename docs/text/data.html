@@ -28,25 +28,28 @@
 </summary>
 <pre><code class="python">from ..imports import *
 from .. import utils as U
-from  . import preprocessor as tpp
+from . import preprocessor as tpp
 from . import textutils as TU
-
 
 
 MAX_FEATURES = 20000
 MAXLEN = 400
 
 
-
-def texts_from_folder(datadir, classes=None, 
-                      max_features=MAX_FEATURES, maxlen=MAXLEN,
-                      ngram_range=1,
-                      train_test_names=[&#39;train&#39;, &#39;test&#39;],
-                      preprocess_mode=&#39;standard&#39;,
-                      encoding=None, # detected automatically
-                      lang=None, # detected automatically
-                      val_pct=0.1, random_state=None,
-                      verbose=1):
+def texts_from_folder(
+    datadir,
+    classes=None,
+    max_features=MAX_FEATURES,
+    maxlen=MAXLEN,
+    ngram_range=1,
+    train_test_names=[&#34;train&#34;, &#34;test&#34;],
+    preprocess_mode=&#34;standard&#34;,
+    encoding=None,  # detected automatically
+    lang=None,  # detected automatically
+    val_pct=0.1,
+    random_state=None,
+    verbose=1,
+):
     &#34;&#34;&#34;
     ```
     Returns corpus as sequence of word IDs.
@@ -57,7 +60,7 @@ def texts_from_folder(datadir, classes=None,
     │   │   ├── class1       # folder containing documents of class 1
     │   │   ├── class2       # folder containing documents of class 2
     │   │   └── classN       # folder containing documents of class N
-    │   └── test 
+    │   └── test
     │       ├── class0       # folder containing documents of class 0
     │       ├── class1       # folder containing documents of class 1
     │       ├── class2       # folder containing documents of class 2
@@ -81,7 +84,7 @@ def texts_from_folder(datadir, classes=None,
                                  if test name is missing, &lt;val_pct&gt; of training
                                  will be used for validation
         preprocess_mode (str):  Either &#39;standard&#39; (normal tokenization) or one of {&#39;bert&#39;, &#39;distilbert&#39;}
-                                tokenization and preprocessing for use with 
+                                tokenization and preprocessing for use with
                                 BERT/DistilBert text classification model.
         encoding (str):        character encoding to use. Auto-detected if None
         lang (str):            language.  Auto-detected if None.
@@ -89,79 +92,90 @@ def texts_from_folder(datadir, classes=None,
         random_state(int):      If integer is supplied, train/test split is reproducible.
                                 IF None, train/test split will be random
         verbose (bool):         verbosity
-        
+
     ```
     &#34;&#34;&#34;
 
     # check train_test_names
     if len(train_test_names) &lt; 1 or len(train_test_names) &gt; 2:
-        raise ValueError(&#39;train_test_names must have 1 or two elements for train and optionally validation&#39;)
+        raise ValueError(
+            &#34;train_test_names must have 1 or two elements for train and optionally validation&#34;
+        )
 
     # read in training and test corpora
     train_str = train_test_names[0]
-    train_b = load_files(os.path.join(datadir, train_str), shuffle=True, categories=classes)
+    train_b = load_files(
+        os.path.join(datadir, train_str), shuffle=True, categories=classes
+    )
     if len(train_test_names) &gt; 1:
         test_str = train_test_names[1]
-        test_b = load_files(os.path.join(datadir,  test_str), shuffle=False, categories=classes)
+        test_b = load_files(
+            os.path.join(datadir, test_str), shuffle=False, categories=classes
+        )
         x_train = train_b.data
         y_train = train_b.target
         x_test = test_b.data
         y_test = test_b.target
     else:
-        x_train, x_test, y_train, y_test = train_test_split(train_b.data, 
-                                                            train_b.target, 
-                                                            test_size=val_pct,
-                                                            random_state=random_state)
+        x_train, x_test, y_train, y_test = train_test_split(
+            train_b.data, train_b.target, test_size=val_pct, random_state=random_state
+        )
 
     # decode based on supplied encoding
     if encoding is None:
         encoding = TU.detect_encoding(x_train)
-        U.vprint(&#39;detected encoding: %s&#39; % (encoding), verbose=verbose)
-    
+        U.vprint(&#34;detected encoding: %s&#34; % (encoding), verbose=verbose)
+
     try:
         x_train = [x.decode(encoding) for x in x_train]
         x_test = [x.decode(encoding) for x in x_test]
     except:
-        U.vprint(&#39;Decoding with %s failed 1st attempt - using %s with skips&#39; % (encoding, 
-                                                                                encoding),
-                                                                                verbose=verbose)
+        U.vprint(
+            &#34;Decoding with %s failed 1st attempt - using %s with skips&#34;
+            % (encoding, encoding),
+            verbose=verbose,
+        )
         x_train = TU.decode_by_line(x_train, encoding=encoding, verbose=verbose)
         x_test = TU.decode_by_line(x_test, encoding=encoding, verbose=verbose)
 
-
     # detect language
-    if lang is None: lang = TU.detect_lang(x_train)
+    if lang is None:
+        lang = TU.detect_lang(x_train)
     check_unsupported_lang(lang, preprocess_mode)
-
-
 
     # return preprocessed the texts
     preproc_type = tpp.TEXT_PREPROCESSORS.get(preprocess_mode, None)
-    if None: raise ValueError(&#39;unsupported preprocess_mode&#39;)
-    preproc = preproc_type(maxlen,
-                           max_features,
-                           class_names = train_b.target_names,
-                           lang=lang, ngram_range=ngram_range)
+    if None:
+        raise ValueError(&#34;unsupported preprocess_mode&#34;)
+    preproc = preproc_type(
+        maxlen,
+        max_features,
+        class_names=train_b.target_names,
+        lang=lang,
+        ngram_range=ngram_range,
+    )
     trn = preproc.preprocess_train(x_train, y_train, verbose=verbose)
-    val = preproc.preprocess_test(x_test,  y_test, verbose=verbose)
+    val = preproc.preprocess_test(x_test, y_test, verbose=verbose)
     return (trn, val, preproc)
 
 
-
-
-
-def texts_from_csv(train_filepath, 
-                   text_column,
-                   label_columns = [],
-                   val_filepath=None,
-                   max_features=MAX_FEATURES, maxlen=MAXLEN, 
-                   val_pct=0.1, ngram_range=1, preprocess_mode=&#39;standard&#39;, 
-                   encoding=None,  # auto-detected
-                   lang=None,      # auto-detected
-                   sep=&#39;,&#39;, 
-                   is_regression=False,
-                   random_state=None,       
-                   verbose=1):
+def texts_from_csv(
+    train_filepath,
+    text_column,
+    label_columns=[],
+    val_filepath=None,
+    max_features=MAX_FEATURES,
+    maxlen=MAXLEN,
+    val_pct=0.1,
+    ngram_range=1,
+    preprocess_mode=&#34;standard&#34;,
+    encoding=None,  # auto-detected
+    lang=None,  # auto-detected
+    sep=&#34;,&#34;,
+    is_regression=False,
+    random_state=None,
+    verbose=1,
+):
     &#34;&#34;&#34;
     ```
     Loads text data from CSV or TSV file. Class labels are assumed to be
@@ -200,7 +214,7 @@ def texts_from_csv(train_filepath,
         val_pct(float): Proportion of training to use for validation.
                         Has no effect if val_filepath is supplied.
         preprocess_mode (str):  Either &#39;standard&#39; (normal tokenization) or one of {&#39;bert&#39;, &#39;distilbert&#39;}
-                                tokenization and preprocessing for use with 
+                                tokenization and preprocessing for use with
                                 BERT/DistilBert text classification model.
         encoding (str):        character encoding to use. Auto-detected if None
         lang (str):            language.  Auto-detected if None.
@@ -212,37 +226,53 @@ def texts_from_csv(train_filepath,
     ```
     &#34;&#34;&#34;
     if encoding is None:
-        with open(train_filepath, &#39;rb&#39;) as f:
-            #encoding = chardet.detect(f.read())[&#39;encoding&#39;]
-            #encoding = &#39;utf-8&#39; if encoding.lower() in [&#39;ascii&#39;, &#39;utf8&#39;, &#39;utf-8&#39;] else encoding
+        with open(train_filepath, &#34;rb&#34;) as f:
+            # encoding = chardet.detect(f.read())[&#39;encoding&#39;]
+            # encoding = &#39;utf-8&#39; if encoding.lower() in [&#39;ascii&#39;, &#39;utf8&#39;, &#39;utf-8&#39;] else encoding
             encoding = TU.detect_encoding(f.read())
-            U.vprint(&#39;detected encoding: %s (if wrong, set manually)&#39; % (encoding), verbose=verbose)
+            U.vprint(
+                &#34;detected encoding: %s (if wrong, set manually)&#34; % (encoding),
+                verbose=verbose,
+            )
 
-    train_df = pd.read_csv(train_filepath, encoding=encoding,sep=sep)
-    val_df = pd.read_csv(val_filepath, encoding=encoding,sep=sep) if val_filepath is not None else None
-    return texts_from_df(train_df,
-                         text_column,
-                         label_columns=label_columns,
-                         val_df = val_df,
-                         max_features=max_features,
-                         maxlen=maxlen,
-                         val_pct=val_pct,
-                         ngram_range=ngram_range, 
-                         preprocess_mode=preprocess_mode,
-                         lang=lang, is_regression=is_regression, random_state=random_state,
-                         verbose=verbose)
+    train_df = pd.read_csv(train_filepath, encoding=encoding, sep=sep)
+    val_df = (
+        pd.read_csv(val_filepath, encoding=encoding, sep=sep)
+        if val_filepath is not None
+        else None
+    )
+    return texts_from_df(
+        train_df,
+        text_column,
+        label_columns=label_columns,
+        val_df=val_df,
+        max_features=max_features,
+        maxlen=maxlen,
+        val_pct=val_pct,
+        ngram_range=ngram_range,
+        preprocess_mode=preprocess_mode,
+        lang=lang,
+        is_regression=is_regression,
+        random_state=random_state,
+        verbose=verbose,
+    )
 
 
-def texts_from_df(train_df, 
-                   text_column,
-                   label_columns = [],
-                   val_df=None,
-                   max_features=MAX_FEATURES, maxlen=MAXLEN, 
-                   val_pct=0.1, ngram_range=1, preprocess_mode=&#39;standard&#39;, 
-                   lang=None, # auto-detected
-                   is_regression=False,
-                   random_state=None,
-                   verbose=1):
+def texts_from_df(
+    train_df,
+    text_column,
+    label_columns=[],
+    val_df=None,
+    max_features=MAX_FEATURES,
+    maxlen=MAXLEN,
+    val_pct=0.1,
+    ngram_range=1,
+    preprocess_mode=&#34;standard&#34;,
+    lang=None,  # auto-detected
+    is_regression=False,
+    random_state=None,
+    verbose=1,
+):
     &#34;&#34;&#34;
     ```
     Loads text data from Pandas dataframe file. Class labels are assumed to be
@@ -281,7 +311,7 @@ def texts_from_df(train_df,
         val_pct(float): Proportion of training to use for validation.
                         Has no effect if val_filepath is supplied.
         preprocess_mode (str):  Either &#39;standard&#39; (normal tokenization) or one of {&#39;bert&#39;, &#39;distilbert&#39;}
-                                tokenization and preprocessing for use with 
+                                tokenization and preprocessing for use with
                                 BERT/DistilBert text classification model.
         lang (str):            language.  Auto-detected if None.
         is_regression(bool):  If True, integer targets will be treated as numerical targets instead of class IDs
@@ -293,12 +323,14 @@ def texts_from_df(train_df,
 
     # read in train and test data
     train_df = train_df.copy()
-    train_df[text_column].fillna(&#39;fillna&#39;, inplace=True)
+    train_df[text_column].fillna(&#34;fillna&#34;, inplace=True)
     if val_df is not None:
         val_df = val_df.copy()
-        val_df[text_column].fillna(&#39;fillna&#39;, inplace=True)
+        val_df[text_column].fillna(&#34;fillna&#34;, inplace=True)
     else:
-        train_df, val_df = train_test_split(train_df, test_size=val_pct, random_state=random_state)
+        train_df, val_df = train_test_split(
+            train_df, test_size=val_pct, random_state=random_state
+        )
 
     # transform labels
     ytransdf = U.YTransformDataFrame(label_columns, is_regression=is_regression)
@@ -312,45 +344,56 @@ def texts_from_df(train_df,
     y_test = v_df[new_lab_cols].values
 
     # detect language
-    if lang is None: lang = TU.detect_lang(x_train)
+    if lang is None:
+        lang = TU.detect_lang(x_train)
     check_unsupported_lang(lang, preprocess_mode)
-
 
     # return preprocessed the texts
     preproc_type = tpp.TEXT_PREPROCESSORS.get(preprocess_mode, None)
-    if None: raise ValueError(&#39;unsupported preprocess_mode&#39;)
-    preproc = preproc_type(maxlen,
-                           max_features,
-                           class_names = class_names,
-                           lang=lang, ngram_range=ngram_range)
+    if None:
+        raise ValueError(&#34;unsupported preprocess_mode&#34;)
+    preproc = preproc_type(
+        maxlen,
+        max_features,
+        class_names=class_names,
+        lang=lang,
+        ngram_range=ngram_range,
+    )
     trn = preproc.preprocess_train(x_train, y_train, verbose=verbose)
-    val = preproc.preprocess_test(x_test,  y_test, verbose=verbose)
+    val = preproc.preprocess_test(x_test, y_test, verbose=verbose)
     # QUICKFIX for #314
     preproc.ytransform.le = ytransdf.le
     return (trn, val, preproc)
 
 
-
-def texts_from_array(x_train, y_train, x_test=None, y_test=None, 
-                   class_names = [],
-                   max_features=MAX_FEATURES, maxlen=MAXLEN, 
-                   val_pct=0.1, ngram_range=1, preprocess_mode=&#39;standard&#39;, 
-                   lang=None, # auto-detected
-                   random_state=None,
-                   verbose=1):
+def texts_from_array(
+    x_train,
+    y_train,
+    x_test=None,
+    y_test=None,
+    class_names=[],
+    max_features=MAX_FEATURES,
+    maxlen=MAXLEN,
+    val_pct=0.1,
+    ngram_range=1,
+    preprocess_mode=&#34;standard&#34;,
+    lang=None,  # auto-detected
+    random_state=None,
+    verbose=1,
+):
     &#34;&#34;&#34;
     ```
     Loads and preprocesses text data from arrays.
     texts_from_array can handle data for both text classification
     and text regression.  If class_names is empty, a regression task is assumed.
     Args:
-        x_train(list): list of training texts 
+        x_train(list): list of training texts
         y_train(list): labels in one of the following forms:
                        1. list of integers representing classes (class_names is required)
                        2. list of strings representing classes (class_names is not needed and ignored.)
                        3. a one or multi hot encoded array representing classes (class_names is required)
                        4. numerical values for text regresssion (class_names should be left empty)
-        x_test(list): list of training texts 
+        x_test(list): list of training texts
         y_test(list): labels in one of the following forms:
                        1. list of integers representing classes (class_names is required)
                        2. list of strings representing classes (class_names is not needed and ignored.)
@@ -367,7 +410,7 @@ def texts_from_array(x_train, y_train, x_test=None, y_test=None,
         val_pct(float): Proportion of training to use for validation.
                         Has no effect if x_val and  y_val is supplied.
         preprocess_mode (str):  Either &#39;standard&#39; (normal tokenization) or one of {&#39;bert&#39;, &#39;distilbert&#39;}
-                                tokenization and preprocessing for use with 
+                                tokenization and preprocessing for use with
                                 BERT/DistilBert text classification model.
         lang (str):            language.  Auto-detected if None.
         random_state(int):      If integer is supplied, train/test split is reproducible.
@@ -375,45 +418,49 @@ def texts_from_array(x_train, y_train, x_test=None, y_test=None,
         verbose (boolean): verbosity
     ```
     &#34;&#34;&#34;
-    U.check_array(x_train,  y=y_train, X_name=&#39;x_train&#39;, y_name=&#39;y_train&#39;)
+    U.check_array(x_train, y=y_train, X_name=&#34;x_train&#34;, y_name=&#34;y_train&#34;)
 
     if x_test is None or y_test is None:
-        x_train, x_test, y_train, y_test = train_test_split(x_train, y_train, 
-                                                            test_size=val_pct,
-                                                            random_state=random_state)
+        x_train, x_test, y_train, y_test = train_test_split(
+            x_train, y_train, test_size=val_pct, random_state=random_state
+        )
     else:
-        U.check_array(x_test,  y=y_test, X_name=&#39;x_test&#39;, y_name=&#39;y_test&#39;)
-
+        U.check_array(x_test, y=y_test, X_name=&#34;x_test&#34;, y_name=&#34;y_test&#34;)
 
     # removed as TextPreprocessor now handles this.
-    #if isinstance(y_train[0], str):
-        #if not isinstance(y_test[0], str): 
-            #raise ValueError(&#39;y_train contains strings, but y_test does not&#39;)
-        #encoder = LabelEncoder()
-        #encoder.fit(y_train)
-        #y_train = encoder.transform(y_train)
-        #y_test = encoder.transform(y_test)
-
+    # if isinstance(y_train[0], str):
+    # if not isinstance(y_test[0], str):
+    # raise ValueError(&#39;y_train contains strings, but y_test does not&#39;)
+    # encoder = LabelEncoder()
+    # encoder.fit(y_train)
+    # y_train = encoder.transform(y_train)
+    # y_test = encoder.transform(y_test)
 
     # detect language
-    if lang is None: lang = TU.detect_lang(x_train)
+    if lang is None:
+        lang = TU.detect_lang(x_train)
     check_unsupported_lang(lang, preprocess_mode)
 
     # return preprocessed the texts
     preproc_type = tpp.TEXT_PREPROCESSORS.get(preprocess_mode, None)
-    if None: raise ValueError(&#39;unsupported preprocess_mode&#39;)
-    preproc = preproc_type(maxlen,
-                           max_features,
-                           class_names = class_names,
-                           lang=lang, ngram_range=ngram_range)
+    if None:
+        raise ValueError(&#34;unsupported preprocess_mode&#34;)
+    preproc = preproc_type(
+        maxlen,
+        max_features,
+        class_names=class_names,
+        lang=lang,
+        ngram_range=ngram_range,
+    )
     trn = preproc.preprocess_train(x_train, y_train, verbose=verbose)
-    val = preproc.preprocess_test(x_test,  y_test, verbose=verbose)
+    val = preproc.preprocess_test(x_test, y_test, verbose=verbose)
     if not preproc.get_classes() and verbose:
-        print(&#39;task: text regression (supply class_names argument if this is supposed to be classification task)&#39;)
+        print(
+            &#34;task: text regression (supply class_names argument if this is supposed to be classification task)&#34;
+        )
     else:
-        print(&#39;task: text classification&#39;)
+        print(&#34;task: text classification&#34;)
     return (trn, val, preproc)
-
 
 
 def check_unsupported_lang(lang, preprocess_mode):
@@ -422,10 +469,16 @@ def check_unsupported_lang(lang, preprocess_mode):
     check for unsupported language (e.g., nospace langs not supported by Jieba)
     ```
     &#34;&#34;&#34;
-    unsupported = preprocess_mode==&#39;standard&#39; and TU.is_nospace_lang(lang) and not TU.is_chinese(lang)
+    unsupported = (
+        preprocess_mode == &#34;standard&#34;
+        and TU.is_nospace_lang(lang)
+        and not TU.is_chinese(lang)
+    )
     if unsupported:
-        raise ValueError(&#39;language %s is currently only supported by the BERT model. &#39; % (lang) +
-                         &#39;Please select preprocess_mode=&#34;bert&#34;&#39;)</code></pre>
+        raise ValueError(
+            &#34;language %s is currently only supported by the BERT model. &#34; % (lang)
+            + &#39;Please select preprocess_mode=&#34;bert&#34;&#39;
+        )</code></pre>
 </details>
 </section>
 <section>
@@ -451,10 +504,16 @@ def check_unsupported_lang(lang, preprocess_mode):
     check for unsupported language (e.g., nospace langs not supported by Jieba)
     ```
     &#34;&#34;&#34;
-    unsupported = preprocess_mode==&#39;standard&#39; and TU.is_nospace_lang(lang) and not TU.is_chinese(lang)
+    unsupported = (
+        preprocess_mode == &#34;standard&#34;
+        and TU.is_nospace_lang(lang)
+        and not TU.is_chinese(lang)
+    )
     if unsupported:
-        raise ValueError(&#39;language %s is currently only supported by the BERT model. &#39; % (lang) +
-                         &#39;Please select preprocess_mode=&#34;bert&#34;&#39;)</code></pre>
+        raise ValueError(
+            &#34;language %s is currently only supported by the BERT model. &#34; % (lang)
+            + &#39;Please select preprocess_mode=&#34;bert&#34;&#39;
+        )</code></pre>
 </details>
 </dd>
 <dt id="ktrain.text.data.texts_from_array"><code class="name flex">
@@ -465,13 +524,13 @@ def check_unsupported_lang(lang, preprocess_mode):
 texts_from_array can handle data for both text classification
 and text regression.  If class_names is empty, a regression task is assumed.
 Args:
-    x_train(list): list of training texts 
+    x_train(list): list of training texts
     y_train(list): labels in one of the following forms:
                    1. list of integers representing classes (class_names is required)
                    2. list of strings representing classes (class_names is not needed and ignored.)
                    3. a one or multi hot encoded array representing classes (class_names is required)
                    4. numerical values for text regresssion (class_names should be left empty)
-    x_test(list): list of training texts 
+    x_test(list): list of training texts
     y_test(list): labels in one of the following forms:
                    1. list of integers representing classes (class_names is required)
                    2. list of strings representing classes (class_names is not needed and ignored.)
@@ -488,7 +547,7 @@ Args:
     val_pct(float): Proportion of training to use for validation.
                     Has no effect if x_val and  y_val is supplied.
     preprocess_mode (str):  Either 'standard' (normal tokenization) or one of {'bert', 'distilbert'}
-                            tokenization and preprocessing for use with 
+                            tokenization and preprocessing for use with
                             BERT/DistilBert text classification model.
     lang (str):            language.  Auto-detected if None.
     random_state(int):      If integer is supplied, train/test split is reproducible.
@@ -499,26 +558,34 @@ Args:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def texts_from_array(x_train, y_train, x_test=None, y_test=None, 
-                   class_names = [],
-                   max_features=MAX_FEATURES, maxlen=MAXLEN, 
-                   val_pct=0.1, ngram_range=1, preprocess_mode=&#39;standard&#39;, 
-                   lang=None, # auto-detected
-                   random_state=None,
-                   verbose=1):
+<pre><code class="python">def texts_from_array(
+    x_train,
+    y_train,
+    x_test=None,
+    y_test=None,
+    class_names=[],
+    max_features=MAX_FEATURES,
+    maxlen=MAXLEN,
+    val_pct=0.1,
+    ngram_range=1,
+    preprocess_mode=&#34;standard&#34;,
+    lang=None,  # auto-detected
+    random_state=None,
+    verbose=1,
+):
     &#34;&#34;&#34;
     ```
     Loads and preprocesses text data from arrays.
     texts_from_array can handle data for both text classification
     and text regression.  If class_names is empty, a regression task is assumed.
     Args:
-        x_train(list): list of training texts 
+        x_train(list): list of training texts
         y_train(list): labels in one of the following forms:
                        1. list of integers representing classes (class_names is required)
                        2. list of strings representing classes (class_names is not needed and ignored.)
                        3. a one or multi hot encoded array representing classes (class_names is required)
                        4. numerical values for text regresssion (class_names should be left empty)
-        x_test(list): list of training texts 
+        x_test(list): list of training texts
         y_test(list): labels in one of the following forms:
                        1. list of integers representing classes (class_names is required)
                        2. list of strings representing classes (class_names is not needed and ignored.)
@@ -535,7 +602,7 @@ Args:
         val_pct(float): Proportion of training to use for validation.
                         Has no effect if x_val and  y_val is supplied.
         preprocess_mode (str):  Either &#39;standard&#39; (normal tokenization) or one of {&#39;bert&#39;, &#39;distilbert&#39;}
-                                tokenization and preprocessing for use with 
+                                tokenization and preprocessing for use with
                                 BERT/DistilBert text classification model.
         lang (str):            language.  Auto-detected if None.
         random_state(int):      If integer is supplied, train/test split is reproducible.
@@ -543,43 +610,48 @@ Args:
         verbose (boolean): verbosity
     ```
     &#34;&#34;&#34;
-    U.check_array(x_train,  y=y_train, X_name=&#39;x_train&#39;, y_name=&#39;y_train&#39;)
+    U.check_array(x_train, y=y_train, X_name=&#34;x_train&#34;, y_name=&#34;y_train&#34;)
 
     if x_test is None or y_test is None:
-        x_train, x_test, y_train, y_test = train_test_split(x_train, y_train, 
-                                                            test_size=val_pct,
-                                                            random_state=random_state)
+        x_train, x_test, y_train, y_test = train_test_split(
+            x_train, y_train, test_size=val_pct, random_state=random_state
+        )
     else:
-        U.check_array(x_test,  y=y_test, X_name=&#39;x_test&#39;, y_name=&#39;y_test&#39;)
-
+        U.check_array(x_test, y=y_test, X_name=&#34;x_test&#34;, y_name=&#34;y_test&#34;)
 
     # removed as TextPreprocessor now handles this.
-    #if isinstance(y_train[0], str):
-        #if not isinstance(y_test[0], str): 
-            #raise ValueError(&#39;y_train contains strings, but y_test does not&#39;)
-        #encoder = LabelEncoder()
-        #encoder.fit(y_train)
-        #y_train = encoder.transform(y_train)
-        #y_test = encoder.transform(y_test)
-
+    # if isinstance(y_train[0], str):
+    # if not isinstance(y_test[0], str):
+    # raise ValueError(&#39;y_train contains strings, but y_test does not&#39;)
+    # encoder = LabelEncoder()
+    # encoder.fit(y_train)
+    # y_train = encoder.transform(y_train)
+    # y_test = encoder.transform(y_test)
 
     # detect language
-    if lang is None: lang = TU.detect_lang(x_train)
+    if lang is None:
+        lang = TU.detect_lang(x_train)
     check_unsupported_lang(lang, preprocess_mode)
 
     # return preprocessed the texts
     preproc_type = tpp.TEXT_PREPROCESSORS.get(preprocess_mode, None)
-    if None: raise ValueError(&#39;unsupported preprocess_mode&#39;)
-    preproc = preproc_type(maxlen,
-                           max_features,
-                           class_names = class_names,
-                           lang=lang, ngram_range=ngram_range)
+    if None:
+        raise ValueError(&#34;unsupported preprocess_mode&#34;)
+    preproc = preproc_type(
+        maxlen,
+        max_features,
+        class_names=class_names,
+        lang=lang,
+        ngram_range=ngram_range,
+    )
     trn = preproc.preprocess_train(x_train, y_train, verbose=verbose)
-    val = preproc.preprocess_test(x_test,  y_test, verbose=verbose)
+    val = preproc.preprocess_test(x_test, y_test, verbose=verbose)
     if not preproc.get_classes() and verbose:
-        print(&#39;task: text regression (supply class_names argument if this is supposed to be classification task)&#39;)
+        print(
+            &#34;task: text regression (supply class_names argument if this is supposed to be classification task)&#34;
+        )
     else:
-        print(&#39;task: text classification&#39;)
+        print(&#34;task: text classification&#34;)
     return (trn, val, preproc)</code></pre>
 </details>
 </dd>
@@ -623,7 +695,7 @@ Args:
     val_pct(float): Proportion of training to use for validation.
                     Has no effect if val_filepath is supplied.
     preprocess_mode (str):  Either 'standard' (normal tokenization) or one of {'bert', 'distilbert'}
-                            tokenization and preprocessing for use with 
+                            tokenization and preprocessing for use with
                             BERT/DistilBert text classification model.
     encoding (str):        character encoding to use. Auto-detected if None
     lang (str):            language.  Auto-detected if None.
@@ -637,18 +709,23 @@ Args:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def texts_from_csv(train_filepath, 
-                   text_column,
-                   label_columns = [],
-                   val_filepath=None,
-                   max_features=MAX_FEATURES, maxlen=MAXLEN, 
-                   val_pct=0.1, ngram_range=1, preprocess_mode=&#39;standard&#39;, 
-                   encoding=None,  # auto-detected
-                   lang=None,      # auto-detected
-                   sep=&#39;,&#39;, 
-                   is_regression=False,
-                   random_state=None,       
-                   verbose=1):
+<pre><code class="python">def texts_from_csv(
+    train_filepath,
+    text_column,
+    label_columns=[],
+    val_filepath=None,
+    max_features=MAX_FEATURES,
+    maxlen=MAXLEN,
+    val_pct=0.1,
+    ngram_range=1,
+    preprocess_mode=&#34;standard&#34;,
+    encoding=None,  # auto-detected
+    lang=None,  # auto-detected
+    sep=&#34;,&#34;,
+    is_regression=False,
+    random_state=None,
+    verbose=1,
+):
     &#34;&#34;&#34;
     ```
     Loads text data from CSV or TSV file. Class labels are assumed to be
@@ -687,7 +764,7 @@ Args:
         val_pct(float): Proportion of training to use for validation.
                         Has no effect if val_filepath is supplied.
         preprocess_mode (str):  Either &#39;standard&#39; (normal tokenization) or one of {&#39;bert&#39;, &#39;distilbert&#39;}
-                                tokenization and preprocessing for use with 
+                                tokenization and preprocessing for use with
                                 BERT/DistilBert text classification model.
         encoding (str):        character encoding to use. Auto-detected if None
         lang (str):            language.  Auto-detected if None.
@@ -699,25 +776,36 @@ Args:
     ```
     &#34;&#34;&#34;
     if encoding is None:
-        with open(train_filepath, &#39;rb&#39;) as f:
-            #encoding = chardet.detect(f.read())[&#39;encoding&#39;]
-            #encoding = &#39;utf-8&#39; if encoding.lower() in [&#39;ascii&#39;, &#39;utf8&#39;, &#39;utf-8&#39;] else encoding
+        with open(train_filepath, &#34;rb&#34;) as f:
+            # encoding = chardet.detect(f.read())[&#39;encoding&#39;]
+            # encoding = &#39;utf-8&#39; if encoding.lower() in [&#39;ascii&#39;, &#39;utf8&#39;, &#39;utf-8&#39;] else encoding
             encoding = TU.detect_encoding(f.read())
-            U.vprint(&#39;detected encoding: %s (if wrong, set manually)&#39; % (encoding), verbose=verbose)
+            U.vprint(
+                &#34;detected encoding: %s (if wrong, set manually)&#34; % (encoding),
+                verbose=verbose,
+            )
 
-    train_df = pd.read_csv(train_filepath, encoding=encoding,sep=sep)
-    val_df = pd.read_csv(val_filepath, encoding=encoding,sep=sep) if val_filepath is not None else None
-    return texts_from_df(train_df,
-                         text_column,
-                         label_columns=label_columns,
-                         val_df = val_df,
-                         max_features=max_features,
-                         maxlen=maxlen,
-                         val_pct=val_pct,
-                         ngram_range=ngram_range, 
-                         preprocess_mode=preprocess_mode,
-                         lang=lang, is_regression=is_regression, random_state=random_state,
-                         verbose=verbose)</code></pre>
+    train_df = pd.read_csv(train_filepath, encoding=encoding, sep=sep)
+    val_df = (
+        pd.read_csv(val_filepath, encoding=encoding, sep=sep)
+        if val_filepath is not None
+        else None
+    )
+    return texts_from_df(
+        train_df,
+        text_column,
+        label_columns=label_columns,
+        val_df=val_df,
+        max_features=max_features,
+        maxlen=maxlen,
+        val_pct=val_pct,
+        ngram_range=ngram_range,
+        preprocess_mode=preprocess_mode,
+        lang=lang,
+        is_regression=is_regression,
+        random_state=random_state,
+        verbose=verbose,
+    )</code></pre>
 </details>
 </dd>
 <dt id="ktrain.text.data.texts_from_df"><code class="name flex">
@@ -760,7 +848,7 @@ Args:
     val_pct(float): Proportion of training to use for validation.
                     Has no effect if val_filepath is supplied.
     preprocess_mode (str):  Either 'standard' (normal tokenization) or one of {'bert', 'distilbert'}
-                            tokenization and preprocessing for use with 
+                            tokenization and preprocessing for use with
                             BERT/DistilBert text classification model.
     lang (str):            language.  Auto-detected if None.
     is_regression(bool):  If True, integer targets will be treated as numerical targets instead of class IDs
@@ -772,16 +860,21 @@ Args:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def texts_from_df(train_df, 
-                   text_column,
-                   label_columns = [],
-                   val_df=None,
-                   max_features=MAX_FEATURES, maxlen=MAXLEN, 
-                   val_pct=0.1, ngram_range=1, preprocess_mode=&#39;standard&#39;, 
-                   lang=None, # auto-detected
-                   is_regression=False,
-                   random_state=None,
-                   verbose=1):
+<pre><code class="python">def texts_from_df(
+    train_df,
+    text_column,
+    label_columns=[],
+    val_df=None,
+    max_features=MAX_FEATURES,
+    maxlen=MAXLEN,
+    val_pct=0.1,
+    ngram_range=1,
+    preprocess_mode=&#34;standard&#34;,
+    lang=None,  # auto-detected
+    is_regression=False,
+    random_state=None,
+    verbose=1,
+):
     &#34;&#34;&#34;
     ```
     Loads text data from Pandas dataframe file. Class labels are assumed to be
@@ -820,7 +913,7 @@ Args:
         val_pct(float): Proportion of training to use for validation.
                         Has no effect if val_filepath is supplied.
         preprocess_mode (str):  Either &#39;standard&#39; (normal tokenization) or one of {&#39;bert&#39;, &#39;distilbert&#39;}
-                                tokenization and preprocessing for use with 
+                                tokenization and preprocessing for use with
                                 BERT/DistilBert text classification model.
         lang (str):            language.  Auto-detected if None.
         is_regression(bool):  If True, integer targets will be treated as numerical targets instead of class IDs
@@ -832,12 +925,14 @@ Args:
 
     # read in train and test data
     train_df = train_df.copy()
-    train_df[text_column].fillna(&#39;fillna&#39;, inplace=True)
+    train_df[text_column].fillna(&#34;fillna&#34;, inplace=True)
     if val_df is not None:
         val_df = val_df.copy()
-        val_df[text_column].fillna(&#39;fillna&#39;, inplace=True)
+        val_df[text_column].fillna(&#34;fillna&#34;, inplace=True)
     else:
-        train_df, val_df = train_test_split(train_df, test_size=val_pct, random_state=random_state)
+        train_df, val_df = train_test_split(
+            train_df, test_size=val_pct, random_state=random_state
+        )
 
     # transform labels
     ytransdf = U.YTransformDataFrame(label_columns, is_regression=is_regression)
@@ -851,19 +946,23 @@ Args:
     y_test = v_df[new_lab_cols].values
 
     # detect language
-    if lang is None: lang = TU.detect_lang(x_train)
+    if lang is None:
+        lang = TU.detect_lang(x_train)
     check_unsupported_lang(lang, preprocess_mode)
-
 
     # return preprocessed the texts
     preproc_type = tpp.TEXT_PREPROCESSORS.get(preprocess_mode, None)
-    if None: raise ValueError(&#39;unsupported preprocess_mode&#39;)
-    preproc = preproc_type(maxlen,
-                           max_features,
-                           class_names = class_names,
-                           lang=lang, ngram_range=ngram_range)
+    if None:
+        raise ValueError(&#34;unsupported preprocess_mode&#34;)
+    preproc = preproc_type(
+        maxlen,
+        max_features,
+        class_names=class_names,
+        lang=lang,
+        ngram_range=ngram_range,
+    )
     trn = preproc.preprocess_train(x_train, y_train, verbose=verbose)
-    val = preproc.preprocess_test(x_test,  y_test, verbose=verbose)
+    val = preproc.preprocess_test(x_test, y_test, verbose=verbose)
     # QUICKFIX for #314
     preproc.ytransform.le = ytransdf.le
     return (trn, val, preproc)</code></pre>
@@ -881,7 +980,7 @@ Assumes corpus is in the following folder structure:
 │   │   ├── class1       # folder containing documents of class 1
 │   │   ├── class2       # folder containing documents of class 2
 │   │   └── classN       # folder containing documents of class N
-│   └── test 
+│   └── test
 │       ├── class0       # folder containing documents of class 0
 │       ├── class1       # folder containing documents of class 1
 │       ├── class2       # folder containing documents of class 2
@@ -905,7 +1004,7 @@ Args:
                              if test name is missing, &lt;val_pct&gt; of training
                              will be used for validation
     preprocess_mode (str):  Either 'standard' (normal tokenization) or one of {'bert', 'distilbert'}
-                            tokenization and preprocessing for use with 
+                            tokenization and preprocessing for use with
                             BERT/DistilBert text classification model.
     encoding (str):        character encoding to use. Auto-detected if None
     lang (str):            language.  Auto-detected if None.
@@ -919,15 +1018,20 @@ Args:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def texts_from_folder(datadir, classes=None, 
-                      max_features=MAX_FEATURES, maxlen=MAXLEN,
-                      ngram_range=1,
-                      train_test_names=[&#39;train&#39;, &#39;test&#39;],
-                      preprocess_mode=&#39;standard&#39;,
-                      encoding=None, # detected automatically
-                      lang=None, # detected automatically
-                      val_pct=0.1, random_state=None,
-                      verbose=1):
+<pre><code class="python">def texts_from_folder(
+    datadir,
+    classes=None,
+    max_features=MAX_FEATURES,
+    maxlen=MAXLEN,
+    ngram_range=1,
+    train_test_names=[&#34;train&#34;, &#34;test&#34;],
+    preprocess_mode=&#34;standard&#34;,
+    encoding=None,  # detected automatically
+    lang=None,  # detected automatically
+    val_pct=0.1,
+    random_state=None,
+    verbose=1,
+):
     &#34;&#34;&#34;
     ```
     Returns corpus as sequence of word IDs.
@@ -938,7 +1042,7 @@ Args:
     │   │   ├── class1       # folder containing documents of class 1
     │   │   ├── class2       # folder containing documents of class 2
     │   │   └── classN       # folder containing documents of class N
-    │   └── test 
+    │   └── test
     │       ├── class0       # folder containing documents of class 0
     │       ├── class1       # folder containing documents of class 1
     │       ├── class2       # folder containing documents of class 2
@@ -962,7 +1066,7 @@ Args:
                                  if test name is missing, &lt;val_pct&gt; of training
                                  will be used for validation
         preprocess_mode (str):  Either &#39;standard&#39; (normal tokenization) or one of {&#39;bert&#39;, &#39;distilbert&#39;}
-                                tokenization and preprocessing for use with 
+                                tokenization and preprocessing for use with
                                 BERT/DistilBert text classification model.
         encoding (str):        character encoding to use. Auto-detected if None
         lang (str):            language.  Auto-detected if None.
@@ -970,61 +1074,70 @@ Args:
         random_state(int):      If integer is supplied, train/test split is reproducible.
                                 IF None, train/test split will be random
         verbose (bool):         verbosity
-        
+
     ```
     &#34;&#34;&#34;
 
     # check train_test_names
     if len(train_test_names) &lt; 1 or len(train_test_names) &gt; 2:
-        raise ValueError(&#39;train_test_names must have 1 or two elements for train and optionally validation&#39;)
+        raise ValueError(
+            &#34;train_test_names must have 1 or two elements for train and optionally validation&#34;
+        )
 
     # read in training and test corpora
     train_str = train_test_names[0]
-    train_b = load_files(os.path.join(datadir, train_str), shuffle=True, categories=classes)
+    train_b = load_files(
+        os.path.join(datadir, train_str), shuffle=True, categories=classes
+    )
     if len(train_test_names) &gt; 1:
         test_str = train_test_names[1]
-        test_b = load_files(os.path.join(datadir,  test_str), shuffle=False, categories=classes)
+        test_b = load_files(
+            os.path.join(datadir, test_str), shuffle=False, categories=classes
+        )
         x_train = train_b.data
         y_train = train_b.target
         x_test = test_b.data
         y_test = test_b.target
     else:
-        x_train, x_test, y_train, y_test = train_test_split(train_b.data, 
-                                                            train_b.target, 
-                                                            test_size=val_pct,
-                                                            random_state=random_state)
+        x_train, x_test, y_train, y_test = train_test_split(
+            train_b.data, train_b.target, test_size=val_pct, random_state=random_state
+        )
 
     # decode based on supplied encoding
     if encoding is None:
         encoding = TU.detect_encoding(x_train)
-        U.vprint(&#39;detected encoding: %s&#39; % (encoding), verbose=verbose)
-    
+        U.vprint(&#34;detected encoding: %s&#34; % (encoding), verbose=verbose)
+
     try:
         x_train = [x.decode(encoding) for x in x_train]
         x_test = [x.decode(encoding) for x in x_test]
     except:
-        U.vprint(&#39;Decoding with %s failed 1st attempt - using %s with skips&#39; % (encoding, 
-                                                                                encoding),
-                                                                                verbose=verbose)
+        U.vprint(
+            &#34;Decoding with %s failed 1st attempt - using %s with skips&#34;
+            % (encoding, encoding),
+            verbose=verbose,
+        )
         x_train = TU.decode_by_line(x_train, encoding=encoding, verbose=verbose)
         x_test = TU.decode_by_line(x_test, encoding=encoding, verbose=verbose)
 
-
     # detect language
-    if lang is None: lang = TU.detect_lang(x_train)
+    if lang is None:
+        lang = TU.detect_lang(x_train)
     check_unsupported_lang(lang, preprocess_mode)
-
-
 
     # return preprocessed the texts
     preproc_type = tpp.TEXT_PREPROCESSORS.get(preprocess_mode, None)
-    if None: raise ValueError(&#39;unsupported preprocess_mode&#39;)
-    preproc = preproc_type(maxlen,
-                           max_features,
-                           class_names = train_b.target_names,
-                           lang=lang, ngram_range=ngram_range)
+    if None:
+        raise ValueError(&#34;unsupported preprocess_mode&#34;)
+    preproc = preproc_type(
+        maxlen,
+        max_features,
+        class_names=train_b.target_names,
+        lang=lang,
+        ngram_range=ngram_range,
+    )
     trn = preproc.preprocess_train(x_train, y_train, verbose=verbose)
-    val = preproc.preprocess_test(x_test,  y_test, verbose=verbose)
+    val = preproc.preprocess_test(x_test, y_test, verbose=verbose)
     return (trn, val, preproc)</code></pre>
 </details>
 </dd>

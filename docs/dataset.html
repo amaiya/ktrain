@@ -81,7 +81,7 @@ class Dataset:
         ```
         &#34;&#34;&#34;
         raise NotImplemented
-    
+
     # optional: used only if invoking *_classifier functions
     def nclasses(self):
         &#34;&#34;&#34;
@@ -100,6 +100,7 @@ class TFDataset(Dataset):
     Wrapper for tf.data.Datasets
     ```
     &#34;&#34;&#34;
+
     def __init__(self, tfdataset, n, y):
         &#34;&#34;&#34;
         ```
@@ -110,9 +111,13 @@ class TFDataset(Dataset):
         ```
         &#34;&#34;&#34;
         if not isinstance(tfdataset, tf.data.Dataset):
-            raise ValueError(&#39;tfdataset must be a fully-configured tf.data.Dataset with batch_size, etc. set appropriately&#39;)
+            raise ValueError(
+                &#34;tfdataset must be a fully-configured tf.data.Dataset with batch_size, etc. set appropriately&#34;
+            )
         self.tfdataset = tfdataset
-        self.bs = next(tfdataset.as_numpy_iterator())[-1].shape[0] # extract batch_size from tfdataset
+        self.bs = next(tfdataset.as_numpy_iterator())[-1].shape[
+            0
+        ]  # extract batch_size from tfdataset
         self.n = n
         self.y = y
 
@@ -123,8 +128,9 @@ class TFDataset(Dataset):
     @batch_size.setter
     def batch_size(self, value):
         if value != self.bs:
-            warnings.warn(&#39;batch_size parameter is ignored, as pre-configured batch_size of tf.data.Dataset is used&#39;)
-
+            warnings.warn(
+                &#34;batch_size parameter is ignored, as pre-configured batch_size of tf.data.Dataset is used&#34;
+            )
 
     def nsamples(self):
         return self.n
@@ -155,6 +161,7 @@ class SequenceDataset(Dataset, keras.utils.Sequence):
     See ktrain.text.preprocess.TransformerDataset as an example.
     ```
     &#34;&#34;&#34;
+
     def __init__(self, batch_size=32):
         self.batch_size = batch_size
 
@@ -169,23 +176,23 @@ class SequenceDataset(Dataset, keras.utils.Sequence):
         return False
 
 
-
-
 class MultiArrayDataset(SequenceDataset):
     def __init__(self, x, y, batch_size=32, shuffle=True):
         # error checks
         err = False
-        if type(x) == np.ndarray and len(x.shape) != 2: err = True
+        if type(x) == np.ndarray and len(x.shape) != 2:
+            err = True
         elif type(x) == list:
             for d in x:
                 if type(d) != np.ndarray or len(d.shape) != 2:
                     err = True
                     break
-        else: err = True
+        else:
+            err = True
         if err:
-            raise ValueError(&#39;x must be a 2d numpy array or a list of 2d numpy arrays&#39;)
+            raise ValueError(&#34;x must be a 2d numpy array or a list of 2d numpy arrays&#34;)
         if type(y) != np.ndarray:
-            raise ValueError(&#39;y must be a numpy array&#39;)
+            raise ValueError(&#34;y must be a numpy array&#34;)
         if type(x) == np.ndarray:
             x = [x]
 
@@ -196,12 +203,11 @@ class MultiArrayDataset(SequenceDataset):
         self.n_inputs = len(x)
         self.shuffle = shuffle
 
-
     def __len__(self):
         return math.ceil(self.x[0].shape[0] / self.batch_size)
 
     def __getitem__(self, idx):
-        inds = self.indices[idx * self.batch_size:(idx + 1) * self.batch_size]
+        inds = self.indices[idx * self.batch_size : (idx + 1) * self.batch_size]
         batch_x = []
         for i in range(self.n_inputs):
             batch_x.append(self.x[i][inds])
@@ -215,7 +221,8 @@ class MultiArrayDataset(SequenceDataset):
         return self.y
 
     def on_epoch_end(self):
-        if self.shuffle: np.random.shuffle(self.indices)
+        if self.shuffle:
+            np.random.shuffle(self.indices)
 
     def xshape(self):
         return self.x[0].shape
@@ -311,7 +318,7 @@ See ktrain.text.preprocess.TransformerDataset as an example.
         ```
         &#34;&#34;&#34;
         raise NotImplemented
-    
+
     # optional: used only if invoking *_classifier functions
     def nclasses(self):
         &#34;&#34;&#34;
@@ -466,17 +473,19 @@ See ktrain.text.preprocess.TransformerDataset as an example.
     def __init__(self, x, y, batch_size=32, shuffle=True):
         # error checks
         err = False
-        if type(x) == np.ndarray and len(x.shape) != 2: err = True
+        if type(x) == np.ndarray and len(x.shape) != 2:
+            err = True
         elif type(x) == list:
             for d in x:
                 if type(d) != np.ndarray or len(d.shape) != 2:
                     err = True
                     break
-        else: err = True
+        else:
+            err = True
         if err:
-            raise ValueError(&#39;x must be a 2d numpy array or a list of 2d numpy arrays&#39;)
+            raise ValueError(&#34;x must be a 2d numpy array or a list of 2d numpy arrays&#34;)
         if type(y) != np.ndarray:
-            raise ValueError(&#39;y must be a numpy array&#39;)
+            raise ValueError(&#34;y must be a numpy array&#34;)
         if type(x) == np.ndarray:
             x = [x]
 
@@ -487,12 +496,11 @@ See ktrain.text.preprocess.TransformerDataset as an example.
         self.n_inputs = len(x)
         self.shuffle = shuffle
 
-
     def __len__(self):
         return math.ceil(self.x[0].shape[0] / self.batch_size)
 
     def __getitem__(self, idx):
-        inds = self.indices[idx * self.batch_size:(idx + 1) * self.batch_size]
+        inds = self.indices[idx * self.batch_size : (idx + 1) * self.batch_size]
         batch_x = []
         for i in range(self.n_inputs):
             batch_x.append(self.x[i][inds])
@@ -506,7 +514,8 @@ See ktrain.text.preprocess.TransformerDataset as an example.
         return self.y
 
     def on_epoch_end(self):
-        if self.shuffle: np.random.shuffle(self.indices)
+        if self.shuffle:
+            np.random.shuffle(self.indices)
 
     def xshape(self):
         return self.x[0].shape
@@ -561,7 +570,8 @@ See ktrain.text.preprocess.TransformerDataset as an example.
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def on_epoch_end(self):
-    if self.shuffle: np.random.shuffle(self.indices)</code></pre>
+    if self.shuffle:
+        np.random.shuffle(self.indices)</code></pre>
 </details>
 </dd>
 </dl>
@@ -619,6 +629,7 @@ See ktrain.text.preprocess.TransformerDataset as an example.
     See ktrain.text.preprocess.TransformerDataset as an example.
     ```
     &#34;&#34;&#34;
+
     def __init__(self, batch_size=32):
         self.batch_size = batch_size
 
@@ -679,6 +690,7 @@ See ktrain.text.preprocess.TransformerDataset as an example.
     Wrapper for tf.data.Datasets
     ```
     &#34;&#34;&#34;
+
     def __init__(self, tfdataset, n, y):
         &#34;&#34;&#34;
         ```
@@ -689,9 +701,13 @@ See ktrain.text.preprocess.TransformerDataset as an example.
         ```
         &#34;&#34;&#34;
         if not isinstance(tfdataset, tf.data.Dataset):
-            raise ValueError(&#39;tfdataset must be a fully-configured tf.data.Dataset with batch_size, etc. set appropriately&#39;)
+            raise ValueError(
+                &#34;tfdataset must be a fully-configured tf.data.Dataset with batch_size, etc. set appropriately&#34;
+            )
         self.tfdataset = tfdataset
-        self.bs = next(tfdataset.as_numpy_iterator())[-1].shape[0] # extract batch_size from tfdataset
+        self.bs = next(tfdataset.as_numpy_iterator())[-1].shape[
+            0
+        ]  # extract batch_size from tfdataset
         self.n = n
         self.y = y
 
@@ -702,8 +718,9 @@ See ktrain.text.preprocess.TransformerDataset as an example.
     @batch_size.setter
     def batch_size(self, value):
         if value != self.bs:
-            warnings.warn(&#39;batch_size parameter is ignored, as pre-configured batch_size of tf.data.Dataset is used&#39;)
-
+            warnings.warn(
+                &#34;batch_size parameter is ignored, as pre-configured batch_size of tf.data.Dataset is used&#34;
+            )
 
     def nsamples(self):
         return self.n

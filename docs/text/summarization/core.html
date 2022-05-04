@@ -27,12 +27,14 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">from ...torch_base import TorchBase
+
+
 class TransformerSummarizer(TorchBase):
     &#34;&#34;&#34;
     interface to Transformer-based text summarization
     &#34;&#34;&#34;
 
-    def __init__(self, model_name=&#39;facebook/bart-large-cnn&#39;, device=None):
+    def __init__(self, model_name=&#34;facebook/bart-large-cnn&#34;, device=None):
         &#34;&#34;&#34;
         ```
         interface to BART-based text summarization using transformers library
@@ -42,13 +44,15 @@ class TransformerSummarizer(TorchBase):
           device(str): device to use (e.g., &#39;cuda&#39;, &#39;cpu&#39;)
         ```
         &#34;&#34;&#34;
-        if &#39;bart&#39; not in model_name:
-            raise ValueError(&#39;TransformerSummarizer currently only accepts BART models&#39;)
+        if &#34;bart&#34; not in model_name:
+            raise ValueError(&#34;TransformerSummarizer currently only accepts BART models&#34;)
         super().__init__(device=device)
         from transformers import BartTokenizer, BartForConditionalGeneration
-        self.tokenizer = BartTokenizer.from_pretrained(model_name)
-        self.model = BartForConditionalGeneration.from_pretrained(model_name).to(self.torch_device)
 
+        self.tokenizer = BartTokenizer.from_pretrained(model_name)
+        self.model = BartForConditionalGeneration.from_pretrained(model_name).to(
+            self.torch_device
+        )
 
     def summarize(self, doc):
         &#34;&#34;&#34;
@@ -61,18 +65,23 @@ class TransformerSummarizer(TorchBase):
         ```
         &#34;&#34;&#34;
         import torch
-        with torch.no_grad():
-            answers_input_ids = self.tokenizer.batch_encode_plus([doc], 
-                                                                 return_tensors=&#39;pt&#39;, truncation=True,
-                                                                 max_length=1024)[&#39;input_ids&#39;].to(self.torch_device)
-            summary_ids = self.model.generate(answers_input_ids,
-                                              num_beams=4,
-                                              length_penalty=2.0,
-                                              max_length=142,
-                                              min_length=56,
-                                              no_repeat_ngram_size=3)
 
-            exec_sum = self.tokenizer.decode(summary_ids.squeeze(), skip_special_tokens=True)
+        with torch.no_grad():
+            answers_input_ids = self.tokenizer.batch_encode_plus(
+                [doc], return_tensors=&#34;pt&#34;, truncation=True, max_length=1024
+            )[&#34;input_ids&#34;].to(self.torch_device)
+            summary_ids = self.model.generate(
+                answers_input_ids,
+                num_beams=4,
+                length_penalty=2.0,
+                max_length=142,
+                min_length=56,
+                no_repeat_ngram_size=3,
+            )
+
+            exec_sum = self.tokenizer.decode(
+                summary_ids.squeeze(), skip_special_tokens=True
+            )
         return exec_sum</code></pre>
 </details>
 </section>
@@ -106,7 +115,7 @@ Args:
     interface to Transformer-based text summarization
     &#34;&#34;&#34;
 
-    def __init__(self, model_name=&#39;facebook/bart-large-cnn&#39;, device=None):
+    def __init__(self, model_name=&#34;facebook/bart-large-cnn&#34;, device=None):
         &#34;&#34;&#34;
         ```
         interface to BART-based text summarization using transformers library
@@ -116,13 +125,15 @@ Args:
           device(str): device to use (e.g., &#39;cuda&#39;, &#39;cpu&#39;)
         ```
         &#34;&#34;&#34;
-        if &#39;bart&#39; not in model_name:
-            raise ValueError(&#39;TransformerSummarizer currently only accepts BART models&#39;)
+        if &#34;bart&#34; not in model_name:
+            raise ValueError(&#34;TransformerSummarizer currently only accepts BART models&#34;)
         super().__init__(device=device)
         from transformers import BartTokenizer, BartForConditionalGeneration
-        self.tokenizer = BartTokenizer.from_pretrained(model_name)
-        self.model = BartForConditionalGeneration.from_pretrained(model_name).to(self.torch_device)
 
+        self.tokenizer = BartTokenizer.from_pretrained(model_name)
+        self.model = BartForConditionalGeneration.from_pretrained(model_name).to(
+            self.torch_device
+        )
 
     def summarize(self, doc):
         &#34;&#34;&#34;
@@ -135,18 +146,23 @@ Args:
         ```
         &#34;&#34;&#34;
         import torch
-        with torch.no_grad():
-            answers_input_ids = self.tokenizer.batch_encode_plus([doc], 
-                                                                 return_tensors=&#39;pt&#39;, truncation=True,
-                                                                 max_length=1024)[&#39;input_ids&#39;].to(self.torch_device)
-            summary_ids = self.model.generate(answers_input_ids,
-                                              num_beams=4,
-                                              length_penalty=2.0,
-                                              max_length=142,
-                                              min_length=56,
-                                              no_repeat_ngram_size=3)
 
-            exec_sum = self.tokenizer.decode(summary_ids.squeeze(), skip_special_tokens=True)
+        with torch.no_grad():
+            answers_input_ids = self.tokenizer.batch_encode_plus(
+                [doc], return_tensors=&#34;pt&#34;, truncation=True, max_length=1024
+            )[&#34;input_ids&#34;].to(self.torch_device)
+            summary_ids = self.model.generate(
+                answers_input_ids,
+                num_beams=4,
+                length_penalty=2.0,
+                max_length=142,
+                min_length=56,
+                no_repeat_ngram_size=3,
+            )
+
+            exec_sum = self.tokenizer.decode(
+                summary_ids.squeeze(), skip_special_tokens=True
+            )
         return exec_sum</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -180,18 +196,23 @@ Returns:
     ```
     &#34;&#34;&#34;
     import torch
-    with torch.no_grad():
-        answers_input_ids = self.tokenizer.batch_encode_plus([doc], 
-                                                             return_tensors=&#39;pt&#39;, truncation=True,
-                                                             max_length=1024)[&#39;input_ids&#39;].to(self.torch_device)
-        summary_ids = self.model.generate(answers_input_ids,
-                                          num_beams=4,
-                                          length_penalty=2.0,
-                                          max_length=142,
-                                          min_length=56,
-                                          no_repeat_ngram_size=3)
 
-        exec_sum = self.tokenizer.decode(summary_ids.squeeze(), skip_special_tokens=True)
+    with torch.no_grad():
+        answers_input_ids = self.tokenizer.batch_encode_plus(
+            [doc], return_tensors=&#34;pt&#34;, truncation=True, max_length=1024
+        )[&#34;input_ids&#34;].to(self.torch_device)
+        summary_ids = self.model.generate(
+            answers_input_ids,
+            num_beams=4,
+            length_penalty=2.0,
+            max_length=142,
+            min_length=56,
+            no_repeat_ngram_size=3,
+        )
+
+        exec_sum = self.tokenizer.decode(
+            summary_ids.squeeze(), skip_special_tokens=True
+        )
     return exec_sum</code></pre>
 </details>
 </dd>

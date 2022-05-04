@@ -27,27 +27,28 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def causal_inference_model(
-                             df,
-                             method=&#39;t-learner&#39;,
-                             metalearner_type=None,
-                             treatment_col=&#39;treatment&#39;,
-                             outcome_col=&#39;outcome&#39;,
-                             text_col=None,
-                             ignore_cols=[],
-                             include_cols=[],
-                             treatment_effect_col = &#39;treatment_effect&#39;,
-                             learner = None,
-                             effect_learner=None,
-                             min_df=0.05,
-                             max_df=0.5,
-                             ngram_range=(1,1),
-                             stop_words=&#39;english&#39;,
-                             verbose=1):
+    df,
+    method=&#34;t-learner&#34;,
+    metalearner_type=None,
+    treatment_col=&#34;treatment&#34;,
+    outcome_col=&#34;outcome&#34;,
+    text_col=None,
+    ignore_cols=[],
+    include_cols=[],
+    treatment_effect_col=&#34;treatment_effect&#34;,
+    learner=None,
+    effect_learner=None,
+    min_df=0.05,
+    max_df=0.5,
+    ngram_range=(1, 1),
+    stop_words=&#34;english&#34;,
+    verbose=1,
+):
     &#34;&#34;&#34;
     ```
     Infers causality from the data contained in `df` using a metalearner.
     This function is a wrapper to the CausalNLP.CausalInferenceModel class.
-    For more details on methods and capabilities of the returned `CausalInferenceModel` object, 
+    For more details on methods and capabilities of the returned `CausalInferenceModel` object,
     see the [CausalNLP documentation](https://amaiya.github.io/causalnlp/causalinference.html).
 
     Usage:
@@ -84,25 +85,27 @@
     try:
         import causalnlp
     except ImportError:
-        raise Exception(&#39;CausalNLP must be installed: pip install causalnlp&#39;)
+        raise Exception(&#34;CausalNLP must be installed: pip install causalnlp&#34;)
     from causalnlp import CausalInferenceModel
+
     return CausalInferenceModel(
-                             df,
-                             method=method,
-                             metalearner_type=metalearner_type,
-                             treatment_col=treatment_col,
-                             outcome_col=outcome_col,
-                             text_col=text_col,
-                             ignore_cols=ignore_cols,
-                             include_cols=include_cols,
-                             treatment_effect_col = treatment_effect_col,
-                             learner = learner,
-                             effect_learner=effect_learner,
-                             min_df=min_df,
-                             max_df=max_df,
-                             ngram_range=ngram_range,
-                             stop_words=stop_words,
-                             verbose=verbose,)</code></pre>
+        df,
+        method=method,
+        metalearner_type=metalearner_type,
+        treatment_col=treatment_col,
+        outcome_col=outcome_col,
+        text_col=text_col,
+        ignore_cols=ignore_cols,
+        include_cols=include_cols,
+        treatment_effect_col=treatment_effect_col,
+        learner=learner,
+        effect_learner=effect_learner,
+        min_df=min_df,
+        max_df=max_df,
+        ngram_range=ngram_range,
+        stop_words=stop_words,
+        verbose=verbose,
+    )</code></pre>
 </details>
 </section>
 <section>
@@ -118,7 +121,7 @@
 <dd>
 <div class="desc"><pre><code>Infers causality from the data contained in `df` using a metalearner.
 This function is a wrapper to the CausalNLP.CausalInferenceModel class.
-For more details on methods and capabilities of the returned `CausalInferenceModel` object, 
+For more details on methods and capabilities of the returned `CausalInferenceModel` object,
 see the [CausalNLP documentation](https://amaiya.github.io/causalnlp/causalinference.html).
 
 Usage:
@@ -156,27 +159,28 @@ Usage:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def causal_inference_model(
-                             df,
-                             method=&#39;t-learner&#39;,
-                             metalearner_type=None,
-                             treatment_col=&#39;treatment&#39;,
-                             outcome_col=&#39;outcome&#39;,
-                             text_col=None,
-                             ignore_cols=[],
-                             include_cols=[],
-                             treatment_effect_col = &#39;treatment_effect&#39;,
-                             learner = None,
-                             effect_learner=None,
-                             min_df=0.05,
-                             max_df=0.5,
-                             ngram_range=(1,1),
-                             stop_words=&#39;english&#39;,
-                             verbose=1):
+    df,
+    method=&#34;t-learner&#34;,
+    metalearner_type=None,
+    treatment_col=&#34;treatment&#34;,
+    outcome_col=&#34;outcome&#34;,
+    text_col=None,
+    ignore_cols=[],
+    include_cols=[],
+    treatment_effect_col=&#34;treatment_effect&#34;,
+    learner=None,
+    effect_learner=None,
+    min_df=0.05,
+    max_df=0.5,
+    ngram_range=(1, 1),
+    stop_words=&#34;english&#34;,
+    verbose=1,
+):
     &#34;&#34;&#34;
     ```
     Infers causality from the data contained in `df` using a metalearner.
     This function is a wrapper to the CausalNLP.CausalInferenceModel class.
-    For more details on methods and capabilities of the returned `CausalInferenceModel` object, 
+    For more details on methods and capabilities of the returned `CausalInferenceModel` object,
     see the [CausalNLP documentation](https://amaiya.github.io/causalnlp/causalinference.html).
 
     Usage:
@@ -213,25 +217,27 @@ Usage:
     try:
         import causalnlp
     except ImportError:
-        raise Exception(&#39;CausalNLP must be installed: pip install causalnlp&#39;)
+        raise Exception(&#34;CausalNLP must be installed: pip install causalnlp&#34;)
     from causalnlp import CausalInferenceModel
+
     return CausalInferenceModel(
-                             df,
-                             method=method,
-                             metalearner_type=metalearner_type,
-                             treatment_col=treatment_col,
-                             outcome_col=outcome_col,
-                             text_col=text_col,
-                             ignore_cols=ignore_cols,
-                             include_cols=include_cols,
-                             treatment_effect_col = treatment_effect_col,
-                             learner = learner,
-                             effect_learner=effect_learner,
-                             min_df=min_df,
-                             max_df=max_df,
-                             ngram_range=ngram_range,
-                             stop_words=stop_words,
-                             verbose=verbose,)</code></pre>
+        df,
+        method=method,
+        metalearner_type=metalearner_type,
+        treatment_col=treatment_col,
+        outcome_col=outcome_col,
+        text_col=text_col,
+        ignore_cols=ignore_cols,
+        include_cols=include_cols,
+        treatment_effect_col=treatment_effect_col,
+        learner=learner,
+        effect_learner=effect_learner,
+        min_df=min_df,
+        max_df=max_df,
+        ngram_range=ngram_range,
+        stop_words=stop_words,
+        verbose=verbose,
+    )</code></pre>
 </details>
 </dd>
 </dl>

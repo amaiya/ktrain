@@ -31,12 +31,17 @@ from .. import utils as U
 from ..preprocessor import Preprocessor
 from . import textutils as TU
 
-from transformers import AutoConfig, TFAutoModelForSequenceClassification, AutoTokenizer, TFAutoModel
+from transformers import (
+    AutoConfig,
+    TFAutoModelForSequenceClassification,
+    AutoTokenizer,
+    TFAutoModel,
+)
 
 
-DISTILBERT= &#39;distilbert&#39;
+DISTILBERT = &#34;distilbert&#34;
 
-NOSPACE_LANGS = [&#39;zh-cn&#39;, &#39;zh-tw&#39;, &#39;ja&#39;]
+NOSPACE_LANGS = [&#34;zh-cn&#34;, &#34;zh-tw&#34;, &#34;ja&#34;]
 
 
 def is_nospace_lang(lang):
@@ -47,69 +52,78 @@ def fname_from_url(url):
     return os.path.split(url)[-1]
 
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Word Vectors
-#------------------------------------------------------------------------------
-WV_URL = &#39;https://dl.fbaipublicfiles.com/fasttext/vectors-english/crawl-300d-2M.vec.zip&#39;
-#WV_URL = &#39;http://nlp.stanford.edu/data/glove.6B.zip
+# ------------------------------------------------------------------------------
+WV_URL = &#34;https://dl.fbaipublicfiles.com/fasttext/vectors-english/crawl-300d-2M.vec.zip&#34;
+# WV_URL = &#39;http://nlp.stanford.edu/data/glove.6B.zip
 
 
 def get_wv_path(wv_path_or_url=WV_URL):
     # process if file path given
-    if os.path.isfile(wv_path_or_url) and wv_path_or_url.endswith(&#39;vec&#39;): return wv_path_or_url
+    if os.path.isfile(wv_path_or_url) and wv_path_or_url.endswith(&#34;vec&#34;):
+        return wv_path_or_url
     elif os.path.isfile(wv_path_or_url):
-        raise ValueError(&#34;wv_path_or_url must either be URL .vec.zip or .vec.gz file or file path to .vec file&#34;)
+        raise ValueError(
+            &#34;wv_path_or_url must either be URL .vec.zip or .vec.gz file or file path to .vec file&#34;
+        )
 
     # process if URL is given
-    fasttext_url = &#39;https://dl.fbaipublicfiles.com/fasttext&#39;
+    fasttext_url = &#34;https://dl.fbaipublicfiles.com/fasttext&#34;
     if not wv_path_or_url.startswith(fasttext_url):
-        raise ValueError(&#39;selected word vector file must be from %s&#39;% (fasttext_url))
-    if not wv_path_or_url.endswith(&#39;.vec.zip&#39;) and not wv_path_or_url.endswith(&#39;vec.gz&#39;):
-        raise ValueError(&#39;If wv_path_or_url is URL, must be .vec.zip filea from Facebook fasttext site.&#39;)
+        raise ValueError(&#34;selected word vector file must be from %s&#34; % (fasttext_url))
+    if not wv_path_or_url.endswith(&#34;.vec.zip&#34;) and not wv_path_or_url.endswith(
+        &#34;vec.gz&#34;
+    ):
+        raise ValueError(
+            &#34;If wv_path_or_url is URL, must be .vec.zip filea from Facebook fasttext site.&#34;
+        )
 
     ktrain_data = U.get_ktrain_data()
     zip_fpath = os.path.join(ktrain_data, fname_from_url(wv_path_or_url))
-    wv_path =  os.path.join(ktrain_data, os.path.splitext(fname_from_url(wv_path_or_url))[0])
+    wv_path = os.path.join(
+        ktrain_data, os.path.splitext(fname_from_url(wv_path_or_url))[0]
+    )
     if not os.path.isfile(wv_path):
         # download zip
-        print(&#39;downloading pretrained word vectors to %s ...&#39; % (ktrain_data))
+        print(&#34;downloading pretrained word vectors to %s ...&#34; % (ktrain_data))
         U.download(wv_path_or_url, zip_fpath)
 
         # unzip
-        print(&#39;\nextracting pretrained word vectors...&#39;)
-        if wv_path_or_url.endswith(&#39;.vec.zip&#39;):
-            with zipfile.ZipFile(zip_fpath, &#39;r&#39;) as zip_ref:
+        print(&#34;\nextracting pretrained word vectors...&#34;)
+        if wv_path_or_url.endswith(&#34;.vec.zip&#34;):
+            with zipfile.ZipFile(zip_fpath, &#34;r&#34;) as zip_ref:
                 zip_ref.extractall(ktrain_data)
-        else: # .vec.gz
-            with gzip.open(zip_fpath, &#39;rb&#39;) as f_in:
-                with open(wv_path, &#39;wb&#39;) as f_out:
+        else:  # .vec.gz
+            with gzip.open(zip_fpath, &#34;rb&#34;) as f_in:
+                with open(wv_path, &#34;wb&#34;) as f_out:
                     shutil.copyfileobj(f_in, f_out)
-        print(&#39;done.\n&#39;)
+        print(&#34;done.\n&#34;)
 
         # cleanup
-        print(&#39;cleanup downloaded zip...&#39;)
+        print(&#34;cleanup downloaded zip...&#34;)
         try:
             os.remove(zip_fpath)
-            print(&#39;done.\n&#39;)
+            print(&#34;done.\n&#34;)
         except OSError:
-            print(&#39;failed to cleanup/remove %s&#39; % (zip_fpath))
+            print(&#34;failed to cleanup/remove %s&#34; % (zip_fpath))
     return wv_path
 
 
-def get_coefs(word, *arr): return word, np.asarray(arr, dtype=&#39;float32&#39;)
+def get_coefs(word, *arr):
+    return word, np.asarray(arr, dtype=&#34;float32&#34;)
 
 
-
-#def load_wv(wv_path=None, verbose=1):
-    #if verbose: print(&#39;Loading pretrained word vectors...this may take a few moments...&#39;)
-    #if wv_path is None: wv_path = get_wv_path()
-    #embeddings_index = dict(get_coefs(*o.rstrip().rsplit(&#39; &#39;)) for o in open(wv_path, encoding=&#39;utf-8&#39;))
-    #if verbose: print(&#39;Done.&#39;)
-    #return embeddings_index
+# def load_wv(wv_path=None, verbose=1):
+# if verbose: print(&#39;Loading pretrained word vectors...this may take a few moments...&#39;)
+# if wv_path is None: wv_path = get_wv_path()
+# embeddings_index = dict(get_coefs(*o.rstrip().rsplit(&#39; &#39;)) for o in open(wv_path, encoding=&#39;utf-8&#39;))
+# if verbose: print(&#39;Done.&#39;)
+# return embeddings_index
 
 
 def file_len(fname):
-    with open(fname, encoding=&#39;utf-8&#39;) as f:
+    with open(fname, encoding=&#34;utf-8&#34;) as f:
         for i, l in enumerate(f):
             pass
     return i + 1
@@ -117,65 +131,73 @@ def file_len(fname):
 
 def load_wv(wv_path_or_url=WV_URL, verbose=1):
     wv_path = get_wv_path(wv_path_or_url)
-    if verbose: print(&#39;loading pretrained word vectors...this may take a few moments...&#39;)
+    if verbose:
+        print(&#34;loading pretrained word vectors...this may take a few moments...&#34;)
     length = file_len(wv_path)
     tups = []
     mb = master_bar(range(1))
     for i in mb:
-        f = open(wv_path, encoding=&#39;utf-8&#39;)
+        f = open(wv_path, encoding=&#34;utf-8&#34;)
         for o in progress_bar(range(length), parent=mb):
             o = f.readline()
-            tups.append(get_coefs(*o.rstrip().rsplit(&#39; &#39;)))
+            tups.append(get_coefs(*o.rstrip().rsplit(&#34; &#34;)))
         f.close()
-        #if verbose: mb.write(&#39;done.&#39;)
+        # if verbose: mb.write(&#39;done.&#39;)
     return dict(tups)
 
 
-
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # BERT
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
-#BERT_PATH = os.path.join(os.path.dirname(os.path.abspath(localbert.__file__)), &#39;uncased_L-12_H-768_A-12&#39;)
-BERT_URL = &#39;https://storage.googleapis.com/bert_models/2018_10_18/uncased_L-12_H-768_A-12.zip&#39;
-BERT_URL_MULTI = &#39;https://storage.googleapis.com/bert_models/2018_11_23/multi_cased_L-12_H-768_A-12.zip&#39;
-BERT_URL_CN = &#39;https://storage.googleapis.com/bert_models/2018_11_03/chinese_L-12_H-768_A-12.zip&#39;
+# BERT_PATH = os.path.join(os.path.dirname(os.path.abspath(localbert.__file__)), &#39;uncased_L-12_H-768_A-12&#39;)
+BERT_URL = (
+    &#34;https://storage.googleapis.com/bert_models/2018_10_18/uncased_L-12_H-768_A-12.zip&#34;
+)
+BERT_URL_MULTI = &#34;https://storage.googleapis.com/bert_models/2018_11_23/multi_cased_L-12_H-768_A-12.zip&#34;
+BERT_URL_CN = (
+    &#34;https://storage.googleapis.com/bert_models/2018_11_03/chinese_L-12_H-768_A-12.zip&#34;
+)
 
-def get_bert_path(lang=&#39;en&#39;):
-    if lang == &#39;en&#39;:
+
+def get_bert_path(lang=&#34;en&#34;):
+    if lang == &#34;en&#34;:
         bert_url = BERT_URL
-    elif lang.startswith(&#39;zh-&#39;):
+    elif lang.startswith(&#34;zh-&#34;):
         bert_url = BERT_URL_CN
     else:
         bert_url = BERT_URL_MULTI
     ktrain_data = U.get_ktrain_data()
     zip_fpath = os.path.join(ktrain_data, fname_from_url(bert_url))
-    bert_path = os.path.join( ktrain_data, os.path.splitext(fname_from_url(bert_url))[0] )
-    if not os.path.isdir(bert_path) or \
-       not os.path.isfile(os.path.join(bert_path, &#39;bert_config.json&#39;)) or\
-       not os.path.isfile(os.path.join(bert_path, &#39;bert_model.ckpt.data-00000-of-00001&#39;)) or\
-       not os.path.isfile(os.path.join(bert_path, &#39;bert_model.ckpt.index&#39;)) or\
-       not os.path.isfile(os.path.join(bert_path, &#39;bert_model.ckpt.meta&#39;)) or\
-       not os.path.isfile(os.path.join(bert_path, &#39;vocab.txt&#39;)):
+    bert_path = os.path.join(ktrain_data, os.path.splitext(fname_from_url(bert_url))[0])
+    if (
+        not os.path.isdir(bert_path)
+        or not os.path.isfile(os.path.join(bert_path, &#34;bert_config.json&#34;))
+        or not os.path.isfile(
+            os.path.join(bert_path, &#34;bert_model.ckpt.data-00000-of-00001&#34;)
+        )
+        or not os.path.isfile(os.path.join(bert_path, &#34;bert_model.ckpt.index&#34;))
+        or not os.path.isfile(os.path.join(bert_path, &#34;bert_model.ckpt.meta&#34;))
+        or not os.path.isfile(os.path.join(bert_path, &#34;vocab.txt&#34;))
+    ):
         # download zip
-        print(&#39;downloading pretrained BERT model (%s)...&#39; % (fname_from_url(bert_url)))
+        print(&#34;downloading pretrained BERT model (%s)...&#34; % (fname_from_url(bert_url)))
         U.download(bert_url, zip_fpath)
 
         # unzip
-        print(&#39;\nextracting pretrained BERT model...&#39;)
-        with zipfile.ZipFile(zip_fpath, &#39;r&#39;) as zip_ref:
+        print(&#34;\nextracting pretrained BERT model...&#34;)
+        with zipfile.ZipFile(zip_fpath, &#34;r&#34;) as zip_ref:
             zip_ref.extractall(ktrain_data)
-        print(&#39;done.\n&#39;)
+        print(&#34;done.\n&#34;)
 
         # cleanup
-        print(&#39;cleanup downloaded zip...&#39;)
+        print(&#34;cleanup downloaded zip...&#34;)
         try:
             os.remove(zip_fpath)
-            print(&#39;done.\n&#39;)
+            print(&#34;done.\n&#34;)
         except OSError:
-            print(&#39;failed to cleanup/remove %s&#39; % (zip_fpath))
+            print(&#34;failed to cleanup/remove %s&#34; % (zip_fpath))
     return bert_path
-
 
 
 def bert_tokenize(docs, tokenizer, max_length, verbose=1):
@@ -186,7 +208,6 @@ def bert_tokenize(docs, tokenizer, max_length, verbose=1):
         mb = range(1)
         pb = docs
 
-
     indices = []
     for i in mb:
         for doc in pb:
@@ -194,27 +215,29 @@ def bert_tokenize(docs, tokenizer, max_length, verbose=1):
             doc = str(doc) if isinstance(doc, (float, int)) else doc
             ids, segments = tokenizer.encode(doc, max_len=max_length)
             indices.append(ids)
-        if verbose: mb.write(&#39;done.&#39;)
+        if verbose:
+            mb.write(&#34;done.&#34;)
     zeros = np.zeros_like(indices)
     return [np.array(indices), np.array(zeros)]
 
-#------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
 # Transformers UTILITIES
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
-#def convert_to_tfdataset(csv):
-    #def gen():
-        #for ex in csv:
-            #yield  {&#39;idx&#39;: ex[0],
-                     #&#39;sentence&#39;: ex[1],
-                     #&#39;label&#39;: str(ex[2])}
-    #return tf.data.Dataset.from_generator(gen,
-        #{&#39;idx&#39;: tf.int64,
-          #&#39;sentence&#39;: tf.string,
-          #&#39;label&#39;: tf.int64})
+# def convert_to_tfdataset(csv):
+# def gen():
+# for ex in csv:
+# yield  {&#39;idx&#39;: ex[0],
+#&#39;sentence&#39;: ex[1],
+#&#39;label&#39;: str(ex[2])}
+# return tf.data.Dataset.from_generator(gen,
+# {&#39;idx&#39;: tf.int64,
+#&#39;sentence&#39;: tf.string,
+#&#39;label&#39;: tf.int64})
 
 
-#def features_to_tfdataset(features):
+# def features_to_tfdataset(features):
 
 #    def gen():
 #        for ex in features:
@@ -234,28 +257,40 @@ def bert_tokenize(docs, tokenizer, max_length, verbose=1):
 #         tf.TensorShape([None])))
 #         #tf.TensorShape(])))
 
+
 def _is_sentence_pair(tup):
-    if isinstance(tup, (tuple)) and len(tup) == 2 and\
-            isinstance(tup[0], str) and isinstance(tup[1], str):
+    if (
+        isinstance(tup, (tuple))
+        and len(tup) == 2
+        and isinstance(tup[0], str)
+        and isinstance(tup[1], str)
+    ):
         return True
     else:
-        if isinstance(tup, (list, np.ndarray)) and len(tup) == 2 and\
-                isinstance(tup[0], str) and isinstance(tup[1], str):
-            warnings.warn(&#39;List or array of two texts supplied, so task being treated as text classification. &#39; +\
-                          &#39;If this is a sentence pair classification task, please cast to tuple.&#39;)
+        # if (
+        # isinstance(tup, (list, np.ndarray))
+        # and len(tup) == 2
+        # and isinstance(tup[0], str)
+        # and isinstance(tup[1], str)
+        # ):
+        # warnings.warn(
+        # &#34;List or array of two texts supplied, so task being treated as text classification. &#34;
+        # + &#34;If this is a sentence pair classification task, please cast to tuple.&#34;
+        # )
         return False
 
 
 def detect_text_format(texts):
     is_pair = False
     is_array = False
-    err_msg = &#39;invalid text format: texts should be list of strings or list of sentence pairs in form of tuples (str, str)&#39;
+    err_msg = &#34;invalid text format: texts should be list of strings or list of sentence pairs in form of tuples (str, str)&#34;
     if _is_sentence_pair(texts):
-        is_pair=True
+        is_pair = True
         is_array = False
     elif isinstance(texts, (tuple, list, np.ndarray)):
         is_array = True
-        if len(texts) == 0: raise ValueError(&#39;texts is empty&#39;)
+        if len(texts) == 0:
+            raise ValueError(&#34;texts is empty&#34;)
         peek = texts[0]
         is_pair = _is_sentence_pair(peek)
         if not is_pair and not isinstance(peek, str):
@@ -263,38 +298,44 @@ def detect_text_format(texts):
     return is_array, is_pair
 
 
-
 def hf_features_to_tfdataset(features_list, labels):
     features_list = np.array(features_list)
     labels = np.array(labels) if labels is not None else None
     tfdataset = tf.data.Dataset.from_tensor_slices((features_list, labels))
-    tfdataset = tfdataset.map(lambda x,y: ({&#39;input_ids&#39;: x[0], 
-                                            &#39;attention_mask&#39;: x[1], 
-                                             &#39;token_type_ids&#39;: x[2]}, y))
+    tfdataset = tfdataset.map(
+        lambda x, y: (
+            {&#34;input_ids&#34;: x[0], &#34;attention_mask&#34;: x[1], &#34;token_type_ids&#34;: x[2]},
+            y,
+        )
+    )
 
     return tfdataset
 
 
-
-def hf_convert_example(text_a, text_b=None, tokenizer=None,
-                       max_length=512,
-                       pad_on_left=False,
-                       pad_token=0,
-                       pad_token_segment_id=0,
-                       mask_padding_with_zero=True):
+def hf_convert_example(
+    text_a,
+    text_b=None,
+    tokenizer=None,
+    max_length=512,
+    pad_on_left=False,
+    pad_token=0,
+    pad_token_segment_id=0,
+    mask_padding_with_zero=True,
+):
     &#34;&#34;&#34;
     ```
     convert InputExample to InputFeature for Hugging Face transformer
     ```
     &#34;&#34;&#34;
-    if tokenizer is None: raise ValueError(&#39;tokenizer is required&#39;)
+    if tokenizer is None:
+        raise ValueError(&#34;tokenizer is required&#34;)
     inputs = tokenizer.encode_plus(
         text_a,
         text_b,
         add_special_tokens=True,
         return_token_type_ids=True,
-        max_length=max_length, 
-        truncation=&#39;longest_first&#39;
+        max_length=max_length,
+        truncation=&#34;longest_first&#34;,
     )
     input_ids, token_type_ids = inputs[&#34;input_ids&#34;], inputs[&#34;token_type_ids&#34;]
 
@@ -306,38 +347,49 @@ def hf_convert_example(text_a, text_b=None, tokenizer=None,
     padding_length = max_length - len(input_ids)
     if pad_on_left:
         input_ids = ([pad_token] * padding_length) + input_ids
-        attention_mask = ([0 if mask_padding_with_zero else 1] * padding_length) + attention_mask
+        attention_mask = (
+            [0 if mask_padding_with_zero else 1] * padding_length
+        ) + attention_mask
         token_type_ids = ([pad_token_segment_id] * padding_length) + token_type_ids
     else:
         input_ids = input_ids + ([pad_token] * padding_length)
-        attention_mask = attention_mask + ([0 if mask_padding_with_zero else 1] * padding_length)
+        attention_mask = attention_mask + (
+            [0 if mask_padding_with_zero else 1] * padding_length
+        )
         token_type_ids = token_type_ids + ([pad_token_segment_id] * padding_length)
-    assert len(input_ids) == max_length, &#34;Error with input length {} vs {}&#34;.format(len(input_ids), max_length)
-    assert len(attention_mask) == max_length, &#34;Error with input length {} vs {}&#34;.format(len(attention_mask), max_length)
-    assert len(token_type_ids) == max_length, &#34;Error with input length {} vs {}&#34;.format(len(token_type_ids), max_length)
+    assert len(input_ids) == max_length, &#34;Error with input length {} vs {}&#34;.format(
+        len(input_ids), max_length
+    )
+    assert len(attention_mask) == max_length, &#34;Error with input length {} vs {}&#34;.format(
+        len(attention_mask), max_length
+    )
+    assert len(token_type_ids) == max_length, &#34;Error with input length {} vs {}&#34;.format(
+        len(token_type_ids), max_length
+    )
 
-
-    #if ex_index &lt; 1:
-        #print(&#34;*** Example ***&#34;)
-        #print(&#34;guid: %s&#34; % (example.guid))
-        #print(&#34;input_ids: %s&#34; % &#34; &#34;.join([str(x) for x in input_ids]))
-        #print(&#34;attention_mask: %s&#34; % &#34; &#34;.join([str(x) for x in attention_mask]))
-        #print(&#34;token_type_ids: %s&#34; % &#34; &#34;.join([str(x) for x in token_type_ids]))
-        #print(&#34;label: %s (id = %d)&#34; % (example.label, label))
+    # if ex_index &lt; 1:
+    # print(&#34;*** Example ***&#34;)
+    # print(&#34;guid: %s&#34; % (example.guid))
+    # print(&#34;input_ids: %s&#34; % &#34; &#34;.join([str(x) for x in input_ids]))
+    # print(&#34;attention_mask: %s&#34; % &#34; &#34;.join([str(x) for x in attention_mask]))
+    # print(&#34;token_type_ids: %s&#34; % &#34; &#34;.join([str(x) for x in token_type_ids]))
+    # print(&#34;label: %s (id = %d)&#34; % (example.label, label))
 
     return [input_ids, attention_mask, token_type_ids]
 
 
-
-
-def hf_convert_examples(texts, y=None, tokenizer=None,
-                        max_length=512,
-                        pad_on_left=False,
-                        pad_token=0,
-                        pad_token_segment_id=0,
-                        mask_padding_with_zero=True,
-                        use_dynamic_shape=False,
-                        verbose=1):
+def hf_convert_examples(
+    texts,
+    y=None,
+    tokenizer=None,
+    max_length=512,
+    pad_on_left=False,
+    pad_token=0,
+    pad_token_segment_id=0,
+    mask_padding_with_zero=True,
+    use_dynamic_shape=False,
+    verbose=1,
+):
     &#34;&#34;&#34;
     ```
     Loads a data file into a list of ``InputFeatures``
@@ -373,12 +425,22 @@ def hf_convert_examples(texts, y=None, tokenizer=None,
             else:
                 text_a = text
                 text_b = None
-            sentences.append( tokenizer.convert_ids_to_tokens(tokenizer.encode(text_a, text_b)) )
-            #sentences.append(tokenizer.tokenize(text_a, text_b)) # only works for Fast tokenizers
-        maxlen = len(max([tokens for tokens in sentences], key=len,)) + 2
+            sentences.append(
+                tokenizer.convert_ids_to_tokens(tokenizer.encode(text_a, text_b))
+            )
+            # sentences.append(tokenizer.tokenize(text_a, text_b)) # only works for Fast tokenizers
+        maxlen = (
+            len(
+                max(
+                    [tokens for tokens in sentences],
+                    key=len,
+                )
+            )
+            + 2
+        )
 
-        if maxlen &lt; max_length: max_length = maxlen
-
+        if maxlen &lt; max_length:
+            max_length = maxlen
 
     data = []
     features_list = []
@@ -390,7 +452,7 @@ def hf_convert_examples(texts, y=None, tokenizer=None,
         mb = range(1)
         pb = texts
     for i in mb:
-        #for (idx, text) in enumerate(progress_bar(texts, parent=mb)):
+        # for (idx, text) in enumerate(progress_bar(texts, parent=mb)):
         for (idx, text) in enumerate(pb):
             if is_pair:
                 text_a = text[0]
@@ -398,26 +460,31 @@ def hf_convert_examples(texts, y=None, tokenizer=None,
             else:
                 text_a = text
                 text_b = None
-            features = hf_convert_example(text_a, text_b=text_b, tokenizer=tokenizer,
-                                          max_length=max_length,
-                                          pad_on_left=pad_on_left,
-                                          pad_token=pad_token,
-                                          pad_token_segment_id=pad_token_segment_id,
-                                          mask_padding_with_zero=mask_padding_with_zero)
+            features = hf_convert_example(
+                text_a,
+                text_b=text_b,
+                tokenizer=tokenizer,
+                max_length=max_length,
+                pad_on_left=pad_on_left,
+                pad_token=pad_token,
+                pad_token_segment_id=pad_token_segment_id,
+                mask_padding_with_zero=mask_padding_with_zero,
+            )
             features_list.append(features)
             labels.append(y[idx] if y is not None else None)
-    #tfdataset = hf_features_to_tfdataset(features_list, labels)
-    #return tfdataset
-    #return (features_list, labels)
+    # tfdataset = hf_features_to_tfdataset(features_list, labels)
+    # return tfdataset
+    # return (features_list, labels)
     # HF_EXCEPTION
     # due to issues in transormers library and TF2 tf.Datasets, arrays are converted
     # to iterators on-the-fly
-    #return  TransformerSequence(np.array(features_list), np.array(labels))
+    # return  TransformerSequence(np.array(features_list), np.array(labels))
     from .dataset import TransformerDataset
-    return  TransformerDataset(np.array(features_list), np.array(labels))
+
+    return TransformerDataset(np.array(features_list), np.array(labels))
 
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 
 class TextPreprocessor(Preprocessor):
@@ -427,69 +494,73 @@ class TextPreprocessor(Preprocessor):
     ```
     &#34;&#34;&#34;
 
-    def __init__(self, maxlen, class_names, lang=&#39;en&#39;, multilabel=None):
+    def __init__(self, maxlen, class_names, lang=&#34;en&#34;, multilabel=None):
 
-        self.set_classes(class_names) # converts to list of necessary
+        self.set_classes(class_names)  # converts to list of necessary
         self.maxlen = maxlen
         self.lang = lang
-        self.multilabel = multilabel # currently, this is always initially set None until set by set_multilabel
+        self.multilabel = multilabel  # currently, this is always initially set None until set by set_multilabel
         self.preprocess_train_called = False
-        #self.label_encoder = None # only set if y is in string format
+        # self.label_encoder = None # only set if y is in string format
         self.ytransform = None
         self.c = self.c.tolist() if isinstance(self.c, np.ndarray) else self.c
-
 
     def migrate_classes(self, class_names, classes):
         # NOTE: this method transforms to np.ndarray to list.
         # If removed and &#34;if class_names&#34; is issued prior to set_classes(), an error will occur.
-        class_names = class_names.tolist() if isinstance(class_names, np.ndarray) else class_names
+        class_names = (
+            class_names.tolist() if isinstance(class_names, np.ndarray) else class_names
+        )
         classes = classes.tolist() if isinstance(classes, np.ndarray) else classes
 
         if not class_names and classes:
             class_names = classes
-            warnings.warn(&#39;The class_names argument is replacing the classes argument. Please update your code.&#39;)
+            warnings.warn(
+                &#34;The class_names argument is replacing the classes argument. Please update your code.&#34;
+            )
         return class_names
 
-
     def get_tokenizer(self):
-        raise NotImplementedError(&#39;This method was not overridden in subclass&#39;)
+        raise NotImplementedError(&#34;This method was not overridden in subclass&#34;)
 
     def check_trained(self):
         if not self.preprocess_train_called:
-            warnings.warn(&#39;The method preprocess_train was never called. You can disable this warning by setting preprocess_train_called=True.&#39;)
-            #raise Exception(&#39;preprocess_train must be called&#39;)
-
+            warnings.warn(
+                &#34;The method preprocess_train was never called. You can disable this warning by setting preprocess_train_called=True.&#34;
+            )
+            # raise Exception(&#39;preprocess_train must be called&#39;)
 
     def get_preprocessor(self):
         raise NotImplementedError
 
-
     def get_classes(self):
         return self.c
 
-
     def set_classes(self, class_names):
-        self.c = class_names.tolist() if isinstance(class_names, np.ndarray) else class_names
-
+        self.c = (
+            class_names.tolist() if isinstance(class_names, np.ndarray) else class_names
+        )
 
     def preprocess(self, texts):
         raise NotImplementedError
 
-
     def set_multilabel(self, data, mode, verbose=1):
-        if mode == &#39;train&#39; and self.get_classes():
+        if mode == &#34;train&#34; and self.get_classes():
             original_multilabel = self.multilabel
             discovered_multilabel = U.is_multilabel(data)
             if original_multilabel is None:
                 self.multilabel = discovered_multilabel
             elif original_multilabel is True and discovered_multilabel is False:
-                warnings.warn(&#39;The multilabel=True argument was supplied, but labels do not indicate &#39;+\
-                              &#39;a multilabel problem (labels appear to be mutually-exclusive).  Using multilabel=True anyways.&#39;)
+                warnings.warn(
+                    &#34;The multilabel=True argument was supplied, but labels do not indicate &#34;
+                    + &#34;a multilabel problem (labels appear to be mutually-exclusive).  Using multilabel=True anyways.&#34;
+                )
             elif original_multilabel is False and discovered_multilabel is True:
-                warnings.warn(&#39;The multilabel=False argument was supplied, but labels inidcate that  &#39;+\
-                              &#39;this is a multilabel problem (labels are not mutually-exclusive).  Using multilabel=False anyways.&#39;)
+                warnings.warn(
+                    &#34;The multilabel=False argument was supplied, but labels inidcate that  &#34;
+                    + &#34;this is a multilabel problem (labels are not mutually-exclusive).  Using multilabel=False anyways.&#34;
+                )
             U.vprint(&#34;Is Multi-Label? %s&#34; % (self.multilabel), verbose=verbose)
-
 
     def undo(self, doc):
         &#34;&#34;&#34;
@@ -500,21 +571,19 @@ class TextPreprocessor(Preprocessor):
         &#34;&#34;&#34;
         raise NotImplementedError
 
-
     def is_chinese(self):
         return TU.is_chinese(self.lang)
-
 
     def is_nospace_lang(self):
         return TU.is_nospace_lang(self.lang)
 
-
     def process_chinese(self, texts, lang=None):
-        #if lang is None: lang = langdetect.detect(texts[0])
-        if lang is None: lang = TU.detect_lang(texts)
-        if not TU.is_nospace_lang(lang): return texts
+        # if lang is None: lang = langdetect.detect(texts[0])
+        if lang is None:
+            lang = TU.detect_lang(texts)
+        if not TU.is_nospace_lang(lang):
+            return texts
         return TU.split_chinese(texts)
-
 
     @classmethod
     def seqlen_stats(cls, list_of_texts):
@@ -537,9 +606,8 @@ class TextPreprocessor(Preprocessor):
             counts.append(len(lst))
         p95 = np.percentile(counts, 95)
         p99 = np.percentile(counts, 99)
-        avg = sum(counts)/len(counts)
-        return {&#39;mean&#39;:avg, &#39;95percentile&#39;: p95, &#39;99percentile&#39;:p99}
-
+        avg = sum(counts) / len(counts)
+        return {&#34;mean&#34;: avg, &#34;95percentile&#34;: p95, &#34;99percentile&#34;: p99}
 
     def print_seqlen_stats(self, texts, mode, verbose=1):
         &#34;&#34;&#34;
@@ -549,10 +617,9 @@ class TextPreprocessor(Preprocessor):
         &#34;&#34;&#34;
         if verbose and not self.is_nospace_lang():
             stat_dict = TextPreprocessor.seqlen_stats(texts)
-            print( &#34;%s sequence lengths:&#34; % mode)
+            print(&#34;%s sequence lengths:&#34; % mode)
             for k in stat_dict:
                 print(&#34;\t%s : %s&#34; % (k, int(round(stat_dict[k]))))
-
 
     def _transform_y(self, y_data, train=False, verbose=1):
         &#34;&#34;&#34;
@@ -565,7 +632,8 @@ class TextPreprocessor(Preprocessor):
         if self.ytransform is None:
             self.ytransform = U.YTransform(class_names=self.get_classes())
         y = self.ytransform.apply(y_data, train=train)
-        if train: self.c = self.ytransform.get_classes()
+        if train:
+            self.c = self.ytransform.get_classes()
         return y
 
 
@@ -576,8 +644,16 @@ class StandardTextPreprocessor(TextPreprocessor):
     ```
     &#34;&#34;&#34;
 
-    def __init__(self, maxlen, max_features, class_names=[], classes=[], 
-                 lang=&#39;en&#39;, ngram_range=1, multilabel=None):
+    def __init__(
+        self,
+        maxlen,
+        max_features,
+        class_names=[],
+        classes=[],
+        lang=&#34;en&#34;,
+        ngram_range=1,
+        multilabel=None,
+    ):
         class_names = self.migrate_classes(class_names, classes)
         super().__init__(maxlen, class_names, lang=lang, multilabel=multilabel)
         self.tok = None
@@ -588,10 +664,8 @@ class StandardTextPreprocessor(TextPreprocessor):
     def get_tokenizer(self):
         return self.tok
 
-
     def __getstate__(self):
         return {k: v for k, v in self.__dict__.items()}
-
 
     def __setstate__(self, state):
         &#34;&#34;&#34;
@@ -600,19 +674,17 @@ class StandardTextPreprocessor(TextPreprocessor):
         ```
         &#34;&#34;&#34;
         self.__dict__.update(state)
-        if not hasattr(self, &#39;ytransform&#39;):
-            le = self.label_encoder if hasattr(self, &#39;label_encoder&#39;) else None
-            self.ytransform = U.YTransform(class_names=self.get_classes(), label_encoder=le)
-
-
+        if not hasattr(self, &#34;ytransform&#34;):
+            le = self.label_encoder if hasattr(self, &#34;label_encoder&#34;) else None
+            self.ytransform = U.YTransform(
+                class_names=self.get_classes(), label_encoder=le
+            )
 
     def get_preprocessor(self):
         return (self.tok, self.tok_dct)
 
-
     def preprocess(self, texts):
         return self.preprocess_test(texts, verbose=0)[0]
-
 
     def undo(self, doc):
         &#34;&#34;&#34;
@@ -624,17 +696,16 @@ class StandardTextPreprocessor(TextPreprocessor):
         dct = self.tok.index_word
         return &#34; &#34;.join([dct[wid] for wid in doc if wid != 0 and wid in dct])
 
-
     def preprocess_train(self, train_text, y_train, verbose=1):
         &#34;&#34;&#34;
         ```
         preprocess training set
         ```
         &#34;&#34;&#34;
-        if self.lang is None: self.lang = TU.detect_lang(train_text)
+        if self.lang is None:
+            self.lang = TU.detect_lang(train_text)
 
-
-        U.vprint(&#39;language: %s&#39; % (self.lang), verbose=verbose)
+        U.vprint(&#34;language: %s&#34; % (self.lang), verbose=verbose)
 
         # special processing if Chinese
         train_text = self.process_chinese(train_text, lang=self.lang)
@@ -642,32 +713,36 @@ class StandardTextPreprocessor(TextPreprocessor):
         # extract vocabulary
         self.tok = keras.preprocessing.text.Tokenizer(num_words=self.max_features)
         self.tok.fit_on_texts(train_text)
-        U.vprint(&#39;Word Counts: {}&#39;.format(len(self.tok.word_counts)), verbose=verbose)
-        U.vprint(&#39;Nrows: {}&#39;.format(len(train_text)), verbose=verbose)
+        U.vprint(&#34;Word Counts: {}&#34;.format(len(self.tok.word_counts)), verbose=verbose)
+        U.vprint(&#34;Nrows: {}&#34;.format(len(train_text)), verbose=verbose)
 
         # convert to word IDs
         x_train = self.tok.texts_to_sequences(train_text)
-        U.vprint(&#39;{} train sequences&#39;.format(len(x_train)), verbose=verbose)
-        self.print_seqlen_stats(x_train, &#39;train&#39;, verbose=verbose)
+        U.vprint(&#34;{} train sequences&#34;.format(len(x_train)), verbose=verbose)
+        self.print_seqlen_stats(x_train, &#34;train&#34;, verbose=verbose)
 
         # add ngrams
         x_train = self._fit_ngrams(x_train, verbose=verbose)
 
         # pad sequences
-        x_train = keras.preprocessing.sequence.pad_sequences(x_train, maxlen=self.maxlen)
-        U.vprint(&#39;x_train shape: ({},{})&#39;.format(x_train.shape[0], x_train.shape[1]), verbose=verbose)
+        x_train = keras.preprocessing.sequence.pad_sequences(
+            x_train, maxlen=self.maxlen
+        )
+        U.vprint(
+            &#34;x_train shape: ({},{})&#34;.format(x_train.shape[0], x_train.shape[1]),
+            verbose=verbose,
+        )
 
         # transform y
         y_train = self._transform_y(y_train, train=True, verbose=verbose)
         if y_train is not None and verbose:
-            print(&#39;y_train shape: %s&#39; % (y_train.shape,))
+            print(&#34;y_train shape: %s&#34; % (y_train.shape,))
 
         # return
-        result =  (x_train, y_train)
-        self.set_multilabel(result, &#39;train&#39;)
+        result = (x_train, y_train)
+        self.set_multilabel(result, &#34;train&#34;)
         self.preprocess_train_called = True
         return result
-
 
     def preprocess_test(self, test_text, y_test=None, verbose=1):
         &#34;&#34;&#34;
@@ -677,39 +752,41 @@ class StandardTextPreprocessor(TextPreprocessor):
         &#34;&#34;&#34;
         self.check_trained()
         if self.tok is None or self.lang is None:
-            raise Exception(&#39;Unfitted tokenizer or missing language. Did you run preprocess_train first?&#39;)
+            raise Exception(
+                &#34;Unfitted tokenizer or missing language. Did you run preprocess_train first?&#34;
+            )
 
         # check for and process chinese
         test_text = self.process_chinese(test_text, self.lang)
 
         # convert to word IDs
         x_test = self.tok.texts_to_sequences(test_text)
-        U.vprint(&#39;{} test sequences&#39;.format(len(x_test)), verbose=verbose)
-        self.print_seqlen_stats(x_test, &#39;test&#39;, verbose=verbose)
+        U.vprint(&#34;{} test sequences&#34;.format(len(x_test)), verbose=verbose)
+        self.print_seqlen_stats(x_test, &#34;test&#34;, verbose=verbose)
 
         # add n-grams
-        x_test = self._add_ngrams(x_test, mode=&#39;test&#39;, verbose=verbose)
-
+        x_test = self._add_ngrams(x_test, mode=&#34;test&#34;, verbose=verbose)
 
         # pad sequences
         x_test = keras.preprocessing.sequence.pad_sequences(x_test, maxlen=self.maxlen)
-        U.vprint(&#39;x_test shape: ({},{})&#39;.format(x_test.shape[0], x_test.shape[1]), verbose=verbose)
+        U.vprint(
+            &#34;x_test shape: ({},{})&#34;.format(x_test.shape[0], x_test.shape[1]),
+            verbose=verbose,
+        )
 
         # transform y
         y_test = self._transform_y(y_test, train=False, verbose=verbose)
         if y_test is not None and verbose:
-            print(&#39;y_test shape: %s&#39; % (y_test.shape,))
-
+            print(&#34;y_test shape: %s&#34; % (y_test.shape,))
 
         # return
         return (x_test, y_test)
 
-
-
     def _fit_ngrams(self, x_train, verbose=1):
         self.tok_dct = {}
-        if self.ngram_range &lt; 2: return x_train
-        U.vprint(&#39;Adding {}-gram features&#39;.format(self.ngram_range), verbose=verbose)
+        if self.ngram_range &lt; 2:
+            return x_train
+        U.vprint(&#34;Adding {}-gram features&#34;.format(self.ngram_range), verbose=verbose)
         # Create set of unique n-gram from the training set.
         ngram_set = set()
         for input_list in x_train:
@@ -727,14 +804,16 @@ class StandardTextPreprocessor(TextPreprocessor):
 
         # max_features is the highest integer that could be found in the dataset.
         self.max_features = np.max(list(indice_token.keys())) + 1
-        U.vprint(&#39;max_features changed to %s with addition of ngrams&#39; % (self.max_features), verbose=verbose)
+        U.vprint(
+            &#34;max_features changed to %s with addition of ngrams&#34; % (self.max_features),
+            verbose=verbose,
+        )
 
         # Augmenting x_train with n-grams features
-        x_train = self._add_ngrams(x_train, verbose=verbose, mode=&#39;train&#39;)
+        x_train = self._add_ngrams(x_train, verbose=verbose, mode=&#34;train&#34;)
         return x_train
 
-
-    def _add_ngrams(self, sequences, verbose=1, mode=&#39;test&#39;):
+    def _add_ngrams(self, sequences, verbose=1, mode=&#34;test&#34;):
         &#34;&#34;&#34;
         ```
         Augment the input list of list (sequences) by appending n-grams values.
@@ -742,22 +821,25 @@ class StandardTextPreprocessor(TextPreprocessor):
         ```
         &#34;&#34;&#34;
         token_indice = self.tok_dct
-        if self.ngram_range &lt; 2: return sequences
+        if self.ngram_range &lt; 2:
+            return sequences
         new_sequences = []
         for input_list in sequences:
             new_list = input_list[:]
             for ngram_value in range(2, self.ngram_range + 1):
                 for i in range(len(new_list) - ngram_value + 1):
-                    ngram = tuple(new_list[i:i + ngram_value])
+                    ngram = tuple(new_list[i : i + ngram_value])
                     if ngram in token_indice:
                         new_list.append(token_indice[ngram])
             new_sequences.append(new_list)
-        U.vprint(&#39;Average {} sequence length with ngrams: {}&#39;.format(mode,
-            np.mean(list(map(len, new_sequences)), dtype=int)), verbose=verbose)    
-        self.print_seqlen_stats(new_sequences, &#39;%s (w/ngrams)&#39; % mode, verbose=verbose)
+        U.vprint(
+            &#34;Average {} sequence length with ngrams: {}&#34;.format(
+                mode, np.mean(list(map(len, new_sequences)), dtype=int)
+            ),
+            verbose=verbose,
+        )
+        self.print_seqlen_stats(new_sequences, &#34;%s (w/ngrams)&#34; % mode, verbose=verbose)
         return new_sequences
-
-
 
     def _create_ngram_set(self, input_list, ngram_value=2):
         &#34;&#34;&#34;
@@ -772,9 +854,9 @@ class StandardTextPreprocessor(TextPreprocessor):
         &#34;&#34;&#34;
         return set(zip(*[input_list[i:] for i in range(ngram_value)]))
 
-
     def ngram_count(self):
-        if not self.tok_dct: return 1
+        if not self.tok_dct:
+            return 1
         s = set()
         for k in self.tok_dct.keys():
             s.add(len(k))
@@ -788,35 +870,41 @@ class BERTPreprocessor(TextPreprocessor):
     ```
     &#34;&#34;&#34;
 
-    def __init__(self, maxlen, max_features, class_names=[], classes=[], 
-                lang=&#39;en&#39;, ngram_range=1, multilabel=None):
+    def __init__(
+        self,
+        maxlen,
+        max_features,
+        class_names=[],
+        classes=[],
+        lang=&#34;en&#34;,
+        ngram_range=1,
+        multilabel=None,
+    ):
         class_names = self.migrate_classes(class_names, classes)
 
-
-        if maxlen &gt; 512: raise ValueError(&#39;BERT only supports maxlen &lt;= 512&#39;)
+        if maxlen &gt; 512:
+            raise ValueError(&#34;BERT only supports maxlen &lt;= 512&#34;)
 
         super().__init__(maxlen, class_names, lang=lang, multilabel=multilabel)
-        vocab_path = os.path.join(get_bert_path(lang=lang), &#39;vocab.txt&#39;)
+        vocab_path = os.path.join(get_bert_path(lang=lang), &#34;vocab.txt&#34;)
         token_dict = {}
-        with codecs.open(vocab_path, &#39;r&#39;, &#39;utf8&#39;) as reader:
+        with codecs.open(vocab_path, &#34;r&#34;, &#34;utf8&#34;) as reader:
             for line in reader:
                 token = line.strip()
                 token_dict[token] = len(token_dict)
         from keras_bert import Tokenizer as BERT_Tokenizer
+
         tokenizer = BERT_Tokenizer(token_dict)
         self.tok = tokenizer
-        self.tok_dct = dict((v,k) for k,v in token_dict.items())
-        self.max_features = max_features # ignored
-        self.ngram_range = 1 # ignored
-
+        self.tok_dct = dict((v, k) for k, v in token_dict.items())
+        self.max_features = max_features  # ignored
+        self.ngram_range = 1  # ignored
 
     def get_tokenizer(self):
         return self.tok
 
-
     def __getstate__(self):
         return {k: v for k, v in self.__dict__.items()}
-
 
     def __setstate__(self, state):
         &#34;&#34;&#34;
@@ -825,19 +913,17 @@ class BERTPreprocessor(TextPreprocessor):
         ```
         &#34;&#34;&#34;
         self.__dict__.update(state)
-        if not hasattr(self, &#39;ytransform&#39;):
-            le = self.label_encoder if hasattr(self, &#39;label_encoder&#39;) else None
-            self.ytransform = U.YTransform(class_names=self.get_classes(), label_encoder=le)
-
+        if not hasattr(self, &#34;ytransform&#34;):
+            le = self.label_encoder if hasattr(self, &#34;label_encoder&#34;) else None
+            self.ytransform = U.YTransform(
+                class_names=self.get_classes(), label_encoder=le
+            )
 
     def get_preprocessor(self):
         return (self.tok, self.tok_dct)
 
-
-
     def preprocess(self, texts):
         return self.preprocess_test(texts, verbose=0)[0]
-
 
     def undo(self, doc):
         &#34;&#34;&#34;
@@ -849,31 +935,30 @@ class BERTPreprocessor(TextPreprocessor):
         dct = self.tok_dct
         return &#34; &#34;.join([dct[wid] for wid in doc if wid != 0 and wid in dct])
 
-
-    def preprocess_train(self, texts, y=None, mode=&#39;train&#39;, verbose=1):
+    def preprocess_train(self, texts, y=None, mode=&#34;train&#34;, verbose=1):
         &#34;&#34;&#34;
         ```
         preprocess training set
         ```
         &#34;&#34;&#34;
-        if mode == &#39;train&#39; and y is None:
-            raise ValueError(&#39;y is required when mode=train&#39;)
-        if self.lang is None and mode==&#39;train&#39;: self.lang = TU.detect_lang(texts)
-        U.vprint(&#39;preprocessing %s...&#39; % (mode), verbose=verbose)
-        U.vprint(&#39;language: %s&#39; % (self.lang), verbose=verbose)
+        if mode == &#34;train&#34; and y is None:
+            raise ValueError(&#34;y is required when mode=train&#34;)
+        if self.lang is None and mode == &#34;train&#34;:
+            self.lang = TU.detect_lang(texts)
+        U.vprint(&#34;preprocessing %s...&#34; % (mode), verbose=verbose)
+        U.vprint(&#34;language: %s&#34; % (self.lang), verbose=verbose)
 
         x = bert_tokenize(texts, self.tok, self.maxlen, verbose=verbose)
 
         # transform y
-        y = self._transform_y(y, train=mode==&#39;train&#39;, verbose=verbose)
+        y = self._transform_y(y, train=mode == &#34;train&#34;, verbose=verbose)
         result = (x, y)
         self.set_multilabel(result, mode)
-        if mode == &#39;train&#39;: self.preprocess_train_called = True
+        if mode == &#34;train&#34;:
+            self.preprocess_train_called = True
         return result
 
-
-
-    def preprocess_test(self, texts, y=None, mode=&#39;test&#39;, verbose=1):
+    def preprocess_test(self, texts, y=None, mode=&#34;test&#34;, verbose=1):
         self.check_trained()
         return self.preprocess_train(texts, y=y, mode=mode, verbose=verbose)
 
@@ -885,22 +970,33 @@ class TransformersPreprocessor(TextPreprocessor):
     ```
     &#34;&#34;&#34;
 
-    def __init__(self,  model_name,
-                maxlen, max_features, class_names=[], classes=[], 
-                lang=&#39;en&#39;, ngram_range=1, multilabel=None):
+    def __init__(
+        self,
+        model_name,
+        maxlen,
+        max_features,
+        class_names=[],
+        classes=[],
+        lang=&#34;en&#34;,
+        ngram_range=1,
+        multilabel=None,
+    ):
         class_names = self.migrate_classes(class_names, classes)
 
-        if maxlen &gt; 512: warnings.warn(&#39;Transformer models typically only support maxlen &lt;= 512, unless you are using certain models like the Longformer.&#39;)
+        if maxlen &gt; 512:
+            warnings.warn(
+                &#34;Transformer models typically only support maxlen &lt;= 512, unless you are using certain models like the Longformer.&#34;
+            )
 
         super().__init__(maxlen, class_names, lang=lang, multilabel=multilabel)
 
         self.model_name = model_name
-        self.name = model_name.split(&#39;-&#39;)[0]
-        if model_name.startswith(&#39;xlm-roberta&#39;): 
-            self.name = &#39;xlm_roberta&#39;
-            self.model_name = &#39;jplu/tf-&#39; + self.model_name
+        self.name = model_name.split(&#34;-&#34;)[0]
+        if model_name.startswith(&#34;xlm-roberta&#34;):
+            self.name = &#34;xlm_roberta&#34;
+            self.model_name = &#34;jplu/tf-&#34; + self.model_name
         else:
-            self.name = model_name.split(&#39;-&#39;)[0]
+            self.name = model_name.split(&#34;-&#34;)[0]
         self.config = AutoConfig.from_pretrained(model_name)
         self.model_type = TFAutoModelForSequenceClassification
         self.tokenizer_type = AutoTokenizer
@@ -911,18 +1007,16 @@ class TransformersPreprocessor(TextPreprocessor):
         # NOTE: As of v0.16.1, do not unnecessarily instantiate tokenizer
         # as it will be saved/pickled along with Preprocessor, which causes
         # problems for some community-uploaded models like bert-base-japanse-whole-word-masking.
-        #tokenizer = self.tokenizer_type.from_pretrained(model_name)
-        #self.tok = tokenizer
-        self.tok = None # not pickled,  see __getstate__ 
+        # tokenizer = self.tokenizer_type.from_pretrained(model_name)
+        # self.tok = tokenizer
+        self.tok = None  # not pickled,  see __getstate__
 
         self.tok_dct = None
-        self.max_features = max_features # ignored
-        self.ngram_range = 1 # ignored
-
+        self.max_features = max_features  # ignored
+        self.ngram_range = 1  # ignored
 
     def __getstate__(self):
-        return {k: v for k, v in self.__dict__.items() if k not in [&#39;tok&#39;]}
-
+        return {k: v for k, v in self.__dict__.items() if k not in [&#34;tok&#34;]}
 
     def __setstate__(self, state):
         &#34;&#34;&#34;
@@ -932,10 +1026,13 @@ class TransformersPreprocessor(TextPreprocessor):
         ```
         &#34;&#34;&#34;
         self.__dict__.update(state)
-        if not hasattr(self, &#39;tok&#39;): self.tok = None
-        if not hasattr(self, &#39;ytransform&#39;): 
-            le = self.label_encoder if hasattr(self, &#39;label_encoder&#39;) else None
-            self.ytransform = U.YTransform(class_names=self.get_classes(), label_encoder=le)
+        if not hasattr(self, &#34;tok&#34;):
+            self.tok = None
+        if not hasattr(self, &#34;ytransform&#34;):
+            le = self.label_encoder if hasattr(self, &#34;label_encoder&#34;) else None
+            self.ytransform = U.YTransform(
+                class_names=self.get_classes(), label_encoder=le
+            )
 
     def set_config(self, config):
         self.config = config
@@ -951,48 +1048,49 @@ class TransformersPreprocessor(TextPreprocessor):
         if self.tok is None:
             try:
                 # use fast tokenizer if possible
-                if self.name == &#39;bert&#39; and &#39;japanese&#39; not in model_name:
+                if self.name == &#34;bert&#34; and &#34;japanese&#34; not in model_name:
                     from transformers import BertTokenizerFast
+
                     self.tok = BertTokenizerFast.from_pretrained(model_name)
-                elif self.name == &#39;distilbert&#39;:
+                elif self.name == &#34;distilbert&#34;:
                     from transformers import DistilBertTokenizerFast
+
                     self.tok = DistilBertTokenizerFast.from_pretrained(model_name)
-                elif self.name == &#39;roberta&#39;:
+                elif self.name == &#34;roberta&#34;:
                     from transformers import RobertaTokenizerFast
+
                     self.tok = RobertaTokenizerFast.from_pretrained(model_name)
                 else:
                     self.tok = self.tokenizer_type.from_pretrained(model_name)
             except:
-                error_msg = f&#34;Could not load tokenizer from model_name: {model_name}. &#34; +\
-                            f&#34;If {model_name} is a local path, please make sure it exists and contains tokenizer files from Hugging Face. &#34; +\
-                            f&#34;You can also reset model_name with preproc.model_name = &#39;/your/new/path&#39;.&#34;
+                error_msg = (
+                    f&#34;Could not load tokenizer from model_name: {model_name}. &#34;
+                    + f&#34;If {model_name} is a local path, please make sure it exists and contains tokenizer files from Hugging Face. &#34;
+                    + f&#34;You can also reset model_name with preproc.model_name = &#39;/your/new/path&#39;.&#34;
+                )
                 raise ValueError(error_msg)
         return self.tok
 
-
     def save_tokenizer(self, fpath):
         if os.path.isfile(fpath):
-            raise ValueError(f&#39;There is an existing file named {fpath}. &#39; +\
-                              &#39;Please use dfferent value for fpath.&#39;)
+            raise ValueError(
+                f&#34;There is an existing file named {fpath}. &#34;
+                + &#34;Please use dfferent value for fpath.&#34;
+            )
         elif os.path.exists(fpath):
             pass
         elif not os.path.exists(fpath):
             os.makedirs(fpath)
-        tok =self.get_tokenizer()
+        tok = self.get_tokenizer()
         tok.save_pretrained(fpath)
         return
-
-
 
     def get_preprocessor(self):
         return (self.get_tokenizer(), self.tok_dct)
 
-
-
     def preprocess(self, texts):
         tseq = self.preprocess_test(texts, verbose=0)
         return tseq.to_tfdataset(train=False)
-
 
     def undo(self, doc):
         &#34;&#34;&#34;
@@ -1003,56 +1101,64 @@ class TransformersPreprocessor(TextPreprocessor):
         &#34;&#34;&#34;
         tok, _ = self.get_preprocessor()
         return self.tok.convert_ids_to_tokens(doc)
-        #raise Exception(&#39;currently_unsupported: Transformers.Preprocessor.undo is not yet supported&#39;)
+        # raise Exception(&#39;currently_unsupported: Transformers.Preprocessor.undo is not yet supported&#39;)
 
-
-    def preprocess_train(self, texts, y=None, mode=&#39;train&#39;, verbose=1):
+    def preprocess_train(self, texts, y=None, mode=&#34;train&#34;, verbose=1):
         &#34;&#34;&#34;
         ```
         preprocess training set
         ```
         &#34;&#34;&#34;
 
-        U.vprint(&#39;preprocessing %s...&#39; % (mode), verbose=verbose)
-        U.check_array(texts, y=y, X_name=&#39;texts&#39;)
+        U.vprint(&#34;preprocessing %s...&#34; % (mode), verbose=verbose)
+        U.check_array(texts, y=y, X_name=&#34;texts&#34;)
 
         # detect sentence pairs
         is_array, is_pair = detect_text_format(texts)
-        if not is_array: raise ValueError(&#39;texts must be a list of strings or a list of sentence pairs&#39;)
+        if not is_array:
+            raise ValueError(
+                &#34;texts must be a list of strings or a list of sentence pairs&#34;
+            )
 
         # detect language
-        if self.lang is None and mode==&#39;train&#39;: self.lang = TU.detect_lang(texts)
-        U.vprint(&#39;language: %s&#39; % (self.lang), verbose=verbose)
+        if self.lang is None and mode == &#34;train&#34;:
+            self.lang = TU.detect_lang(texts)
+        U.vprint(&#34;language: %s&#34; % (self.lang), verbose=verbose)
 
         # print stats
-        if not is_pair: self.print_seqlen_stats(texts, mode, verbose=verbose)
-        if is_pair: U.vprint(&#39;sentence pairs detected&#39;, verbose=verbose)
+        if not is_pair:
+            self.print_seqlen_stats(texts, mode, verbose=verbose)
+        if is_pair:
+            U.vprint(&#34;sentence pairs detected&#34;, verbose=verbose)
 
         # transform y
-        if y is None and mode == &#39;train&#39;:
-            raise ValueError(&#39;y is required for training sets&#39;)
+        if y is None and mode == &#34;train&#34;:
+            raise ValueError(&#34;y is required for training sets&#34;)
         elif y is None:
             y = np.array([1] * len(texts))
-        y = self._transform_y(y, train=mode==&#39;train&#39;, verbose=verbose)
+        y = self._transform_y(y, train=mode == &#34;train&#34;, verbose=verbose)
 
         # convert examples
         tok, _ = self.get_preprocessor()
-        dataset = hf_convert_examples(texts, y=y, tokenizer=tok, max_length=self.maxlen,
-                                      pad_on_left=bool(self.name in [&#39;xlnet&#39;]),
-                                      pad_token=tok.convert_tokens_to_ids([tok.pad_token][0]),
-                                      pad_token_segment_id=4 if self.name in [&#39;xlnet&#39;] else 0,
-                                      use_dynamic_shape=False if mode == &#39;train&#39; else True,
-                                      verbose=verbose)
+        dataset = hf_convert_examples(
+            texts,
+            y=y,
+            tokenizer=tok,
+            max_length=self.maxlen,
+            pad_on_left=bool(self.name in [&#34;xlnet&#34;]),
+            pad_token=tok.convert_tokens_to_ids([tok.pad_token][0]),
+            pad_token_segment_id=4 if self.name in [&#34;xlnet&#34;] else 0,
+            use_dynamic_shape=False if mode == &#34;train&#34; else True,
+            verbose=verbose,
+        )
         self.set_multilabel(dataset, mode, verbose=verbose)
-        if mode == &#39;train&#39;:  self.preprocess_train_called = True
+        if mode == &#34;train&#34;:
+            self.preprocess_train_called = True
         return dataset
 
-
-
-    def preprocess_test(self, texts, y=None, mode=&#39;test&#39;, verbose=1):
+    def preprocess_test(self, texts, y=None, mode=&#34;test&#34;, verbose=1):
         self.check_trained()
         return self.preprocess_train(texts, y=y, mode=mode, verbose=verbose)
-
 
     @classmethod
     def load_model_and_configure_from_data(cls, fpath, transformer_ds):
@@ -1069,20 +1175,16 @@ class TransformersPreprocessor(TextPreprocessor):
         multilabel = U.is_multilabel(transformer_ds)
         model = TFAutoModelForSequenceClassification.from_pretrained(fpath)
         if is_regression:
-            metrics = [&#39;mae&#39;]
-            loss_fn = &#39;mse&#39;
+            metrics = [&#34;mae&#34;]
+            loss_fn = &#34;mse&#34;
         else:
-            metrics = [&#39;accuracy&#39;]
+            metrics = [&#34;accuracy&#34;]
             if multilabel:
-                loss_fn =  keras.losses.BinaryCrossentropy(from_logits=True)
+                loss_fn = keras.losses.BinaryCrossentropy(from_logits=True)
             else:
                 loss_fn = keras.losses.CategoricalCrossentropy(from_logits=True)
-        model.compile(loss=loss_fn,
-                      optimizer=U.DEFAULT_OPT,
-                      metrics=metrics)
+        model.compile(loss=loss_fn, optimizer=U.DEFAULT_OPT, metrics=metrics)
         return model
-
-
 
     def _load_pretrained(self, mname, num_labels):
         &#34;&#34;&#34;
@@ -1095,23 +1197,25 @@ class TransformersPreprocessor(TextPreprocessor):
             try:
                 model = self.model_type.from_pretrained(mname, config=self.config)
             except:
-                warnings.warn(&#39;Could not find Tensorflow version of model.  Attempting to download/load PyTorch version as TensorFlow model using from_pt=True. &#39; +\
-                              &#39;You will need PyTorch installed for this.&#39;)
+                warnings.warn(
+                    &#34;Could not load a Tensorflow version of model. (If this worked before, it might be an out-of-memory issue.) &#34; +\
+                    &#34;Attempting to download/load PyTorch version as TensorFlow model using from_pt=True. You will need PyTorch installed for this.&#34; 
+                )
                 try:
-                    model = self.model_type.from_pretrained(mname, config=self.config, from_pt=True)
+                    model = self.model_type.from_pretrained(
+                        mname, config=self.config, from_pt=True
+                    )
                 except:
                     # load model as normal to expose error to user
                     model = self.model_type.from_pretrained(mname, config=self.config)
-                    #raise ValueError(&#39;could not load pretrained model %s using both from_pt=False and from_pt=True&#39; % (mname))
+                    # raise ValueError(&#39;could not load pretrained model %s using both from_pt=False and from_pt=True&#39; % (mname))
         else:
             model = self.model_type.from_pretrained(mname, num_labels=num_labels)
         # ISSUE 416: mname is either model name (e.g., bert-base-uncased) or path to folder with tokenizer files
         self.get_tokenizer(mname)
         return model
 
-
-
-    def get_classifier(self, fpath=None, multilabel=None, metrics=[&#39;accuracy&#39;]):
+    def get_classifier(self, fpath=None, multilabel=None, metrics=[&#34;accuracy&#34;]):
         &#34;&#34;&#34;
         ```
         creates a model for text classification
@@ -1126,33 +1230,34 @@ class TransformersPreprocessor(TextPreprocessor):
         &#34;&#34;&#34;
         self.check_trained()
         if not self.get_classes():
-            warnings.warn(&#39;no class labels were provided - treating as regression&#39;)
+            warnings.warn(&#34;no class labels were provided - treating as regression&#34;)
             return self.get_regression_model()
 
         # process multilabel task
         multilabel = self.multilabel if multilabel is None else multilabel
         if multilabel is True and self.multilabel is False:
-            warnings.warn(&#39;The multilabel=True argument was supplied, but labels do not indicate &#39;+\
-                          &#39;a multilabel problem (labels appear to be mutually-exclusive).  Using multilabel=True anyways.&#39;)
+            warnings.warn(
+                &#34;The multilabel=True argument was supplied, but labels do not indicate &#34;
+                + &#34;a multilabel problem (labels appear to be mutually-exclusive).  Using multilabel=True anyways.&#34;
+            )
         elif multilabel is False and self.multilabel is True:
-                warnings.warn(&#39;The multilabel=False argument was supplied, but labels inidcate that  &#39;+\
-                              &#39;this is a multilabel problem (labels are not mutually-exclusive).  Using multilabel=False anyways.&#39;)
+            warnings.warn(
+                &#34;The multilabel=False argument was supplied, but labels inidcate that  &#34;
+                + &#34;this is a multilabel problem (labels are not mutually-exclusive).  Using multilabel=False anyways.&#34;
+            )
 
         # setup model
         num_labels = len(self.get_classes())
         mname = fpath if fpath is not None else self.model_name
         model = self._load_pretrained(mname, num_labels)
         if multilabel:
-            loss_fn =  keras.losses.BinaryCrossentropy(from_logits=True)
+            loss_fn = keras.losses.BinaryCrossentropy(from_logits=True)
         else:
             loss_fn = keras.losses.CategoricalCrossentropy(from_logits=True)
-        model.compile(loss=loss_fn,
-                      optimizer=U.DEFAULT_OPT,
-                      metrics=metrics)
+        model.compile(loss=loss_fn, optimizer=U.DEFAULT_OPT, metrics=metrics)
         return model
 
-
-    def get_regression_model(self, fpath=None, metrics=[&#39;mae&#39;]):
+    def get_regression_model(self, fpath=None, metrics=[&#34;mae&#34;]):
         &#34;&#34;&#34;
         ```
         creates a model for text regression
@@ -1163,17 +1268,16 @@ class TransformersPreprocessor(TextPreprocessor):
         &#34;&#34;&#34;
         self.check_trained()
         if self.get_classes():
-            warnings.warn(&#39;class labels were provided - treating as classification problem&#39;)
+            warnings.warn(
+                &#34;class labels were provided - treating as classification problem&#34;
+            )
             return self.get_classifier()
         num_labels = 1
         mname = fpath if fpath is not None else self.model_name
         model = self._load_pretrained(mname, num_labels)
-        loss_fn = &#39;mse&#39;
-        model.compile(loss=loss_fn,
-                      optimizer=U.DEFAULT_OPT,
-                      metrics=metrics)
+        loss_fn = &#34;mse&#34;
+        model.compile(loss=loss_fn, optimizer=U.DEFAULT_OPT, metrics=metrics)
         return model
-
 
     def get_model(self, fpath=None):
         self.check_trained()
@@ -1183,7 +1287,6 @@ class TransformersPreprocessor(TextPreprocessor):
             return self.get_classifier(fpath=fpath)
 
 
-
 class DistilBertPreprocessor(TransformersPreprocessor):
     &#34;&#34;&#34;
     ```
@@ -1191,24 +1294,30 @@ class DistilBertPreprocessor(TransformersPreprocessor):
     ```
     &#34;&#34;&#34;
 
-    def __init__(self, maxlen, max_features, class_names=[], classes=[], 
-                lang=&#39;en&#39;, ngram_range=1):
+    def __init__(
+        self, maxlen, max_features, class_names=[], classes=[], lang=&#34;en&#34;, ngram_range=1
+    ):
         class_names = self.migrate_classes(class_names, classes)
         name = DISTILBERT
-        if lang == &#39;en&#39;:
-            model_name = &#39;distilbert-base-uncased&#39;
+        if lang == &#34;en&#34;:
+            model_name = &#34;distilbert-base-uncased&#34;
         else:
-            model_name = &#39;distilbert-base-multilingual-cased&#39;
+            model_name = &#34;distilbert-base-multilingual-cased&#34;
 
-        super().__init__(model_name,
-                         maxlen, max_features, class_names=class_names, 
-                         lang=lang, ngram_range=ngram_range)
+        super().__init__(
+            model_name,
+            maxlen,
+            max_features,
+            class_names=class_names,
+            lang=lang,
+            ngram_range=ngram_range,
+        )
 
 
 class Transformer(TransformersPreprocessor):
     &#34;&#34;&#34;
     ```
-    convenience class for text classification Hugging Face transformers 
+    convenience class for text classification Hugging Face transformers
     Usage:
        t = Transformer(&#39;distilbert-base-uncased&#39;, maxlen=128, classes=[&#39;neg&#39;, &#39;pos&#39;], batch_size=16)
        train_dataset = t.preprocess_train(train_texts, train_labels)
@@ -1217,8 +1326,15 @@ class Transformer(TransformersPreprocessor):
     ```
     &#34;&#34;&#34;
 
-    def __init__(self, model_name, maxlen=128, class_names=[], classes=[],
-                 batch_size=None, use_with_learner=True):
+    def __init__(
+        self,
+        model_name,
+        maxlen=128,
+        class_names=[],
+        classes=[],
+        batch_size=None,
+        use_with_learner=True,
+    ):
         &#34;&#34;&#34;
         ```
         Args:
@@ -1247,20 +1363,24 @@ class Transformer(TransformersPreprocessor):
 
         ```
         &#34;&#34;&#34;
-        multilabel = None # force discovery of multilabel task from data in preprocess_train-&gt;set_multilabel
+        multilabel = None  # force discovery of multilabel task from data in preprocess_train-&gt;set_multilabel
         class_names = self.migrate_classes(class_names, classes)
         if not use_with_learner and batch_size is None:
-            raise ValueError(&#39;batch_size is required when use_with_learner=False&#39;)
+            raise ValueError(&#34;batch_size is required when use_with_learner=False&#34;)
         if multilabel and (class_names is None or not class_names):
-            raise ValueError(&#39;classes argument is required when multilabel=True&#39;)
-        super().__init__(model_name,
-                         maxlen, max_features=10000, class_names=class_names, multilabel=multilabel)
+            raise ValueError(&#34;classes argument is required when multilabel=True&#34;)
+        super().__init__(
+            model_name,
+            maxlen,
+            max_features=10000,
+            class_names=class_names,
+            multilabel=multilabel,
+        )
         self.batch_size = batch_size
         self.use_with_learner = use_with_learner
         self.lang = None
 
-
-    def preprocess_train(self, texts, y=None, mode=&#39;train&#39;, verbose=1):
+    def preprocess_train(self, texts, y=None, mode=&#34;train&#34;, verbose=1):
         &#34;&#34;&#34;
         ```
         Preprocess training set for A Transformer model
@@ -1289,13 +1409,13 @@ class Transformer(TransformersPreprocessor):
         ```
         &#34;&#34;&#34;
         tseq = super().preprocess_train(texts, y=y, mode=mode, verbose=verbose)
-        if self.use_with_learner: return tseq
+        if self.use_with_learner:
+            return tseq
         tseq.batch_size = self.batch_size
-        train = (mode == &#39;train&#39;)
+        train = mode == &#34;train&#34;
         return tseq.to_tfdataset(train=train)
 
-
-    def preprocess_test(self, texts, y=None,  verbose=1):
+    def preprocess_test(self, texts, y=None, verbose=1):
         &#34;&#34;&#34;
         ```
         Preprocess the validation or test set for a Transformer model
@@ -1320,10 +1440,10 @@ class Transformer(TransformersPreprocessor):
         ```
         &#34;&#34;&#34;
         self.check_trained()
-        return self.preprocess_train(texts, y=y, mode=&#39;test&#39;, verbose=verbose)
+        return self.preprocess_train(texts, y=y, mode=&#34;test&#34;, verbose=verbose)
 
 
-class TransformerEmbedding():
+class TransformerEmbedding:
     def __init__(self, model_name, layers=U.DEFAULT_TRANSFORMER_LAYERS):
         &#34;&#34;&#34;
         ```
@@ -1332,15 +1452,15 @@ class TransformerEmbedding():
                                Choose from here: https://huggingface.co/transformers/pretrained_models.html
             layers(list): list of indexes indicating which hidden layers to use when
                           constructing the embedding (e.g., last=[-1])
-                               
+
         ```
         &#34;&#34;&#34;
         self.layers = layers
         self.model_name = model_name
-        if model_name.startswith(&#39;xlm-roberta&#39;):
-            self.name = &#39;xlm_roberta&#39;
+        if model_name.startswith(&#34;xlm-roberta&#34;):
+            self.name = &#34;xlm_roberta&#34;
         else:
-            self.name = model_name.split(&#39;-&#39;)[0]
+            self.name = model_name.split(&#34;-&#34;)[0]
 
         self.config = AutoConfig.from_pretrained(model_name)
         self.model_type = TFAutoModel
@@ -1352,14 +1472,22 @@ class TransformerEmbedding():
         self.tokenizer = self.tokenizer_type.from_pretrained(model_name)
         self.model = self._load_pretrained(model_name)
         try:
-            self.embsize = self.embed(&#39;ktrain&#39;, word_level=False).shape[1] # (batch_size, embsize)
+            self.embsize = self.embed(&#34;ktrain&#34;, word_level=False).shape[
+                1
+            ]  # (batch_size, embsize)
         except:
-            warnings.warn(&#39;could not determine Embedding size&#39;)
-        if type(self.model).__name__ not in [&#39;TFBertModel&#39;, &#39;TFDistilBertModel&#39;, &#39;TFAlbertModel&#39;]:
-            raise ValueError(&#39;TransformerEmbedding class currently only supports BERT-style models: &#39; +\
-                             &#39;Bert, DistilBert, and Albert and variants like BioBERT and SciBERT\n\n&#39; +\
-                             &#39;model received: %s (%s))&#39; % (type(self.model).__name__, model_name))
-
+            warnings.warn(&#34;could not determine Embedding size&#34;)
+        # if type(self.model).__name__ not in [
+        # &#34;TFBertModel&#34;,
+        # &#34;TFDistilBertModel&#34;,
+        # &#34;TFAlbertModel&#34;,
+        # &#34;TFRobertaModel&#34;,
+        # ]:
+        # raise ValueError(
+        # &#34;TransformerEmbedding class currently only supports BERT-style models: &#34;
+        # + &#34;Bert, DistilBert, RoBERTa and Albert and variants like BioBERT and SciBERT\n\n&#34;
+        # + &#34;model received: %s (%s))&#34; % (type(self.model).__name__, model_name)
+        # )
 
     def _load_pretrained(self, model_name):
         &#34;&#34;&#34;
@@ -1372,19 +1500,22 @@ class TransformerEmbedding():
             try:
                 model = self.model_type.from_pretrained(model_name, config=self.config)
             except:
-                warnings.warn(&#39;Could not find Tensorflow version of model.  Attempting to download/load PyTorch version as TensorFlow model using from_pt=True. &#39; +\
-                              &#39;You will need PyTorch installed for this.&#39;)
-                try:
-                    model = self.model_type.from_pretrained(model_name, config=self.config, from_pt=True)
-                except:
-                    raise ValueError(&#39;could not load pretrained model %s using both from_pt=False and from_pt=True&#39; % (model_name))
+                warnings.warn(
+                    &#34;Could not load a Tensorflow version of model. (If this worked before, it might be an out-of-memory issue.) &#34; +\
+                    &#34;Attempting to download/load PyTorch version as TensorFlow model using from_pt=True. You will need PyTorch installed for this.&#34; 
+                )
+                model = self.model_type.from_pretrained(
+                    model_name, config=self.config, from_pt=True
+                )
         else:
-            model = self.model_type.from_pretrained(model_name, output_hidden_states=True)
+            model = self.model_type.from_pretrained(
+                model_name, output_hidden_states=True
+            )
         return model
 
-
-
-    def embed(self, texts, word_level=True, max_length=512):
+    def embed(
+        self, texts, word_level=True, max_length=512, aggregation_strategy=&#34;first&#34;, layers=U.DEFAULT_TRANSFORMER_LAYERS
+    ):
         &#34;&#34;&#34;
         ```
         get embedding for word, phrase, or sentence
@@ -1393,44 +1524,70 @@ class TransformerEmbedding():
           word_level(bool): If True, returns embedding for each token in supplied texts.
                             If False, returns embedding for each text in texts
           max_length(int): max length of tokens
+          aggregation_strategy(str): If &#39;first&#39;, vector of first subword is used as representation.
+                                     If &#39;average&#39;, mean of all subword vectors is used.
+          layers(list): list of indexes indicating which hidden layers to use when
+                        constructing the embedding (e.g., last hidden state is [-1])
         Returns:
             np.ndarray : embeddings
         ```
         &#34;&#34;&#34;
-        if isinstance(texts, str): texts = [texts]
-        if not isinstance(texts[0], str): texts = [&#34; &#34;.join(text) for text in texts]
+        if isinstance(texts, str):
+            texts = [texts]
+        if not isinstance(texts[0], str):
+            texts = [&#34; &#34;.join(text) for text in texts]
 
         sentences = []
         for text in texts:
             sentences.append(self.tokenizer.tokenize(text))
-        maxlen = len(max([tokens for tokens in sentences], key=len,)) + 2
-        if max_length is not None and maxlen &gt; max_length: maxlen = max_length # added due to issue #270
+        maxlen = (
+            len(
+                max(
+                    [tokens for tokens in sentences],
+                    key=len,
+                )
+            )
+            + 2
+        )
+        if max_length is not None and maxlen &gt; max_length:
+            maxlen = max_length  # added due to issue #270
         sentences = []
 
         all_input_ids = []
         all_input_masks = []
+        all_word_ids = []
+        all_offsets = []
         for text in texts:
-            tokens = self.tokenizer.tokenize(text)
+            encoded = self.tokenizer.encode_plus(
+                text, max_length=maxlen, truncation=True, return_offsets_mapping=True
+            )
+            input_ids = encoded[&#34;input_ids&#34;]
+            offsets = encoded[&#34;offset_mapping&#34;]
+            del encoded[&#34;offset_mapping&#34;]
+            inp = encoded[&#34;input_ids&#34;][:]
+            inp = inp[1:] if inp[0] == self.tokenizer.cls_token_id else inp
+            inp = inp[:-1] if inp[-1] == self.tokenizer.sep_token_id else inp
+            tokens = self.tokenizer.convert_ids_to_tokens(inp)
             if len(tokens) &gt; maxlen - 2:
                 tokens = tokens[0 : (maxlen - 2)]
             sentences.append(tokens)
-            tokens = [self.tokenizer.cls_token] + tokens + [self.tokenizer.sep_token]
-            input_ids = self.tokenizer.convert_tokens_to_ids(tokens)
             input_mask = [1] * len(input_ids)
             while len(input_ids) &lt; maxlen:
                 input_ids.append(0)
                 input_mask.append(0)
             all_input_ids.append(input_ids)
             all_input_masks.append(input_mask)
+            all_word_ids.append(encoded.word_ids())
+            all_offsets.append(offsets)
 
         all_input_ids = np.array(all_input_ids)
         all_input_masks = np.array(all_input_masks)
         outputs = self.model(all_input_ids, attention_mask=all_input_masks)
-        hidden_states = outputs[-1] # output_hidden_states=True
+        hidden_states = outputs[-1]  # output_hidden_states=True
 
         # compile raw embeddings
         if len(self.layers) == 1:
-            #raw_embeddings = hidden_states[-1].numpy()
+            # raw_embeddings = hidden_states[-1].numpy()
             raw_embeddings = hidden_states[self.layers[0]].numpy()
         else:
             raw_embeddings = []
@@ -1439,124 +1596,68 @@ class TransformerEmbedding():
                 for token_id in range(hidden_states[0].shape[1]):
                     all_layers = []
                     for layer_id in self.layers:
-                        all_layers.append(hidden_states[layer_id][batch_id][token_id].numpy())
-                    token_embeddings.append(np.concatenate(all_layers) )  
+                        all_layers.append(
+                            hidden_states[layer_id][batch_id][token_id].numpy()
+                        )
+                    token_embeddings.append(np.concatenate(all_layers))
                 raw_embeddings.append(token_embeddings)
             raw_embeddings = np.array(raw_embeddings)
 
-        if not word_level: # sentence-level embedding
+        if not word_level:  # sentence-level embedding
             return np.mean(raw_embeddings, axis=1)
-            #return np.squeeze(raw_embeddings[:,0:1,:], axis=1)
 
-        # filter-out extra subword tokens and special tokens 
-        # (using first subword of each token as embedding representations)
+        # all space-separate tokens in input should be assigned a single embedding vector
+        # example: If 99.9% is a token, then it gets a single embedding.
+        # example: If input is pre-tokenized (i.e., 99 . 9 %), then there are four embedding vectors
         filtered_embeddings = []
-        for batch_idx, tokens in enumerate(sentences):
-            embedding = []
-            for token_idx, token in enumerate(tokens):
-                if token in [self.tokenizer.cls_token, self.tokenizer.sep_token] or token.startswith(&#39;##&#39;): continue
-                embedding.append(raw_embeddings[batch_idx][token_idx])
-            filtered_embeddings.append(embedding)
+        for i in range(len(raw_embeddings)):
+            filtered_embedding = []
+            raw_embedding = raw_embeddings[i]
+            subvectors = []
+            last_offset = (-1, -1)
+            #subwords = [] # debugging
+            for j in range(len(all_offsets[i])):
+                if all_word_ids[i][j] is None:
+                    continue
+                # must test to see if start is same as last offset start due to xml-roberta quirk with tokens like 070
+                if all_offsets[i][j][0] == last_offset[1] or all_offsets[i][j][0] == last_offset[0]:
+                    subvectors.append(raw_embedding[j])
+                    #subwords[-1] += texts[i][all_offsets[i][j][0]:all_offsets[i][j][1]] # debugging
+                    last_offset = all_offsets[i][j]
+                if all_offsets[i][j][0] &gt; last_offset[1]:
+                    #subwords.append(texts[i][all_offsets[i][j][0]:all_offsets[i][j][1]]) # debugging
+                    if len(subvectors) &gt; 0:
+                        if aggregation_strategy == &#34;average&#34;:
+                            filtered_embedding.append(np.mean(subvectors, axis=0))
+                        else:
+                            filtered_embedding.append(subvectors[0])
+                        subvectors = []
+                    subvectors.append(raw_embedding[j])
+                    last_offset = all_offsets[i][j]
+            if len(subvectors) &gt; 0:
+                if aggregation_strategy == &#34;average&#34;:
+                    filtered_embedding.append(np.mean(subvectors, axis=0))
+                else:
+                    filtered_embedding.append(subvectors[0])
+                subvectors = []
+            filtered_embeddings.append(filtered_embedding)
 
         # pad embeddings with zeros
         max_length = max([len(e) for e in filtered_embeddings])
         embeddings = []
         for e in filtered_embeddings:
-            for i in range(max_length-len(e)):
+            for i in range(max_length - len(e)):
                 e.append(np.zeros((self.embsize,)))
             embeddings.append(np.array(e))
         return np.array(embeddings)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # preprocessors
-TEXT_PREPROCESSORS = {&#39;standard&#39;: StandardTextPreprocessor,
-                      &#39;bert&#39;: BERTPreprocessor,
-                      &#39;distilbert&#39;: DistilBertPreprocessor}</code></pre>
+TEXT_PREPROCESSORS = {
+    &#34;standard&#34;: StandardTextPreprocessor,
+    &#34;bert&#34;: BERTPreprocessor,
+    &#34;distilbert&#34;: DistilBertPreprocessor,
+}</code></pre>
 </details>
 </section>
 <section>
@@ -1583,7 +1684,6 @@ TEXT_PREPROCESSORS = {&#39;standard&#39;: StandardTextPreprocessor,
         mb = range(1)
         pb = docs
 
-
     indices = []
     for i in mb:
         for doc in pb:
@@ -1591,7 +1691,8 @@ TEXT_PREPROCESSORS = {&#39;standard&#39;: StandardTextPreprocessor,
             doc = str(doc) if isinstance(doc, (float, int)) else doc
             ids, segments = tokenizer.encode(doc, max_len=max_length)
             indices.append(ids)
-        if verbose: mb.write(&#39;done.&#39;)
+        if verbose:
+            mb.write(&#34;done.&#34;)
     zeros = np.zeros_like(indices)
     return [np.array(indices), np.array(zeros)]</code></pre>
 </details>
@@ -1608,13 +1709,14 @@ TEXT_PREPROCESSORS = {&#39;standard&#39;: StandardTextPreprocessor,
 <pre><code class="python">def detect_text_format(texts):
     is_pair = False
     is_array = False
-    err_msg = &#39;invalid text format: texts should be list of strings or list of sentence pairs in form of tuples (str, str)&#39;
+    err_msg = &#34;invalid text format: texts should be list of strings or list of sentence pairs in form of tuples (str, str)&#34;
     if _is_sentence_pair(texts):
-        is_pair=True
+        is_pair = True
         is_array = False
     elif isinstance(texts, (tuple, list, np.ndarray)):
         is_array = True
-        if len(texts) == 0: raise ValueError(&#39;texts is empty&#39;)
+        if len(texts) == 0:
+            raise ValueError(&#34;texts is empty&#34;)
         peek = texts[0]
         is_pair = _is_sentence_pair(peek)
         if not is_pair and not isinstance(peek, str):
@@ -1632,7 +1734,7 @@ TEXT_PREPROCESSORS = {&#39;standard&#39;: StandardTextPreprocessor,
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def file_len(fname):
-    with open(fname, encoding=&#39;utf-8&#39;) as f:
+    with open(fname, encoding=&#34;utf-8&#34;) as f:
         for i, l in enumerate(f):
             pass
     return i + 1</code></pre>
@@ -1660,39 +1762,43 @@ TEXT_PREPROCESSORS = {&#39;standard&#39;: StandardTextPreprocessor,
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_bert_path(lang=&#39;en&#39;):
-    if lang == &#39;en&#39;:
+<pre><code class="python">def get_bert_path(lang=&#34;en&#34;):
+    if lang == &#34;en&#34;:
         bert_url = BERT_URL
-    elif lang.startswith(&#39;zh-&#39;):
+    elif lang.startswith(&#34;zh-&#34;):
         bert_url = BERT_URL_CN
     else:
         bert_url = BERT_URL_MULTI
     ktrain_data = U.get_ktrain_data()
     zip_fpath = os.path.join(ktrain_data, fname_from_url(bert_url))
-    bert_path = os.path.join( ktrain_data, os.path.splitext(fname_from_url(bert_url))[0] )
-    if not os.path.isdir(bert_path) or \
-       not os.path.isfile(os.path.join(bert_path, &#39;bert_config.json&#39;)) or\
-       not os.path.isfile(os.path.join(bert_path, &#39;bert_model.ckpt.data-00000-of-00001&#39;)) or\
-       not os.path.isfile(os.path.join(bert_path, &#39;bert_model.ckpt.index&#39;)) or\
-       not os.path.isfile(os.path.join(bert_path, &#39;bert_model.ckpt.meta&#39;)) or\
-       not os.path.isfile(os.path.join(bert_path, &#39;vocab.txt&#39;)):
+    bert_path = os.path.join(ktrain_data, os.path.splitext(fname_from_url(bert_url))[0])
+    if (
+        not os.path.isdir(bert_path)
+        or not os.path.isfile(os.path.join(bert_path, &#34;bert_config.json&#34;))
+        or not os.path.isfile(
+            os.path.join(bert_path, &#34;bert_model.ckpt.data-00000-of-00001&#34;)
+        )
+        or not os.path.isfile(os.path.join(bert_path, &#34;bert_model.ckpt.index&#34;))
+        or not os.path.isfile(os.path.join(bert_path, &#34;bert_model.ckpt.meta&#34;))
+        or not os.path.isfile(os.path.join(bert_path, &#34;vocab.txt&#34;))
+    ):
         # download zip
-        print(&#39;downloading pretrained BERT model (%s)...&#39; % (fname_from_url(bert_url)))
+        print(&#34;downloading pretrained BERT model (%s)...&#34; % (fname_from_url(bert_url)))
         U.download(bert_url, zip_fpath)
 
         # unzip
-        print(&#39;\nextracting pretrained BERT model...&#39;)
-        with zipfile.ZipFile(zip_fpath, &#39;r&#39;) as zip_ref:
+        print(&#34;\nextracting pretrained BERT model...&#34;)
+        with zipfile.ZipFile(zip_fpath, &#34;r&#34;) as zip_ref:
             zip_ref.extractall(ktrain_data)
-        print(&#39;done.\n&#39;)
+        print(&#34;done.\n&#34;)
 
         # cleanup
-        print(&#39;cleanup downloaded zip...&#39;)
+        print(&#34;cleanup downloaded zip...&#34;)
         try:
             os.remove(zip_fpath)
-            print(&#39;done.\n&#39;)
+            print(&#34;done.\n&#34;)
         except OSError:
-            print(&#39;failed to cleanup/remove %s&#39; % (zip_fpath))
+            print(&#34;failed to cleanup/remove %s&#34; % (zip_fpath))
     return bert_path</code></pre>
 </details>
 </dd>
@@ -1705,7 +1811,8 @@ TEXT_PREPROCESSORS = {&#39;standard&#39;: StandardTextPreprocessor,
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_coefs(word, *arr): return word, np.asarray(arr, dtype=&#39;float32&#39;)</code></pre>
+<pre><code class="python">def get_coefs(word, *arr):
+    return word, np.asarray(arr, dtype=&#34;float32&#34;)</code></pre>
 </details>
 </dd>
 <dt id="ktrain.text.preprocessor.get_wv_path"><code class="name flex">
@@ -1719,43 +1826,52 @@ TEXT_PREPROCESSORS = {&#39;standard&#39;: StandardTextPreprocessor,
 </summary>
 <pre><code class="python">def get_wv_path(wv_path_or_url=WV_URL):
     # process if file path given
-    if os.path.isfile(wv_path_or_url) and wv_path_or_url.endswith(&#39;vec&#39;): return wv_path_or_url
+    if os.path.isfile(wv_path_or_url) and wv_path_or_url.endswith(&#34;vec&#34;):
+        return wv_path_or_url
     elif os.path.isfile(wv_path_or_url):
-        raise ValueError(&#34;wv_path_or_url must either be URL .vec.zip or .vec.gz file or file path to .vec file&#34;)
+        raise ValueError(
+            &#34;wv_path_or_url must either be URL .vec.zip or .vec.gz file or file path to .vec file&#34;
+        )
 
     # process if URL is given
-    fasttext_url = &#39;https://dl.fbaipublicfiles.com/fasttext&#39;
+    fasttext_url = &#34;https://dl.fbaipublicfiles.com/fasttext&#34;
     if not wv_path_or_url.startswith(fasttext_url):
-        raise ValueError(&#39;selected word vector file must be from %s&#39;% (fasttext_url))
-    if not wv_path_or_url.endswith(&#39;.vec.zip&#39;) and not wv_path_or_url.endswith(&#39;vec.gz&#39;):
-        raise ValueError(&#39;If wv_path_or_url is URL, must be .vec.zip filea from Facebook fasttext site.&#39;)
+        raise ValueError(&#34;selected word vector file must be from %s&#34; % (fasttext_url))
+    if not wv_path_or_url.endswith(&#34;.vec.zip&#34;) and not wv_path_or_url.endswith(
+        &#34;vec.gz&#34;
+    ):
+        raise ValueError(
+            &#34;If wv_path_or_url is URL, must be .vec.zip filea from Facebook fasttext site.&#34;
+        )
 
     ktrain_data = U.get_ktrain_data()
     zip_fpath = os.path.join(ktrain_data, fname_from_url(wv_path_or_url))
-    wv_path =  os.path.join(ktrain_data, os.path.splitext(fname_from_url(wv_path_or_url))[0])
+    wv_path = os.path.join(
+        ktrain_data, os.path.splitext(fname_from_url(wv_path_or_url))[0]
+    )
     if not os.path.isfile(wv_path):
         # download zip
-        print(&#39;downloading pretrained word vectors to %s ...&#39; % (ktrain_data))
+        print(&#34;downloading pretrained word vectors to %s ...&#34; % (ktrain_data))
         U.download(wv_path_or_url, zip_fpath)
 
         # unzip
-        print(&#39;\nextracting pretrained word vectors...&#39;)
-        if wv_path_or_url.endswith(&#39;.vec.zip&#39;):
-            with zipfile.ZipFile(zip_fpath, &#39;r&#39;) as zip_ref:
+        print(&#34;\nextracting pretrained word vectors...&#34;)
+        if wv_path_or_url.endswith(&#34;.vec.zip&#34;):
+            with zipfile.ZipFile(zip_fpath, &#34;r&#34;) as zip_ref:
                 zip_ref.extractall(ktrain_data)
-        else: # .vec.gz
-            with gzip.open(zip_fpath, &#39;rb&#39;) as f_in:
-                with open(wv_path, &#39;wb&#39;) as f_out:
+        else:  # .vec.gz
+            with gzip.open(zip_fpath, &#34;rb&#34;) as f_in:
+                with open(wv_path, &#34;wb&#34;) as f_out:
                     shutil.copyfileobj(f_in, f_out)
-        print(&#39;done.\n&#39;)
+        print(&#34;done.\n&#34;)
 
         # cleanup
-        print(&#39;cleanup downloaded zip...&#39;)
+        print(&#34;cleanup downloaded zip...&#34;)
         try:
             os.remove(zip_fpath)
-            print(&#39;done.\n&#39;)
+            print(&#34;done.\n&#34;)
         except OSError:
-            print(&#39;failed to cleanup/remove %s&#39; % (zip_fpath))
+            print(&#34;failed to cleanup/remove %s&#34; % (zip_fpath))
     return wv_path</code></pre>
 </details>
 </dd>
@@ -1769,25 +1885,30 @@ TEXT_PREPROCESSORS = {&#39;standard&#39;: StandardTextPreprocessor,
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def hf_convert_example(text_a, text_b=None, tokenizer=None,
-                       max_length=512,
-                       pad_on_left=False,
-                       pad_token=0,
-                       pad_token_segment_id=0,
-                       mask_padding_with_zero=True):
+<pre><code class="python">def hf_convert_example(
+    text_a,
+    text_b=None,
+    tokenizer=None,
+    max_length=512,
+    pad_on_left=False,
+    pad_token=0,
+    pad_token_segment_id=0,
+    mask_padding_with_zero=True,
+):
     &#34;&#34;&#34;
     ```
     convert InputExample to InputFeature for Hugging Face transformer
     ```
     &#34;&#34;&#34;
-    if tokenizer is None: raise ValueError(&#39;tokenizer is required&#39;)
+    if tokenizer is None:
+        raise ValueError(&#34;tokenizer is required&#34;)
     inputs = tokenizer.encode_plus(
         text_a,
         text_b,
         add_special_tokens=True,
         return_token_type_ids=True,
-        max_length=max_length, 
-        truncation=&#39;longest_first&#39;
+        max_length=max_length,
+        truncation=&#34;longest_first&#34;,
     )
     input_ids, token_type_ids = inputs[&#34;input_ids&#34;], inputs[&#34;token_type_ids&#34;]
 
@@ -1799,24 +1920,33 @@ TEXT_PREPROCESSORS = {&#39;standard&#39;: StandardTextPreprocessor,
     padding_length = max_length - len(input_ids)
     if pad_on_left:
         input_ids = ([pad_token] * padding_length) + input_ids
-        attention_mask = ([0 if mask_padding_with_zero else 1] * padding_length) + attention_mask
+        attention_mask = (
+            [0 if mask_padding_with_zero else 1] * padding_length
+        ) + attention_mask
         token_type_ids = ([pad_token_segment_id] * padding_length) + token_type_ids
     else:
         input_ids = input_ids + ([pad_token] * padding_length)
-        attention_mask = attention_mask + ([0 if mask_padding_with_zero else 1] * padding_length)
+        attention_mask = attention_mask + (
+            [0 if mask_padding_with_zero else 1] * padding_length
+        )
         token_type_ids = token_type_ids + ([pad_token_segment_id] * padding_length)
-    assert len(input_ids) == max_length, &#34;Error with input length {} vs {}&#34;.format(len(input_ids), max_length)
-    assert len(attention_mask) == max_length, &#34;Error with input length {} vs {}&#34;.format(len(attention_mask), max_length)
-    assert len(token_type_ids) == max_length, &#34;Error with input length {} vs {}&#34;.format(len(token_type_ids), max_length)
+    assert len(input_ids) == max_length, &#34;Error with input length {} vs {}&#34;.format(
+        len(input_ids), max_length
+    )
+    assert len(attention_mask) == max_length, &#34;Error with input length {} vs {}&#34;.format(
+        len(attention_mask), max_length
+    )
+    assert len(token_type_ids) == max_length, &#34;Error with input length {} vs {}&#34;.format(
+        len(token_type_ids), max_length
+    )
 
-
-    #if ex_index &lt; 1:
-        #print(&#34;*** Example ***&#34;)
-        #print(&#34;guid: %s&#34; % (example.guid))
-        #print(&#34;input_ids: %s&#34; % &#34; &#34;.join([str(x) for x in input_ids]))
-        #print(&#34;attention_mask: %s&#34; % &#34; &#34;.join([str(x) for x in attention_mask]))
-        #print(&#34;token_type_ids: %s&#34; % &#34; &#34;.join([str(x) for x in token_type_ids]))
-        #print(&#34;label: %s (id = %d)&#34; % (example.label, label))
+    # if ex_index &lt; 1:
+    # print(&#34;*** Example ***&#34;)
+    # print(&#34;guid: %s&#34; % (example.guid))
+    # print(&#34;input_ids: %s&#34; % &#34; &#34;.join([str(x) for x in input_ids]))
+    # print(&#34;attention_mask: %s&#34; % &#34; &#34;.join([str(x) for x in attention_mask]))
+    # print(&#34;token_type_ids: %s&#34; % &#34; &#34;.join([str(x) for x in token_type_ids]))
+    # print(&#34;label: %s (id = %d)&#34; % (example.label, label))
 
     return [input_ids, attention_mask, token_type_ids]</code></pre>
 </details>
@@ -1849,14 +1979,18 @@ Returns:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def hf_convert_examples(texts, y=None, tokenizer=None,
-                        max_length=512,
-                        pad_on_left=False,
-                        pad_token=0,
-                        pad_token_segment_id=0,
-                        mask_padding_with_zero=True,
-                        use_dynamic_shape=False,
-                        verbose=1):
+<pre><code class="python">def hf_convert_examples(
+    texts,
+    y=None,
+    tokenizer=None,
+    max_length=512,
+    pad_on_left=False,
+    pad_token=0,
+    pad_token_segment_id=0,
+    mask_padding_with_zero=True,
+    use_dynamic_shape=False,
+    verbose=1,
+):
     &#34;&#34;&#34;
     ```
     Loads a data file into a list of ``InputFeatures``
@@ -1892,12 +2026,22 @@ Returns:
             else:
                 text_a = text
                 text_b = None
-            sentences.append( tokenizer.convert_ids_to_tokens(tokenizer.encode(text_a, text_b)) )
-            #sentences.append(tokenizer.tokenize(text_a, text_b)) # only works for Fast tokenizers
-        maxlen = len(max([tokens for tokens in sentences], key=len,)) + 2
+            sentences.append(
+                tokenizer.convert_ids_to_tokens(tokenizer.encode(text_a, text_b))
+            )
+            # sentences.append(tokenizer.tokenize(text_a, text_b)) # only works for Fast tokenizers
+        maxlen = (
+            len(
+                max(
+                    [tokens for tokens in sentences],
+                    key=len,
+                )
+            )
+            + 2
+        )
 
-        if maxlen &lt; max_length: max_length = maxlen
-
+        if maxlen &lt; max_length:
+            max_length = maxlen
 
     data = []
     features_list = []
@@ -1909,7 +2053,7 @@ Returns:
         mb = range(1)
         pb = texts
     for i in mb:
-        #for (idx, text) in enumerate(progress_bar(texts, parent=mb)):
+        # for (idx, text) in enumerate(progress_bar(texts, parent=mb)):
         for (idx, text) in enumerate(pb):
             if is_pair:
                 text_a = text[0]
@@ -1917,23 +2061,28 @@ Returns:
             else:
                 text_a = text
                 text_b = None
-            features = hf_convert_example(text_a, text_b=text_b, tokenizer=tokenizer,
-                                          max_length=max_length,
-                                          pad_on_left=pad_on_left,
-                                          pad_token=pad_token,
-                                          pad_token_segment_id=pad_token_segment_id,
-                                          mask_padding_with_zero=mask_padding_with_zero)
+            features = hf_convert_example(
+                text_a,
+                text_b=text_b,
+                tokenizer=tokenizer,
+                max_length=max_length,
+                pad_on_left=pad_on_left,
+                pad_token=pad_token,
+                pad_token_segment_id=pad_token_segment_id,
+                mask_padding_with_zero=mask_padding_with_zero,
+            )
             features_list.append(features)
             labels.append(y[idx] if y is not None else None)
-    #tfdataset = hf_features_to_tfdataset(features_list, labels)
-    #return tfdataset
-    #return (features_list, labels)
+    # tfdataset = hf_features_to_tfdataset(features_list, labels)
+    # return tfdataset
+    # return (features_list, labels)
     # HF_EXCEPTION
     # due to issues in transormers library and TF2 tf.Datasets, arrays are converted
     # to iterators on-the-fly
-    #return  TransformerSequence(np.array(features_list), np.array(labels))
+    # return  TransformerSequence(np.array(features_list), np.array(labels))
     from .dataset import TransformerDataset
-    return  TransformerDataset(np.array(features_list), np.array(labels))</code></pre>
+
+    return TransformerDataset(np.array(features_list), np.array(labels))</code></pre>
 </details>
 </dd>
 <dt id="ktrain.text.preprocessor.hf_features_to_tfdataset"><code class="name flex">
@@ -1949,9 +2098,12 @@ Returns:
     features_list = np.array(features_list)
     labels = np.array(labels) if labels is not None else None
     tfdataset = tf.data.Dataset.from_tensor_slices((features_list, labels))
-    tfdataset = tfdataset.map(lambda x,y: ({&#39;input_ids&#39;: x[0], 
-                                            &#39;attention_mask&#39;: x[1], 
-                                             &#39;token_type_ids&#39;: x[2]}, y))
+    tfdataset = tfdataset.map(
+        lambda x, y: (
+            {&#34;input_ids&#34;: x[0], &#34;attention_mask&#34;: x[1], &#34;token_type_ids&#34;: x[2]},
+            y,
+        )
+    )
 
     return tfdataset</code></pre>
 </details>
@@ -1980,17 +2132,18 @@ Returns:
 </summary>
 <pre><code class="python">def load_wv(wv_path_or_url=WV_URL, verbose=1):
     wv_path = get_wv_path(wv_path_or_url)
-    if verbose: print(&#39;loading pretrained word vectors...this may take a few moments...&#39;)
+    if verbose:
+        print(&#34;loading pretrained word vectors...this may take a few moments...&#34;)
     length = file_len(wv_path)
     tups = []
     mb = master_bar(range(1))
     for i in mb:
-        f = open(wv_path, encoding=&#39;utf-8&#39;)
+        f = open(wv_path, encoding=&#34;utf-8&#34;)
         for o in progress_bar(range(length), parent=mb):
             o = f.readline()
-            tups.append(get_coefs(*o.rstrip().rsplit(&#39; &#39;)))
+            tups.append(get_coefs(*o.rstrip().rsplit(&#34; &#34;)))
         f.close()
-        #if verbose: mb.write(&#39;done.&#39;)
+        # if verbose: mb.write(&#39;done.&#39;)
     return dict(tups)</code></pre>
 </details>
 </dd>
@@ -2017,35 +2170,41 @@ Returns:
     ```
     &#34;&#34;&#34;
 
-    def __init__(self, maxlen, max_features, class_names=[], classes=[], 
-                lang=&#39;en&#39;, ngram_range=1, multilabel=None):
+    def __init__(
+        self,
+        maxlen,
+        max_features,
+        class_names=[],
+        classes=[],
+        lang=&#34;en&#34;,
+        ngram_range=1,
+        multilabel=None,
+    ):
         class_names = self.migrate_classes(class_names, classes)
 
-
-        if maxlen &gt; 512: raise ValueError(&#39;BERT only supports maxlen &lt;= 512&#39;)
+        if maxlen &gt; 512:
+            raise ValueError(&#34;BERT only supports maxlen &lt;= 512&#34;)
 
         super().__init__(maxlen, class_names, lang=lang, multilabel=multilabel)
-        vocab_path = os.path.join(get_bert_path(lang=lang), &#39;vocab.txt&#39;)
+        vocab_path = os.path.join(get_bert_path(lang=lang), &#34;vocab.txt&#34;)
         token_dict = {}
-        with codecs.open(vocab_path, &#39;r&#39;, &#39;utf8&#39;) as reader:
+        with codecs.open(vocab_path, &#34;r&#34;, &#34;utf8&#34;) as reader:
             for line in reader:
                 token = line.strip()
                 token_dict[token] = len(token_dict)
         from keras_bert import Tokenizer as BERT_Tokenizer
+
         tokenizer = BERT_Tokenizer(token_dict)
         self.tok = tokenizer
-        self.tok_dct = dict((v,k) for k,v in token_dict.items())
-        self.max_features = max_features # ignored
-        self.ngram_range = 1 # ignored
-
+        self.tok_dct = dict((v, k) for k, v in token_dict.items())
+        self.max_features = max_features  # ignored
+        self.ngram_range = 1  # ignored
 
     def get_tokenizer(self):
         return self.tok
 
-
     def __getstate__(self):
         return {k: v for k, v in self.__dict__.items()}
-
 
     def __setstate__(self, state):
         &#34;&#34;&#34;
@@ -2054,19 +2213,17 @@ Returns:
         ```
         &#34;&#34;&#34;
         self.__dict__.update(state)
-        if not hasattr(self, &#39;ytransform&#39;):
-            le = self.label_encoder if hasattr(self, &#39;label_encoder&#39;) else None
-            self.ytransform = U.YTransform(class_names=self.get_classes(), label_encoder=le)
-
+        if not hasattr(self, &#34;ytransform&#34;):
+            le = self.label_encoder if hasattr(self, &#34;label_encoder&#34;) else None
+            self.ytransform = U.YTransform(
+                class_names=self.get_classes(), label_encoder=le
+            )
 
     def get_preprocessor(self):
         return (self.tok, self.tok_dct)
 
-
-
     def preprocess(self, texts):
         return self.preprocess_test(texts, verbose=0)[0]
-
 
     def undo(self, doc):
         &#34;&#34;&#34;
@@ -2078,31 +2235,30 @@ Returns:
         dct = self.tok_dct
         return &#34; &#34;.join([dct[wid] for wid in doc if wid != 0 and wid in dct])
 
-
-    def preprocess_train(self, texts, y=None, mode=&#39;train&#39;, verbose=1):
+    def preprocess_train(self, texts, y=None, mode=&#34;train&#34;, verbose=1):
         &#34;&#34;&#34;
         ```
         preprocess training set
         ```
         &#34;&#34;&#34;
-        if mode == &#39;train&#39; and y is None:
-            raise ValueError(&#39;y is required when mode=train&#39;)
-        if self.lang is None and mode==&#39;train&#39;: self.lang = TU.detect_lang(texts)
-        U.vprint(&#39;preprocessing %s...&#39; % (mode), verbose=verbose)
-        U.vprint(&#39;language: %s&#39; % (self.lang), verbose=verbose)
+        if mode == &#34;train&#34; and y is None:
+            raise ValueError(&#34;y is required when mode=train&#34;)
+        if self.lang is None and mode == &#34;train&#34;:
+            self.lang = TU.detect_lang(texts)
+        U.vprint(&#34;preprocessing %s...&#34; % (mode), verbose=verbose)
+        U.vprint(&#34;language: %s&#34; % (self.lang), verbose=verbose)
 
         x = bert_tokenize(texts, self.tok, self.maxlen, verbose=verbose)
 
         # transform y
-        y = self._transform_y(y, train=mode==&#39;train&#39;, verbose=verbose)
+        y = self._transform_y(y, train=mode == &#34;train&#34;, verbose=verbose)
         result = (x, y)
         self.set_multilabel(result, mode)
-        if mode == &#39;train&#39;: self.preprocess_train_called = True
+        if mode == &#34;train&#34;:
+            self.preprocess_train_called = True
         return result
 
-
-
-    def preprocess_test(self, texts, y=None, mode=&#39;test&#39;, verbose=1):
+    def preprocess_test(self, texts, y=None, mode=&#34;test&#34;, verbose=1):
         self.check_trained()
         return self.preprocess_train(texts, y=y, mode=mode, verbose=verbose)</code></pre>
 </details>
@@ -2162,7 +2318,7 @@ Returns:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def preprocess_test(self, texts, y=None, mode=&#39;test&#39;, verbose=1):
+<pre><code class="python">def preprocess_test(self, texts, y=None, mode=&#34;test&#34;, verbose=1):
     self.check_trained()
     return self.preprocess_train(texts, y=y, mode=mode, verbose=verbose)</code></pre>
 </details>
@@ -2177,25 +2333,27 @@ Returns:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def preprocess_train(self, texts, y=None, mode=&#39;train&#39;, verbose=1):
+<pre><code class="python">def preprocess_train(self, texts, y=None, mode=&#34;train&#34;, verbose=1):
     &#34;&#34;&#34;
     ```
     preprocess training set
     ```
     &#34;&#34;&#34;
-    if mode == &#39;train&#39; and y is None:
-        raise ValueError(&#39;y is required when mode=train&#39;)
-    if self.lang is None and mode==&#39;train&#39;: self.lang = TU.detect_lang(texts)
-    U.vprint(&#39;preprocessing %s...&#39; % (mode), verbose=verbose)
-    U.vprint(&#39;language: %s&#39; % (self.lang), verbose=verbose)
+    if mode == &#34;train&#34; and y is None:
+        raise ValueError(&#34;y is required when mode=train&#34;)
+    if self.lang is None and mode == &#34;train&#34;:
+        self.lang = TU.detect_lang(texts)
+    U.vprint(&#34;preprocessing %s...&#34; % (mode), verbose=verbose)
+    U.vprint(&#34;language: %s&#34; % (self.lang), verbose=verbose)
 
     x = bert_tokenize(texts, self.tok, self.maxlen, verbose=verbose)
 
     # transform y
-    y = self._transform_y(y, train=mode==&#39;train&#39;, verbose=verbose)
+    y = self._transform_y(y, train=mode == &#34;train&#34;, verbose=verbose)
     result = (x, y)
     self.set_multilabel(result, mode)
-    if mode == &#39;train&#39;: self.preprocess_train_called = True
+    if mode == &#34;train&#34;:
+        self.preprocess_train_called = True
     return result</code></pre>
 </details>
 </dd>
@@ -2229,18 +2387,24 @@ Returns:
     ```
     &#34;&#34;&#34;
 
-    def __init__(self, maxlen, max_features, class_names=[], classes=[], 
-                lang=&#39;en&#39;, ngram_range=1):
+    def __init__(
+        self, maxlen, max_features, class_names=[], classes=[], lang=&#34;en&#34;, ngram_range=1
+    ):
         class_names = self.migrate_classes(class_names, classes)
         name = DISTILBERT
-        if lang == &#39;en&#39;:
-            model_name = &#39;distilbert-base-uncased&#39;
+        if lang == &#34;en&#34;:
+            model_name = &#34;distilbert-base-uncased&#34;
         else:
-            model_name = &#39;distilbert-base-multilingual-cased&#39;
+            model_name = &#34;distilbert-base-multilingual-cased&#34;
 
-        super().__init__(model_name,
-                         maxlen, max_features, class_names=class_names, 
-                         lang=lang, ngram_range=ngram_range)</code></pre>
+        super().__init__(
+            model_name,
+            maxlen,
+            max_features,
+            class_names=class_names,
+            lang=lang,
+            ngram_range=ngram_range,
+        )</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -2282,8 +2446,16 @@ Returns:
     ```
     &#34;&#34;&#34;
 
-    def __init__(self, maxlen, max_features, class_names=[], classes=[], 
-                 lang=&#39;en&#39;, ngram_range=1, multilabel=None):
+    def __init__(
+        self,
+        maxlen,
+        max_features,
+        class_names=[],
+        classes=[],
+        lang=&#34;en&#34;,
+        ngram_range=1,
+        multilabel=None,
+    ):
         class_names = self.migrate_classes(class_names, classes)
         super().__init__(maxlen, class_names, lang=lang, multilabel=multilabel)
         self.tok = None
@@ -2294,10 +2466,8 @@ Returns:
     def get_tokenizer(self):
         return self.tok
 
-
     def __getstate__(self):
         return {k: v for k, v in self.__dict__.items()}
-
 
     def __setstate__(self, state):
         &#34;&#34;&#34;
@@ -2306,19 +2476,17 @@ Returns:
         ```
         &#34;&#34;&#34;
         self.__dict__.update(state)
-        if not hasattr(self, &#39;ytransform&#39;):
-            le = self.label_encoder if hasattr(self, &#39;label_encoder&#39;) else None
-            self.ytransform = U.YTransform(class_names=self.get_classes(), label_encoder=le)
-
-
+        if not hasattr(self, &#34;ytransform&#34;):
+            le = self.label_encoder if hasattr(self, &#34;label_encoder&#34;) else None
+            self.ytransform = U.YTransform(
+                class_names=self.get_classes(), label_encoder=le
+            )
 
     def get_preprocessor(self):
         return (self.tok, self.tok_dct)
 
-
     def preprocess(self, texts):
         return self.preprocess_test(texts, verbose=0)[0]
-
 
     def undo(self, doc):
         &#34;&#34;&#34;
@@ -2330,17 +2498,16 @@ Returns:
         dct = self.tok.index_word
         return &#34; &#34;.join([dct[wid] for wid in doc if wid != 0 and wid in dct])
 
-
     def preprocess_train(self, train_text, y_train, verbose=1):
         &#34;&#34;&#34;
         ```
         preprocess training set
         ```
         &#34;&#34;&#34;
-        if self.lang is None: self.lang = TU.detect_lang(train_text)
+        if self.lang is None:
+            self.lang = TU.detect_lang(train_text)
 
-
-        U.vprint(&#39;language: %s&#39; % (self.lang), verbose=verbose)
+        U.vprint(&#34;language: %s&#34; % (self.lang), verbose=verbose)
 
         # special processing if Chinese
         train_text = self.process_chinese(train_text, lang=self.lang)
@@ -2348,32 +2515,36 @@ Returns:
         # extract vocabulary
         self.tok = keras.preprocessing.text.Tokenizer(num_words=self.max_features)
         self.tok.fit_on_texts(train_text)
-        U.vprint(&#39;Word Counts: {}&#39;.format(len(self.tok.word_counts)), verbose=verbose)
-        U.vprint(&#39;Nrows: {}&#39;.format(len(train_text)), verbose=verbose)
+        U.vprint(&#34;Word Counts: {}&#34;.format(len(self.tok.word_counts)), verbose=verbose)
+        U.vprint(&#34;Nrows: {}&#34;.format(len(train_text)), verbose=verbose)
 
         # convert to word IDs
         x_train = self.tok.texts_to_sequences(train_text)
-        U.vprint(&#39;{} train sequences&#39;.format(len(x_train)), verbose=verbose)
-        self.print_seqlen_stats(x_train, &#39;train&#39;, verbose=verbose)
+        U.vprint(&#34;{} train sequences&#34;.format(len(x_train)), verbose=verbose)
+        self.print_seqlen_stats(x_train, &#34;train&#34;, verbose=verbose)
 
         # add ngrams
         x_train = self._fit_ngrams(x_train, verbose=verbose)
 
         # pad sequences
-        x_train = keras.preprocessing.sequence.pad_sequences(x_train, maxlen=self.maxlen)
-        U.vprint(&#39;x_train shape: ({},{})&#39;.format(x_train.shape[0], x_train.shape[1]), verbose=verbose)
+        x_train = keras.preprocessing.sequence.pad_sequences(
+            x_train, maxlen=self.maxlen
+        )
+        U.vprint(
+            &#34;x_train shape: ({},{})&#34;.format(x_train.shape[0], x_train.shape[1]),
+            verbose=verbose,
+        )
 
         # transform y
         y_train = self._transform_y(y_train, train=True, verbose=verbose)
         if y_train is not None and verbose:
-            print(&#39;y_train shape: %s&#39; % (y_train.shape,))
+            print(&#34;y_train shape: %s&#34; % (y_train.shape,))
 
         # return
-        result =  (x_train, y_train)
-        self.set_multilabel(result, &#39;train&#39;)
+        result = (x_train, y_train)
+        self.set_multilabel(result, &#34;train&#34;)
         self.preprocess_train_called = True
         return result
-
 
     def preprocess_test(self, test_text, y_test=None, verbose=1):
         &#34;&#34;&#34;
@@ -2383,39 +2554,41 @@ Returns:
         &#34;&#34;&#34;
         self.check_trained()
         if self.tok is None or self.lang is None:
-            raise Exception(&#39;Unfitted tokenizer or missing language. Did you run preprocess_train first?&#39;)
+            raise Exception(
+                &#34;Unfitted tokenizer or missing language. Did you run preprocess_train first?&#34;
+            )
 
         # check for and process chinese
         test_text = self.process_chinese(test_text, self.lang)
 
         # convert to word IDs
         x_test = self.tok.texts_to_sequences(test_text)
-        U.vprint(&#39;{} test sequences&#39;.format(len(x_test)), verbose=verbose)
-        self.print_seqlen_stats(x_test, &#39;test&#39;, verbose=verbose)
+        U.vprint(&#34;{} test sequences&#34;.format(len(x_test)), verbose=verbose)
+        self.print_seqlen_stats(x_test, &#34;test&#34;, verbose=verbose)
 
         # add n-grams
-        x_test = self._add_ngrams(x_test, mode=&#39;test&#39;, verbose=verbose)
-
+        x_test = self._add_ngrams(x_test, mode=&#34;test&#34;, verbose=verbose)
 
         # pad sequences
         x_test = keras.preprocessing.sequence.pad_sequences(x_test, maxlen=self.maxlen)
-        U.vprint(&#39;x_test shape: ({},{})&#39;.format(x_test.shape[0], x_test.shape[1]), verbose=verbose)
+        U.vprint(
+            &#34;x_test shape: ({},{})&#34;.format(x_test.shape[0], x_test.shape[1]),
+            verbose=verbose,
+        )
 
         # transform y
         y_test = self._transform_y(y_test, train=False, verbose=verbose)
         if y_test is not None and verbose:
-            print(&#39;y_test shape: %s&#39; % (y_test.shape,))
-
+            print(&#34;y_test shape: %s&#34; % (y_test.shape,))
 
         # return
         return (x_test, y_test)
 
-
-
     def _fit_ngrams(self, x_train, verbose=1):
         self.tok_dct = {}
-        if self.ngram_range &lt; 2: return x_train
-        U.vprint(&#39;Adding {}-gram features&#39;.format(self.ngram_range), verbose=verbose)
+        if self.ngram_range &lt; 2:
+            return x_train
+        U.vprint(&#34;Adding {}-gram features&#34;.format(self.ngram_range), verbose=verbose)
         # Create set of unique n-gram from the training set.
         ngram_set = set()
         for input_list in x_train:
@@ -2433,14 +2606,16 @@ Returns:
 
         # max_features is the highest integer that could be found in the dataset.
         self.max_features = np.max(list(indice_token.keys())) + 1
-        U.vprint(&#39;max_features changed to %s with addition of ngrams&#39; % (self.max_features), verbose=verbose)
+        U.vprint(
+            &#34;max_features changed to %s with addition of ngrams&#34; % (self.max_features),
+            verbose=verbose,
+        )
 
         # Augmenting x_train with n-grams features
-        x_train = self._add_ngrams(x_train, verbose=verbose, mode=&#39;train&#39;)
+        x_train = self._add_ngrams(x_train, verbose=verbose, mode=&#34;train&#34;)
         return x_train
 
-
-    def _add_ngrams(self, sequences, verbose=1, mode=&#39;test&#39;):
+    def _add_ngrams(self, sequences, verbose=1, mode=&#34;test&#34;):
         &#34;&#34;&#34;
         ```
         Augment the input list of list (sequences) by appending n-grams values.
@@ -2448,22 +2623,25 @@ Returns:
         ```
         &#34;&#34;&#34;
         token_indice = self.tok_dct
-        if self.ngram_range &lt; 2: return sequences
+        if self.ngram_range &lt; 2:
+            return sequences
         new_sequences = []
         for input_list in sequences:
             new_list = input_list[:]
             for ngram_value in range(2, self.ngram_range + 1):
                 for i in range(len(new_list) - ngram_value + 1):
-                    ngram = tuple(new_list[i:i + ngram_value])
+                    ngram = tuple(new_list[i : i + ngram_value])
                     if ngram in token_indice:
                         new_list.append(token_indice[ngram])
             new_sequences.append(new_list)
-        U.vprint(&#39;Average {} sequence length with ngrams: {}&#39;.format(mode,
-            np.mean(list(map(len, new_sequences)), dtype=int)), verbose=verbose)    
-        self.print_seqlen_stats(new_sequences, &#39;%s (w/ngrams)&#39; % mode, verbose=verbose)
+        U.vprint(
+            &#34;Average {} sequence length with ngrams: {}&#34;.format(
+                mode, np.mean(list(map(len, new_sequences)), dtype=int)
+            ),
+            verbose=verbose,
+        )
+        self.print_seqlen_stats(new_sequences, &#34;%s (w/ngrams)&#34; % mode, verbose=verbose)
         return new_sequences
-
-
 
     def _create_ngram_set(self, input_list, ngram_value=2):
         &#34;&#34;&#34;
@@ -2478,9 +2656,9 @@ Returns:
         &#34;&#34;&#34;
         return set(zip(*[input_list[i:] for i in range(ngram_value)]))
 
-
     def ngram_count(self):
-        if not self.tok_dct: return 1
+        if not self.tok_dct:
+            return 1
         s = set()
         for k in self.tok_dct.keys():
             s.add(len(k))
@@ -2530,7 +2708,8 @@ Returns:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def ngram_count(self):
-    if not self.tok_dct: return 1
+    if not self.tok_dct:
+        return 1
     s = set()
     for k in self.tok_dct.keys():
         s.add(len(k))
@@ -2568,29 +2747,32 @@ Returns:
     &#34;&#34;&#34;
     self.check_trained()
     if self.tok is None or self.lang is None:
-        raise Exception(&#39;Unfitted tokenizer or missing language. Did you run preprocess_train first?&#39;)
+        raise Exception(
+            &#34;Unfitted tokenizer or missing language. Did you run preprocess_train first?&#34;
+        )
 
     # check for and process chinese
     test_text = self.process_chinese(test_text, self.lang)
 
     # convert to word IDs
     x_test = self.tok.texts_to_sequences(test_text)
-    U.vprint(&#39;{} test sequences&#39;.format(len(x_test)), verbose=verbose)
-    self.print_seqlen_stats(x_test, &#39;test&#39;, verbose=verbose)
+    U.vprint(&#34;{} test sequences&#34;.format(len(x_test)), verbose=verbose)
+    self.print_seqlen_stats(x_test, &#34;test&#34;, verbose=verbose)
 
     # add n-grams
-    x_test = self._add_ngrams(x_test, mode=&#39;test&#39;, verbose=verbose)
-
+    x_test = self._add_ngrams(x_test, mode=&#34;test&#34;, verbose=verbose)
 
     # pad sequences
     x_test = keras.preprocessing.sequence.pad_sequences(x_test, maxlen=self.maxlen)
-    U.vprint(&#39;x_test shape: ({},{})&#39;.format(x_test.shape[0], x_test.shape[1]), verbose=verbose)
+    U.vprint(
+        &#34;x_test shape: ({},{})&#34;.format(x_test.shape[0], x_test.shape[1]),
+        verbose=verbose,
+    )
 
     # transform y
     y_test = self._transform_y(y_test, train=False, verbose=verbose)
     if y_test is not None and verbose:
-        print(&#39;y_test shape: %s&#39; % (y_test.shape,))
-
+        print(&#34;y_test shape: %s&#34; % (y_test.shape,))
 
     # return
     return (x_test, y_test)</code></pre>
@@ -2612,10 +2794,10 @@ Returns:
     preprocess training set
     ```
     &#34;&#34;&#34;
-    if self.lang is None: self.lang = TU.detect_lang(train_text)
+    if self.lang is None:
+        self.lang = TU.detect_lang(train_text)
 
-
-    U.vprint(&#39;language: %s&#39; % (self.lang), verbose=verbose)
+    U.vprint(&#34;language: %s&#34; % (self.lang), verbose=verbose)
 
     # special processing if Chinese
     train_text = self.process_chinese(train_text, lang=self.lang)
@@ -2623,29 +2805,34 @@ Returns:
     # extract vocabulary
     self.tok = keras.preprocessing.text.Tokenizer(num_words=self.max_features)
     self.tok.fit_on_texts(train_text)
-    U.vprint(&#39;Word Counts: {}&#39;.format(len(self.tok.word_counts)), verbose=verbose)
-    U.vprint(&#39;Nrows: {}&#39;.format(len(train_text)), verbose=verbose)
+    U.vprint(&#34;Word Counts: {}&#34;.format(len(self.tok.word_counts)), verbose=verbose)
+    U.vprint(&#34;Nrows: {}&#34;.format(len(train_text)), verbose=verbose)
 
     # convert to word IDs
     x_train = self.tok.texts_to_sequences(train_text)
-    U.vprint(&#39;{} train sequences&#39;.format(len(x_train)), verbose=verbose)
-    self.print_seqlen_stats(x_train, &#39;train&#39;, verbose=verbose)
+    U.vprint(&#34;{} train sequences&#34;.format(len(x_train)), verbose=verbose)
+    self.print_seqlen_stats(x_train, &#34;train&#34;, verbose=verbose)
 
     # add ngrams
     x_train = self._fit_ngrams(x_train, verbose=verbose)
 
     # pad sequences
-    x_train = keras.preprocessing.sequence.pad_sequences(x_train, maxlen=self.maxlen)
-    U.vprint(&#39;x_train shape: ({},{})&#39;.format(x_train.shape[0], x_train.shape[1]), verbose=verbose)
+    x_train = keras.preprocessing.sequence.pad_sequences(
+        x_train, maxlen=self.maxlen
+    )
+    U.vprint(
+        &#34;x_train shape: ({},{})&#34;.format(x_train.shape[0], x_train.shape[1]),
+        verbose=verbose,
+    )
 
     # transform y
     y_train = self._transform_y(y_train, train=True, verbose=verbose)
     if y_train is not None and verbose:
-        print(&#39;y_train shape: %s&#39; % (y_train.shape,))
+        print(&#34;y_train shape: %s&#34; % (y_train.shape,))
 
     # return
-    result =  (x_train, y_train)
-    self.set_multilabel(result, &#39;train&#39;)
+    result = (x_train, y_train)
+    self.set_multilabel(result, &#34;train&#34;)
     self.preprocess_train_called = True
     return result</code></pre>
 </details>
@@ -2680,69 +2867,73 @@ Returns:
     ```
     &#34;&#34;&#34;
 
-    def __init__(self, maxlen, class_names, lang=&#39;en&#39;, multilabel=None):
+    def __init__(self, maxlen, class_names, lang=&#34;en&#34;, multilabel=None):
 
-        self.set_classes(class_names) # converts to list of necessary
+        self.set_classes(class_names)  # converts to list of necessary
         self.maxlen = maxlen
         self.lang = lang
-        self.multilabel = multilabel # currently, this is always initially set None until set by set_multilabel
+        self.multilabel = multilabel  # currently, this is always initially set None until set by set_multilabel
         self.preprocess_train_called = False
-        #self.label_encoder = None # only set if y is in string format
+        # self.label_encoder = None # only set if y is in string format
         self.ytransform = None
         self.c = self.c.tolist() if isinstance(self.c, np.ndarray) else self.c
-
 
     def migrate_classes(self, class_names, classes):
         # NOTE: this method transforms to np.ndarray to list.
         # If removed and &#34;if class_names&#34; is issued prior to set_classes(), an error will occur.
-        class_names = class_names.tolist() if isinstance(class_names, np.ndarray) else class_names
+        class_names = (
+            class_names.tolist() if isinstance(class_names, np.ndarray) else class_names
+        )
         classes = classes.tolist() if isinstance(classes, np.ndarray) else classes
 
         if not class_names and classes:
             class_names = classes
-            warnings.warn(&#39;The class_names argument is replacing the classes argument. Please update your code.&#39;)
+            warnings.warn(
+                &#34;The class_names argument is replacing the classes argument. Please update your code.&#34;
+            )
         return class_names
 
-
     def get_tokenizer(self):
-        raise NotImplementedError(&#39;This method was not overridden in subclass&#39;)
+        raise NotImplementedError(&#34;This method was not overridden in subclass&#34;)
 
     def check_trained(self):
         if not self.preprocess_train_called:
-            warnings.warn(&#39;The method preprocess_train was never called. You can disable this warning by setting preprocess_train_called=True.&#39;)
-            #raise Exception(&#39;preprocess_train must be called&#39;)
-
+            warnings.warn(
+                &#34;The method preprocess_train was never called. You can disable this warning by setting preprocess_train_called=True.&#34;
+            )
+            # raise Exception(&#39;preprocess_train must be called&#39;)
 
     def get_preprocessor(self):
         raise NotImplementedError
 
-
     def get_classes(self):
         return self.c
 
-
     def set_classes(self, class_names):
-        self.c = class_names.tolist() if isinstance(class_names, np.ndarray) else class_names
-
+        self.c = (
+            class_names.tolist() if isinstance(class_names, np.ndarray) else class_names
+        )
 
     def preprocess(self, texts):
         raise NotImplementedError
 
-
     def set_multilabel(self, data, mode, verbose=1):
-        if mode == &#39;train&#39; and self.get_classes():
+        if mode == &#34;train&#34; and self.get_classes():
             original_multilabel = self.multilabel
             discovered_multilabel = U.is_multilabel(data)
             if original_multilabel is None:
                 self.multilabel = discovered_multilabel
             elif original_multilabel is True and discovered_multilabel is False:
-                warnings.warn(&#39;The multilabel=True argument was supplied, but labels do not indicate &#39;+\
-                              &#39;a multilabel problem (labels appear to be mutually-exclusive).  Using multilabel=True anyways.&#39;)
+                warnings.warn(
+                    &#34;The multilabel=True argument was supplied, but labels do not indicate &#34;
+                    + &#34;a multilabel problem (labels appear to be mutually-exclusive).  Using multilabel=True anyways.&#34;
+                )
             elif original_multilabel is False and discovered_multilabel is True:
-                warnings.warn(&#39;The multilabel=False argument was supplied, but labels inidcate that  &#39;+\
-                              &#39;this is a multilabel problem (labels are not mutually-exclusive).  Using multilabel=False anyways.&#39;)
+                warnings.warn(
+                    &#34;The multilabel=False argument was supplied, but labels inidcate that  &#34;
+                    + &#34;this is a multilabel problem (labels are not mutually-exclusive).  Using multilabel=False anyways.&#34;
+                )
             U.vprint(&#34;Is Multi-Label? %s&#34; % (self.multilabel), verbose=verbose)
-
 
     def undo(self, doc):
         &#34;&#34;&#34;
@@ -2753,21 +2944,19 @@ Returns:
         &#34;&#34;&#34;
         raise NotImplementedError
 
-
     def is_chinese(self):
         return TU.is_chinese(self.lang)
-
 
     def is_nospace_lang(self):
         return TU.is_nospace_lang(self.lang)
 
-
     def process_chinese(self, texts, lang=None):
-        #if lang is None: lang = langdetect.detect(texts[0])
-        if lang is None: lang = TU.detect_lang(texts)
-        if not TU.is_nospace_lang(lang): return texts
+        # if lang is None: lang = langdetect.detect(texts[0])
+        if lang is None:
+            lang = TU.detect_lang(texts)
+        if not TU.is_nospace_lang(lang):
+            return texts
         return TU.split_chinese(texts)
-
 
     @classmethod
     def seqlen_stats(cls, list_of_texts):
@@ -2790,9 +2979,8 @@ Returns:
             counts.append(len(lst))
         p95 = np.percentile(counts, 95)
         p99 = np.percentile(counts, 99)
-        avg = sum(counts)/len(counts)
-        return {&#39;mean&#39;:avg, &#39;95percentile&#39;: p95, &#39;99percentile&#39;:p99}
-
+        avg = sum(counts) / len(counts)
+        return {&#34;mean&#34;: avg, &#34;95percentile&#34;: p95, &#34;99percentile&#34;: p99}
 
     def print_seqlen_stats(self, texts, mode, verbose=1):
         &#34;&#34;&#34;
@@ -2802,10 +2990,9 @@ Returns:
         &#34;&#34;&#34;
         if verbose and not self.is_nospace_lang():
             stat_dict = TextPreprocessor.seqlen_stats(texts)
-            print( &#34;%s sequence lengths:&#34; % mode)
+            print(&#34;%s sequence lengths:&#34; % mode)
             for k in stat_dict:
                 print(&#34;\t%s : %s&#34; % (k, int(round(stat_dict[k]))))
-
 
     def _transform_y(self, y_data, train=False, verbose=1):
         &#34;&#34;&#34;
@@ -2818,7 +3005,8 @@ Returns:
         if self.ytransform is None:
             self.ytransform = U.YTransform(class_names=self.get_classes())
         y = self.ytransform.apply(y_data, train=train)
-        if train: self.c = self.ytransform.get_classes()
+        if train:
+            self.c = self.ytransform.get_classes()
         return y</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -2870,8 +3058,8 @@ def seqlen_stats(cls, list_of_texts):
         counts.append(len(lst))
     p95 = np.percentile(counts, 95)
     p99 = np.percentile(counts, 99)
-    avg = sum(counts)/len(counts)
-    return {&#39;mean&#39;:avg, &#39;95percentile&#39;: p95, &#39;99percentile&#39;:p99}</code></pre>
+    avg = sum(counts) / len(counts)
+    return {&#34;mean&#34;: avg, &#34;95percentile&#34;: p95, &#34;99percentile&#34;: p99}</code></pre>
 </details>
 </dd>
 </dl>
@@ -2888,7 +3076,9 @@ def seqlen_stats(cls, list_of_texts):
 </summary>
 <pre><code class="python">def check_trained(self):
     if not self.preprocess_train_called:
-        warnings.warn(&#39;The method preprocess_train was never called. You can disable this warning by setting preprocess_train_called=True.&#39;)</code></pre>
+        warnings.warn(
+            &#34;The method preprocess_train was never called. You can disable this warning by setting preprocess_train_called=True.&#34;
+        )</code></pre>
 </details>
 </dd>
 <dt id="ktrain.text.preprocessor.TextPreprocessor.get_classes"><code class="name flex">
@@ -2927,7 +3117,7 @@ def seqlen_stats(cls, list_of_texts):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_tokenizer(self):
-    raise NotImplementedError(&#39;This method was not overridden in subclass&#39;)</code></pre>
+    raise NotImplementedError(&#34;This method was not overridden in subclass&#34;)</code></pre>
 </details>
 </dd>
 <dt id="ktrain.text.preprocessor.TextPreprocessor.is_chinese"><code class="name flex">
@@ -2968,12 +3158,16 @@ def seqlen_stats(cls, list_of_texts):
 <pre><code class="python">def migrate_classes(self, class_names, classes):
     # NOTE: this method transforms to np.ndarray to list.
     # If removed and &#34;if class_names&#34; is issued prior to set_classes(), an error will occur.
-    class_names = class_names.tolist() if isinstance(class_names, np.ndarray) else class_names
+    class_names = (
+        class_names.tolist() if isinstance(class_names, np.ndarray) else class_names
+    )
     classes = classes.tolist() if isinstance(classes, np.ndarray) else classes
 
     if not class_names and classes:
         class_names = classes
-        warnings.warn(&#39;The class_names argument is replacing the classes argument. Please update your code.&#39;)
+        warnings.warn(
+            &#34;The class_names argument is replacing the classes argument. Please update your code.&#34;
+        )
     return class_names</code></pre>
 </details>
 </dd>
@@ -3008,7 +3202,7 @@ def seqlen_stats(cls, list_of_texts):
     &#34;&#34;&#34;
     if verbose and not self.is_nospace_lang():
         stat_dict = TextPreprocessor.seqlen_stats(texts)
-        print( &#34;%s sequence lengths:&#34; % mode)
+        print(&#34;%s sequence lengths:&#34; % mode)
         for k in stat_dict:
             print(&#34;\t%s : %s&#34; % (k, int(round(stat_dict[k]))))</code></pre>
 </details>
@@ -3023,9 +3217,11 @@ def seqlen_stats(cls, list_of_texts):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def process_chinese(self, texts, lang=None):
-    #if lang is None: lang = langdetect.detect(texts[0])
-    if lang is None: lang = TU.detect_lang(texts)
-    if not TU.is_nospace_lang(lang): return texts
+    # if lang is None: lang = langdetect.detect(texts[0])
+    if lang is None:
+        lang = TU.detect_lang(texts)
+    if not TU.is_nospace_lang(lang):
+        return texts
     return TU.split_chinese(texts)</code></pre>
 </details>
 </dd>
@@ -3039,7 +3235,9 @@ def seqlen_stats(cls, list_of_texts):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def set_classes(self, class_names):
-    self.c = class_names.tolist() if isinstance(class_names, np.ndarray) else class_names</code></pre>
+    self.c = (
+        class_names.tolist() if isinstance(class_names, np.ndarray) else class_names
+    )</code></pre>
 </details>
 </dd>
 <dt id="ktrain.text.preprocessor.TextPreprocessor.set_multilabel"><code class="name flex">
@@ -3052,17 +3250,21 @@ def seqlen_stats(cls, list_of_texts):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def set_multilabel(self, data, mode, verbose=1):
-    if mode == &#39;train&#39; and self.get_classes():
+    if mode == &#34;train&#34; and self.get_classes():
         original_multilabel = self.multilabel
         discovered_multilabel = U.is_multilabel(data)
         if original_multilabel is None:
             self.multilabel = discovered_multilabel
         elif original_multilabel is True and discovered_multilabel is False:
-            warnings.warn(&#39;The multilabel=True argument was supplied, but labels do not indicate &#39;+\
-                          &#39;a multilabel problem (labels appear to be mutually-exclusive).  Using multilabel=True anyways.&#39;)
+            warnings.warn(
+                &#34;The multilabel=True argument was supplied, but labels do not indicate &#34;
+                + &#34;a multilabel problem (labels appear to be mutually-exclusive).  Using multilabel=True anyways.&#34;
+            )
         elif original_multilabel is False and discovered_multilabel is True:
-            warnings.warn(&#39;The multilabel=False argument was supplied, but labels inidcate that  &#39;+\
-                          &#39;this is a multilabel problem (labels are not mutually-exclusive).  Using multilabel=False anyways.&#39;)
+            warnings.warn(
+                &#34;The multilabel=False argument was supplied, but labels inidcate that  &#34;
+                + &#34;this is a multilabel problem (labels are not mutually-exclusive).  Using multilabel=False anyways.&#34;
+            )
         U.vprint(&#34;Is Multi-Label? %s&#34; % (self.multilabel), verbose=verbose)</code></pre>
 </details>
 </dd>
@@ -3094,7 +3296,7 @@ converting a list or array of Word IDs back to words
 <span>(</span><span>model_name, maxlen=128, class_names=[], classes=[], batch_size=None, use_with_learner=True)</span>
 </code></dt>
 <dd>
-<div class="desc"><pre><code>convenience class for text classification Hugging Face transformers 
+<div class="desc"><pre><code>convenience class for text classification Hugging Face transformers
 Usage:
    t = Transformer('distilbert-base-uncased', maxlen=128, classes=['neg', 'pos'], batch_size=16)
    train_dataset = t.preprocess_train(train_texts, train_labels)
@@ -3133,7 +3335,7 @@ Usage:
 <pre><code class="python">class Transformer(TransformersPreprocessor):
     &#34;&#34;&#34;
     ```
-    convenience class for text classification Hugging Face transformers 
+    convenience class for text classification Hugging Face transformers
     Usage:
        t = Transformer(&#39;distilbert-base-uncased&#39;, maxlen=128, classes=[&#39;neg&#39;, &#39;pos&#39;], batch_size=16)
        train_dataset = t.preprocess_train(train_texts, train_labels)
@@ -3142,8 +3344,15 @@ Usage:
     ```
     &#34;&#34;&#34;
 
-    def __init__(self, model_name, maxlen=128, class_names=[], classes=[],
-                 batch_size=None, use_with_learner=True):
+    def __init__(
+        self,
+        model_name,
+        maxlen=128,
+        class_names=[],
+        classes=[],
+        batch_size=None,
+        use_with_learner=True,
+    ):
         &#34;&#34;&#34;
         ```
         Args:
@@ -3172,20 +3381,24 @@ Usage:
 
         ```
         &#34;&#34;&#34;
-        multilabel = None # force discovery of multilabel task from data in preprocess_train-&gt;set_multilabel
+        multilabel = None  # force discovery of multilabel task from data in preprocess_train-&gt;set_multilabel
         class_names = self.migrate_classes(class_names, classes)
         if not use_with_learner and batch_size is None:
-            raise ValueError(&#39;batch_size is required when use_with_learner=False&#39;)
+            raise ValueError(&#34;batch_size is required when use_with_learner=False&#34;)
         if multilabel and (class_names is None or not class_names):
-            raise ValueError(&#39;classes argument is required when multilabel=True&#39;)
-        super().__init__(model_name,
-                         maxlen, max_features=10000, class_names=class_names, multilabel=multilabel)
+            raise ValueError(&#34;classes argument is required when multilabel=True&#34;)
+        super().__init__(
+            model_name,
+            maxlen,
+            max_features=10000,
+            class_names=class_names,
+            multilabel=multilabel,
+        )
         self.batch_size = batch_size
         self.use_with_learner = use_with_learner
         self.lang = None
 
-
-    def preprocess_train(self, texts, y=None, mode=&#39;train&#39;, verbose=1):
+    def preprocess_train(self, texts, y=None, mode=&#34;train&#34;, verbose=1):
         &#34;&#34;&#34;
         ```
         Preprocess training set for A Transformer model
@@ -3214,13 +3427,13 @@ Usage:
         ```
         &#34;&#34;&#34;
         tseq = super().preprocess_train(texts, y=y, mode=mode, verbose=verbose)
-        if self.use_with_learner: return tseq
+        if self.use_with_learner:
+            return tseq
         tseq.batch_size = self.batch_size
-        train = (mode == &#39;train&#39;)
+        train = mode == &#34;train&#34;
         return tseq.to_tfdataset(train=train)
 
-
-    def preprocess_test(self, texts, y=None,  verbose=1):
+    def preprocess_test(self, texts, y=None, verbose=1):
         &#34;&#34;&#34;
         ```
         Preprocess the validation or test set for a Transformer model
@@ -3245,7 +3458,7 @@ Usage:
         ```
         &#34;&#34;&#34;
         self.check_trained()
-        return self.preprocess_train(texts, y=y, mode=&#39;test&#39;, verbose=verbose)</code></pre>
+        return self.preprocess_train(texts, y=y, mode=&#34;test&#34;, verbose=verbose)</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -3284,7 +3497,7 @@ Returns:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def preprocess_test(self, texts, y=None,  verbose=1):
+<pre><code class="python">def preprocess_test(self, texts, y=None, verbose=1):
     &#34;&#34;&#34;
     ```
     Preprocess the validation or test set for a Transformer model
@@ -3309,7 +3522,7 @@ Returns:
     ```
     &#34;&#34;&#34;
     self.check_trained()
-    return self.preprocess_train(texts, y=y, mode=&#39;test&#39;, verbose=verbose)</code></pre>
+    return self.preprocess_train(texts, y=y, mode=&#34;test&#34;, verbose=verbose)</code></pre>
 </details>
 </dd>
 <dt id="ktrain.text.preprocessor.Transformer.preprocess_train"><code class="name flex">
@@ -3344,7 +3557,7 @@ Returns:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def preprocess_train(self, texts, y=None, mode=&#39;train&#39;, verbose=1):
+<pre><code class="python">def preprocess_train(self, texts, y=None, mode=&#34;train&#34;, verbose=1):
     &#34;&#34;&#34;
     ```
     Preprocess training set for A Transformer model
@@ -3373,9 +3586,10 @@ Returns:
     ```
     &#34;&#34;&#34;
     tseq = super().preprocess_train(texts, y=y, mode=mode, verbose=verbose)
-    if self.use_with_learner: return tseq
+    if self.use_with_learner:
+        return tseq
     tseq.batch_size = self.batch_size
-    train = (mode == &#39;train&#39;)
+    train = mode == &#34;train&#34;
     return tseq.to_tfdataset(train=train)</code></pre>
 </details>
 </dd>
@@ -3410,7 +3624,7 @@ Returns:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class TransformerEmbedding():
+<pre><code class="python">class TransformerEmbedding:
     def __init__(self, model_name, layers=U.DEFAULT_TRANSFORMER_LAYERS):
         &#34;&#34;&#34;
         ```
@@ -3419,15 +3633,15 @@ Returns:
                                Choose from here: https://huggingface.co/transformers/pretrained_models.html
             layers(list): list of indexes indicating which hidden layers to use when
                           constructing the embedding (e.g., last=[-1])
-                               
+
         ```
         &#34;&#34;&#34;
         self.layers = layers
         self.model_name = model_name
-        if model_name.startswith(&#39;xlm-roberta&#39;):
-            self.name = &#39;xlm_roberta&#39;
+        if model_name.startswith(&#34;xlm-roberta&#34;):
+            self.name = &#34;xlm_roberta&#34;
         else:
-            self.name = model_name.split(&#39;-&#39;)[0]
+            self.name = model_name.split(&#34;-&#34;)[0]
 
         self.config = AutoConfig.from_pretrained(model_name)
         self.model_type = TFAutoModel
@@ -3439,14 +3653,22 @@ Returns:
         self.tokenizer = self.tokenizer_type.from_pretrained(model_name)
         self.model = self._load_pretrained(model_name)
         try:
-            self.embsize = self.embed(&#39;ktrain&#39;, word_level=False).shape[1] # (batch_size, embsize)
+            self.embsize = self.embed(&#34;ktrain&#34;, word_level=False).shape[
+                1
+            ]  # (batch_size, embsize)
         except:
-            warnings.warn(&#39;could not determine Embedding size&#39;)
-        if type(self.model).__name__ not in [&#39;TFBertModel&#39;, &#39;TFDistilBertModel&#39;, &#39;TFAlbertModel&#39;]:
-            raise ValueError(&#39;TransformerEmbedding class currently only supports BERT-style models: &#39; +\
-                             &#39;Bert, DistilBert, and Albert and variants like BioBERT and SciBERT\n\n&#39; +\
-                             &#39;model received: %s (%s))&#39; % (type(self.model).__name__, model_name))
-
+            warnings.warn(&#34;could not determine Embedding size&#34;)
+        # if type(self.model).__name__ not in [
+        # &#34;TFBertModel&#34;,
+        # &#34;TFDistilBertModel&#34;,
+        # &#34;TFAlbertModel&#34;,
+        # &#34;TFRobertaModel&#34;,
+        # ]:
+        # raise ValueError(
+        # &#34;TransformerEmbedding class currently only supports BERT-style models: &#34;
+        # + &#34;Bert, DistilBert, RoBERTa and Albert and variants like BioBERT and SciBERT\n\n&#34;
+        # + &#34;model received: %s (%s))&#34; % (type(self.model).__name__, model_name)
+        # )
 
     def _load_pretrained(self, model_name):
         &#34;&#34;&#34;
@@ -3459,19 +3681,22 @@ Returns:
             try:
                 model = self.model_type.from_pretrained(model_name, config=self.config)
             except:
-                warnings.warn(&#39;Could not find Tensorflow version of model.  Attempting to download/load PyTorch version as TensorFlow model using from_pt=True. &#39; +\
-                              &#39;You will need PyTorch installed for this.&#39;)
-                try:
-                    model = self.model_type.from_pretrained(model_name, config=self.config, from_pt=True)
-                except:
-                    raise ValueError(&#39;could not load pretrained model %s using both from_pt=False and from_pt=True&#39; % (model_name))
+                warnings.warn(
+                    &#34;Could not load a Tensorflow version of model. (If this worked before, it might be an out-of-memory issue.) &#34; +\
+                    &#34;Attempting to download/load PyTorch version as TensorFlow model using from_pt=True. You will need PyTorch installed for this.&#34; 
+                )
+                model = self.model_type.from_pretrained(
+                    model_name, config=self.config, from_pt=True
+                )
         else:
-            model = self.model_type.from_pretrained(model_name, output_hidden_states=True)
+            model = self.model_type.from_pretrained(
+                model_name, output_hidden_states=True
+            )
         return model
 
-
-
-    def embed(self, texts, word_level=True, max_length=512):
+    def embed(
+        self, texts, word_level=True, max_length=512, aggregation_strategy=&#34;first&#34;, layers=U.DEFAULT_TRANSFORMER_LAYERS
+    ):
         &#34;&#34;&#34;
         ```
         get embedding for word, phrase, or sentence
@@ -3480,44 +3705,70 @@ Returns:
           word_level(bool): If True, returns embedding for each token in supplied texts.
                             If False, returns embedding for each text in texts
           max_length(int): max length of tokens
+          aggregation_strategy(str): If &#39;first&#39;, vector of first subword is used as representation.
+                                     If &#39;average&#39;, mean of all subword vectors is used.
+          layers(list): list of indexes indicating which hidden layers to use when
+                        constructing the embedding (e.g., last hidden state is [-1])
         Returns:
             np.ndarray : embeddings
         ```
         &#34;&#34;&#34;
-        if isinstance(texts, str): texts = [texts]
-        if not isinstance(texts[0], str): texts = [&#34; &#34;.join(text) for text in texts]
+        if isinstance(texts, str):
+            texts = [texts]
+        if not isinstance(texts[0], str):
+            texts = [&#34; &#34;.join(text) for text in texts]
 
         sentences = []
         for text in texts:
             sentences.append(self.tokenizer.tokenize(text))
-        maxlen = len(max([tokens for tokens in sentences], key=len,)) + 2
-        if max_length is not None and maxlen &gt; max_length: maxlen = max_length # added due to issue #270
+        maxlen = (
+            len(
+                max(
+                    [tokens for tokens in sentences],
+                    key=len,
+                )
+            )
+            + 2
+        )
+        if max_length is not None and maxlen &gt; max_length:
+            maxlen = max_length  # added due to issue #270
         sentences = []
 
         all_input_ids = []
         all_input_masks = []
+        all_word_ids = []
+        all_offsets = []
         for text in texts:
-            tokens = self.tokenizer.tokenize(text)
+            encoded = self.tokenizer.encode_plus(
+                text, max_length=maxlen, truncation=True, return_offsets_mapping=True
+            )
+            input_ids = encoded[&#34;input_ids&#34;]
+            offsets = encoded[&#34;offset_mapping&#34;]
+            del encoded[&#34;offset_mapping&#34;]
+            inp = encoded[&#34;input_ids&#34;][:]
+            inp = inp[1:] if inp[0] == self.tokenizer.cls_token_id else inp
+            inp = inp[:-1] if inp[-1] == self.tokenizer.sep_token_id else inp
+            tokens = self.tokenizer.convert_ids_to_tokens(inp)
             if len(tokens) &gt; maxlen - 2:
                 tokens = tokens[0 : (maxlen - 2)]
             sentences.append(tokens)
-            tokens = [self.tokenizer.cls_token] + tokens + [self.tokenizer.sep_token]
-            input_ids = self.tokenizer.convert_tokens_to_ids(tokens)
             input_mask = [1] * len(input_ids)
             while len(input_ids) &lt; maxlen:
                 input_ids.append(0)
                 input_mask.append(0)
             all_input_ids.append(input_ids)
             all_input_masks.append(input_mask)
+            all_word_ids.append(encoded.word_ids())
+            all_offsets.append(offsets)
 
         all_input_ids = np.array(all_input_ids)
         all_input_masks = np.array(all_input_masks)
         outputs = self.model(all_input_ids, attention_mask=all_input_masks)
-        hidden_states = outputs[-1] # output_hidden_states=True
+        hidden_states = outputs[-1]  # output_hidden_states=True
 
         # compile raw embeddings
         if len(self.layers) == 1:
-            #raw_embeddings = hidden_states[-1].numpy()
+            # raw_embeddings = hidden_states[-1].numpy()
             raw_embeddings = hidden_states[self.layers[0]].numpy()
         else:
             raw_embeddings = []
@@ -3526,30 +3777,57 @@ Returns:
                 for token_id in range(hidden_states[0].shape[1]):
                     all_layers = []
                     for layer_id in self.layers:
-                        all_layers.append(hidden_states[layer_id][batch_id][token_id].numpy())
-                    token_embeddings.append(np.concatenate(all_layers) )  
+                        all_layers.append(
+                            hidden_states[layer_id][batch_id][token_id].numpy()
+                        )
+                    token_embeddings.append(np.concatenate(all_layers))
                 raw_embeddings.append(token_embeddings)
             raw_embeddings = np.array(raw_embeddings)
 
-        if not word_level: # sentence-level embedding
+        if not word_level:  # sentence-level embedding
             return np.mean(raw_embeddings, axis=1)
-            #return np.squeeze(raw_embeddings[:,0:1,:], axis=1)
 
-        # filter-out extra subword tokens and special tokens 
-        # (using first subword of each token as embedding representations)
+        # all space-separate tokens in input should be assigned a single embedding vector
+        # example: If 99.9% is a token, then it gets a single embedding.
+        # example: If input is pre-tokenized (i.e., 99 . 9 %), then there are four embedding vectors
         filtered_embeddings = []
-        for batch_idx, tokens in enumerate(sentences):
-            embedding = []
-            for token_idx, token in enumerate(tokens):
-                if token in [self.tokenizer.cls_token, self.tokenizer.sep_token] or token.startswith(&#39;##&#39;): continue
-                embedding.append(raw_embeddings[batch_idx][token_idx])
-            filtered_embeddings.append(embedding)
+        for i in range(len(raw_embeddings)):
+            filtered_embedding = []
+            raw_embedding = raw_embeddings[i]
+            subvectors = []
+            last_offset = (-1, -1)
+            #subwords = [] # debugging
+            for j in range(len(all_offsets[i])):
+                if all_word_ids[i][j] is None:
+                    continue
+                # must test to see if start is same as last offset start due to xml-roberta quirk with tokens like 070
+                if all_offsets[i][j][0] == last_offset[1] or all_offsets[i][j][0] == last_offset[0]:
+                    subvectors.append(raw_embedding[j])
+                    #subwords[-1] += texts[i][all_offsets[i][j][0]:all_offsets[i][j][1]] # debugging
+                    last_offset = all_offsets[i][j]
+                if all_offsets[i][j][0] &gt; last_offset[1]:
+                    #subwords.append(texts[i][all_offsets[i][j][0]:all_offsets[i][j][1]]) # debugging
+                    if len(subvectors) &gt; 0:
+                        if aggregation_strategy == &#34;average&#34;:
+                            filtered_embedding.append(np.mean(subvectors, axis=0))
+                        else:
+                            filtered_embedding.append(subvectors[0])
+                        subvectors = []
+                    subvectors.append(raw_embedding[j])
+                    last_offset = all_offsets[i][j]
+            if len(subvectors) &gt; 0:
+                if aggregation_strategy == &#34;average&#34;:
+                    filtered_embedding.append(np.mean(subvectors, axis=0))
+                else:
+                    filtered_embedding.append(subvectors[0])
+                subvectors = []
+            filtered_embeddings.append(filtered_embedding)
 
         # pad embeddings with zeros
         max_length = max([len(e) for e in filtered_embeddings])
         embeddings = []
         for e in filtered_embeddings:
-            for i in range(max_length-len(e)):
+            for i in range(max_length - len(e)):
                 e.append(np.zeros((self.embsize,)))
             embeddings.append(np.array(e))
         return np.array(embeddings)</code></pre>
@@ -3557,7 +3835,7 @@ Returns:
 <h3>Methods</h3>
 <dl>
 <dt id="ktrain.text.preprocessor.TransformerEmbedding.embed"><code class="name flex">
-<span>def <span class="ident">embed</span></span>(<span>self, texts, word_level=True, max_length=512)</span>
+<span>def <span class="ident">embed</span></span>(<span>self, texts, word_level=True, max_length=512, aggregation_strategy='first', layers=[-2])</span>
 </code></dt>
 <dd>
 <div class="desc"><pre><code>get embedding for word, phrase, or sentence
@@ -3566,6 +3844,10 @@ Args:
   word_level(bool): If True, returns embedding for each token in supplied texts.
                     If False, returns embedding for each text in texts
   max_length(int): max length of tokens
+  aggregation_strategy(str): If 'first', vector of first subword is used as representation.
+                             If 'average', mean of all subword vectors is used.
+  layers(list): list of indexes indicating which hidden layers to use when
+                constructing the embedding (e.g., last hidden state is [-1])
 Returns:
     np.ndarray : embeddings
 </code></pre></div>
@@ -3573,7 +3855,9 @@ Returns:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def embed(self, texts, word_level=True, max_length=512):
+<pre><code class="python">def embed(
+    self, texts, word_level=True, max_length=512, aggregation_strategy=&#34;first&#34;, layers=U.DEFAULT_TRANSFORMER_LAYERS
+):
     &#34;&#34;&#34;
     ```
     get embedding for word, phrase, or sentence
@@ -3582,44 +3866,70 @@ Returns:
       word_level(bool): If True, returns embedding for each token in supplied texts.
                         If False, returns embedding for each text in texts
       max_length(int): max length of tokens
+      aggregation_strategy(str): If &#39;first&#39;, vector of first subword is used as representation.
+                                 If &#39;average&#39;, mean of all subword vectors is used.
+      layers(list): list of indexes indicating which hidden layers to use when
+                    constructing the embedding (e.g., last hidden state is [-1])
     Returns:
         np.ndarray : embeddings
     ```
     &#34;&#34;&#34;
-    if isinstance(texts, str): texts = [texts]
-    if not isinstance(texts[0], str): texts = [&#34; &#34;.join(text) for text in texts]
+    if isinstance(texts, str):
+        texts = [texts]
+    if not isinstance(texts[0], str):
+        texts = [&#34; &#34;.join(text) for text in texts]
 
     sentences = []
     for text in texts:
         sentences.append(self.tokenizer.tokenize(text))
-    maxlen = len(max([tokens for tokens in sentences], key=len,)) + 2
-    if max_length is not None and maxlen &gt; max_length: maxlen = max_length # added due to issue #270
+    maxlen = (
+        len(
+            max(
+                [tokens for tokens in sentences],
+                key=len,
+            )
+        )
+        + 2
+    )
+    if max_length is not None and maxlen &gt; max_length:
+        maxlen = max_length  # added due to issue #270
     sentences = []
 
     all_input_ids = []
     all_input_masks = []
+    all_word_ids = []
+    all_offsets = []
     for text in texts:
-        tokens = self.tokenizer.tokenize(text)
+        encoded = self.tokenizer.encode_plus(
+            text, max_length=maxlen, truncation=True, return_offsets_mapping=True
+        )
+        input_ids = encoded[&#34;input_ids&#34;]
+        offsets = encoded[&#34;offset_mapping&#34;]
+        del encoded[&#34;offset_mapping&#34;]
+        inp = encoded[&#34;input_ids&#34;][:]
+        inp = inp[1:] if inp[0] == self.tokenizer.cls_token_id else inp
+        inp = inp[:-1] if inp[-1] == self.tokenizer.sep_token_id else inp
+        tokens = self.tokenizer.convert_ids_to_tokens(inp)
         if len(tokens) &gt; maxlen - 2:
             tokens = tokens[0 : (maxlen - 2)]
         sentences.append(tokens)
-        tokens = [self.tokenizer.cls_token] + tokens + [self.tokenizer.sep_token]
-        input_ids = self.tokenizer.convert_tokens_to_ids(tokens)
         input_mask = [1] * len(input_ids)
         while len(input_ids) &lt; maxlen:
             input_ids.append(0)
             input_mask.append(0)
         all_input_ids.append(input_ids)
         all_input_masks.append(input_mask)
+        all_word_ids.append(encoded.word_ids())
+        all_offsets.append(offsets)
 
     all_input_ids = np.array(all_input_ids)
     all_input_masks = np.array(all_input_masks)
     outputs = self.model(all_input_ids, attention_mask=all_input_masks)
-    hidden_states = outputs[-1] # output_hidden_states=True
+    hidden_states = outputs[-1]  # output_hidden_states=True
 
     # compile raw embeddings
     if len(self.layers) == 1:
-        #raw_embeddings = hidden_states[-1].numpy()
+        # raw_embeddings = hidden_states[-1].numpy()
         raw_embeddings = hidden_states[self.layers[0]].numpy()
     else:
         raw_embeddings = []
@@ -3628,30 +3938,57 @@ Returns:
             for token_id in range(hidden_states[0].shape[1]):
                 all_layers = []
                 for layer_id in self.layers:
-                    all_layers.append(hidden_states[layer_id][batch_id][token_id].numpy())
-                token_embeddings.append(np.concatenate(all_layers) )  
+                    all_layers.append(
+                        hidden_states[layer_id][batch_id][token_id].numpy()
+                    )
+                token_embeddings.append(np.concatenate(all_layers))
             raw_embeddings.append(token_embeddings)
         raw_embeddings = np.array(raw_embeddings)
 
-    if not word_level: # sentence-level embedding
+    if not word_level:  # sentence-level embedding
         return np.mean(raw_embeddings, axis=1)
-        #return np.squeeze(raw_embeddings[:,0:1,:], axis=1)
 
-    # filter-out extra subword tokens and special tokens 
-    # (using first subword of each token as embedding representations)
+    # all space-separate tokens in input should be assigned a single embedding vector
+    # example: If 99.9% is a token, then it gets a single embedding.
+    # example: If input is pre-tokenized (i.e., 99 . 9 %), then there are four embedding vectors
     filtered_embeddings = []
-    for batch_idx, tokens in enumerate(sentences):
-        embedding = []
-        for token_idx, token in enumerate(tokens):
-            if token in [self.tokenizer.cls_token, self.tokenizer.sep_token] or token.startswith(&#39;##&#39;): continue
-            embedding.append(raw_embeddings[batch_idx][token_idx])
-        filtered_embeddings.append(embedding)
+    for i in range(len(raw_embeddings)):
+        filtered_embedding = []
+        raw_embedding = raw_embeddings[i]
+        subvectors = []
+        last_offset = (-1, -1)
+        #subwords = [] # debugging
+        for j in range(len(all_offsets[i])):
+            if all_word_ids[i][j] is None:
+                continue
+            # must test to see if start is same as last offset start due to xml-roberta quirk with tokens like 070
+            if all_offsets[i][j][0] == last_offset[1] or all_offsets[i][j][0] == last_offset[0]:
+                subvectors.append(raw_embedding[j])
+                #subwords[-1] += texts[i][all_offsets[i][j][0]:all_offsets[i][j][1]] # debugging
+                last_offset = all_offsets[i][j]
+            if all_offsets[i][j][0] &gt; last_offset[1]:
+                #subwords.append(texts[i][all_offsets[i][j][0]:all_offsets[i][j][1]]) # debugging
+                if len(subvectors) &gt; 0:
+                    if aggregation_strategy == &#34;average&#34;:
+                        filtered_embedding.append(np.mean(subvectors, axis=0))
+                    else:
+                        filtered_embedding.append(subvectors[0])
+                    subvectors = []
+                subvectors.append(raw_embedding[j])
+                last_offset = all_offsets[i][j]
+        if len(subvectors) &gt; 0:
+            if aggregation_strategy == &#34;average&#34;:
+                filtered_embedding.append(np.mean(subvectors, axis=0))
+            else:
+                filtered_embedding.append(subvectors[0])
+            subvectors = []
+        filtered_embeddings.append(filtered_embedding)
 
     # pad embeddings with zeros
     max_length = max([len(e) for e in filtered_embeddings])
     embeddings = []
     for e in filtered_embeddings:
-        for i in range(max_length-len(e)):
+        for i in range(max_length - len(e)):
             e.append(np.zeros((self.embsize,)))
         embeddings.append(np.array(e))
     return np.array(embeddings)</code></pre>
@@ -3677,22 +4014,33 @@ Returns:
     ```
     &#34;&#34;&#34;
 
-    def __init__(self,  model_name,
-                maxlen, max_features, class_names=[], classes=[], 
-                lang=&#39;en&#39;, ngram_range=1, multilabel=None):
+    def __init__(
+        self,
+        model_name,
+        maxlen,
+        max_features,
+        class_names=[],
+        classes=[],
+        lang=&#34;en&#34;,
+        ngram_range=1,
+        multilabel=None,
+    ):
         class_names = self.migrate_classes(class_names, classes)
 
-        if maxlen &gt; 512: warnings.warn(&#39;Transformer models typically only support maxlen &lt;= 512, unless you are using certain models like the Longformer.&#39;)
+        if maxlen &gt; 512:
+            warnings.warn(
+                &#34;Transformer models typically only support maxlen &lt;= 512, unless you are using certain models like the Longformer.&#34;
+            )
 
         super().__init__(maxlen, class_names, lang=lang, multilabel=multilabel)
 
         self.model_name = model_name
-        self.name = model_name.split(&#39;-&#39;)[0]
-        if model_name.startswith(&#39;xlm-roberta&#39;): 
-            self.name = &#39;xlm_roberta&#39;
-            self.model_name = &#39;jplu/tf-&#39; + self.model_name
+        self.name = model_name.split(&#34;-&#34;)[0]
+        if model_name.startswith(&#34;xlm-roberta&#34;):
+            self.name = &#34;xlm_roberta&#34;
+            self.model_name = &#34;jplu/tf-&#34; + self.model_name
         else:
-            self.name = model_name.split(&#39;-&#39;)[0]
+            self.name = model_name.split(&#34;-&#34;)[0]
         self.config = AutoConfig.from_pretrained(model_name)
         self.model_type = TFAutoModelForSequenceClassification
         self.tokenizer_type = AutoTokenizer
@@ -3703,18 +4051,16 @@ Returns:
         # NOTE: As of v0.16.1, do not unnecessarily instantiate tokenizer
         # as it will be saved/pickled along with Preprocessor, which causes
         # problems for some community-uploaded models like bert-base-japanse-whole-word-masking.
-        #tokenizer = self.tokenizer_type.from_pretrained(model_name)
-        #self.tok = tokenizer
-        self.tok = None # not pickled,  see __getstate__ 
+        # tokenizer = self.tokenizer_type.from_pretrained(model_name)
+        # self.tok = tokenizer
+        self.tok = None  # not pickled,  see __getstate__
 
         self.tok_dct = None
-        self.max_features = max_features # ignored
-        self.ngram_range = 1 # ignored
-
+        self.max_features = max_features  # ignored
+        self.ngram_range = 1  # ignored
 
     def __getstate__(self):
-        return {k: v for k, v in self.__dict__.items() if k not in [&#39;tok&#39;]}
-
+        return {k: v for k, v in self.__dict__.items() if k not in [&#34;tok&#34;]}
 
     def __setstate__(self, state):
         &#34;&#34;&#34;
@@ -3724,10 +4070,13 @@ Returns:
         ```
         &#34;&#34;&#34;
         self.__dict__.update(state)
-        if not hasattr(self, &#39;tok&#39;): self.tok = None
-        if not hasattr(self, &#39;ytransform&#39;): 
-            le = self.label_encoder if hasattr(self, &#39;label_encoder&#39;) else None
-            self.ytransform = U.YTransform(class_names=self.get_classes(), label_encoder=le)
+        if not hasattr(self, &#34;tok&#34;):
+            self.tok = None
+        if not hasattr(self, &#34;ytransform&#34;):
+            le = self.label_encoder if hasattr(self, &#34;label_encoder&#34;) else None
+            self.ytransform = U.YTransform(
+                class_names=self.get_classes(), label_encoder=le
+            )
 
     def set_config(self, config):
         self.config = config
@@ -3743,48 +4092,49 @@ Returns:
         if self.tok is None:
             try:
                 # use fast tokenizer if possible
-                if self.name == &#39;bert&#39; and &#39;japanese&#39; not in model_name:
+                if self.name == &#34;bert&#34; and &#34;japanese&#34; not in model_name:
                     from transformers import BertTokenizerFast
+
                     self.tok = BertTokenizerFast.from_pretrained(model_name)
-                elif self.name == &#39;distilbert&#39;:
+                elif self.name == &#34;distilbert&#34;:
                     from transformers import DistilBertTokenizerFast
+
                     self.tok = DistilBertTokenizerFast.from_pretrained(model_name)
-                elif self.name == &#39;roberta&#39;:
+                elif self.name == &#34;roberta&#34;:
                     from transformers import RobertaTokenizerFast
+
                     self.tok = RobertaTokenizerFast.from_pretrained(model_name)
                 else:
                     self.tok = self.tokenizer_type.from_pretrained(model_name)
             except:
-                error_msg = f&#34;Could not load tokenizer from model_name: {model_name}. &#34; +\
-                            f&#34;If {model_name} is a local path, please make sure it exists and contains tokenizer files from Hugging Face. &#34; +\
-                            f&#34;You can also reset model_name with preproc.model_name = &#39;/your/new/path&#39;.&#34;
+                error_msg = (
+                    f&#34;Could not load tokenizer from model_name: {model_name}. &#34;
+                    + f&#34;If {model_name} is a local path, please make sure it exists and contains tokenizer files from Hugging Face. &#34;
+                    + f&#34;You can also reset model_name with preproc.model_name = &#39;/your/new/path&#39;.&#34;
+                )
                 raise ValueError(error_msg)
         return self.tok
 
-
     def save_tokenizer(self, fpath):
         if os.path.isfile(fpath):
-            raise ValueError(f&#39;There is an existing file named {fpath}. &#39; +\
-                              &#39;Please use dfferent value for fpath.&#39;)
+            raise ValueError(
+                f&#34;There is an existing file named {fpath}. &#34;
+                + &#34;Please use dfferent value for fpath.&#34;
+            )
         elif os.path.exists(fpath):
             pass
         elif not os.path.exists(fpath):
             os.makedirs(fpath)
-        tok =self.get_tokenizer()
+        tok = self.get_tokenizer()
         tok.save_pretrained(fpath)
         return
-
-
 
     def get_preprocessor(self):
         return (self.get_tokenizer(), self.tok_dct)
 
-
-
     def preprocess(self, texts):
         tseq = self.preprocess_test(texts, verbose=0)
         return tseq.to_tfdataset(train=False)
-
 
     def undo(self, doc):
         &#34;&#34;&#34;
@@ -3795,56 +4145,64 @@ Returns:
         &#34;&#34;&#34;
         tok, _ = self.get_preprocessor()
         return self.tok.convert_ids_to_tokens(doc)
-        #raise Exception(&#39;currently_unsupported: Transformers.Preprocessor.undo is not yet supported&#39;)
+        # raise Exception(&#39;currently_unsupported: Transformers.Preprocessor.undo is not yet supported&#39;)
 
-
-    def preprocess_train(self, texts, y=None, mode=&#39;train&#39;, verbose=1):
+    def preprocess_train(self, texts, y=None, mode=&#34;train&#34;, verbose=1):
         &#34;&#34;&#34;
         ```
         preprocess training set
         ```
         &#34;&#34;&#34;
 
-        U.vprint(&#39;preprocessing %s...&#39; % (mode), verbose=verbose)
-        U.check_array(texts, y=y, X_name=&#39;texts&#39;)
+        U.vprint(&#34;preprocessing %s...&#34; % (mode), verbose=verbose)
+        U.check_array(texts, y=y, X_name=&#34;texts&#34;)
 
         # detect sentence pairs
         is_array, is_pair = detect_text_format(texts)
-        if not is_array: raise ValueError(&#39;texts must be a list of strings or a list of sentence pairs&#39;)
+        if not is_array:
+            raise ValueError(
+                &#34;texts must be a list of strings or a list of sentence pairs&#34;
+            )
 
         # detect language
-        if self.lang is None and mode==&#39;train&#39;: self.lang = TU.detect_lang(texts)
-        U.vprint(&#39;language: %s&#39; % (self.lang), verbose=verbose)
+        if self.lang is None and mode == &#34;train&#34;:
+            self.lang = TU.detect_lang(texts)
+        U.vprint(&#34;language: %s&#34; % (self.lang), verbose=verbose)
 
         # print stats
-        if not is_pair: self.print_seqlen_stats(texts, mode, verbose=verbose)
-        if is_pair: U.vprint(&#39;sentence pairs detected&#39;, verbose=verbose)
+        if not is_pair:
+            self.print_seqlen_stats(texts, mode, verbose=verbose)
+        if is_pair:
+            U.vprint(&#34;sentence pairs detected&#34;, verbose=verbose)
 
         # transform y
-        if y is None and mode == &#39;train&#39;:
-            raise ValueError(&#39;y is required for training sets&#39;)
+        if y is None and mode == &#34;train&#34;:
+            raise ValueError(&#34;y is required for training sets&#34;)
         elif y is None:
             y = np.array([1] * len(texts))
-        y = self._transform_y(y, train=mode==&#39;train&#39;, verbose=verbose)
+        y = self._transform_y(y, train=mode == &#34;train&#34;, verbose=verbose)
 
         # convert examples
         tok, _ = self.get_preprocessor()
-        dataset = hf_convert_examples(texts, y=y, tokenizer=tok, max_length=self.maxlen,
-                                      pad_on_left=bool(self.name in [&#39;xlnet&#39;]),
-                                      pad_token=tok.convert_tokens_to_ids([tok.pad_token][0]),
-                                      pad_token_segment_id=4 if self.name in [&#39;xlnet&#39;] else 0,
-                                      use_dynamic_shape=False if mode == &#39;train&#39; else True,
-                                      verbose=verbose)
+        dataset = hf_convert_examples(
+            texts,
+            y=y,
+            tokenizer=tok,
+            max_length=self.maxlen,
+            pad_on_left=bool(self.name in [&#34;xlnet&#34;]),
+            pad_token=tok.convert_tokens_to_ids([tok.pad_token][0]),
+            pad_token_segment_id=4 if self.name in [&#34;xlnet&#34;] else 0,
+            use_dynamic_shape=False if mode == &#34;train&#34; else True,
+            verbose=verbose,
+        )
         self.set_multilabel(dataset, mode, verbose=verbose)
-        if mode == &#39;train&#39;:  self.preprocess_train_called = True
+        if mode == &#34;train&#34;:
+            self.preprocess_train_called = True
         return dataset
 
-
-
-    def preprocess_test(self, texts, y=None, mode=&#39;test&#39;, verbose=1):
+    def preprocess_test(self, texts, y=None, mode=&#34;test&#34;, verbose=1):
         self.check_trained()
         return self.preprocess_train(texts, y=y, mode=mode, verbose=verbose)
-
 
     @classmethod
     def load_model_and_configure_from_data(cls, fpath, transformer_ds):
@@ -3861,20 +4219,16 @@ Returns:
         multilabel = U.is_multilabel(transformer_ds)
         model = TFAutoModelForSequenceClassification.from_pretrained(fpath)
         if is_regression:
-            metrics = [&#39;mae&#39;]
-            loss_fn = &#39;mse&#39;
+            metrics = [&#34;mae&#34;]
+            loss_fn = &#34;mse&#34;
         else:
-            metrics = [&#39;accuracy&#39;]
+            metrics = [&#34;accuracy&#34;]
             if multilabel:
-                loss_fn =  keras.losses.BinaryCrossentropy(from_logits=True)
+                loss_fn = keras.losses.BinaryCrossentropy(from_logits=True)
             else:
                 loss_fn = keras.losses.CategoricalCrossentropy(from_logits=True)
-        model.compile(loss=loss_fn,
-                      optimizer=U.DEFAULT_OPT,
-                      metrics=metrics)
+        model.compile(loss=loss_fn, optimizer=U.DEFAULT_OPT, metrics=metrics)
         return model
-
-
 
     def _load_pretrained(self, mname, num_labels):
         &#34;&#34;&#34;
@@ -3887,23 +4241,25 @@ Returns:
             try:
                 model = self.model_type.from_pretrained(mname, config=self.config)
             except:
-                warnings.warn(&#39;Could not find Tensorflow version of model.  Attempting to download/load PyTorch version as TensorFlow model using from_pt=True. &#39; +\
-                              &#39;You will need PyTorch installed for this.&#39;)
+                warnings.warn(
+                    &#34;Could not load a Tensorflow version of model. (If this worked before, it might be an out-of-memory issue.) &#34; +\
+                    &#34;Attempting to download/load PyTorch version as TensorFlow model using from_pt=True. You will need PyTorch installed for this.&#34; 
+                )
                 try:
-                    model = self.model_type.from_pretrained(mname, config=self.config, from_pt=True)
+                    model = self.model_type.from_pretrained(
+                        mname, config=self.config, from_pt=True
+                    )
                 except:
                     # load model as normal to expose error to user
                     model = self.model_type.from_pretrained(mname, config=self.config)
-                    #raise ValueError(&#39;could not load pretrained model %s using both from_pt=False and from_pt=True&#39; % (mname))
+                    # raise ValueError(&#39;could not load pretrained model %s using both from_pt=False and from_pt=True&#39; % (mname))
         else:
             model = self.model_type.from_pretrained(mname, num_labels=num_labels)
         # ISSUE 416: mname is either model name (e.g., bert-base-uncased) or path to folder with tokenizer files
         self.get_tokenizer(mname)
         return model
 
-
-
-    def get_classifier(self, fpath=None, multilabel=None, metrics=[&#39;accuracy&#39;]):
+    def get_classifier(self, fpath=None, multilabel=None, metrics=[&#34;accuracy&#34;]):
         &#34;&#34;&#34;
         ```
         creates a model for text classification
@@ -3918,33 +4274,34 @@ Returns:
         &#34;&#34;&#34;
         self.check_trained()
         if not self.get_classes():
-            warnings.warn(&#39;no class labels were provided - treating as regression&#39;)
+            warnings.warn(&#34;no class labels were provided - treating as regression&#34;)
             return self.get_regression_model()
 
         # process multilabel task
         multilabel = self.multilabel if multilabel is None else multilabel
         if multilabel is True and self.multilabel is False:
-            warnings.warn(&#39;The multilabel=True argument was supplied, but labels do not indicate &#39;+\
-                          &#39;a multilabel problem (labels appear to be mutually-exclusive).  Using multilabel=True anyways.&#39;)
+            warnings.warn(
+                &#34;The multilabel=True argument was supplied, but labels do not indicate &#34;
+                + &#34;a multilabel problem (labels appear to be mutually-exclusive).  Using multilabel=True anyways.&#34;
+            )
         elif multilabel is False and self.multilabel is True:
-                warnings.warn(&#39;The multilabel=False argument was supplied, but labels inidcate that  &#39;+\
-                              &#39;this is a multilabel problem (labels are not mutually-exclusive).  Using multilabel=False anyways.&#39;)
+            warnings.warn(
+                &#34;The multilabel=False argument was supplied, but labels inidcate that  &#34;
+                + &#34;this is a multilabel problem (labels are not mutually-exclusive).  Using multilabel=False anyways.&#34;
+            )
 
         # setup model
         num_labels = len(self.get_classes())
         mname = fpath if fpath is not None else self.model_name
         model = self._load_pretrained(mname, num_labels)
         if multilabel:
-            loss_fn =  keras.losses.BinaryCrossentropy(from_logits=True)
+            loss_fn = keras.losses.BinaryCrossentropy(from_logits=True)
         else:
             loss_fn = keras.losses.CategoricalCrossentropy(from_logits=True)
-        model.compile(loss=loss_fn,
-                      optimizer=U.DEFAULT_OPT,
-                      metrics=metrics)
+        model.compile(loss=loss_fn, optimizer=U.DEFAULT_OPT, metrics=metrics)
         return model
 
-
-    def get_regression_model(self, fpath=None, metrics=[&#39;mae&#39;]):
+    def get_regression_model(self, fpath=None, metrics=[&#34;mae&#34;]):
         &#34;&#34;&#34;
         ```
         creates a model for text regression
@@ -3955,17 +4312,16 @@ Returns:
         &#34;&#34;&#34;
         self.check_trained()
         if self.get_classes():
-            warnings.warn(&#39;class labels were provided - treating as classification problem&#39;)
+            warnings.warn(
+                &#34;class labels were provided - treating as classification problem&#34;
+            )
             return self.get_classifier()
         num_labels = 1
         mname = fpath if fpath is not None else self.model_name
         model = self._load_pretrained(mname, num_labels)
-        loss_fn = &#39;mse&#39;
-        model.compile(loss=loss_fn,
-                      optimizer=U.DEFAULT_OPT,
-                      metrics=metrics)
+        loss_fn = &#34;mse&#34;
+        model.compile(loss=loss_fn, optimizer=U.DEFAULT_OPT, metrics=metrics)
         return model
-
 
     def get_model(self, fpath=None):
         self.check_trained()
@@ -4016,17 +4372,15 @@ def load_model_and_configure_from_data(cls, fpath, transformer_ds):
     multilabel = U.is_multilabel(transformer_ds)
     model = TFAutoModelForSequenceClassification.from_pretrained(fpath)
     if is_regression:
-        metrics = [&#39;mae&#39;]
-        loss_fn = &#39;mse&#39;
+        metrics = [&#34;mae&#34;]
+        loss_fn = &#34;mse&#34;
     else:
-        metrics = [&#39;accuracy&#39;]
+        metrics = [&#34;accuracy&#34;]
         if multilabel:
-            loss_fn =  keras.losses.BinaryCrossentropy(from_logits=True)
+            loss_fn = keras.losses.BinaryCrossentropy(from_logits=True)
         else:
             loss_fn = keras.losses.CategoricalCrossentropy(from_logits=True)
-    model.compile(loss=loss_fn,
-                  optimizer=U.DEFAULT_OPT,
-                  metrics=metrics)
+    model.compile(loss=loss_fn, optimizer=U.DEFAULT_OPT, metrics=metrics)
     return model</code></pre>
 </details>
 </dd>
@@ -4050,7 +4404,7 @@ Args:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_classifier(self, fpath=None, multilabel=None, metrics=[&#39;accuracy&#39;]):
+<pre><code class="python">def get_classifier(self, fpath=None, multilabel=None, metrics=[&#34;accuracy&#34;]):
     &#34;&#34;&#34;
     ```
     creates a model for text classification
@@ -4065,29 +4419,31 @@ Args:
     &#34;&#34;&#34;
     self.check_trained()
     if not self.get_classes():
-        warnings.warn(&#39;no class labels were provided - treating as regression&#39;)
+        warnings.warn(&#34;no class labels were provided - treating as regression&#34;)
         return self.get_regression_model()
 
     # process multilabel task
     multilabel = self.multilabel if multilabel is None else multilabel
     if multilabel is True and self.multilabel is False:
-        warnings.warn(&#39;The multilabel=True argument was supplied, but labels do not indicate &#39;+\
-                      &#39;a multilabel problem (labels appear to be mutually-exclusive).  Using multilabel=True anyways.&#39;)
+        warnings.warn(
+            &#34;The multilabel=True argument was supplied, but labels do not indicate &#34;
+            + &#34;a multilabel problem (labels appear to be mutually-exclusive).  Using multilabel=True anyways.&#34;
+        )
     elif multilabel is False and self.multilabel is True:
-            warnings.warn(&#39;The multilabel=False argument was supplied, but labels inidcate that  &#39;+\
-                          &#39;this is a multilabel problem (labels are not mutually-exclusive).  Using multilabel=False anyways.&#39;)
+        warnings.warn(
+            &#34;The multilabel=False argument was supplied, but labels inidcate that  &#34;
+            + &#34;this is a multilabel problem (labels are not mutually-exclusive).  Using multilabel=False anyways.&#34;
+        )
 
     # setup model
     num_labels = len(self.get_classes())
     mname = fpath if fpath is not None else self.model_name
     model = self._load_pretrained(mname, num_labels)
     if multilabel:
-        loss_fn =  keras.losses.BinaryCrossentropy(from_logits=True)
+        loss_fn = keras.losses.BinaryCrossentropy(from_logits=True)
     else:
         loss_fn = keras.losses.CategoricalCrossentropy(from_logits=True)
-    model.compile(loss=loss_fn,
-                  optimizer=U.DEFAULT_OPT,
-                  metrics=metrics)
+    model.compile(loss=loss_fn, optimizer=U.DEFAULT_OPT, metrics=metrics)
     return model</code></pre>
 </details>
 </dd>
@@ -4147,7 +4503,7 @@ Args:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_regression_model(self, fpath=None, metrics=[&#39;mae&#39;]):
+<pre><code class="python">def get_regression_model(self, fpath=None, metrics=[&#34;mae&#34;]):
     &#34;&#34;&#34;
     ```
     creates a model for text regression
@@ -4158,15 +4514,15 @@ Args:
     &#34;&#34;&#34;
     self.check_trained()
     if self.get_classes():
-        warnings.warn(&#39;class labels were provided - treating as classification problem&#39;)
+        warnings.warn(
+            &#34;class labels were provided - treating as classification problem&#34;
+        )
         return self.get_classifier()
     num_labels = 1
     mname = fpath if fpath is not None else self.model_name
     model = self._load_pretrained(mname, num_labels)
-    loss_fn = &#39;mse&#39;
-    model.compile(loss=loss_fn,
-                  optimizer=U.DEFAULT_OPT,
-                  metrics=metrics)
+    loss_fn = &#34;mse&#34;
+    model.compile(loss=loss_fn, optimizer=U.DEFAULT_OPT, metrics=metrics)
     return model</code></pre>
 </details>
 </dd>
@@ -4184,21 +4540,26 @@ Args:
     if self.tok is None:
         try:
             # use fast tokenizer if possible
-            if self.name == &#39;bert&#39; and &#39;japanese&#39; not in model_name:
+            if self.name == &#34;bert&#34; and &#34;japanese&#34; not in model_name:
                 from transformers import BertTokenizerFast
+
                 self.tok = BertTokenizerFast.from_pretrained(model_name)
-            elif self.name == &#39;distilbert&#39;:
+            elif self.name == &#34;distilbert&#34;:
                 from transformers import DistilBertTokenizerFast
+
                 self.tok = DistilBertTokenizerFast.from_pretrained(model_name)
-            elif self.name == &#39;roberta&#39;:
+            elif self.name == &#34;roberta&#34;:
                 from transformers import RobertaTokenizerFast
+
                 self.tok = RobertaTokenizerFast.from_pretrained(model_name)
             else:
                 self.tok = self.tokenizer_type.from_pretrained(model_name)
         except:
-            error_msg = f&#34;Could not load tokenizer from model_name: {model_name}. &#34; +\
-                        f&#34;If {model_name} is a local path, please make sure it exists and contains tokenizer files from Hugging Face. &#34; +\
-                        f&#34;You can also reset model_name with preproc.model_name = &#39;/your/new/path&#39;.&#34;
+            error_msg = (
+                f&#34;Could not load tokenizer from model_name: {model_name}. &#34;
+                + f&#34;If {model_name} is a local path, please make sure it exists and contains tokenizer files from Hugging Face. &#34;
+                + f&#34;You can also reset model_name with preproc.model_name = &#39;/your/new/path&#39;.&#34;
+            )
             raise ValueError(error_msg)
     return self.tok</code></pre>
 </details>
@@ -4226,7 +4587,7 @@ Args:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def preprocess_test(self, texts, y=None, mode=&#39;test&#39;, verbose=1):
+<pre><code class="python">def preprocess_test(self, texts, y=None, mode=&#34;test&#34;, verbose=1):
     self.check_trained()
     return self.preprocess_train(texts, y=y, mode=mode, verbose=verbose)</code></pre>
 </details>
@@ -4241,45 +4602,57 @@ Args:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def preprocess_train(self, texts, y=None, mode=&#39;train&#39;, verbose=1):
+<pre><code class="python">def preprocess_train(self, texts, y=None, mode=&#34;train&#34;, verbose=1):
     &#34;&#34;&#34;
     ```
     preprocess training set
     ```
     &#34;&#34;&#34;
 
-    U.vprint(&#39;preprocessing %s...&#39; % (mode), verbose=verbose)
-    U.check_array(texts, y=y, X_name=&#39;texts&#39;)
+    U.vprint(&#34;preprocessing %s...&#34; % (mode), verbose=verbose)
+    U.check_array(texts, y=y, X_name=&#34;texts&#34;)
 
     # detect sentence pairs
     is_array, is_pair = detect_text_format(texts)
-    if not is_array: raise ValueError(&#39;texts must be a list of strings or a list of sentence pairs&#39;)
+    if not is_array:
+        raise ValueError(
+            &#34;texts must be a list of strings or a list of sentence pairs&#34;
+        )
 
     # detect language
-    if self.lang is None and mode==&#39;train&#39;: self.lang = TU.detect_lang(texts)
-    U.vprint(&#39;language: %s&#39; % (self.lang), verbose=verbose)
+    if self.lang is None and mode == &#34;train&#34;:
+        self.lang = TU.detect_lang(texts)
+    U.vprint(&#34;language: %s&#34; % (self.lang), verbose=verbose)
 
     # print stats
-    if not is_pair: self.print_seqlen_stats(texts, mode, verbose=verbose)
-    if is_pair: U.vprint(&#39;sentence pairs detected&#39;, verbose=verbose)
+    if not is_pair:
+        self.print_seqlen_stats(texts, mode, verbose=verbose)
+    if is_pair:
+        U.vprint(&#34;sentence pairs detected&#34;, verbose=verbose)
 
     # transform y
-    if y is None and mode == &#39;train&#39;:
-        raise ValueError(&#39;y is required for training sets&#39;)
+    if y is None and mode == &#34;train&#34;:
+        raise ValueError(&#34;y is required for training sets&#34;)
     elif y is None:
         y = np.array([1] * len(texts))
-    y = self._transform_y(y, train=mode==&#39;train&#39;, verbose=verbose)
+    y = self._transform_y(y, train=mode == &#34;train&#34;, verbose=verbose)
 
     # convert examples
     tok, _ = self.get_preprocessor()
-    dataset = hf_convert_examples(texts, y=y, tokenizer=tok, max_length=self.maxlen,
-                                  pad_on_left=bool(self.name in [&#39;xlnet&#39;]),
-                                  pad_token=tok.convert_tokens_to_ids([tok.pad_token][0]),
-                                  pad_token_segment_id=4 if self.name in [&#39;xlnet&#39;] else 0,
-                                  use_dynamic_shape=False if mode == &#39;train&#39; else True,
-                                  verbose=verbose)
+    dataset = hf_convert_examples(
+        texts,
+        y=y,
+        tokenizer=tok,
+        max_length=self.maxlen,
+        pad_on_left=bool(self.name in [&#34;xlnet&#34;]),
+        pad_token=tok.convert_tokens_to_ids([tok.pad_token][0]),
+        pad_token_segment_id=4 if self.name in [&#34;xlnet&#34;] else 0,
+        use_dynamic_shape=False if mode == &#34;train&#34; else True,
+        verbose=verbose,
+    )
     self.set_multilabel(dataset, mode, verbose=verbose)
-    if mode == &#39;train&#39;:  self.preprocess_train_called = True
+    if mode == &#34;train&#34;:
+        self.preprocess_train_called = True
     return dataset</code></pre>
 </details>
 </dd>
@@ -4294,13 +4667,15 @@ Args:
 </summary>
 <pre><code class="python">def save_tokenizer(self, fpath):
     if os.path.isfile(fpath):
-        raise ValueError(f&#39;There is an existing file named {fpath}. &#39; +\
-                          &#39;Please use dfferent value for fpath.&#39;)
+        raise ValueError(
+            f&#34;There is an existing file named {fpath}. &#34;
+            + &#34;Please use dfferent value for fpath.&#34;
+        )
     elif os.path.exists(fpath):
         pass
     elif not os.path.exists(fpath):
         os.makedirs(fpath)
-    tok =self.get_tokenizer()
+    tok = self.get_tokenizer()
     tok.save_pretrained(fpath)
     return</code></pre>
 </details>

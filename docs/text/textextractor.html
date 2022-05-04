@@ -29,20 +29,24 @@
 <pre><code class="python">from ..imports import *
 from . import textutils as TU
 
+
 class TextExtractor:
     &#34;&#34;&#34;
     ```
-    Text Extractor: a wrapper to textract package   
+    Text Extractor: a wrapper to textract package
     ```
     &#34;&#34;&#34;
+
     def __init__(self):
         try:
             import textract
         except ImportError:
-            raise Exception(&#39;TextExtractor requires textract: pip install textract&#39;)
+            raise Exception(&#34;TextExtractor requires textract: pip install textract&#34;)
         self.process = textract.process
 
-    def extract(self, filename=None, text=None,return_format=&#39;document&#39;, lang=None, verbose=1):
+    def extract(
+        self, filename=None, text=None, return_format=&#34;document&#34;, lang=None, verbose=1
+    ):
         &#34;&#34;&#34;
         ```
         Extracts text from document given file path to document.
@@ -58,30 +62,34 @@ class TextExtractor:
         ```
         &#34;&#34;&#34;
         if filename is None and text is None:
-            raise ValueError(&#39;Either the filename parameter or the text parameter must be supplied&#39;)
+            raise ValueError(
+                &#34;Either the filename parameter or the text parameter must be supplied&#34;
+            )
         if filename is not None and text is not None:
-            raise ValueError(&#39;The filename and text parameters are mutually-exclusive.&#39;)
-        if return_format not in [&#39;document&#39;, &#39;paragraphs&#39;, &#39;sentences&#39;]:
-            raise ValueError(&#39;return_format must be one of {&#34;document&#34;, &#34;paragraphs&#34;, &#34;sentences&#34;}&#39;)
+            raise ValueError(&#34;The filename and text parameters are mutually-exclusive.&#34;)
+        if return_format not in [&#34;document&#34;, &#34;paragraphs&#34;, &#34;sentences&#34;]:
+            raise ValueError(
+                &#39;return_format must be one of {&#34;document&#34;, &#34;paragraphs&#34;, &#34;sentences&#34;}&#39;
+            )
         if filename is not None:
             mtype = TU.get_mimetype(filename)
             try:
-                if mtype and mtype.split(&#39;/&#39;)[0] == &#39;text&#39;:
-                    with open(filename, &#39;r&#39;) as f:
+                if mtype and mtype.split(&#34;/&#34;)[0] == &#34;text&#34;:
+                    with open(filename, &#34;r&#34;) as f:
                         text = f.read()
                         text = str.encode(text)
                 else:
                     text = self.process(filename)
             except Exception as e:
                 if verbose:
-                    print(&#39;ERROR on %s:\n%s&#39; % (filename, e))
+                    print(&#34;ERROR on %s:\n%s&#34; % (filename, e))
         try:
-            text = text.decode(errors=&#39;ignore&#39;)
+            text = text.decode(errors=&#34;ignore&#34;)
         except:
             pass
-        if return_format == &#39;sentences&#39;:
+        if return_format == &#34;sentences&#34;:
             return TU.sent_tokenize(text, lang=lang)
-        elif return_format == &#39;paragraphs&#39;:
+        elif return_format == &#34;paragraphs&#34;:
             return TU.paragraph_tokenize(text, join_sentences=True, lang=lang)
         else:
             return text</code></pre>
@@ -100,7 +108,7 @@ class TextExtractor:
 <span>class <span class="ident">TextExtractor</span></span>
 </code></dt>
 <dd>
-<div class="desc"><pre><code>Text Extractor: a wrapper to textract package   
+<div class="desc"><pre><code>Text Extractor: a wrapper to textract package
 </code></pre></div>
 <details class="source">
 <summary>
@@ -109,17 +117,20 @@ class TextExtractor:
 <pre><code class="python">class TextExtractor:
     &#34;&#34;&#34;
     ```
-    Text Extractor: a wrapper to textract package   
+    Text Extractor: a wrapper to textract package
     ```
     &#34;&#34;&#34;
+
     def __init__(self):
         try:
             import textract
         except ImportError:
-            raise Exception(&#39;TextExtractor requires textract: pip install textract&#39;)
+            raise Exception(&#34;TextExtractor requires textract: pip install textract&#34;)
         self.process = textract.process
 
-    def extract(self, filename=None, text=None,return_format=&#39;document&#39;, lang=None, verbose=1):
+    def extract(
+        self, filename=None, text=None, return_format=&#34;document&#34;, lang=None, verbose=1
+    ):
         &#34;&#34;&#34;
         ```
         Extracts text from document given file path to document.
@@ -135,30 +146,34 @@ class TextExtractor:
         ```
         &#34;&#34;&#34;
         if filename is None and text is None:
-            raise ValueError(&#39;Either the filename parameter or the text parameter must be supplied&#39;)
+            raise ValueError(
+                &#34;Either the filename parameter or the text parameter must be supplied&#34;
+            )
         if filename is not None and text is not None:
-            raise ValueError(&#39;The filename and text parameters are mutually-exclusive.&#39;)
-        if return_format not in [&#39;document&#39;, &#39;paragraphs&#39;, &#39;sentences&#39;]:
-            raise ValueError(&#39;return_format must be one of {&#34;document&#34;, &#34;paragraphs&#34;, &#34;sentences&#34;}&#39;)
+            raise ValueError(&#34;The filename and text parameters are mutually-exclusive.&#34;)
+        if return_format not in [&#34;document&#34;, &#34;paragraphs&#34;, &#34;sentences&#34;]:
+            raise ValueError(
+                &#39;return_format must be one of {&#34;document&#34;, &#34;paragraphs&#34;, &#34;sentences&#34;}&#39;
+            )
         if filename is not None:
             mtype = TU.get_mimetype(filename)
             try:
-                if mtype and mtype.split(&#39;/&#39;)[0] == &#39;text&#39;:
-                    with open(filename, &#39;r&#39;) as f:
+                if mtype and mtype.split(&#34;/&#34;)[0] == &#34;text&#34;:
+                    with open(filename, &#34;r&#34;) as f:
                         text = f.read()
                         text = str.encode(text)
                 else:
                     text = self.process(filename)
             except Exception as e:
                 if verbose:
-                    print(&#39;ERROR on %s:\n%s&#39; % (filename, e))
+                    print(&#34;ERROR on %s:\n%s&#34; % (filename, e))
         try:
-            text = text.decode(errors=&#39;ignore&#39;)
+            text = text.decode(errors=&#34;ignore&#34;)
         except:
             pass
-        if return_format == &#39;sentences&#39;:
+        if return_format == &#34;sentences&#34;:
             return TU.sent_tokenize(text, lang=lang)
-        elif return_format == &#39;paragraphs&#39;:
+        elif return_format == &#34;paragraphs&#34;:
             return TU.paragraph_tokenize(text, join_sentences=True, lang=lang)
         else:
             return text</code></pre>
@@ -184,7 +199,9 @@ verbose(bool): verbosity
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def extract(self, filename=None, text=None,return_format=&#39;document&#39;, lang=None, verbose=1):
+<pre><code class="python">def extract(
+    self, filename=None, text=None, return_format=&#34;document&#34;, lang=None, verbose=1
+):
     &#34;&#34;&#34;
     ```
     Extracts text from document given file path to document.
@@ -200,30 +217,34 @@ verbose(bool): verbosity
     ```
     &#34;&#34;&#34;
     if filename is None and text is None:
-        raise ValueError(&#39;Either the filename parameter or the text parameter must be supplied&#39;)
+        raise ValueError(
+            &#34;Either the filename parameter or the text parameter must be supplied&#34;
+        )
     if filename is not None and text is not None:
-        raise ValueError(&#39;The filename and text parameters are mutually-exclusive.&#39;)
-    if return_format not in [&#39;document&#39;, &#39;paragraphs&#39;, &#39;sentences&#39;]:
-        raise ValueError(&#39;return_format must be one of {&#34;document&#34;, &#34;paragraphs&#34;, &#34;sentences&#34;}&#39;)
+        raise ValueError(&#34;The filename and text parameters are mutually-exclusive.&#34;)
+    if return_format not in [&#34;document&#34;, &#34;paragraphs&#34;, &#34;sentences&#34;]:
+        raise ValueError(
+            &#39;return_format must be one of {&#34;document&#34;, &#34;paragraphs&#34;, &#34;sentences&#34;}&#39;
+        )
     if filename is not None:
         mtype = TU.get_mimetype(filename)
         try:
-            if mtype and mtype.split(&#39;/&#39;)[0] == &#39;text&#39;:
-                with open(filename, &#39;r&#39;) as f:
+            if mtype and mtype.split(&#34;/&#34;)[0] == &#34;text&#34;:
+                with open(filename, &#34;r&#34;) as f:
                     text = f.read()
                     text = str.encode(text)
             else:
                 text = self.process(filename)
         except Exception as e:
             if verbose:
-                print(&#39;ERROR on %s:\n%s&#39; % (filename, e))
+                print(&#34;ERROR on %s:\n%s&#34; % (filename, e))
     try:
-        text = text.decode(errors=&#39;ignore&#39;)
+        text = text.decode(errors=&#34;ignore&#34;)
     except:
         pass
-    if return_format == &#39;sentences&#39;:
+    if return_format == &#34;sentences&#34;:
         return TU.sent_tokenize(text, lang=lang)
-    elif return_format == &#39;paragraphs&#39;:
+    elif return_format == &#34;paragraphs&#34;:
         return TU.paragraph_tokenize(text, join_sentences=True, lang=lang)
     else:
         return text</code></pre>

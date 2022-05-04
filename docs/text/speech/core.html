@@ -28,6 +28,7 @@
 </summary>
 <pre><code class="python">try:
     import librosa as librosa
+
     LIBROSA = True
 except (ImportError, OSError):
     LIBROSA = False
@@ -56,7 +57,6 @@ class Transcriber(TorchBase):
     Transcriber: speech to text pipeline
     &#34;&#34;&#34;
 
-
     def __init__(self, model_name=&#34;facebook/wav2vec2-base-960h&#34;, device=None):
         &#34;&#34;&#34;
         ```
@@ -68,16 +68,16 @@ class Transcriber(TorchBase):
         ```
         &#34;&#34;&#34;
         super().__init__(device=device, quantize=False)
-        #if not SOUNDFILE:
-            #raise ImportError(&#34;SoundFile library not installed or libsndfile not found: pip install soundfile&#34;)
+        # if not SOUNDFILE:
+        # raise ImportError(&#34;SoundFile library not installed or libsndfile not found: pip install soundfile&#34;)
         if not LIBROSA:
-            raise ImportError(&#34;librosa library must be installed: pip install librosa. Conda users may also have to install ffmpeg: conda install -c conda-forge ffmpeg&#34;)
-
+            raise ImportError(
+                &#34;librosa library must be installed: pip install librosa. Conda users may also have to install ffmpeg: conda install -c conda-forge ffmpeg&#34;
+            )
 
         # load model and processor
         self.model = Wav2Vec2ForCTC.from_pretrained(model_name).to(self.torch_device)
         self.processor = Wav2Vec2Processor.from_pretrained(model_name)
-
 
     def transcribe(self, afiles, batch_size=32):
         &#34;&#34;&#34;
@@ -97,7 +97,7 @@ class Transcriber(TorchBase):
         values = [afiles] if not isinstance(afiles, list) else afiles
 
         # parse audio files
-        #speech = [sf.read(f) for f in values]
+        # speech = [sf.read(f) for f in values]
         speech = [librosa.load(f, sr=16000) for f in values]
 
         # get unique list of sampling rates (since we&#39;re resampling, should be {16000})
@@ -121,7 +121,6 @@ class Transcriber(TorchBase):
         results = [results[x] for x in sorted(results)]
         return results[0] if isinstance(afiles, str) else results
 
-
     def _transcribe(self, speech, sampling):
         &#34;&#34;&#34;
         Transcribes audio to text.
@@ -132,9 +131,12 @@ class Transcriber(TorchBase):
             list of transcribed text
         &#34;&#34;&#34;
         import torch
+
         with torch.no_grad():
             # Convert samples to features
-            inputs = self.processor(speech, sampling_rate=sampling, padding=True, return_tensors=&#39;pt&#39;).input_values
+            inputs = self.processor(
+                speech, sampling_rate=sampling, padding=True, return_tensors=&#34;pt&#34;
+            ).input_values
             # Place inputs on tensor device
             inputs = inputs.to(self.torch_device)
             # Retrieve logits
@@ -206,7 +208,6 @@ Args:
     Transcriber: speech to text pipeline
     &#34;&#34;&#34;
 
-
     def __init__(self, model_name=&#34;facebook/wav2vec2-base-960h&#34;, device=None):
         &#34;&#34;&#34;
         ```
@@ -218,16 +219,16 @@ Args:
         ```
         &#34;&#34;&#34;
         super().__init__(device=device, quantize=False)
-        #if not SOUNDFILE:
-            #raise ImportError(&#34;SoundFile library not installed or libsndfile not found: pip install soundfile&#34;)
+        # if not SOUNDFILE:
+        # raise ImportError(&#34;SoundFile library not installed or libsndfile not found: pip install soundfile&#34;)
         if not LIBROSA:
-            raise ImportError(&#34;librosa library must be installed: pip install librosa. Conda users may also have to install ffmpeg: conda install -c conda-forge ffmpeg&#34;)
-
+            raise ImportError(
+                &#34;librosa library must be installed: pip install librosa. Conda users may also have to install ffmpeg: conda install -c conda-forge ffmpeg&#34;
+            )
 
         # load model and processor
         self.model = Wav2Vec2ForCTC.from_pretrained(model_name).to(self.torch_device)
         self.processor = Wav2Vec2Processor.from_pretrained(model_name)
-
 
     def transcribe(self, afiles, batch_size=32):
         &#34;&#34;&#34;
@@ -247,7 +248,7 @@ Args:
         values = [afiles] if not isinstance(afiles, list) else afiles
 
         # parse audio files
-        #speech = [sf.read(f) for f in values]
+        # speech = [sf.read(f) for f in values]
         speech = [librosa.load(f, sr=16000) for f in values]
 
         # get unique list of sampling rates (since we&#39;re resampling, should be {16000})
@@ -271,7 +272,6 @@ Args:
         results = [results[x] for x in sorted(results)]
         return results[0] if isinstance(afiles, str) else results
 
-
     def _transcribe(self, speech, sampling):
         &#34;&#34;&#34;
         Transcribes audio to text.
@@ -282,9 +282,12 @@ Args:
             list of transcribed text
         &#34;&#34;&#34;
         import torch
+
         with torch.no_grad():
             # Convert samples to features
-            inputs = self.processor(speech, sampling_rate=sampling, padding=True, return_tensors=&#39;pt&#39;).input_values
+            inputs = self.processor(
+                speech, sampling_rate=sampling, padding=True, return_tensors=&#34;pt&#34;
+            ).input_values
             # Place inputs on tensor device
             inputs = inputs.to(self.torch_device)
             # Retrieve logits
@@ -334,7 +337,7 @@ Returns:
     values = [afiles] if not isinstance(afiles, list) else afiles
 
     # parse audio files
-    #speech = [sf.read(f) for f in values]
+    # speech = [sf.read(f) for f in values]
     speech = [librosa.load(f, sr=16000) for f in values]
 
     # get unique list of sampling rates (since we&#39;re resampling, should be {16000})
