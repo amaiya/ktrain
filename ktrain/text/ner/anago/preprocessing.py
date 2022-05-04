@@ -127,7 +127,7 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
     def transformer_is_activated(self):
         return self.te is not None
 
-     def fix_tokenization(
+    def fix_tokenization(
         self,
         X,
         Y,

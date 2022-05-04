@@ -1170,8 +1170,8 @@ class TransformersPreprocessor(TextPreprocessor):
                 model = self.model_type.from_pretrained(mname, config=self.config)
             except:
                 warnings.warn(
-                    "Could not find Tensorflow version of model.  Attempting to download/load PyTorch version as TensorFlow model using from_pt=True. "
-                    + "You will need PyTorch installed for this."
+                    "Could not load Tensorflow version of model.  Attempting to download/load PyTorch version as TensorFlow model using from_pt=True. "
+                    + "You will need PyTorch installed for this. (If things worked before, it might be an out-of-memory issue.)"
                 )
                 try:
                     model = self.model_type.from_pretrained(
@@ -1449,17 +1449,17 @@ class TransformerEmbedding:
             ]  # (batch_size, embsize)
         except:
             warnings.warn("could not determine Embedding size")
-        if type(self.model).__name__ not in [
-            "TFBertModel",
-            "TFDistilBertModel",
-            "TFAlbertModel",
-            "TFRobertaModel"
-        ]:
-            raise ValueError(
-                "TransformerEmbedding class currently only supports BERT-style models: "
-                + "Bert, DistilBert, RoBERTa and Albert and variants like BioBERT and SciBERT\n\n"
-                + "model received: %s (%s))" % (type(self.model).__name__, model_name)
-            )
+        # if type(self.model).__name__ not in [
+        # "TFBertModel",
+        # "TFDistilBertModel",
+        # "TFAlbertModel",
+        # "TFRobertaModel",
+        # ]:
+        # raise ValueError(
+        # "TransformerEmbedding class currently only supports BERT-style models: "
+        # + "Bert, DistilBert, RoBERTa and Albert and variants like BioBERT and SciBERT\n\n"
+        # + "model received: %s (%s))" % (type(self.model).__name__, model_name)
+        # )
 
     def _load_pretrained(self, model_name):
         """
@@ -1473,18 +1473,12 @@ class TransformerEmbedding:
                 model = self.model_type.from_pretrained(model_name, config=self.config)
             except:
                 warnings.warn(
-                    "Could not find Tensorflow version of model.  Attempting to download/load PyTorch version as TensorFlow model using from_pt=True. "
-                    + "You will need PyTorch installed for this."
+                    "Could not load Tensorflow version of model.  Attempting to download/load PyTorch version as TensorFlow model using from_pt=True. "
+                    + "You will need PyTorch installed for this. (If things worked before, it might be an out-of-memory issue.)"
                 )
-                try:
-                    model = self.model_type.from_pretrained(
-                        model_name, config=self.config, from_pt=True
-                    )
-                except:
-                    raise ValueError(
-                        "could not load pretrained model %s using both from_pt=False and from_pt=True"
-                        % (model_name)
-                    )
+                model = self.model_type.from_pretrained(
+                    model_name, config=self.config, from_pt=True
+                )
         else:
             model = self.model_type.from_pretrained(
                 model_name, output_hidden_states=True

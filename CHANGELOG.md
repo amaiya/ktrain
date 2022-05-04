@@ -6,10 +6,10 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
-## 0.30.1 (2022-04-12)
+## 0.30.1 (TBD)
 
 ### new:
-- N/A
+- The `bert_model` argument in the `text.ner.models.sequence_tagger` function now supports models like Roberta (for `bio-bert` NER models).
 
 ### changed
 - Code base was reformatted using [black](https://github.com/psf/black)
