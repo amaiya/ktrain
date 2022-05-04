@@ -1584,15 +1584,18 @@ class TransformerEmbedding:
             filtered_embedding = []
             raw_embedding = raw_embeddings[i]
             subvectors = []
-            last_index = -1
-
+            last_offset = (-1, -1)
+            #subwords = [] # debugging
             for j in range(len(all_offsets[i])):
                 if all_word_ids[i][j] is None:
                     continue
-                if all_offsets[i][j][0] == last_index:
+                # must test to see if start is same as last offset start due to xml-roberta quirk with tokens like 070
+                if all_offsets[i][j][0] == last_offset[1] or all_offsets[i][j][0] == last_offset[0]:
                     subvectors.append(raw_embedding[j])
-                    last_index = all_offsets[i][j][1]
-                if all_offsets[i][j][0] > last_index:
+                    #subwords[-1] += texts[i][all_offsets[i][j][0]:all_offsets[i][j][1]] # debugging
+                    last_offset = all_offsets[i][j]
+                if all_offsets[i][j][0] > last_offset[1]:
+                    #subwords.append(texts[i][all_offsets[i][j][0]:all_offsets[i][j][1]]) # debugging
                     if len(subvectors) > 0:
                         if aggregation_strategy == "average":
                             filtered_embedding.append(np.mean(subvectors, axis=0))
@@ -1600,7 +1603,7 @@ class TransformerEmbedding:
                             filtered_embedding.append(subvectors[0])
                         subvectors = []
                     subvectors.append(raw_embedding[j])
-                    last_index = all_offsets[i][j][1]
+                    last_offset = all_offsets[i][j]
             if len(subvectors) > 0:
                 if aggregation_strategy == "average":
                     filtered_embedding.append(np.mean(subvectors, axis=0))
