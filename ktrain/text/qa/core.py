@@ -146,7 +146,7 @@ class QA(ABC, TorchBase):
         model_name = bert_squad_model if bert_squad_model is not None else model_name
         if bert_squad_model:
             warnings.warn(
-                "the bert_squad_model is deprecated - please use model_name instead.",
+                "The bert_squad_model argument is deprecated - please use model_name instead.",
                 DeprecationWarning,
                 stacklevel=2,
             )

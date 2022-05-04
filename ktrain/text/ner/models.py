@@ -30,6 +30,7 @@ def sequence_tagger(
     wv_path_or_url=None,
     transformer_model="bert-base-multilingual-cased",
     transformer_layers_to_use=U.DEFAULT_TRANSFORMER_LAYERS,
+    bert_model = None,
     word_embedding_dim=100,
     char_embedding_dim=25,
     word_lstm_size=100,
@@ -68,9 +69,9 @@ def sequence_tagger(
 
                             Default:None (randomly-initialized word embeddings are used)
 
-        transformer_model_name(str):  the name of the BERT model.  default: 'bert-base-multilingual-cased'
-                                      This parameter is only used if bilstm-bert is selected for name parameter.
-                                       The value of this parameter is a name of BERT model from here:
+        transformer_model_name(str):  the name of the transformer model.  default: 'bert-base-multilingual-cased'
+                                      This parameter is only used if bilstm-transformer is selected for name parameter.
+                                       The value of this parameter is a name of transformer model from here:
                                             https://huggingface.co/transformers/pretrained_models.html
                                        or a community-uploaded BERT model from here:
                                            https://huggingface.co/models
@@ -84,6 +85,7 @@ def sequence_tagger(
 
         transformer_layers_to_use(list): indices of hidden layers to use.  default:[-2] # second-to-last layer
                                          To use the concatenation of last 4 layers: use [-1, -2, -3, -4]
+        bert_model(str): alias for transformer_model
         word_embedding_dim (int): word embedding dimensions.
         char_embedding_dim (int): character embedding dimensions.
         word_lstm_size (int): character LSTM feature extractor output dimensions.
@@ -95,6 +97,15 @@ def sequence_tagger(
     Return:
         model (Model): A Keras Model instance
     """
+    # backwards compatibility
+    name = BILSTM_TRANSFORMER if name == 'bilstm-bert' else name
+    if bert_model is not None:
+        transformer_model = bert_model
+        warnings.warn( "The bert_model argument is deprecated - please use transformer_model instead.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+
 
     if name not in SEQUENCE_TAGGERS:
         raise ValueError(
@@ -147,7 +158,7 @@ def sequence_tagger(
         else:
             emb_names.append("word embeddings initialized randomly")
         if name in TRANSFORMER_MODELS:
-            emb_names.append("Transformer embeddings with " + transformer_model)
+            emb_names.append("transformer embeddings with " + transformer_model)
         if name in ELMO_MODELS:
             emb_names.append("Elmo embeddings for English")
         if preproc.p._use_char:
