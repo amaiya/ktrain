@@ -1170,8 +1170,8 @@ class TransformersPreprocessor(TextPreprocessor):
                 model = self.model_type.from_pretrained(mname, config=self.config)
             except:
                 warnings.warn(
-                    "Could not load a Tensorflow version of model. (If this worked before, it might be an out-of-memory issue.) " +\
-                    "Attempting to download/load PyTorch version as TensorFlow model using from_pt=True. You will need PyTorch installed for this." 
+                    "Could not load a Tensorflow version of model. (If this worked before, it might be an out-of-memory issue.) "
+                    + "Attempting to download/load PyTorch version as TensorFlow model using from_pt=True. You will need PyTorch installed for this."
                 )
                 try:
                     model = self.model_type.from_pretrained(
@@ -1473,8 +1473,8 @@ class TransformerEmbedding:
                 model = self.model_type.from_pretrained(model_name, config=self.config)
             except:
                 warnings.warn(
-                    "Could not load a Tensorflow version of model. (If this worked before, it might be an out-of-memory issue.) " +\
-                    "Attempting to download/load PyTorch version as TensorFlow model using from_pt=True. You will need PyTorch installed for this." 
+                    "Could not load a Tensorflow version of model. (If this worked before, it might be an out-of-memory issue.) "
+                    + "Attempting to download/load PyTorch version as TensorFlow model using from_pt=True. You will need PyTorch installed for this."
                 )
                 model = self.model_type.from_pretrained(
                     model_name, config=self.config, from_pt=True
@@ -1486,7 +1486,12 @@ class TransformerEmbedding:
         return model
 
     def embed(
-        self, texts, word_level=True, max_length=512, aggregation_strategy="first", layers=U.DEFAULT_TRANSFORMER_LAYERS
+        self,
+        texts,
+        word_level=True,
+        max_length=512,
+        aggregation_strategy="first",
+        layers=U.DEFAULT_TRANSFORMER_LAYERS,
     ):
         """
         ```
@@ -1587,17 +1592,20 @@ class TransformerEmbedding:
             raw_embedding = raw_embeddings[i]
             subvectors = []
             last_offset = (-1, -1)
-            #subwords = [] # debugging
+            # subwords = [] # debugging
             for j in range(len(all_offsets[i])):
                 if all_word_ids[i][j] is None:
                     continue
                 # must test to see if start is same as last offset start due to xml-roberta quirk with tokens like 070
-                if all_offsets[i][j][0] == last_offset[1] or all_offsets[i][j][0] == last_offset[0]:
+                if (
+                    all_offsets[i][j][0] == last_offset[1]
+                    or all_offsets[i][j][0] == last_offset[0]
+                ):
                     subvectors.append(raw_embedding[j])
-                    #subwords[-1] += texts[i][all_offsets[i][j][0]:all_offsets[i][j][1]] # debugging
+                    # subwords[-1] += texts[i][all_offsets[i][j][0]:all_offsets[i][j][1]] # debugging
                     last_offset = all_offsets[i][j]
                 if all_offsets[i][j][0] > last_offset[1]:
-                    #subwords.append(texts[i][all_offsets[i][j][0]:all_offsets[i][j][1]]) # debugging
+                    # subwords.append(texts[i][all_offsets[i][j][0]:all_offsets[i][j][1]]) # debugging
                     if len(subvectors) > 0:
                         if aggregation_strategy == "average":
                             filtered_embedding.append(np.mean(subvectors, axis=0))

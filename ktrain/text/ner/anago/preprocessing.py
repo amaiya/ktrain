@@ -251,7 +251,7 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
         if self.te is not None:
             transformer_embeddings = self.te.embed(X, word_level=True)
             features.append(transformer_embeddings)
-            #print(f' | {X} | [trans_shape={transformer_embeddings.shape[1]} | word_id_shape={len(word_ids)}')
+            # print(f' | {X} | [trans_shape={transformer_embeddings.shape[1]} | word_id_shape={len(word_ids)}')
 
         if y is not None:
             y = [self._label_vocab.doc2id(doc) for doc in y]

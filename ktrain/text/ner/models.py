@@ -97,11 +97,15 @@ def sequence_tagger(
     """
 
     if name not in SEQUENCE_TAGGERS:
-        raise ValueError(f"Invalid model name {name}. {'Did you mean bilstm-transformer?' if name == 'bilstm-bert' else ''}")
+        raise ValueError(
+            f"Invalid model name {name}. {'Did you mean bilstm-transformer?' if name == 'bilstm-bert' else ''}"
+        )
 
     # check BERT
     if name in TRANSFORMER_MODELS and not transformer_model:
-        raise ValueError(f"transformer_model is required for {BILSTM_TRANSFORMER} models")
+        raise ValueError(
+            f"transformer_model is required for {BILSTM_TRANSFORMER} models"
+        )
     if name in TRANSFORMER_MODELS and DISABLE_V2_BEHAVIOR:
         raise ValueError(
             "BERT and other transformer models cannot be used with DISABLE_v2_BEHAVIOR"
