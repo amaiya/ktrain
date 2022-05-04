@@ -9,10 +9,10 @@ Most recent releases are shown at the top. Each release shows:
 ## 0.31.0 (TBD)
 
 ### new:
-- The `text.ner.models.sequence_tagger` now supports embeddings from non-BERT transformer models (e.g., `roberta-base`, `openai-gpt`)
-- [**breaking change**] In the `text.ner.models.sequence_tagger` function, the `bilstm-bert` model  is now called `bilstm-transformer` and the `bert_model` parameter has been renamed to `transormer_model`. 
+- The `text.ner.models.sequence_tagger` now supports word embeddings from non-BERT transformer models (e.g., `roberta-base`, `openai-gpt`)
 
 ### changed
+- [**breaking change**] In the `text.ner.models.sequence_tagger` function, the `bilstm-bert` model  is now called `bilstm-transformer` and the `bert_model` parameter has been renamed to `transformer_model`. 
 - Code base was reformatted using [black](https://github.com/psf/black)
 - removed warning about sentence pair classification to avoid confusion
 
