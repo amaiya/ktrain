@@ -6,10 +6,10 @@ BILSTM_CRF = "bilstm-crf"
 BILSTM = "bilstm"
 BILSTM_ELMO = "bilstm-elmo"
 BILSTM_CRF_ELMO = "bilstm-crf-elmo"
-BILSTM_TRANSFORMER = "bilstm-bert"
+BILSTM_TRANSFORMER = "bilstm-transformer"
 SEQUENCE_TAGGERS = {
     BILSTM: "Bidirectional LSTM (https://arxiv.org/abs/1603.01360)",
-    BILSTM_TRANSFORMER: "Bidirectional LSTM w/ BERT embeddings",
+    BILSTM_TRANSFORMER: "Bidirectional LSTM w/ transformer embeddings (multlingual BERT is default)",
     BILSTM_CRF: "Bidirectional LSTM-CRF  (https://arxiv.org/abs/1603.01360)",
     BILSTM_ELMO: "Bidirectional LSTM w/ Elmo embeddings [English only]",
     BILSTM_CRF_ELMO: "Bidirectional LSTM-CRF w/ Elmo embeddings [English only]",
@@ -28,8 +28,8 @@ def sequence_tagger(
     name,
     preproc,
     wv_path_or_url=None,
-    bert_model="bert-base-multilingual-cased",
-    bert_layers_to_use=U.DEFAULT_TRANSFORMER_LAYERS,
+    transformer_model="bert-base-multilingual-cased",
+    transformer_layers_to_use=U.DEFAULT_TRANSFORMER_LAYERS,
     word_embedding_dim=100,
     char_embedding_dim=25,
     word_lstm_size=100,
@@ -68,12 +68,12 @@ def sequence_tagger(
 
                             Default:None (randomly-initialized word embeddings are used)
 
-        bert_model_name(str):  the name of the BERT model.  default: 'bert-base-multilingual-cased'
-                               This parameter is only used if bilstm-bert is selected for name parameter.
-                               The value of this parameter is a name of BERT model from here:
-                                        https://huggingface.co/transformers/pretrained_models.html
-                               or a community-uploaded BERT model from here:
-                                        https://huggingface.co/models
+        transformer_model_name(str):  the name of the BERT model.  default: 'bert-base-multilingual-cased'
+                                      This parameter is only used if bilstm-bert is selected for name parameter.
+                                       The value of this parameter is a name of BERT model from here:
+                                            https://huggingface.co/transformers/pretrained_models.html
+                                       or a community-uploaded BERT model from here:
+                                           https://huggingface.co/models
                                Example values:
                                  bert-base-multilingual-cased:  Multilingual BERT (157 languages) - this is the default
                                  bert-base-cased:  English BERT
@@ -82,8 +82,8 @@ def sequence_tagger(
                                  albert-base-v2: English ALBERT model
                                  monologg/biobert_v1.1_pubmed: community uploaded BioBERT (pretrained on PubMed)
 
-        bert_layers_to_use(list): indices of hidden layers to use.  default:[-2] # second-to-last layer
-                                  To use the concatenation of last 4 layers: use [-1, -2, -3, -4]
+        transformer_layers_to_use(list): indices of hidden layers to use.  default:[-2] # second-to-last layer
+                                         To use the concatenation of last 4 layers: use [-1, -2, -3, -4]
         word_embedding_dim (int): word embedding dimensions.
         char_embedding_dim (int): character embedding dimensions.
         word_lstm_size (int): character LSTM feature extractor output dimensions.
@@ -97,11 +97,11 @@ def sequence_tagger(
     """
 
     if name not in SEQUENCE_TAGGERS:
-        raise ValueError("invalid name: %s" % (name))
+        raise ValueError(f"Invalid model name {name}. {'Did you mean bilstm-transformer?' if name == 'bilstm-bert' else ''}")
 
     # check BERT
-    if name in TRANSFORMER_MODELS and not bert_model:
-        raise ValueError("bert_model is required for bilstm-bert models")
+    if name in TRANSFORMER_MODELS and not transformer_model:
+        raise ValueError(f"transformer_model is required for {BILSTM_TRANSFORMER} models")
     if name in TRANSFORMER_MODELS and DISABLE_V2_BEHAVIOR:
         raise ValueError(
             "BERT and other transformer models cannot be used with DISABLE_v2_BEHAVIOR"
@@ -143,7 +143,7 @@ def sequence_tagger(
         else:
             emb_names.append("word embeddings initialized randomly")
         if name in TRANSFORMER_MODELS:
-            emb_names.append("BERT embeddings with " + bert_model)
+            emb_names.append("Transformer embeddings with " + transformer_model)
         if name in ELMO_MODELS:
             emb_names.append("Elmo embeddings for English")
         if preproc.p._use_char:
@@ -176,7 +176,7 @@ def sequence_tagger(
     elif name == BILSTM_TRANSFORMER:
         use_crf = False
         preproc.p.activate_transformer(
-            bert_model, layers=bert_layers_to_use, force=True
+            transformer_model, layers=transformer_layers_to_use, force=True
         )
     else:
         raise ValueError("Unsupported model name")

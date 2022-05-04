@@ -1170,8 +1170,8 @@ class TransformersPreprocessor(TextPreprocessor):
                 model = self.model_type.from_pretrained(mname, config=self.config)
             except:
                 warnings.warn(
-                    "Could not load Tensorflow version of model.  Attempting to download/load PyTorch version as TensorFlow model using from_pt=True. "
-                    + "You will need PyTorch installed for this. (If things worked before, it might be an out-of-memory issue.)"
+                    "Could not load a Tensorflow version of model. (If this worked before, it might be an out-of-memory issue.) " +\
+                    "Attempting to download/load PyTorch version as TensorFlow model using from_pt=True. You will need PyTorch installed for this." 
                 )
                 try:
                     model = self.model_type.from_pretrained(
@@ -1473,8 +1473,8 @@ class TransformerEmbedding:
                 model = self.model_type.from_pretrained(model_name, config=self.config)
             except:
                 warnings.warn(
-                    "Could not load Tensorflow version of model.  Attempting to download/load PyTorch version as TensorFlow model using from_pt=True. "
-                    + "You will need PyTorch installed for this. (If things worked before, it might be an out-of-memory issue.)"
+                    "Could not load a Tensorflow version of model. (If this worked before, it might be an out-of-memory issue.) " +\
+                    "Attempting to download/load PyTorch version as TensorFlow model using from_pt=True. You will need PyTorch installed for this." 
                 )
                 model = self.model_type.from_pretrained(
                     model_name, config=self.config, from_pt=True
@@ -1486,7 +1486,7 @@ class TransformerEmbedding:
         return model
 
     def embed(
-        self, texts, word_level=True, max_length=512, aggregation_strategy="first"
+        self, texts, word_level=True, max_length=512, aggregation_strategy="first", layers=U.DEFAULT_TRANSFORMER_LAYERS
     ):
         """
         ```
@@ -1498,6 +1498,8 @@ class TransformerEmbedding:
           max_length(int): max length of tokens
           aggregation_strategy(str): If 'first', vector of first subword is used as representation.
                                      If 'average', mean of all subword vectors is used.
+          layers(list): list of indexes indicating which hidden layers to use when
+                        constructing the embedding (e.g., last hidden state is [-1])
         Returns:
             np.ndarray : embeddings
         ```
