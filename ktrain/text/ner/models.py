@@ -30,7 +30,7 @@ def sequence_tagger(
     wv_path_or_url=None,
     transformer_model="bert-base-multilingual-cased",
     transformer_layers_to_use=U.DEFAULT_TRANSFORMER_LAYERS,
-    bert_model = None,
+    bert_model=None,
     word_embedding_dim=100,
     char_embedding_dim=25,
     word_lstm_size=100,
@@ -98,14 +98,14 @@ def sequence_tagger(
         model (Model): A Keras Model instance
     """
     # backwards compatibility
-    name = BILSTM_TRANSFORMER if name == 'bilstm-bert' else name
+    name = BILSTM_TRANSFORMER if name == "bilstm-bert" else name
     if bert_model is not None:
         transformer_model = bert_model
-        warnings.warn( "The bert_model argument is deprecated - please use transformer_model instead.",
-                DeprecationWarning,
-                stacklevel=2,
-            )
-
+        warnings.warn(
+            "The bert_model argument is deprecated - please use transformer_model instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
 
     if name not in SEQUENCE_TAGGERS:
         raise ValueError(
