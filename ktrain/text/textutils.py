@@ -382,36 +382,38 @@ def sent_tokenize(text, lang=None):
     return sents
 
 
-#def paragraph_tokenize(text, join_sentences=False, lang=None):
-    #"""
-    #```
-    #segment text into paragraphs
-    #```
-    #"""
-    #lang = detect_lang(text) if lang is None else lang
-    #if is_chinese(lang):
-        #raise ValueError("paragraph_tokenize does not currently support Chinese.")
-    #paragraphs = []
-    #sents = []
-    #for paragraph in segmenter.process(text):
-        #sents = []
-        #for sentence in paragraph:
-            #sents.append(" ".join([t.value for t in sentence]))
-        #if join_sentences:
-            #sents = " ".join(sents)
-        #paragraphs.append(sents)
-    #return paragraphs
+# def paragraph_tokenize(text, join_sentences=False, lang=None):
+# """
+# ```
+# segment text into paragraphs
+# ```
+# """
+# lang = detect_lang(text) if lang is None else lang
+# if is_chinese(lang):
+# raise ValueError("paragraph_tokenize does not currently support Chinese.")
+# paragraphs = []
+# sents = []
+# for paragraph in segmenter.process(text):
+# sents = []
+# for sentence in paragraph:
+# sents.append(" ".join([t.value for t in sentence]))
+# if join_sentences:
+# sents = " ".join(sents)
+# paragraphs.append(sents)
+# return paragraphs
 
 ## tokenizer_filter = rs='!"#$%&()*+,-./:;<=>?@[\\]^_`{|}~\t\n'
-#re_tok = re.compile(f"([{string.punctuation}“”¨«»®´·º½¾¿¡§£₤‘’])")
-#def tokenize(s, join_tokens=False, join_char=" "):
+# re_tok = re.compile(f"([{string.punctuation}“”¨«»®´·º½¾¿¡§£₤‘’])")
+# def tokenize(s, join_tokens=False, join_char=" "):
 #    tokens = re_tok.sub(r" \1 ", s).split()
 #    if join_tokens:
 #        tokens = join_char.join(tokens)
 #    return tokens
 
 
-def paragraph_tokenize(text, join_sentences=False, join_tokens=True, join_char=" ", lang=None):
+def paragraph_tokenize(
+    text, join_sentences=False, join_tokens=True, join_char=" ", lang=None
+):
     """
     ```
     segment text into paragraphs
@@ -425,7 +427,11 @@ def paragraph_tokenize(text, join_sentences=False, join_tokens=True, join_char="
     for paragraph in segmenter.process(text):
         sents = []
         for sentence in paragraph:
-            sents.append(join_char.join([t.value for t in sentence]) if join_tokens else [t.value for t in sentence])
+            sents.append(
+                join_char.join([t.value for t in sentence])
+                if join_tokens
+                else [t.value for t in sentence]
+            )
         if join_sentences and join_tokens:
             sents = join_char.join(sents)
         elif join_sentences and not join_tokens:
@@ -437,7 +443,9 @@ def paragraph_tokenize(text, join_sentences=False, join_tokens=True, join_char="
 
 def tokenize(s, join_tokens=False, join_sentences=True, join_char=" "):
     s = s.replace("\n", " ")
-    return paragraph_tokenize(s, join_tokens=join_tokens, join_sentences=join_sentences, join_char=join_char)
+    return paragraph_tokenize(
+        s, join_tokens=join_tokens, join_sentences=join_sentences, join_char=join_char
+    )
 
 
 def extract_noun_phrases(text):
