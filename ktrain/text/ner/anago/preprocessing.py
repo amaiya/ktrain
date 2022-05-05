@@ -155,21 +155,23 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
                 offsets = encoded_input["offset_mapping"]
                 subtokens = encoded_input.tokens()
                 token_len = len(subtokens)
-                if seq_len + token_len > (maxlen - num_special):
+                if (seq_len + token_len) > (maxlen - num_special):
                     break
                 seq_len += token_len
 
-                word_ids = encoded_input.word_ids()
-                hf_s = []
-                for k, subtoken in enumerate(subtokens):
-                    word_id = word_ids[k]
-                    currlen = len(hf_s)
-                    if currlen == word_id + 1:
-                        hf_s[word_id].append(offsets[k])
-                    elif word_id + 1 > currlen:
-                        hf_s.append([offsets[k]])
-                hf_s = [s[entry[0][0] : entry[-1][1]] for entry in hf_s]
-                # hf_s = " ".join(subtokens).replace(" ##", "").split()
+                if len(s.split()) == 1:
+                    hf_s = [s]
+                else:
+                    word_ids = encoded_input.word_ids()
+                    hf_s = []
+                    for k, subtoken in enumerate(subtokens):
+                        word_id = word_ids[k]
+                        currlen = len(hf_s)
+                        if currlen == word_id + 1:
+                            hf_s[word_id].append(offsets[k])
+                        elif word_id + 1 > currlen:
+                            hf_s.append([offsets[k]])
+                    hf_s = [s[entry[0][0] : entry[-1][1]] for entry in hf_s]
 
                 new_x.extend(hf_s)
                 if Y is not None:
@@ -180,8 +182,6 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
                         if tag.startswith("B-"):
                             new_tag = "I-" + tag[2:]
                         new_y.extend([new_tag] * (len(hf_s) - 1))
-                    # if tag.startswith('B-'): tag = 'I-'+tag[2:]
-
             new_X.append(new_x)
             new_Y.append(new_y)
         new_Y = None if Y is None else new_Y
