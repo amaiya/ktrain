@@ -24,7 +24,7 @@ class TextExtractor:
     ```
     """
 
-    def __init__(self, use_tika=True):
+    def __init__(self, use_tika=False):
         if use_tika and not TIKA_INSTALLED:
             raise ValueError("TextExtractor requires tika: pip install tika")
         if not use_tika and not TEXTRACT_INSTALLED:
