@@ -255,7 +255,7 @@ print(time.time() - start)
 # zsl
 from ktrain.text.zsl import ZeroShotClassifier
 
-zsl = ZeroShotClassifier(device="cpu", quantize=True)
+zsl = ZeroShotClassifier(device="cuda", quantize=True)
 topic_strings = ["politics", "elections", "sports", "films", "television"]
 doc = "I am unhappy with decisions of the government and will definitely vote in 2020."
 start = time.time()
