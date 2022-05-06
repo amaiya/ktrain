@@ -1,7 +1,6 @@
-from ..imports import *
 from .. import utils as U
+from ..imports import *
 from .wrn import create_wide_residual_network
-
 
 PRETRAINED_RESNET50 = "pretrained_resnet50"
 PRETRAINED_MOBILENET = "pretrained_mobilenet"

@@ -1,5 +1,5 @@
-from .imports import *
 from . import utils as U
+from .imports import *
 
 
 def search(query, doc, case_sensitive=False, keys=[], progress=False):

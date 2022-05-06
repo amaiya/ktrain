@@ -1,6 +1,6 @@
+from .. import utils as U
 from ..imports import *
 from ..predictor import Predictor
-from .. import utils as U
 from .preprocessor import TabularPreprocessor
 
 

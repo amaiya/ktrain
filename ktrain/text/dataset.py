@@ -1,5 +1,5 @@
-from ..imports import *
 from ..dataset import SequenceDataset
+from ..imports import *
 
 
 class TransformerDataset(SequenceDataset):

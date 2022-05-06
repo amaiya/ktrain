@@ -2,8 +2,10 @@
 """
 Tests of ktrain text classification flows
 """
-import testenv
 from unittest import TestCase, main, skip
+
+import testenv
+
 import ktrain
 
 Sequential = ktrain.imports.keras.models.Sequential

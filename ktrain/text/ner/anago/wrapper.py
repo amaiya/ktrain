@@ -3,12 +3,12 @@ Wrapper class.
 """
 
 from ....imports import *
-from .models import BiLSTMCRF, save_model, load_model
+from .. import metrics
+from .models import BiLSTMCRF, load_model, save_model
 from .preprocessing import IndexTransformer
 from .tagger import Tagger
 from .trainer import Trainer
 from .utils import filter_embeddings
-from .. import metrics
 
 
 class Sequence(object):

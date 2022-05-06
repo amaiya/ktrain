@@ -2,12 +2,14 @@
 """
 Tests of ktrain text classification flows
 """
-import testenv
 from unittest import TestCase, main, skip
+
+import testenv
+
 import ktrain
 from ktrain import text as txt
-from ktrain import vision as vis
 from ktrain import utils as U
+from ktrain import vision as vis
 
 
 def texts_from_folder(preprocess_mode="standard"):

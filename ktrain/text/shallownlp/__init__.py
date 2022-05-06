@@ -1,8 +1,7 @@
 from .classifier import Classifier
-from .searcher import *
 from .ner import NER
-from .utils import sent_tokenize, extract_filenames, read_text
-
+from .searcher import *
+from .utils import extract_filenames, read_text, sent_tokenize
 
 __all__ = [
     "Classifier",

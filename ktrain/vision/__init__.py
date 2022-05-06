@@ -1,12 +1,19 @@
-from .models import print_image_classifiers, image_classifier
-from .models import print_image_regression_models, image_regression_model
-from .data import show_image, show_random_images, preview_data_aug, get_data_aug
 from .data import (
-    images_from_folder,
-    images_from_csv,
+    get_data_aug,
     images_from_array,
+    images_from_csv,
     images_from_fname,
+    images_from_folder,
     preprocess_csv,
+    preview_data_aug,
+    show_image,
+    show_random_images,
+)
+from .models import (
+    image_classifier,
+    image_regression_model,
+    print_image_classifiers,
+    print_image_regression_models,
 )
 from .predictor import ImagePredictor
 

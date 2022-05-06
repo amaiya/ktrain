@@ -1,8 +1,7 @@
-import tensorflow as tf
-
+import warnings
 
 import pandas as pd
-import warnings
+import tensorflow as tf
 
 
 def convert_to_dataset(list_of_dicts):

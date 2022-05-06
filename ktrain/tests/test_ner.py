@@ -2,12 +2,12 @@
 """
 Tests of ktrain text classification flows
 """
-import testenv
-import IPython
-from unittest import TestCase, main, skip
-import numpy as np
-
 import os
+from unittest import TestCase, main, skip
+
+import IPython
+import numpy as np
+import testenv
 
 os.environ["DISABLE_V2_BEHAVIOR"] = "0"
 

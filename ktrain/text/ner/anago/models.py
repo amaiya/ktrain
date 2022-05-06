@@ -1,8 +1,8 @@
 """
 Model definition.
 """
-from ....imports import *
 from .... import utils as U
+from ....imports import *
 
 # if U.is_tf_keras():
 # from .layers import CRF

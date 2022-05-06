@@ -1,8 +1,9 @@
-from ..imports import *
-from .. import utils as U
-from . import textutils as TU
-from . import preprocessor as pp
 import time
+
+from .. import utils as U
+from ..imports import *
+from . import preprocessor as pp
+from . import textutils as TU
 
 
 class TopicModel:
@@ -540,9 +541,9 @@ class TopicModel:
         # check fo bokeh
         try:
             import bokeh.plotting as bp
-            from bokeh.plotting import save
-            from bokeh.models import HoverTool
             from bokeh.io import output_notebook
+            from bokeh.models import HoverTool
+            from bokeh.plotting import save
         except:
             warnings.warn(
                 "visualize_documents method requires bokeh package: pip install bokeh"

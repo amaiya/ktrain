@@ -2,10 +2,12 @@
 """
 Tests of ktrain text classification flows
 """
-import testenv
-import IPython
 from unittest import TestCase, main, skip
+
+import IPython
 import numpy as np
+import testenv
+
 import ktrain
 from ktrain import text
 from ktrain.imports import ACC_NAME, VAL_ACC_NAME
@@ -24,8 +26,8 @@ class TestQA(TestCase):
         docs = newsgroups_train.data + newsgroups_test.data
 
         # tmp_folder = '/tmp/qa_test'
-        import tempfile
         import shutil
+        import tempfile
 
         tmp_folder = tempfile.mkdtemp()
         shutil.rmtree(tmp_folder)

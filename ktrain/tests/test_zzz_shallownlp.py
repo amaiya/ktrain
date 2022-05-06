@@ -4,11 +4,11 @@ Tests of ktrain shallownlp module:
 2020-05-26: renamed test_zzz_shallownlp.py because
             causes issues for tests following it when run in conjunction with test_regression.py.
 """
-import testenv
-from unittest import TestCase, main, skip
-import numpy as np
-
 import os
+from unittest import TestCase, main, skip
+
+import numpy as np
+import testenv
 
 os.environ["DISABLE_V2_BEHAVIOR"] = "1"
 from ktrain.text import shallownlp as snlp
@@ -66,7 +66,7 @@ class TestShallowNLP(TestCase):
     def test_ner(self):
         ner = snlp.NER("en")
         text = """
-        Xuetao Cao was head of the Chinese Academy of Medical Sciences and is 
+        Xuetao Cao was head of the Chinese Academy of Medical Sciences and is
         the current president of Nankai University.
         """
         result = ner.predict(text)

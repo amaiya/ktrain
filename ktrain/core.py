@@ -1,22 +1,20 @@
-from .imports import *
-
-from .lroptimize.lrfinder import *
 from . import utils as U
-
-from .vision.preprocessor import ImagePreprocessor
-from .vision.predictor import ImagePredictor
-from .text.preprocessor import (
-    TextPreprocessor,
-    BERTPreprocessor,
-    TransformersPreprocessor,
-)
-from .text.predictor import TextPredictor
-from .text.ner.predictor import NERPredictor
-from .text.ner.preprocessor import NERPreprocessor
-from .graph.predictor import NodePredictor, LinkPredictor
-from .graph.preprocessor import NodePreprocessor, LinkPreprocessor
+from .graph.predictor import LinkPredictor, NodePredictor
+from .graph.preprocessor import LinkPreprocessor, NodePreprocessor
+from .imports import *
+from .lroptimize.lrfinder import *
 from .tabular.predictor import TabularPredictor
 from .tabular.preprocessor import TabularPreprocessor
+from .text.ner.predictor import NERPredictor
+from .text.ner.preprocessor import NERPreprocessor
+from .text.predictor import TextPredictor
+from .text.preprocessor import (
+    BERTPreprocessor,
+    TextPreprocessor,
+    TransformersPreprocessor,
+)
+from .vision.predictor import ImagePredictor
+from .vision.preprocessor import ImagePreprocessor
 
 
 class Learner(ABC):
@@ -911,7 +909,7 @@ class Learner(ABC):
                 warnings.warn(
                     """
                               The early_stopping=True argument relies on EarlyStopping.restore_best_weights,
-                              which is only supported on Keras 2.2.3 or greater. 
+                              which is only supported on Keras 2.2.3 or greater.
                               For now, we are falling back to EarlyStopping.restore_best_weights=False.
                               Please use checkpoint_folder option in fit() to restore best weights."""
                 )
@@ -1963,8 +1961,7 @@ def _load_model(fpath, preproc=None, train_data=None, custom_objects=None):
         or train_data
         and U.is_ner(data=train_data)
     ):
-        from .text.ner.anago.layers import CRF
-        from .text.ner.anago.layers import crf_loss
+        from .text.ner.anago.layers import CRF, crf_loss
 
         custom_objects = {"CRF": CRF, "crf_loss": crf_loss}
         # save old te_model as backup

@@ -2,9 +2,11 @@
 """
 Tests of ktrain text classification flows
 """
-import testenv
-import numpy as np
 from unittest import TestCase, main, skip
+
+import numpy as np
+import testenv
+
 from ktrain import tabular
 
 

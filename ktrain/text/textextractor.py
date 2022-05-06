@@ -1,6 +1,6 @@
+from .. import utils as U
 from ..imports import *
 from . import textutils as TU
-from .. import utils as U
 
 try:
     from tika import parser

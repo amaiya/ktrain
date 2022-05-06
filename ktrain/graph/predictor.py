@@ -1,7 +1,7 @@
+from .. import utils as U
 from ..imports import *
 from ..predictor import Predictor
-from .preprocessor import NodePreprocessor, LinkPreprocessor
-from .. import utils as U
+from .preprocessor import LinkPreprocessor, NodePreprocessor
 
 
 class NodePredictor(Predictor):

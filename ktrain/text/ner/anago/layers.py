@@ -1,7 +1,7 @@
-from __future__ import absolute_import
-from __future__ import division
-from ....imports import *
+from __future__ import absolute_import, division
+
 from .... import utils as U
+from ....imports import *
 
 # from keras_contrib.losses import crf_loss
 # from keras_contrib.metrics import crf_marginal_accuracy

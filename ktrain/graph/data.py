@@ -1,6 +1,6 @@
-from ..imports import *
 from .. import utils as U
-from .preprocessor import NodePreprocessor, LinkPreprocessor
+from ..imports import *
+from .preprocessor import LinkPreprocessor, NodePreprocessor
 
 
 def graph_nodes_from_csv(

@@ -9,6 +9,7 @@ from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor
 
 from ...torch_base import TorchBase
 
+
 # duplicated from ktrain.utils for now
 def batchify(X, size):
     """

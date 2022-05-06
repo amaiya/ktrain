@@ -1,11 +1,10 @@
-from ..imports import *
 from ..dataset import SequenceDataset
-
+from ..imports import *
 
 # import stellargraph
 try:
     import stellargraph as sg
-    from stellargraph.mapper import node_mappers, link_mappers
+    from stellargraph.mapper import link_mappers, node_mappers
 except:
     raise Exception(SG_ERRMSG)
 if version.parse(sg.__version__) < version.parse("0.8"):

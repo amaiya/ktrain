@@ -1,9 +1,10 @@
 import math
 import warnings
+
 import numpy as np
 
-from ...torch_base import TorchBase
 from ... import utils as U
+from ...torch_base import TorchBase
 
 list2chunks = U.list2chunks
 

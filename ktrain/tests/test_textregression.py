@@ -1,18 +1,20 @@
 #!/usr/bin/env python3
 """
-Tests of ktrain text regression 
+Tests of ktrain text regression
 """
-import testenv
-import IPython
 from unittest import TestCase, main, skip
+
+import IPython
 import numpy as np
+import testenv
+
 import ktrain
 from ktrain import text as txt
 from ktrain.imports import ACC_NAME, VAL_ACC_NAME
 
-TEST_DOC = """A wine that has created its own universe. It has a unique, special softness 
-              that allies with the total purity that comes from a small, enclosed single vineyard. 
-              The fruit is almost irrelevant here, because it comes as part of a much deeper complexity. 
+TEST_DOC = """A wine that has created its own universe. It has a unique, special softness
+              that allies with the total purity that comes from a small, enclosed single vineyard.
+              The fruit is almost irrelevant here, because it comes as part of a much deeper complexity.
               This is a great wine, at the summit of Champagne, a sublime, unforgettable experience.
               """
 

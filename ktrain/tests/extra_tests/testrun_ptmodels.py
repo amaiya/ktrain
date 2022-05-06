@@ -1,5 +1,6 @@
-import testenv
 import time
+
+import testenv
 
 from ktrain.text.summarization import TransformerSummarizer
 

@@ -1,6 +1,6 @@
-from ..imports import *
 from .. import utils as U
 from ..core import GenLearner
+from ..imports import *
 from .data import show_image
 
 

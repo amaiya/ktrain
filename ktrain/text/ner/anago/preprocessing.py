@@ -3,10 +3,9 @@
 Preprocessors.
 """
 
-from ....imports import *
 from .... import utils as U
+from ....imports import *
 from .utils import Vocabulary
-
 
 try:
     from allennlp.modules.elmo import Elmo, batch_to_ids

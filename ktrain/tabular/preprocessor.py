@@ -1,5 +1,5 @@
-from ..imports import *
 from .. import utils as U
+from ..imports import *
 from ..preprocessor import Preprocessor
 
 
@@ -212,6 +212,7 @@ def clean_df(
 
 
 from numbers import Number
+from types import SimpleNamespace
 from typing import (
     Any,
     AnyStr,
@@ -224,12 +225,13 @@ from typing import (
     Mapping,
     NewType,
     Optional,
+    Sequence,
+    Tuple,
+    TypeVar,
+    Union,
 )
-from typing import Sequence, Tuple, TypeVar, Union
-from types import SimpleNamespace
 
-
-from pandas.api.types import is_numeric_dtype, is_categorical_dtype
+from pandas.api.types import is_categorical_dtype, is_numeric_dtype
 
 
 def ifnone(a, b):
@@ -299,7 +301,7 @@ def add_datepart(
     for n in attr:
         df[prefix + n] = getattr(field.dt, n.lower())
         added_columns.append(prefix + n)
-    df[prefix + "Elapsed"] = field.astype(np.int64) // 10**9
+    df[prefix + "Elapsed"] = field.astype(np.int64) // 10 ** 9
     if drop:
         df.drop(field_name, axis=1, inplace=True)
     if return_added_columns:
@@ -463,7 +465,7 @@ class FillMissing(TabularProc):
                 df[name] = df[name].fillna(self.filler_dict[name])
             elif pd.isnull(df[name]).sum() != 0:
                 warnings.warn(
-                    f"""There are nan values in field {name} but there were none in the training set. 
+                    f"""There are nan values in field {name} but there were none in the training set.
                 Filled with {self.fill_strategy}."""
                 )
                 df[name] = df[name].fillna(self.filler_dict[name])

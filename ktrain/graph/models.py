@@ -1,6 +1,5 @@
-from ..imports import *
 from .. import utils as U
-
+from ..imports import *
 
 GRAPHSAGE = "graphsage"
 NODE_CLASSIFIERS = {GRAPHSAGE: "GraphSAGE:  https://arxiv.org/pdf/1706.02216.pdf"}

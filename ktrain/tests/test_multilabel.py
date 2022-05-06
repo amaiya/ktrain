@@ -2,13 +2,14 @@
 """
 Tests of ktrain text classification flows
 """
-import testenv
-import numpy as np
 from unittest import TestCase, main, skip
-import ktrain
-from ktrain.imports import ACC_NAME, VAL_ACC_NAME
-from ktrain import utils as U
 
+import numpy as np
+import testenv
+
+import ktrain
+from ktrain import utils as U
+from ktrain.imports import ACC_NAME, VAL_ACC_NAME
 
 Sequential = ktrain.imports.keras.models.Sequential
 Dense = ktrain.imports.keras.layers.Dense

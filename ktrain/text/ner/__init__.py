@@ -1,2 +1,2 @@
-from .data import entities_from_gmb, entities_from_conll2003
-from .models import sequence_tagger, print_sequence_taggers
+from .data import entities_from_conll2003, entities_from_gmb
+from .models import print_sequence_taggers, sequence_tagger

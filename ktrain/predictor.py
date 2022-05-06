@@ -1,5 +1,5 @@
-from .imports import *
 from . import utils as U
+from .imports import *
 
 
 class Predictor(ABC):
@@ -127,7 +127,8 @@ class Predictor(ABC):
         ```
         """
         try:
-            import onnxruntime, onnx
+            import onnx
+            import onnxruntime
         except ImportError:
             raise Exception(
                 "This method requires ONNX libraries to be installed: "

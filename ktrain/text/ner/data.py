@@ -1,9 +1,8 @@
-from ...imports import *
 from ... import utils as U
+from ...imports import *
 from .. import textutils as TU
 from . import preprocessor as pp
 from .preprocessor import NERPreprocessor
-
 
 MAXLEN = 128
 WORD_COL = pp.WORD_COL

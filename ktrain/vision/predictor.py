@@ -1,7 +1,7 @@
+from .. import utils as U
 from ..imports import *
 from ..predictor import Predictor
 from .preprocessor import ImagePreprocessor
-from .. import utils as U
 
 
 class ImagePredictor(Predictor):

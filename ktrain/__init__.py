@@ -1,5 +1,5 @@
-from .version import __version__
 from . import imports as I
+from . import utils as U
 from .core import (
     ArrayLearner,
     GenLearner,
@@ -7,12 +7,11 @@ from .core import (
     load_predictor,
     release_gpu_memory,
 )
-from .vision.learner import ImageClassLearner
+from .graph.learner import LinkPredLearner, NodeClassLearner
 from .text.learner import BERTTextClassLearner, TransformerTextClassLearner
 from .text.ner.learner import NERLearner
-from .graph.learner import NodeClassLearner, LinkPredLearner
-
-from . import utils as U
+from .version import __version__
+from .vision.learner import ImageClassLearner
 
 __all__ = ["get_learner", "get_predictor", "load_predictor", "release_gpu_memory"]
 
@@ -80,7 +79,7 @@ def get_learner(
         sequence len=320, max_batch_size=14
         sequence len=384, max_batch_size=12
         sequence len=512, max_batch_size=6
-        
+
         You've exceeded these limits.
         If using a GPU with <=12GB of memory, you may run out of memory during training.
         If necessary, adjust sequence length or batch size based on above."""

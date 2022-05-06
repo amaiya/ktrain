@@ -1,6 +1,6 @@
-from ..imports import *
-from subprocess import Popen, PIPE, DEVNULL
+from subprocess import DEVNULL, PIPE, Popen
 
+from ..imports import *
 
 DEFAULT_TOKEN_PATTERN = (
     r"\b[a-zA-Z][a-zA-Z0-9]*(?:[_/&-][a-zA-Z0-9]+)+\b|"

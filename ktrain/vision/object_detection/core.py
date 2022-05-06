@@ -1,6 +1,7 @@
-from ...torch_base import TorchBase
-from ... import imports as I
 from transformers import pipeline
+
+from ... import imports as I
+from ...torch_base import TorchBase
 
 
 class ObjectDetector(TorchBase):

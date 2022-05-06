@@ -1,8 +1,7 @@
-from ..imports import *
 from .. import utils as U
+from ..imports import *
 from . import preprocessor as tpp
 from . import textutils as TU
-
 
 MAX_FEATURES = 20000
 MAXLEN = 400

@@ -2,16 +2,15 @@
 """
 Tests of ktrain image classification flows
 """
-import testenv
 from unittest import TestCase, main, skip
-import numpy as np
 
+import numpy as np
+import testenv
 
 import ktrain
-from ktrain import vision as vis
 import ktrain.utils as U
+from ktrain import vision as vis
 from ktrain.imports import ACC_NAME, VAL_ACC_NAME
-
 
 # def classify_from_csv():
 # train_fpath = './image_data/train-vision.csv'
@@ -167,9 +166,9 @@ class TestImageClassification(TestCase):
     # @skip('temporarily disabled')
     def test_array(self):
 
+        import numpy as np
         from tensorflow.keras.datasets import mnist
         from tensorflow.keras.utils import to_categorical
-        import numpy as np
 
         (x_train, y_train), (x_test, y_test) = mnist.load_data()
         x_train = x_train.astype("float32")
@@ -258,9 +257,9 @@ class TestImageClassification(TestCase):
     # @skip('temporarily disabled')
     def test_array_regression(self):
 
+        import numpy as np
         from tensorflow.keras.datasets import mnist
         from tensorflow.keras.utils import to_categorical
-        import numpy as np
 
         (x_train, y_train), (x_test, y_test) = mnist.load_data()
         x_train = x_train.astype("float32")

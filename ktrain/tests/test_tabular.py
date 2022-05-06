@@ -2,14 +2,16 @@
 """
 Tests of ktrain text classification flows
 """
-import testenv
-import IPython
 from unittest import TestCase, main, skip
+
+import IPython
 import numpy as np
+import pandas as pd
+import testenv
+
 import ktrain
 from ktrain import tabular
 from ktrain.imports import ACC_NAME, VAL_ACC_NAME
-import pandas as pd
 
 
 class TestTabular(TestCase):

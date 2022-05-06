@@ -1,15 +1,14 @@
-from ..imports import *
-from .. import utils as U
-from ..preprocessor import Preprocessor
-from . import textutils as TU
-
 from transformers import (
     AutoConfig,
-    TFAutoModelForSequenceClassification,
     AutoTokenizer,
     TFAutoModel,
+    TFAutoModelForSequenceClassification,
 )
 
+from .. import utils as U
+from ..imports import *
+from ..preprocessor import Preprocessor
+from . import textutils as TU
 
 DISTILBERT = "distilbert"
 

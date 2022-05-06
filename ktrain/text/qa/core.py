@@ -1,20 +1,19 @@
-from ...imports import *
-from ... import utils as U
-from .. import textutils as TU
-from .. import preprocessor as tpp
-from ...torch_base import TorchBase
-
-
-from whoosh import index
-from whoosh.fields import *
-from whoosh import qparser
-from whoosh.qparser import QueryParser
-
-
 # from transformers import TFBertForQuestionAnswering
 # from transformers import BertTokenizer
-from transformers import TFAutoModelForQuestionAnswering, AutoModelForQuestionAnswering
-from transformers import AutoTokenizer
+from transformers import (
+    AutoModelForQuestionAnswering,
+    AutoTokenizer,
+    TFAutoModelForQuestionAnswering,
+)
+from whoosh import index, qparser
+from whoosh.fields import *
+from whoosh.qparser import QueryParser
+
+from ... import utils as U
+from ...imports import *
+from ...torch_base import TorchBase
+from .. import preprocessor as tpp
+from .. import textutils as TU
 
 LOWCONF = -10000
 
@@ -61,7 +60,7 @@ def display_answers(answers):
     if not answers:
         return
     df = _answers2df(answers)
-    from IPython.core.display import display, HTML
+    from IPython.core.display import HTML, display
 
     return display(HTML(df.to_html(render_links=True, escape=False)))
 

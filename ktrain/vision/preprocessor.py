@@ -1,6 +1,6 @@
+from .. import utils as U
 from ..imports import *
 from ..preprocessor import Preprocessor
-from .. import utils as U
 
 
 class ImagePreprocessor(Preprocessor):

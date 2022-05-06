@@ -1,6 +1,6 @@
-from ..imports import *
 from .. import utils as U
 from ..core import ArrayLearner, GenLearner, _load_model
+from ..imports import *
 from .preprocessor import TransformersPreprocessor
 
 

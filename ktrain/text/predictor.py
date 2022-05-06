@@ -1,7 +1,7 @@
+from .. import utils as U
 from ..imports import *
 from ..predictor import Predictor
 from .preprocessor import TextPreprocessor, TransformersPreprocessor, detect_text_format
-from .. import utils as U
 
 
 class TextPredictor(Predictor):

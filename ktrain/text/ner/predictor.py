@@ -1,8 +1,8 @@
+from ... import utils as U
 from ...imports import *
 from ...predictor import Predictor
-from .preprocessor import NERPreprocessor
-from ... import utils as U
 from .. import textutils as TU
+from .preprocessor import NERPreprocessor
 
 
 class NERPredictor(Predictor):

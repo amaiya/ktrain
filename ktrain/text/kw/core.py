@@ -1,5 +1,5 @@
-from collections import Counter
 import warnings
+from collections import Counter
 
 from ... import imports as I
 from .. import textutils as TU

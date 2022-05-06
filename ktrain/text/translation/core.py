@@ -1,7 +1,7 @@
-from ...imports import *
 from ... import utils as U
-from .. import textutils as TU
+from ...imports import *
 from ...torch_base import TorchBase
+from .. import textutils as TU
 
 SUPPORTED_SRC_LANGS = ["zh", "ar", "ru", "de", "af", "es", "fr", "it", "pt"]
 

@@ -1,8 +1,8 @@
-from ...imports import *
 from ... import utils as U
+from ...imports import *
 from ...preprocessor import Preprocessor
-from .. import textutils as TU
 from .. import preprocessor as tpp
+from .. import textutils as TU
 
 OTHER = "O"
 W2V = "word2vec"

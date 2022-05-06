@@ -1,5 +1,5 @@
-from ..imports import *
 from .. import utils as U
+from ..imports import *
 from .preprocessor import ImagePreprocessor
 
 
