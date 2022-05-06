@@ -556,6 +556,27 @@ def get_ktrain_data():
 # MISC UTILITIES
 # ------------------------------------------------------------------------------
 
+from subprocess import Popen
+def checkjava(path=None):
+    """
+    Checks if a Java executable is available for Tika.
+    Args:
+        path(str): path to java executable
+    Returns:
+        True if Java is available, False otherwise
+    """
+
+    # Get path to java executable if path not set
+    if not path:
+        path = os.getenv("TIKA_JAVA", "java")
+
+    # Check if java binary is available on path
+    try:
+        _ = Popen(path, stdout=open(os.devnull, "w"), stderr=open(os.devnull, "w"))
+    except:
+        return False
+    return True
+
 
 def batchify(X, size):
     """
@@ -643,6 +664,9 @@ def get_hf_model_name(model_id):
     return model_name
 
 
+# ------------------------------------------------------------------------------
+# target-handling
+# ------------------------------------------------------------------------------
 class YTransform:
     def __init__(self, class_names=[], label_encoder=None):
         """

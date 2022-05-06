@@ -13,6 +13,7 @@ all_extras = [ 'ipython',        # for tests
               'datasets',        # for text.qa.AnswerExtractor.finetune
               'textblob',        # for text.kw.KeywordExtractor and textutils.extract_noun_phrases
               'tika',            # for TextExtractor
+              'textract',            # for TextExtractor
               'causalnlp',       # for tabular.causalinference
               'librosa',         # for text.speech
               'torch==1.8.1',    # for qa, summarization, translation, zsl, speech

@@ -1,6 +1,6 @@
 from ..imports import *
 from . import textutils as TU
-from subprocess import Popen
+from .. import utils as U
 
 try:
     from tika import parser
@@ -16,6 +16,7 @@ try:
 except ImportError:
     TEXTRACT_INSTALLED = False
 
+JAVA_INSTALLED = U.checkjava()
 
 class TextExtractor:
     """
@@ -24,11 +25,11 @@ class TextExtractor:
     ```
     """
 
-    def __init__(self, use_tika=False):
+    def __init__(self, use_tika=True):
         if use_tika and not TIKA_INSTALLED:
-            raise ValueError("TextExtractor requires tika: pip install tika")
+            raise ValueError("If use_tika=True, then TextExtractor requires tika: pip install tika")
         if not use_tika and not TEXTRACT_INSTALLED:
-            raise ValueError("TextExtractor requires textract: pip install textract")
+            raise ValueError("If use_tika=False, then TextExtractor requires textract: pip install textract")
         self.use_tika = use_tika
 
     def extract(
@@ -83,31 +84,13 @@ class TextExtractor:
 
     def _extract(self, filename):
         if self.use_tika:
-            if self._checkjava():
+            if JAVA_INSTALLED:
                 parsed = parser.from_file(filename)
                 text = parsed["content"]
             else:
                 raise Exception("Please install Java for TIKA text extraction")
         else:
             text = textract.process(filename)
-        return text
+        return text.strip()
 
-    def _checkjava(self, path=None):
-        """
-        Checks if a Java executable is available for Tika.
-        Args:
-            path(str): path to java executable
-        Returns:
-            True if Java is available, False otherwise
-        """
 
-        # Get path to java executable if path not set
-        if not path:
-            path = os.getenv("TIKA_JAVA", "java")
-
-        # Check if java binary is available on path
-        try:
-            _ = Popen(path, stdout=open(os.devnull, "w"), stderr=open(os.devnull, "w"))
-        except:
-            return False
-        return True
