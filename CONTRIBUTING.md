@@ -34,5 +34,5 @@ python3 test_dataloading.py
 - Keep each PR focused. While it's more convenient, please try to avoid combining several unrelated fixes together.
 - Checkout to `develop` branch before make any changes. Make sure you choose `develop` branch as base on your PR.
 - Try to maintain backwards compatibility.  If this is not possible, please discuss with maintainer(s).
-- Use four spaces for indentation. 
-- To ensure a standardized code style, we use the formatter [black](https://github.com/psf/black). If your code is not formatted correctly, it will fail the GitHub Workflow checks when pushed.
+- Use four spaces for indentation.
+- To ensure a standardized code style, we use the formatter [black](https://github.com/psf/black) and [isort](https://github.com/PyCQA/isort). If your code is not formatted correctly, it will fail the GitHub Workflow checks when pushed.
