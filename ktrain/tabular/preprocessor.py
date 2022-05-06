@@ -301,7 +301,7 @@ def add_datepart(
     for n in attr:
         df[prefix + n] = getattr(field.dt, n.lower())
         added_columns.append(prefix + n)
-    df[prefix + "Elapsed"] = field.astype(np.int64) // 10 ** 9
+    df[prefix + "Elapsed"] = field.astype(np.int64) // 10**9
     if drop:
         df.drop(field_name, axis=1, inplace=True)
     if return_added_columns:

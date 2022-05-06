@@ -37,7 +37,7 @@ class LRFinder:
         loss = logs["loss"]
         self.batch_num += 1
         self.avg_loss = self.beta * self.avg_loss + (1 - self.beta) * loss
-        smoothed_loss = self.avg_loss / (1 - self.beta ** self.batch_num)
+        smoothed_loss = self.avg_loss / (1 - self.beta**self.batch_num)
         self.losses.append(smoothed_loss)
 
         # Check whether the loss got too large or NaN
