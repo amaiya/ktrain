@@ -352,7 +352,7 @@ pip install librosa
 # for tabular.causal_inference_model:
 pip install causalnlp
 # for text.TextExtractor:
-pip install textract
+pip install tika 
 # for text.kw.KeywordExtractor
 pip install textblob
 ```
