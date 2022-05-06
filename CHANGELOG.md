@@ -9,11 +9,12 @@ Most recent releases are shown at the top. Each release shows:
 ## 0.31.0 (TBD)
 
 ### new:
-- The `text.ner.models.sequence_tagger` now supports word embeddings from non-BERT transformer models (e.g., `roberta-base`, `openai-gpt`)
+- The `text.ner.models.sequence_tagger` now supports word embeddings from non-BERT transformer models (e.g., `roberta-base`, `openai-gpt`). Thank to @Niekvdplas.
 - Custom tokenization can now be used in sequence-tagging even when using transformer word embeddings.  See `custom_tokenizer` argument to `NERPredictor.predict`.
 
 ### changed
 - [**breaking change**] In the `text.ner.models.sequence_tagger` function, the `bilstm-bert` model  is now called `bilstm-transformer` and the `bert_model` parameter has been renamed to `transformer_model`. 
+- [**breaking change**] The  `syntok` package is now used as the default tokenizer for `NERPredictor` (sequence-tagging prediction). To use the tokenization scheme from older versions of ktrain, you can import the `re` and  `string` packages and supply this function to the `custom_tokenizer` argument: `lambda s: re.compile(f"([{string.punctuation}“”¨«»®´·º½¾¿¡§£₤‘’])").sub(r" \1 ", s).split()`.
 - Code base was reformatted using [black](https://github.com/psf/black)
 - removed warning about sentence pair classification to avoid confusion
 
