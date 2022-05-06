@@ -410,8 +410,6 @@ def sent_tokenize(text, lang=None):
 #        tokens = join_char.join(tokens)
 #    return tokens
 
-re_tok = re.compile(f"([{string.punctuation}“”¨«»®´·º½¾¿¡§£₤‘’])").sub(r" \1 ", s).split()
-def tokenize(s): return re_tok.sub(r" \1 ", s).split()
 
 def paragraph_tokenize(
     text, join_sentences=False, join_tokens=True, join_char=" ", lang=None
