@@ -18,6 +18,7 @@ except ImportError:
 
 JAVA_INSTALLED = U.checkjava()
 
+
 class TextExtractor:
     """
     ```
@@ -27,9 +28,13 @@ class TextExtractor:
 
     def __init__(self, use_tika=True):
         if use_tika and not TIKA_INSTALLED:
-            raise ValueError("If use_tika=True, then TextExtractor requires tika: pip install tika")
+            raise ValueError(
+                "If use_tika=True, then TextExtractor requires tika: pip install tika"
+            )
         if not use_tika and not TEXTRACT_INSTALLED:
-            raise ValueError("If use_tika=False, then TextExtractor requires textract: pip install textract")
+            raise ValueError(
+                "If use_tika=False, then TextExtractor requires textract: pip install textract"
+            )
         self.use_tika = use_tika
 
     def extract(
@@ -92,5 +97,3 @@ class TextExtractor:
         else:
             text = textract.process(filename)
         return text.strip()
-
-

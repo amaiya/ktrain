@@ -557,6 +557,8 @@ def get_ktrain_data():
 # ------------------------------------------------------------------------------
 
 from subprocess import Popen
+
+
 def checkjava(path=None):
     """
     Checks if a Java executable is available for Tika.
