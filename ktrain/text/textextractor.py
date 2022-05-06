@@ -1,19 +1,20 @@
 from ..imports import *
 from . import textutils as TU
 from subprocess import Popen
+
 try:
     from tika import parser
-    TIKA_INSTALLED=True
+
+    TIKA_INSTALLED = True
 except ImportError:
-    TIKA_INSTALLED=False
+    TIKA_INSTALLED = False
 
 try:
     import textract
-    TEXTRACT_INSTALLED=True
+
+    TEXTRACT_INSTALLED = True
 except ImportError:
-    TEXTRACT_INSTALLED=False
-
-
+    TEXTRACT_INSTALLED = False
 
 
 class TextExtractor:
@@ -25,11 +26,10 @@ class TextExtractor:
 
     def __init__(self, use_tika=False):
         if use_tika and not TIKA_INSTALLED:
-            raise ValueError('TextExtractor requires tika: pip install tika')
+            raise ValueError("TextExtractor requires tika: pip install tika")
         if not use_tika and not TEXTRACT_INSTALLED:
-            raise ValueError('TextExtractor requires textract: pip install textract')
-        self.use_tika=use_tika
-
+            raise ValueError("TextExtractor requires textract: pip install textract")
+        self.use_tika = use_tika
 
     def extract(
         self, filename=None, text=None, return_format="document", lang=None, verbose=1
@@ -87,13 +87,10 @@ class TextExtractor:
                 parsed = parser.from_file(filename)
                 text = parsed["content"]
             else:
-                raise Exception(
-                    "Please install Java for TIKA text extraction"
-                )
+                raise Exception("Please install Java for TIKA text extraction")
         else:
             text = textract.process(filename)
         return text
-
 
     def _checkjava(self, path=None):
         """
@@ -114,4 +111,3 @@ class TextExtractor:
         except:
             return False
         return True
-
