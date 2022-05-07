@@ -26,11 +26,12 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from ..imports import *
+<pre><code class="python">import time
+
 from .. import utils as U
-from . import textutils as TU
+from ..imports import *
 from . import preprocessor as pp
-import time
+from . import textutils as TU
 
 
 class TopicModel:
@@ -568,9 +569,9 @@ class TopicModel:
         # check fo bokeh
         try:
             import bokeh.plotting as bp
-            from bokeh.plotting import save
-            from bokeh.models import HoverTool
             from bokeh.io import output_notebook
+            from bokeh.models import HoverTool
+            from bokeh.plotting import save
         except:
             warnings.warn(
                 &#34;visualize_documents method requires bokeh package: pip install bokeh&#34;
@@ -1487,9 +1488,9 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
         # check fo bokeh
         try:
             import bokeh.plotting as bp
-            from bokeh.plotting import save
-            from bokeh.models import HoverTool
             from bokeh.io import output_notebook
+            from bokeh.models import HoverTool
+            from bokeh.plotting import save
         except:
             warnings.warn(
                 &#34;visualize_documents method requires bokeh package: pip install bokeh&#34;
@@ -2885,9 +2886,9 @@ Optional filepath to save the interactive visualization</p></div>
     # check fo bokeh
     try:
         import bokeh.plotting as bp
-        from bokeh.plotting import save
-        from bokeh.models import HoverTool
         from bokeh.io import output_notebook
+        from bokeh.models import HoverTool
+        from bokeh.plotting import save
     except:
         warnings.warn(
             &#34;visualize_documents method requires bokeh package: pip install bokeh&#34;
@@ -3542,9 +3543,9 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
         # check fo bokeh
         try:
             import bokeh.plotting as bp
-            from bokeh.plotting import save
-            from bokeh.models import HoverTool
             from bokeh.io import output_notebook
+            from bokeh.models import HoverTool
+            from bokeh.plotting import save
         except:
             warnings.warn(
                 &#34;visualize_documents method requires bokeh package: pip install bokeh&#34;
@@ -4940,9 +4941,9 @@ Optional filepath to save the interactive visualization</p></div>
     # check fo bokeh
     try:
         import bokeh.plotting as bp
-        from bokeh.plotting import save
-        from bokeh.models import HoverTool
         from bokeh.io import output_notebook
+        from bokeh.models import HoverTool
+        from bokeh.plotting import save
     except:
         warnings.warn(
             &#34;visualize_documents method requires bokeh package: pip install bokeh&#34;

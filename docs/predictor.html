@@ -26,8 +26,8 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from .imports import *
-from . import utils as U
+<pre><code class="python">from . import utils as U
+from .imports import *
 
 
 class Predictor(ABC):
@@ -155,7 +155,8 @@ class Predictor(ABC):
         ```
         &#34;&#34;&#34;
         try:
-            import onnxruntime, onnx
+            import onnx
+            import onnxruntime
         except ImportError:
             raise Exception(
                 &#34;This method requires ONNX libraries to be installed: &#34;
@@ -426,7 +427,8 @@ class Predictor(ABC):
         ```
         &#34;&#34;&#34;
         try:
-            import onnxruntime, onnx
+            import onnx
+            import onnxruntime
         except ImportError:
             raise Exception(
                 &#34;This method requires ONNX libraries to be installed: &#34;
@@ -674,7 +676,8 @@ Returns:
     ```
     &#34;&#34;&#34;
     try:
-        import onnxruntime, onnx
+        import onnx
+        import onnxruntime
     except ImportError:
         raise Exception(
             &#34;This method requires ONNX libraries to be installed: &#34;

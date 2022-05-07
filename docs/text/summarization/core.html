@@ -47,7 +47,7 @@ class TransformerSummarizer(TorchBase):
         if &#34;bart&#34; not in model_name:
             raise ValueError(&#34;TransformerSummarizer currently only accepts BART models&#34;)
         super().__init__(device=device)
-        from transformers import BartTokenizer, BartForConditionalGeneration
+        from transformers import BartForConditionalGeneration, BartTokenizer
 
         self.tokenizer = BartTokenizer.from_pretrained(model_name)
         self.model = BartForConditionalGeneration.from_pretrained(model_name).to(
@@ -128,7 +128,7 @@ Args:
         if &#34;bart&#34; not in model_name:
             raise ValueError(&#34;TransformerSummarizer currently only accepts BART models&#34;)
         super().__init__(device=device)
-        from transformers import BartTokenizer, BartForConditionalGeneration
+        from transformers import BartForConditionalGeneration, BartTokenizer
 
         self.tokenizer = BartTokenizer.from_pretrained(model_name)
         self.model = BartForConditionalGeneration.from_pretrained(model_name).to(

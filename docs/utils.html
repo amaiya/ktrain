@@ -28,7 +28,6 @@
 </summary>
 <pre><code class="python">from .imports import *
 
-
 # ------------------------------------------------------------------------------
 # KTRAIN DEFAULTS
 # ------------------------------------------------------------------------------
@@ -584,6 +583,29 @@ def get_ktrain_data():
 # MISC UTILITIES
 # ------------------------------------------------------------------------------
 
+from subprocess import Popen
+
+
+def checkjava(path=None):
+    &#34;&#34;&#34;
+    Checks if a Java executable is available for Tika.
+    Args:
+        path(str): path to java executable
+    Returns:
+        True if Java is available, False otherwise
+    &#34;&#34;&#34;
+
+    # Get path to java executable if path not set
+    if not path:
+        path = os.getenv(&#34;TIKA_JAVA&#34;, &#34;java&#34;)
+
+    # Check if java binary is available on path
+    try:
+        _ = Popen(path, stdout=open(os.devnull, &#34;w&#34;), stderr=open(os.devnull, &#34;w&#34;))
+    except:
+        return False
+    return True
+
 
 def batchify(X, size):
     &#34;&#34;&#34;
@@ -671,6 +693,9 @@ def get_hf_model_name(model_id):
     return model_name
 
 
+# ------------------------------------------------------------------------------
+# target-handling
+# ------------------------------------------------------------------------------
 class YTransform:
     def __init__(self, class_names=[], label_encoder=None):
         &#34;&#34;&#34;
@@ -1048,6 +1073,40 @@ Returns:
     if y is not None and not isinstance(y, (list, np.ndarray)):
         raise ValueError(&#34;%s must be a list or NumPy array&#34; % y_name)
     return</code></pre>
+</details>
+</dd>
+<dt id="ktrain.utils.checkjava"><code class="name flex">
+<span>def <span class="ident">checkjava</span></span>(<span>path=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Checks if a Java executable is available for Tika.</p>
+<h2 id="args">Args</h2>
+<p>path(str): path to java executable</p>
+<h2 id="returns">Returns</h2>
+<p>True if Java is available, False otherwise</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def checkjava(path=None):
+    &#34;&#34;&#34;
+    Checks if a Java executable is available for Tika.
+    Args:
+        path(str): path to java executable
+    Returns:
+        True if Java is available, False otherwise
+    &#34;&#34;&#34;
+
+    # Get path to java executable if path not set
+    if not path:
+        path = os.getenv(&#34;TIKA_JAVA&#34;, &#34;java&#34;)
+
+    # Check if java binary is available on path
+    try:
+        _ = Popen(path, stdout=open(os.devnull, &#34;w&#34;), stderr=open(os.devnull, &#34;w&#34;))
+    except:
+        return False
+    return True</code></pre>
 </details>
 </dd>
 <dt id="ktrain.utils.data_arg_check"><code class="name flex">
@@ -2475,6 +2534,7 @@ Args:
 <li><code><a title="ktrain.utils.batchify" href="#ktrain.utils.batchify">batchify</a></code></li>
 <li><code><a title="ktrain.utils.bert_data_tuple" href="#ktrain.utils.bert_data_tuple">bert_data_tuple</a></code></li>
 <li><code><a title="ktrain.utils.check_array" href="#ktrain.utils.check_array">check_array</a></code></li>
+<li><code><a title="ktrain.utils.checkjava" href="#ktrain.utils.checkjava">checkjava</a></code></li>
 <li><code><a title="ktrain.utils.data_arg_check" href="#ktrain.utils.data_arg_check">data_arg_check</a></code></li>
 <li><code><a title="ktrain.utils.download" href="#ktrain.utils.download">download</a></code></li>
 <li><code><a title="ktrain.utils.get_default_optimizer" href="#ktrain.utils.get_default_optimizer">get_default_optimizer</a></code></li>

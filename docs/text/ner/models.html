@@ -26,8 +26,8 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from ...imports import *
-from ... import utils as U
+<pre><code class="python">from ... import utils as U
+from ...imports import *
 from . import preprocessor as pp
 
 BILSTM_CRF = &#34;bilstm-crf&#34;
@@ -58,6 +58,7 @@ def sequence_tagger(
     wv_path_or_url=None,
     transformer_model=&#34;bert-base-multilingual-cased&#34;,
     transformer_layers_to_use=U.DEFAULT_TRANSFORMER_LAYERS,
+    bert_model=None,
     word_embedding_dim=100,
     char_embedding_dim=25,
     word_lstm_size=100,
@@ -96,9 +97,9 @@ def sequence_tagger(
 
                             Default:None (randomly-initialized word embeddings are used)
 
-        transformer_model_name(str):  the name of the BERT model.  default: &#39;bert-base-multilingual-cased&#39;
-                                      This parameter is only used if bilstm-bert is selected for name parameter.
-                                       The value of this parameter is a name of BERT model from here:
+        transformer_model_name(str):  the name of the transformer model.  default: &#39;bert-base-multilingual-cased&#39;
+                                      This parameter is only used if bilstm-transformer is selected for name parameter.
+                                       The value of this parameter is a name of transformer model from here:
                                             https://huggingface.co/transformers/pretrained_models.html
                                        or a community-uploaded BERT model from here:
                                            https://huggingface.co/models
@@ -112,6 +113,7 @@ def sequence_tagger(
 
         transformer_layers_to_use(list): indices of hidden layers to use.  default:[-2] # second-to-last layer
                                          To use the concatenation of last 4 layers: use [-1, -2, -3, -4]
+        bert_model(str): alias for transformer_model
         word_embedding_dim (int): word embedding dimensions.
         char_embedding_dim (int): character embedding dimensions.
         word_lstm_size (int): character LSTM feature extractor output dimensions.
@@ -123,13 +125,26 @@ def sequence_tagger(
     Return:
         model (Model): A Keras Model instance
     &#34;&#34;&#34;
+    # backwards compatibility
+    name = BILSTM_TRANSFORMER if name == &#34;bilstm-bert&#34; else name
+    if bert_model is not None:
+        transformer_model = bert_model
+        warnings.warn(
+            &#34;The bert_model argument is deprecated - please use transformer_model instead.&#34;,
+            DeprecationWarning,
+            stacklevel=2,
+        )
 
     if name not in SEQUENCE_TAGGERS:
-        raise ValueError(f&#34;Invalid model name {name}. {&#39;Did you mean bilstm-transformer?&#39; if name == &#39;bilstm-bert&#39; else &#39;&#39;}&#34;)
+        raise ValueError(
+            f&#34;Invalid model name {name}. {&#39;Did you mean bilstm-transformer?&#39; if name == &#39;bilstm-bert&#39; else &#39;&#39;}&#34;
+        )
 
     # check BERT
     if name in TRANSFORMER_MODELS and not transformer_model:
-        raise ValueError(f&#34;transformer_model is required for {BILSTM_TRANSFORMER} models&#34;)
+        raise ValueError(
+            f&#34;transformer_model is required for {BILSTM_TRANSFORMER} models&#34;
+        )
     if name in TRANSFORMER_MODELS and DISABLE_V2_BEHAVIOR:
         raise ValueError(
             &#34;BERT and other transformer models cannot be used with DISABLE_v2_BEHAVIOR&#34;
@@ -171,7 +186,7 @@ def sequence_tagger(
         else:
             emb_names.append(&#34;word embeddings initialized randomly&#34;)
         if name in TRANSFORMER_MODELS:
-            emb_names.append(&#34;Transformer embeddings with &#34; + transformer_model)
+            emb_names.append(&#34;transformer embeddings with &#34; + transformer_model)
         if name in ELMO_MODELS:
             emb_names.append(&#34;Elmo embeddings for English&#34;)
         if preproc.p._use_char:
@@ -253,7 +268,7 @@ def sequence_tagger(
 </details>
 </dd>
 <dt id="ktrain.text.ner.models.sequence_tagger"><code class="name flex">
-<span>def <span class="ident">sequence_tagger</span></span>(<span>name, preproc, wv_path_or_url=None, transformer_model='bert-base-multilingual-cased', transformer_layers_to_use=[-2], word_embedding_dim=100, char_embedding_dim=25, word_lstm_size=100, char_lstm_size=25, fc_dim=100, dropout=0.5, verbose=1)</span>
+<span>def <span class="ident">sequence_tagger</span></span>(<span>name, preproc, wv_path_or_url=None, transformer_model='bert-base-multilingual-cased', transformer_layers_to_use=[-2], bert_model=None, word_embedding_dim=100, char_embedding_dim=25, word_lstm_size=100, char_lstm_size=25, fc_dim=100, dropout=0.5, verbose=1)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Build and return a sequence tagger (i.e., named entity recognizer).</p>
@@ -288,10 +303,10 @@ Example valid values for wv_path_or_url:</p>
                 Default:None (randomly-initialized word embeddings are used)
 </code></pre>
 <p>transformer_model_name(str):
-the name of the BERT model.
+the name of the transformer model.
 default: 'bert-base-multilingual-cased'
-This parameter is only used if bilstm-bert is selected for name parameter.
-The value of this parameter is a name of BERT model from here:
+This parameter is only used if bilstm-transformer is selected for name parameter.
+The value of this parameter is a name of transformer model from here:
 <a href="https://huggingface.co/transformers/pretrained_models.html">https://huggingface.co/transformers/pretrained_models.html</a>
 or a community-uploaded BERT model from here:
 <a href="https://huggingface.co/models">https://huggingface.co/models</a>
@@ -308,6 +323,7 @@ monologg/biobert_v1.1_pubmed: community uploaded BioBERT (pretrained on PubMed)<
 <dt>transformer_layers_to_use(list): indices of hidden layers to use.
 default:[-2] # second-to-last layer</dt>
 <dt>To use the concatenation of last 4 layers: use [-1, -2, -3, -4]</dt>
+<dt>bert_model(str): alias for transformer_model</dt>
 <dt><strong><code>word_embedding_dim</code></strong> :&ensp;<code>int</code></dt>
 <dd>word embedding dimensions.</dd>
 <dt><strong><code>char_embedding_dim</code></strong> :&ensp;<code>int</code></dt>
@@ -335,6 +351,7 @@ default:[-2] # second-to-last layer</dt>
     wv_path_or_url=None,
     transformer_model=&#34;bert-base-multilingual-cased&#34;,
     transformer_layers_to_use=U.DEFAULT_TRANSFORMER_LAYERS,
+    bert_model=None,
     word_embedding_dim=100,
     char_embedding_dim=25,
     word_lstm_size=100,
@@ -373,9 +390,9 @@ default:[-2] # second-to-last layer</dt>
 
                             Default:None (randomly-initialized word embeddings are used)
 
-        transformer_model_name(str):  the name of the BERT model.  default: &#39;bert-base-multilingual-cased&#39;
-                                      This parameter is only used if bilstm-bert is selected for name parameter.
-                                       The value of this parameter is a name of BERT model from here:
+        transformer_model_name(str):  the name of the transformer model.  default: &#39;bert-base-multilingual-cased&#39;
+                                      This parameter is only used if bilstm-transformer is selected for name parameter.
+                                       The value of this parameter is a name of transformer model from here:
                                             https://huggingface.co/transformers/pretrained_models.html
                                        or a community-uploaded BERT model from here:
                                            https://huggingface.co/models
@@ -389,6 +406,7 @@ default:[-2] # second-to-last layer</dt>
 
         transformer_layers_to_use(list): indices of hidden layers to use.  default:[-2] # second-to-last layer
                                          To use the concatenation of last 4 layers: use [-1, -2, -3, -4]
+        bert_model(str): alias for transformer_model
         word_embedding_dim (int): word embedding dimensions.
         char_embedding_dim (int): character embedding dimensions.
         word_lstm_size (int): character LSTM feature extractor output dimensions.
@@ -400,13 +418,26 @@ default:[-2] # second-to-last layer</dt>
     Return:
         model (Model): A Keras Model instance
     &#34;&#34;&#34;
+    # backwards compatibility
+    name = BILSTM_TRANSFORMER if name == &#34;bilstm-bert&#34; else name
+    if bert_model is not None:
+        transformer_model = bert_model
+        warnings.warn(
+            &#34;The bert_model argument is deprecated - please use transformer_model instead.&#34;,
+            DeprecationWarning,
+            stacklevel=2,
+        )
 
     if name not in SEQUENCE_TAGGERS:
-        raise ValueError(f&#34;Invalid model name {name}. {&#39;Did you mean bilstm-transformer?&#39; if name == &#39;bilstm-bert&#39; else &#39;&#39;}&#34;)
+        raise ValueError(
+            f&#34;Invalid model name {name}. {&#39;Did you mean bilstm-transformer?&#39; if name == &#39;bilstm-bert&#39; else &#39;&#39;}&#34;
+        )
 
     # check BERT
     if name in TRANSFORMER_MODELS and not transformer_model:
-        raise ValueError(f&#34;transformer_model is required for {BILSTM_TRANSFORMER} models&#34;)
+        raise ValueError(
+            f&#34;transformer_model is required for {BILSTM_TRANSFORMER} models&#34;
+        )
     if name in TRANSFORMER_MODELS and DISABLE_V2_BEHAVIOR:
         raise ValueError(
             &#34;BERT and other transformer models cannot be used with DISABLE_v2_BEHAVIOR&#34;
@@ -448,7 +479,7 @@ default:[-2] # second-to-last layer</dt>
         else:
             emb_names.append(&#34;word embeddings initialized randomly&#34;)
         if name in TRANSFORMER_MODELS:
-            emb_names.append(&#34;Transformer embeddings with &#34; + transformer_model)
+            emb_names.append(&#34;transformer embeddings with &#34; + transformer_model)
         if name in ELMO_MODELS:
             emb_names.append(&#34;Elmo embeddings for English&#34;)
         if preproc.p._use_char:

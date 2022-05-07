@@ -26,9 +26,9 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from ..imports import *
-from subprocess import Popen, PIPE, DEVNULL
+<pre><code class="python">from subprocess import DEVNULL, PIPE, Popen
 
+from ..imports import *
 
 DEFAULT_TOKEN_PATTERN = (
     r&#34;\b[a-zA-Z][a-zA-Z0-9]*(?:[_/&amp;-][a-zA-Z0-9]+)+\b|&#34;
@@ -392,17 +392,6 @@ def read_text(filename):
     return decoded_text.strip()
 
 
-# tokenizer_filter = rs=&#39;!&#34;#$%&amp;()*+,-./:;&lt;=&gt;?@[\\]^_`{|}~\t\n&#39;
-re_tok = re.compile(f&#34;([{string.punctuation}“”¨«»®´·º½¾¿¡§£₤‘’])&#34;)
-
-
-def tokenize(s, join_tokens=False, join_char=&#34; &#34;):
-    tokens = re_tok.sub(r&#34; \1 &#34;, s).split()
-    if join_tokens:
-        tokens = join_char.join(tokens)
-    return tokens
-
-
 def sent_tokenize(text, lang=None):
     &#34;&#34;&#34;
     ```
@@ -421,7 +410,38 @@ def sent_tokenize(text, lang=None):
     return sents
 
 
-def paragraph_tokenize(text, join_sentences=False, lang=None):
+# def paragraph_tokenize(text, join_sentences=False, lang=None):
+# &#34;&#34;&#34;
+# ```
+# segment text into paragraphs
+# ```
+# &#34;&#34;&#34;
+# lang = detect_lang(text) if lang is None else lang
+# if is_chinese(lang):
+# raise ValueError(&#34;paragraph_tokenize does not currently support Chinese.&#34;)
+# paragraphs = []
+# sents = []
+# for paragraph in segmenter.process(text):
+# sents = []
+# for sentence in paragraph:
+# sents.append(&#34; &#34;.join([t.value for t in sentence]))
+# if join_sentences:
+# sents = &#34; &#34;.join(sents)
+# paragraphs.append(sents)
+# return paragraphs
+
+## tokenizer_filter = rs=&#39;!&#34;#$%&amp;()*+,-./:;&lt;=&gt;?@[\\]^_`{|}~\t\n&#39;
+# re_tok = re.compile(f&#34;([{string.punctuation}“”¨«»®´·º½¾¿¡§£₤‘’])&#34;)
+# def tokenize(s, join_tokens=False, join_char=&#34; &#34;):
+#    tokens = re_tok.sub(r&#34; \1 &#34;, s).split()
+#    if join_tokens:
+#        tokens = join_char.join(tokens)
+#    return tokens
+
+
+def paragraph_tokenize(
+    text, join_sentences=False, join_tokens=True, join_char=&#34; &#34;, lang=None
+):
     &#34;&#34;&#34;
     ```
     segment text into paragraphs
@@ -435,11 +455,25 @@ def paragraph_tokenize(text, join_sentences=False, lang=None):
     for paragraph in segmenter.process(text):
         sents = []
         for sentence in paragraph:
-            sents.append(&#34; &#34;.join([t.value for t in sentence]))
-        if join_sentences:
-            sents = &#34; &#34;.join(sents)
+            sents.append(
+                join_char.join([t.value for t in sentence])
+                if join_tokens
+                else [t.value for t in sentence]
+            )
+        if join_sentences and join_tokens:
+            sents = join_char.join(sents)
+        elif join_sentences and not join_tokens:
+            sents = [item for sublist in sents for item in sublist]
         paragraphs.append(sents)
+    paragraphs = paragraphs[0] if len(paragraphs) == 1 else paragraphs
     return paragraphs
+
+
+def tokenize(s, join_tokens=False, join_sentences=True, join_char=&#34; &#34;):
+    s = s.replace(&#34;\n&#34;, &#34; &#34;)
+    return paragraph_tokenize(
+        s, join_tokens=join_tokens, join_sentences=join_sentences, join_char=join_char
+    )
 
 
 def extract_noun_phrases(text):
@@ -985,7 +1019,7 @@ Return:
 </details>
 </dd>
 <dt id="ktrain.text.textutils.paragraph_tokenize"><code class="name flex">
-<span>def <span class="ident">paragraph_tokenize</span></span>(<span>text, join_sentences=False, lang=None)</span>
+<span>def <span class="ident">paragraph_tokenize</span></span>(<span>text, join_sentences=False, join_tokens=True, join_char=' ', lang=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><pre><code>segment text into paragraphs
@@ -994,7 +1028,9 @@ Return:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def paragraph_tokenize(text, join_sentences=False, lang=None):
+<pre><code class="python">def paragraph_tokenize(
+    text, join_sentences=False, join_tokens=True, join_char=&#34; &#34;, lang=None
+):
     &#34;&#34;&#34;
     ```
     segment text into paragraphs
@@ -1008,10 +1044,17 @@ Return:
     for paragraph in segmenter.process(text):
         sents = []
         for sentence in paragraph:
-            sents.append(&#34; &#34;.join([t.value for t in sentence]))
-        if join_sentences:
-            sents = &#34; &#34;.join(sents)
+            sents.append(
+                join_char.join([t.value for t in sentence])
+                if join_tokens
+                else [t.value for t in sentence]
+            )
+        if join_sentences and join_tokens:
+            sents = join_char.join(sents)
+        elif join_sentences and not join_tokens:
+            sents = [item for sublist in sents for item in sublist]
         paragraphs.append(sents)
+    paragraphs = paragraphs[0] if len(paragraphs) == 1 else paragraphs
     return paragraphs</code></pre>
 </details>
 </dd>
@@ -1218,7 +1261,7 @@ unidecode map to be used by translate as explained here:</p>
 </details>
 </dd>
 <dt id="ktrain.text.textutils.tokenize"><code class="name flex">
-<span>def <span class="ident">tokenize</span></span>(<span>s, join_tokens=False, join_char=' ')</span>
+<span>def <span class="ident">tokenize</span></span>(<span>s, join_tokens=False, join_sentences=True, join_char=' ')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -1226,11 +1269,11 @@ unidecode map to be used by translate as explained here:</p>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def tokenize(s, join_tokens=False, join_char=&#34; &#34;):
-    tokens = re_tok.sub(r&#34; \1 &#34;, s).split()
-    if join_tokens:
-        tokens = join_char.join(tokens)
-    return tokens</code></pre>
+<pre><code class="python">def tokenize(s, join_tokens=False, join_sentences=True, join_char=&#34; &#34;):
+    s = s.replace(&#34;\n&#34;, &#34; &#34;)
+    return paragraph_tokenize(
+        s, join_tokens=join_tokens, join_sentences=join_sentences, join_char=join_char
+    )</code></pre>
 </details>
 </dd>
 </dl>

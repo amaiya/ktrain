@@ -30,12 +30,13 @@
 # Tensorflow Keras imports
 # --------------------------
 
-import os
-import warnings
 import logging
-from distutils.util import strtobool
-from packaging import version
+import os
 import re
+import warnings
+from distutils.util import strtobool
+
+from packaging import version
 
 os.environ[
     &#34;NUMEXPR_MAX_THREADS&#34;
@@ -95,59 +96,57 @@ except:
 # standards
 # ----------------------------------------------------------
 
-# import warnings # imported above
-import sys
+import codecs
+import copy
+import csv
+import glob
+import gzip
+import itertools
+import json
+import math
+import mimetypes
+import operator
 import os
 import os.path
-import re
-import operator
-from collections import Counter
-from distutils.version import StrictVersion
-import tempfile
 import pickle
-from abc import ABC, abstractmethod
-import math
-import itertools
-import csv
-import copy
-import glob
-import codecs
-import urllib.request
-import zipfile
-import gzip
+import random
+import re
 import shutil
 import string
-import random
-import json
-import mimetypes
 
+# import warnings # imported above
+import sys
+import tempfile
+import urllib.request
+import zipfile
+from abc import ABC, abstractmethod
+from collections import Counter
+from distutils.version import StrictVersion
+
+import numpy as np
+from matplotlib import pyplot as plt
+from matplotlib.colors import rgb2hex
 
 # ----------------------------------------------------------
 # external dependencies
 # ----------------------------------------------------------
 
 
-import numpy as np
-from matplotlib import pyplot as plt
-from matplotlib.colors import rgb2hex
-
 plt.ion()  # interactive mode
-import sklearn
-from sklearn.metrics import classification_report, confusion_matrix
-from sklearn.datasets import load_files
-from sklearn.model_selection import train_test_split
-from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
-from sklearn.decomposition import NMF, LatentDirichletAllocation
-from sklearn.manifold import TSNE
-from sklearn.preprocessing import LabelEncoder
-
-
 # from sklearn.externals import joblib
 import joblib
+import pandas as pd
+import sklearn
 from scipy import sparse  # utils
 from scipy.sparse import csr_matrix
-import pandas as pd
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.datasets import load_files
+from sklearn.decomposition import NMF, LatentDirichletAllocation
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.manifold import TSNE
+from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
 
 try:
     # fastprogress &gt;= v0.2.0
@@ -156,7 +155,6 @@ except:
     # fastprogress &lt; v0.2.0
     from fastprogress import master_bar, progress_bar
 
-
 import requests
 
 # verify=False added to avoid headaches from some corporate networks
@@ -164,13 +162,14 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-# text processing
-import syntok.segmenter as segmenter
+import cchardet as chardet
+import jieba
 
 # multilingual text processing
 import langdetect
-import jieba
-import cchardet as chardet
+
+# text processing
+import syntok.segmenter as segmenter
 
 # &#39;bert&#39; text classification model
 try:

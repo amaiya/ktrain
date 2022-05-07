@@ -26,8 +26,25 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from ..imports import *
+<pre><code class="python">from .. import utils as U
+from ..imports import *
 from . import textutils as TU
+
+try:
+    from tika import parser
+
+    TIKA_INSTALLED = True
+except ImportError:
+    TIKA_INSTALLED = False
+
+try:
+    import textract
+
+    TEXTRACT_INSTALLED = True
+except ImportError:
+    TEXTRACT_INSTALLED = False
+
+JAVA_INSTALLED = U.checkjava()
 
 
 class TextExtractor:
@@ -37,12 +54,16 @@ class TextExtractor:
     ```
     &#34;&#34;&#34;
 
-    def __init__(self):
-        try:
-            import textract
-        except ImportError:
-            raise Exception(&#34;TextExtractor requires textract: pip install textract&#34;)
-        self.process = textract.process
+    def __init__(self, use_tika=True):
+        if use_tika and not TIKA_INSTALLED:
+            raise ValueError(
+                &#34;If use_tika=True, then TextExtractor requires tika: pip install tika&#34;
+            )
+        if not use_tika and not TEXTRACT_INSTALLED:
+            raise ValueError(
+                &#34;If use_tika=False, then TextExtractor requires textract: pip install textract&#34;
+            )
+        self.use_tika = use_tika
 
     def extract(
         self, filename=None, text=None, return_format=&#34;document&#34;, lang=None, verbose=1
@@ -79,7 +100,7 @@ class TextExtractor:
                         text = f.read()
                         text = str.encode(text)
                 else:
-                    text = self.process(filename)
+                    text = self._extract(filename)
             except Exception as e:
                 if verbose:
                     print(&#34;ERROR on %s:\n%s&#34; % (filename, e))
@@ -92,7 +113,18 @@ class TextExtractor:
         elif return_format == &#34;paragraphs&#34;:
             return TU.paragraph_tokenize(text, join_sentences=True, lang=lang)
         else:
-            return text</code></pre>
+            return text
+
+    def _extract(self, filename):
+        if self.use_tika:
+            if JAVA_INSTALLED:
+                parsed = parser.from_file(filename)
+                text = parsed[&#34;content&#34;]
+            else:
+                raise Exception(&#34;Please install Java for TIKA text extraction&#34;)
+        else:
+            text = textract.process(filename)
+        return text.strip()</code></pre>
 </details>
 </section>
 <section>
@@ -106,6 +138,7 @@ class TextExtractor:
 <dl>
 <dt id="ktrain.text.textextractor.TextExtractor"><code class="flex name class">
 <span>class <span class="ident">TextExtractor</span></span>
+<span>(</span><span>use_tika=True)</span>
 </code></dt>
 <dd>
 <div class="desc"><pre><code>Text Extractor: a wrapper to textract package
@@ -121,12 +154,16 @@ class TextExtractor:
     ```
     &#34;&#34;&#34;
 
-    def __init__(self):
-        try:
-            import textract
-        except ImportError:
-            raise Exception(&#34;TextExtractor requires textract: pip install textract&#34;)
-        self.process = textract.process
+    def __init__(self, use_tika=True):
+        if use_tika and not TIKA_INSTALLED:
+            raise ValueError(
+                &#34;If use_tika=True, then TextExtractor requires tika: pip install tika&#34;
+            )
+        if not use_tika and not TEXTRACT_INSTALLED:
+            raise ValueError(
+                &#34;If use_tika=False, then TextExtractor requires textract: pip install textract&#34;
+            )
+        self.use_tika = use_tika
 
     def extract(
         self, filename=None, text=None, return_format=&#34;document&#34;, lang=None, verbose=1
@@ -163,7 +200,7 @@ class TextExtractor:
                         text = f.read()
                         text = str.encode(text)
                 else:
-                    text = self.process(filename)
+                    text = self._extract(filename)
             except Exception as e:
                 if verbose:
                     print(&#34;ERROR on %s:\n%s&#34; % (filename, e))
@@ -176,7 +213,18 @@ class TextExtractor:
         elif return_format == &#34;paragraphs&#34;:
             return TU.paragraph_tokenize(text, join_sentences=True, lang=lang)
         else:
-            return text</code></pre>
+            return text
+
+    def _extract(self, filename):
+        if self.use_tika:
+            if JAVA_INSTALLED:
+                parsed = parser.from_file(filename)
+                text = parsed[&#34;content&#34;]
+            else:
+                raise Exception(&#34;Please install Java for TIKA text extraction&#34;)
+        else:
+            text = textract.process(filename)
+        return text.strip()</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
@@ -234,7 +282,7 @@ verbose(bool): verbosity
                     text = f.read()
                     text = str.encode(text)
             else:
-                text = self.process(filename)
+                text = self._extract(filename)
         except Exception as e:
             if verbose:
                 print(&#34;ERROR on %s:\n%s&#34; % (filename, e))

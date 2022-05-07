@@ -26,32 +26,32 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from .models import (
+<pre><code class="python">import pickle
+
+from . import shallownlp, textutils
+from .data import texts_from_array, texts_from_csv, texts_from_df, texts_from_folder
+from .eda import get_topic_model
+from .models import (
     print_text_classifiers,
     print_text_regression_models,
     text_classifier,
     text_regression_model,
 )
-from .data import texts_from_folder, texts_from_csv, texts_from_df, texts_from_array
 from .ner.data import (
-    entities_from_gmb,
-    entities_from_conll2003,
-    entities_from_txt,
-    entities_from_df,
     entities_from_array,
+    entities_from_conll2003,
+    entities_from_df,
+    entities_from_gmb,
+    entities_from_txt,
 )
-from .ner.models import sequence_tagger, print_sequence_taggers
-from .eda import get_topic_model
-from .textutils import extract_filenames, load_text_files, filter_by_id
+from .ner.models import print_sequence_taggers, sequence_tagger
 from .preprocessor import Transformer, TransformerEmbedding
+from .qa import AnswerExtractor, SimpleQA
 from .summarization import TransformerSummarizer
-from .zsl import ZeroShotClassifier
-from .translation import EnglishTranslator, Translator
-from . import shallownlp
-from .qa import SimpleQA, AnswerExtractor
 from .textextractor import TextExtractor
-from . import textutils
-import pickle
+from .textutils import extract_filenames, filter_by_id, load_text_files
+from .translation import EnglishTranslator, Translator
+from .zsl import ZeroShotClassifier
 
 __all__ = [
     &#34;text_classifier&#34;,
@@ -696,7 +696,7 @@ If None, encoding is discovered automatically</dt>
 </details>
 </dd>
 <dt id="ktrain.text.sequence_tagger"><code class="name flex">
-<span>def <span class="ident">sequence_tagger</span></span>(<span>name, preproc, wv_path_or_url=None, transformer_model='bert-base-multilingual-cased', transformer_layers_to_use=[-2], word_embedding_dim=100, char_embedding_dim=25, word_lstm_size=100, char_lstm_size=25, fc_dim=100, dropout=0.5, verbose=1)</span>
+<span>def <span class="ident">sequence_tagger</span></span>(<span>name, preproc, wv_path_or_url=None, transformer_model='bert-base-multilingual-cased', transformer_layers_to_use=[-2], bert_model=None, word_embedding_dim=100, char_embedding_dim=25, word_lstm_size=100, char_lstm_size=25, fc_dim=100, dropout=0.5, verbose=1)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Build and return a sequence tagger (i.e., named entity recognizer).</p>
@@ -731,10 +731,10 @@ Example valid values for wv_path_or_url:</p>
                 Default:None (randomly-initialized word embeddings are used)
 </code></pre>
 <p>transformer_model_name(str):
-the name of the BERT model.
+the name of the transformer model.
 default: 'bert-base-multilingual-cased'
-This parameter is only used if bilstm-bert is selected for name parameter.
-The value of this parameter is a name of BERT model from here:
+This parameter is only used if bilstm-transformer is selected for name parameter.
+The value of this parameter is a name of transformer model from here:
 <a href="https://huggingface.co/transformers/pretrained_models.html">https://huggingface.co/transformers/pretrained_models.html</a>
 or a community-uploaded BERT model from here:
 <a href="https://huggingface.co/models">https://huggingface.co/models</a>
@@ -751,6 +751,7 @@ monologg/biobert_v1.1_pubmed: community uploaded BioBERT (pretrained on PubMed)<
 <dt>transformer_layers_to_use(list): indices of hidden layers to use.
 default:[-2] # second-to-last layer</dt>
 <dt>To use the concatenation of last 4 layers: use [-1, -2, -3, -4]</dt>
+<dt>bert_model(str): alias for transformer_model</dt>
 <dt><strong><code>word_embedding_dim</code></strong> :&ensp;<code>int</code></dt>
 <dd>word embedding dimensions.</dd>
 <dt><strong><code>char_embedding_dim</code></strong> :&ensp;<code>int</code></dt>
@@ -778,6 +779,7 @@ default:[-2] # second-to-last layer</dt>
     wv_path_or_url=None,
     transformer_model=&#34;bert-base-multilingual-cased&#34;,
     transformer_layers_to_use=U.DEFAULT_TRANSFORMER_LAYERS,
+    bert_model=None,
     word_embedding_dim=100,
     char_embedding_dim=25,
     word_lstm_size=100,
@@ -816,9 +818,9 @@ default:[-2] # second-to-last layer</dt>
 
                             Default:None (randomly-initialized word embeddings are used)
 
-        transformer_model_name(str):  the name of the BERT model.  default: &#39;bert-base-multilingual-cased&#39;
-                                      This parameter is only used if bilstm-bert is selected for name parameter.
-                                       The value of this parameter is a name of BERT model from here:
+        transformer_model_name(str):  the name of the transformer model.  default: &#39;bert-base-multilingual-cased&#39;
+                                      This parameter is only used if bilstm-transformer is selected for name parameter.
+                                       The value of this parameter is a name of transformer model from here:
                                             https://huggingface.co/transformers/pretrained_models.html
                                        or a community-uploaded BERT model from here:
                                            https://huggingface.co/models
@@ -832,6 +834,7 @@ default:[-2] # second-to-last layer</dt>
 
         transformer_layers_to_use(list): indices of hidden layers to use.  default:[-2] # second-to-last layer
                                          To use the concatenation of last 4 layers: use [-1, -2, -3, -4]
+        bert_model(str): alias for transformer_model
         word_embedding_dim (int): word embedding dimensions.
         char_embedding_dim (int): character embedding dimensions.
         word_lstm_size (int): character LSTM feature extractor output dimensions.
@@ -843,13 +846,26 @@ default:[-2] # second-to-last layer</dt>
     Return:
         model (Model): A Keras Model instance
     &#34;&#34;&#34;
+    # backwards compatibility
+    name = BILSTM_TRANSFORMER if name == &#34;bilstm-bert&#34; else name
+    if bert_model is not None:
+        transformer_model = bert_model
+        warnings.warn(
+            &#34;The bert_model argument is deprecated - please use transformer_model instead.&#34;,
+            DeprecationWarning,
+            stacklevel=2,
+        )
 
     if name not in SEQUENCE_TAGGERS:
-        raise ValueError(f&#34;Invalid model name {name}. {&#39;Did you mean bilstm-transformer?&#39; if name == &#39;bilstm-bert&#39; else &#39;&#39;}&#34;)
+        raise ValueError(
+            f&#34;Invalid model name {name}. {&#39;Did you mean bilstm-transformer?&#39; if name == &#39;bilstm-bert&#39; else &#39;&#39;}&#34;
+        )
 
     # check BERT
     if name in TRANSFORMER_MODELS and not transformer_model:
-        raise ValueError(f&#34;transformer_model is required for {BILSTM_TRANSFORMER} models&#34;)
+        raise ValueError(
+            f&#34;transformer_model is required for {BILSTM_TRANSFORMER} models&#34;
+        )
     if name in TRANSFORMER_MODELS and DISABLE_V2_BEHAVIOR:
         raise ValueError(
             &#34;BERT and other transformer models cannot be used with DISABLE_v2_BEHAVIOR&#34;
@@ -891,7 +907,7 @@ default:[-2] # second-to-last layer</dt>
         else:
             emb_names.append(&#34;word embeddings initialized randomly&#34;)
         if name in TRANSFORMER_MODELS:
-            emb_names.append(&#34;Transformer embeddings with &#34; + transformer_model)
+            emb_names.append(&#34;transformer embeddings with &#34; + transformer_model)
         if name in ELMO_MODELS:
             emb_names.append(&#34;Elmo embeddings for English&#34;)
         if preproc.p._use_char:
@@ -2927,6 +2943,7 @@ Returns:
 </dd>
 <dt id="ktrain.text.TextExtractor"><code class="flex name class">
 <span>class <span class="ident">TextExtractor</span></span>
+<span>(</span><span>use_tika=True)</span>
 </code></dt>
 <dd>
 <div class="desc"><pre><code>Text Extractor: a wrapper to textract package
@@ -2942,12 +2959,16 @@ Returns:
     ```
     &#34;&#34;&#34;
 
-    def __init__(self):
-        try:
-            import textract
-        except ImportError:
-            raise Exception(&#34;TextExtractor requires textract: pip install textract&#34;)
-        self.process = textract.process
+    def __init__(self, use_tika=True):
+        if use_tika and not TIKA_INSTALLED:
+            raise ValueError(
+                &#34;If use_tika=True, then TextExtractor requires tika: pip install tika&#34;
+            )
+        if not use_tika and not TEXTRACT_INSTALLED:
+            raise ValueError(
+                &#34;If use_tika=False, then TextExtractor requires textract: pip install textract&#34;
+            )
+        self.use_tika = use_tika
 
     def extract(
         self, filename=None, text=None, return_format=&#34;document&#34;, lang=None, verbose=1
@@ -2984,7 +3005,7 @@ Returns:
                         text = f.read()
                         text = str.encode(text)
                 else:
-                    text = self.process(filename)
+                    text = self._extract(filename)
             except Exception as e:
                 if verbose:
                     print(&#34;ERROR on %s:\n%s&#34; % (filename, e))
@@ -2997,7 +3018,18 @@ Returns:
         elif return_format == &#34;paragraphs&#34;:
             return TU.paragraph_tokenize(text, join_sentences=True, lang=lang)
         else:
-            return text</code></pre>
+            return text
+
+    def _extract(self, filename):
+        if self.use_tika:
+            if JAVA_INSTALLED:
+                parsed = parser.from_file(filename)
+                text = parsed[&#34;content&#34;]
+            else:
+                raise Exception(&#34;Please install Java for TIKA text extraction&#34;)
+        else:
+            text = textract.process(filename)
+        return text.strip()</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
@@ -3055,7 +3087,7 @@ verbose(bool): verbosity
                     text = f.read()
                     text = str.encode(text)
             else:
-                text = self.process(filename)
+                text = self._extract(filename)
         except Exception as e:
             if verbose:
                 print(&#34;ERROR on %s:\n%s&#34; % (filename, e))
@@ -3658,9 +3690,9 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
         # check fo bokeh
         try:
             import bokeh.plotting as bp
-            from bokeh.plotting import save
-            from bokeh.models import HoverTool
             from bokeh.io import output_notebook
+            from bokeh.models import HoverTool
+            from bokeh.plotting import save
         except:
             warnings.warn(
                 &#34;visualize_documents method requires bokeh package: pip install bokeh&#34;
@@ -5056,9 +5088,9 @@ Optional filepath to save the interactive visualization</p></div>
     # check fo bokeh
     try:
         import bokeh.plotting as bp
-        from bokeh.plotting import save
-        from bokeh.models import HoverTool
         from bokeh.io import output_notebook
+        from bokeh.models import HoverTool
+        from bokeh.plotting import save
     except:
         warnings.warn(
             &#34;visualize_documents method requires bokeh package: pip install bokeh&#34;
@@ -5519,8 +5551,8 @@ Returns:
                 model = self.model_type.from_pretrained(model_name, config=self.config)
             except:
                 warnings.warn(
-                    &#34;Could not load a Tensorflow version of model. (If this worked before, it might be an out-of-memory issue.) &#34; +\
-                    &#34;Attempting to download/load PyTorch version as TensorFlow model using from_pt=True. You will need PyTorch installed for this.&#34; 
+                    &#34;Could not load a Tensorflow version of model. (If this worked before, it might be an out-of-memory issue.) &#34;
+                    + &#34;Attempting to download/load PyTorch version as TensorFlow model using from_pt=True. You will need PyTorch installed for this.&#34;
                 )
                 model = self.model_type.from_pretrained(
                     model_name, config=self.config, from_pt=True
@@ -5532,7 +5564,12 @@ Returns:
         return model
 
     def embed(
-        self, texts, word_level=True, max_length=512, aggregation_strategy=&#34;first&#34;, layers=U.DEFAULT_TRANSFORMER_LAYERS
+        self,
+        texts,
+        word_level=True,
+        max_length=512,
+        aggregation_strategy=&#34;first&#34;,
+        layers=U.DEFAULT_TRANSFORMER_LAYERS,
     ):
         &#34;&#34;&#34;
         ```
@@ -5633,17 +5670,20 @@ Returns:
             raw_embedding = raw_embeddings[i]
             subvectors = []
             last_offset = (-1, -1)
-            #subwords = [] # debugging
+            # subwords = [] # debugging
             for j in range(len(all_offsets[i])):
                 if all_word_ids[i][j] is None:
                     continue
                 # must test to see if start is same as last offset start due to xml-roberta quirk with tokens like 070
-                if all_offsets[i][j][0] == last_offset[1] or all_offsets[i][j][0] == last_offset[0]:
+                if (
+                    all_offsets[i][j][0] == last_offset[1]
+                    or all_offsets[i][j][0] == last_offset[0]
+                ):
                     subvectors.append(raw_embedding[j])
-                    #subwords[-1] += texts[i][all_offsets[i][j][0]:all_offsets[i][j][1]] # debugging
+                    # subwords[-1] += texts[i][all_offsets[i][j][0]:all_offsets[i][j][1]] # debugging
                     last_offset = all_offsets[i][j]
                 if all_offsets[i][j][0] &gt; last_offset[1]:
-                    #subwords.append(texts[i][all_offsets[i][j][0]:all_offsets[i][j][1]]) # debugging
+                    # subwords.append(texts[i][all_offsets[i][j][0]:all_offsets[i][j][1]]) # debugging
                     if len(subvectors) &gt; 0:
                         if aggregation_strategy == &#34;average&#34;:
                             filtered_embedding.append(np.mean(subvectors, axis=0))
@@ -5693,7 +5733,12 @@ Returns:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def embed(
-    self, texts, word_level=True, max_length=512, aggregation_strategy=&#34;first&#34;, layers=U.DEFAULT_TRANSFORMER_LAYERS
+    self,
+    texts,
+    word_level=True,
+    max_length=512,
+    aggregation_strategy=&#34;first&#34;,
+    layers=U.DEFAULT_TRANSFORMER_LAYERS,
 ):
     &#34;&#34;&#34;
     ```
@@ -5794,17 +5839,20 @@ Returns:
         raw_embedding = raw_embeddings[i]
         subvectors = []
         last_offset = (-1, -1)
-        #subwords = [] # debugging
+        # subwords = [] # debugging
         for j in range(len(all_offsets[i])):
             if all_word_ids[i][j] is None:
                 continue
             # must test to see if start is same as last offset start due to xml-roberta quirk with tokens like 070
-            if all_offsets[i][j][0] == last_offset[1] or all_offsets[i][j][0] == last_offset[0]:
+            if (
+                all_offsets[i][j][0] == last_offset[1]
+                or all_offsets[i][j][0] == last_offset[0]
+            ):
                 subvectors.append(raw_embedding[j])
-                #subwords[-1] += texts[i][all_offsets[i][j][0]:all_offsets[i][j][1]] # debugging
+                # subwords[-1] += texts[i][all_offsets[i][j][0]:all_offsets[i][j][1]] # debugging
                 last_offset = all_offsets[i][j]
             if all_offsets[i][j][0] &gt; last_offset[1]:
-                #subwords.append(texts[i][all_offsets[i][j][0]:all_offsets[i][j][1]]) # debugging
+                # subwords.append(texts[i][all_offsets[i][j][0]:all_offsets[i][j][1]]) # debugging
                 if len(subvectors) &gt; 0:
                     if aggregation_strategy == &#34;average&#34;:
                         filtered_embedding.append(np.mean(subvectors, axis=0))
@@ -5867,7 +5915,7 @@ Args:
         if &#34;bart&#34; not in model_name:
             raise ValueError(&#34;TransformerSummarizer currently only accepts BART models&#34;)
         super().__init__(device=device)
-        from transformers import BartTokenizer, BartForConditionalGeneration
+        from transformers import BartForConditionalGeneration, BartTokenizer
 
         self.tokenizer = BartTokenizer.from_pretrained(model_name)
         self.model = BartForConditionalGeneration.from_pretrained(model_name).to(

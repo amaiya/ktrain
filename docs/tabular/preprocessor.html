@@ -26,8 +26,8 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from ..imports import *
-from .. import utils as U
+<pre><code class="python">from .. import utils as U
+from ..imports import *
 from ..preprocessor import Preprocessor
 
 
@@ -240,6 +240,7 @@ def clean_df(
 
 
 from numbers import Number
+from types import SimpleNamespace
 from typing import (
     Any,
     AnyStr,
@@ -252,12 +253,13 @@ from typing import (
     Mapping,
     NewType,
     Optional,
+    Sequence,
+    Tuple,
+    TypeVar,
+    Union,
 )
-from typing import Sequence, Tuple, TypeVar, Union
-from types import SimpleNamespace
 
-
-from pandas.api.types import is_numeric_dtype, is_categorical_dtype
+from pandas.api.types import is_categorical_dtype, is_numeric_dtype
 
 
 def ifnone(a, b):
@@ -491,7 +493,7 @@ class FillMissing(TabularProc):
                 df[name] = df[name].fillna(self.filler_dict[name])
             elif pd.isnull(df[name]).sum() != 0:
                 warnings.warn(
-                    f&#34;&#34;&#34;There are nan values in field {name} but there were none in the training set. 
+                    f&#34;&#34;&#34;There are nan values in field {name} but there were none in the training set.
                 Filled with {self.fill_strategy}.&#34;&#34;&#34;
                 )
                 df[name] = df[name].fillna(self.filler_dict[name])
@@ -929,7 +931,7 @@ Args:
                 df[name] = df[name].fillna(self.filler_dict[name])
             elif pd.isnull(df[name]).sum() != 0:
                 warnings.warn(
-                    f&#34;&#34;&#34;There are nan values in field {name} but there were none in the training set. 
+                    f&#34;&#34;&#34;There are nan values in field {name} but there were none in the training set.
                 Filled with {self.fill_strategy}.&#34;&#34;&#34;
                 )
                 df[name] = df[name].fillna(self.filler_dict[name])</code></pre>
@@ -960,7 +962,7 @@ Args:
             df[name] = df[name].fillna(self.filler_dict[name])
         elif pd.isnull(df[name]).sum() != 0:
             warnings.warn(
-                f&#34;&#34;&#34;There are nan values in field {name} but there were none in the training set. 
+                f&#34;&#34;&#34;There are nan values in field {name} but there were none in the training set.
             Filled with {self.fill_strategy}.&#34;&#34;&#34;
             )
             df[name] = df[name].fillna(self.filler_dict[name])</code></pre>

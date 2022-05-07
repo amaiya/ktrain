@@ -26,9 +26,10 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from ...torch_base import TorchBase
+<pre><code class="python">from transformers import pipeline
+
 from ... import imports as I
-from transformers import pipeline
+from ...torch_base import TorchBase
 
 
 class ObjectDetector(TorchBase):

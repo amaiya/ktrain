@@ -32,10 +32,9 @@
 Preprocessors.
 &#34;&#34;&#34;
 
-from ....imports import *
 from .... import utils as U
+from ....imports import *
 from .utils import Vocabulary
-
 
 try:
     from allennlp.modules.elmo import Elmo, batch_to_ids
@@ -184,21 +183,23 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
                 offsets = encoded_input[&#34;offset_mapping&#34;]
                 subtokens = encoded_input.tokens()
                 token_len = len(subtokens)
-                if seq_len + token_len &gt; (maxlen - num_special):
+                if (seq_len + token_len) &gt; (maxlen - num_special):
                     break
                 seq_len += token_len
 
-                word_ids = encoded_input.word_ids()
-                hf_s = []
-                for k, subtoken in enumerate(subtokens):
-                    word_id = word_ids[k]
-                    currlen = len(hf_s)
-                    if currlen == word_id + 1:
-                        hf_s[word_id].append(offsets[k])
-                    elif word_id + 1 &gt; currlen:
-                        hf_s.append([offsets[k]])
-                hf_s = [s[entry[0][0] : entry[-1][1]] for entry in hf_s]
-                # hf_s = &#34; &#34;.join(subtokens).replace(&#34; ##&#34;, &#34;&#34;).split()
+                if len(s.split()) == 1:
+                    hf_s = [s]
+                else:
+                    word_ids = encoded_input.word_ids()
+                    hf_s = []
+                    for k, subtoken in enumerate(subtokens):
+                        word_id = word_ids[k]
+                        currlen = len(hf_s)
+                        if currlen == word_id + 1:
+                            hf_s[word_id].append(offsets[k])
+                        elif word_id + 1 &gt; currlen:
+                            hf_s.append([offsets[k]])
+                    hf_s = [s[entry[0][0] : entry[-1][1]] for entry in hf_s]
 
                 new_x.extend(hf_s)
                 if Y is not None:
@@ -209,8 +210,6 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
                         if tag.startswith(&#34;B-&#34;):
                             new_tag = &#34;I-&#34; + tag[2:]
                         new_y.extend([new_tag] * (len(hf_s) - 1))
-                    # if tag.startswith(&#39;B-&#39;): tag = &#39;I-&#39;+tag[2:]
-
             new_X.append(new_x)
             new_Y.append(new_y)
         new_Y = None if Y is None else new_Y
@@ -280,7 +279,7 @@ class IndexTransformer(BaseEstimator, TransformerMixin):
         if self.te is not None:
             transformer_embeddings = self.te.embed(X, word_level=True)
             features.append(transformer_embeddings)
-            #print(f&#39; | {X} | [trans_shape={transformer_embeddings.shape[1]} | word_id_shape={len(word_ids)}&#39;)
+            # print(f&#39; | {X} | [trans_shape={transformer_embeddings.shape[1]} | word_id_shape={len(word_ids)}&#39;)
 
         if y is not None:
             y = [self._label_vocab.doc2id(doc) for doc in y]
@@ -621,21 +620,23 @@ into a 3D Numpy array of shape <code>(num_samples, max_sent_len, max_word_len)</
                 offsets = encoded_input[&#34;offset_mapping&#34;]
                 subtokens = encoded_input.tokens()
                 token_len = len(subtokens)
-                if seq_len + token_len &gt; (maxlen - num_special):
+                if (seq_len + token_len) &gt; (maxlen - num_special):
                     break
                 seq_len += token_len
 
-                word_ids = encoded_input.word_ids()
-                hf_s = []
-                for k, subtoken in enumerate(subtokens):
-                    word_id = word_ids[k]
-                    currlen = len(hf_s)
-                    if currlen == word_id + 1:
-                        hf_s[word_id].append(offsets[k])
-                    elif word_id + 1 &gt; currlen:
-                        hf_s.append([offsets[k]])
-                hf_s = [s[entry[0][0] : entry[-1][1]] for entry in hf_s]
-                # hf_s = &#34; &#34;.join(subtokens).replace(&#34; ##&#34;, &#34;&#34;).split()
+                if len(s.split()) == 1:
+                    hf_s = [s]
+                else:
+                    word_ids = encoded_input.word_ids()
+                    hf_s = []
+                    for k, subtoken in enumerate(subtokens):
+                        word_id = word_ids[k]
+                        currlen = len(hf_s)
+                        if currlen == word_id + 1:
+                            hf_s[word_id].append(offsets[k])
+                        elif word_id + 1 &gt; currlen:
+                            hf_s.append([offsets[k]])
+                    hf_s = [s[entry[0][0] : entry[-1][1]] for entry in hf_s]
 
                 new_x.extend(hf_s)
                 if Y is not None:
@@ -646,8 +647,6 @@ into a 3D Numpy array of shape <code>(num_samples, max_sent_len, max_word_len)</
                         if tag.startswith(&#34;B-&#34;):
                             new_tag = &#34;I-&#34; + tag[2:]
                         new_y.extend([new_tag] * (len(hf_s) - 1))
-                    # if tag.startswith(&#39;B-&#39;): tag = &#39;I-&#39;+tag[2:]
-
             new_X.append(new_x)
             new_Y.append(new_y)
         new_Y = None if Y is None else new_Y
@@ -717,7 +716,7 @@ into a 3D Numpy array of shape <code>(num_samples, max_sent_len, max_word_len)</
         if self.te is not None:
             transformer_embeddings = self.te.embed(X, word_level=True)
             features.append(transformer_embeddings)
-            #print(f&#39; | {X} | [trans_shape={transformer_embeddings.shape[1]} | word_id_shape={len(word_ids)}&#39;)
+            # print(f&#39; | {X} | [trans_shape={transformer_embeddings.shape[1]} | word_id_shape={len(word_ids)}&#39;)
 
         if y is not None:
             y = [self._label_vocab.doc2id(doc) for doc in y]
@@ -1018,21 +1017,23 @@ an iterable which yields either str, unicode or file objects.</p>
             offsets = encoded_input[&#34;offset_mapping&#34;]
             subtokens = encoded_input.tokens()
             token_len = len(subtokens)
-            if seq_len + token_len &gt; (maxlen - num_special):
+            if (seq_len + token_len) &gt; (maxlen - num_special):
                 break
             seq_len += token_len
 
-            word_ids = encoded_input.word_ids()
-            hf_s = []
-            for k, subtoken in enumerate(subtokens):
-                word_id = word_ids[k]
-                currlen = len(hf_s)
-                if currlen == word_id + 1:
-                    hf_s[word_id].append(offsets[k])
-                elif word_id + 1 &gt; currlen:
-                    hf_s.append([offsets[k]])
-            hf_s = [s[entry[0][0] : entry[-1][1]] for entry in hf_s]
-            # hf_s = &#34; &#34;.join(subtokens).replace(&#34; ##&#34;, &#34;&#34;).split()
+            if len(s.split()) == 1:
+                hf_s = [s]
+            else:
+                word_ids = encoded_input.word_ids()
+                hf_s = []
+                for k, subtoken in enumerate(subtokens):
+                    word_id = word_ids[k]
+                    currlen = len(hf_s)
+                    if currlen == word_id + 1:
+                        hf_s[word_id].append(offsets[k])
+                    elif word_id + 1 &gt; currlen:
+                        hf_s.append([offsets[k]])
+                hf_s = [s[entry[0][0] : entry[-1][1]] for entry in hf_s]
 
             new_x.extend(hf_s)
             if Y is not None:
@@ -1043,8 +1044,6 @@ an iterable which yields either str, unicode or file objects.</p>
                     if tag.startswith(&#34;B-&#34;):
                         new_tag = &#34;I-&#34; + tag[2:]
                     new_y.extend([new_tag] * (len(hf_s) - 1))
-                # if tag.startswith(&#39;B-&#39;): tag = &#39;I-&#39;+tag[2:]
-
         new_X.append(new_x)
         new_Y.append(new_y)
     new_Y = None if Y is None else new_Y
@@ -1183,7 +1182,7 @@ y : iterabl, label strings.</p>
     if self.te is not None:
         transformer_embeddings = self.te.embed(X, word_level=True)
         features.append(transformer_embeddings)
-        #print(f&#39; | {X} | [trans_shape={transformer_embeddings.shape[1]} | word_id_shape={len(word_ids)}&#39;)
+        # print(f&#39; | {X} | [trans_shape={transformer_embeddings.shape[1]} | word_id_shape={len(word_ids)}&#39;)
 
     if y is not None:
         y = [self._label_vocab.doc2id(doc) for doc in y]

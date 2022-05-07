@@ -26,23 +26,22 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from ...imports import *
-from ... import utils as U
-from .. import textutils as TU
-from .. import preprocessor as tpp
-from ...torch_base import TorchBase
-
-
-from whoosh import index
+<pre><code class="python"># from transformers import TFBertForQuestionAnswering
+# from transformers import BertTokenizer
+from transformers import (
+    AutoModelForQuestionAnswering,
+    AutoTokenizer,
+    TFAutoModelForQuestionAnswering,
+)
+from whoosh import index, qparser
 from whoosh.fields import *
-from whoosh import qparser
 from whoosh.qparser import QueryParser
 
-
-# from transformers import TFBertForQuestionAnswering
-# from transformers import BertTokenizer
-from transformers import TFAutoModelForQuestionAnswering, AutoModelForQuestionAnswering
-from transformers import AutoTokenizer
+from ... import utils as U
+from ...imports import *
+from ...torch_base import TorchBase
+from .. import preprocessor as tpp
+from .. import textutils as TU
 
 LOWCONF = -10000
 
@@ -89,7 +88,7 @@ def display_answers(answers):
     if not answers:
         return
     df = _answers2df(answers)
-    from IPython.core.display import display, HTML
+    from IPython.core.display import HTML, display
 
     return display(HTML(df.to_html(render_links=True, escape=False)))
 
@@ -174,7 +173,7 @@ class QA(ABC, TorchBase):
         model_name = bert_squad_model if bert_squad_model is not None else model_name
         if bert_squad_model:
             warnings.warn(
-                &#34;the bert_squad_model is deprecated - please use model_name instead.&#34;,
+                &#34;The bert_squad_model argument is deprecated - please use model_name instead.&#34;,
                 DeprecationWarning,
                 stacklevel=2,
             )
@@ -1193,7 +1192,7 @@ class AnswerExtractor:
     if not answers:
         return
     df = _answers2df(answers)
-    from IPython.core.display import display, HTML
+    from IPython.core.display import HTML, display
 
     return display(HTML(df.to_html(render_links=True, escape=False)))</code></pre>
 </details>
@@ -1644,7 +1643,7 @@ Returns:
         model_name = bert_squad_model if bert_squad_model is not None else model_name
         if bert_squad_model:
             warnings.warn(
-                &#34;the bert_squad_model is deprecated - please use model_name instead.&#34;,
+                &#34;The bert_squad_model argument is deprecated - please use model_name instead.&#34;,
                 DeprecationWarning,
                 stacklevel=2,
             )
