@@ -12,7 +12,7 @@
 
 
 ### News and Announcements
-- **2022-05-06**
+- **2022-05-07**
   - **ktrain v0.31.x** is released and now allows you to use any `transformers` model (e.g., `roberta-base`) for word embeddings in sequence-tagging via the `transformer_model` argument (thanks to Niek van der Plas).
 ```python
 from ktrain import text as txt
