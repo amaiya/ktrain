@@ -6,7 +6,7 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
-## 0.31.0 (2022-05-06)
+## 0.31.0 (2022-05-07)
 
 ### new:
 - The `text.ner.models.sequence_tagger` now supports word embeddings from non-BERT transformer models (e.g., `roberta-base`, `openai-gpt`). Thank to @Niekvdplas.
