@@ -15,9 +15,9 @@
 - **2022-05-07**
   - **ktrain v0.31.x** is released and now allows you to use any `transformers` model (e.g., `roberta-base`) for word embeddings in sequence-tagging via the `transformer_model` argument (thanks to Niek van der Plas).
 ```python
-from ktrain import text as txt
-(trn, val, preproc) = txt.entities_from_conll2003('train.txt', val_filepath='valid.txt')
-model = txt.sequence_tagger('bilstm-transformer', preproc, transformer_model='roberta-base')
+import ktrain
+(trn, val, preproc) = ktrain.text.entities_from_conll2003('train.txt', val_filepath='valid.txt')
+model = ktrain.text.sequence_tagger('bilstm-transformer', preproc, transformer_model='roberta-base')
 learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=128)
 learner.fit(0.01, 1, cycle_len=1)
 predictor = ktrain.get_predictor(model, preproc)
