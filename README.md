@@ -12,6 +12,18 @@
 
 
 ### News and Announcements
+- **2022-05-06**
+  - **ktrain v0.31.x** is released and now allows you to use any `transformers` model (e.g., `roberta-base`) for word embeddings in sequence-tagging via the `transformer_model` argument (thanks to Niek van der Plas).
+```python
+from ktrain import text as txt
+(trn, val, preproc) = txt.entities_from_conll2003('train.txt', val_filepath='valid.txt')
+model = txt.sequence_tagger('bilstm-transformer', preproc, transformer_model='roberta-base')
+learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=128)
+learner.fit(0.01, 1, cycle_len=1)
+predictor = ktrain.get_predictor(model, preproc)
+predictor.predict('James Gandolfini was a great actor.')
+```
+
 - **2022-03-31**
   - **ktrain v0.30.x** is released and now includes support for [keyphrase extraction](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/keyword_extraction_example.ipynb):
 ```python
@@ -82,7 +94,7 @@ kwe.extract_keywords(text, candidate_generator='noun_phrases')
 - utilize learning rate schedules such as the [triangular policy](https://arxiv.org/abs/1506.01186), the [1cycle policy](https://arxiv.org/abs/1803.09820), and [SGDR](https://arxiv.org/abs/1608.03983) to effectively minimize loss and improve generalization
 - build text classifiers for any language (e.g., [Arabic Sentiment Analysis with BERT](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/ArabicHotelReviews-AraBERT.ipynb), [Chinese Sentiment Analysis with NBSVM](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/ChineseHotelReviews-nbsvm.ipynb))
 - easily train NER models for any language (e.g., [Dutch NER](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/CoNLL2002_Dutch-BiLSTM.ipynb) )
-- load and preprocess text and image data from a variety of formats 
+- load and preprocess text and image data from a variety of formats
 - inspect data points that were misclassified and [provide explanations](https://eli5.readthedocs.io/en/latest/) to help improve your model
 - leverage a simple prediction API for saving and deploying both models and data-preprocessing steps to make predictions on new raw data
 - built-in support for exporting models to [ONNX](https://onnx.ai/) and  [TensorFlow Lite](https://www.tensorflow.org/lite) (see [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/ktrain-ONNX-TFLite-examples.ipynb) for more information)
@@ -98,7 +110,7 @@ Please see the following tutorial notebooks for a guide on how to use **ktrain**
 * Tutorial 5: [Learning from Unlabeled Text Data](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-05-learning_from_unlabeled_text_data.ipynb)
 * Tutorial 6: [Text Sequence Tagging](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-06-sequence-tagging.ipynb) for Named Entity Recognition
 * Tutorial 7: [Graph Node Classification](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-07-graph-node_classification.ipynb) with Graph Neural Networks
-* Tutorial 8: [Tabular Classification and Regression](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-08-tabular_classification_and_regression.ipynb) 
+* Tutorial 8: [Tabular Classification and Regression](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-08-tabular_classification_and_regression.ipynb)
 * Tutorial A1: [Additional tricks](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-A1-additional-tricks.ipynb), which covers topics such as previewing data augmentation schemes, inspecting intermediate output of Keras models for debugging, setting global weight decay, and use of built-in and custom callbacks.
 * Tutorial A2: [Explaining Predictions and Misclassifications](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-A2-explaining-predictions.ipynb)
 * Tutorial A3: [Text Classification with Hugging Face Transformers](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/tutorials/tutorial-A3-hugging_face_transformers.ipynb)
@@ -107,10 +119,10 @@ Please see the following tutorial notebooks for a guide on how to use **ktrain**
 
 Some blog tutorials and other guides about **ktrain** are shown below:
 
-> [**ktrain: A Lightweight Wrapper for Keras to Help Train Neural Networks**](https://towardsdatascience.com/ktrain-a-lightweight-wrapper-for-keras-to-help-train-neural-networks-82851ba889c) 
+> [**ktrain: A Lightweight Wrapper for Keras to Help Train Neural Networks**](https://towardsdatascience.com/ktrain-a-lightweight-wrapper-for-keras-to-help-train-neural-networks-82851ba889c)
 
 
-> [**BERT Text Classification in 3 Lines of Code**](https://towardsdatascience.com/bert-text-classification-in-3-lines-of-code-using-keras-264db7e7a358)  
+> [**BERT Text Classification in 3 Lines of Code**](https://towardsdatascience.com/bert-text-classification-in-3-lines-of-code-using-keras-264db7e7a358)
 
 > [**Text Classification with Hugging Face Transformers in  TensorFlow 2 (Without Tears)**](https://medium.com/@asmaiya/text-classification-with-hugging-face-transformers-in-tensorflow-2-without-tears-ee50e4f3e7ed)
 
@@ -130,7 +142,7 @@ Some blog tutorials and other guides about **ktrain** are shown below:
 
 ### Examples
 
-Tasks such as text classification and image classification can be accomplished easily with 
+Tasks such as text classification and image classification can be accomplished easily with
 only a few lines of code.
 
 #### Example: Text Classification of [IMDb Movie Reviews](https://ai.stanford.edu/~amaas/data/sentiment/) Using [BERT](https://arxiv.org/pdf/1810.04805.pdf) <sub><sup>[[see notebook](https://github.com/amaiya/ktrain/blob/master/examples/text/IMDb-BERT.ipynb)]</sup></sub>
@@ -139,7 +151,7 @@ import ktrain
 from ktrain import text as txt
 
 # load data
-(x_train, y_train), (x_test, y_test), preproc = txt.texts_from_folder('data/aclImdb', maxlen=500, 
+(x_train, y_train), (x_test, y_test), preproc = txt.texts_from_folder('data/aclImdb', maxlen=500,
                                                                      preprocess_mode='bert',
                                                                      train_test_names=['train', 'test'],
                                                                      classes=['pos', 'neg'])
@@ -148,9 +160,9 @@ from ktrain import text as txt
 model = txt.text_classifier('bert', (x_train, y_train), preproc=preproc)
 
 # wrap model and data in ktrain.Learner object
-learner = ktrain.get_learner(model, 
-                             train_data=(x_train, y_train), 
-                             val_data=(x_test, y_test), 
+learner = ktrain.get_learner(model,
+                             train_data=(x_train, y_train),
+                             val_data=(x_test, y_test),
                              batch_size=6)
 
 # find good learning rate
@@ -158,7 +170,7 @@ learner.lr_find()             # briefly simulate training to find good learning 
 learner.lr_plot()             # visually identify best learning rate
 
 # train using 1cycle learning rate schedule for 3 epochs
-learner.fit_onecycle(2e-5, 3) 
+learner.fit_onecycle(2e-5, 3)
 ```
 
 
@@ -171,14 +183,14 @@ from ktrain import vision as vis
 (train_data, val_data, preproc) = vis.images_from_folder(
                                               datadir='data/dogscats',
                                               data_aug = vis.get_data_aug(horizontal_flip=True),
-                                              train_test_names=['train', 'valid'], 
+                                              train_test_names=['train', 'valid'],
                                               target_size=(224,224), color_mode='rgb')
 
 # load model
 model = vis.image_classifier('pretrained_resnet50', train_data, val_data, freeze_layers=80)
 
 # wrap model and data in ktrain.Learner object
-learner = ktrain.get_learner(model=model, train_data=train_data, val_data=val_data, 
+learner = ktrain.get_learner(model=model, train_data=train_data, val_data=val_data,
                              workers=8, use_multiprocessing=False, batch_size=64)
 
 # find good learning rate
@@ -186,7 +198,7 @@ learner.lr_find()             # briefly simulate training to find good learning 
 learner.lr_plot()             # visually identify best learning rate
 
 # train using triangular policy with ModelCheckpoint and implicit ReduceLROnPlateau and EarlyStopping
-learner.autofit(1e-4, checkpoint_folder='/tmp/saved_weights') 
+learner.autofit(1e-4, checkpoint_folder='/tmp/saved_weights')
 ```
 
 #### Example: Sequence Labeling for [Named Entity Recognition](https://www.kaggle.com/abhinavwalia95/entity-annotated-corpus/version/2) using a randomly initialized [Bidirectional LSTM CRF](https://arxiv.org/abs/1603.01360) model <sub><sup>[[see notebook](https://github.com/amaiya/ktrain/blob/master/examples/text/CoNLL2003-BiLSTM_CRF.ipynb)]</sup></sub>
@@ -198,7 +210,7 @@ from ktrain import text as txt
 (trn, val, preproc) = txt.entities_from_txt('data/ner_dataset.csv',
                                             sentence_column='Sentence #',
                                             word_column='Word',
-                                            tag_column='Tag', 
+                                            tag_column='Tag',
                                             data_format='gmb',
                                             use_char=True) # enable character embeddings
 
@@ -210,7 +222,7 @@ learner = ktrain.get_learner(model, train_data=trn, val_data=val)
 
 
 # conventional training for 1 epoch using a learning rate of 0.001 (Keras default for Adam optmizer)
-learner.fit(1e-3, 1) 
+learner.fit(1e-3, 1)
 ```
 
 
@@ -223,8 +235,8 @@ from ktrain import graph as gr
 (trn, val, preproc)  = gr.graph_nodes_from_csv(
                                                'cora.content', # node attributes/labels
                                                'cora.cites',   # edge list
-                                               sample_size=20, 
-                                               holdout_pct=None, 
+                                               sample_size=20,
+                                               holdout_pct=None,
                                                holdout_for_inductive=False,
                                               train_pct=0.1, sep='\t')
 
@@ -330,7 +342,7 @@ Using **ktrain** on **Google Colab**?  See these Colab examples:
 3. Install *ktrain*: `pip install ktrain`
 
 
-The above should be all you need on Linux systems and cloud computing environments like Google Colab and AWS EC2.  If you are using **ktrain** on a **Windows computer**, you can follow these 
+The above should be all you need on Linux systems and cloud computing environments like Google Colab and AWS EC2.  If you are using **ktrain** on a **Windows computer**, you can follow these
 [more detailed instructions](https://github.com/amaiya/ktrain/blob/master/FAQ.md#how-do-i-install-ktrain-on-a-windows-machine) that include some extra steps.
 
 **ktrain** should currently support any version of TensorFlow at or above to v2.3: i.e., `pip install tensorflow>=2.3`.
@@ -352,7 +364,7 @@ pip install librosa
 # for tabular.causal_inference_model:
 pip install causalnlp
 # for text.TextExtractor:
-pip install tika 
+pip install tika
 # for text.kw.KeywordExtractor
 pip install textblob
 ```
@@ -414,8 +426,8 @@ The following software/libraries should be installed:
 - [scikit-learn](https://scikit-learn.org/stable/) (tested on 0.20.0)
 - [matplotlib](https://matplotlib.org/) (tested on 3.0.0)
 - [pandas](https://pandas.pydata.org/) (tested on 0.24.2)
-- [keras_bert](https://github.com/CyberZHG/keras-bert/tree/master/keras_bert) 
-- [fastprogress](https://github.com/fastai/fastprogress) 
+- [keras_bert](https://github.com/CyberZHG/keras-bert/tree/master/keras_bert)
+- [fastprogress](https://github.com/fastai/fastprogress)
 -->
 
 

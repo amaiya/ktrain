@@ -6,14 +6,14 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
-## 0.31.0 (TBD)
+## 0.31.0 (2022-05-06)
 
 ### new:
 - The `text.ner.models.sequence_tagger` now supports word embeddings from non-BERT transformer models (e.g., `roberta-base`, `openai-gpt`). Thank to @Niekvdplas.
 - Custom tokenization can now be used in sequence-tagging even when using transformer word embeddings.  See `custom_tokenizer` argument to `NERPredictor.predict`.
 
 ### changed
-- [**breaking change**] In the `text.ner.models.sequence_tagger` function, the `bilstm-bert` model  is now called `bilstm-transformer` and the `bert_model` parameter has been renamed to `transformer_model`. 
+- [**breaking change**] In the `text.ner.models.sequence_tagger` function, the `bilstm-bert` model  is now called `bilstm-transformer` and the `bert_model` parameter has been renamed to `transformer_model`.
 - [**breaking change**] The  `syntok` package is now used as the default tokenizer for `NERPredictor` (sequence-tagging prediction). To use the tokenization scheme from older versions of ktrain, you can import the `re` and  `string` packages and supply this function to the `custom_tokenizer` argument: `lambda s: re.compile(f"([{string.punctuation}“”¨«»®´·º½¾¿¡§£₤‘’])").sub(r" \1 ", s).split()`.
 - Code base was reformatted using [black](https://github.com/psf/black)
 - **ktrain** now supports TIKA for text extraction in the `text.textractor.TextExtractor` package with the `use_tika=True` argument as default.  To use the old-style text extraction based on the `textract` package, you can supply `use_tika=False` to `TextExtractor`.
@@ -28,7 +28,7 @@ Most recent releases are shown at the top. Each release shows:
 
 ### new:
 - **ktrain** now supports simple, fast, and robust keyphrase extraction with the `ktran.text.kw.KeywordExtractor` module
-- **ktrain** now only issues a warning if TensorFlow is not installed, insteading of halting and preventing further use. This means that 
+- **ktrain** now only issues a warning if TensorFlow is not installed, insteading of halting and preventing further use. This means that
   pre-trained PyTorch models (e.g., `text.zsl.ZeroShotClassifier`) and sklearn models (e.g., `text.eda.TopicModel`) in **ktrain** can now be used
   **without** having TensorFlow installed.
 - `text.qa.SimpleQA` and `text.qa.AnswerExtractor` now both support PyTorch with optional quantization (use `framework='pt'` for PyTorch version)
@@ -59,7 +59,7 @@ Most recent releases are shown at the top. Each release shows:
 -  The `valley` learning rate suggestion is now returned in `learner.lr_estimate` and `learner.lr_plot` (when `suggest=True` supplied to `learner.lr_plot`)
 
 ### fixed:
-- save `TransformerEmbedding` model, tokenizer, and configuration when saving `NERPredictor` and reset `te_model` to 
+- save `TransformerEmbedding` model, tokenizer, and configuration when saving `NERPredictor` and reset `te_model` to
   facilitate loading NERPredictors with BERT embeddings offline (#423)
 - switched from `keras2onnx` to `tf2onnx`, which supports newer versions of TensorFlow
 
@@ -82,7 +82,7 @@ Most recent releases are shown at the top. Each release shows:
 - N/A
 
 ### changed
-- pin to `sklearn==0.24.2` due to breaking changes.  `eli5` fork for tf.keras updated for 0.24.2.  
+- pin to `sklearn==0.24.2` due to breaking changes.  `eli5` fork for tf.keras updated for 0.24.2.
    To use `scikit-learn==0.24.2`, users must uninstall and re-install the `eli5` fork with: `pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip`
 
 ### fixed:
@@ -428,7 +428,7 @@ Most recent releases are shown at the top. Each release shows:
 
 ### Changed
 - **[breaking change]** `TopicModel.get_docs` now returns a list of dicts instead of a list of tuples.  Each dict has keys: `text`, `doc_id`, `topic_proba`, `topic_id`.
-- added `TopicModel.get_document_topic_distribution` 
+- added `TopicModel.get_document_topic_distribution`
 - added `TopicModel.get_sorted_docs` method to return all documents sorted by relevance to a given `topic_id`
 
 
@@ -470,7 +470,7 @@ Most recent releases are shown at the top. Each release shows:
 - added `extract_noun_phrases` to `textutils`
 
 ### Changed
-- `SimpleQA.ask` now includes an `include_np` parameter.  When True, noun phrases will be used to retrieve documents 
+- `SimpleQA.ask` now includes an `include_np` parameter.  When True, noun phrases will be used to retrieve documents
    containing candidate answers.
 
 
@@ -485,8 +485,8 @@ Most recent releases are shown at the top. Each release shows:
 - N/A
 
 ### Changed
-- added optional `references` argument to `SimpleQA.index_from_list` 
-- added `min_words` argument to `SimpleQA.index_from_list` and `SimpleQA.index_from_folder` to prune small documents or paragraphs 
+- added optional `references` argument to `SimpleQA.index_from_list`
+- added `min_words` argument to `SimpleQA.index_from_list` and `SimpleQA.index_from_folder` to prune small documents or paragraphs
   that are unlikely to include good answers
 - `qa.display_answers` now supports hyperlinks for document references
 
@@ -695,8 +695,8 @@ Most recent releases are shown at the top. Each release shows:
 - `TextPreprocessor` instances now use `YTransform` class to transform targets
 - `texts_from_df`, `texts_from_csv`, and `texts_from_array` employ the use of either `YTransformDataFrame` or `YTransform`
 - `images_from_df`, `images_from_fname`, `images_from_csv`, and `imagas_from_array` use `YTransformDataFrame` or `YTransform`
-- Extra imports removed from PyTorch-based `zsl.core.ZeroShotClassifier` and `summarization.core.TransformerSummarizer`. If necessary, 
-   both can now be used without having TensorFlow installed by installing ktrain using `--no-deps` and importing these modules using 
+- Extra imports removed from PyTorch-based `zsl.core.ZeroShotClassifier` and `summarization.core.TransformerSummarizer`. If necessary,
+   both can now be used without having TensorFlow installed by installing ktrain using `--no-deps` and importing these modules using
     a method like [this](https://stackoverflow.com/a/58423785).
 
 ### Fixed:
@@ -840,7 +840,7 @@ Most recent releases are shown at the top. Each release shows:
   - addd `**kwargs` to `AdamWeightDecay based on [this issue](https://github.com/tensorflow/addons/issues/1645)
   - changed `TransformerTextClassLearner.predict` and `TextPredictor.predict` to deal with tuples being returned by `predict` in TensorFlow 2.2.0
   - changed multilabel test to use loss insead of accuracy due to [TF 2.2.0 issue](https://github.com/tensorflow/tensorflow/issues/41114)
-  - changed `Learner.lr_find` to use `save_model` and `load_model` to restore weights due to [this TF issue](https://github.com/tensorflow/tensorflow/issues/41116) 
+  - changed `Learner.lr_find` to use `save_model` and `load_model` to restore weights due to [this TF issue](https://github.com/tensorflow/tensorflow/issues/41116)
     and added `TransformersPreprocessor.load_model_and_configure_from_data` to support this
 
 ### Fixed:
@@ -971,7 +971,7 @@ Most recent releases are shown at the top. Each release shows:
 ## 0.16.0 (2020-06-03)
 
 ### New:
-- support for Zero-Shot Topic Classification via the `text.ZeroShotClassifier`.  
+- support for Zero-Shot Topic Classification via the `text.ZeroShotClassifier`.
 
 ### Changed
 - N/A/
@@ -1302,7 +1302,7 @@ Most recent releases are shown at the top. Each release shows:
 ### Changed:
 - ensure `DISABLE_V2_BEHAVIOR=True` when `ImagePredictor.explain` is invoked
 - added `SUPPRESS_TF_WARNINGS` environment variable.  Default is '1'. If set to '0', TF warnings will be displayed.
-- `merge_entities` method of `ktrain.text.shallownlp.ner.NER` changed to `merge_tokens` 
+- `merge_entities` method of `ktrain.text.shallownlp.ner.NER` changed to `merge_tokens`
 - moved `load_predictor` to constructor in `krain.text.shallownlp.ner.NER`
 - `ktrain.text.shallownlp.ner.NER` now supports `predictor_path` argument
 
@@ -1341,7 +1341,7 @@ Most recent releases are shown at the top. Each release shows:
 - `text.eda` module now supports NMF in addition to LDA
 
 ### Changed:
-- `texts_from_csv` and `texts_from_df` now accept a single column of labels in string format and will 
+- `texts_from_csv` and `texts_from_df` now accept a single column of labels in string format and will
    1-hot-encode labels automatically for classification or multi-class classification problems.
 - reorganized language-handling to `text.textutils`
 - more suppression of warnings due to spurious warnings from TF2 causing confusion in output
@@ -1383,8 +1383,8 @@ Most recent releases are shown at the top. Each release shows:
 - N/A
 
 ### Changed:
-- Removed Exception when `distilbert` is selected in `text_classifier` for non-English language after 
-  [Hugging Face fixed the reported bug](https://github.com/huggingface/transformers/issues/2462). 
+- Removed Exception when `distilbert` is selected in `text_classifier` for non-English language after
+  [Hugging Face fixed the reported bug](https://github.com/huggingface/transformers/issues/2462).
 
 ### Fixed:
 - XLNet models like `xlnet-base-cased` now works after casting input arrays to `int32`
@@ -1422,7 +1422,7 @@ Most recent releases are shown at the top. Each release shows:
 - N/A
 
 ### Changed:
-- `MultiArrayDataset` accepts list of Numpy arrays 
+- `MultiArrayDataset` accepts list of Numpy arrays
 
 ### Fixed:
 - fixed incorrect activation in `TextPredictor` for multi-label Transformer models
@@ -1490,7 +1490,7 @@ Most recent releases are shown at the top. Each release shows:
 that will enable consistent reproduction of the train-test split.
 
 ### Changed:
-- perform local checks for `stellargraph` where needed.  
+- perform local checks for `stellargraph` where needed.
 - removed `stellargraph` as dependency due to issues with it overwriting `tensorflow-gpu`
 - change `setup.py` to skip navigation links for pypi page
 
@@ -1505,7 +1505,7 @@ that will enable consistent reproduction of the train-test split.
 that will enable consistent reproduction of the train-test split.
 
 ### Changed:
-- perform local checks for `stellargraph` where needed.  
+- perform local checks for `stellargraph` where needed.
 - removed `stellargraph` as dependency due to issues with it overwriting `tensorflow-gpu`
 
 ### Fixed:
@@ -1515,7 +1515,7 @@ that will enable consistent reproduction of the train-test split.
 ## 0.7.0 (2019-12-10)
 
 ### New:
-- *ktrain* now uses tf.keras (`tensorflow>=1.14,<=2.0`) instead of stand-alone Keras.  
+- *ktrain* now uses tf.keras (`tensorflow>=1.14,<=2.0`) instead of stand-alone Keras.
 
 ### Changed:
 - N/A
@@ -1533,7 +1533,7 @@ that will enable consistent reproduction of the train-test split.
 
 ### Fixed:
 - added encoding argument when reading in word vectors to bypass error on Windows systems (PR #31)
-- Change preprocessing defaults and apply special preprocessing in `text.eda.get_topic_model` 
+- Change preprocessing defaults and apply special preprocessing in `text.eda.get_topic_model`
   when non-English is detected.
 
 
@@ -1662,9 +1662,9 @@ that will enable consistent reproduction of the train-test split.
 ## 0.4.0 (2019-09-30)
 
 ### New:
-- Added multilingual support for text classification.  
+- Added multilingual support for text classification.
 - Added experimental support for tf.keras. By default, *ktrain* will use standalone Keras.
-  If `os.environ['TF_KERAS']` is set, *ktrian* will attempt to use tf.keras. 
+  If `os.environ['TF_KERAS']` is set, *ktrian* will attempt to use tf.keras.
   Some capabilities (e.g., `predictor.explain` for images) are not yet supported for tf.keras
 
 ### Changed:
@@ -1693,7 +1693,7 @@ that will enable consistent reproduction of the train-test split.
 
 ### New:
 - Support for sequence tagging with Bidirectional LSTM-CRF. Word embeddings can currently be either
-  random or word2vec(cbow).  If latter chosen, word vectors will be downloaded automaticlaly from Facebook fasttext 
+  random or word2vec(cbow).  If latter chosen, word vectors will be downloaded automaticlaly from Facebook fasttext
   site.
 - Added `ktra.text.texts_from_df` function
 
@@ -1703,7 +1703,7 @@ that will enable consistent reproduction of the train-test split.
 
 
 ### Fixed:
-- Fixed construction of custom_objects dictionary for BERT to ensure load_model works for 
+- Fixed construction of custom_objects dictionary for BERT to ensure load_model works for
   custom BERT models
 - Resolved issue with pretrained bigru models failing when max_features >= than total word count.
 
@@ -1749,7 +1749,7 @@ always requiring a list.
   matching a name in the ```classes``` list will be considered.
 
 ### Fixed:
-- Fixed issue with ```learner.validate``` and ```learner.predict``` failing when validation data is in 
+- Fixed issue with ```learner.validate``` and ```learner.predict``` failing when validation data is in
   the form of an Iterator (e.g., DirectoryIterator).
 
 
@@ -1763,7 +1763,7 @@ always requiring a list.
   which may happen when bad/dysfunctional model is supplied to learning rate finder.
 
 ### Fixed:
-- In ```ktrain.text.data.texts_from_folder``` function, only subfolders specified in classes argument 
+- In ```ktrain.text.data.texts_from_folder``` function, only subfolders specified in classes argument
   are read in as training and validation data.
 
 ## 0.2.1 (2019-08-15)
@@ -1781,10 +1781,10 @@ always requiring a list.
 ## 0.2.0 (2019-08-12)
 
 ### New:
-- Support for pretrained BERT Text Classification 
+- Support for pretrained BERT Text Classification
 
 ### Changed:
-- For ```Learner.lr_find```, added optional ```max_epochs``` argument. 
+- For ```Learner.lr_find```, added optional ```max_epochs``` argument.
 - Changed ```Learner.confusion_matrix``` to ```Learner.validate``` and added optional ```val_data``` argument.
   The ```use_valid``` argument has been removed.
 - Removed ```pretrained_fpath``` argument to ```text.text_classifier```.  Pretrained word vectors are
@@ -1853,7 +1853,7 @@ always requiring a list.
 ### New:
 
 ### Changed:
-- relocated calls to tensorflow 
+- relocated calls to tensorflow
 - installation instructions and reformatted examples
 
 ### Fixed:
@@ -1883,6 +1883,3 @@ always requiring a list.
 ## 0.1.4 (2019-04-10)
 
 - Last release without CHANGELOG updates
-
-
-
