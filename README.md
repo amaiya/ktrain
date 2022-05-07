@@ -50,8 +50,6 @@ kwe.extract_keywords(text, candidate_generator='noun_phrases')
 - **2022-01-28**
   - **ktrain v0.29.x** is released and includes miscellaneous enhancements contributed by [Sandy Khosasi](https://github.com/ilos-vigil) such as [support for MobileNetV3 and EfficientNet](https://colab.research.google.com/drive/1EJHpMVG6fBCg33UPla_Ly_6LQdswU2Ur?usp=sharing), [plotting improvements](https://colab.research.google.com/drive/1_WaRQ0J4g0VTn6HWS3kszdFZbBBWoa7R?usp=sharing), and [raw confidence scores in QA](https://colab.research.google.com/drive/1ParprLN9hFX6cxJ1w7bv91PYx4o0J1zm?usp=sharing).
 
-- **2021-07-15**
-  - **ktrain** was used to train machine learning models for [CoronaCentral.ai](https://coronacentral.ai/), a machine-learning-enhanced search engine for COVID publications at Stanford University. The CoronaCentral document classifier, **CoronaBERT**, is [available on the Hugging Face model hub](https://huggingface.co/jakelever/coronabert).  CoronaCentral.ai was developed by Jake Lever and Russ Altman and funded by the Chan Zuckerberg Biohub. Check out [their paper](https://www.biorxiv.org/content/10.1101/2020.12.21.423860v1).
 ----
 
 ### Overview
