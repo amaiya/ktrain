@@ -144,6 +144,7 @@ Using **ktrain** on **Google Colab**?  See these Colab examples:
 -  **text classification:** [a simple demo of Multiclass Text Classification with BERT](https://colab.research.google.com/drive/1AH3fkKiEqBpVpO5ua00scp7zcHs5IDLK)
 -  **text classification:** [a simple demo of Multiclass Text Classification with Hugging Face Transformers](https://colab.research.google.com/drive/1YxcceZxsNlvK35pRURgbwvkgejXwFxUt)
 - **sequence-tagging (NER):** [NER example using `transformer` word embeddings](https://colab.research.google.com/drive/1whrnmM7ElqbaEhXf760eiOMiYk5MNO-Z?usp=sharing)
+- **question-answering:** [End-to-End Question-Answering](https://colab.research.google.com/drive/1tcsEQ7igx7lw_R0Pfpmsg9Wf3DEXyOvk?usp=sharing) using the 20newsgroups dataset.
 -  **image classification:** [image classification with Cats vs. Dogs](https://colab.research.google.com/drive/1WipQJUPL7zqyvLT10yekxf_HNMXDDtyR)
 
 
