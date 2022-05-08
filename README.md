@@ -13,7 +13,7 @@
 
 ### News and Announcements
 - **2022-05-07**
-  - **ktrain v0.31.x** is released and now allows you to use any `transformers` model (e.g., `roberta-base`) for word embeddings in sequence-tagging via the `transformer_model` argument (thanks to Niek van der Plas).
+  - **ktrain v0.31.x** is released and now allows you to use any `transformers` model (e.g., `roberta-base`) for word embeddings in sequence-tagging via the `transformer_model` argument (thanks to Niek van der Plas). See [this Colab notebook](https://colab.research.google.com/drive/1whrnmM7ElqbaEhXf760eiOMiYk5MNO-Z?usp=sharing) for an example.
 ```python
 import ktrain
 (trn, val, preproc) = ktrain.text.entities_from_conll2003('train.txt', val_filepath='valid.txt')
@@ -139,6 +139,14 @@ Some blog tutorials and other guides about **ktrain** are shown below:
 
 
 ### Examples
+
+Using **ktrain** on **Google Colab**?  See these Colab examples:
+-  **text classification:** [a simple demo of Multiclass Text Classification with BERT](https://colab.research.google.com/drive/1AH3fkKiEqBpVpO5ua00scp7zcHs5IDLK)
+-  **text classification:** [a simple demo of Multiclass Text Classification with Hugging Face Transformers](https://colab.research.google.com/drive/1YxcceZxsNlvK35pRURgbwvkgejXwFxUt)
+- **sequence-tagging (NER):** [NER example using `transformer` word embeddings](https://colab.research.google.com/drive/1whrnmM7ElqbaEhXf760eiOMiYk5MNO-Z?usp=sharing)
+-  **image classification:** [image classification with Cats vs. Dogs](https://colab.research.google.com/drive/1WipQJUPL7zqyvLT10yekxf_HNMXDDtyR)
+
+
 
 Tasks such as text classification and image classification can be accomplished easily with
 only a few lines of code.
@@ -322,10 +330,10 @@ learner.evaluate(tst, class_names=preproc.get_classes())
 ```
 
 
-Using **ktrain** on **Google Colab**?  See these Colab examples:
--  [a simple demo of Multiclass Text Classification with BERT](https://colab.research.google.com/drive/1AH3fkKiEqBpVpO5ua00scp7zcHs5IDLK)
--  [a simple demo of Multiclass Text Classification with Hugging Face Transformers](https://colab.research.google.com/drive/1YxcceZxsNlvK35pRURgbwvkgejXwFxUt)
--  [image classification with Cats vs. Dogs](https://colab.research.google.com/drive/1WipQJUPL7zqyvLT10yekxf_HNMXDDtyR)
+
+
+
+
 
 #### Additional examples can be found [here](https://github.com/amaiya/ktrain/tree/master/examples).
 
