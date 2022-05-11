@@ -117,8 +117,7 @@ class NERPredictor(Predictor):
                             sentences[i], tokens=[entry[0] for entry in x]
                         )
                         result = list(
-                            zip(x, y, [(o["start"], o["end"])
-                                for o in offsets])
+                            zip(x, y, [(o["start"], o["end"]) for o in offsets])
                         )
                     else:
                         result = list(zip(x, y))
@@ -181,7 +180,8 @@ class NERPredictor(Predictor):
             elif tag is None and current_token:
                 entities.append(
                     self._build_merge_tuple(
-                        current_token, current_tag, start, last_end, prob_list)
+                        current_token, current_tag, start, last_end, prob_list
+                    )
                 )
                 prob_list = []
                 current_token = ""
@@ -197,11 +197,14 @@ class NERPredictor(Predictor):
         if current_token and current_tag:
             entities.append(
                 self._build_merge_tuple(
-                    current_token, current_tag, start, last_end, prob_list)
+                    current_token, current_tag, start, last_end, prob_list
+                )
             )
         return entities
 
-    def _build_merge_tuple(self, current_token, current_tag, start=None, end=None, prob_list=[]):
+    def _build_merge_tuple(
+        self, current_token, current_tag, start=None, end=None, prob_list=[]
+    ):
         entry = [current_token, current_tag]
         if start is not None and end is not None:
             entry.append((start, end))

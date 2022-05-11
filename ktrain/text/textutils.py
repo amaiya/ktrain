@@ -99,8 +99,7 @@ def pdftotext(filename):
     :return: text from file, or empty string if failure
     ```
     """
-    output = Popen(["pdftotext", "-q", filename, "-"],
-                   stdout=PIPE).communicate()[0]
+    output = Popen(["pdftotext", "-q", filename, "-"], stdout=PIPE).communicate()[0]
     # None may indicate damage, but convert for consistency
     return "" if output is None else output
 
@@ -114,8 +113,7 @@ def requires_ocr(filename):
     :return: True if requires OCR, False if not
     ```
     """
-    output = Popen(["pdffonts", filename], stdout=PIPE,
-                   stderr=DEVNULL).communicate()[0]
+    output = Popen(["pdffonts", filename], stdout=PIPE, stderr=DEVNULL).communicate()[0]
     return len(output.split("\n")) < 4
 
 
@@ -228,8 +226,7 @@ def filter_by_id(lst, ids=[]):
 
 def chinese_stopwords():
     with open(
-        os.path.join(os.path.dirname(
-            os.path.abspath(__file__)), "stopwords-zh.txt"),
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "stopwords-zh.txt"),
         "r",
     ) as f:
         return [line.strip() for line in f]
@@ -335,8 +332,7 @@ def decode_by_line(texts, encoding="utf-8", verbose=1):
         new_texts.append(text)
     pct = round((skips * 1.0 / num_lines) * 100, 1)
     if verbose:
-        print("skipped %s lines (%s%%) due to character decoding errors" %
-              (skips, pct))
+        print("skipped %s lines (%s%%) due to character decoding errors" % (skips, pct))
         if pct > 10:
             print("If this is too many, try a different encoding")
     return new_texts
@@ -349,8 +345,7 @@ def detect_encoding(texts, sample_size=32):
     lst = [chardet.detect(doc)["encoding"] for doc in texts[:sample_size]]
     encoding = max(set(lst), key=lst.count)
     # standardize to utf-8 to prevent BERT problems
-    encoding = "utf-8" if encoding.lower() in ["ascii",
-                                               "utf8", "utf-8"] else encoding
+    encoding = "utf-8" if encoding.lower() in ["ascii", "utf8", "utf-8"] else encoding
     return encoding
 
 
@@ -427,8 +422,7 @@ def paragraph_tokenize(
     """
     lang = detect_lang(text) if lang is None else lang
     if is_chinese(lang):
-        raise ValueError(
-            "paragraph_tokenize does not currently support Chinese.")
+        raise ValueError("paragraph_tokenize does not currently support Chinese.")
     paragraphs = []
     sents = []
     for paragraph in segmenter.process(text):
@@ -464,8 +458,7 @@ def extract_noun_phrases(text):
     try:
         from textblob import TextBlob
     except:
-        raise Exception(
-            "extract_noun_phrases require TextBlob: pip install textblob")
+        raise Exception("extract_noun_phrases require TextBlob: pip install textblob")
     blob = TextBlob(text)
     stop_words = ["which", "what"]
     curr_phrase = []
@@ -505,7 +498,7 @@ def extract_offsets(sentence, tokens=None, tokenizer=tokenize):
     offsets = []
     last_end = 0
     for t in tokens:
-        if t == '':  # t[0] doesn't exist for empty strings
+        if t == "":  # t[0] doesn't exist for empty strings
             continue
         # find start of current token
         for start_ind in range(last_end, len(sentence)):
