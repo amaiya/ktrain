@@ -30,4 +30,6 @@ jobs:
         run: pip freeze
       - name: Run tests
         run: |
-            python3 ./ktrain/tests/test_db.py
+            pwd
+            ls
+            python3 ./ktrain/ktrain/tests/test_db.py
