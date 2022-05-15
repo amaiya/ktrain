@@ -11,3 +11,23 @@ jobs:
         with:
             options: "--check --verbose"
             src: "./ktrain"
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install pip dependencies
+        run: | 
+            pip install -U pip wheel
+            pip install -e .
+            pip install tensorflow_cpu==2.8.0
+            pip install https://github.com/amaiya/stellargraph/archive/refs/heads/no_tf_dep_082.zip
+            pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip
+      - name: Show installed pip dependencies
+        run: pip freeze
+      - name: Run tests
+        run: |
+            python3 ./ktrain/tests/test_db.py

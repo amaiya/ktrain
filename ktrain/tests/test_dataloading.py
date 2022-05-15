@@ -2,6 +2,7 @@
 """
 Tests of ktrain text classification flows
 """
+import os.path
 from unittest import TestCase, main, skip
 
 import testenv
@@ -11,9 +12,11 @@ from ktrain import text as txt
 from ktrain import utils as U
 from ktrain import vision as vis
 
+CURRDIR = os.path.dirname(__file__)
+
 
 def texts_from_folder(preprocess_mode="standard"):
-    DATADIR = "./text_data/text_folder"
+    DATADIR = os.path.join(CURRDIR, "text_data/text_folder")
     trn, val, preproc = txt.texts_from_folder(
         DATADIR,
         max_features=100,
@@ -28,7 +31,7 @@ def texts_from_folder(preprocess_mode="standard"):
 
 
 def texts_from_csv(preprocess_mode="standard"):
-    DATA_PATH = "./text_data/texts.csv"
+    DATA_PATH = os.path.join(CURRDIR, "text_data/texts.csv")
     trn, val, preproc = txt.texts_from_csv(
         DATA_PATH,
         "text",
@@ -43,7 +46,7 @@ def texts_from_csv(preprocess_mode="standard"):
 
 
 def texts_from_csv_string(preprocess_mode="standard"):
-    DATA_PATH = "./text_data/texts-strings.csv"
+    DATA_PATH = os.path.join(CURRDIR, "text_data/texts-strings.csv")
     trn, val, preproc = txt.texts_from_csv(
         DATA_PATH,
         "text",
@@ -58,7 +61,7 @@ def texts_from_csv_string(preprocess_mode="standard"):
 
 
 def texts_from_csv_int(preprocess_mode="standard"):
-    DATA_PATH = "./text_data/texts-ints.csv"
+    DATA_PATH = os.path.join(CURRDIR, "text_data/texts-ints.csv")
     trn, val, preproc = txt.texts_from_csv(
         DATA_PATH,
         "text",
@@ -73,15 +76,15 @@ def texts_from_csv_int(preprocess_mode="standard"):
 
 
 def entities_from_conll2003():
-    TDATA = "conll2003/train.txt"
-    VDATA = "conll2003/valid.txt"
+    TDATA = os.path.join(CURRDIR, "conll2003/train.txt")
+    VDATA = os.path.join(CURRDIR, "conll2003/valid.txt")
     (trn, val, preproc) = txt.entities_from_conll2003(TDATA, val_filepath=VDATA)
     return (trn, val, preproc)
 
 
 def images_from_folder():
     (trn, val, preproc) = vis.images_from_folder(
-        datadir="image_data/image_folder",
+        datadir=os.path.join(CURRDIR, "image_data/image_folder"),
         data_aug=vis.get_data_aug(horizontal_flip=True),
         classes=["cat", "dog"],
         train_test_names=["train", "valid"],
@@ -90,12 +93,12 @@ def images_from_folder():
 
 
 def images_from_csv():
-    train_fpath = "./image_data/train-vision.csv"
-    val_fpath = "./image_data/valid-vision.csv"
+    train_fpath = os.path.join(CURRDIR, "image_data/train-vision.csv")
+    val_fpath = os.path.join(CURRDIR, "image_data/valid-vision.csv")
     trn, val, preproc = vis.images_from_csv(
         train_fpath,
         "filename",
-        directory="./image_data/image_folder/all",
+        directory=os.path.join(CURRDIR, "image_data/image_folder/all"),
         val_filepath=val_fpath,
         label_columns=["cat", "dog"],
         data_aug=vis.get_data_aug(horizontal_flip=True),
@@ -105,7 +108,7 @@ def images_from_csv():
 
 def images_from_fname():
     trn, val, preproc = vis.images_from_fname(
-        "./image_data/image_folder/all",
+        os.path.join(CURRDIR, "image_data/image_folder/all"),
         pattern=r"([^/]+)\.\d+.jpg$",
         val_pct=0.25,
         random_state=42,
@@ -116,7 +119,7 @@ def images_from_fname():
 
 def images_from_fname_regression():
     trn, val, preproc = vis.images_from_fname(
-        "./image_data/image_folder/all",
+        os.path.join(CURRDIR, "image_data/image_folder/all"),
         pattern=r"[^/]+\.(\d+).jpg$",
         val_pct=0.25,
         random_state=42,
@@ -254,7 +257,9 @@ class TestImageData(TestCase):
         self.assertEqual(U.y_from_data(trn).shape, (nsamples, 2))
         self.assertFalse(U.bert_data_tuple(trn))
         self.assertEqual(preproc.get_classes(), ["cat", "dog"])
-        (gen, steps) = preproc.preprocess("./image_data/image_folder/all")
+        (gen, steps) = preproc.preprocess(
+            os.path.join(CURRDIR, "image_data/image_folder/all")
+        )
         self.assertEqual(type(gen).__name__, "DirectoryIterator")
         self.assertEqual(steps, 1)
 
@@ -269,7 +274,9 @@ class TestImageData(TestCase):
         self.assertEqual(U.y_from_data(trn).shape, (nsamples,))
         self.assertFalse(U.bert_data_tuple(trn))
         self.assertEqual(preproc.get_classes(), [])
-        (gen, steps) = preproc.preprocess("./image_data/image_folder/all")
+        (gen, steps) = preproc.preprocess(
+            os.path.join(CURRDIR, "image_data/image_folder/all")
+        )
         self.assertEqual(type(gen).__name__, "DirectoryIterator")
         self.assertEqual(steps, 1)
 
