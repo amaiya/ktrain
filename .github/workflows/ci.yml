@@ -15,10 +15,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python 3.10
+      - name: Set up Python 3.10.0
         uses: actions/setup-python@v2
         with:
-          python-version: 3.10
+          python-version: 3.10.0
       - name: Install pip dependencies
         run: | 
             pip install -U pip wheel
@@ -30,7 +30,7 @@ jobs:
       - name: Show installed pip dependencies
         run: pip freeze
       - name: Run tests 
-        # tests basic ML pipeline using latest TensorFlow
+        # tests basic ML pipeline using latest TensorFlow and the Python version shipped with latest Ubuntu LTS release
         # full integration tests on real datasets are run offline prior to releases
         run: |
             python3 ./tests/test_dataloading.py
