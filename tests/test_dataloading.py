@@ -76,8 +76,8 @@ def texts_from_csv_int(preprocess_mode="standard"):
 
 
 def entities_from_conll2003():
-    TDATA = os.path.join(CURRDIR, "conll2003/train.txt")
-    VDATA = os.path.join(CURRDIR, "conll2003/valid.txt")
+    TDATA = os.path.join(CURRDIR, "resources/conll2003/train.txt")
+    VDATA = os.path.join(CURRDIR, "resources/conll2003/valid.txt")
     (trn, val, preproc) = txt.entities_from_conll2003(TDATA, val_filepath=VDATA)
     return (trn, val, preproc)
 

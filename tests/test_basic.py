@@ -21,7 +21,7 @@ CURRDIR = os.path.dirname(__file__)
 class TestTextClassification(TestCase):
     def test_fasttext_chinese(self):
         trn, val, preproc = txt.texts_from_csv(
-            os.path.join(CURRDIR, "resources/ext_data/chinese_hotel_reviews.csv"),
+            os.path.join(CURRDIR, "resources/text_data/chinese_hotel_reviews.csv"),
             "content",
             label_columns=["pos", "neg"],
             max_features=30000,

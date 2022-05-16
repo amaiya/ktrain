@@ -30,6 +30,5 @@ jobs:
         run: pip freeze
       - name: Run tests
         run: |
-            pwd
-            ls
             python3 ./tests/test_dataloading.py
+            python3 ./tests/test_basic.py
