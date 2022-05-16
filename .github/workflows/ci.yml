@@ -25,8 +25,9 @@ jobs:
             pip install -e .
             pip install ipython
             pip install tensorflow_cpu
-            pip install https://github.com/amaiya/stellargraph/archive/refs/heads/no_tf_dep_082.zip
+            pip install jinja2==3.0.3 # eli5 dep issue
             pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip
+            pip install https://github.com/amaiya/stellargraph/archive/refs/heads/no_tf_dep_082.zip
       - name: Show installed pip dependencies
         run: pip freeze
       - name: Run tests
