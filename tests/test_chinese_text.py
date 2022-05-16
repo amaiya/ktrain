@@ -18,7 +18,7 @@ from ktrain.imports import ACC_NAME, VAL_ACC_NAME
 class TestTextClassification(TestCase):
     def test_fasttext_chinese(self):
         trn, val, preproc = txt.texts_from_csv(
-            "./text_data/chinese_hotel_reviews.csv",
+            "./resources/ext_data/chinese_hotel_reviews.csv",
             "content",
             label_columns=["pos", "neg"],
             max_features=30000,

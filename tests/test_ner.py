@@ -17,7 +17,7 @@ from ktrain import text as txt
 
 class TestNERClassification(TestCase):
     def setUp(self):
-        TDATA = "conll2003/train.txt"
+        TDATA = "resources/conll2003/train.txt"
         (trn, val, preproc) = txt.entities_from_txt(TDATA)
         self.trn = trn
         self.val = val

@@ -17,7 +17,9 @@ class TestLinkPrediction(TestCase):
     def test_cora(self):
 
         (trn, val, preproc) = gr.graph_links_from_csv(
-            "graph_data/cora/cora.content", "graph_data/cora/cora.cites", sep="\t"
+            "resources/graph_data/cora/cora.content",
+            "resources/graph_data/cora/cora.cites",
+            sep="\t",
         )
 
         learner = ktrain.get_learner(

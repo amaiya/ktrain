@@ -17,8 +17,8 @@ class TestNodeClassification(TestCase):
     def test_cora(self):
 
         (trn, val, preproc, df_holdout, G_complete) = gr.graph_nodes_from_csv(
-            "graph_data/cora/cora.content",
-            "graph_data/cora/cora.cites",
+            "resources/graph_data/cora/cora.content",
+            "resources/graph_data/cora/cora.cites",
             sample_size=20,
             holdout_pct=0.1,
             holdout_for_inductive=True,
