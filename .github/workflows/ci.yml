@@ -15,22 +15,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python 3.7
+      - name: Set up Python 3.9
         uses: actions/setup-python@v2
         with:
-          python-version: 3.7
+          python-version: 3.9
       - name: Install pip dependencies
         run: | 
             pip install -U pip wheel
             pip install -e .
             pip install ipython
-            pip install tensorflow_cpu==2.8.0
+            pip install tensorflow_cpu
             pip install https://github.com/amaiya/stellargraph/archive/refs/heads/no_tf_dep_082.zip
             pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip
       - name: Show installed pip dependencies
         run: pip freeze
       - name: Run tests
         run: |
-            #python3 ./tests/test_dataloading.py
-            #python3 ./tests/test_basic.py
-            python3 -c 'import eli5; from eli5.lime import TextExplainer'
+            python3 ./tests/test_dataloading.py
+            python3 ./tests/test_basic.py
