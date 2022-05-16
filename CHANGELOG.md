@@ -13,6 +13,7 @@ Most recent releases are shown at the top. Each release shows:
 
 ### changed
 - Allow for returning prediction probabilities when merging tokens in sequence-tagging (PR #445)
+- added basic ML pipeline test to workflow using latest TensorFlow
 
 ### fixed:
 - N/A
