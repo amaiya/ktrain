@@ -15,10 +15,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python 3.9
+      - name: Set up Python 3.10
         uses: actions/setup-python@v2
         with:
-          python-version: 3.9
+          python-version: 3.10
       - name: Install pip dependencies
         run: | 
             pip install -U pip wheel
@@ -29,7 +29,9 @@ jobs:
             pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip
       - name: Show installed pip dependencies
         run: pip freeze
-      - name: Run tests
+      - name: Run tests 
+        # tests basic ML pipeline using latest TensorFlow
+        # full integration tests on real datasets are run offline prior to releases
         run: |
             python3 ./tests/test_dataloading.py
             python3 ./tests/test_basic.py
