@@ -16,7 +16,7 @@ class TestTextExtraction(TestCase):
 
     # @skip('temporarily disabled')
     def test_tika_extract(self):
-        path = "./text_data/ktrain.pdf"
+        path = "./resources/text_data/ktrain.pdf"
         from ktrain.text import TextExtractor
 
         te = TextExtractor(use_tika=True)
@@ -25,7 +25,7 @@ class TestTextExtraction(TestCase):
 
     # @skip('temporarily disabled')
     def test_textract_extract(self):
-        path = "./text_data/ktrain.pdf"
+        path = "./resources/text_data/ktrain.pdf"
         from ktrain.text import TextExtractor
 
         te = TextExtractor(use_tika=False)
