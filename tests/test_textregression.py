@@ -26,7 +26,7 @@ class TestTextRegression(TestCase):
         # wine price dataset should be downloaded
         # from: https://github.com/floydhub/regression-template
         # and prepared as described in the wide-deep.ipynb notebook
-        path = "./text_data/wines.csv"
+        path = "./resources/text_data/wines.csv"
         data = pd.read_csv(path)
         data = data.sample(frac=1.0, random_state=42)
 

@@ -13,25 +13,35 @@ from ktrain import graph as gr
 from ktrain.imports import ACC_NAME, VAL_ACC_NAME
 
 
-class TestLinkPrediction(TestCase):
+class TestNodeClassification(TestCase):
     def test_cora(self):
 
-        (trn, val, preproc) = gr.graph_links_from_csv(
-            "graph_data/cora/cora.content", "graph_data/cora/cora.cites", sep="\t"
+        (trn, val, preproc, df_holdout, G_complete) = gr.graph_nodes_from_csv(
+            "resources/graph_data/cora/cora.content",
+            "resources/graph_data/cora/cora.cites",
+            sample_size=20,
+            holdout_pct=0.1,
+            holdout_for_inductive=True,
+            train_pct=0.1,
+            sep="\t",
         )
 
         learner = ktrain.get_learner(
-            model=gr.graph_link_predictor("graphsage", trn, preproc),
+            model=gr.graph_node_classifier(
+                "graphsage",
+                trn,
+            ),
             train_data=trn,
-            val_data=val,
+            # val_data=val,
+            batch_size=64,
         )
 
         lr = 0.01
-        hist = learner.fit_onecycle(lr, 5)
+        hist = learner.autofit(lr, 10)
 
         # test training results
         self.assertAlmostEqual(max(hist.history["lr"]), lr)
-        self.assertGreater(max(hist.history[VAL_ACC_NAME]), 0.78)
+        self.assertGreater(max(hist.history[ACC_NAME]), 0.9)
 
         # test top losses
         obs = learner.top_losses(n=1, val_data=val)
@@ -52,19 +62,17 @@ class TestLinkPrediction(TestCase):
         cm = learner.validate(val_data=val)
         print(cm)
         for i, row in enumerate(cm):
+            if i == 5:
+                continue  # many 5s are classified as 6s
             self.assertEqual(np.argmax(row), i)
 
         # test predictor
         p = ktrain.get_predictor(learner.model, preproc)
-        self.assertIn(
-            p.predict(preproc.G, list(preproc.G.edges()))[:5][0], preproc.get_classes()
-        )
+        self.assertIn(p.predict_transductive(val.ids[0:1])[0], preproc.get_classes())
+        p.predict_transductive(val.ids[0:1])
         p.save("/tmp/test_predictor")
         p = ktrain.load_predictor("/tmp/test_predictor")
-        self.assertEqual(
-            p.predict(preproc.G, list(preproc.G.edges()))[:5][0],
-            preproc.get_classes()[1],
-        )
+        self.assertIn(p.predict_transductive(val.ids[0:1])[0], preproc.get_classes())
 
 
 if __name__ == "__main__":

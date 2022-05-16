@@ -16,7 +16,7 @@ from ktrain.imports import ACC_NAME, VAL_ACC_NAME
 
 class TestTabular(TestCase):
     def test_classification(self):
-        train_df = pd.read_csv("tabular_data/train.csv", index_col=0)
+        train_df = pd.read_csv("resources/tabular_data/train.csv", index_col=0)
         train_df = train_df.drop("Name", 1)
         train_df = train_df.drop("Ticket", 1)
         trn, val, preproc = tabular.tabular_from_df(
@@ -63,7 +63,7 @@ class TestTabular(TestCase):
 
     def test_regression(self):
         trn, val, preproc = tabular.tabular_from_csv(
-            "tabular_data/adults.csv",
+            "resources/tabular_data/adults.csv",
             label_columns=["age"],
             is_regression=True,
             random_state=42,
@@ -100,7 +100,7 @@ class TestTabular(TestCase):
         # test predictor
         p = ktrain.get_predictor(learner.model, preproc)
 
-        train_df = pd.read_csv("tabular_data/adults.csv")
+        train_df = pd.read_csv("resources/tabular_data/adults.csv")
         age = p.predict(train_df)[0][0]
         self.assertLess(age, 100)
         p.save("/tmp/test_predictor")

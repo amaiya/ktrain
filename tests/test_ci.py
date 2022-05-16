@@ -13,7 +13,7 @@ from ktrain import tabular
 def adult_census():
     import pandas as pd
 
-    df = pd.read_csv("tabular_data/adults.csv")
+    df = pd.read_csv("resources/tabular_data/adults.csv")
     df = df.rename(columns=lambda x: x.strip())
     df = df.applymap(lambda x: x.strip() if isinstance(x, str) else x)
     filter_set = "Doctorate"

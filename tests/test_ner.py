@@ -9,7 +9,7 @@ import IPython
 import numpy as np
 import testenv
 
-os.environ["DISABLE_V2_BEHAVIOR"] = "1"
+os.environ["DISABLE_V2_BEHAVIOR"] = "0"
 
 import ktrain
 from ktrain import text as txt
@@ -17,17 +17,16 @@ from ktrain import text as txt
 
 class TestNERClassification(TestCase):
     def setUp(self):
-        TDATA = "conll2003/train.txt"
-        (trn, val, preproc) = txt.entities_from_txt(TDATA, use_char=True)
+        TDATA = "resources/conll2003/train.txt"
+        (trn, val, preproc) = txt.entities_from_txt(TDATA)
         self.trn = trn
         self.val = val
         self.preproc = preproc
 
     def test_ner(self):
-        wv_url = (
-            "https://dl.fbaipublicfiles.com/fasttext/vectors-crawl/cc.en.300.vec.gz"
+        model = txt.sequence_tagger(
+            "bilstm-transformer", self.preproc, transformer_model="bert-base-cased"
         )
-        model = txt.sequence_tagger("bilstm-crf", self.preproc, wv_path_or_url=wv_url)
         learner = ktrain.get_learner(
             model, train_data=self.trn, val_data=self.val, batch_size=128
         )
@@ -36,7 +35,7 @@ class TestNERClassification(TestCase):
 
         # test training results
         # self.assertAlmostEqual(max(hist.history['lr']), lr)
-        self.assertGreater(learner.validate(), 0.65)
+        self.assertGreater(learner.validate(), 0.79)
 
         # test top losses
         obs = learner.top_losses(n=1)
@@ -59,6 +58,10 @@ class TestNERClassification(TestCase):
         p.save("/tmp/test_predictor")
         p = ktrain.load_predictor("/tmp/test_predictor")
         self.assertEqual(p.predict(SENT)[-2][1], "I-PER")
+        merged_prediction = p.predict(SENT, merge_tokens=True, return_offsets=True)
+        self.assertEqual(merged_prediction[0][0], "John Smith")
+        self.assertEqual(merged_prediction[0][1], "PER")
+        self.assertEqual(merged_prediction[0][2], (21, 31))
 
 
 if __name__ == "__main__":

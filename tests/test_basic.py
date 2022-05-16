@@ -2,6 +2,7 @@
 """
 Tests of ktrain text classification flows
 """
+import os.path
 from unittest import TestCase, main, skip
 
 import IPython
@@ -10,15 +11,17 @@ import testenv
 
 import ktrain
 from ktrain import text as txt
+from ktrain.imports import ACC_NAME, VAL_ACC_NAME
 
 TEST_DOC = "还好，床很大而且很干净，前台很友好，很满意，下次还来。"
-from ktrain.imports import ACC_NAME, VAL_ACC_NAME
+
+CURRDIR = os.path.dirname(__file__)
 
 
 class TestTextClassification(TestCase):
     def test_fasttext_chinese(self):
         trn, val, preproc = txt.texts_from_csv(
-            "./text_data/chinese_hotel_reviews.csv",
+            os.path.join(CURRDIR, "resources/text_data/chinese_hotel_reviews.csv"),
             "content",
             label_columns=["pos", "neg"],
             max_features=30000,

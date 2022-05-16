@@ -49,7 +49,7 @@ class TestShallowNLP(TestCase):
 
     # @skip('temporarily disabled')
     def test_classifier_chinese(self):
-        fpath = "./text_data/chinese_hotel_reviews.csv"
+        fpath = "./resources/text_data/chinese_hotel_reviews.csv"
         (x_train, y_train, label_names) = snlp.Classifier.load_texts_from_csv(
             fpath, text_column="content", label_column="pos", sep="|"
         )

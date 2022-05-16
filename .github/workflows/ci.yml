@@ -1,0 +1,37 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: psf/black@stable
+        with:
+            options: "--check --verbose"
+            src: "./ktrain"
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+      - name: Install pip dependencies
+        run: | 
+            pip install -U pip wheel
+            pip install -e .
+            pip install ipython
+            pip install tensorflow_cpu
+            pip install jinja2==3.0.3 # eli5 dep issue
+            pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip
+      - name: Show installed pip dependencies
+        run: pip freeze
+      - name: Run tests 
+        # tests basic ML pipeline using latest TensorFlow
+        # full integration tests on real datasets are run offline prior to releases
+        run: |
+            python3 ./tests/test_dataloading.py
+            python3 ./tests/test_basic.py

@@ -278,7 +278,7 @@ print(time.time() - start)
 from ktrain.text.speech import Transcriber
 
 transcriber = Transcriber()
-afiles = ["text_data/sample.wav"]
+afiles = ["resources/text_data/sample.wav"]
 start = time.time()
 result = transcriber.transcribe(afiles)
 print(time.time() - start)
@@ -289,7 +289,7 @@ print(result)
 from ktrain.vision.caption import ImageCaptioner
 
 ic = ImageCaptioner()
-ifiles = ["image_data/squirrel.jpg"]
+ifiles = ["resources/image_data/squirrel.jpg"]
 start = time.time()
 result = ic.caption(ifiles)
 print(time.time() - start)

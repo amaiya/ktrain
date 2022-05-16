@@ -340,7 +340,8 @@ def decode_by_line(texts, encoding="utf-8", verbose=1):
 
 def detect_encoding(texts, sample_size=32):
     if not isinstance(texts, list):
-        texts = [texts]  # check for instance of list as bytes are supplied as input
+        # check for instance of list as bytes are supplied as input
+        texts = [texts]
     lst = [chardet.detect(doc)["encoding"] for doc in texts[:sample_size]]
     encoding = max(set(lst), key=lst.count)
     # standardize to utf-8 to prevent BERT problems
@@ -402,7 +403,7 @@ def sent_tokenize(text, lang=None):
 # paragraphs.append(sents)
 # return paragraphs
 
-## tokenizer_filter = rs='!"#$%&()*+,-./:;<=>?@[\\]^_`{|}~\t\n'
+# tokenizer_filter = rs='!"#$%&()*+,-./:;<=>?@[\\]^_`{|}~\t\n'
 # re_tok = re.compile(f"([{string.punctuation}“”¨«»®´·º½¾¿¡§£₤‘’])")
 # def tokenize(s, join_tokens=False, join_char=" "):
 #    tokens = re_tok.sub(r" \1 ", s).split()
@@ -497,6 +498,8 @@ def extract_offsets(sentence, tokens=None, tokenizer=tokenize):
     offsets = []
     last_end = 0
     for t in tokens:
+        if t == "":  # t[0] doesn't exist for empty strings
+            continue
         # find start of current token
         for start_ind in range(last_end, len(sentence)):
             if sentence[start_ind] == t[0]:

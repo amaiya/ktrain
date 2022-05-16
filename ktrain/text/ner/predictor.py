@@ -58,10 +58,10 @@ class NERPredictor(Predictor):
             raise ValueError(
                 "Param sentence must be either string-representation of a sentence or a list of sentence strings."
             )
-        if return_proba and merge_tokens:
-            raise ValueError(
-                "return_proba and merge_tokens are mutually exclusive with one another."
-            )
+        # if return_proba and merge_tokens:
+        #     raise ValueError(
+        #         "return_proba and merge_tokens are mutually exclusive with one another."
+        #     )
         if isinstance(sentences, str):
             sentences = [sentences]
         lang = TU.detect_lang(sentences)
@@ -107,6 +107,8 @@ class NERPredictor(Predictor):
                         ]
                     else:
                         result = [(x[i], y[i], prob[i]) for i in range(len(x))]
+                    if merge_tokens:
+                        result = self.merge_tokens(result, lang, True)
                     results.append(result)
             else:
                 for i, (x, y) in enumerate(zip(nerseq.x, y_labels)):
@@ -120,13 +122,13 @@ class NERPredictor(Predictor):
                     else:
                         result = list(zip(x, y))
                     if merge_tokens:
-                        result = self.merge_tokens(result, lang)
+                        result = self.merge_tokens(result, lang, False)
                     results.append(result)
         if not is_array:
             results = results[0]
         return results
 
-    def merge_tokens(self, annotated_sentence, lang):
+    def merge_tokens(self, annotated_sentence, lang, return_proba):
 
         if TU.is_chinese(
             lang, strict=False
@@ -137,6 +139,7 @@ class NERPredictor(Predictor):
 
         current_token = ""
         current_tag = ""
+        prob_list = []
         entities = []
         start = None
         last_end = None
@@ -144,7 +147,11 @@ class NERPredictor(Predictor):
         for tup in annotated_sentence:
             token = tup[0]
             entity = tup[1]
-            offsets = tup[2] if len(tup) > 2 else None
+            if return_proba:
+                prob = tup[2]
+                offsets = tup[3] if len(tup) > 3 else None
+            else:
+                offsets = tup[2] if len(tup) > 2 else None
             tag = entity.split("-")[1] if "-" in entity else None
             prefix = entity.split("-")[0] if "-" in entity else None
             # not within entity
@@ -156,9 +163,10 @@ class NERPredictor(Predictor):
                 if current_token:  # consecutive entities
                     entities.append(
                         self._build_merge_tuple(
-                            current_token, current_tag, start, last_end
+                            current_token, current_tag, start, last_end, prob_list
                         )
                     )
+                    prob_list = []
                     current_token = ""
                     current_tag = None
                     start, end = None, None
@@ -166,29 +174,42 @@ class NERPredictor(Predictor):
                 current_tag = tag
                 start = offsets[0] if offsets else None
                 last_end = offsets[1] if offsets else None
+                if return_proba:
+                    prob_list.append(prob)
             # end of entity
             elif tag is None and current_token:
                 entities.append(
-                    self._build_merge_tuple(current_token, current_tag, start, last_end)
+                    self._build_merge_tuple(
+                        current_token, current_tag, start, last_end, prob_list
+                    )
                 )
+                prob_list = []
                 current_token = ""
                 current_tag = None
                 continue
             # within entity
-            elif tag and current_token:  #  prefix I
+            elif tag and current_token:  # prefix I
                 current_token = current_token + sep + token
                 current_tag = tag
                 last_end = offsets[1] if offsets else None
+                if return_proba:
+                    prob_list.append(prob)
         if current_token and current_tag:
             entities.append(
-                self._build_merge_tuple(current_token, current_tag, start, last_end)
+                self._build_merge_tuple(
+                    current_token, current_tag, start, last_end, prob_list
+                )
             )
         return entities
 
-    def _build_merge_tuple(self, current_token, current_tag, start=None, end=None):
+    def _build_merge_tuple(
+        self, current_token, current_tag, start=None, end=None, prob_list=[]
+    ):
         entry = [current_token, current_tag]
         if start is not None and end is not None:
             entry.append((start, end))
+        if prob_list:
+            entry.append(np.mean(prob_list))
         return tuple(entry)
 
     def _save_preproc(self, fpath):
