@@ -368,7 +368,8 @@ def decode_by_line(texts, encoding=&#34;utf-8&#34;, verbose=1):
 
 def detect_encoding(texts, sample_size=32):
     if not isinstance(texts, list):
-        texts = [texts]  # check for instance of list as bytes are supplied as input
+        # check for instance of list as bytes are supplied as input
+        texts = [texts]
     lst = [chardet.detect(doc)[&#34;encoding&#34;] for doc in texts[:sample_size]]
     encoding = max(set(lst), key=lst.count)
     # standardize to utf-8 to prevent BERT problems
@@ -430,7 +431,7 @@ def sent_tokenize(text, lang=None):
 # paragraphs.append(sents)
 # return paragraphs
 
-## tokenizer_filter = rs=&#39;!&#34;#$%&amp;()*+,-./:;&lt;=&gt;?@[\\]^_`{|}~\t\n&#39;
+# tokenizer_filter = rs=&#39;!&#34;#$%&amp;()*+,-./:;&lt;=&gt;?@[\\]^_`{|}~\t\n&#39;
 # re_tok = re.compile(f&#34;([{string.punctuation}“”¨«»®´·º½¾¿¡§£₤‘’])&#34;)
 # def tokenize(s, join_tokens=False, join_char=&#34; &#34;):
 #    tokens = re_tok.sub(r&#34; \1 &#34;, s).split()
@@ -525,6 +526,8 @@ def extract_offsets(sentence, tokens=None, tokenizer=tokenize):
     offsets = []
     last_end = 0
     for t in tokens:
+        if t == &#34;&#34;:  # t[0] doesn&#39;t exist for empty strings
+            continue
         # find start of current token
         for start_ind in range(last_end, len(sentence)):
             if sentence[start_ind] == t[0]:
@@ -619,7 +622,8 @@ def extract_offsets(sentence, tokens=None, tokenizer=tokenize):
 </summary>
 <pre><code class="python">def detect_encoding(texts, sample_size=32):
     if not isinstance(texts, list):
-        texts = [texts]  # check for instance of list as bytes are supplied as input
+        # check for instance of list as bytes are supplied as input
+        texts = [texts]
     lst = [chardet.detect(doc)[&#34;encoding&#34;] for doc in texts[:sample_size]]
     encoding = max(set(lst), key=lst.count)
     # standardize to utf-8 to prevent BERT problems
@@ -860,6 +864,8 @@ Return:
     offsets = []
     last_end = 0
     for t in tokens:
+        if t == &#34;&#34;:  # t[0] doesn&#39;t exist for empty strings
+            continue
         # find start of current token
         for start_ind in range(last_end, len(sentence)):
             if sentence[start_ind] == t[0]:
