@@ -24,8 +24,9 @@ class TestKeywordExtraction(TestCase):
          'reasonable' way (see inductive bias)."""
         kwe = KeywordExtractor()
         result = kwe.extract_keywords(text)
+        print(result)
         self.assertEqual(result[0][0], "supervised learning")
-        self.assertAlmostEqual(result[0][1], 0.07317073170731707)
+        self.assertAlmostEqual(round(result[0][1], 2), 0.07)
 
 
 if __name__ == "__main__":

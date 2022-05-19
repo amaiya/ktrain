@@ -92,6 +92,7 @@ class KeywordExtractor:
         candidate_generator="ngrams",
         constrain_unigram_case=True,
         maxlen=64,
+        minchars=3,
     ):
         """
         ```
@@ -111,6 +112,7 @@ class KeywordExtractor:
                                        If True, only unigrams in uppercase are returned (e.g., LDA, SVM, NASA).
                                        True is recommended.
           maxlen(int): maximum number of characters in keyphrase. Default:64
+          minchars(int): Minimum number of characters in keyword (default:3)
 
           Returns:
             list
@@ -180,9 +182,9 @@ class KeywordExtractor:
                 [
                     kw
                     for kw in grams
-                    if kw[0].isalpha()
+                    if any([c.isalpha() for c in kw[:3]])
                     and len([w for w in kw if not w.isspace() and w not in ["-", "."]])
-                    >= 3
+                    >= minchars
                     and (kw[-1].isalpha() or kw[-1].isdigit())
                     and "@" not in kw
                 ]
