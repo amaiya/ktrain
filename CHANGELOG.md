@@ -12,7 +12,7 @@ Most recent releases are shown at the top. Each release shows:
 - N/A
 
 ### changed
-- added `minchars` argument to `KeywordExtractor`
+- added `truncate_to` argument (default:5000) and `minchars` argument (default:3) argument to `KeywordExtractor.extract_keywords` method. 
 
 ### fixed:
 - N/A
