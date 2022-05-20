@@ -34,16 +34,16 @@ kwe = KeywordExtractor()
 kwe.extract_keywords(text, candidate_generator='noun_phrases')
 
 # OUTPUT
-#[('machine learning', 0.0784313725490196),
-# ('text classification', 0.049019607843137254),
-# ('image classification', 0.049019607843137254),
-# ('exact answers', 0.0392156862745098),
-# ('augmented machine learning', 0.0392156862745098),
-# ('graph data', 0.029411764705882353),
-# ('node classification', 0.029411764705882353),
-# ('entity recognition', 0.029411764705882353),
-# ('code example', 0.029411764705882353),
-# ('index documents', 0.029411764705882353)]
+[('machine learning', 0.5341716824761019),
+ ('augmented machine learning', 0.5208544167057394),
+ ('text classification', 0.5134074336523509),
+ ('image classification', 0.5071170746851726),
+ ('node classification', 0.4973034499292447),
+ ('tabular data', 0.49645958463369566),
+ ('entity recognition', 0.45195059648705926),
+ ('exact answers', 0.4462502183477142),
+ ('import ktrain', 0.32891369271775894),
+ ('load model', 0.32052348289886556)]
 ```
 - **2022-01-28**
   - **ktrain v0.29.x** is released and includes miscellaneous enhancements contributed by [Sandy Khosasi](https://github.com/ilos-vigil) such as [support for MobileNetV3 and EfficientNet](https://colab.research.google.com/drive/1EJHpMVG6fBCg33UPla_Ly_6LQdswU2Ur?usp=sharing), [plotting improvements](https://colab.research.google.com/drive/1_WaRQ0J4g0VTn6HWS3kszdFZbBBWoa7R?usp=sharing), and [raw confidence scores in QA](https://colab.research.google.com/drive/1ParprLN9hFX6cxJ1w7bv91PYx4o0J1zm?usp=sharing).

@@ -156,7 +156,6 @@ class KeywordExtractor:
         else:
             noun_phrases = blob.noun_phrases
             for np in noun_phrases:
-                print(np)
                 words = np.split()
                 n = len(words)
                 if n not in ngram_lens:
