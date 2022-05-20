@@ -93,6 +93,7 @@ class KeywordExtractor:
         constrain_unigram_case=True,
         maxlen=64,
         minchars=3,
+        truncate_to=5000,
     ):
         """
         ```
@@ -113,6 +114,8 @@ class KeywordExtractor:
                                        True is recommended.
           maxlen(int): maximum number of characters in keyphrase. Default:64
           minchars(int): Minimum number of characters in keyword (default:3)
+          truncate_to(int): Truncate input to this many words (default:5000, i.e., first 5K words).
+                            If None, no truncation is performed.
 
           Returns:
             list
@@ -131,6 +134,8 @@ class KeywordExtractor:
                 + 'Falling back to candidate_generator="ngrams"'
             )
             candidate_generator = "ngrams"
+
+        text = " ".join(text.split()[:truncate_to]) if truncate_to is not None else text
 
         blob = textblob.TextBlob(text)
         candidates = []
