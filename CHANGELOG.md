@@ -13,6 +13,7 @@ Most recent releases are shown at the top. Each release shows:
 
 ### changed
 - added `truncate_to` argument (default:5000) and `minchars` argument (default:3) argument to `KeywordExtractor.extract_keywords` method. 
+- added `score_by` argument to `KeywordExtractor.extract_keywords`.  Default is `freqpos`, which means keywords are now ranked by a combination of frequency and position in document.
 
 ### fixed:
 - N/A
