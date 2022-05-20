@@ -94,6 +94,7 @@ class KeywordExtractor:
         maxlen=64,
         minchars=3,
         truncate_to=5000,
+        score_by="freqpos",
     ):
         """
         ```
@@ -116,6 +117,11 @@ class KeywordExtractor:
           minchars(int): Minimum number of characters in keyword (default:3)
           truncate_to(int): Truncate input to this many words (default:5000, i.e., first 5K words).
                             If None, no truncation is performed.
+          score_by(str): one of:
+                         'freqpos': average of frequency and position scores
+                         'freq': frequency of occurrence
+                         'pos': position of first occurrence.
+                         Default is 'freqpos'
 
           Returns:
             list
@@ -150,6 +156,7 @@ class KeywordExtractor:
         else:
             noun_phrases = blob.noun_phrases
             for np in noun_phrases:
+                print(np)
                 words = np.split()
                 n = len(words)
                 if n not in ngram_lens:
@@ -172,6 +179,11 @@ class KeywordExtractor:
                             and constrain_unigram_case
                             and k[0].isupper()
                         )
+                        # or (
+                        #    candidate_generator == "noun_phrases"
+                        #    and constrain_unigram_case
+                        #    and k[0].upper() in text
+                        # )
                     )
                 ]
             else:
@@ -202,4 +214,18 @@ class KeywordExtractor:
         scores = [tup[1] for tup in tups if len(tup[0]) <= maxlen]
         scores = [float(i) / sum(scores) for i in scores]
         result = list(zip(keywords, scores))
-        return [r[0] for r in result[:top_n]] if omit_scores else result[:top_n]
+        result = result[:top_n]
+        if score_by in ["freqpos", "pos"]:
+            text = text.lower()
+            num_chars = len(text)
+            result_final = []
+            for r in result:
+                first_see = text.find(r[0])
+                first_see = num_chars - 1 if first_see < 0 else first_see
+                pos_score = 1 - float(first_see) / num_chars
+                score = pos_score if score_by == "pos" else (r[1] + pos_score) / 2
+                result_final.append((r[0], score))
+            result = result_final
+        result.sort(key=lambda y: y[1], reverse=True)
+
+        return [r[0] for r in result] if omit_scores else result
