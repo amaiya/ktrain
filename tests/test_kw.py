@@ -26,7 +26,7 @@ class TestKeywordExtraction(TestCase):
         result = kwe.extract_keywords(text)
         print(result)
         self.assertEqual(result[0][0], "supervised learning")
-        self.assertAlmostEqual(round(result[0][1], 2), 0.07)
+        self.assertAlmostEqual(round(result[0][1], 2), 0.54)
 
 
 if __name__ == "__main__":
