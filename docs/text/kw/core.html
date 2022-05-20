@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.9.2" />
+<meta name="generator" content="pdoc 0.10.0" />
 <title>ktrain.text.kw.core API documentation</title>
 <meta name="description" content="" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
@@ -120,6 +120,9 @@ class KeywordExtractor:
         candidate_generator=&#34;ngrams&#34;,
         constrain_unigram_case=True,
         maxlen=64,
+        minchars=3,
+        truncate_to=5000,
+        score_by=&#34;freqpos&#34;,
     ):
         &#34;&#34;&#34;
         ```
@@ -139,6 +142,14 @@ class KeywordExtractor:
                                        If True, only unigrams in uppercase are returned (e.g., LDA, SVM, NASA).
                                        True is recommended.
           maxlen(int): maximum number of characters in keyphrase. Default:64
+          minchars(int): Minimum number of characters in keyword (default:3)
+          truncate_to(int): Truncate input to this many words (default:5000, i.e., first 5K words).
+                            If None, no truncation is performed.
+          score_by(str): one of:
+                         &#39;freqpos&#39;: average of frequency and position scores
+                         &#39;freq&#39;: frequency of occurrence
+                         &#39;pos&#39;: position of first occurrence.
+                         Default is &#39;freqpos&#39;
 
           Returns:
             list
@@ -157,6 +168,8 @@ class KeywordExtractor:
                 + &#39;Falling back to candidate_generator=&#34;ngrams&#34;&#39;
             )
             candidate_generator = &#34;ngrams&#34;
+
+        text = &#34; &#34;.join(text.split()[:truncate_to]) if truncate_to is not None else text
 
         blob = textblob.TextBlob(text)
         candidates = []
@@ -193,6 +206,11 @@ class KeywordExtractor:
                             and constrain_unigram_case
                             and k[0].isupper()
                         )
+                        # or (
+                        #    candidate_generator == &#34;noun_phrases&#34;
+                        #    and constrain_unigram_case
+                        #    and k[0].upper() in text
+                        # )
                     )
                 ]
             else:
@@ -208,9 +226,9 @@ class KeywordExtractor:
                 [
                     kw
                     for kw in grams
-                    if kw[0].isalpha()
+                    if any([c.isalpha() for c in kw[:3]])
                     and len([w for w in kw if not w.isspace() and w not in [&#34;-&#34;, &#34;.&#34;]])
-                    &gt;= 3
+                    &gt;= minchars
                     and (kw[-1].isalpha() or kw[-1].isdigit())
                     and &#34;@&#34; not in kw
                 ]
@@ -223,7 +241,21 @@ class KeywordExtractor:
         scores = [tup[1] for tup in tups if len(tup[0]) &lt;= maxlen]
         scores = [float(i) / sum(scores) for i in scores]
         result = list(zip(keywords, scores))
-        return [r[0] for r in result[:top_n]] if omit_scores else result[:top_n]</code></pre>
+        result = result[:top_n]
+        if score_by in [&#34;freqpos&#34;, &#34;pos&#34;]:
+            text = text.lower()
+            num_chars = len(text)
+            result_final = []
+            for r in result:
+                first_see = text.find(r[0])
+                first_see = num_chars - 1 if first_see &lt; 0 else first_see
+                pos_score = 1 - float(first_see) / num_chars
+                score = pos_score if score_by == &#34;pos&#34; else (r[1] + pos_score) / 2
+                result_final.append((r[0], score))
+            result = result_final
+        result.sort(key=lambda y: y[1], reverse=True)
+
+        return [r[0] for r in result] if omit_scores else result</code></pre>
 </details>
 </section>
 <section>
@@ -304,6 +336,9 @@ Args:
         candidate_generator=&#34;ngrams&#34;,
         constrain_unigram_case=True,
         maxlen=64,
+        minchars=3,
+        truncate_to=5000,
+        score_by=&#34;freqpos&#34;,
     ):
         &#34;&#34;&#34;
         ```
@@ -323,6 +358,14 @@ Args:
                                        If True, only unigrams in uppercase are returned (e.g., LDA, SVM, NASA).
                                        True is recommended.
           maxlen(int): maximum number of characters in keyphrase. Default:64
+          minchars(int): Minimum number of characters in keyword (default:3)
+          truncate_to(int): Truncate input to this many words (default:5000, i.e., first 5K words).
+                            If None, no truncation is performed.
+          score_by(str): one of:
+                         &#39;freqpos&#39;: average of frequency and position scores
+                         &#39;freq&#39;: frequency of occurrence
+                         &#39;pos&#39;: position of first occurrence.
+                         Default is &#39;freqpos&#39;
 
           Returns:
             list
@@ -341,6 +384,8 @@ Args:
                 + &#39;Falling back to candidate_generator=&#34;ngrams&#34;&#39;
             )
             candidate_generator = &#34;ngrams&#34;
+
+        text = &#34; &#34;.join(text.split()[:truncate_to]) if truncate_to is not None else text
 
         blob = textblob.TextBlob(text)
         candidates = []
@@ -377,6 +422,11 @@ Args:
                             and constrain_unigram_case
                             and k[0].isupper()
                         )
+                        # or (
+                        #    candidate_generator == &#34;noun_phrases&#34;
+                        #    and constrain_unigram_case
+                        #    and k[0].upper() in text
+                        # )
                     )
                 ]
             else:
@@ -392,9 +442,9 @@ Args:
                 [
                     kw
                     for kw in grams
-                    if kw[0].isalpha()
+                    if any([c.isalpha() for c in kw[:3]])
                     and len([w for w in kw if not w.isspace() and w not in [&#34;-&#34;, &#34;.&#34;]])
-                    &gt;= 3
+                    &gt;= minchars
                     and (kw[-1].isalpha() or kw[-1].isdigit())
                     and &#34;@&#34; not in kw
                 ]
@@ -407,12 +457,26 @@ Args:
         scores = [tup[1] for tup in tups if len(tup[0]) &lt;= maxlen]
         scores = [float(i) / sum(scores) for i in scores]
         result = list(zip(keywords, scores))
-        return [r[0] for r in result[:top_n]] if omit_scores else result[:top_n]</code></pre>
+        result = result[:top_n]
+        if score_by in [&#34;freqpos&#34;, &#34;pos&#34;]:
+            text = text.lower()
+            num_chars = len(text)
+            result_final = []
+            for r in result:
+                first_see = text.find(r[0])
+                first_see = num_chars - 1 if first_see &lt; 0 else first_see
+                pos_score = 1 - float(first_see) / num_chars
+                score = pos_score if score_by == &#34;pos&#34; else (r[1] + pos_score) / 2
+                result_final.append((r[0], score))
+            result = result_final
+        result.sort(key=lambda y: y[1], reverse=True)
+
+        return [r[0] for r in result] if omit_scores else result</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
 <dt id="ktrain.text.kw.core.KeywordExtractor.extract_keywords"><code class="name flex">
-<span>def <span class="ident">extract_keywords</span></span>(<span>self, text, ngram_range=(1, 3), top_n=10, n_candidates=50, omit_scores=False, candidate_generator='ngrams', constrain_unigram_case=True, maxlen=64)</span>
+<span>def <span class="ident">extract_keywords</span></span>(<span>self, text, ngram_range=(1, 3), top_n=10, n_candidates=50, omit_scores=False, candidate_generator='ngrams', constrain_unigram_case=True, maxlen=64, minchars=3, truncate_to=5000, score_by='freqpos')</span>
 </code></dt>
 <dd>
 <div class="desc"><pre><code>simple keyword extraction
@@ -433,6 +497,14 @@ contrain_unigram_case(bool): Only applies if candidate_generator=='ngrams'.
                              If True, only unigrams in uppercase are returned (e.g., LDA, SVM, NASA).
                              True is recommended.
 maxlen(int): maximum number of characters in keyphrase. Default:64
+minchars(int): Minimum number of characters in keyword (default:3)
+truncate_to(int): Truncate input to this many words (default:5000, i.e., first 5K words).
+                  If None, no truncation is performed.
+score_by(str): one of:
+               'freqpos': average of frequency and position scores
+               'freq': frequency of occurrence
+               'pos': position of first occurrence.
+               Default is 'freqpos'
 
 Returns:
   list
@@ -451,6 +523,9 @@ Returns:
     candidate_generator=&#34;ngrams&#34;,
     constrain_unigram_case=True,
     maxlen=64,
+    minchars=3,
+    truncate_to=5000,
+    score_by=&#34;freqpos&#34;,
 ):
     &#34;&#34;&#34;
     ```
@@ -470,6 +545,14 @@ Returns:
                                    If True, only unigrams in uppercase are returned (e.g., LDA, SVM, NASA).
                                    True is recommended.
       maxlen(int): maximum number of characters in keyphrase. Default:64
+      minchars(int): Minimum number of characters in keyword (default:3)
+      truncate_to(int): Truncate input to this many words (default:5000, i.e., first 5K words).
+                        If None, no truncation is performed.
+      score_by(str): one of:
+                     &#39;freqpos&#39;: average of frequency and position scores
+                     &#39;freq&#39;: frequency of occurrence
+                     &#39;pos&#39;: position of first occurrence.
+                     Default is &#39;freqpos&#39;
 
       Returns:
         list
@@ -488,6 +571,8 @@ Returns:
             + &#39;Falling back to candidate_generator=&#34;ngrams&#34;&#39;
         )
         candidate_generator = &#34;ngrams&#34;
+
+    text = &#34; &#34;.join(text.split()[:truncate_to]) if truncate_to is not None else text
 
     blob = textblob.TextBlob(text)
     candidates = []
@@ -524,6 +609,11 @@ Returns:
                         and constrain_unigram_case
                         and k[0].isupper()
                     )
+                    # or (
+                    #    candidate_generator == &#34;noun_phrases&#34;
+                    #    and constrain_unigram_case
+                    #    and k[0].upper() in text
+                    # )
                 )
             ]
         else:
@@ -539,9 +629,9 @@ Returns:
             [
                 kw
                 for kw in grams
-                if kw[0].isalpha()
+                if any([c.isalpha() for c in kw[:3]])
                 and len([w for w in kw if not w.isspace() and w not in [&#34;-&#34;, &#34;.&#34;]])
-                &gt;= 3
+                &gt;= minchars
                 and (kw[-1].isalpha() or kw[-1].isdigit())
                 and &#34;@&#34; not in kw
             ]
@@ -554,7 +644,21 @@ Returns:
     scores = [tup[1] for tup in tups if len(tup[0]) &lt;= maxlen]
     scores = [float(i) / sum(scores) for i in scores]
     result = list(zip(keywords, scores))
-    return [r[0] for r in result[:top_n]] if omit_scores else result[:top_n]</code></pre>
+    result = result[:top_n]
+    if score_by in [&#34;freqpos&#34;, &#34;pos&#34;]:
+        text = text.lower()
+        num_chars = len(text)
+        result_final = []
+        for r in result:
+            first_see = text.find(r[0])
+            first_see = num_chars - 1 if first_see &lt; 0 else first_see
+            pos_score = 1 - float(first_see) / num_chars
+            score = pos_score if score_by == &#34;pos&#34; else (r[1] + pos_score) / 2
+            result_final.append((r[0], score))
+        result = result_final
+    result.sort(key=lambda y: y[1], reverse=True)
+
+    return [r[0] for r in result] if omit_scores else result</code></pre>
 </details>
 </dd>
 </dl>
@@ -587,7 +691,7 @@ Returns:
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
 </footer>
 </body>
 </html>
