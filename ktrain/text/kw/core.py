@@ -201,7 +201,8 @@ class KeywordExtractor:
                     if any([c.isalpha() for c in kw[:3]])
                     and len([w for w in kw if not w.isspace() and w not in ["-", "."]])
                     >= minchars
-                    and (kw[-1].isalpha() or kw[-1].isdigit())
+                    and kw[-1].isalnum()
+                    and kw[0].isalnum()
                     and "@" not in kw
                 ]
             )
