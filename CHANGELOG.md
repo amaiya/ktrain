@@ -6,14 +6,13 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
-## 0.31.2 (2022-05-20)
+## 0.31.3 (TBD)
 
 ### new:
 - N/A
 
 ### changed
-- added `truncate_to` argument (default:5000) and `minchars` argument (default:3) argument to `KeywordExtractor.extract_keywords` method. 
-- added `score_by` argument to `KeywordExtractor.extract_keywords`.  Default is `freqpos`, which means keywords are now ranked by a combination of frequency and position in document.
+- added `alnum` check to `KeywordExtractor`
 
 ### fixed:
 - N/A
