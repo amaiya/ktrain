@@ -12,7 +12,7 @@ Most recent releases are shown at the top. Each release shows:
 - N/A
 
 ### changed
-- added `alnum` check to `KeywordExtractor`
+- added `alnum` check and period check to `KeywordExtractor`
 
 ### fixed:
 - N/A
