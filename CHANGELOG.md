@@ -6,7 +6,7 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
-## 0.31.3 (TBD)
+## 0.31.3 (2022-07-15)
 
 ### new:
 - N/A
@@ -15,7 +15,7 @@ Most recent releases are shown at the top. Each release shows:
 - added `alnum` check and period check to `KeywordExtractor`
 
 ### fixed:
-- N/A
+- fixed bug in `text.qa.core` caused by previous refactoring of `paragraph_tokenize` and `tokenize`
 
 
 ## 0.31.1 (2022-05-17)

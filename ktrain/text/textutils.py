@@ -438,15 +438,17 @@ def paragraph_tokenize(
         elif join_sentences and not join_tokens:
             sents = [item for sublist in sents for item in sublist]
         paragraphs.append(sents)
-    paragraphs = paragraphs[0] if len(paragraphs) == 1 else paragraphs
+    # 20220715: moved to tokenize due to text/qa/core.py usage
+    # paragraphs = paragraphs[0] if len(paragraphs) == 1 else paragraphs
     return paragraphs
 
 
 def tokenize(s, join_tokens=False, join_sentences=True, join_char=" "):
     s = s.replace("\n", " ")
-    return paragraph_tokenize(
+    paragraphs = paragraph_tokenize(
         s, join_tokens=join_tokens, join_sentences=join_sentences, join_char=join_char
     )
+    return paragraphs[0] if len(paragraphs) == 1 else paragraphs
 
 
 def extract_noun_phrases(text):
