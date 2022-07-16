@@ -6,6 +6,7 @@
 </p>
 
 # Welcome to ktrain
+> **ktrain** is the "Swiss Army knife" of machine learning
 
 
 
