@@ -7,7 +7,7 @@
 </p>
 
 # Welcome to ktrain
-> A "Swiss Army knife" for machine learning
+> a "Swiss Army knife" for machine learning
 
 
 
