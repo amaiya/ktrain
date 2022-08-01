@@ -6,6 +6,19 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.31.4 (2022-08-01)
+
+### new:
+- N/A
+
+### changed
+- `TextPredictor.explain` and `ImagePredictor.explain` now use a different fork of `eli5`: `pip install https://github.com/amaiya/eli5-tf/archive/refs/heads/master.zip`
+
+### fixed:
+- Fixed `loss_fn_from_model` function to work with `DISABLE_V2_BEHAVIOR` properly
+- `TextPredictor.explain` and `ImagePredictor.explain` now work with `tensorflow>=2.9` and `scipy>=1.9` (due to new `eli5-tf` fork -- see above)
+
+
 ## 0.31.3 (2022-07-15)
 
 ### new:
