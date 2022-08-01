@@ -55,7 +55,7 @@ def is_ktrain_dataset(data):
 
 def loss_fn_from_model(model):
     # dep_fix
-    if version.parse(tf.__version__) < version.parse("2.2"):
+    if version.parse(tf.__version__) < version.parse("2.2") or DISABLE_V2_BEHAVIOR:
         return model.loss_functions[0].fn
     else:  # TF 2.2.0
         return model.compiled_loss._get_loss_object(
