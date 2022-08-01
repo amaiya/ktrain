@@ -2,6 +2,11 @@ from .. import utils as U
 from ..imports import *
 from .preprocessor import ImagePreprocessor
 
+try:
+    from tensorflow.keras.utils import img_to_array
+except ImportError:
+    img_to_array = keras.preprocessing.image.img_to_array
+
 
 def show_image(img_path):
     """
@@ -29,7 +34,7 @@ def show_random_images(img_folder, n=4, rows=1):
     for i in range(n):
         img_path = random.choice(fnames)
         img = keras.preprocessing.image.load_img(img_path)
-        x = keras.preprocessing.image.img_to_array(img)
+        x = img_to_array(img)
         x = x / 255.0
         ims.append(x)
     U.plots(ims, rows=rows)
@@ -55,7 +60,7 @@ def preview_data_aug(img_path, data_aug, rows=1, n=4):
     idg.preprocessing_function = None
 
     img = keras.preprocessing.image.load_img(img_path)
-    x = keras.preprocessing.image.img_to_array(img)
+    x = img_to_array(img)
     x = x / 255.0
     x = x.reshape((1,) + x.shape)
     i = 0
@@ -88,7 +93,7 @@ def preview_data_aug_OLD(img_path, data_aug, n=4):
     idg.preprocessing_function = None
 
     img = keras.preprocessing.image.load_img(img_path)
-    x = keras.preprocessing.image.img_to_array(img)
+    x = img_to_array(img)
     x = x / 255.0
     x = x.reshape((1,) + x.shape)
     i = 0
