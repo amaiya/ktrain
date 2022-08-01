@@ -292,8 +292,8 @@ def graph_links_from_csv(
     node_data = df
     node_features = node_data[feature_names].values
     for nid, f in zip(node_data.index, node_features):
-        G.node[nid][sg.globalvar.TYPE_ATTR_NAME] = "node"
-        G.node[nid]["feature"] = f
+        G.nodes[nid][sg.globalvar.TYPE_ATTR_NAME] = "node"
+        G.nodes[nid]["feature"] = f
 
     # ----------------------------------------------------------------
     # train/validation sets

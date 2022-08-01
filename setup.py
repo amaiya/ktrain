@@ -20,7 +20,7 @@ all_extras = [
     "textract",  # for TextExtractor
     "causalnlp",  # for tabular.causalinference
     "librosa",  # for text.speech
-    "torch==1.8.1",  # for qa, summarization, translation, zsl, speech
+    "torch",  # for qa, summarization, translation, zsl, speech
     "shap",  # for tabular.TabularPredictor.explain
     "eli5 @ git+https://github@github.com/amaiya/eli5-tf@master#egg=eli5",  # for explain in text/vision
     "stellargraph @ git+https://github@github.com/amaiya/stellargraph@no_tf_dep_082#egg=stellargraph",  # for graph module
