@@ -3,9 +3,9 @@ repos:
     rev: 22.3.0
     hooks:
       - id: black
-        #language_version: python3.6 
-  #- repo: https://github.com/pycqa/isort
-    #rev: 5.10.1
-    #hooks:
-      #- id: isort
-        #name: isort (python)
+        language_version: python3.6 
+  - repo: https://github.com/pycqa/isort
+    rev: 5.10.1
+    hooks:
+      - id: isort
+        name: isort (python)

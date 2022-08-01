@@ -32,7 +32,6 @@ class ImagePredictor(Predictor):
         Highlights image to explain prediction
         ```
         """
-
         try:
             import eli5
         except:
