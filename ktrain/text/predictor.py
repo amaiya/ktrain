@@ -132,17 +132,7 @@ class TextPredictor(Predictor):
         except:
             msg = (
                 "ktrain requires a forked version of eli5 to support tf.keras. "
-                + "Install with: pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip"
-            )
-            warnings.warn(msg)
-            return
-        if (
-            not hasattr(eli5, "KTRAIN_ELI5_TAG")
-            or eli5.KTRAIN_ELI5_TAG != KTRAIN_ELI5_TAG
-        ):
-            msg = (
-                "ktrain requires a forked version of eli5 to support tf.keras. It is either missing or not up-to-date. "
-                + "Uninstall the current version and install/re-install the fork with: pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip"
+                + "Install with: pip install https://github.com/amaiya/eli5-tf/archive/refs/heads/master.zip"
             )
             warnings.warn(msg)
             return

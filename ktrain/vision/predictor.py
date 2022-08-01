@@ -32,34 +32,15 @@ class ImagePredictor(Predictor):
         Highlights image to explain prediction
         ```
         """
-        # if U.is_tf_keras():
-        # warnings.warn("currently_unsupported: explain() method is not available because tf.keras is "+\
-        # "not yet adequately supported by the eli5 library. You can switch to " +\
-        # "stand-alone Keras by setting os.environ['TF_KERAS']='0'" )
-        # return
 
         try:
             import eli5
         except:
             msg = (
                 "ktrain requires a forked version of eli5 to support tf.keras. "
-                + "Install with: pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip"
+                + "Install with: pip install https://github.com/amaiya/eli5-tf/archive/refs/heads/master.zip"
             )
             warnings.warn(msg)
-            return
-
-        # if not hasattr(eli5, 'KTRAIN'):
-        if (
-            not hasattr(eli5, "KTRAIN_ELI5_TAG")
-            or eli5.KTRAIN_ELI5_TAG != KTRAIN_ELI5_TAG
-        ):
-            warnings.warn(
-                "Since eli5 does not yet support tf.keras, ktrain uses a forked version of eli5.  "
-                + "We do not detect this forked version (or it is out-of-date), so predictor.explain may not work.  "
-                + "It will work if you uninstall the current version of eli5 and install "
-                + "the forked version:  "
-                + "pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip"
-            )
             return
 
         if not DISABLE_V2_BEHAVIOR:

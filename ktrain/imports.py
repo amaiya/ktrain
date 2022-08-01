@@ -15,6 +15,7 @@ os.environ[
 ] = "8"  # suppress warning from NumExpr on machines with many CPUs
 
 # TensorFlow
+os.environ["TF_KERAS"] = "1"  # needed for eli5-tf
 SUPPRESS_DEP_WARNINGS = strtobool(os.environ.get("SUPPRESS_DEP_WARNINGS", "1"))
 if (
     SUPPRESS_DEP_WARNINGS

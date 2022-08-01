@@ -361,7 +361,7 @@ The above should be all you need on Linux systems and cloud computing environmen
 # for graph module:
 pip install https://github.com/amaiya/stellargraph/archive/refs/heads/no_tf_dep_082.zip
 # for text.TextPredictor.explain and vision.ImagePredictor.explain:
-pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip
+pip install https://github.com/amaiya/eli5-tf/archive/refs/heads/master.zip
 # for tabular.TabularPredictor.explain:
 pip install shap
 # for text.zsl (ZeroShotClassifier), text.summarization, text.translation, text.speech:
