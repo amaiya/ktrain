@@ -6,13 +6,13 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
-## 0.31.6 (TBD)
+## 0.31.6 (2022-08-02)
 
 ### new:
 - N/A
 
 ### changed
-- updated dependencies to work with newer versions
+- updated dependencies to work with newer versions (but temporarily continue pinning to `transformers==4.10.1`)
 
 ### fixed:
 - fixes for newer `networkx`
