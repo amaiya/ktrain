@@ -51,7 +51,7 @@ class TestTransformers(TestCase):
         # self.classes = train_b.target_names
         self.classes = []  # discover from string labels
 
-    # @skip('temporarily disabled')
+    @skip("temporarily disabled")
     def test_transformers_api_1(self):
         trn, val, preproc = txt.texts_from_array(
             x_train=self.trn[0],
