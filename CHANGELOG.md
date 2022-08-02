@@ -12,7 +12,7 @@ Most recent releases are shown at the top. Each release shows:
 - N/A
 
 ### changed
-- N/A
+- updated dependencies to work with newer versions
 
 ### fixed:
 - fixes for newer `networkx`
