@@ -44,7 +44,7 @@ setup(
     url="https://github.com/amaiya/ktrain",
     keywords=["tensorflow", "keras", "deep learning", "machine learning"],
     install_requires=[
-        "scikit-learn==0.24.2",  # due to change in 0.24.x that breaks eli5
+        "scikit-learn",  # due to change in 0.24.x that breaks eli5
         "matplotlib >= 3.0.0",
         "pandas >= 1.0.1",
         "fastprogress >= 0.1.21",
@@ -55,7 +55,7 @@ setup(
         "jieba",
         "cchardet",  # previously pinned to 2.1.5 (due to this issue: https://github.com/PyYoshi/cChardet/issues/61) but no longer needed
         "chardet",  # required by stellargraph and no longer installed by other dependencies as of July 2021
-        "syntok==1.3.3",  # due to bug in 1.4.1 causing problems in QA paragraph tokenization
+        "syntok>1.3.3",  # previously pinned to 1.3.3 due to bug in 1.4.1, which caused problems in QA paragraph tokenization (now appears fixed)
         # NOTE: these modules can be optionally omitted from deployment if not being used to yield lighter-weight footprint
         "transformers==4.10.3",  # imported in imports with warning and used in 'ktrain.text' ; pin to transformers==4.10.3 due to issues saving using 4.5.1
         "sentencepiece",  #  Added due to breaking change in transformers>=4.0
