@@ -6,6 +6,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.31.7 (TBD)
+
+### new:
+- N/A
+
+### changed
+- re-arranged dep warnings for tF
+
+### fixed:
+- N/A
+
+
 ## 0.31.6 (2022-08-02)
 
 ### new:

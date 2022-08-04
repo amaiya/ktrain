@@ -1944,12 +1944,11 @@ def _load_model(fpath, preproc=None, train_data=None, custom_objects=None):
         and U.bert_data_tuple(train_data)
     ):
         # custom BERT model
-        from keras_bert import get_custom_objects
-
+        check_keras_bert()
         if isinstance(custom_objects, dict):
-            custom_objects.update(get_custom_objects())
+            custom_objects.update(keras_bert.get_custom_objects())
         else:
-            custom_objects = get_custom_objects()
+            custom_objects = keras_bert.get_custom_objects()
     elif (
         (
             preproc

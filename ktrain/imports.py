@@ -15,12 +15,15 @@ os.environ[
 ] = "8"  # suppress warning from NumExpr on machines with many CPUs
 
 # TensorFlow
-os.environ["TF_KERAS"] = "1"  # needed for eli5-tf
 SUPPRESS_DEP_WARNINGS = strtobool(os.environ.get("SUPPRESS_DEP_WARNINGS", "1"))
 if (
     SUPPRESS_DEP_WARNINGS
 ):  # 2021-11-12:  copied this here to properly suppress TF/CUDA warnings in Kaggle notebooks, etc.
     os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+TF_WARNING = (
+    "TensorFlow is not installed and will be needed if training neural networks, "
+    + "but non-TensorFlow features in ktrain can still be used. See https://github.com/amaiya/ktrain/blob/master/README.md"
+)
 DISABLE_V2_BEHAVIOR = strtobool(os.environ.get("DISABLE_V2_BEHAVIOR", "0"))
 try:
     if DISABLE_V2_BEHAVIOR:
@@ -46,16 +49,15 @@ try:
         raise Exception(
             "As of v0.8.x, ktrain needs TensorFlow 2. Please upgrade TensorFlow."
         )
-    os.environ["TF_KERAS"] = "1"  # to use keras_bert package below with tf.Keras
+    os.environ["TF_KERAS"] = "1"  # for eli5-tf (and previously keras_bert)
+    TF_INSTALLED = True
 except ImportError:
-    warnings.warn(
-        "TensorFlow is not installed. You can still use ktrain's scikit-learn models and pretrained PyTorch models: "
-        + "text.zsl.ZeroShotClassifier, text.translation.Translator, text.summarization.TransformerSummarizer, "
-        + "text.speech.Transcriber, and text.eda.TopicModel. To train neural network models, you will need to install TensorFlow: "
-        + "pip install tensorflow"
-    )
     keras = None
     K = None
+    tf = None
+    TF_INSTALLED = False
+    warnings.warn(TF_WARNING)
+
 # for TF backwards compatibility (e.g., support for TF 2.3.x):
 try:
     MobileNetV3Small = keras.applications.MobileNetV3Small
@@ -145,13 +147,22 @@ import langdetect
 import syntok.segmenter as segmenter
 
 # 'bert' text classification model
-try:
-    import keras_bert
-    from keras_bert import Tokenizer as BERT_Tokenizer
-except ImportError:
-    warnings.warn(
-        "keras_bert (and/or its TensorFlow dependency) is not installed. keras_bert is only needed only for 'bert' text classification model"
-    )
+if TF_INSTALLED:
+    try:
+        import keras_bert
+        from keras_bert import Tokenizer as BERT_Tokenizer
+
+        KERAS_BERT_INSTALLED = True
+    except ImportError:
+        warnings.warn(
+            "keras_bert is not installed. keras_bert is only needed only for 'bert' text classification model"
+        )
+        KERAS_BERT_INSTALLED = False
+
+
+def check_keras_bert():
+    if not KERAS_BERT_INSTALLED:
+        raise Exception("Please install keras_bert: pip install keras_bert")
 
 
 # transformers for models in 'text' module
@@ -163,6 +174,13 @@ except ImportError:
         "transformers not installed - needed by various models in 'text' module"
     )
 
+if sys.version.startswith("3.6") and (
+    version.parse(transformers.__version__) >= version.parse("4.11.0")
+):
+    raise Exception(
+        "You are using Python 3.6.  Please downgrade transformers "
+        + "(and ignore the resultant pip ERROR): pip install transformers==4.10.3"
+    )
 
 try:
     from PIL import Image

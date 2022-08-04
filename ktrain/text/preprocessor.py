@@ -863,8 +863,7 @@ class BERTPreprocessor(TextPreprocessor):
             for line in reader:
                 token = line.strip()
                 token_dict[token] = len(token_dict)
-        from keras_bert import Tokenizer as BERT_Tokenizer
-
+        check_keras_bert()
         tokenizer = BERT_Tokenizer(token_dict)
         self.tok = tokenizer
         self.tok_dct = dict((v, k) for k, v in token_dict.items())
