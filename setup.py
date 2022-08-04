@@ -58,7 +58,6 @@ setup(
         "syntok>1.3.3",  # previously pinned to 1.3.3 due to bug in 1.4.1, which caused problems in QA paragraph tokenization (now appears fixed)
         # NOTE: these modules can be optionally omitted from deployment if not being used to yield lighter-weight footprint
         "transformers==4.17.0",  # pin to transformers==4.17.0 due to undocumented transformers issue in >=4.18.0 -> **kwargs removed from call
-        # "transformers==4.10.1",  # pin to transformers==4.10.1 to temporarily continue to support the default Python on older Ubunt 18.04 machines
         "sentencepiece",  #  Added due to breaking change in transformers>=4.0
         "keras_bert>=0.86.0",  # imported in imports with warning and used in 'ktrain.text' ; support for TF 2.3
         "whoosh",  # imported by text.qa module
