@@ -932,6 +932,7 @@ class _QAExtractor(QA):
 
         # extract paragraphs as contexts
         contexts, refs = self._split_contexts(doc_results)
+        contexts = [c.replace("\n", " ") for c in contexts]
 
         # batchify contexts
         context_batches = self._batchify(contexts, batch_size=batch_size)
@@ -1095,7 +1096,8 @@ class AnswerExtractor:
             raise ValueError(
                 "Number of texts is not equal to the number of rows in the DataFrame."
             )
-        texts = [t.replace("\n", " ").replace("\t", " ") for t in texts]
+        #texts = [t.replace("\n", " ").replace("\t", " ") for t in texts]
+        texts = [t.replace("\t", " ") for t in texts]
         questions = [q for q, l in question_label_pairs]
         labels = [l for q, l in question_label_pairs]
         self._check_columns(labels, df)
