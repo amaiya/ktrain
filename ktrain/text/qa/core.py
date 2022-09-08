@@ -1096,7 +1096,7 @@ class AnswerExtractor:
             raise ValueError(
                 "Number of texts is not equal to the number of rows in the DataFrame."
             )
-        #texts = [t.replace("\n", " ").replace("\t", " ") for t in texts]
+        # texts = [t.replace("\n", " ").replace("\t", " ") for t in texts]
         texts = [t.replace("\t", " ") for t in texts]
         questions = [q for q, l in question_label_pairs]
         labels = [l for q, l in question_label_pairs]
