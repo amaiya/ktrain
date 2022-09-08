@@ -60,7 +60,8 @@ class TopicModel:
                 raise ValueError("If n_topics is None, texts must be supplied")
             estimated = max(1, int(math.floor(math.sqrt(len(texts) / 2))))
             n_topics = min(400, estimated)
-            print("n_topics automatically set to %s" % (n_topics))
+            if verbose:
+                print("n_topics automatically set to %s" % (n_topics))
 
         # train model
         if texts is not None:
