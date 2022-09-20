@@ -16,6 +16,7 @@ Most recent releases are shown at the top. Each release shows:
 
 ### fixed:
 - Fixed paragraph tokenization in `AnswerExtractor`
+- Adjustment for kwe
 
 
 ## 0.31.7 (2022-08-04)
