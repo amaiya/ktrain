@@ -205,6 +205,7 @@ class KeywordExtractor:
                     and kw[0].isalnum()
                     and "@" not in kw
                     and "." not in kw
+                    and "'" not in kw
                 ]
             )
         cnt = Counter(candidates)
