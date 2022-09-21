@@ -5,7 +5,10 @@ from .preprocessor import ImagePreprocessor
 try:
     from tensorflow.keras.utils import img_to_array
 except ImportError:
-    img_to_array = keras.preprocessing.image.img_to_array
+    try:
+        img_to_array = keras.preprocessing.image.img_to_array
+    except Exception as e:
+        img_to_array = None
 
 
 def show_image(img_path):
