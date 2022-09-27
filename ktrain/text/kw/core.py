@@ -45,7 +45,9 @@ class KeywordExtractor:
     """
 
     def __init__(
-        self, lang="en", custom_stopwords=["et al", "et", "al", "n't", "did", "does"]
+        self,
+        lang="en",
+        custom_stopwords=["et al", "et", "al", "n't", "did", "does", "lt", "gt", "br"],
     ):
         """
         ```
