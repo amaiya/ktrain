@@ -2,12 +2,6 @@ from .. import utils as U
 from ..imports import *
 from . import textutils as TU
 
-try:
-    from tika import parser
-
-    TIKA_INSTALLED = True
-except ImportError:
-    TIKA_INSTALLED = False
 
 try:
     import textract
@@ -27,10 +21,17 @@ class TextExtractor:
     """
 
     def __init__(self, use_tika=True):
-        if use_tika and not TIKA_INSTALLED:
-            raise ValueError(
-                "If use_tika=True, then TextExtractor requires tika: pip install tika"
-            )
+        if use_tika:
+            try:
+                from tika import parser
+            except ImportError as e:
+                raise ValueError(
+                    "If use_tika=True, then TextExtractor requires tika: pip install tika"
+                )
+            except PermissionError as e:
+                raise PermissionError(
+                    f"There may already be a /tmp/tika.log file from another user - please delete it or change permissions: {e}"
+                )
         if not use_tika and not TEXTRACT_INSTALLED:
             raise ValueError(
                 "If use_tika=False, then TextExtractor requires textract: pip install textract"
@@ -89,6 +90,8 @@ class TextExtractor:
 
     def _extract(self, filename):
         if self.use_tika:
+            from tika import parser
+
             if JAVA_INSTALLED:
                 parsed = parser.from_file(filename)
                 text = parsed["content"]

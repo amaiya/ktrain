@@ -6,6 +6,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.31.10 (2022-10-01)
+
+### new:
+- N/A
+
+### changed
+- N/A
+
+### fixed:
+- Adjusted tika imports due to issue with `/tmp/tika.log` in multi-user scenario
+
+
 ## 0.31.9 (2022-09-24)
 
 ### new:
