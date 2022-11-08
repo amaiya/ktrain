@@ -1076,7 +1076,7 @@ class Learner(ABC):
         During each epoch, this learning rate policy varies the learning rate from lr/10 to lr
         and then back to a low learning rate that is near-zero.
         If epochs is None, then early_stopping and reduce_on_plateau are atomatically
-        set to 6 and 3, respectively.
+        set to 5 and 2, respectively.
 
         Args:
             lr (float): optional initial learning rate.  If missing,
