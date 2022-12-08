@@ -142,7 +142,17 @@ def create_optimizer(
     return optimizer, lr_schedule
 
 
-class AdamWeightDecay(tf.keras.optimizers.Adam):
+# dep_fix
+from packaging import version
+
+adam_class = (
+    tf.keras.optimizers.Adam
+    if version.parse(tf.__version__) < version.parse("2.11")
+    else tf.keras.optimizers.legacy.Adam
+)
+
+
+class AdamWeightDecay(adam_class):
     """
     ```
     Adam enables L2 weight decay and clip_by_global_norm on gradients. Just adding the square of the weights to the

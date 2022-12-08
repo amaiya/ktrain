@@ -23,7 +23,12 @@ def get_default_optimizer(lr=0.001, wd=DEFAULT_WD):
 # Use vanilla Adam as default unless weight decay is explicitly set by user
 # in which case AdamWeightDecay is default optimizer.
 # See core.Learner.set_weight_decay for more information
-DEFAULT_OPT = "adam"
+# dep_fix
+DEFAULT_OPT = (
+    "adam"
+    if version.parse(tf.__version__) < version.parse("2.11")
+    else tf.keras.optimizers.legacy.Adam()
+)
 DEFAULT_BS = 32
 DEFAULT_ES = 5
 DEFAULT_ROP = 2

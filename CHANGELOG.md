@@ -15,6 +15,7 @@ Most recent releases are shown at the top. Each release shows:
 - N/A
 
 ### fixed:
+- Added support for TensorFlow 2.11. For now, as recommended in the [TF release notes](https://github.com/tensorflow/tensorflow/releases/tag/v2.11.0), **ktrain** has been changed to use the legacy optimizers in `tf.keras.optimizers.legacy`.  This means that, when compiling Keras models, you should supply `tf.keras.optimizers.legacy.Adam()` instead of the string `"adam"`. ( #468)
 - fixed error in docs
 
 
