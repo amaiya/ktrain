@@ -352,7 +352,7 @@ learner.evaluate(tst, class_names=preproc.get_classes())
 The above should be all you need on Linux systems and cloud computing environments like Google Colab and AWS EC2.  If you are using **ktrain** on a **Windows computer**, you can follow these
 [more detailed instructions](https://github.com/amaiya/ktrain/blob/master/FAQ.md#how-do-i-install-ktrain-on-a-windows-machine) that include some extra steps.
 
-**Supported TensorFlow Versions**:  **ktrain** should currently support any version of TensorFlow at or above to v2.3: i.e., `pip install tensorflow>=2.3`.  However, if using `tensorflow>=2.11`, then you must only use legacy optimizers such as `tf.keras.optimizers.legacy.Adam`.  The newer `tf.keras.optimizers.Optimizer` base class is not supported at this time, so please use `Adam()` insetad of the string `"adam"` in `model.compile` when using TensorFlow 2.11 and above.
+**Supported TensorFlow Versions**:  *ktrain* should currently support any version of TensorFlow at or above to v2.3: i.e., `pip install tensorflow>=2.3`.  However, if using `tensorflow>=2.11`, then you must only use legacy optimizers such as `tf.keras.optimizers.legacy.Adam`.  The newer `tf.keras.optimizers.Optimizer` base class is not supported at this time.  For instance, when using TensorFlow 2.11 and above, please use `tf.keras.optimzers.legacy.Adam()` instead of the string `"adam"` in `model.compile`. **ktrain** does this automatically when using out-of-the-box models (e.g., models from the `transformers` library).
 
 #### Additional Notes About Installation
 
