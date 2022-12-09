@@ -6,7 +6,7 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
-## 0.31.11 (TBD)
+## 0.31.11 (2022-12-08)
 
 ### new:
 - N/A
@@ -15,7 +15,8 @@ Most recent releases are shown at the top. Each release shows:
 - N/A
 
 ### fixed:
-- Added support for TensorFlow 2.11. For now, as recommended in the [TF release notes](https://github.com/tensorflow/tensorflow/releases/tag/v2.11.0), **ktrain** has been changed to use the legacy optimizers in `tf.keras.optimizers.legacy`.  This means that, when compiling Keras models, you should supply `tf.keras.optimizers.legacy.Adam()` instead of the string `"adam"`. ( #468)
+- Fixes to support TensorFlow 2.11. For now, as recommended in the [TF release notes](https://github.com/tensorflow/tensorflow/releases/tag/v2.11.0), **ktrain** has been changed to use the legacy optimizers in `tf.keras.optimizers.legacy`.  This means that, when compiling Keras models, you should supply `tf.keras.optimizers.legacy.Adam()` instead of the string `"adam"`. ( #468)
+- Fixes to support Python 3.10. Changed references from `CountVectorizer.get_field_names` to `CountVectorizer.get_field_names_out`.  Updated supported versions in `setup.py`.
 - fixed error in docs
 
 
