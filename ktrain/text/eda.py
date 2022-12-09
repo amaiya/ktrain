@@ -264,7 +264,7 @@ class TopicModel:
             raise ValueError(
                 "topic_id must be less than %s" % (len(self.model.components_))
             )
-        feature_names = self.vectorizer.get_feature_names()
+        feature_names = self.vectorizer.get_feature_names_out()
         word_probs = self.model.components_[topic_id]
         word_ids = [i for i in word_probs.argsort()[: -n_words - 1 : -1]]
         words = [feature_names[i] for i in word_ids]
@@ -285,7 +285,7 @@ class TopicModel:
 
         """
         self._check_model()
-        feature_names = self.vectorizer.get_feature_names()
+        feature_names = self.vectorizer.get_feature_names_out()
         topic_summaries = []
         for topic_idx, topic in enumerate(self.model.components_):
             summary = [feature_names[i] for i in topic.argsort()[: -n_words - 1 : -1]]
