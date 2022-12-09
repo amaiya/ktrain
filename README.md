@@ -12,6 +12,8 @@
 
 
 ### News and Announcements
+- **2022-12-08**
+  - **ktrain 0.32.x** was released and includes fixes to support TensorFlow 2.11 and Python 3.10.
 - **2022-05-07**
   - **ktrain v0.31.x** is released and now allows you to use any `transformers` model (e.g., `roberta-base`) for word embeddings in sequence-tagging via the `transformer_model` argument (thanks to Niek van der Plas). See [this Colab notebook](https://colab.research.google.com/drive/1whrnmM7ElqbaEhXf760eiOMiYk5MNO-Z?usp=sharing) for an example.
 ```python
