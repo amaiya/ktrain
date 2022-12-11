@@ -118,7 +118,7 @@ def get_learner(
             learner = BERTTextClassLearner
         else:  # vanilla text classifiers use standard ArrayLearners
             learner = ArrayLearner
-    return learner(
+    l = learner(
         model,
         train_data=train_data,
         val_data=val_data,
@@ -127,6 +127,19 @@ def get_learner(
         workers=workers,
         use_multiprocessing=use_multiprocessing,
     )
+    import tensorflow as tf
+    from tensorflow.keras.optimizers import Optimizer
+    import warnings
+    from packaging import version
+
+    if (version.parse(tf.__version__) >= version.parse("2.11")) and (
+        isinstance(l.model.optimizer, Optimizer)
+    ):
+        warnings.warn(
+            "ktrain currently only supports legacy optimizers in tensorflow>=2.11 - recompiling your model to use legacy Adam"
+        )
+        l._recompile(wd=0)
+    return l
 
 
 # keys

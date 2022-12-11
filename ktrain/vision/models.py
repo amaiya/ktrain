@@ -141,7 +141,7 @@ def image_classifier(
                             If None, then all layers except new Dense layers
                             will be frozen/untrainable.
         metrics (list):  metrics to use
-        optimizer_name(str): name of Keras optimizer (e.g., 'adam', 'sgd')
+        optimizer_name(str|obj): name of Keras optimizer (e.g., 'adam', 'sgd') or instance of keras Optimizer
         multilabel(bool):  If True, model will be build to support
                            multilabel classificaiton (labels are not mutually exclusive).
                            If False, binary/multiclassification model will be returned.
@@ -259,7 +259,7 @@ def image_model(
                             If None, then all layers except new Dense layers
                             will be frozen/untrainable.
         metrics (list):  metrics to use
-        optimizer_name(str): name of Keras optimizer (e.g., 'adam', 'sgd')
+        optimizer_name(str|obj): name of Keras optimizer (e.g., 'adam', 'sgd') or instance of Keras optimizer
         multilabel(bool):  If True, model will be build to support
                            multilabel classificaiton (labels are not mutually exclusive).
                            If False, binary/multiclassification model will be returned.

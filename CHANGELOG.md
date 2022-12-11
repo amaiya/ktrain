@@ -6,6 +6,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.32.1 (2022-12-11)
+
+### new:
+- N/A
+
+### changed
+- N/A
+
+### fixed:
+- In TensorFlow 2.11, the `tf.optimizers.Optimizer` base class points the new keras optimizer that seems to have problems.  Users should use legacy optimizers in `tf.keras.optimizers.legacy` with **ktrain** (which evidently will never be deleted). This means that, in TF 2.11, supplying a string representation of an optimizer like `"adam"` to `model.compile` uses the new optimizer instead of the legacy optimizers. In these cases, **ktrain** will issue a warning and automatically recompile the model with the default `tf.keras.optimizers.legacy.Adam` optimizer. 
+
+
 ## 0.32.0 (2022-12-08)
 
 ### new:
