@@ -209,7 +209,7 @@ class TopicModel:
                 n_components=n_topics,
                 max_iter=max_iter,
                 verbose=self.verbose,
-                alpha=alpha,
+                alpha_W=alpha,  # alpha removed in 1.2
                 l1_ratio=l1_ratio,
                 random_state=0,
             )
