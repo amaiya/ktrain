@@ -139,7 +139,8 @@ class TopicModel:
                                      Keys in this dict can be any of the following:
                                          alpha: alpha for LDA  default: 5./n_topics
                                          beta: beta for LDA.  default:0.01
-                                         nmf_alpha: alias for alpha for backwars compatilibity
+                                         nmf_alpha_W: alpha for NMF alpha_W (default is 0.0)
+                                         nmf_alpha_H: alpha for NMF alpha_H (default is 'same')
                                          l1_ratio: l1_ratio for NMF. default: 0
                                          ngram_range:  whether to consider bigrams, trigrams. default: (1,1)
 
@@ -150,8 +151,8 @@ class TopicModel:
         if hyperparam_kwargs is None:
             hyperparam_kwargs = {}
         alpha = hyperparam_kwargs.get("alpha", 5.0 / n_topics)
-        nmf_alpha = hyperparam_kwargs.get("nmf_alpha", None)
-        alpha = nmf_alpha if nmf_alpha is not None else alpha
+        nmf_alpha_W = hyperparam_kwargs.get("nmf_alpha_W", 0.0)
+        nmf_alpha_H = hyperparam_kwargs.get("nmf_alpha_H", "same")
         beta = hyperparam_kwargs.get("beta", 0.01)
         l1_ratio = hyperparam_kwargs.get("l1_ratio", 0)
         ngram_range = hyperparam_kwargs.get("ngram_range", (1, 1))
@@ -209,7 +210,8 @@ class TopicModel:
                 n_components=n_topics,
                 max_iter=max_iter,
                 verbose=self.verbose,
-                alpha_W=alpha,  # alpha removed in 1.2
+                alpha_W=nmf_alpha_W,
+                alpha_H=nmf_alpha_H,
                 l1_ratio=l1_ratio,
                 random_state=0,
             )

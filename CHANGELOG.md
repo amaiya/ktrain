@@ -6,7 +6,7 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
-## 0.32.2 (2022-12-12)
+## 0.32.3 (2022-12-12)
 
 ### new:
 - N/A
@@ -15,7 +15,8 @@ Most recent releases are shown at the top. Each release shows:
 - N/A
 
 ### fixed:
-- Changed call to `NMF` to use `alpha_W` instead of `alpha`, as `alpha` parameter was removed in `scikit-learn==1.2`.
+- Changed NMF to accept optional parameters `nmf_alpha_W` and `nmf_alpha_H` based on changes in `scikit-learn==1.2.0`.
+- Change `ktrain.utils` to check for TensorFlow before doing a version check, so that **ktrain** can be imported without TensorFlow being installed.
 
 
 ## 0.32.1 (2022-12-11)
