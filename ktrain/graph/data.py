@@ -266,7 +266,7 @@ def graph_links_from_csv(
     # ----------------------------------------------------------------
     nx_sep = None if sep in [" ", "\t"] else sep
     G = nx.read_edgelist(path=links_filepath, delimiter=nx_sep)
-    print(nx.info(G))
+    # print(nx.info(G))
 
     # ----------------------------------------------------------------
     # read node attributes

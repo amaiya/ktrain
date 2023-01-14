@@ -6,7 +6,7 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
-## 0.33.0 (TBD)
+## 0.33.0 (2023-01-14)
 
 ### new:
 - Support for the latest version of `transformers`.  
@@ -18,6 +18,7 @@ Most recent releases are shown at the top. Each release shows:
 - Changed `numpy.float` and `numpy.int` to `numpy.float64` and `numpy.int_` respectively, in `ktrain.utils` (#474)
 - Removed  `pandas` deprecation warnings from `ktrain.tabular.prepreprocessor` (#475)
 - Ensure `use_token_type_ids` always exists in `TransformerPreprocessor` objects to ensure backwards compatibility
+- Removed reference to `networkx.info`, as it was removed in `networkx>=3`
 
 
 ## 0.32.3 (2022-12-12)
