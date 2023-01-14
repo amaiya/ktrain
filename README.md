@@ -13,7 +13,7 @@
 
 ### News and Announcements
 - **2023-01-14**
-  - **ktrain 0.33.x** is released and includes fixes to support the latest version of Hugging Face`transformers`. Note that `transformers<=0.25.1` [has a bug](https://github.com/huggingface/transformers/issues/20750) related to TensorFlow 2.11. You can downgrade TensorFlow to 2.10 if you receive an error that says *"has no attribute 'expand_1d'"* (or upgrade to `transformers>0.25.1` if available).
+  - **ktrain 0.33.x** is released and includes fixes to support the latest version of Hugging Face`transformers`. Note that `transformers<=4.25.1` [has a bug](https://github.com/huggingface/transformers/issues/20750) related to TensorFlow 2.11. You can downgrade TensorFlow to 2.10 if you receive an error that says *"has no attribute 'expand_1d'"* (or upgrade to `transformers>4.25.1` if available).
 
 - **2022-12-08**
   - **ktrain 0.32.x** is released and includes fixes to support TensorFlow 2.11 and Python 3.10.
