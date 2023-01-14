@@ -404,14 +404,12 @@ class Categorify(TabularProc):
     def apply_train(self, df):
         self.categories = {}
         for n in self.cat_names:
-            df.loc[:, n] = df.loc[:, n].astype("category").cat.as_ordered()
+            df[n] = df[n].astype("category").cat.as_ordered()
             self.categories[n] = df[n].cat.categories
 
     def apply_test(self, df):
         for n in self.cat_names:
-            df.loc[:, n] = pd.Categorical(
-                df[n], categories=self.categories[n], ordered=True
-            )
+            df[n] = pd.Categorical(df[n], categories=self.categories[n], ordered=True)
 
 
 FILL_MEDIAN = "median"

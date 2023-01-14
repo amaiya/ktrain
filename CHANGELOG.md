@@ -16,6 +16,7 @@ Most recent releases are shown at the top. Each release shows:
 
 ### fixed:
 - Changed `numpy.float` and `numpy.int` to `numpy.float64` and `numpy.int_` respectively, in `ktrain.utils` (#474)
+- Removed  `pandas` deprecation warnings from `ktrain.tabular.prepreprocessor` (#475)
 
 
 ## 0.32.3 (2022-12-12)
