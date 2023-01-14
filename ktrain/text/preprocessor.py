@@ -906,10 +906,10 @@ class TransformersPreprocessor(TextPreprocessor):
             self.ytransform = U.YTransform(
                 class_names=self.get_classes(), label_encoder=le
             )
-        if not hasattr(self, 'use_token_type_ids'):
-            # As a short cut, we simply set use_token_type_ids to False if model is distilbert,
-            # as most models use token_type_ids (e.g., bert, deberta, etc.).
-            self.use_token_type_ids = self.name != 'distilbert'
+        if not hasattr(self, "use_token_type_ids"):
+            # As a shortcut, we simply set use_token_type_ids to False if model is distilbert,
+            # as most models use token_type_ids (e.g., bert, deberta, etc.) in their call method
+            self.use_token_type_ids = self.name != "distilbert"
 
     def set_config(self, config):
         self.config = config
