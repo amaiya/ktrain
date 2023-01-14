@@ -12,8 +12,11 @@
 
 
 ### News and Announcements
+- **2023-01-15**
+  - **ktrain 0.33.x** is released and includes fixes to support the latest version of Hugging Face`transformers`. Note that `transformers<=0.25.1` [has a bug](https://github.com/huggingface/transformers/issues/20750) related to TensorFlow 2.11. You can downgrade TensorFlow to 2.10 if you receive an error that says *"has no attribute 'expand_1d'"* (or upgrade to `transformers>0.25.1` if available).
+
 - **2022-12-08**
-  - **ktrain 0.32.x** was released and includes fixes to support TensorFlow 2.11 and Python 3.10.
+  - **ktrain 0.32.x** is released and includes fixes to support TensorFlow 2.11 and Python 3.10.
 - **2022-05-07**
   - **ktrain v0.31.x** is released and now allows you to use any `transformers` model (e.g., `roberta-base`) for word embeddings in sequence-tagging via the `transformer_model` argument (thanks to Niek van der Plas). See [this Colab notebook](https://colab.research.google.com/drive/1whrnmM7ElqbaEhXf760eiOMiYk5MNO-Z?usp=sharing) for an example.
 ```python
@@ -49,9 +52,6 @@ kwe.extract_keywords(text, candidate_generator='noun_phrases')
  ('import ktrain', 0.32891369271775894),
  ('load model', 0.32052348289886556)]
 ```
-- **2022-01-28**
-  - **ktrain v0.29.x** is released and includes miscellaneous enhancements contributed by [Sandy Khosasi](https://github.com/ilos-vigil) such as [support for MobileNetV3 and EfficientNet](https://colab.research.google.com/drive/1EJHpMVG6fBCg33UPla_Ly_6LQdswU2Ur?usp=sharing), [plotting improvements](https://colab.research.google.com/drive/1_WaRQ0J4g0VTn6HWS3kszdFZbBBWoa7R?usp=sharing), and [raw confidence scores in QA](https://colab.research.google.com/drive/1ParprLN9hFX6cxJ1w7bv91PYx4o0J1zm?usp=sharing).
-
 ----
 
 ### Overview
