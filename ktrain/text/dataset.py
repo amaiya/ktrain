@@ -9,7 +9,7 @@ class TransformerDataset(SequenceDataset):
     ```
     """
 
-    def __init__(self, x, y, batch_size=1):
+    def __init__(self, x, y, batch_size=1, use_token_type_ids=True):
         if type(x) not in [list, np.ndarray]:
             raise ValueError("x must be list or np.ndarray")
         if type(y) not in [list, np.ndarray]:
@@ -21,6 +21,7 @@ class TransformerDataset(SequenceDataset):
         self.x = x
         self.y = y
         self.batch_size = batch_size
+        self.use_token_type_ids = use_token_type_ids
 
     def __getitem__(self, idx):
         batch_x = self.x[idx * self.batch_size : (idx + 1) * self.batch_size]
@@ -50,36 +51,67 @@ class TransformerDataset(SequenceDataset):
             yshape = [None]
             ytype = tf.int64
 
-        def gen():
-            for idx, data in enumerate(self.x):
-                yield (
-                    {
-                        "input_ids": data[0],
-                        "attention_mask": data[1],
-                        "token_type_ids": data[2],
-                    },
-                    self.y[idx],
-                )
+        if self.use_token_type_ids:
 
-        tfdataset = tf.data.Dataset.from_generator(
-            gen,
-            (
-                {
-                    "input_ids": tf.int32,
-                    "attention_mask": tf.int32,
-                    "token_type_ids": tf.int32,
-                },
-                ytype,
-            ),
-            (
-                {
-                    "input_ids": tf.TensorShape([None]),
-                    "attention_mask": tf.TensorShape([None]),
-                    "token_type_ids": tf.TensorShape([None]),
-                },
-                tf.TensorShape(yshape),
-            ),
-        )
+            def gen():
+                for idx, data in enumerate(self.x):
+                    yield (
+                        {
+                            "input_ids": data[0],
+                            "attention_mask": data[1],
+                            "token_type_ids": data[2],
+                        },
+                        self.y[idx],
+                    )
+
+            tfdataset = tf.data.Dataset.from_generator(
+                gen,
+                (
+                    {
+                        "input_ids": tf.int32,
+                        "attention_mask": tf.int32,
+                        "token_type_ids": tf.int32,
+                    },
+                    ytype,
+                ),
+                (
+                    {
+                        "input_ids": tf.TensorShape([None]),
+                        "attention_mask": tf.TensorShape([None]),
+                        "token_type_ids": tf.TensorShape([None]),
+                    },
+                    tf.TensorShape(yshape),
+                ),
+            )
+        else:
+
+            def gen():
+                for idx, data in enumerate(self.x):
+                    yield (
+                        {
+                            "input_ids": data[0],
+                            "attention_mask": data[1],
+                        },
+                        self.y[idx],
+                    )
+
+            tfdataset = tf.data.Dataset.from_generator(
+                gen,
+                (
+                    {
+                        "input_ids": tf.int32,
+                        "attention_mask": tf.int32,
+                    },
+                    ytype,
+                ),
+                (
+                    {
+                        "input_ids": tf.TensorShape([None]),
+                        "attention_mask": tf.TensorShape([None]),
+                    },
+                    tf.TensorShape(yshape),
+                ),
+            )
 
         if shuffle:
             tfdataset = tfdataset.shuffle(self.x.shape[0])

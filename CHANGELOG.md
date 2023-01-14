@@ -6,6 +6,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.33.0 (TBD)
+
+### new:
+- Support for the latest version of `transformers`.  
+
+### changed
+- Removed pin to `transformers==4.17`
+
+### fixed:
+- N/A
+
+
 ## 0.32.3 (2022-12-12)
 
 ### new:
