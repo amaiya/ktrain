@@ -15,7 +15,7 @@ Most recent releases are shown at the top. Each release shows:
 - Removed pin to `transformers==4.17`
 
 ### fixed:
-- N/A
+- Changed `numpy.float` and `numpy.int` to `numpy.float64` and `numpy.int_` respectively, in `ktrain.utils` (#474)
 
 
 ## 0.32.3 (2022-12-12)

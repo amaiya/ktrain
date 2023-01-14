@@ -872,13 +872,13 @@ class YTransformDataFrame(YTransform):
             targets = (
                 df[self.label_columns[0]].values
                 if labels_exist
-                else np.zeros(df.shape[0], dtype=np.int)
+                else np.zeros(df.shape[0], dtype=np.int_)
             )
             if self.is_regression and isinstance(targets[0], str):
                 warnings.warn(
                     "is_regression=True was supplied but targets are strings - casting to floats"
                 )
-                targets = targets.astype(np.float)
+                targets = targets.astype(np.float64)
 
             # set class_names if classification task and targets with integer labels
             if train and not self.is_regression and not isinstance(targets[0], str):
