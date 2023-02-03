@@ -867,12 +867,33 @@ class TransformersPreprocessor(TextPreprocessor):
 
         # DistilBert call method no longer accepts **kwargs, so we must avoid including token_type_ids parameter
         # reference: https://github.com/huggingface/transformers/issues/2702
-        self.use_token_type_ids = (
-            "token_type_ids"
-            in self.model_type.from_pretrained(
-                self.model_name
-            ).call.__code__.co_varnames
-        )
+        try:
+            self.use_token_type_ids = (
+                "token_type_ids"
+                in self.model_type.from_pretrained(
+                    self.model_name
+                ).call.__code__.co_varnames
+            )
+        except:
+            warnings.warn(
+                "Could not load a Tensorflow version of model. (If this worked before, it might be an out-of-memory issue.) "
+                + "Attempting to download/load PyTorch version as TensorFlow model using from_pt=True. You will need PyTorch installed for this."
+            )
+            try:
+                self.use_token_type_ids = (
+                    "token_type_ids"
+                    in self.model_type.from_pretrained(
+                        self.model_name, from_pt=True
+                    ).call.__code__.co_varnames
+                )
+            except:
+                # load model as normal to expose error to user
+                self.use_token_type_ids = (
+                    "token_type_ids"
+                    in self.model_type.from_pretrained(
+                        self.model_name
+                    ).call.__code__.co_varnames
+                )
 
         if "bert-base-japanese" in model_name:
             self.tokenizer_type = transformers.BertJapaneseTokenizer
