@@ -75,7 +75,6 @@ class ImageClassLearner(GenLearner):
 
         # iterate through losses
         for tup in tups:
-
             # get data
             idx = tup[0]
             loss = tup[1]

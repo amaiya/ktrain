@@ -26,7 +26,6 @@ class Sequence(object):
         initial_vocab=None,
         optimizer="adam",
     ):
-
         self.model = None
         self.p = None
         self.tagger = None

@@ -280,7 +280,6 @@ def _build_logreg(
     metrics=["accuracy"],
     verbose=1,
 ):
-
     embedding_matrix = np.ones((max_features, 1))
     embedding_matrix[0] = 0
 
@@ -458,7 +457,6 @@ def _build_fasttext(
     metrics=["accuracy"],
     verbose=1,
 ):
-
     model = keras.models.Sequential()
     model.add(keras.layers.Embedding(max_features, 64, input_length=maxlen))
     model.add(keras.layers.SpatialDropout1D(0.25))
@@ -503,7 +501,6 @@ def _build_bigru(
     tokenizer=None,
     preproc=None,
 ):
-
     if tokenizer is None:
         raise ValueError("bigru requires valid Tokenizer object")
     if preproc is None:

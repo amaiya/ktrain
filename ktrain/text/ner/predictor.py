@@ -11,7 +11,6 @@ class NERPredictor(Predictor):
     """
 
     def __init__(self, model, preproc, batch_size=U.DEFAULT_BS):
-
         if not isinstance(model, keras.Model):
             raise ValueError("model must be of instance keras.Model")
         if not isinstance(preproc, NERPreprocessor):
@@ -129,7 +128,6 @@ class NERPredictor(Predictor):
         return results
 
     def merge_tokens(self, annotated_sentence, lang, return_proba):
-
         if TU.is_chinese(
             lang, strict=False
         ):  # strict=False: workaround for langdetect bug on short chinese texts
@@ -213,7 +211,6 @@ class NERPredictor(Predictor):
         return tuple(entry)
 
     def _save_preproc(self, fpath):
-
         # ensure transformers embedding model is saved in a subdirectory
         p = self.preproc.p
         hf_dir = os.path.join(fpath, "hf")

@@ -125,7 +125,6 @@ def image_classifier(
     pt_ps=[],
     verbose=1,
 ):
-
     """
     ```
     Returns a pre-defined/pre-trained model ready to be trained/fine-tuned
@@ -183,7 +182,6 @@ def image_regression_model(
     pt_ps=[],
     verbose=1,
 ):
-
     """
     ```
     Returns a pre-defined/pre-trained model ready to be trained/fine-tuned
@@ -243,7 +241,6 @@ def image_model(
     pt_ps=[],
     verbose=1,
 ):
-
     """
     ```
     Returns a pre-defined/pre-trained model ready to be trained/fine-tuned
@@ -375,7 +372,6 @@ def build_visionmodel(
     pt_fc=[],
     pt_ps=[],
 ):
-
     if name in PREDEFINED_MODELS:
         model = build_predefined(
             name,

@@ -1473,7 +1473,6 @@ class ArrayLearner(Learner):
         classes = preproc.get_classes() if preproc is not None else None
         # iterate through losses
         for tup in tups:
-
             # get data
             idx = tup[0]
             loss = tup[1]
@@ -1721,7 +1720,6 @@ class GenLearner(Learner):
         classes = preproc.get_classes() if preproc is not None else None
         # iterate through losses
         for tup in tups:
-
             # get data
             idx = tup[0]
             loss = tup[1]

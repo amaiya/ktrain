@@ -247,7 +247,6 @@ def datagen_needs_fit(datagen):
 
 
 def sample_image_folder(train_directory, target_size, color_mode="rgb", flat_dir=False):
-
     # adjust train_directory
     classes = None
     if flat_dir and train_directory is not None:
@@ -386,7 +385,6 @@ def images_from_folder(
     data_aug=None,
     verbose=1,
 ):
-
     """
     ```
     Returns image generator (Iterator instance).
@@ -491,7 +489,6 @@ def images_from_df(
     val_pct=0.1,
     random_state=None,
 ):
-
     """
     ```
     Returns image generator (Iterator instance).
@@ -641,7 +638,6 @@ def images_from_csv(
     val_pct=0.1,
     random_state=None,
 ):
-
     """
     ```
     Returns image generator (Iterator instance).
@@ -735,7 +731,6 @@ def images_from_fname(
     random_state=None,
     verbose=1,
 ):
-
     """
     ```
     Returns image generator (Iterator instance).
@@ -851,7 +846,6 @@ def images_from_array(
     class_names=None,
     is_regression=False,
 ):
-
     """
     ```
     Returns image generator (Iterator instance) from training

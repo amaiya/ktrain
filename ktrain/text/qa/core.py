@@ -924,7 +924,6 @@ class _QAExtractor(QA):
         )
 
     def ask(self, question, batch_size=8, **kwargs):
-
         # locate candidate document contexts
         doc_results = kwargs.get("doc_results", [])
         if not doc_results:

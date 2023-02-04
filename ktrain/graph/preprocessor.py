@@ -11,7 +11,6 @@ class NodePreprocessor(Preprocessor):
     """
 
     def __init__(self, G_nx, df, sample_size=10, missing_label_value=None):
-
         self.sampsize = sample_size  # neighbor sample size
         self.df = df  # node attributes and targets
         # TODO: eliminate storage redundancy

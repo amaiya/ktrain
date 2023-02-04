@@ -35,7 +35,6 @@ class SGDRScheduler(keras.callbacks.Callback):
         cycle_length=10,
         mult_factor=2,
     ):
-
         super(keras.callbacks.Callback, self).__init__()
         self.min_lr = min_lr
         self.max_lr = max_lr

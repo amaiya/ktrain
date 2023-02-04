@@ -92,7 +92,6 @@ class BiLSTMCRF(object):
         self._use_transformer_with_dim = use_transformer_with_dim
 
     def build(self):
-
         # build word embedding
         word_ids = keras.layers.Input(
             batch_shape=(None, None), dtype="int32", name="word_input"

@@ -257,7 +257,6 @@ def create_wide_residual_network(
 
 
 if __name__ == "__main__":
-
     init = (32, 32, 3)
 
     wrn_28_10 = create_wide_residual_network(init, nb_classes=10, N=2, k=2, dropout=0.0)

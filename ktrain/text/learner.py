@@ -60,7 +60,6 @@ class BERTTextClassLearner(ArrayLearner):
 
         # iterate through losses
         for tup in tups:
-
             # get data
             idx = tup[0]
             loss = tup[1]
@@ -141,7 +140,6 @@ class TransformerTextClassLearner(GenLearner):
 
         # iterate through losses
         for tup in tups:
-
             # get data
             idx = tup[0]
             loss = tup[1]

@@ -11,7 +11,6 @@ class ImagePreprocessor(Preprocessor):
     """
 
     def __init__(self, datagen, classes, target_size=(224, 224), color_mode="rgb"):
-
         if not isinstance(datagen, keras.preprocessing.image.ImageDataGenerator):
             raise ValueError("datagen must be instance of ImageDataGenerator")
         self.datagen = datagen

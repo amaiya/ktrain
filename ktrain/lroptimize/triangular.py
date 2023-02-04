@@ -184,7 +184,6 @@ class CyclicLR(keras.callbacks.Callback):
         self.orig_base_lr = self.base_lr
 
     def on_batch_end(self, batch, logs=None):
-
         logs = logs or {}
         self.trn_iterations += 1
         self.clr_iterations += 1

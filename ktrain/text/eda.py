@@ -321,7 +321,7 @@ class TopicModel:
                 key=lambda kv: kv[-1],
                 reverse=True,
             )
-            for (idx, topic, count) in topic_counts:
+            for idx, topic, count in topic_counts:
                 print("topic:%s | count:%s | %s" % (idx, count, topic))
         else:
             for i, t in enumerate(topics):

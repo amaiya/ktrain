@@ -14,7 +14,6 @@ def tabular_from_df(
     random_state=None,
     verbose=1,
 ):
-
     train_df = train_df.copy()
 
     # strip space from string columns and check supplied val_df

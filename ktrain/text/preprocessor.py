@@ -360,7 +360,6 @@ class TextPreprocessor(Preprocessor):
     """
 
     def __init__(self, maxlen, class_names, lang="en", multilabel=None):
-
         self.set_classes(class_names)  # converts to list of necessary
         self.maxlen = maxlen
         self.lang = lang
@@ -1260,7 +1259,7 @@ class TransformersPreprocessor(TextPreprocessor):
             pb = texts
         for i in mb:
             # for (idx, text) in enumerate(progress_bar(texts, parent=mb)):
-            for (idx, text) in enumerate(pb):
+            for idx, text in enumerate(pb):
                 if is_pair:
                     text_a = text[0]
                     text_b = text[1]

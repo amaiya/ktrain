@@ -12,7 +12,6 @@ class NodePredictor(Predictor):
     """
 
     def __init__(self, model, preproc, batch_size=U.DEFAULT_BS):
-
         if not isinstance(model, keras.Model):
             raise ValueError("model must be of instance keras.Model")
         if not isinstance(preproc, NodePreprocessor):
@@ -68,7 +67,6 @@ class LinkPredictor(Predictor):
     """
 
     def __init__(self, model, preproc, batch_size=U.DEFAULT_BS):
-
         if not isinstance(model, keras.Model):
             raise ValueError("model must be of instance keras.Model")
         if not isinstance(preproc, LinkPreprocessor):
