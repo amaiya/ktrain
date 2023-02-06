@@ -129,7 +129,7 @@ class EnglishTranslator:
 
         if src_lang is None or src_lang not in SUPPORTED_SRC_LANGS:
             raise ValueError(
-                "A src_lang must be supplied and be one of: %s" % (SUPPORED_SRC_LANG)
+                "A src_lang must be supplied and be one of: %s" % (SUPPORTED_SRC_LANGS)
             )
         self.src_lang = src_lang
         self.translators = []
