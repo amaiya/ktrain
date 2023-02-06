@@ -874,10 +874,6 @@ class TransformersPreprocessor(TextPreprocessor):
                 ).call.__code__.co_varnames
             )
         except:
-            warnings.warn(
-                "Could not load a Tensorflow version of model. (If this worked before, it might be an out-of-memory issue.) "
-                + "Attempting to download/load PyTorch version as TensorFlow model using from_pt=True. You will need PyTorch installed for this."
-            )
             try:
                 self.use_token_type_ids = (
                     "token_type_ids"

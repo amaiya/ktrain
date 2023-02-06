@@ -15,7 +15,8 @@ Most recent releases are shown at the top. Each release shows:
 - N/A
 
 ### fixed:
-- N/A
+- fixed typo in `translation` module (#479)
+- removed superfluous warning when inspecting `transformer` model signature
 
 
 ## 0.33.1 (2023-02-03)
