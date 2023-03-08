@@ -118,7 +118,8 @@ class KeywordExtractor:
                                        True is recommended.
           contrain_unigram_case(bool): If True, only unigrams in uppercase are returned (e.g., LDA, SVM, NASA).
                                        True is recommended. Not applied if exclude_unigram=False
-          exclude_unigrams(bool): If True, unigrams will be excluded from results
+          exclude_unigrams(bool): If True, unigrams will be excluded from results.
+                                  Convenience parameter that is functionally equivalent to changing adjusting ngram_range to be above 1.
           maxlen(int): maximum number of characters in keyphrase. Default:64
           minchars(int): Minimum number of characters in keyword (default:3)
           truncate_to(int): Truncate input to this many words (default:5000, i.e., first 5K words).
