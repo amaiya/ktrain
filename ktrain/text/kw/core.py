@@ -226,18 +226,13 @@ class KeywordExtractor:
         tups = cnt.most_common(n_candidates)
 
         # normalize and return
+        tups = [
+            tup
+            for tup in tups
+            if len(tup[0].split()) > 1 or text.count(" " + tup[0].upper() + " ") > 1
+        ]
         keywords = [tup[0] for tup in tups if len(tup[0]) <= maxlen]
         scores = [tup[1] for tup in tups if len(tup[0]) <= maxlen]
-        keywords = [
-            tup[0]
-            for tup in tups
-            if len(tup[0].split()) > 1 or text.count(" " + tup[0].upper() + " ") > 1
-        ]
-        scores = [
-            tup[1]
-            for tup in tups
-            if len(tup[0].split()) > 1 or text.count(" " + tup[0].upper() + " ") > 1
-        ]
         scores = [float(i) / sum(scores) for i in scores]
         result = list(zip(keywords, scores))
         result = result[:top_n]
