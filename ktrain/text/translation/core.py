@@ -34,7 +34,7 @@ class Translator(TorchBase):
         if quantize:
             self.model = self.quantize_model(self.model)
 
-    def translate(self, src_text, join_with="\n", num_beams=None, early_stopping=None):
+    def translate(self, src_text, join_with="\n", num_beams=1, early_stopping=False):
         """
         ```
         Translate document (src_text).

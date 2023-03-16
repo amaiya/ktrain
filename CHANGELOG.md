@@ -15,7 +15,7 @@ Most recent releases are shown at the top. Each release shows:
 - Added `exclude_unigrams` argument to `text.kw` module and support unigram extraction when `noun_phrases` is selected
 
 ### fixed:
-- N/A
+- explicitly set `num_beams` and `early_stopping` for `generate` in `ktrain.text.translation.core` to prevent errors in `transformers>=4.26.0`
 
 
 ## 0.33.2 (2023-02-06)
