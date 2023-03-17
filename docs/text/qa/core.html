@@ -952,7 +952,6 @@ class _QAExtractor(QA):
         )
 
     def ask(self, question, batch_size=8, **kwargs):
-
         # locate candidate document contexts
         doc_results = kwargs.get(&#34;doc_results&#34;, [])
         if not doc_results:
@@ -960,6 +959,7 @@ class _QAExtractor(QA):
 
         # extract paragraphs as contexts
         contexts, refs = self._split_contexts(doc_results)
+        contexts = [c.replace(&#34;\n&#34;, &#34; &#34;) for c in contexts]
 
         # batchify contexts
         context_batches = self._batchify(contexts, batch_size=batch_size)
@@ -1123,7 +1123,8 @@ class AnswerExtractor:
             raise ValueError(
                 &#34;Number of texts is not equal to the number of rows in the DataFrame.&#34;
             )
-        texts = [t.replace(&#34;\n&#34;, &#34; &#34;).replace(&#34;\t&#34;, &#34; &#34;) for t in texts]
+        # texts = [t.replace(&#34;\n&#34;, &#34; &#34;).replace(&#34;\t&#34;, &#34; &#34;) for t in texts]
+        texts = [t.replace(&#34;\t&#34;, &#34; &#34;) for t in texts]
         questions = [q for q, l in question_label_pairs]
         labels = [l for q, l in question_label_pairs]
         self._check_columns(labels, df)
@@ -1274,15 +1275,13 @@ strings.</p></div>
 </details>
 </dd>
 <dt id="ktrain.text.qa.core.unpack_byte"><code class="name flex">
-<span>def <span class="ident">unpack_byte</span></span>(<span>...)</span>
+<span>def <span class="ident">unpack_byte</span></span>(<span>buffer, /)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>S.unpack(buffer) -&gt; (v1, v2, &hellip;)</p>
-<p>Return a tuple containing values unpacked according to the format
-string S.format.
-The buffer's size in bytes must be S.size.
-See
-help(struct) for more on format strings.</p></div>
+<div class="desc"><p>Return a tuple containing unpacked values.</p>
+<p>Unpack according to the format string Struct.format. The buffer's size
+in bytes must be Struct.size.</p>
+<p>See help(struct) for more on format strings.</p></div>
 </dd>
 </dl>
 </section>
@@ -1434,7 +1433,8 @@ help(struct) for more on format strings.</p></div>
             raise ValueError(
                 &#34;Number of texts is not equal to the number of rows in the DataFrame.&#34;
             )
-        texts = [t.replace(&#34;\n&#34;, &#34; &#34;).replace(&#34;\t&#34;, &#34; &#34;) for t in texts]
+        # texts = [t.replace(&#34;\n&#34;, &#34; &#34;).replace(&#34;\t&#34;, &#34; &#34;) for t in texts]
+        texts = [t.replace(&#34;\t&#34;, &#34; &#34;) for t in texts]
         questions = [q for q, l in question_label_pairs]
         labels = [l for q, l in question_label_pairs]
         self._check_columns(labels, df)
@@ -1542,7 +1542,8 @@ Args:
         raise ValueError(
             &#34;Number of texts is not equal to the number of rows in the DataFrame.&#34;
         )
-    texts = [t.replace(&#34;\n&#34;, &#34; &#34;).replace(&#34;\t&#34;, &#34; &#34;) for t in texts]
+    # texts = [t.replace(&#34;\n&#34;, &#34; &#34;).replace(&#34;\t&#34;, &#34; &#34;) for t in texts]
+    texts = [t.replace(&#34;\t&#34;, &#34; &#34;) for t in texts]
     questions = [q for q, l in question_label_pairs]
     labels = [l for q, l in question_label_pairs]
     self._check_columns(labels, df)

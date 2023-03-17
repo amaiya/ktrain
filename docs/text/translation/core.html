@@ -62,7 +62,7 @@ class Translator(TorchBase):
         if quantize:
             self.model = self.quantize_model(self.model)
 
-    def translate(self, src_text, join_with=&#34;\n&#34;, num_beams=None, early_stopping=None):
+    def translate(self, src_text, join_with=&#34;\n&#34;, num_beams=1, early_stopping=False):
         &#34;&#34;&#34;
         ```
         Translate document (src_text).
@@ -92,7 +92,7 @@ class Translator(TorchBase):
         )
         return join_with.join(tgt_sentences)
 
-    def translate_sentences(self, sentences, num_beams=None, early_stopping=None):
+    def translate_sentences(self, sentences, num_beams=1, early_stopping=False):
         &#34;&#34;&#34;
         ```
         Translate sentences using model_name as model.
@@ -157,7 +157,7 @@ class EnglishTranslator:
 
         if src_lang is None or src_lang not in SUPPORTED_SRC_LANGS:
             raise ValueError(
-                &#34;A src_lang must be supplied and be one of: %s&#34; % (SUPPORED_SRC_LANG)
+                &#34;A src_lang must be supplied and be one of: %s&#34; % (SUPPORTED_SRC_LANGS)
             )
         self.src_lang = src_lang
         self.translators = []
@@ -215,7 +215,7 @@ class EnglishTranslator:
         else:
             raise ValueError(&#34;lang:%s is currently not supported.&#34; % (src_lang))
 
-    def translate(self, src_text, join_with=&#34;\n&#34;, num_beams=None, early_stopping=None):
+    def translate(self, src_text, join_with=&#34;\n&#34;, num_beams=1, early_stopping=False):
         &#34;&#34;&#34;
         ```
         Translate source document to English.
@@ -316,7 +316,7 @@ Args:
 
         if src_lang is None or src_lang not in SUPPORTED_SRC_LANGS:
             raise ValueError(
-                &#34;A src_lang must be supplied and be one of: %s&#34; % (SUPPORED_SRC_LANG)
+                &#34;A src_lang must be supplied and be one of: %s&#34; % (SUPPORTED_SRC_LANGS)
             )
         self.src_lang = src_lang
         self.translators = []
@@ -374,7 +374,7 @@ Args:
         else:
             raise ValueError(&#34;lang:%s is currently not supported.&#34; % (src_lang))
 
-    def translate(self, src_text, join_with=&#34;\n&#34;, num_beams=None, early_stopping=None):
+    def translate(self, src_text, join_with=&#34;\n&#34;, num_beams=1, early_stopping=False):
         &#34;&#34;&#34;
         ```
         Translate source document to English.
@@ -412,7 +412,7 @@ Args:
 <h3>Methods</h3>
 <dl>
 <dt id="ktrain.text.translation.core.EnglishTranslator.translate"><code class="name flex">
-<span>def <span class="ident">translate</span></span>(<span>self, src_text, join_with='\n', num_beams=None, early_stopping=None)</span>
+<span>def <span class="ident">translate</span></span>(<span>self, src_text, join_with='\n', num_beams=1, early_stopping=False)</span>
 </code></dt>
 <dd>
 <div class="desc"><pre><code>Translate source document to English.
@@ -440,7 +440,7 @@ Returns:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def translate(self, src_text, join_with=&#34;\n&#34;, num_beams=None, early_stopping=None):
+<pre><code class="python">def translate(self, src_text, join_with=&#34;\n&#34;, num_beams=1, early_stopping=False):
     &#34;&#34;&#34;
     ```
     Translate source document to English.
@@ -523,7 +523,7 @@ Args:
         if quantize:
             self.model = self.quantize_model(self.model)
 
-    def translate(self, src_text, join_with=&#34;\n&#34;, num_beams=None, early_stopping=None):
+    def translate(self, src_text, join_with=&#34;\n&#34;, num_beams=1, early_stopping=False):
         &#34;&#34;&#34;
         ```
         Translate document (src_text).
@@ -553,7 +553,7 @@ Args:
         )
         return join_with.join(tgt_sentences)
 
-    def translate_sentences(self, sentences, num_beams=None, early_stopping=None):
+    def translate_sentences(self, sentences, num_beams=1, early_stopping=False):
         &#34;&#34;&#34;
         ```
         Translate sentences using model_name as model.
@@ -595,7 +595,7 @@ Args:
 <h3>Methods</h3>
 <dl>
 <dt id="ktrain.text.translation.core.Translator.translate"><code class="name flex">
-<span>def <span class="ident">translate</span></span>(<span>self, src_text, join_with='\n', num_beams=None, early_stopping=None)</span>
+<span>def <span class="ident">translate</span></span>(<span>self, src_text, join_with='\n', num_beams=1, early_stopping=False)</span>
 </code></dt>
 <dd>
 <div class="desc"><pre><code>Translate document (src_text).
@@ -622,7 +622,7 @@ Returns:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def translate(self, src_text, join_with=&#34;\n&#34;, num_beams=None, early_stopping=None):
+<pre><code class="python">def translate(self, src_text, join_with=&#34;\n&#34;, num_beams=1, early_stopping=False):
     &#34;&#34;&#34;
     ```
     Translate document (src_text).
@@ -654,7 +654,7 @@ Returns:
 </details>
 </dd>
 <dt id="ktrain.text.translation.core.Translator.translate_sentences"><code class="name flex">
-<span>def <span class="ident">translate_sentences</span></span>(<span>self, sentences, num_beams=None, early_stopping=None)</span>
+<span>def <span class="ident">translate_sentences</span></span>(<span>self, sentences, num_beams=1, early_stopping=False)</span>
 </code></dt>
 <dd>
 <div class="desc"><pre><code>Translate sentences using model_name as model.
@@ -677,7 +677,7 @@ Returns:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def translate_sentences(self, sentences, num_beams=None, early_stopping=None):
+<pre><code class="python">def translate_sentences(self, sentences, num_beams=1, early_stopping=False):
     &#34;&#34;&#34;
     ```
     Translate sentences using model_name as model.

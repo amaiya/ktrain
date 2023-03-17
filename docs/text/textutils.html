@@ -466,15 +466,17 @@ def paragraph_tokenize(
         elif join_sentences and not join_tokens:
             sents = [item for sublist in sents for item in sublist]
         paragraphs.append(sents)
-    paragraphs = paragraphs[0] if len(paragraphs) == 1 else paragraphs
+    # 20220715: moved to tokenize due to text/qa/core.py usage
+    # paragraphs = paragraphs[0] if len(paragraphs) == 1 else paragraphs
     return paragraphs
 
 
 def tokenize(s, join_tokens=False, join_sentences=True, join_char=&#34; &#34;):
     s = s.replace(&#34;\n&#34;, &#34; &#34;)
-    return paragraph_tokenize(
+    paragraphs = paragraph_tokenize(
         s, join_tokens=join_tokens, join_sentences=join_sentences, join_char=join_char
     )
+    return paragraphs[0] if len(paragraphs) == 1 else paragraphs
 
 
 def extract_noun_phrases(text):
@@ -1060,7 +1062,8 @@ Return:
         elif join_sentences and not join_tokens:
             sents = [item for sublist in sents for item in sublist]
         paragraphs.append(sents)
-    paragraphs = paragraphs[0] if len(paragraphs) == 1 else paragraphs
+    # 20220715: moved to tokenize due to text/qa/core.py usage
+    # paragraphs = paragraphs[0] if len(paragraphs) == 1 else paragraphs
     return paragraphs</code></pre>
 </details>
 </dd>
@@ -1277,9 +1280,10 @@ unidecode map to be used by translate as explained here:</p>
 </summary>
 <pre><code class="python">def tokenize(s, join_tokens=False, join_sentences=True, join_char=&#34; &#34;):
     s = s.replace(&#34;\n&#34;, &#34; &#34;)
-    return paragraph_tokenize(
+    paragraphs = paragraph_tokenize(
         s, join_tokens=join_tokens, join_sentences=join_sentences, join_char=join_char
-    )</code></pre>
+    )
+    return paragraphs[0] if len(paragraphs) == 1 else paragraphs</code></pre>
 </details>
 </dd>
 </dl>

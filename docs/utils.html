@@ -51,7 +51,15 @@ def get_default_optimizer(lr=0.001, wd=DEFAULT_WD):
 # Use vanilla Adam as default unless weight decay is explicitly set by user
 # in which case AdamWeightDecay is default optimizer.
 # See core.Learner.set_weight_decay for more information
-DEFAULT_OPT = &#34;adam&#34;
+# dep_fix
+if &#34;tensorflow&#34; in sys.modules:
+    DEFAULT_OPT = (
+        &#34;adam&#34;
+        if version.parse(tf.__version__) &lt; version.parse(&#34;2.11&#34;)
+        else tf.keras.optimizers.legacy.Adam()
+    )
+else:
+    DEFAULT_OPT = &#34;adam&#34;
 DEFAULT_BS = 32
 DEFAULT_ES = 5
 DEFAULT_ROP = 2
@@ -83,7 +91,7 @@ def is_ktrain_dataset(data):
 
 def loss_fn_from_model(model):
     # dep_fix
-    if version.parse(tf.__version__) &lt; version.parse(&#34;2.2&#34;):
+    if version.parse(tf.__version__) &lt; version.parse(&#34;2.2&#34;) or DISABLE_V2_BEHAVIOR:
         return model.loss_functions[0].fn
     else:  # TF 2.2.0
         return model.compiled_loss._get_loss_object(
@@ -656,7 +664,6 @@ def vprint(s=None, verbose=1):
 
 
 def add_headers_to_df(fname_in, header_dict, fname_out=None):
-
     df = pd.read_csv(fname_in, header=None)
     df.rename(columns=header_dict, inplace=True)
     if fname_out is None:
@@ -892,13 +899,13 @@ class YTransformDataFrame(YTransform):
             targets = (
                 df[self.label_columns[0]].values
                 if labels_exist
-                else np.zeros(df.shape[0], dtype=np.int)
+                else np.zeros(df.shape[0], dtype=np.int_)
             )
             if self.is_regression and isinstance(targets[0], str):
                 warnings.warn(
                     &#34;is_regression=True was supplied but targets are strings - casting to floats&#34;
                 )
-                targets = targets.astype(np.float)
+                targets = targets.astype(np.float64)
 
             # set class_names if classification task and targets with integer labels
             if train and not self.is_regression and not isinstance(targets[0], str):
@@ -965,7 +972,6 @@ class YTransformDataFrame(YTransform):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def add_headers_to_df(fname_in, header_dict, fname_out=None):
-
     df = pd.read_csv(fname_in, header=None)
     df.rename(columns=header_dict, inplace=True)
     if fname_out is None:
@@ -1636,7 +1642,7 @@ model and/or data</p></div>
 </summary>
 <pre><code class="python">def loss_fn_from_model(model):
     # dep_fix
-    if version.parse(tf.__version__) &lt; version.parse(&#34;2.2&#34;):
+    if version.parse(tf.__version__) &lt; version.parse(&#34;2.2&#34;) or DISABLE_V2_BEHAVIOR:
         return model.loss_functions[0].fn
     else:  # TF 2.2.0
         return model.compiled_loss._get_loss_object(
@@ -2297,13 +2303,13 @@ Args:
             targets = (
                 df[self.label_columns[0]].values
                 if labels_exist
-                else np.zeros(df.shape[0], dtype=np.int)
+                else np.zeros(df.shape[0], dtype=np.int_)
             )
             if self.is_regression and isinstance(targets[0], str):
                 warnings.warn(
                     &#34;is_regression=True was supplied but targets are strings - casting to floats&#34;
                 )
-                targets = targets.astype(np.float)
+                targets = targets.astype(np.float64)
 
             # set class_names if classification task and targets with integer labels
             if train and not self.is_regression and not isinstance(targets[0], str):
@@ -2413,13 +2419,13 @@ Args:
         targets = (
             df[self.label_columns[0]].values
             if labels_exist
-            else np.zeros(df.shape[0], dtype=np.int)
+            else np.zeros(df.shape[0], dtype=np.int_)
         )
         if self.is_regression and isinstance(targets[0], str):
             warnings.warn(
                 &#34;is_regression=True was supplied but targets are strings - casting to floats&#34;
             )
-            targets = targets.astype(np.float)
+            targets = targets.astype(np.float64)
 
         # set class_names if classification task and targets with integer labels
         if train and not self.is_regression and not isinstance(targets[0], str):

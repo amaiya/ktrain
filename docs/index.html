@@ -146,7 +146,7 @@ def get_learner(
             learner = BERTTextClassLearner
         else:  # vanilla text classifiers use standard ArrayLearners
             learner = ArrayLearner
-    return learner(
+    l = learner(
         model,
         train_data=train_data,
         val_data=val_data,
@@ -155,6 +155,19 @@ def get_learner(
         workers=workers,
         use_multiprocessing=use_multiprocessing,
     )
+    import tensorflow as tf
+    from tensorflow.keras.optimizers import Optimizer
+    import warnings
+    from packaging import version
+
+    if (version.parse(tf.__version__) &gt;= version.parse(&#34;2.11&#34;)) and (
+        isinstance(l.model.optimizer, Optimizer)
+    ):
+        warnings.warn(
+            &#34;ktrain currently only supports legacy optimizers in tensorflow&gt;=2.11 - recompiling your model to use legacy Adam&#34;
+        )
+        l._recompile(wd=0)
+    return l
 
 
 # keys
@@ -368,7 +381,7 @@ use_multiprocessing(bool):  whether or not to use multiprocessing for workers
             learner = BERTTextClassLearner
         else:  # vanilla text classifiers use standard ArrayLearners
             learner = ArrayLearner
-    return learner(
+    l = learner(
         model,
         train_data=train_data,
         val_data=val_data,
@@ -376,7 +389,20 @@ use_multiprocessing(bool):  whether or not to use multiprocessing for workers
         eval_batch_size=eval_batch_size,
         workers=workers,
         use_multiprocessing=use_multiprocessing,
-    )</code></pre>
+    )
+    import tensorflow as tf
+    from tensorflow.keras.optimizers import Optimizer
+    import warnings
+    from packaging import version
+
+    if (version.parse(tf.__version__) &gt;= version.parse(&#34;2.11&#34;)) and (
+        isinstance(l.model.optimizer, Optimizer)
+    ):
+        warnings.warn(
+            &#34;ktrain currently only supports legacy optimizers in tensorflow&gt;=2.11 - recompiling your model to use legacy Adam&#34;
+        )
+        l._recompile(wd=0)
+    return l</code></pre>
 </details>
 </dd>
 <dt id="ktrain.get_predictor"><code class="name flex">

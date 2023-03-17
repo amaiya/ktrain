@@ -432,14 +432,12 @@ class Categorify(TabularProc):
     def apply_train(self, df):
         self.categories = {}
         for n in self.cat_names:
-            df.loc[:, n] = df.loc[:, n].astype(&#34;category&#34;).cat.as_ordered()
+            df[n] = df[n].astype(&#34;category&#34;).cat.as_ordered()
             self.categories[n] = df[n].cat.categories
 
     def apply_test(self, df):
         for n in self.cat_names:
-            df.loc[:, n] = pd.Categorical(
-                df[n], categories=self.categories[n], ordered=True
-            )
+            df[n] = pd.Categorical(df[n], categories=self.categories[n], ordered=True)
 
 
 FILL_MEDIAN = &#34;median&#34;
@@ -851,14 +849,12 @@ Args:
     def apply_train(self, df):
         self.categories = {}
         for n in self.cat_names:
-            df.loc[:, n] = df.loc[:, n].astype(&#34;category&#34;).cat.as_ordered()
+            df[n] = df[n].astype(&#34;category&#34;).cat.as_ordered()
             self.categories[n] = df[n].cat.categories
 
     def apply_test(self, df):
         for n in self.cat_names:
-            df.loc[:, n] = pd.Categorical(
-                df[n], categories=self.categories[n], ordered=True
-            )</code></pre>
+            df[n] = pd.Categorical(df[n], categories=self.categories[n], ordered=True)</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -934,7 +930,9 @@ Args:
                     f&#34;&#34;&#34;There are nan values in field {name} but there were none in the training set.
                 Filled with {self.fill_strategy}.&#34;&#34;&#34;
                 )
-                df[name] = df[name].fillna(self.filler_dict[name])</code></pre>
+                df[name] = df[name].fillna(self.filler_dict[name])
+                # raise Exception(f&#34;&#34;&#34;There are nan values in field {name} but there were none in the training set.
+                # Please fix those manually.&#34;&#34;&#34;)</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -965,7 +963,9 @@ Args:
                 f&#34;&#34;&#34;There are nan values in field {name} but there were none in the training set.
             Filled with {self.fill_strategy}.&#34;&#34;&#34;
             )
-            df[name] = df[name].fillna(self.filler_dict[name])</code></pre>
+            df[name] = df[name].fillna(self.filler_dict[name])
+            # raise Exception(f&#34;&#34;&#34;There are nan values in field {name} but there were none in the training set.
+            # Please fix those manually.&#34;&#34;&#34;)</code></pre>
 </details>
 </dd>
 </dl>

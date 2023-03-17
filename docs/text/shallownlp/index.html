@@ -1063,7 +1063,46 @@ Args:
         results = self.predictor.predict(texts, merge_tokens=merge_tokens)
         if len(results) == 1:
             results = results[0]
-        return results</code></pre>
+        return results
+
+    # 2020-04-30: moved to text.ner.predictor
+    # def merge_tokens(self, annotated_sentence):
+    #    if self.lang.startswith(&#39;zh&#39;):
+    #        sep = &#39;&#39;
+    #    else:
+    #        sep = &#39; &#39;
+    #    current_token = &#34;&#34;
+    #    current_tag = &#34;&#34;
+    #    entities = []
+
+    #    for tup in annotated_sentence:
+    #        token = tup[0]
+    #        entity = tup[1]
+    #        tag = entity.split(&#39;-&#39;)[1] if &#39;-&#39; in entity else None
+    #        prefix = entity.split(&#39;-&#39;)[0] if &#39;-&#39; in entity else None
+    #        # not within entity
+    #        if tag is None and not current_token:
+    #            continue
+    #        # beginning of entity
+    #        #elif tag and prefix==&#39;B&#39;:
+    #        elif tag and (prefix==&#39;B&#39; or prefix==&#39;I&#39; and not current_token):
+    #            if current_token: # consecutive entities
+    #                entities.append((current_token, current_tag))
+    #                current_token = &#34;&#34;
+    #                current_tag = None
+    #            current_token = token
+    #            current_tag = tag
+    #        # end of entity
+    #        elif tag is None and current_token:
+    #            entities.append((current_token, current_tag))
+    #            current_token = &#34;&#34;
+    #            current_tag = None
+    #            continue
+    #        # within entity
+    #        elif tag and current_token:  #  prefix I
+    #            current_token = current_token + sep + token
+    #            current_tag = tag
+    #    return entities</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>

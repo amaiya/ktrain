@@ -294,7 +294,7 @@ def graph_links_from_csv(
     # ----------------------------------------------------------------
     nx_sep = None if sep in [&#34; &#34;, &#34;\t&#34;] else sep
     G = nx.read_edgelist(path=links_filepath, delimiter=nx_sep)
-    print(nx.info(G))
+    # print(nx.info(G))
 
     # ----------------------------------------------------------------
     # read node attributes
@@ -320,8 +320,8 @@ def graph_links_from_csv(
     node_data = df
     node_features = node_data[feature_names].values
     for nid, f in zip(node_data.index, node_features):
-        G.node[nid][sg.globalvar.TYPE_ATTR_NAME] = &#34;node&#34;
-        G.node[nid][&#34;feature&#34;] = f
+        G.nodes[nid][sg.globalvar.TYPE_ATTR_NAME] = &#34;node&#34;
+        G.nodes[nid][&#34;feature&#34;] = f
 
     # ----------------------------------------------------------------
     # train/validation sets
@@ -423,7 +423,7 @@ Return:
     # ----------------------------------------------------------------
     nx_sep = None if sep in [&#34; &#34;, &#34;\t&#34;] else sep
     G = nx.read_edgelist(path=links_filepath, delimiter=nx_sep)
-    print(nx.info(G))
+    # print(nx.info(G))
 
     # ----------------------------------------------------------------
     # read node attributes
@@ -449,8 +449,8 @@ Return:
     node_data = df
     node_features = node_data[feature_names].values
     for nid, f in zip(node_data.index, node_features):
-        G.node[nid][sg.globalvar.TYPE_ATTR_NAME] = &#34;node&#34;
-        G.node[nid][&#34;feature&#34;] = f
+        G.nodes[nid][sg.globalvar.TYPE_ATTR_NAME] = &#34;node&#34;
+        G.nodes[nid][&#34;feature&#34;] = f
 
     # ----------------------------------------------------------------
     # train/validation sets

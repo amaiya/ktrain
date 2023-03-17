@@ -377,112 +377,6 @@ def hf_convert_example(
     return [input_ids, attention_mask, token_type_ids]
 
 
-def hf_convert_examples(
-    texts,
-    y=None,
-    tokenizer=None,
-    max_length=512,
-    pad_on_left=False,
-    pad_token=0,
-    pad_token_segment_id=0,
-    mask_padding_with_zero=True,
-    use_dynamic_shape=False,
-    verbose=1,
-):
-    &#34;&#34;&#34;
-    ```
-    Loads a data file into a list of ``InputFeatures``
-    Args:
-        texts: texts of documents or sentence pairs
-        y:  labels for documents
-        tokenizer: Instance of a tokenizer that will tokenize the examples
-        max_length: Maximum example length
-        pad_on_left: If set to ``True``, the examples will be padded on the left rather than on the right (default)
-        pad_token: Padding token
-        pad_token_segment_id: The segment ID for the padding token (It is usually 0, but can vary such as for XLNet where it is 4)
-        mask_padding_with_zero: If set to ``True``, the attention mask will be filled by ``1`` for actual values
-            and by ``0`` for padded values. If set to ``False``, inverts it (``1`` for padded values, ``0`` for
-            actual values)
-        use_dynamic_shape(bool):  If True, supplied max_length will be ignored and will be computed
-                                  based on provided texts instead.
-        verbose(bool): verbosity
-    Returns:
-        If the ``examples`` input is a ``tf.data.Dataset``, will return a ``tf.data.Dataset``
-        containing the task-specific features. If the input is a list of ``InputExamples``, will return
-        a list of task-specific ``InputFeatures`` which can be fed to the model.
-    ```
-    &#34;&#34;&#34;
-
-    is_array, is_pair = detect_text_format(texts)
-
-    if use_dynamic_shape:
-        sentences = []
-        for text in texts:
-            if is_pair:
-                text_a = text[0]
-                text_b = text[1]
-            else:
-                text_a = text
-                text_b = None
-            sentences.append(
-                tokenizer.convert_ids_to_tokens(tokenizer.encode(text_a, text_b))
-            )
-            # sentences.append(tokenizer.tokenize(text_a, text_b)) # only works for Fast tokenizers
-        maxlen = (
-            len(
-                max(
-                    [tokens for tokens in sentences],
-                    key=len,
-                )
-            )
-            + 2
-        )
-
-        if maxlen &lt; max_length:
-            max_length = maxlen
-
-    data = []
-    features_list = []
-    labels = []
-    if verbose:
-        mb = master_bar(range(1))
-        pb = progress_bar(texts, parent=mb)
-    else:
-        mb = range(1)
-        pb = texts
-    for i in mb:
-        # for (idx, text) in enumerate(progress_bar(texts, parent=mb)):
-        for (idx, text) in enumerate(pb):
-            if is_pair:
-                text_a = text[0]
-                text_b = text[1]
-            else:
-                text_a = text
-                text_b = None
-            features = hf_convert_example(
-                text_a,
-                text_b=text_b,
-                tokenizer=tokenizer,
-                max_length=max_length,
-                pad_on_left=pad_on_left,
-                pad_token=pad_token,
-                pad_token_segment_id=pad_token_segment_id,
-                mask_padding_with_zero=mask_padding_with_zero,
-            )
-            features_list.append(features)
-            labels.append(y[idx] if y is not None else None)
-    # tfdataset = hf_features_to_tfdataset(features_list, labels)
-    # return tfdataset
-    # return (features_list, labels)
-    # HF_EXCEPTION
-    # due to issues in transormers library and TF2 tf.Datasets, arrays are converted
-    # to iterators on-the-fly
-    # return  TransformerSequence(np.array(features_list), np.array(labels))
-    from .dataset import TransformerDataset
-
-    return TransformerDataset(np.array(features_list), np.array(labels))
-
-
 # ------------------------------------------------------------------------------
 
 
@@ -494,7 +388,6 @@ class TextPreprocessor(Preprocessor):
     &#34;&#34;&#34;
 
     def __init__(self, maxlen, class_names, lang=&#34;en&#34;, multilabel=None):
-
         self.set_classes(class_names)  # converts to list of necessary
         self.maxlen = maxlen
         self.lang = lang
@@ -891,8 +784,7 @@ class BERTPreprocessor(TextPreprocessor):
             for line in reader:
                 token = line.strip()
                 token_dict[token] = len(token_dict)
-        from keras_bert import Tokenizer as BERT_Tokenizer
-
+        check_keras_bert()
         tokenizer = BERT_Tokenizer(token_dict)
         self.tok = tokenizer
         self.tok_dct = dict((v, k) for k, v in token_dict.items())
@@ -1000,6 +892,32 @@ class TransformersPreprocessor(TextPreprocessor):
         self.model_type = TFAutoModelForSequenceClassification
         self.tokenizer_type = AutoTokenizer
 
+        # DistilBert call method no longer accepts **kwargs, so we must avoid including token_type_ids parameter
+        # reference: https://github.com/huggingface/transformers/issues/2702
+        try:
+            self.use_token_type_ids = (
+                &#34;token_type_ids&#34;
+                in self.model_type.from_pretrained(
+                    self.model_name
+                ).call.__code__.co_varnames
+            )
+        except:
+            try:
+                self.use_token_type_ids = (
+                    &#34;token_type_ids&#34;
+                    in self.model_type.from_pretrained(
+                        self.model_name, from_pt=True
+                    ).call.__code__.co_varnames
+                )
+            except:
+                # load model as normal to expose error to user
+                self.use_token_type_ids = (
+                    &#34;token_type_ids&#34;
+                    in self.model_type.from_pretrained(
+                        self.model_name
+                    ).call.__code__.co_varnames
+                )
+
         if &#34;bert-base-japanese&#34; in model_name:
             self.tokenizer_type = transformers.BertJapaneseTokenizer
 
@@ -1032,6 +950,10 @@ class TransformersPreprocessor(TextPreprocessor):
             self.ytransform = U.YTransform(
                 class_names=self.get_classes(), label_encoder=le
             )
+        if not hasattr(self, &#34;use_token_type_ids&#34;):
+            # As a shortcut, we simply set use_token_type_ids to False if model is distilbert,
+            # as most models use token_type_ids (e.g., bert, deberta, etc.) in their call method
+            self.use_token_type_ids = self.name != &#34;distilbert&#34;
 
     def set_config(self, config):
         self.config = config
@@ -1139,7 +1061,7 @@ class TransformersPreprocessor(TextPreprocessor):
 
         # convert examples
         tok, _ = self.get_preprocessor()
-        dataset = hf_convert_examples(
+        dataset = self.hf_convert_examples(
             texts,
             y=y,
             tokenizer=tok,
@@ -1284,6 +1206,116 @@ class TransformersPreprocessor(TextPreprocessor):
             return self.get_regression_model(fpath=fpath)
         else:
             return self.get_classifier(fpath=fpath)
+
+    def hf_convert_examples(
+        self,
+        texts,
+        y=None,
+        tokenizer=None,
+        max_length=512,
+        pad_on_left=False,
+        pad_token=0,
+        pad_token_segment_id=0,
+        mask_padding_with_zero=True,
+        use_dynamic_shape=False,
+        verbose=1,
+    ):
+        &#34;&#34;&#34;
+        ```
+        Loads a data file into a list of ``InputFeatures``
+        Args:
+            texts: texts of documents or sentence pairs
+            y:  labels for documents
+            tokenizer: Instance of a tokenizer that will tokenize the examples
+            max_length: Maximum example length
+            pad_on_left: If set to ``True``, the examples will be padded on the left rather than on the right (default)
+            pad_token: Padding token
+            pad_token_segment_id: The segment ID for the padding token (It is usually 0, but can vary such as for XLNet where it is 4)
+            mask_padding_with_zero: If set to ``True``, the attention mask will be filled by ``1`` for actual values
+                and by ``0`` for padded values. If set to ``False``, inverts it (``1`` for padded values, ``0`` for
+                actual values)
+            use_dynamic_shape(bool):  If True, supplied max_length will be ignored and will be computed
+                                      based on provided texts instead.
+            verbose(bool): verbosity
+        Returns:
+            If the ``examples`` input is a ``tf.data.Dataset``, will return a ``tf.data.Dataset``
+            containing the task-specific features. If the input is a list of ``InputExamples``, will return
+            a list of task-specific ``InputFeatures`` which can be fed to the model.
+        ```
+        &#34;&#34;&#34;
+
+        is_array, is_pair = detect_text_format(texts)
+
+        if use_dynamic_shape:
+            sentences = []
+            for text in texts:
+                if is_pair:
+                    text_a = text[0]
+                    text_b = text[1]
+                else:
+                    text_a = text
+                    text_b = None
+                sentences.append(
+                    tokenizer.convert_ids_to_tokens(tokenizer.encode(text_a, text_b))
+                )
+                # sentences.append(tokenizer.tokenize(text_a, text_b)) # only works for Fast tokenizers
+            maxlen = (
+                len(
+                    max(
+                        [tokens for tokens in sentences],
+                        key=len,
+                    )
+                )
+                + 2
+            )
+
+            if maxlen &lt; max_length:
+                max_length = maxlen
+
+        data = []
+        features_list = []
+        labels = []
+        if verbose:
+            mb = master_bar(range(1))
+            pb = progress_bar(texts, parent=mb)
+        else:
+            mb = range(1)
+            pb = texts
+        for i in mb:
+            # for (idx, text) in enumerate(progress_bar(texts, parent=mb)):
+            for idx, text in enumerate(pb):
+                if is_pair:
+                    text_a = text[0]
+                    text_b = text[1]
+                else:
+                    text_a = text
+                    text_b = None
+                features = hf_convert_example(
+                    text_a,
+                    text_b=text_b,
+                    tokenizer=tokenizer,
+                    max_length=max_length,
+                    pad_on_left=pad_on_left,
+                    pad_token=pad_token,
+                    pad_token_segment_id=pad_token_segment_id,
+                    mask_padding_with_zero=mask_padding_with_zero,
+                )
+                features_list.append(features)
+                labels.append(y[idx] if y is not None else None)
+        # tfdataset = hf_features_to_tfdataset(features_list, labels)
+        # return tfdataset
+        # return (features_list, labels)
+        # HF_EXCEPTION
+        # due to issues in transormers library and TF2 tf.Datasets, arrays are converted
+        # to iterators on-the-fly
+        # return  TransformerSequence(np.array(features_list), np.array(labels))
+        from .dataset import TransformerDataset
+
+        return TransformerDataset(
+            np.array(features_list),
+            np.array(labels),
+            use_token_type_ids=self.use_token_type_ids,
+        )
 
 
 class DistilBertPreprocessor(TransformersPreprocessor):
@@ -1958,140 +1990,6 @@ TEXT_PREPROCESSORS = {
     return [input_ids, attention_mask, token_type_ids]</code></pre>
 </details>
 </dd>
-<dt id="ktrain.text.preprocessor.hf_convert_examples"><code class="name flex">
-<span>def <span class="ident">hf_convert_examples</span></span>(<span>texts, y=None, tokenizer=None, max_length=512, pad_on_left=False, pad_token=0, pad_token_segment_id=0, mask_padding_with_zero=True, use_dynamic_shape=False, verbose=1)</span>
-</code></dt>
-<dd>
-<div class="desc"><pre><code>Loads a data file into a list of ``InputFeatures``
-Args:
-    texts: texts of documents or sentence pairs
-    y:  labels for documents
-    tokenizer: Instance of a tokenizer that will tokenize the examples
-    max_length: Maximum example length
-    pad_on_left: If set to ``True``, the examples will be padded on the left rather than on the right (default)
-    pad_token: Padding token
-    pad_token_segment_id: The segment ID for the padding token (It is usually 0, but can vary such as for XLNet where it is 4)
-    mask_padding_with_zero: If set to ``True``, the attention mask will be filled by ``1`` for actual values
-        and by ``0`` for padded values. If set to ``False``, inverts it (``1`` for padded values, ``0`` for
-        actual values)
-    use_dynamic_shape(bool):  If True, supplied max_length will be ignored and will be computed
-                              based on provided texts instead.
-    verbose(bool): verbosity
-Returns:
-    If the ``examples`` input is a ``tf.data.Dataset``, will return a ``tf.data.Dataset``
-    containing the task-specific features. If the input is a list of ``InputExamples``, will return
-    a list of task-specific ``InputFeatures`` which can be fed to the model.
-</code></pre></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def hf_convert_examples(
-    texts,
-    y=None,
-    tokenizer=None,
-    max_length=512,
-    pad_on_left=False,
-    pad_token=0,
-    pad_token_segment_id=0,
-    mask_padding_with_zero=True,
-    use_dynamic_shape=False,
-    verbose=1,
-):
-    &#34;&#34;&#34;
-    ```
-    Loads a data file into a list of ``InputFeatures``
-    Args:
-        texts: texts of documents or sentence pairs
-        y:  labels for documents
-        tokenizer: Instance of a tokenizer that will tokenize the examples
-        max_length: Maximum example length
-        pad_on_left: If set to ``True``, the examples will be padded on the left rather than on the right (default)
-        pad_token: Padding token
-        pad_token_segment_id: The segment ID for the padding token (It is usually 0, but can vary such as for XLNet where it is 4)
-        mask_padding_with_zero: If set to ``True``, the attention mask will be filled by ``1`` for actual values
-            and by ``0`` for padded values. If set to ``False``, inverts it (``1`` for padded values, ``0`` for
-            actual values)
-        use_dynamic_shape(bool):  If True, supplied max_length will be ignored and will be computed
-                                  based on provided texts instead.
-        verbose(bool): verbosity
-    Returns:
-        If the ``examples`` input is a ``tf.data.Dataset``, will return a ``tf.data.Dataset``
-        containing the task-specific features. If the input is a list of ``InputExamples``, will return
-        a list of task-specific ``InputFeatures`` which can be fed to the model.
-    ```
-    &#34;&#34;&#34;
-
-    is_array, is_pair = detect_text_format(texts)
-
-    if use_dynamic_shape:
-        sentences = []
-        for text in texts:
-            if is_pair:
-                text_a = text[0]
-                text_b = text[1]
-            else:
-                text_a = text
-                text_b = None
-            sentences.append(
-                tokenizer.convert_ids_to_tokens(tokenizer.encode(text_a, text_b))
-            )
-            # sentences.append(tokenizer.tokenize(text_a, text_b)) # only works for Fast tokenizers
-        maxlen = (
-            len(
-                max(
-                    [tokens for tokens in sentences],
-                    key=len,
-                )
-            )
-            + 2
-        )
-
-        if maxlen &lt; max_length:
-            max_length = maxlen
-
-    data = []
-    features_list = []
-    labels = []
-    if verbose:
-        mb = master_bar(range(1))
-        pb = progress_bar(texts, parent=mb)
-    else:
-        mb = range(1)
-        pb = texts
-    for i in mb:
-        # for (idx, text) in enumerate(progress_bar(texts, parent=mb)):
-        for (idx, text) in enumerate(pb):
-            if is_pair:
-                text_a = text[0]
-                text_b = text[1]
-            else:
-                text_a = text
-                text_b = None
-            features = hf_convert_example(
-                text_a,
-                text_b=text_b,
-                tokenizer=tokenizer,
-                max_length=max_length,
-                pad_on_left=pad_on_left,
-                pad_token=pad_token,
-                pad_token_segment_id=pad_token_segment_id,
-                mask_padding_with_zero=mask_padding_with_zero,
-            )
-            features_list.append(features)
-            labels.append(y[idx] if y is not None else None)
-    # tfdataset = hf_features_to_tfdataset(features_list, labels)
-    # return tfdataset
-    # return (features_list, labels)
-    # HF_EXCEPTION
-    # due to issues in transormers library and TF2 tf.Datasets, arrays are converted
-    # to iterators on-the-fly
-    # return  TransformerSequence(np.array(features_list), np.array(labels))
-    from .dataset import TransformerDataset
-
-    return TransformerDataset(np.array(features_list), np.array(labels))</code></pre>
-</details>
-</dd>
 <dt id="ktrain.text.preprocessor.hf_features_to_tfdataset"><code class="name flex">
 <span>def <span class="ident">hf_features_to_tfdataset</span></span>(<span>features_list, labels)</span>
 </code></dt>
@@ -2199,8 +2097,7 @@ Returns:
             for line in reader:
                 token = line.strip()
                 token_dict[token] = len(token_dict)
-        from keras_bert import Tokenizer as BERT_Tokenizer
-
+        check_keras_bert()
         tokenizer = BERT_Tokenizer(token_dict)
         self.tok = tokenizer
         self.tok_dct = dict((v, k) for k, v in token_dict.items())
@@ -2426,6 +2323,7 @@ Returns:
 <ul class="hlist">
 <li><code><a title="ktrain.text.preprocessor.TransformersPreprocessor.get_classifier" href="#ktrain.text.preprocessor.TransformersPreprocessor.get_classifier">get_classifier</a></code></li>
 <li><code><a title="ktrain.text.preprocessor.TransformersPreprocessor.get_regression_model" href="#ktrain.text.preprocessor.TransformersPreprocessor.get_regression_model">get_regression_model</a></code></li>
+<li><code><a title="ktrain.text.preprocessor.TransformersPreprocessor.hf_convert_examples" href="#ktrain.text.preprocessor.TransformersPreprocessor.hf_convert_examples">hf_convert_examples</a></code></li>
 <li><code><a title="ktrain.text.preprocessor.TransformersPreprocessor.load_model_and_configure_from_data" href="#ktrain.text.preprocessor.TransformersPreprocessor.load_model_and_configure_from_data">load_model_and_configure_from_data</a></code></li>
 <li><code><a title="ktrain.text.preprocessor.TransformersPreprocessor.preprocess_train" href="#ktrain.text.preprocessor.TransformersPreprocessor.preprocess_train">preprocess_train</a></code></li>
 <li><code><a title="ktrain.text.preprocessor.TransformersPreprocessor.print_seqlen_stats" href="#ktrain.text.preprocessor.TextPreprocessor.print_seqlen_stats">print_seqlen_stats</a></code></li>
@@ -2875,7 +2773,6 @@ Returns:
     &#34;&#34;&#34;
 
     def __init__(self, maxlen, class_names, lang=&#34;en&#34;, multilabel=None):
-
         self.set_classes(class_names)  # converts to list of necessary
         self.maxlen = maxlen
         self.lang = lang
@@ -3085,7 +2982,8 @@ def seqlen_stats(cls, list_of_texts):
     if not self.preprocess_train_called:
         warnings.warn(
             &#34;The method preprocess_train was never called. You can disable this warning by setting preprocess_train_called=True.&#34;
-        )</code></pre>
+        )
+        # raise Exception(&#39;preprocess_train must be called&#39;)</code></pre>
 </details>
 </dd>
 <dt id="ktrain.text.preprocessor.TextPreprocessor.get_classes"><code class="name flex">
@@ -3607,6 +3505,7 @@ Returns:
 <ul class="hlist">
 <li><code><a title="ktrain.text.preprocessor.TransformersPreprocessor.get_classifier" href="#ktrain.text.preprocessor.TransformersPreprocessor.get_classifier">get_classifier</a></code></li>
 <li><code><a title="ktrain.text.preprocessor.TransformersPreprocessor.get_regression_model" href="#ktrain.text.preprocessor.TransformersPreprocessor.get_regression_model">get_regression_model</a></code></li>
+<li><code><a title="ktrain.text.preprocessor.TransformersPreprocessor.hf_convert_examples" href="#ktrain.text.preprocessor.TransformersPreprocessor.hf_convert_examples">hf_convert_examples</a></code></li>
 <li><code><a title="ktrain.text.preprocessor.TransformersPreprocessor.load_model_and_configure_from_data" href="#ktrain.text.preprocessor.TransformersPreprocessor.load_model_and_configure_from_data">load_model_and_configure_from_data</a></code></li>
 <li><code><a title="ktrain.text.preprocessor.TransformersPreprocessor.print_seqlen_stats" href="#ktrain.text.preprocessor.TextPreprocessor.print_seqlen_stats">print_seqlen_stats</a></code></li>
 <li><code><a title="ktrain.text.preprocessor.TransformersPreprocessor.seqlen_stats" href="#ktrain.text.preprocessor.TextPreprocessor.seqlen_stats">seqlen_stats</a></code></li>
@@ -4068,6 +3967,32 @@ Returns:
         self.model_type = TFAutoModelForSequenceClassification
         self.tokenizer_type = AutoTokenizer
 
+        # DistilBert call method no longer accepts **kwargs, so we must avoid including token_type_ids parameter
+        # reference: https://github.com/huggingface/transformers/issues/2702
+        try:
+            self.use_token_type_ids = (
+                &#34;token_type_ids&#34;
+                in self.model_type.from_pretrained(
+                    self.model_name
+                ).call.__code__.co_varnames
+            )
+        except:
+            try:
+                self.use_token_type_ids = (
+                    &#34;token_type_ids&#34;
+                    in self.model_type.from_pretrained(
+                        self.model_name, from_pt=True
+                    ).call.__code__.co_varnames
+                )
+            except:
+                # load model as normal to expose error to user
+                self.use_token_type_ids = (
+                    &#34;token_type_ids&#34;
+                    in self.model_type.from_pretrained(
+                        self.model_name
+                    ).call.__code__.co_varnames
+                )
+
         if &#34;bert-base-japanese&#34; in model_name:
             self.tokenizer_type = transformers.BertJapaneseTokenizer
 
@@ -4100,6 +4025,10 @@ Returns:
             self.ytransform = U.YTransform(
                 class_names=self.get_classes(), label_encoder=le
             )
+        if not hasattr(self, &#34;use_token_type_ids&#34;):
+            # As a shortcut, we simply set use_token_type_ids to False if model is distilbert,
+            # as most models use token_type_ids (e.g., bert, deberta, etc.) in their call method
+            self.use_token_type_ids = self.name != &#34;distilbert&#34;
 
     def set_config(self, config):
         self.config = config
@@ -4207,7 +4136,7 @@ Returns:
 
         # convert examples
         tok, _ = self.get_preprocessor()
-        dataset = hf_convert_examples(
+        dataset = self.hf_convert_examples(
             texts,
             y=y,
             tokenizer=tok,
@@ -4351,7 +4280,117 @@ Returns:
         if not self.get_classes():
             return self.get_regression_model(fpath=fpath)
         else:
-            return self.get_classifier(fpath=fpath)</code></pre>
+            return self.get_classifier(fpath=fpath)
+
+    def hf_convert_examples(
+        self,
+        texts,
+        y=None,
+        tokenizer=None,
+        max_length=512,
+        pad_on_left=False,
+        pad_token=0,
+        pad_token_segment_id=0,
+        mask_padding_with_zero=True,
+        use_dynamic_shape=False,
+        verbose=1,
+    ):
+        &#34;&#34;&#34;
+        ```
+        Loads a data file into a list of ``InputFeatures``
+        Args:
+            texts: texts of documents or sentence pairs
+            y:  labels for documents
+            tokenizer: Instance of a tokenizer that will tokenize the examples
+            max_length: Maximum example length
+            pad_on_left: If set to ``True``, the examples will be padded on the left rather than on the right (default)
+            pad_token: Padding token
+            pad_token_segment_id: The segment ID for the padding token (It is usually 0, but can vary such as for XLNet where it is 4)
+            mask_padding_with_zero: If set to ``True``, the attention mask will be filled by ``1`` for actual values
+                and by ``0`` for padded values. If set to ``False``, inverts it (``1`` for padded values, ``0`` for
+                actual values)
+            use_dynamic_shape(bool):  If True, supplied max_length will be ignored and will be computed
+                                      based on provided texts instead.
+            verbose(bool): verbosity
+        Returns:
+            If the ``examples`` input is a ``tf.data.Dataset``, will return a ``tf.data.Dataset``
+            containing the task-specific features. If the input is a list of ``InputExamples``, will return
+            a list of task-specific ``InputFeatures`` which can be fed to the model.
+        ```
+        &#34;&#34;&#34;
+
+        is_array, is_pair = detect_text_format(texts)
+
+        if use_dynamic_shape:
+            sentences = []
+            for text in texts:
+                if is_pair:
+                    text_a = text[0]
+                    text_b = text[1]
+                else:
+                    text_a = text
+                    text_b = None
+                sentences.append(
+                    tokenizer.convert_ids_to_tokens(tokenizer.encode(text_a, text_b))
+                )
+                # sentences.append(tokenizer.tokenize(text_a, text_b)) # only works for Fast tokenizers
+            maxlen = (
+                len(
+                    max(
+                        [tokens for tokens in sentences],
+                        key=len,
+                    )
+                )
+                + 2
+            )
+
+            if maxlen &lt; max_length:
+                max_length = maxlen
+
+        data = []
+        features_list = []
+        labels = []
+        if verbose:
+            mb = master_bar(range(1))
+            pb = progress_bar(texts, parent=mb)
+        else:
+            mb = range(1)
+            pb = texts
+        for i in mb:
+            # for (idx, text) in enumerate(progress_bar(texts, parent=mb)):
+            for idx, text in enumerate(pb):
+                if is_pair:
+                    text_a = text[0]
+                    text_b = text[1]
+                else:
+                    text_a = text
+                    text_b = None
+                features = hf_convert_example(
+                    text_a,
+                    text_b=text_b,
+                    tokenizer=tokenizer,
+                    max_length=max_length,
+                    pad_on_left=pad_on_left,
+                    pad_token=pad_token,
+                    pad_token_segment_id=pad_token_segment_id,
+                    mask_padding_with_zero=mask_padding_with_zero,
+                )
+                features_list.append(features)
+                labels.append(y[idx] if y is not None else None)
+        # tfdataset = hf_features_to_tfdataset(features_list, labels)
+        # return tfdataset
+        # return (features_list, labels)
+        # HF_EXCEPTION
+        # due to issues in transormers library and TF2 tf.Datasets, arrays are converted
+        # to iterators on-the-fly
+        # return  TransformerSequence(np.array(features_list), np.array(labels))
+        from .dataset import TransformerDataset
+
+        return TransformerDataset(
+            np.array(features_list),
+            np.array(labels),
+            use_token_type_ids=self.use_token_type_ids,
+        )</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -4587,6 +4626,145 @@ Args:
     return self.tok</code></pre>
 </details>
 </dd>
+<dt id="ktrain.text.preprocessor.TransformersPreprocessor.hf_convert_examples"><code class="name flex">
+<span>def <span class="ident">hf_convert_examples</span></span>(<span>self, texts, y=None, tokenizer=None, max_length=512, pad_on_left=False, pad_token=0, pad_token_segment_id=0, mask_padding_with_zero=True, use_dynamic_shape=False, verbose=1)</span>
+</code></dt>
+<dd>
+<div class="desc"><pre><code>Loads a data file into a list of ``InputFeatures``
+Args:
+    texts: texts of documents or sentence pairs
+    y:  labels for documents
+    tokenizer: Instance of a tokenizer that will tokenize the examples
+    max_length: Maximum example length
+    pad_on_left: If set to ``True``, the examples will be padded on the left rather than on the right (default)
+    pad_token: Padding token
+    pad_token_segment_id: The segment ID for the padding token (It is usually 0, but can vary such as for XLNet where it is 4)
+    mask_padding_with_zero: If set to ``True``, the attention mask will be filled by ``1`` for actual values
+        and by ``0`` for padded values. If set to ``False``, inverts it (``1`` for padded values, ``0`` for
+        actual values)
+    use_dynamic_shape(bool):  If True, supplied max_length will be ignored and will be computed
+                              based on provided texts instead.
+    verbose(bool): verbosity
+Returns:
+    If the ``examples`` input is a ``tf.data.Dataset``, will return a ``tf.data.Dataset``
+    containing the task-specific features. If the input is a list of ``InputExamples``, will return
+    a list of task-specific ``InputFeatures`` which can be fed to the model.
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def hf_convert_examples(
+    self,
+    texts,
+    y=None,
+    tokenizer=None,
+    max_length=512,
+    pad_on_left=False,
+    pad_token=0,
+    pad_token_segment_id=0,
+    mask_padding_with_zero=True,
+    use_dynamic_shape=False,
+    verbose=1,
+):
+    &#34;&#34;&#34;
+    ```
+    Loads a data file into a list of ``InputFeatures``
+    Args:
+        texts: texts of documents or sentence pairs
+        y:  labels for documents
+        tokenizer: Instance of a tokenizer that will tokenize the examples
+        max_length: Maximum example length
+        pad_on_left: If set to ``True``, the examples will be padded on the left rather than on the right (default)
+        pad_token: Padding token
+        pad_token_segment_id: The segment ID for the padding token (It is usually 0, but can vary such as for XLNet where it is 4)
+        mask_padding_with_zero: If set to ``True``, the attention mask will be filled by ``1`` for actual values
+            and by ``0`` for padded values. If set to ``False``, inverts it (``1`` for padded values, ``0`` for
+            actual values)
+        use_dynamic_shape(bool):  If True, supplied max_length will be ignored and will be computed
+                                  based on provided texts instead.
+        verbose(bool): verbosity
+    Returns:
+        If the ``examples`` input is a ``tf.data.Dataset``, will return a ``tf.data.Dataset``
+        containing the task-specific features. If the input is a list of ``InputExamples``, will return
+        a list of task-specific ``InputFeatures`` which can be fed to the model.
+    ```
+    &#34;&#34;&#34;
+
+    is_array, is_pair = detect_text_format(texts)
+
+    if use_dynamic_shape:
+        sentences = []
+        for text in texts:
+            if is_pair:
+                text_a = text[0]
+                text_b = text[1]
+            else:
+                text_a = text
+                text_b = None
+            sentences.append(
+                tokenizer.convert_ids_to_tokens(tokenizer.encode(text_a, text_b))
+            )
+            # sentences.append(tokenizer.tokenize(text_a, text_b)) # only works for Fast tokenizers
+        maxlen = (
+            len(
+                max(
+                    [tokens for tokens in sentences],
+                    key=len,
+                )
+            )
+            + 2
+        )
+
+        if maxlen &lt; max_length:
+            max_length = maxlen
+
+    data = []
+    features_list = []
+    labels = []
+    if verbose:
+        mb = master_bar(range(1))
+        pb = progress_bar(texts, parent=mb)
+    else:
+        mb = range(1)
+        pb = texts
+    for i in mb:
+        # for (idx, text) in enumerate(progress_bar(texts, parent=mb)):
+        for idx, text in enumerate(pb):
+            if is_pair:
+                text_a = text[0]
+                text_b = text[1]
+            else:
+                text_a = text
+                text_b = None
+            features = hf_convert_example(
+                text_a,
+                text_b=text_b,
+                tokenizer=tokenizer,
+                max_length=max_length,
+                pad_on_left=pad_on_left,
+                pad_token=pad_token,
+                pad_token_segment_id=pad_token_segment_id,
+                mask_padding_with_zero=mask_padding_with_zero,
+            )
+            features_list.append(features)
+            labels.append(y[idx] if y is not None else None)
+    # tfdataset = hf_features_to_tfdataset(features_list, labels)
+    # return tfdataset
+    # return (features_list, labels)
+    # HF_EXCEPTION
+    # due to issues in transormers library and TF2 tf.Datasets, arrays are converted
+    # to iterators on-the-fly
+    # return  TransformerSequence(np.array(features_list), np.array(labels))
+    from .dataset import TransformerDataset
+
+    return TransformerDataset(
+        np.array(features_list),
+        np.array(labels),
+        use_token_type_ids=self.use_token_type_ids,
+    )</code></pre>
+</details>
+</dd>
 <dt id="ktrain.text.preprocessor.TransformersPreprocessor.preprocess"><code class="name flex">
 <span>def <span class="ident">preprocess</span></span>(<span>self, texts)</span>
 </code></dt>
@@ -4662,7 +4840,7 @@ Args:
 
     # convert examples
     tok, _ = self.get_preprocessor()
-    dataset = hf_convert_examples(
+    dataset = self.hf_convert_examples(
         texts,
         y=y,
         tokenizer=tok,
@@ -4765,7 +4943,6 @@ Args:
 <li><code><a title="ktrain.text.preprocessor.get_coefs" href="#ktrain.text.preprocessor.get_coefs">get_coefs</a></code></li>
 <li><code><a title="ktrain.text.preprocessor.get_wv_path" href="#ktrain.text.preprocessor.get_wv_path">get_wv_path</a></code></li>
 <li><code><a title="ktrain.text.preprocessor.hf_convert_example" href="#ktrain.text.preprocessor.hf_convert_example">hf_convert_example</a></code></li>
-<li><code><a title="ktrain.text.preprocessor.hf_convert_examples" href="#ktrain.text.preprocessor.hf_convert_examples">hf_convert_examples</a></code></li>
 <li><code><a title="ktrain.text.preprocessor.hf_features_to_tfdataset" href="#ktrain.text.preprocessor.hf_features_to_tfdataset">hf_features_to_tfdataset</a></code></li>
 <li><code><a title="ktrain.text.preprocessor.is_nospace_lang" href="#ktrain.text.preprocessor.is_nospace_lang">is_nospace_lang</a></code></li>
 <li><code><a title="ktrain.text.preprocessor.load_wv" href="#ktrain.text.preprocessor.load_wv">load_wv</a></code></li>
@@ -4838,6 +5015,7 @@ Args:
 <li><code><a title="ktrain.text.preprocessor.TransformersPreprocessor.get_preprocessor" href="#ktrain.text.preprocessor.TransformersPreprocessor.get_preprocessor">get_preprocessor</a></code></li>
 <li><code><a title="ktrain.text.preprocessor.TransformersPreprocessor.get_regression_model" href="#ktrain.text.preprocessor.TransformersPreprocessor.get_regression_model">get_regression_model</a></code></li>
 <li><code><a title="ktrain.text.preprocessor.TransformersPreprocessor.get_tokenizer" href="#ktrain.text.preprocessor.TransformersPreprocessor.get_tokenizer">get_tokenizer</a></code></li>
+<li><code><a title="ktrain.text.preprocessor.TransformersPreprocessor.hf_convert_examples" href="#ktrain.text.preprocessor.TransformersPreprocessor.hf_convert_examples">hf_convert_examples</a></code></li>
 <li><code><a title="ktrain.text.preprocessor.TransformersPreprocessor.load_model_and_configure_from_data" href="#ktrain.text.preprocessor.TransformersPreprocessor.load_model_and_configure_from_data">load_model_and_configure_from_data</a></code></li>
 <li><code><a title="ktrain.text.preprocessor.TransformersPreprocessor.preprocess" href="#ktrain.text.preprocessor.TransformersPreprocessor.preprocess">preprocess</a></code></li>
 <li><code><a title="ktrain.text.preprocessor.TransformersPreprocessor.preprocess_test" href="#ktrain.text.preprocessor.TransformersPreprocessor.preprocess_test">preprocess_test</a></code></li>

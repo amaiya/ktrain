@@ -1454,11 +1454,11 @@ set to &lt;code&gt;True&lt;/code&gt;.
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
-<li>tensorflow.python.keras.engine.base_layer.Layer</li>
+<li>keras.engine.base_layer.Layer</li>
 <li>tensorflow.python.module.module.Module</li>
-<li>tensorflow.python.training.tracking.tracking.AutoTrackable</li>
-<li>tensorflow.python.training.tracking.base.Trackable</li>
-<li>tensorflow.python.keras.utils.version_utils.LayerVersionSelector</li>
+<li>tensorflow.python.trackable.autotrackable.AutoTrackable</li>
+<li>tensorflow.python.trackable.base.Trackable</li>
+<li>keras.utils.version_utils.LayerVersionSelector</li>
 </ul>
 <h3>Static methods</h3>
 <dl>
@@ -1643,12 +1643,17 @@ def viterbi_acc(self):
 <div class="desc"><p>Creates the variables of the layer (optional, for subclass implementers).</p>
 <p>This is a method that implementers of subclasses of <code>Layer</code> or <code>Model</code>
 can override if they need a state-creation step in-between
-layer instantiation and layer call.</p>
-<p>This is typically used to create the weights of <code>Layer</code> subclasses.</p>
-<h2 id="arguments">Arguments</h2>
-<p>input_shape: Instance of <code>TensorShape</code>, or list of instances of
+layer instantiation and layer call. It is invoked automatically before
+the first execution of <code>call()</code>.</p>
+<p>This is typically used to create the weights of <code>Layer</code> subclasses
+(at the discretion of the subclass implementer).</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>input_shape</code></strong></dt>
+<dd>Instance of <code>TensorShape</code>, or list of instances of
 <code>TensorShape</code> if the layer expects a list of inputs
-(one instance per input).</p></div>
+(one instance per input).</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1705,13 +1710,50 @@ layer instantiation and layer call.</p>
 </code></dt>
 <dd>
 <div class="desc"><p>This is where the layer's logic lives.</p>
-<p>Note here that <code>call()</code> method in <code>tf.keras</code> is little bit different
-from <code>keras</code> API. In <code>keras</code> API, you can pass support masking for
-layers as additional arguments. Whereas <code>tf.keras</code> has <code>compute_mask()</code>
-method to support masking.</p>
-<h2 id="arguments">Arguments</h2>
-<p>inputs: Input tensor, or list/tuple of input tensors.
-**kwargs: Additional keyword arguments. Currently unused.</p>
+<p>The <code>call()</code> method may not create state (except in its first
+invocation, wrapping the creation of variables or other resources in
+<code>tf.init_scope()</code>).
+It is recommended to create state, including
+<code>tf.Variable</code> instances and nested <code>Layer</code> instances,
+in <code>__init__()</code>, or in the <code>build()</code> method that is
+called automatically before <code>call()</code> executes for the first time.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>inputs</code></strong></dt>
+<dd>Input tensor, or dict/list/tuple of input tensors.
+The first positional <code>inputs</code> argument is subject to special rules:
+- <code>inputs</code> must be explicitly passed. A layer cannot have zero
+arguments, and <code>inputs</code> cannot be provided via the default value
+of a keyword argument.
+- NumPy array or Python scalar values in <code>inputs</code> get cast as
+tensors.
+- Keras mask metadata is only collected from <code>inputs</code>.
+- Layers are built (<code>build(input_shape)</code> method)
+using shape info from <code>inputs</code> only.
+- <code>input_spec</code> compatibility is only checked against <code>inputs</code>.
+- Mixed precision input casting is only applied to <code>inputs</code>.
+If a layer has tensor arguments in <code>*args</code> or <code>**kwargs</code>, their
+casting behavior in mixed precision should be handled manually.
+- The SavedModel input specification is generated using <code>inputs</code>
+only.
+- Integration with various ecosystem packages like TFMOT, TFLite,
+TF.js, etc is only supported for <code>inputs</code> and not for tensors in
+positional and keyword arguments.</dd>
+<dt><strong><code>*args</code></strong></dt>
+<dd>Additional positional arguments. May contain tensors, although
+this is not recommended, for the reasons above.</dd>
+<dt><strong><code>**kwargs</code></strong></dt>
+<dd>Additional keyword arguments. May contain tensors, although
+this is not recommended, for the reasons above.
+The following optional keyword arguments are reserved:
+- <code>training</code>: Boolean scalar tensor of Python boolean indicating
+whether the <code>call</code> is meant for training or inference.
+- <code>mask</code>: Boolean input mask. If the layer's <code>call()</code> method takes a
+<code>mask</code> argument, its default value will be set to the mask
+generated for <code>inputs</code> by the previous layer (if <code>input</code> did come
+from a layer that generated a corresponding mask, i.e. if it came
+from a Keras layer with masking support).</dd>
+</dl>
 <h2 id="returns">Returns</h2>
 <p>A tensor or list/tuple of tensors.</p></div>
 <details class="source">
@@ -1745,9 +1787,13 @@ method to support masking.</p>
 </code></dt>
 <dd>
 <div class="desc"><p>Computes an output mask tensor.</p>
-<h2 id="arguments">Arguments</h2>
-<p>inputs: Tensor or list of tensors.
-mask: Tensor or list of tensors.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>inputs</code></strong></dt>
+<dd>Tensor or list of tensors.</dd>
+<dt><strong><code>mask</code></strong></dt>
+<dd>Tensor or list of tensors.</dd>
+</dl>
 <h2 id="returns">Returns</h2>
 <p>None or a tensor (or list of tensors,
 one per output tensor of the layer).</p></div>
@@ -1766,16 +1812,21 @@ one per output tensor of the layer).</p></div>
 </code></dt>
 <dd>
 <div class="desc"><p>Computes the output shape of the layer.</p>
-<p>If the layer has not been built, this method will call <code>build</code> on the
-layer. This assumes that the layer will later be used with inputs that
-match the input shape provided here.</p>
-<h2 id="arguments">Arguments</h2>
-<p>input_shape: Shape tuple (tuple of integers)
-or list of shape tuples (one per output tensor of the layer).
+<p>This method will cause the layer's state to be built, if that has not
+happened before. This requires that the layer will later be used with
+inputs that match the input shape provided here.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>input_shape</code></strong></dt>
+<dd>Shape tuple (tuple of integers) or <code>tf.TensorShape</code>,
+or structure of shape tuples / <code>tf.TensorShape</code> instances
+(one per output tensor of the layer).
 Shape tuples can include None for free dimensions,
-instead of an integer.</p>
+instead of an integer.</dd>
+</dl>
 <h2 id="returns">Returns</h2>
-<p>An input shape tuple.</p></div>
+<p>A <code>tf.TensorShape</code> instance
+or structure of <code>tf.TensorShape</code> instances.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1809,6 +1860,9 @@ The same layer can be reinstantiated later
 <p>The config of a layer does not include connectivity
 information, nor the layer class name. These are handled
 by <code>Network</code> (one layer of abstraction above).</p>
+<p>Note that <code>get_config()</code> does not guarantee to return a fresh copy of
+dict every time it is called. The callers should make a copy of the
+returned dict if they want to modify it.</p>
 <h2 id="returns">Returns</h2>
 <p>Python dictionary.</p></div>
 <details class="source">
