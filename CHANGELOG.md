@@ -6,6 +6,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.33.4 (TBD)
+
+### new:
+- N/A
+
+### changed
+- Added `verbose` parameter to `predict*` methods in all `Predictor` classes
+
+### fixed:
+- N/A
+
+
 ## 0.33.3 (2023-03-17)
 
 ### new:
