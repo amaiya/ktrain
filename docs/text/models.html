@@ -308,7 +308,6 @@ def _build_logreg(
     metrics=[&#34;accuracy&#34;],
     verbose=1,
 ):
-
     embedding_matrix = np.ones((max_features, 1))
     embedding_matrix[0] = 0
 
@@ -354,8 +353,7 @@ def _build_bert(
         raise ValueError(&#34;lang is missing&#34;)
     config_path = os.path.join(tpp.get_bert_path(lang=lang), &#34;bert_config.json&#34;)
     checkpoint_path = os.path.join(tpp.get_bert_path(lang=lang), &#34;bert_model.ckpt&#34;)
-    import keras_bert
-
+    check_keras_bert()
     model = keras_bert.load_trained_model_from_checkpoint(
         config_path, checkpoint_path, training=True, trainable=True, seq_len=maxlen
     )
@@ -487,7 +485,6 @@ def _build_fasttext(
     metrics=[&#34;accuracy&#34;],
     verbose=1,
 ):
-
     model = keras.models.Sequential()
     model.add(keras.layers.Embedding(max_features, 64, input_length=maxlen))
     model.add(keras.layers.SpatialDropout1D(0.25))
@@ -532,7 +529,6 @@ def _build_bigru(
     tokenizer=None,
     preproc=None,
 ):
-
     if tokenizer is None:
         raise ValueError(&#34;bigru requires valid Tokenizer object&#34;)
     if preproc is None:

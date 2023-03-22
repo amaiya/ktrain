@@ -93,6 +93,7 @@ class KeywordExtractor:
         omit_scores=False,
         candidate_generator="ngrams",
         constrain_unigram_case=True,
+        exclude_unigrams=False,
         maxlen=64,
         minchars=3,
         truncate_to=5000,
@@ -115,6 +116,10 @@ class KeywordExtractor:
           contrain_unigram_case(bool): Only applies if candidate_generator=='ngrams'.
                                        If True, only unigrams in uppercase are returned (e.g., LDA, SVM, NASA).
                                        True is recommended.
+          contrain_unigram_case(bool): If True, only unigrams in uppercase are returned (e.g., LDA, SVM, NASA).
+                                       True is recommended. Not applied if exclude_unigram=False
+          exclude_unigrams(bool): If True, unigrams will be excluded from results.
+                                  Convenience parameter that is functionally equivalent to changing ngram_range to be above 1.
           maxlen(int): maximum number of characters in keyphrase. Default:64
           minchars(int): Minimum number of characters in keyword (default:3)
           truncate_to(int): Truncate input to this many words (default:5000, i.e., first 5K words).
@@ -162,6 +167,12 @@ class KeywordExtractor:
                 n = len(words)
                 if n not in ngram_lens:
                     continue
+                if (
+                    not exclude_unigrams
+                    and n == 1
+                    and text.count(" " + words[0].upper() + " ") > 1
+                ):
+                    words[0] = words[0].upper()
                 lst = ngrams.get(n, [])
                 lst.append(words)
                 ngrams[n] = lst
@@ -175,9 +186,10 @@ class KeywordExtractor:
                     if not any(w.lower() in self.blacklist for w in k)
                     and (
                         not constrain_unigram_case
+                        and not exclude_unigrams
                         or (
-                            candidate_generator == "ngrams"
-                            and constrain_unigram_case
+                            constrain_unigram_case
+                            and not exclude_unigrams
                             and k[0].isupper()
                         )
                         # or (
@@ -214,6 +226,11 @@ class KeywordExtractor:
         tups = cnt.most_common(n_candidates)
 
         # normalize and return
+        tups = [
+            tup
+            for tup in tups
+            if len(tup[0].split()) > 1 or text.count(" " + tup[0].upper() + " ") > 1
+        ]
         keywords = [tup[0] for tup in tups if len(tup[0]) <= maxlen]
         scores = [tup[1] for tup in tups if len(tup[0]) <= maxlen]
         scores = [float(i) / sum(scores) for i in scores]

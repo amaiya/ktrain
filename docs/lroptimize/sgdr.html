@@ -63,7 +63,6 @@ class SGDRScheduler(keras.callbacks.Callback):
         cycle_length=10,
         mult_factor=2,
     ):
-
         super(keras.callbacks.Callback, self).__init__()
         self.min_lr = min_lr
         self.max_lr = max_lr
@@ -204,7 +203,6 @@ Blog Post:      &lt;http://www.jeremyjordan.me/nn-learning-rate/&gt;
         cycle_length=10,
         mult_factor=2,
     ):
-
         super(keras.callbacks.Callback, self).__init__()
         self.min_lr = min_lr
         self.max_lr = max_lr
@@ -269,7 +267,7 @@ Blog Post:      &lt;http://www.jeremyjordan.me/nn-learning-rate/&gt;
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
-<li>tensorflow.python.keras.callbacks.Callback</li>
+<li>keras.callbacks.Callback</li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -310,7 +308,8 @@ Blog Post:      &lt;http://www.jeremyjordan.me/nn-learning-rate/&gt;
         self.history.setdefault(k, []).append(v)
 
     self.batch_since_restart += 1
-    K.set_value(self.model.optimizer.lr, self.clr())</code></pre>
+    K.set_value(self.model.optimizer.lr, self.clr())
+    # print(K.eval(self.model.optimizer.lr))</code></pre>
 </details>
 </dd>
 <dt id="ktrain.lroptimize.sgdr.SGDRScheduler.on_epoch_begin"><code class="name flex">
@@ -343,7 +342,9 @@ Blog Post:      &lt;http://www.jeremyjordan.me/nn-learning-rate/&gt;
         self.batch_since_restart = 0
         self.cycle_length = np.ceil(self.cycle_length * self.mult_factor)
         self.next_restart += self.cycle_length
-        self.max_lr *= self.lr_decay</code></pre>
+        self.max_lr *= self.lr_decay
+        # no longer needed as kauto completes cycles/epochs
+        # self.best_weights = self.model.get_weights()</code></pre>
 </details>
 </dd>
 <dt id="ktrain.lroptimize.sgdr.SGDRScheduler.on_train_begin"><code class="name flex">

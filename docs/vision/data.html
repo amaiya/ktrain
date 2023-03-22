@@ -30,6 +30,14 @@
 from ..imports import *
 from .preprocessor import ImagePreprocessor
 
+try:
+    from tensorflow.keras.utils import img_to_array
+except ImportError:
+    try:
+        img_to_array = keras.preprocessing.image.img_to_array
+    except Exception as e:
+        img_to_array = None
+
 
 def show_image(img_path):
     &#34;&#34;&#34;
@@ -57,7 +65,7 @@ def show_random_images(img_folder, n=4, rows=1):
     for i in range(n):
         img_path = random.choice(fnames)
         img = keras.preprocessing.image.load_img(img_path)
-        x = keras.preprocessing.image.img_to_array(img)
+        x = img_to_array(img)
         x = x / 255.0
         ims.append(x)
     U.plots(ims, rows=rows)
@@ -83,7 +91,7 @@ def preview_data_aug(img_path, data_aug, rows=1, n=4):
     idg.preprocessing_function = None
 
     img = keras.preprocessing.image.load_img(img_path)
-    x = keras.preprocessing.image.img_to_array(img)
+    x = img_to_array(img)
     x = x / 255.0
     x = x.reshape((1,) + x.shape)
     i = 0
@@ -116,7 +124,7 @@ def preview_data_aug_OLD(img_path, data_aug, n=4):
     idg.preprocessing_function = None
 
     img = keras.preprocessing.image.load_img(img_path)
-    x = keras.preprocessing.image.img_to_array(img)
+    x = img_to_array(img)
     x = x / 255.0
     x = x.reshape((1,) + x.shape)
     i = 0
@@ -267,7 +275,6 @@ def datagen_needs_fit(datagen):
 
 
 def sample_image_folder(train_directory, target_size, color_mode=&#34;rgb&#34;, flat_dir=False):
-
     # adjust train_directory
     classes = None
     if flat_dir and train_directory is not None:
@@ -406,7 +413,6 @@ def images_from_folder(
     data_aug=None,
     verbose=1,
 ):
-
     &#34;&#34;&#34;
     ```
     Returns image generator (Iterator instance).
@@ -511,7 +517,6 @@ def images_from_df(
     val_pct=0.1,
     random_state=None,
 ):
-
     &#34;&#34;&#34;
     ```
     Returns image generator (Iterator instance).
@@ -661,7 +666,6 @@ def images_from_csv(
     val_pct=0.1,
     random_state=None,
 ):
-
     &#34;&#34;&#34;
     ```
     Returns image generator (Iterator instance).
@@ -755,7 +759,6 @@ def images_from_fname(
     random_state=None,
     verbose=1,
 ):
-
     &#34;&#34;&#34;
     ```
     Returns image generator (Iterator instance).
@@ -871,7 +874,6 @@ def images_from_array(
     class_names=None,
     is_regression=False,
 ):
-
     &#34;&#34;&#34;
     ```
     Returns image generator (Iterator instance) from training
@@ -1166,7 +1168,6 @@ Returns:
     class_names=None,
     is_regression=False,
 ):
-
     &#34;&#34;&#34;
     ```
     Returns image generator (Iterator instance) from training
@@ -1313,7 +1314,6 @@ batches: a tuple of two Iterators - one for train and one for test
     val_pct=0.1,
     random_state=None,
 ):
-
     &#34;&#34;&#34;
     ```
     Returns image generator (Iterator instance).
@@ -1475,7 +1475,6 @@ batches: a tuple of two Iterators - one for train and one for test
     val_pct=0.1,
     random_state=None,
 ):
-
     &#34;&#34;&#34;
     ```
     Returns image generator (Iterator instance).
@@ -1655,7 +1654,6 @@ batches: a tuple of two Iterators - one for train and one for test
     random_state=None,
     verbose=1,
 ):
-
     &#34;&#34;&#34;
     ```
     Returns image generator (Iterator instance).
@@ -1766,7 +1764,6 @@ batches: a tuple of two Iterators - one for train and one for test
     data_aug=None,
     verbose=1,
 ):
-
     &#34;&#34;&#34;
     ```
     Returns image generator (Iterator instance).
@@ -2002,7 +1999,7 @@ on a supplied image.
     idg.preprocessing_function = None
 
     img = keras.preprocessing.image.load_img(img_path)
-    x = keras.preprocessing.image.img_to_array(img)
+    x = img_to_array(img)
     x = x / 255.0
     x = x.reshape((1,) + x.shape)
     i = 0
@@ -2046,7 +2043,7 @@ on a supplied image.
     idg.preprocessing_function = None
 
     img = keras.preprocessing.image.load_img(img_path)
-    x = keras.preprocessing.image.img_to_array(img)
+    x = img_to_array(img)
     x = x / 255.0
     x = x.reshape((1,) + x.shape)
     i = 0
@@ -2108,7 +2105,6 @@ on a supplied image.
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def sample_image_folder(train_directory, target_size, color_mode=&#34;rgb&#34;, flat_dir=False):
-
     # adjust train_directory
     classes = None
     if flat_dir and train_directory is not None:
@@ -2187,7 +2183,7 @@ on a supplied image.
     for i in range(n):
         img_path = random.choice(fnames)
         img = keras.preprocessing.image.load_img(img_path)
-        x = keras.preprocessing.image.img_to_array(img)
+        x = img_to_array(img)
         x = x / 255.0
         ims.append(x)
     U.plots(ims, rows=rows)

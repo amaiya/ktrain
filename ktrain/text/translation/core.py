@@ -34,7 +34,7 @@ class Translator(TorchBase):
         if quantize:
             self.model = self.quantize_model(self.model)
 
-    def translate(self, src_text, join_with="\n", num_beams=None, early_stopping=None):
+    def translate(self, src_text, join_with="\n", num_beams=1, early_stopping=False):
         """
         ```
         Translate document (src_text).
@@ -64,7 +64,7 @@ class Translator(TorchBase):
         )
         return join_with.join(tgt_sentences)
 
-    def translate_sentences(self, sentences, num_beams=None, early_stopping=None):
+    def translate_sentences(self, sentences, num_beams=1, early_stopping=False):
         """
         ```
         Translate sentences using model_name as model.
@@ -187,7 +187,7 @@ class EnglishTranslator:
         else:
             raise ValueError("lang:%s is currently not supported." % (src_lang))
 
-    def translate(self, src_text, join_with="\n", num_beams=None, early_stopping=None):
+    def translate(self, src_text, join_with="\n", num_beams=1, early_stopping=False):
         """
         ```
         Translate source document to English.

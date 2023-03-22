@@ -171,7 +171,17 @@ def create_optimizer(
     return optimizer, lr_schedule
 
 
-class AdamWeightDecay(tf.keras.optimizers.Adam):
+# dep_fix
+from packaging import version
+
+adam_class = (
+    tf.keras.optimizers.Adam
+    if version.parse(tf.__version__) &lt; version.parse(&#34;2.11&#34;)
+    else tf.keras.optimizers.legacy.Adam
+)
+
+
+class AdamWeightDecay(adam_class):
     &#34;&#34;&#34;
     ```
     Adam enables L2 weight decay and clip_by_global_norm on gradients. Just adding the square of the weights to the
@@ -499,7 +509,7 @@ Args:
 <dl>
 <dt id="ktrain.lroptimize.optimization.AdamWeightDecay"><code class="flex name class">
 <span>class <span class="ident">AdamWeightDecay</span></span>
-<span>(</span><span>learning_rate: Union[float, tensorflow.python.keras.optimizer_v2.learning_rate_schedule.LearningRateSchedule] = 0.001, beta_1: float = 0.9, beta_2: float = 0.999, epsilon: float = 1e-07, amsgrad: bool = False, weight_decay_rate: float = 0.0, include_in_weight_decay: Optional[List[str]] = None, exclude_from_weight_decay: Optional[List[str]] = None, name: str = 'AdamWeightDecay', **kwargs)</span>
+<span>(</span><span>learning_rate: Union[float, keras.optimizers.schedules.learning_rate_schedule.LearningRateSchedule] = 0.001, beta_1: float = 0.9, beta_2: float = 0.999, epsilon: float = 1e-07, amsgrad: bool = False, weight_decay_rate: float = 0.0, include_in_weight_decay: Optional[List[str]] = None, exclude_from_weight_decay: Optional[List[str]] = None, name: str = 'AdamWeightDecay', **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"><pre><code>Adam enables L2 weight decay and clip_by_global_norm on gradients. Just adding the square of the weights to the
@@ -542,30 +552,51 @@ Note that Optimizer instances should not bind to a single graph,
 and so shouldn't keep Tensors as member variables. Generally
 you should be able to use the _set_hyper()/state.get_hyper()
 facility instead.</p>
-<p>This class in stateful and thread-compatible.</p>
+<p>This class is stateful and thread-compatible.</p>
+<p>Example of custom gradient transformations:</p>
+<pre><code class="language-python">def my_gradient_transformer(grads_and_vars):
+  # Simple example, double the gradients.
+  return [(2. * g, v) for g, v in grads_and_vars]
+
+optimizer = tf.keras.optimizers.legacy.SGD(
+    1e-3, gradient_transformers=[my_gradient_transformer])
+</code></pre>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>name</code></strong></dt>
-<dd>A non-empty string.
-The name to use for accumulators created
-for the optimizer.</dd>
+<dd>String. The name to use for momentum accumulator weights created
+by the optimizer.</dd>
+<dt><strong><code>gradient_aggregator</code></strong></dt>
+<dd>The function to use to aggregate gradients across
+devices (when using <code>tf.distribute.Strategy</code>). If <code>None</code>, defaults
+to summing the gradients across devices. The function should accept
+and return a list of <code>(gradient, variable)</code> tuples.</dd>
+<dt><strong><code>gradient_transformers</code></strong></dt>
+<dd>Optional. List of functions to use to transform
+gradients before applying updates to Variables. The functions are
+applied after <code>gradient_aggregator</code>. The functions should accept and
+return a list of <code>(gradient, variable)</code> tuples.</dd>
 <dt><strong><code>**kwargs</code></strong></dt>
-<dd>keyword arguments. Allowed to be {<code>clipnorm</code>, <code>clipvalue</code>, <code>lr</code>,
-<code>decay</code>}. <code>clipnorm</code> is clip gradients by norm; <code>clipvalue</code> is clip
-gradients by value, <code>decay</code> is included for backward compatibility to
-allow time inverse decay of learning rate. <code>lr</code> is included for backward
-compatibility, recommended to use <code>learning_rate</code> instead.</dd>
+<dd>keyword arguments. Allowed arguments are <code>clipvalue</code>,
+<code>clipnorm</code>, <code>global_clipnorm</code>.
+If <code>clipvalue</code> (float) is set, the gradient of each weight
+is clipped to be no higher than this value.
+If <code>clipnorm</code> (float) is set, the gradient of each weight
+is individually clipped so that its norm is no higher than this
+value. If <code>global_clipnorm</code> (float) is set the gradient of all
+weights is clipped so that their global norm is no higher than this
+value.</dd>
 </dl>
 <h2 id="raises">Raises</h2>
 <dl>
 <dt><code>ValueError</code></dt>
-<dd>If name is malformed.</dd>
+<dd>in case of any invalid argument.</dd>
 </dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class AdamWeightDecay(tf.keras.optimizers.Adam):
+<pre><code class="python">class AdamWeightDecay(adam_class):
     &#34;&#34;&#34;
     ```
     Adam enables L2 weight decay and clip_by_global_norm on gradients. Just adding the square of the weights to the
@@ -711,9 +742,9 @@ compatibility, recommended to use <code>learning_rate</code> instead.</dd>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
-<li>tensorflow.python.keras.optimizer_v2.adam.Adam</li>
-<li>tensorflow.python.keras.optimizer_v2.optimizer_v2.OptimizerV2</li>
-<li>tensorflow.python.training.tracking.base.Trackable</li>
+<li>keras.optimizers.optimizer_v2.adam.Adam</li>
+<li>keras.optimizers.optimizer_v2.optimizer_v2.OptimizerV2</li>
+<li>tensorflow.python.trackable.base.Trackable</li>
 </ul>
 <h3>Static methods</h3>
 <dl>
@@ -746,8 +777,8 @@ def from_config(cls, config):
 <p>This is the second part of <code>minimize()</code>. It returns an <code>Operation</code> that
 applies gradients.</p>
 <p>The method sums gradients from all replicas in the presence of
-<code>tf.distribute.Strategy</code> by default. You can aggregate gradients yourself by
-passing <code>experimental_aggregate_gradients=False</code>.</p>
+<code>tf.distribute.Strategy</code> by default. You can aggregate gradients
+yourself by passing <code>experimental_aggregate_gradients=False</code>.</p>
 <p>Example:</p>
 <pre><code class="language-python">grads = tape.gradient(loss, vars)
 grads = tf.distribute.get_replica_context().all_reduce('sum', grads)
@@ -761,12 +792,13 @@ optimizer.apply_gradients(zip(grads, vars),
 <dt><strong><code>grads_and_vars</code></strong></dt>
 <dd>List of (gradient, variable) pairs.</dd>
 <dt><strong><code>name</code></strong></dt>
-<dd>Optional name for the returned operation. Default to the name passed
-to the <code>Optimizer</code> constructor.</dd>
+<dd>Optional name for the returned operation. Default to the name
+passed to the <code>Optimizer</code> constructor.</dd>
 <dt><strong><code>experimental_aggregate_gradients</code></strong></dt>
-<dd>Whether to sum gradients from different
-replicas in the presense of <code>tf.distribute.Strategy</code>. If False, it's
-user responsibility to aggregate the gradients. Default to True.</dd>
+<dd>Whether to sum gradients from
+different replicas in the presence of <code>tf.distribute.Strategy</code>. If
+False, it's user responsibility to aggregate the gradients. Default
+to True.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <p>An <code>Operation</code> that applies the specified gradients. The <code>iterations</code>
@@ -777,6 +809,8 @@ will be automatically increased by 1.</p>
 <dd>If <code>grads_and_vars</code> is malformed.</dd>
 <dt><code>ValueError</code></dt>
 <dd>If none of the variables have gradients.</dd>
+<dt><code>RuntimeError</code></dt>
+<dd>If called in a cross-replica context.</dd>
 </dl></div>
 <details class="source">
 <summary>
@@ -1060,7 +1094,7 @@ Args:
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
-<li>tensorflow.python.keras.optimizer_v2.learning_rate_schedule.LearningRateSchedule</li>
+<li>keras.optimizers.schedules.learning_rate_schedule.LearningRateSchedule</li>
 </ul>
 <h3>Methods</h3>
 <dl>

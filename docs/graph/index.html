@@ -228,7 +228,7 @@ Return:
     # ----------------------------------------------------------------
     nx_sep = None if sep in [&#34; &#34;, &#34;\t&#34;] else sep
     G = nx.read_edgelist(path=links_filepath, delimiter=nx_sep)
-    print(nx.info(G))
+    # print(nx.info(G))
 
     # ----------------------------------------------------------------
     # read node attributes
@@ -254,8 +254,8 @@ Return:
     node_data = df
     node_features = node_data[feature_names].values
     for nid, f in zip(node_data.index, node_features):
-        G.node[nid][sg.globalvar.TYPE_ATTR_NAME] = &#34;node&#34;
-        G.node[nid][&#34;feature&#34;] = f
+        G.nodes[nid][sg.globalvar.TYPE_ATTR_NAME] = &#34;node&#34;
+        G.nodes[nid][&#34;feature&#34;] = f
 
     # ----------------------------------------------------------------
     # train/validation sets
@@ -358,7 +358,7 @@ Return:
     x_inp, x_out = graphsage_model.build()
     prediction = keras.layers.Dense(units=num_classes, activation=activation)(x_out)
     model = keras.Model(inputs=x_inp, outputs=prediction)
-    model.compile(optimizer=&#34;adam&#34;, loss=loss_func, metrics=[&#34;accuracy&#34;])
+    model.compile(optimizer=U.DEFAULT_OPT, loss=loss_func, metrics=[&#34;accuracy&#34;])
     U.vprint(&#34;done&#34;, verbose=verbose)
     return model</code></pre>
 </details>

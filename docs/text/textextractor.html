@@ -30,12 +30,6 @@
 from ..imports import *
 from . import textutils as TU
 
-try:
-    from tika import parser
-
-    TIKA_INSTALLED = True
-except ImportError:
-    TIKA_INSTALLED = False
 
 try:
     import textract
@@ -55,10 +49,17 @@ class TextExtractor:
     &#34;&#34;&#34;
 
     def __init__(self, use_tika=True):
-        if use_tika and not TIKA_INSTALLED:
-            raise ValueError(
-                &#34;If use_tika=True, then TextExtractor requires tika: pip install tika&#34;
-            )
+        if use_tika:
+            try:
+                from tika import parser
+            except ImportError as e:
+                raise ValueError(
+                    &#34;If use_tika=True, then TextExtractor requires tika: pip install tika&#34;
+                )
+            except PermissionError as e:
+                raise PermissionError(
+                    f&#34;There may already be a /tmp/tika.log file from another user - please delete it or change permissions: {e}&#34;
+                )
         if not use_tika and not TEXTRACT_INSTALLED:
             raise ValueError(
                 &#34;If use_tika=False, then TextExtractor requires textract: pip install textract&#34;
@@ -117,6 +118,8 @@ class TextExtractor:
 
     def _extract(self, filename):
         if self.use_tika:
+            from tika import parser
+
             if JAVA_INSTALLED:
                 parsed = parser.from_file(filename)
                 text = parsed[&#34;content&#34;]
@@ -155,10 +158,17 @@ class TextExtractor:
     &#34;&#34;&#34;
 
     def __init__(self, use_tika=True):
-        if use_tika and not TIKA_INSTALLED:
-            raise ValueError(
-                &#34;If use_tika=True, then TextExtractor requires tika: pip install tika&#34;
-            )
+        if use_tika:
+            try:
+                from tika import parser
+            except ImportError as e:
+                raise ValueError(
+                    &#34;If use_tika=True, then TextExtractor requires tika: pip install tika&#34;
+                )
+            except PermissionError as e:
+                raise PermissionError(
+                    f&#34;There may already be a /tmp/tika.log file from another user - please delete it or change permissions: {e}&#34;
+                )
         if not use_tika and not TEXTRACT_INSTALLED:
             raise ValueError(
                 &#34;If use_tika=False, then TextExtractor requires textract: pip install textract&#34;
@@ -217,6 +227,8 @@ class TextExtractor:
 
     def _extract(self, filename):
         if self.use_tika:
+            from tika import parser
+
             if JAVA_INSTALLED:
                 parsed = parser.from_file(filename)
                 text = parsed[&#34;content&#34;]

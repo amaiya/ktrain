@@ -88,7 +88,6 @@ class BERTTextClassLearner(ArrayLearner):
 
         # iterate through losses
         for tup in tups:
-
             # get data
             idx = tup[0]
             loss = tup[1]
@@ -169,7 +168,6 @@ class TransformerTextClassLearner(GenLearner):
 
         # iterate through losses
         for tup in tups:
-
             # get data
             idx = tup[0]
             loss = tup[1]
@@ -337,7 +335,6 @@ class TransformerTextClassLearner(GenLearner):
 
         # iterate through losses
         for tup in tups:
-
             # get data
             idx = tup[0]
             loss = tup[1]
@@ -419,7 +416,6 @@ Returns:
 
     # iterate through losses
     for tup in tups:
-
         # get data
         idx = tup[0]
         loss = tup[1]
@@ -541,7 +537,6 @@ Returns:
 
         # iterate through losses
         for tup in tups:
-
             # get data
             idx = tup[0]
             loss = tup[1]
@@ -613,7 +608,24 @@ Returns:
         &#34;&#34;&#34;
         self._make_model_folder(fpath)
         self.model.save_pretrained(fpath)
-        return</code></pre>
+        return
+
+    # 2020-07-07: removed, as core.Learner.load_model calls TransformerPreprocessor.load_model_and_configure
+    # def load_model(self, fpath, preproc=None):
+    #    &#34;&#34;&#34;
+    #    load Transformers model
+    #    Args:
+    #      fpath(str): path to folder containing model files
+    #      preproc(TransformerPreprocessor): a TransformerPreprocessor instance.
+    #    &#34;&#34;&#34;
+    #    if preproc is None or not isinstance(preproc, TransformersPreprocessor):
+    #        raise ValueError(&#39;preproc arg is required to load Transformer models from disk. &#39; +\
+    #                          &#39;Supply a TransformersPreprocessor instance. This is &#39; +\
+    #                          &#39;either the third return value from texts_from* function or &#39;+\
+    #                          &#39;the result of calling ktrain.text.Transformer&#39;)
+
+    #    self.model = _load_model(fpath, preproc=preproc)
+    #    return</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -694,7 +706,6 @@ Returns:
 
     # iterate through losses
     for tup in tups:
-
         # get data
         idx = tup[0]
         loss = tup[1]

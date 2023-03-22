@@ -212,7 +212,6 @@ class CyclicLR(keras.callbacks.Callback):
         self.orig_base_lr = self.base_lr
 
     def on_batch_end(self, batch, logs=None):
-
         logs = logs or {}
         self.trn_iterations += 1
         self.clr_iterations += 1
@@ -581,7 +580,6 @@ Code Reference: <a href="https://github.com/bckenstler/CLR">https://github.com/b
         self.orig_base_lr = self.base_lr
 
     def on_batch_end(self, batch, logs=None):
-
         logs = logs or {}
         self.trn_iterations += 1
         self.clr_iterations += 1
@@ -678,7 +676,7 @@ Code Reference: <a href="https://github.com/bckenstler/CLR">https://github.com/b
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
-<li>tensorflow.python.keras.callbacks.Callback</li>
+<li>keras.callbacks.Callback</li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -714,7 +712,6 @@ Code Reference: <a href="https://github.com/bckenstler/CLR">https://github.com/b
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def on_batch_end(self, batch, logs=None):
-
     logs = logs or {}
     self.trn_iterations += 1
     self.clr_iterations += 1
@@ -764,13 +761,19 @@ Code Reference: <a href="https://github.com/bckenstler/CLR">https://github.com/b
 </code></dt>
 <dd>
 <div class="desc"><p>Called at the end of an epoch.</p>
-<p>Subclasses should override for any actions to run. This function should only
-be called during TRAIN mode.</p>
-<h2 id="arguments">Arguments</h2>
-<p>epoch: Integer, index of epoch.
-logs: Dict, metric results for this training epoch, and for the
-validation epoch if validation is performed. Validation result keys
-are prefixed with <code>val_</code>.</p></div>
+<p>Subclasses should override for any actions to run. This function should
+only be called during TRAIN mode.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>epoch</code></strong></dt>
+<dd>Integer, index of epoch.</dd>
+<dt><strong><code>logs</code></strong></dt>
+<dd>Dict, metric results for this training epoch, and for the
+validation epoch if validation is performed. Validation result
+keys are prefixed with <code>val_</code>. For training epoch, the values of
+the <code>Model</code>'s metrics are returned. Example:
+<code>{'loss': 0.2, 'accuracy': 0.7}</code>.</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -833,9 +836,12 @@ are prefixed with <code>val_</code>.</p></div>
 <dd>
 <div class="desc"><p>Called at the beginning of training.</p>
 <p>Subclasses should override for any actions to run.</p>
-<h2 id="arguments">Arguments</h2>
-<p>logs: Dict. Currently no data is passed to this argument for this method
-but that may change in the future.</p></div>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>logs</code></strong></dt>
+<dd>Dict. Currently no data is passed to this argument for this
+method but that may change in the future.</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>

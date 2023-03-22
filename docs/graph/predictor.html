@@ -40,7 +40,6 @@ class NodePredictor(Predictor):
     &#34;&#34;&#34;
 
     def __init__(self, model, preproc, batch_size=U.DEFAULT_BS):
-
         if not isinstance(model, keras.Model):
             raise ValueError(&#34;model must be of instance keras.Model&#34;)
         if not isinstance(preproc, NodePreprocessor):
@@ -96,7 +95,6 @@ class LinkPredictor(Predictor):
     &#34;&#34;&#34;
 
     def __init__(self, model, preproc, batch_size=U.DEFAULT_BS):
-
         if not isinstance(model, keras.Model):
             raise ValueError(&#34;model must be of instance keras.Model&#34;)
         if not isinstance(preproc, LinkPreprocessor):
@@ -156,7 +154,6 @@ class LinkPredictor(Predictor):
     &#34;&#34;&#34;
 
     def __init__(self, model, preproc, batch_size=U.DEFAULT_BS):
-
         if not isinstance(model, keras.Model):
             raise ValueError(&#34;model must be of instance keras.Model&#34;)
         if not isinstance(preproc, LinkPreprocessor):
@@ -269,7 +266,6 @@ If return_proba is True, returns probabilities of each class.
     &#34;&#34;&#34;
 
     def __init__(self, model, preproc, batch_size=U.DEFAULT_BS):
-
         if not isinstance(model, keras.Model):
             raise ValueError(&#34;model must be of instance keras.Model&#34;)
         if not isinstance(preproc, NodePreprocessor):

@@ -88,7 +88,8 @@ class TopicModel:
                 raise ValueError(&#34;If n_topics is None, texts must be supplied&#34;)
             estimated = max(1, int(math.floor(math.sqrt(len(texts) / 2))))
             n_topics = min(400, estimated)
-            print(&#34;n_topics automatically set to %s&#34; % (n_topics))
+            if verbose:
+                print(&#34;n_topics automatically set to %s&#34; % (n_topics))
 
         # train model
         if texts is not None:
@@ -166,7 +167,8 @@ class TopicModel:
                                      Keys in this dict can be any of the following:
                                          alpha: alpha for LDA  default: 5./n_topics
                                          beta: beta for LDA.  default:0.01
-                                         nmf_alpha: alias for alpha for backwars compatilibity
+                                         nmf_alpha_W: alpha for NMF alpha_W (default is 0.0)
+                                         nmf_alpha_H: alpha for NMF alpha_H (default is &#39;same&#39;)
                                          l1_ratio: l1_ratio for NMF. default: 0
                                          ngram_range:  whether to consider bigrams, trigrams. default: (1,1)
 
@@ -177,8 +179,8 @@ class TopicModel:
         if hyperparam_kwargs is None:
             hyperparam_kwargs = {}
         alpha = hyperparam_kwargs.get(&#34;alpha&#34;, 5.0 / n_topics)
-        nmf_alpha = hyperparam_kwargs.get(&#34;nmf_alpha&#34;, None)
-        alpha = nmf_alpha if nmf_alpha is not None else alpha
+        nmf_alpha_W = hyperparam_kwargs.get(&#34;nmf_alpha_W&#34;, 0.0)
+        nmf_alpha_H = hyperparam_kwargs.get(&#34;nmf_alpha_H&#34;, &#34;same&#34;)
         beta = hyperparam_kwargs.get(&#34;beta&#34;, 0.01)
         l1_ratio = hyperparam_kwargs.get(&#34;l1_ratio&#34;, 0)
         ngram_range = hyperparam_kwargs.get(&#34;ngram_range&#34;, (1, 1))
@@ -236,7 +238,8 @@ class TopicModel:
                 n_components=n_topics,
                 max_iter=max_iter,
                 verbose=self.verbose,
-                alpha=alpha,
+                alpha_W=nmf_alpha_W,
+                alpha_H=nmf_alpha_H,
                 l1_ratio=l1_ratio,
                 random_state=0,
             )
@@ -291,7 +294,7 @@ class TopicModel:
             raise ValueError(
                 &#34;topic_id must be less than %s&#34; % (len(self.model.components_))
             )
-        feature_names = self.vectorizer.get_feature_names()
+        feature_names = self.vectorizer.get_feature_names_out()
         word_probs = self.model.components_[topic_id]
         word_ids = [i for i in word_probs.argsort()[: -n_words - 1 : -1]]
         words = [feature_names[i] for i in word_ids]
@@ -312,7 +315,7 @@ class TopicModel:
 
         &#34;&#34;&#34;
         self._check_model()
-        feature_names = self.vectorizer.get_feature_names()
+        feature_names = self.vectorizer.get_feature_names_out()
         topic_summaries = []
         for topic_idx, topic in enumerate(self.model.components_):
             summary = [feature_names[i] for i in topic.argsort()[: -n_words - 1 : -1]]
@@ -346,7 +349,7 @@ class TopicModel:
                 key=lambda kv: kv[-1],
                 reverse=True,
             )
-            for (idx, topic, count) in topic_counts:
+            for idx, topic, count in topic_counts:
                 print(&#34;topic:%s | count:%s | %s&#34; % (idx, count, topic))
         else:
             for i, t in enumerate(topics):
@@ -1007,7 +1010,8 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
                 raise ValueError(&#34;If n_topics is None, texts must be supplied&#34;)
             estimated = max(1, int(math.floor(math.sqrt(len(texts) / 2))))
             n_topics = min(400, estimated)
-            print(&#34;n_topics automatically set to %s&#34; % (n_topics))
+            if verbose:
+                print(&#34;n_topics automatically set to %s&#34; % (n_topics))
 
         # train model
         if texts is not None:
@@ -1085,7 +1089,8 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
                                      Keys in this dict can be any of the following:
                                          alpha: alpha for LDA  default: 5./n_topics
                                          beta: beta for LDA.  default:0.01
-                                         nmf_alpha: alias for alpha for backwars compatilibity
+                                         nmf_alpha_W: alpha for NMF alpha_W (default is 0.0)
+                                         nmf_alpha_H: alpha for NMF alpha_H (default is &#39;same&#39;)
                                          l1_ratio: l1_ratio for NMF. default: 0
                                          ngram_range:  whether to consider bigrams, trigrams. default: (1,1)
 
@@ -1096,8 +1101,8 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
         if hyperparam_kwargs is None:
             hyperparam_kwargs = {}
         alpha = hyperparam_kwargs.get(&#34;alpha&#34;, 5.0 / n_topics)
-        nmf_alpha = hyperparam_kwargs.get(&#34;nmf_alpha&#34;, None)
-        alpha = nmf_alpha if nmf_alpha is not None else alpha
+        nmf_alpha_W = hyperparam_kwargs.get(&#34;nmf_alpha_W&#34;, 0.0)
+        nmf_alpha_H = hyperparam_kwargs.get(&#34;nmf_alpha_H&#34;, &#34;same&#34;)
         beta = hyperparam_kwargs.get(&#34;beta&#34;, 0.01)
         l1_ratio = hyperparam_kwargs.get(&#34;l1_ratio&#34;, 0)
         ngram_range = hyperparam_kwargs.get(&#34;ngram_range&#34;, (1, 1))
@@ -1155,7 +1160,8 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
                 n_components=n_topics,
                 max_iter=max_iter,
                 verbose=self.verbose,
-                alpha=alpha,
+                alpha_W=nmf_alpha_W,
+                alpha_H=nmf_alpha_H,
                 l1_ratio=l1_ratio,
                 random_state=0,
             )
@@ -1210,7 +1216,7 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
             raise ValueError(
                 &#34;topic_id must be less than %s&#34; % (len(self.model.components_))
             )
-        feature_names = self.vectorizer.get_feature_names()
+        feature_names = self.vectorizer.get_feature_names_out()
         word_probs = self.model.components_[topic_id]
         word_ids = [i for i in word_probs.argsort()[: -n_words - 1 : -1]]
         words = [feature_names[i] for i in word_ids]
@@ -1231,7 +1237,7 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
 
         &#34;&#34;&#34;
         self._check_model()
-        feature_names = self.vectorizer.get_feature_names()
+        feature_names = self.vectorizer.get_feature_names_out()
         topic_summaries = []
         for topic_idx, topic in enumerate(self.model.components_):
             summary = [feature_names[i] for i in topic.argsort()[: -n_words - 1 : -1]]
@@ -1265,7 +1271,7 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
                 key=lambda kv: kv[-1],
                 reverse=True,
             )
-            for (idx, topic, count) in topic_counts:
+            for idx, topic, count in topic_counts:
                 print(&#34;topic:%s | count:%s | %s&#34; % (idx, count, topic))
         else:
             for i, t in enumerate(topics):
@@ -2141,7 +2147,7 @@ Dictionary where key is topic ID and value is a tuple of form (topic summary, co
 
     &#34;&#34;&#34;
     self._check_model()
-    feature_names = self.vectorizer.get_feature_names()
+    feature_names = self.vectorizer.get_feature_names_out()
     topic_summaries = []
     for topic_idx, topic in enumerate(self.model.components_):
         summary = [feature_names[i] for i in topic.argsort()[: -n_words - 1 : -1]]
@@ -2189,7 +2195,7 @@ n_words=int): number of top words</p></div>
         raise ValueError(
             &#34;topic_id must be less than %s&#34; % (len(self.model.components_))
         )
-    feature_names = self.vectorizer.get_feature_names()
+    feature_names = self.vectorizer.get_feature_names_out()
     word_probs = self.model.components_[topic_id]
     word_ids = [i for i in word_probs.argsort()[: -n_words - 1 : -1]]
     words = [feature_names[i] for i in word_ids]
@@ -2287,7 +2293,7 @@ the count is the number of documents with that topic as primary.</p></div>
             key=lambda kv: kv[-1],
             reverse=True,
         )
-        for (idx, topic, count) in topic_counts:
+        for idx, topic, count in topic_counts:
             print(&#34;topic:%s | count:%s | %s&#34; % (idx, count, topic))
     else:
         for i, t in enumerate(topics):
@@ -2568,7 +2574,8 @@ alpha: alpha for LDA
 default: 5./n_topics
 beta: beta for LDA.
 default:0.01
-nmf_alpha: alias for alpha for backwars compatilibity
+nmf_alpha_W: alpha for NMF alpha_W (default is 0.0)
+nmf_alpha_H: alpha for NMF alpha_H (default is 'same')
 l1_ratio: l1_ratio for NMF. default: 0
 ngram_range:
 whether to consider bigrams, trigrams. default: (1,1)</p>
@@ -2620,7 +2627,8 @@ whether to consider bigrams, trigrams. default: (1,1)</p>
                                  Keys in this dict can be any of the following:
                                      alpha: alpha for LDA  default: 5./n_topics
                                      beta: beta for LDA.  default:0.01
-                                     nmf_alpha: alias for alpha for backwars compatilibity
+                                     nmf_alpha_W: alpha for NMF alpha_W (default is 0.0)
+                                     nmf_alpha_H: alpha for NMF alpha_H (default is &#39;same&#39;)
                                      l1_ratio: l1_ratio for NMF. default: 0
                                      ngram_range:  whether to consider bigrams, trigrams. default: (1,1)
 
@@ -2631,8 +2639,8 @@ whether to consider bigrams, trigrams. default: (1,1)</p>
     if hyperparam_kwargs is None:
         hyperparam_kwargs = {}
     alpha = hyperparam_kwargs.get(&#34;alpha&#34;, 5.0 / n_topics)
-    nmf_alpha = hyperparam_kwargs.get(&#34;nmf_alpha&#34;, None)
-    alpha = nmf_alpha if nmf_alpha is not None else alpha
+    nmf_alpha_W = hyperparam_kwargs.get(&#34;nmf_alpha_W&#34;, 0.0)
+    nmf_alpha_H = hyperparam_kwargs.get(&#34;nmf_alpha_H&#34;, &#34;same&#34;)
     beta = hyperparam_kwargs.get(&#34;beta&#34;, 0.01)
     l1_ratio = hyperparam_kwargs.get(&#34;l1_ratio&#34;, 0)
     ngram_range = hyperparam_kwargs.get(&#34;ngram_range&#34;, (1, 1))
@@ -2690,7 +2698,8 @@ whether to consider bigrams, trigrams. default: (1,1)</p>
             n_components=n_topics,
             max_iter=max_iter,
             verbose=self.verbose,
-            alpha=alpha,
+            alpha_W=nmf_alpha_W,
+            alpha_H=nmf_alpha_H,
             l1_ratio=l1_ratio,
             random_state=0,
         )
@@ -3062,7 +3071,8 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
                 raise ValueError(&#34;If n_topics is None, texts must be supplied&#34;)
             estimated = max(1, int(math.floor(math.sqrt(len(texts) / 2))))
             n_topics = min(400, estimated)
-            print(&#34;n_topics automatically set to %s&#34; % (n_topics))
+            if verbose:
+                print(&#34;n_topics automatically set to %s&#34; % (n_topics))
 
         # train model
         if texts is not None:
@@ -3140,7 +3150,8 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
                                      Keys in this dict can be any of the following:
                                          alpha: alpha for LDA  default: 5./n_topics
                                          beta: beta for LDA.  default:0.01
-                                         nmf_alpha: alias for alpha for backwars compatilibity
+                                         nmf_alpha_W: alpha for NMF alpha_W (default is 0.0)
+                                         nmf_alpha_H: alpha for NMF alpha_H (default is &#39;same&#39;)
                                          l1_ratio: l1_ratio for NMF. default: 0
                                          ngram_range:  whether to consider bigrams, trigrams. default: (1,1)
 
@@ -3151,8 +3162,8 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
         if hyperparam_kwargs is None:
             hyperparam_kwargs = {}
         alpha = hyperparam_kwargs.get(&#34;alpha&#34;, 5.0 / n_topics)
-        nmf_alpha = hyperparam_kwargs.get(&#34;nmf_alpha&#34;, None)
-        alpha = nmf_alpha if nmf_alpha is not None else alpha
+        nmf_alpha_W = hyperparam_kwargs.get(&#34;nmf_alpha_W&#34;, 0.0)
+        nmf_alpha_H = hyperparam_kwargs.get(&#34;nmf_alpha_H&#34;, &#34;same&#34;)
         beta = hyperparam_kwargs.get(&#34;beta&#34;, 0.01)
         l1_ratio = hyperparam_kwargs.get(&#34;l1_ratio&#34;, 0)
         ngram_range = hyperparam_kwargs.get(&#34;ngram_range&#34;, (1, 1))
@@ -3210,7 +3221,8 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
                 n_components=n_topics,
                 max_iter=max_iter,
                 verbose=self.verbose,
-                alpha=alpha,
+                alpha_W=nmf_alpha_W,
+                alpha_H=nmf_alpha_H,
                 l1_ratio=l1_ratio,
                 random_state=0,
             )
@@ -3265,7 +3277,7 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
             raise ValueError(
                 &#34;topic_id must be less than %s&#34; % (len(self.model.components_))
             )
-        feature_names = self.vectorizer.get_feature_names()
+        feature_names = self.vectorizer.get_feature_names_out()
         word_probs = self.model.components_[topic_id]
         word_ids = [i for i in word_probs.argsort()[: -n_words - 1 : -1]]
         words = [feature_names[i] for i in word_ids]
@@ -3286,7 +3298,7 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
 
         &#34;&#34;&#34;
         self._check_model()
-        feature_names = self.vectorizer.get_feature_names()
+        feature_names = self.vectorizer.get_feature_names_out()
         topic_summaries = []
         for topic_idx, topic in enumerate(self.model.components_):
             summary = [feature_names[i] for i in topic.argsort()[: -n_words - 1 : -1]]
@@ -3320,7 +3332,7 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
                 key=lambda kv: kv[-1],
                 reverse=True,
             )
-            for (idx, topic, count) in topic_counts:
+            for idx, topic, count in topic_counts:
                 print(&#34;topic:%s | count:%s | %s&#34; % (idx, count, topic))
         else:
             for i, t in enumerate(topics):
@@ -4196,7 +4208,7 @@ Dictionary where key is topic ID and value is a tuple of form (topic summary, co
 
     &#34;&#34;&#34;
     self._check_model()
-    feature_names = self.vectorizer.get_feature_names()
+    feature_names = self.vectorizer.get_feature_names_out()
     topic_summaries = []
     for topic_idx, topic in enumerate(self.model.components_):
         summary = [feature_names[i] for i in topic.argsort()[: -n_words - 1 : -1]]
@@ -4244,7 +4256,7 @@ n_words=int): number of top words</p></div>
         raise ValueError(
             &#34;topic_id must be less than %s&#34; % (len(self.model.components_))
         )
-    feature_names = self.vectorizer.get_feature_names()
+    feature_names = self.vectorizer.get_feature_names_out()
     word_probs = self.model.components_[topic_id]
     word_ids = [i for i in word_probs.argsort()[: -n_words - 1 : -1]]
     words = [feature_names[i] for i in word_ids]
@@ -4342,7 +4354,7 @@ the count is the number of documents with that topic as primary.</p></div>
             key=lambda kv: kv[-1],
             reverse=True,
         )
-        for (idx, topic, count) in topic_counts:
+        for idx, topic, count in topic_counts:
             print(&#34;topic:%s | count:%s | %s&#34; % (idx, count, topic))
     else:
         for i, t in enumerate(topics):
@@ -4623,7 +4635,8 @@ alpha: alpha for LDA
 default: 5./n_topics
 beta: beta for LDA.
 default:0.01
-nmf_alpha: alias for alpha for backwars compatilibity
+nmf_alpha_W: alpha for NMF alpha_W (default is 0.0)
+nmf_alpha_H: alpha for NMF alpha_H (default is 'same')
 l1_ratio: l1_ratio for NMF. default: 0
 ngram_range:
 whether to consider bigrams, trigrams. default: (1,1)</p>
@@ -4675,7 +4688,8 @@ whether to consider bigrams, trigrams. default: (1,1)</p>
                                  Keys in this dict can be any of the following:
                                      alpha: alpha for LDA  default: 5./n_topics
                                      beta: beta for LDA.  default:0.01
-                                     nmf_alpha: alias for alpha for backwars compatilibity
+                                     nmf_alpha_W: alpha for NMF alpha_W (default is 0.0)
+                                     nmf_alpha_H: alpha for NMF alpha_H (default is &#39;same&#39;)
                                      l1_ratio: l1_ratio for NMF. default: 0
                                      ngram_range:  whether to consider bigrams, trigrams. default: (1,1)
 
@@ -4686,8 +4700,8 @@ whether to consider bigrams, trigrams. default: (1,1)</p>
     if hyperparam_kwargs is None:
         hyperparam_kwargs = {}
     alpha = hyperparam_kwargs.get(&#34;alpha&#34;, 5.0 / n_topics)
-    nmf_alpha = hyperparam_kwargs.get(&#34;nmf_alpha&#34;, None)
-    alpha = nmf_alpha if nmf_alpha is not None else alpha
+    nmf_alpha_W = hyperparam_kwargs.get(&#34;nmf_alpha_W&#34;, 0.0)
+    nmf_alpha_H = hyperparam_kwargs.get(&#34;nmf_alpha_H&#34;, &#34;same&#34;)
     beta = hyperparam_kwargs.get(&#34;beta&#34;, 0.01)
     l1_ratio = hyperparam_kwargs.get(&#34;l1_ratio&#34;, 0)
     ngram_range = hyperparam_kwargs.get(&#34;ngram_range&#34;, (1, 1))
@@ -4745,7 +4759,8 @@ whether to consider bigrams, trigrams. default: (1,1)</p>
             n_components=n_topics,
             max_iter=max_iter,
             verbose=self.verbose,
-            alpha=alpha,
+            alpha_W=nmf_alpha_W,
+            alpha_H=nmf_alpha_H,
             l1_ratio=l1_ratio,
             random_state=0,
         )

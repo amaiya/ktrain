@@ -165,7 +165,7 @@ function may adjust these as needed.
 </details>
 </dd>
 <dt id="ktrain.vision.image_classifier"><code class="name flex">
-<span>def <span class="ident">image_classifier</span></span>(<span>name, train_data, val_data=None, freeze_layers=None, metrics=['accuracy'], optimizer_name='adam', multilabel=None, pt_fc=[], pt_ps=[], verbose=1)</span>
+<span>def <span class="ident">image_classifier</span></span>(<span>name, train_data, val_data=None, freeze_layers=None, metrics=['accuracy'], optimizer_name=&lt;keras.optimizers.optimizer_v2.adam.Adam object&gt;, multilabel=None, pt_fc=[], pt_ps=[], verbose=1)</span>
 </code></dt>
 <dd>
 <div class="desc"><pre><code>Returns a pre-defined/pre-trained model ready to be trained/fine-tuned
@@ -181,7 +181,7 @@ Args:
                         If None, then all layers except new Dense layers
                         will be frozen/untrainable.
     metrics (list):  metrics to use
-    optimizer_name(str): name of Keras optimizer (e.g., 'adam', 'sgd')
+    optimizer_name(str|obj): name of Keras optimizer (e.g., 'adam', 'sgd') or instance of keras Optimizer
     multilabel(bool):  If True, model will be build to support
                        multilabel classificaiton (labels are not mutually exclusive).
                        If False, binary/multiclassification model will be returned.
@@ -213,7 +213,6 @@ Return:
     pt_ps=[],
     verbose=1,
 ):
-
     &#34;&#34;&#34;
     ```
     Returns a pre-defined/pre-trained model ready to be trained/fine-tuned
@@ -229,7 +228,7 @@ Return:
                             If None, then all layers except new Dense layers
                             will be frozen/untrainable.
         metrics (list):  metrics to use
-        optimizer_name(str): name of Keras optimizer (e.g., &#39;adam&#39;, &#39;sgd&#39;)
+        optimizer_name(str|obj): name of Keras optimizer (e.g., &#39;adam&#39;, &#39;sgd&#39;) or instance of keras Optimizer
         multilabel(bool):  If True, model will be build to support
                            multilabel classificaiton (labels are not mutually exclusive).
                            If False, binary/multiclassification model will be returned.
@@ -261,7 +260,7 @@ Return:
 </details>
 </dd>
 <dt id="ktrain.vision.image_regression_model"><code class="name flex">
-<span>def <span class="ident">image_regression_model</span></span>(<span>name, train_data, val_data=None, freeze_layers=None, metrics=['mae'], optimizer_name='adam', pt_fc=[], pt_ps=[], verbose=1)</span>
+<span>def <span class="ident">image_regression_model</span></span>(<span>name, train_data, val_data=None, freeze_layers=None, metrics=['mae'], optimizer_name=&lt;keras.optimizers.optimizer_v2.adam.Adam object&gt;, pt_fc=[], pt_ps=[], verbose=1)</span>
 </code></dt>
 <dd>
 <div class="desc"><pre><code>Returns a pre-defined/pre-trained model ready to be trained/fine-tuned
@@ -308,7 +307,6 @@ Return:
     pt_ps=[],
     verbose=1,
 ):
-
     &#34;&#34;&#34;
     ```
     Returns a pre-defined/pre-trained model ready to be trained/fine-tuned
@@ -398,7 +396,6 @@ Returns:
     class_names=None,
     is_regression=False,
 ):
-
     &#34;&#34;&#34;
     ```
     Returns image generator (Iterator instance) from training
@@ -545,7 +542,6 @@ batches: a tuple of two Iterators - one for train and one for test
     val_pct=0.1,
     random_state=None,
 ):
-
     &#34;&#34;&#34;
     ```
     Returns image generator (Iterator instance).
@@ -671,7 +667,6 @@ batches: a tuple of two Iterators - one for train and one for test
     random_state=None,
     verbose=1,
 ):
-
     &#34;&#34;&#34;
     ```
     Returns image generator (Iterator instance).
@@ -782,7 +777,6 @@ batches: a tuple of two Iterators - one for train and one for test
     data_aug=None,
     verbose=1,
 ):
-
     &#34;&#34;&#34;
     ```
     Returns image generator (Iterator instance).
@@ -1018,7 +1012,7 @@ on a supplied image.
     idg.preprocessing_function = None
 
     img = keras.preprocessing.image.load_img(img_path)
-    x = keras.preprocessing.image.img_to_array(img)
+    x = img_to_array(img)
     x = x / 255.0
     x = x.reshape((1,) + x.shape)
     i = 0
@@ -1106,7 +1100,7 @@ on a supplied image.
     for i in range(n):
         img_path = random.choice(fnames)
         img = keras.preprocessing.image.load_img(img_path)
-        x = keras.preprocessing.image.img_to_array(img)
+        x = img_to_array(img)
         x = x / 255.0
         ims.append(x)
     U.plots(ims, rows=rows)
@@ -1137,7 +1131,6 @@ on a supplied image.
     &#34;&#34;&#34;
 
     def __init__(self, model, preproc, batch_size=U.DEFAULT_BS):
-
         if not isinstance(model, keras.Model):
             raise ValueError(&#34;model must be of instance keras.Model&#34;)
         if not isinstance(preproc, ImagePreprocessor):
@@ -1157,34 +1150,14 @@ on a supplied image.
         Highlights image to explain prediction
         ```
         &#34;&#34;&#34;
-        # if U.is_tf_keras():
-        # warnings.warn(&#34;currently_unsupported: explain() method is not available because tf.keras is &#34;+\
-        # &#34;not yet adequately supported by the eli5 library. You can switch to &#34; +\
-        # &#34;stand-alone Keras by setting os.environ[&#39;TF_KERAS&#39;]=&#39;0&#39;&#34; )
-        # return
-
         try:
             import eli5
         except:
             msg = (
                 &#34;ktrain requires a forked version of eli5 to support tf.keras. &#34;
-                + &#34;Install with: pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip&#34;
+                + &#34;Install with: pip install https://github.com/amaiya/eli5-tf/archive/refs/heads/master.zip&#34;
             )
             warnings.warn(msg)
-            return
-
-        # if not hasattr(eli5, &#39;KTRAIN&#39;):
-        if (
-            not hasattr(eli5, &#34;KTRAIN_ELI5_TAG&#34;)
-            or eli5.KTRAIN_ELI5_TAG != KTRAIN_ELI5_TAG
-        ):
-            warnings.warn(
-                &#34;Since eli5 does not yet support tf.keras, ktrain uses a forked version of eli5.  &#34;
-                + &#34;We do not detect this forked version (or it is out-of-date), so predictor.explain may not work.  &#34;
-                + &#34;It will work if you uninstall the current version of eli5 and install &#34;
-                + &#34;the forked version:  &#34;
-                + &#34;pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip&#34;
-            )
             return
 
         if not DISABLE_V2_BEHAVIOR:
@@ -1407,34 +1380,14 @@ problems, not multilabel classification problems.
     Highlights image to explain prediction
     ```
     &#34;&#34;&#34;
-    # if U.is_tf_keras():
-    # warnings.warn(&#34;currently_unsupported: explain() method is not available because tf.keras is &#34;+\
-    # &#34;not yet adequately supported by the eli5 library. You can switch to &#34; +\
-    # &#34;stand-alone Keras by setting os.environ[&#39;TF_KERAS&#39;]=&#39;0&#39;&#34; )
-    # return
-
     try:
         import eli5
     except:
         msg = (
             &#34;ktrain requires a forked version of eli5 to support tf.keras. &#34;
-            + &#34;Install with: pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip&#34;
+            + &#34;Install with: pip install https://github.com/amaiya/eli5-tf/archive/refs/heads/master.zip&#34;
         )
         warnings.warn(msg)
-        return
-
-    # if not hasattr(eli5, &#39;KTRAIN&#39;):
-    if (
-        not hasattr(eli5, &#34;KTRAIN_ELI5_TAG&#34;)
-        or eli5.KTRAIN_ELI5_TAG != KTRAIN_ELI5_TAG
-    ):
-        warnings.warn(
-            &#34;Since eli5 does not yet support tf.keras, ktrain uses a forked version of eli5.  &#34;
-            + &#34;We do not detect this forked version (or it is out-of-date), so predictor.explain may not work.  &#34;
-            + &#34;It will work if you uninstall the current version of eli5 and install &#34;
-            + &#34;the forked version:  &#34;
-            + &#34;pip install https://github.com/amaiya/eli5/archive/refs/heads/tfkeras_0_10_1.zip&#34;
-        )
         return
 
     if not DISABLE_V2_BEHAVIOR:

@@ -73,7 +73,9 @@ class KeywordExtractor:
     &#34;&#34;&#34;
 
     def __init__(
-        self, lang=&#34;en&#34;, custom_stopwords=[&#34;et al&#34;, &#34;et&#34;, &#34;al&#34;, &#34;n&#39;t&#34;, &#34;did&#34;, &#34;does&#34;]
+        self,
+        lang=&#34;en&#34;,
+        custom_stopwords=[&#34;et al&#34;, &#34;et&#34;, &#34;al&#34;, &#34;n&#39;t&#34;, &#34;did&#34;, &#34;does&#34;, &#34;lt&#34;, &#34;gt&#34;, &#34;br&#34;],
     ):
         &#34;&#34;&#34;
         ```
@@ -119,6 +121,7 @@ class KeywordExtractor:
         omit_scores=False,
         candidate_generator=&#34;ngrams&#34;,
         constrain_unigram_case=True,
+        exclude_unigrams=False,
         maxlen=64,
         minchars=3,
         truncate_to=5000,
@@ -141,6 +144,10 @@ class KeywordExtractor:
           contrain_unigram_case(bool): Only applies if candidate_generator==&#39;ngrams&#39;.
                                        If True, only unigrams in uppercase are returned (e.g., LDA, SVM, NASA).
                                        True is recommended.
+          contrain_unigram_case(bool): If True, only unigrams in uppercase are returned (e.g., LDA, SVM, NASA).
+                                       True is recommended. Not applied if exclude_unigram=False
+          exclude_unigrams(bool): If True, unigrams will be excluded from results.
+                                  Convenience parameter that is functionally equivalent to changing ngram_range to be above 1.
           maxlen(int): maximum number of characters in keyphrase. Default:64
           minchars(int): Minimum number of characters in keyword (default:3)
           truncate_to(int): Truncate input to this many words (default:5000, i.e., first 5K words).
@@ -188,6 +195,12 @@ class KeywordExtractor:
                 n = len(words)
                 if n not in ngram_lens:
                     continue
+                if (
+                    not exclude_unigrams
+                    and n == 1
+                    and text.count(&#34; &#34; + words[0].upper() + &#34; &#34;) &gt; 1
+                ):
+                    words[0] = words[0].upper()
                 lst = ngrams.get(n, [])
                 lst.append(words)
                 ngrams[n] = lst
@@ -201,9 +214,10 @@ class KeywordExtractor:
                     if not any(w.lower() in self.blacklist for w in k)
                     and (
                         not constrain_unigram_case
+                        and not exclude_unigrams
                         or (
-                            candidate_generator == &#34;ngrams&#34;
-                            and constrain_unigram_case
+                            constrain_unigram_case
+                            and not exclude_unigrams
                             and k[0].isupper()
                         )
                         # or (
@@ -229,14 +243,22 @@ class KeywordExtractor:
                     if any([c.isalpha() for c in kw[:3]])
                     and len([w for w in kw if not w.isspace() and w not in [&#34;-&#34;, &#34;.&#34;]])
                     &gt;= minchars
-                    and (kw[-1].isalpha() or kw[-1].isdigit())
+                    and kw[-1].isalnum()
+                    and kw[0].isalnum()
                     and &#34;@&#34; not in kw
+                    and &#34;.&#34; not in kw
+                    and &#34;&#39;&#34; not in kw
                 ]
             )
         cnt = Counter(candidates)
         tups = cnt.most_common(n_candidates)
 
         # normalize and return
+        tups = [
+            tup
+            for tup in tups
+            if len(tup[0].split()) &gt; 1 or text.count(&#34; &#34; + tup[0].upper() + &#34; &#34;) &gt; 1
+        ]
         keywords = [tup[0] for tup in tups if len(tup[0]) &lt;= maxlen]
         scores = [tup[1] for tup in tups if len(tup[0]) &lt;= maxlen]
         scores = [float(i) / sum(scores) for i in scores]
@@ -269,7 +291,7 @@ class KeywordExtractor:
 <dl>
 <dt id="ktrain.text.kw.core.KeywordExtractor"><code class="flex name class">
 <span>class <span class="ident">KeywordExtractor</span></span>
-<span>(</span><span>lang='en', custom_stopwords=['et al', 'et', 'al', "n't", 'did', 'does'])</span>
+<span>(</span><span>lang='en', custom_stopwords=['et al', 'et', 'al', "n't", 'did', 'does', 'lt', 'gt', 'br'])</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Keyphrase Extraction</p>
@@ -289,7 +311,9 @@ Args:
     &#34;&#34;&#34;
 
     def __init__(
-        self, lang=&#34;en&#34;, custom_stopwords=[&#34;et al&#34;, &#34;et&#34;, &#34;al&#34;, &#34;n&#39;t&#34;, &#34;did&#34;, &#34;does&#34;]
+        self,
+        lang=&#34;en&#34;,
+        custom_stopwords=[&#34;et al&#34;, &#34;et&#34;, &#34;al&#34;, &#34;n&#39;t&#34;, &#34;did&#34;, &#34;does&#34;, &#34;lt&#34;, &#34;gt&#34;, &#34;br&#34;],
     ):
         &#34;&#34;&#34;
         ```
@@ -335,6 +359,7 @@ Args:
         omit_scores=False,
         candidate_generator=&#34;ngrams&#34;,
         constrain_unigram_case=True,
+        exclude_unigrams=False,
         maxlen=64,
         minchars=3,
         truncate_to=5000,
@@ -357,6 +382,10 @@ Args:
           contrain_unigram_case(bool): Only applies if candidate_generator==&#39;ngrams&#39;.
                                        If True, only unigrams in uppercase are returned (e.g., LDA, SVM, NASA).
                                        True is recommended.
+          contrain_unigram_case(bool): If True, only unigrams in uppercase are returned (e.g., LDA, SVM, NASA).
+                                       True is recommended. Not applied if exclude_unigram=False
+          exclude_unigrams(bool): If True, unigrams will be excluded from results.
+                                  Convenience parameter that is functionally equivalent to changing ngram_range to be above 1.
           maxlen(int): maximum number of characters in keyphrase. Default:64
           minchars(int): Minimum number of characters in keyword (default:3)
           truncate_to(int): Truncate input to this many words (default:5000, i.e., first 5K words).
@@ -404,6 +433,12 @@ Args:
                 n = len(words)
                 if n not in ngram_lens:
                     continue
+                if (
+                    not exclude_unigrams
+                    and n == 1
+                    and text.count(&#34; &#34; + words[0].upper() + &#34; &#34;) &gt; 1
+                ):
+                    words[0] = words[0].upper()
                 lst = ngrams.get(n, [])
                 lst.append(words)
                 ngrams[n] = lst
@@ -417,9 +452,10 @@ Args:
                     if not any(w.lower() in self.blacklist for w in k)
                     and (
                         not constrain_unigram_case
+                        and not exclude_unigrams
                         or (
-                            candidate_generator == &#34;ngrams&#34;
-                            and constrain_unigram_case
+                            constrain_unigram_case
+                            and not exclude_unigrams
                             and k[0].isupper()
                         )
                         # or (
@@ -445,14 +481,22 @@ Args:
                     if any([c.isalpha() for c in kw[:3]])
                     and len([w for w in kw if not w.isspace() and w not in [&#34;-&#34;, &#34;.&#34;]])
                     &gt;= minchars
-                    and (kw[-1].isalpha() or kw[-1].isdigit())
+                    and kw[-1].isalnum()
+                    and kw[0].isalnum()
                     and &#34;@&#34; not in kw
+                    and &#34;.&#34; not in kw
+                    and &#34;&#39;&#34; not in kw
                 ]
             )
         cnt = Counter(candidates)
         tups = cnt.most_common(n_candidates)
 
         # normalize and return
+        tups = [
+            tup
+            for tup in tups
+            if len(tup[0].split()) &gt; 1 or text.count(&#34; &#34; + tup[0].upper() + &#34; &#34;) &gt; 1
+        ]
         keywords = [tup[0] for tup in tups if len(tup[0]) &lt;= maxlen]
         scores = [tup[1] for tup in tups if len(tup[0]) &lt;= maxlen]
         scores = [float(i) / sum(scores) for i in scores]
@@ -476,7 +520,7 @@ Args:
 <h3>Methods</h3>
 <dl>
 <dt id="ktrain.text.kw.core.KeywordExtractor.extract_keywords"><code class="name flex">
-<span>def <span class="ident">extract_keywords</span></span>(<span>self, text, ngram_range=(1, 3), top_n=10, n_candidates=50, omit_scores=False, candidate_generator='ngrams', constrain_unigram_case=True, maxlen=64, minchars=3, truncate_to=5000, score_by='freqpos')</span>
+<span>def <span class="ident">extract_keywords</span></span>(<span>self, text, ngram_range=(1, 3), top_n=10, n_candidates=50, omit_scores=False, candidate_generator='ngrams', constrain_unigram_case=True, exclude_unigrams=False, maxlen=64, minchars=3, truncate_to=5000, score_by='freqpos')</span>
 </code></dt>
 <dd>
 <div class="desc"><pre><code>simple keyword extraction
@@ -496,6 +540,10 @@ candidate_generator(str):  Either 'noun_phrases' or 'ngrams'.
 contrain_unigram_case(bool): Only applies if candidate_generator=='ngrams'.
                              If True, only unigrams in uppercase are returned (e.g., LDA, SVM, NASA).
                              True is recommended.
+contrain_unigram_case(bool): If True, only unigrams in uppercase are returned (e.g., LDA, SVM, NASA).
+                             True is recommended. Not applied if exclude_unigram=False
+exclude_unigrams(bool): If True, unigrams will be excluded from results.
+                        Convenience parameter that is functionally equivalent to changing ngram_range to be above 1.
 maxlen(int): maximum number of characters in keyphrase. Default:64
 minchars(int): Minimum number of characters in keyword (default:3)
 truncate_to(int): Truncate input to this many words (default:5000, i.e., first 5K words).
@@ -522,6 +570,7 @@ Returns:
     omit_scores=False,
     candidate_generator=&#34;ngrams&#34;,
     constrain_unigram_case=True,
+    exclude_unigrams=False,
     maxlen=64,
     minchars=3,
     truncate_to=5000,
@@ -544,6 +593,10 @@ Returns:
       contrain_unigram_case(bool): Only applies if candidate_generator==&#39;ngrams&#39;.
                                    If True, only unigrams in uppercase are returned (e.g., LDA, SVM, NASA).
                                    True is recommended.
+      contrain_unigram_case(bool): If True, only unigrams in uppercase are returned (e.g., LDA, SVM, NASA).
+                                   True is recommended. Not applied if exclude_unigram=False
+      exclude_unigrams(bool): If True, unigrams will be excluded from results.
+                              Convenience parameter that is functionally equivalent to changing ngram_range to be above 1.
       maxlen(int): maximum number of characters in keyphrase. Default:64
       minchars(int): Minimum number of characters in keyword (default:3)
       truncate_to(int): Truncate input to this many words (default:5000, i.e., first 5K words).
@@ -591,6 +644,12 @@ Returns:
             n = len(words)
             if n not in ngram_lens:
                 continue
+            if (
+                not exclude_unigrams
+                and n == 1
+                and text.count(&#34; &#34; + words[0].upper() + &#34; &#34;) &gt; 1
+            ):
+                words[0] = words[0].upper()
             lst = ngrams.get(n, [])
             lst.append(words)
             ngrams[n] = lst
@@ -604,9 +663,10 @@ Returns:
                 if not any(w.lower() in self.blacklist for w in k)
                 and (
                     not constrain_unigram_case
+                    and not exclude_unigrams
                     or (
-                        candidate_generator == &#34;ngrams&#34;
-                        and constrain_unigram_case
+                        constrain_unigram_case
+                        and not exclude_unigrams
                         and k[0].isupper()
                     )
                     # or (
@@ -632,14 +692,22 @@ Returns:
                 if any([c.isalpha() for c in kw[:3]])
                 and len([w for w in kw if not w.isspace() and w not in [&#34;-&#34;, &#34;.&#34;]])
                 &gt;= minchars
-                and (kw[-1].isalpha() or kw[-1].isdigit())
+                and kw[-1].isalnum()
+                and kw[0].isalnum()
                 and &#34;@&#34; not in kw
+                and &#34;.&#34; not in kw
+                and &#34;&#39;&#34; not in kw
             ]
         )
     cnt = Counter(candidates)
     tups = cnt.most_common(n_candidates)
 
     # normalize and return
+    tups = [
+        tup
+        for tup in tups
+        if len(tup[0].split()) &gt; 1 or text.count(&#34; &#34; + tup[0].upper() + &#34; &#34;) &gt; 1
+    ]
     keywords = [tup[0] for tup in tups if len(tup[0]) &lt;= maxlen]
     scores = [tup[1] for tup in tups if len(tup[0]) &lt;= maxlen]
     scores = [float(i) / sum(scores) for i in scores]

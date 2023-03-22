@@ -48,6 +48,10 @@ if (
     SUPPRESS_DEP_WARNINGS
 ):  # 2021-11-12:  copied this here to properly suppress TF/CUDA warnings in Kaggle notebooks, etc.
     os.environ[&#34;TF_CPP_MIN_LOG_LEVEL&#34;] = &#34;3&#34;
+TF_WARNING = (
+    &#34;TensorFlow is not installed and will be needed if training neural networks, &#34;
+    + &#34;but non-TensorFlow features in ktrain can still be used. See https://github.com/amaiya/ktrain/blob/master/README.md&#34;
+)
 DISABLE_V2_BEHAVIOR = strtobool(os.environ.get(&#34;DISABLE_V2_BEHAVIOR&#34;, &#34;0&#34;))
 try:
     if DISABLE_V2_BEHAVIOR:
@@ -73,16 +77,15 @@ try:
         raise Exception(
             &#34;As of v0.8.x, ktrain needs TensorFlow 2. Please upgrade TensorFlow.&#34;
         )
-    os.environ[&#34;TF_KERAS&#34;] = &#34;1&#34;  # to use keras_bert package below with tf.Keras
+    os.environ[&#34;TF_KERAS&#34;] = &#34;1&#34;  # for eli5-tf (and previously keras_bert)
+    TF_INSTALLED = True
 except ImportError:
-    warnings.warn(
-        &#34;TensorFlow is not installed. You can still use ktrain&#39;s scikit-learn models and pretrained PyTorch models: &#34;
-        + &#34;text.zsl.ZeroShotClassifier, text.translation.Translator, text.summarization.TransformerSummarizer, &#34;
-        + &#34;text.speech.Transcriber, and text.eda.TopicModel. To train neural network models, you will need to install TensorFlow: &#34;
-        + &#34;pip install tensorflow&#34;
-    )
     keras = None
     K = None
+    tf = None
+    TF_INSTALLED = False
+    warnings.warn(TF_WARNING)
+
 # for TF backwards compatibility (e.g., support for TF 2.3.x):
 try:
     MobileNetV3Small = keras.applications.MobileNetV3Small
@@ -172,13 +175,22 @@ import langdetect
 import syntok.segmenter as segmenter
 
 # &#39;bert&#39; text classification model
-try:
-    import keras_bert
-    from keras_bert import Tokenizer as BERT_Tokenizer
-except ImportError:
-    warnings.warn(
-        &#34;keras_bert (and/or its TensorFlow dependency) is not installed. keras_bert is only needed only for &#39;bert&#39; text classification model&#34;
-    )
+if TF_INSTALLED:
+    try:
+        import keras_bert
+        from keras_bert import Tokenizer as BERT_Tokenizer
+
+        KERAS_BERT_INSTALLED = True
+    except ImportError:
+        warnings.warn(
+            &#34;keras_bert is not installed. keras_bert is only needed only for &#39;bert&#39; text classification model&#34;
+        )
+        KERAS_BERT_INSTALLED = False
+
+
+def check_keras_bert():
+    if not KERAS_BERT_INSTALLED:
+        raise Exception(&#34;Please install keras_bert: pip install keras_bert&#34;)
 
 
 # transformers for models in &#39;text&#39; module
@@ -190,6 +202,13 @@ except ImportError:
         &#34;transformers not installed - needed by various models in &#39;text&#39; module&#34;
     )
 
+if sys.version.startswith(&#34;3.6&#34;) and (
+    version.parse(transformers.__version__) &gt;= version.parse(&#34;4.11.0&#34;)
+):
+    raise Exception(
+        &#34;You are using Python 3.6.  Please downgrade transformers &#34;
+        + &#34;(and ignore the resultant pip ERROR): pip install transformers==4.10.3&#34;
+    )
 
 try:
     from PIL import Image
@@ -258,6 +277,20 @@ if SUPPRESS_DEP_WARNINGS:
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
+<dt id="ktrain.imports.check_keras_bert"><code class="name flex">
+<span>def <span class="ident">check_keras_bert</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def check_keras_bert():
+    if not KERAS_BERT_INSTALLED:
+        raise Exception(&#34;Please install keras_bert: pip install keras_bert&#34;)</code></pre>
+</details>
+</dd>
 <dt id="ktrain.imports.set_global_logging_level"><code class="name flex">
 <span>def <span class="ident">set_global_logging_level</span></span>(<span>level=40, prefices=[''])</span>
 </code></dt>
@@ -310,6 +343,7 @@ The match is a case-sensitive <code>module_name.startswith(prefix)</code></li>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
+<li><code><a title="ktrain.imports.check_keras_bert" href="#ktrain.imports.check_keras_bert">check_keras_bert</a></code></li>
 <li><code><a title="ktrain.imports.set_global_logging_level" href="#ktrain.imports.set_global_logging_level">set_global_logging_level</a></code></li>
 </ul>
 </li>

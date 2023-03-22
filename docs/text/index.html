@@ -1886,7 +1886,8 @@ Args:
             raise ValueError(
                 &#34;Number of texts is not equal to the number of rows in the DataFrame.&#34;
             )
-        texts = [t.replace(&#34;\n&#34;, &#34; &#34;).replace(&#34;\t&#34;, &#34; &#34;) for t in texts]
+        # texts = [t.replace(&#34;\n&#34;, &#34; &#34;).replace(&#34;\t&#34;, &#34; &#34;) for t in texts]
+        texts = [t.replace(&#34;\t&#34;, &#34; &#34;) for t in texts]
         questions = [q for q, l in question_label_pairs]
         labels = [l for q, l in question_label_pairs]
         self._check_columns(labels, df)
@@ -1994,7 +1995,8 @@ Args:
         raise ValueError(
             &#34;Number of texts is not equal to the number of rows in the DataFrame.&#34;
         )
-    texts = [t.replace(&#34;\n&#34;, &#34; &#34;).replace(&#34;\t&#34;, &#34; &#34;) for t in texts]
+    # texts = [t.replace(&#34;\n&#34;, &#34; &#34;).replace(&#34;\t&#34;, &#34; &#34;) for t in texts]
+    texts = [t.replace(&#34;\t&#34;, &#34; &#34;) for t in texts]
     questions = [q for q, l in question_label_pairs]
     labels = [l for q, l in question_label_pairs]
     self._check_columns(labels, df)
@@ -2124,7 +2126,7 @@ Args:
 
         if src_lang is None or src_lang not in SUPPORTED_SRC_LANGS:
             raise ValueError(
-                &#34;A src_lang must be supplied and be one of: %s&#34; % (SUPPORED_SRC_LANG)
+                &#34;A src_lang must be supplied and be one of: %s&#34; % (SUPPORTED_SRC_LANGS)
             )
         self.src_lang = src_lang
         self.translators = []
@@ -2182,7 +2184,7 @@ Args:
         else:
             raise ValueError(&#34;lang:%s is currently not supported.&#34; % (src_lang))
 
-    def translate(self, src_text, join_with=&#34;\n&#34;, num_beams=None, early_stopping=None):
+    def translate(self, src_text, join_with=&#34;\n&#34;, num_beams=1, early_stopping=False):
         &#34;&#34;&#34;
         ```
         Translate source document to English.
@@ -2220,7 +2222,7 @@ Args:
 <h3>Methods</h3>
 <dl>
 <dt id="ktrain.text.EnglishTranslator.translate"><code class="name flex">
-<span>def <span class="ident">translate</span></span>(<span>self, src_text, join_with='\n', num_beams=None, early_stopping=None)</span>
+<span>def <span class="ident">translate</span></span>(<span>self, src_text, join_with='\n', num_beams=1, early_stopping=False)</span>
 </code></dt>
 <dd>
 <div class="desc"><pre><code>Translate source document to English.
@@ -2248,7 +2250,7 @@ Returns:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def translate(self, src_text, join_with=&#34;\n&#34;, num_beams=None, early_stopping=None):
+<pre><code class="python">def translate(self, src_text, join_with=&#34;\n&#34;, num_beams=1, early_stopping=False):
     &#34;&#34;&#34;
     ```
     Translate source document to English.
@@ -2960,10 +2962,17 @@ Returns:
     &#34;&#34;&#34;
 
     def __init__(self, use_tika=True):
-        if use_tika and not TIKA_INSTALLED:
-            raise ValueError(
-                &#34;If use_tika=True, then TextExtractor requires tika: pip install tika&#34;
-            )
+        if use_tika:
+            try:
+                from tika import parser
+            except ImportError as e:
+                raise ValueError(
+                    &#34;If use_tika=True, then TextExtractor requires tika: pip install tika&#34;
+                )
+            except PermissionError as e:
+                raise PermissionError(
+                    f&#34;There may already be a /tmp/tika.log file from another user - please delete it or change permissions: {e}&#34;
+                )
         if not use_tika and not TEXTRACT_INSTALLED:
             raise ValueError(
                 &#34;If use_tika=False, then TextExtractor requires textract: pip install textract&#34;
@@ -3022,6 +3031,8 @@ Returns:
 
     def _extract(self, filename):
         if self.use_tika:
+            from tika import parser
+
             if JAVA_INSTALLED:
                 parsed = parser.from_file(filename)
                 text = parsed[&#34;content&#34;]
@@ -3209,7 +3220,8 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
                 raise ValueError(&#34;If n_topics is None, texts must be supplied&#34;)
             estimated = max(1, int(math.floor(math.sqrt(len(texts) / 2))))
             n_topics = min(400, estimated)
-            print(&#34;n_topics automatically set to %s&#34; % (n_topics))
+            if verbose:
+                print(&#34;n_topics automatically set to %s&#34; % (n_topics))
 
         # train model
         if texts is not None:
@@ -3287,7 +3299,8 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
                                      Keys in this dict can be any of the following:
                                          alpha: alpha for LDA  default: 5./n_topics
                                          beta: beta for LDA.  default:0.01
-                                         nmf_alpha: alias for alpha for backwars compatilibity
+                                         nmf_alpha_W: alpha for NMF alpha_W (default is 0.0)
+                                         nmf_alpha_H: alpha for NMF alpha_H (default is &#39;same&#39;)
                                          l1_ratio: l1_ratio for NMF. default: 0
                                          ngram_range:  whether to consider bigrams, trigrams. default: (1,1)
 
@@ -3298,8 +3311,8 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
         if hyperparam_kwargs is None:
             hyperparam_kwargs = {}
         alpha = hyperparam_kwargs.get(&#34;alpha&#34;, 5.0 / n_topics)
-        nmf_alpha = hyperparam_kwargs.get(&#34;nmf_alpha&#34;, None)
-        alpha = nmf_alpha if nmf_alpha is not None else alpha
+        nmf_alpha_W = hyperparam_kwargs.get(&#34;nmf_alpha_W&#34;, 0.0)
+        nmf_alpha_H = hyperparam_kwargs.get(&#34;nmf_alpha_H&#34;, &#34;same&#34;)
         beta = hyperparam_kwargs.get(&#34;beta&#34;, 0.01)
         l1_ratio = hyperparam_kwargs.get(&#34;l1_ratio&#34;, 0)
         ngram_range = hyperparam_kwargs.get(&#34;ngram_range&#34;, (1, 1))
@@ -3357,7 +3370,8 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
                 n_components=n_topics,
                 max_iter=max_iter,
                 verbose=self.verbose,
-                alpha=alpha,
+                alpha_W=nmf_alpha_W,
+                alpha_H=nmf_alpha_H,
                 l1_ratio=l1_ratio,
                 random_state=0,
             )
@@ -3412,7 +3426,7 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
             raise ValueError(
                 &#34;topic_id must be less than %s&#34; % (len(self.model.components_))
             )
-        feature_names = self.vectorizer.get_feature_names()
+        feature_names = self.vectorizer.get_feature_names_out()
         word_probs = self.model.components_[topic_id]
         word_ids = [i for i in word_probs.argsort()[: -n_words - 1 : -1]]
         words = [feature_names[i] for i in word_ids]
@@ -3433,7 +3447,7 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
 
         &#34;&#34;&#34;
         self._check_model()
-        feature_names = self.vectorizer.get_feature_names()
+        feature_names = self.vectorizer.get_feature_names_out()
         topic_summaries = []
         for topic_idx, topic in enumerate(self.model.components_):
             summary = [feature_names[i] for i in topic.argsort()[: -n_words - 1 : -1]]
@@ -3467,7 +3481,7 @@ whether to consider bigrams, trigrams. default: (1,1)</p></div>
                 key=lambda kv: kv[-1],
                 reverse=True,
             )
-            for (idx, topic, count) in topic_counts:
+            for idx, topic, count in topic_counts:
                 print(&#34;topic:%s | count:%s | %s&#34; % (idx, count, topic))
         else:
             for i, t in enumerate(topics):
@@ -4343,7 +4357,7 @@ Dictionary where key is topic ID and value is a tuple of form (topic summary, co
 
     &#34;&#34;&#34;
     self._check_model()
-    feature_names = self.vectorizer.get_feature_names()
+    feature_names = self.vectorizer.get_feature_names_out()
     topic_summaries = []
     for topic_idx, topic in enumerate(self.model.components_):
         summary = [feature_names[i] for i in topic.argsort()[: -n_words - 1 : -1]]
@@ -4391,7 +4405,7 @@ n_words=int): number of top words</p></div>
         raise ValueError(
             &#34;topic_id must be less than %s&#34; % (len(self.model.components_))
         )
-    feature_names = self.vectorizer.get_feature_names()
+    feature_names = self.vectorizer.get_feature_names_out()
     word_probs = self.model.components_[topic_id]
     word_ids = [i for i in word_probs.argsort()[: -n_words - 1 : -1]]
     words = [feature_names[i] for i in word_ids]
@@ -4489,7 +4503,7 @@ the count is the number of documents with that topic as primary.</p></div>
             key=lambda kv: kv[-1],
             reverse=True,
         )
-        for (idx, topic, count) in topic_counts:
+        for idx, topic, count in topic_counts:
             print(&#34;topic:%s | count:%s | %s&#34; % (idx, count, topic))
     else:
         for i, t in enumerate(topics):
@@ -4770,7 +4784,8 @@ alpha: alpha for LDA
 default: 5./n_topics
 beta: beta for LDA.
 default:0.01
-nmf_alpha: alias for alpha for backwars compatilibity
+nmf_alpha_W: alpha for NMF alpha_W (default is 0.0)
+nmf_alpha_H: alpha for NMF alpha_H (default is 'same')
 l1_ratio: l1_ratio for NMF. default: 0
 ngram_range:
 whether to consider bigrams, trigrams. default: (1,1)</p>
@@ -4822,7 +4837,8 @@ whether to consider bigrams, trigrams. default: (1,1)</p>
                                  Keys in this dict can be any of the following:
                                      alpha: alpha for LDA  default: 5./n_topics
                                      beta: beta for LDA.  default:0.01
-                                     nmf_alpha: alias for alpha for backwars compatilibity
+                                     nmf_alpha_W: alpha for NMF alpha_W (default is 0.0)
+                                     nmf_alpha_H: alpha for NMF alpha_H (default is &#39;same&#39;)
                                      l1_ratio: l1_ratio for NMF. default: 0
                                      ngram_range:  whether to consider bigrams, trigrams. default: (1,1)
 
@@ -4833,8 +4849,8 @@ whether to consider bigrams, trigrams. default: (1,1)</p>
     if hyperparam_kwargs is None:
         hyperparam_kwargs = {}
     alpha = hyperparam_kwargs.get(&#34;alpha&#34;, 5.0 / n_topics)
-    nmf_alpha = hyperparam_kwargs.get(&#34;nmf_alpha&#34;, None)
-    alpha = nmf_alpha if nmf_alpha is not None else alpha
+    nmf_alpha_W = hyperparam_kwargs.get(&#34;nmf_alpha_W&#34;, 0.0)
+    nmf_alpha_H = hyperparam_kwargs.get(&#34;nmf_alpha_H&#34;, &#34;same&#34;)
     beta = hyperparam_kwargs.get(&#34;beta&#34;, 0.01)
     l1_ratio = hyperparam_kwargs.get(&#34;l1_ratio&#34;, 0)
     ngram_range = hyperparam_kwargs.get(&#34;ngram_range&#34;, (1, 1))
@@ -4892,7 +4908,8 @@ whether to consider bigrams, trigrams. default: (1,1)</p>
             n_components=n_topics,
             max_iter=max_iter,
             verbose=self.verbose,
-            alpha=alpha,
+            alpha_W=nmf_alpha_W,
+            alpha_H=nmf_alpha_H,
             l1_ratio=l1_ratio,
             random_state=0,
         )
@@ -5469,6 +5486,7 @@ Returns:
 <ul class="hlist">
 <li><code><a title="ktrain.text.preprocessor.TransformersPreprocessor.get_classifier" href="preprocessor.html#ktrain.text.preprocessor.TransformersPreprocessor.get_classifier">get_classifier</a></code></li>
 <li><code><a title="ktrain.text.preprocessor.TransformersPreprocessor.get_regression_model" href="preprocessor.html#ktrain.text.preprocessor.TransformersPreprocessor.get_regression_model">get_regression_model</a></code></li>
+<li><code><a title="ktrain.text.preprocessor.TransformersPreprocessor.hf_convert_examples" href="preprocessor.html#ktrain.text.preprocessor.TransformersPreprocessor.hf_convert_examples">hf_convert_examples</a></code></li>
 <li><code><a title="ktrain.text.preprocessor.TransformersPreprocessor.load_model_and_configure_from_data" href="preprocessor.html#ktrain.text.preprocessor.TransformersPreprocessor.load_model_and_configure_from_data">load_model_and_configure_from_data</a></code></li>
 <li><code><a title="ktrain.text.preprocessor.TransformersPreprocessor.print_seqlen_stats" href="preprocessor.html#ktrain.text.preprocessor.TextPreprocessor.print_seqlen_stats">print_seqlen_stats</a></code></li>
 <li><code><a title="ktrain.text.preprocessor.TransformersPreprocessor.seqlen_stats" href="preprocessor.html#ktrain.text.preprocessor.TextPreprocessor.seqlen_stats">seqlen_stats</a></code></li>
@@ -6058,7 +6076,7 @@ Args:
         if quantize:
             self.model = self.quantize_model(self.model)
 
-    def translate(self, src_text, join_with=&#34;\n&#34;, num_beams=None, early_stopping=None):
+    def translate(self, src_text, join_with=&#34;\n&#34;, num_beams=1, early_stopping=False):
         &#34;&#34;&#34;
         ```
         Translate document (src_text).
@@ -6088,7 +6106,7 @@ Args:
         )
         return join_with.join(tgt_sentences)
 
-    def translate_sentences(self, sentences, num_beams=None, early_stopping=None):
+    def translate_sentences(self, sentences, num_beams=1, early_stopping=False):
         &#34;&#34;&#34;
         ```
         Translate sentences using model_name as model.
@@ -6130,7 +6148,7 @@ Args:
 <h3>Methods</h3>
 <dl>
 <dt id="ktrain.text.Translator.translate"><code class="name flex">
-<span>def <span class="ident">translate</span></span>(<span>self, src_text, join_with='\n', num_beams=None, early_stopping=None)</span>
+<span>def <span class="ident">translate</span></span>(<span>self, src_text, join_with='\n', num_beams=1, early_stopping=False)</span>
 </code></dt>
 <dd>
 <div class="desc"><pre><code>Translate document (src_text).
@@ -6157,7 +6175,7 @@ Returns:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def translate(self, src_text, join_with=&#34;\n&#34;, num_beams=None, early_stopping=None):
+<pre><code class="python">def translate(self, src_text, join_with=&#34;\n&#34;, num_beams=1, early_stopping=False):
     &#34;&#34;&#34;
     ```
     Translate document (src_text).
@@ -6189,7 +6207,7 @@ Returns:
 </details>
 </dd>
 <dt id="ktrain.text.Translator.translate_sentences"><code class="name flex">
-<span>def <span class="ident">translate_sentences</span></span>(<span>self, sentences, num_beams=None, early_stopping=None)</span>
+<span>def <span class="ident">translate_sentences</span></span>(<span>self, sentences, num_beams=1, early_stopping=False)</span>
 </code></dt>
 <dd>
 <div class="desc"><pre><code>Translate sentences using model_name as model.
@@ -6212,7 +6230,7 @@ Returns:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def translate_sentences(self, sentences, num_beams=None, early_stopping=None):
+<pre><code class="python">def translate_sentences(self, sentences, num_beams=1, early_stopping=False):
     &#34;&#34;&#34;
     ```
     Translate sentences using model_name as model.
