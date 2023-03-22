@@ -1182,7 +1182,7 @@ on a supplied image.
         x = np.expand_dims(x, axis=0)
         return eli5.show_prediction(self.model, x)
 
-    def predict(self, data, return_proba=False):
+    def predict(self, data, return_proba=False, verbose=0):
         &#34;&#34;&#34;
         ```
         Predicts class from image in array format.
@@ -1192,9 +1192,11 @@ on a supplied image.
         if not isinstance(data, np.ndarray):
             raise ValueError(&#34;data must be numpy.ndarray&#34;)
         (generator, steps) = self.preproc.preprocess(data, batch_size=self.batch_size)
-        return self.predict_generator(generator, steps=steps, return_proba=return_proba)
+        return self.predict_generator(
+            generator, steps=steps, return_proba=return_proba, verbose=verbose
+        )
 
-    def predict_filename(self, img_path, return_proba=False):
+    def predict_filename(self, img_path, return_proba=False, verbose=0):
         &#34;&#34;&#34;
         ```
         Predicts class from filepath to single image file.
@@ -1206,9 +1208,11 @@ on a supplied image.
         (generator, steps) = self.preproc.preprocess(
             img_path, batch_size=self.batch_size
         )
-        return self.predict_generator(generator, steps=steps, return_proba=return_proba)
+        return self.predict_generator(
+            generator, steps=steps, return_proba=return_proba, verbose=verbose
+        )
 
-    def predict_folder(self, folder, return_proba=False):
+    def predict_folder(self, folder, return_proba=False, verbose=0):
         &#34;&#34;&#34;
         ```
         Predicts the classes of all images in a folder.
@@ -1220,13 +1224,13 @@ on a supplied image.
             raise ValueError(&#34;folder must be valid directory&#34;)
         (generator, steps) = self.preproc.preprocess(folder, batch_size=self.batch_size)
         result = self.predict_generator(
-            generator, steps=steps, return_proba=return_proba
+            generator, steps=steps, return_proba=return_proba, verbose=verbose
         )
         if len(result) != len(generator.filenames):
             raise Exception(&#34;number of results does not equal number of filenames&#34;)
         return list(zip(generator.filenames, result))
 
-    def predict_generator(self, generator, steps=None, return_proba=False):
+    def predict_generator(self, generator, steps=None, return_proba=False, verbose=0):
         # loss = self.model.loss
         # if callable(loss): loss = loss.__name__
         # treat_multilabel = False
@@ -1238,7 +1242,7 @@ on a supplied image.
             return_proba = True
         # *_generator methods are deprecated from TF 2.1.0
         # preds =  self.model.predict_generator(generator, steps=steps)
-        preds = self.model.predict(generator, steps=steps)
+        preds = self.model.predict(generator, steps=steps, verbose=verbose)
         result = (
             preds
             if return_proba or multilabel
@@ -1251,17 +1255,19 @@ on a supplied image.
         else:
             return result
 
-    def predict_proba(self, data):
-        return self.predict(data, return_proba=True)
+    def predict_proba(self, data, verbose=0):
+        return self.predict(data, return_proba=True, verbose=verbose)
 
-    def predict_proba_folder(self, folder):
-        return self.predict_folder(folder, return_proba=True)
+    def predict_proba_folder(self, folder, verbose=0):
+        return self.predict_folder(folder, return_proba=True, verbose=verbose)
 
-    def predict_proba_filename(self, img_path):
-        return self.predict_filename(img_path, return_proba=True)
+    def predict_proba_filename(self, img_path, verbose=0):
+        return self.predict_filename(img_path, return_proba=True, verbose=verbose)
 
-    def predict_proba_generator(self, generator, steps=None):
-        return self.predict_proba_generator(generator, steps=steps, return_proba=True)
+    def predict_proba_generator(self, generator, steps=None, verbose=0):
+        return self.predict_proba_generator(
+            generator, steps=steps, return_proba=True, verbose=verbose
+        )
 
     def analyze_valid(self, generator, print_report=True, multilabel=None):
         &#34;&#34;&#34;
@@ -1427,7 +1433,7 @@ problems, not multilabel classification problems.
 </details>
 </dd>
 <dt id="ktrain.vision.ImagePredictor.predict"><code class="name flex">
-<span>def <span class="ident">predict</span></span>(<span>self, data, return_proba=False)</span>
+<span>def <span class="ident">predict</span></span>(<span>self, data, return_proba=False, verbose=0)</span>
 </code></dt>
 <dd>
 <div class="desc"><pre><code>Predicts class from image in array format.
@@ -1437,7 +1443,7 @@ If return_proba is True, returns probabilities of each class.
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def predict(self, data, return_proba=False):
+<pre><code class="python">def predict(self, data, return_proba=False, verbose=0):
     &#34;&#34;&#34;
     ```
     Predicts class from image in array format.
@@ -1447,11 +1453,13 @@ If return_proba is True, returns probabilities of each class.
     if not isinstance(data, np.ndarray):
         raise ValueError(&#34;data must be numpy.ndarray&#34;)
     (generator, steps) = self.preproc.preprocess(data, batch_size=self.batch_size)
-    return self.predict_generator(generator, steps=steps, return_proba=return_proba)</code></pre>
+    return self.predict_generator(
+        generator, steps=steps, return_proba=return_proba, verbose=verbose
+    )</code></pre>
 </details>
 </dd>
 <dt id="ktrain.vision.ImagePredictor.predict_filename"><code class="name flex">
-<span>def <span class="ident">predict_filename</span></span>(<span>self, img_path, return_proba=False)</span>
+<span>def <span class="ident">predict_filename</span></span>(<span>self, img_path, return_proba=False, verbose=0)</span>
 </code></dt>
 <dd>
 <div class="desc"><pre><code>Predicts class from filepath to single image file.
@@ -1461,7 +1469,7 @@ If return_proba is True, returns probabilities of each class.
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def predict_filename(self, img_path, return_proba=False):
+<pre><code class="python">def predict_filename(self, img_path, return_proba=False, verbose=0):
     &#34;&#34;&#34;
     ```
     Predicts class from filepath to single image file.
@@ -1473,11 +1481,13 @@ If return_proba is True, returns probabilities of each class.
     (generator, steps) = self.preproc.preprocess(
         img_path, batch_size=self.batch_size
     )
-    return self.predict_generator(generator, steps=steps, return_proba=return_proba)</code></pre>
+    return self.predict_generator(
+        generator, steps=steps, return_proba=return_proba, verbose=verbose
+    )</code></pre>
 </details>
 </dd>
 <dt id="ktrain.vision.ImagePredictor.predict_folder"><code class="name flex">
-<span>def <span class="ident">predict_folder</span></span>(<span>self, folder, return_proba=False)</span>
+<span>def <span class="ident">predict_folder</span></span>(<span>self, folder, return_proba=False, verbose=0)</span>
 </code></dt>
 <dd>
 <div class="desc"><pre><code>Predicts the classes of all images in a folder.
@@ -1487,7 +1497,7 @@ If return_proba is True, returns probabilities of each class.
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def predict_folder(self, folder, return_proba=False):
+<pre><code class="python">def predict_folder(self, folder, return_proba=False, verbose=0):
     &#34;&#34;&#34;
     ```
     Predicts the classes of all images in a folder.
@@ -1499,7 +1509,7 @@ If return_proba is True, returns probabilities of each class.
         raise ValueError(&#34;folder must be valid directory&#34;)
     (generator, steps) = self.preproc.preprocess(folder, batch_size=self.batch_size)
     result = self.predict_generator(
-        generator, steps=steps, return_proba=return_proba
+        generator, steps=steps, return_proba=return_proba, verbose=verbose
     )
     if len(result) != len(generator.filenames):
         raise Exception(&#34;number of results does not equal number of filenames&#34;)
@@ -1507,7 +1517,7 @@ If return_proba is True, returns probabilities of each class.
 </details>
 </dd>
 <dt id="ktrain.vision.ImagePredictor.predict_generator"><code class="name flex">
-<span>def <span class="ident">predict_generator</span></span>(<span>self, generator, steps=None, return_proba=False)</span>
+<span>def <span class="ident">predict_generator</span></span>(<span>self, generator, steps=None, return_proba=False, verbose=0)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -1515,7 +1525,7 @@ If return_proba is True, returns probabilities of each class.
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def predict_generator(self, generator, steps=None, return_proba=False):
+<pre><code class="python">def predict_generator(self, generator, steps=None, return_proba=False, verbose=0):
     # loss = self.model.loss
     # if callable(loss): loss = loss.__name__
     # treat_multilabel = False
@@ -1527,7 +1537,7 @@ If return_proba is True, returns probabilities of each class.
         return_proba = True
     # *_generator methods are deprecated from TF 2.1.0
     # preds =  self.model.predict_generator(generator, steps=steps)
-    preds = self.model.predict(generator, steps=steps)
+    preds = self.model.predict(generator, steps=steps, verbose=verbose)
     result = (
         preds
         if return_proba or multilabel
@@ -1542,7 +1552,7 @@ If return_proba is True, returns probabilities of each class.
 </details>
 </dd>
 <dt id="ktrain.vision.ImagePredictor.predict_proba"><code class="name flex">
-<span>def <span class="ident">predict_proba</span></span>(<span>self, data)</span>
+<span>def <span class="ident">predict_proba</span></span>(<span>self, data, verbose=0)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -1550,12 +1560,12 @@ If return_proba is True, returns probabilities of each class.
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def predict_proba(self, data):
-    return self.predict(data, return_proba=True)</code></pre>
+<pre><code class="python">def predict_proba(self, data, verbose=0):
+    return self.predict(data, return_proba=True, verbose=verbose)</code></pre>
 </details>
 </dd>
 <dt id="ktrain.vision.ImagePredictor.predict_proba_filename"><code class="name flex">
-<span>def <span class="ident">predict_proba_filename</span></span>(<span>self, img_path)</span>
+<span>def <span class="ident">predict_proba_filename</span></span>(<span>self, img_path, verbose=0)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -1563,12 +1573,12 @@ If return_proba is True, returns probabilities of each class.
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def predict_proba_filename(self, img_path):
-    return self.predict_filename(img_path, return_proba=True)</code></pre>
+<pre><code class="python">def predict_proba_filename(self, img_path, verbose=0):
+    return self.predict_filename(img_path, return_proba=True, verbose=verbose)</code></pre>
 </details>
 </dd>
 <dt id="ktrain.vision.ImagePredictor.predict_proba_folder"><code class="name flex">
-<span>def <span class="ident">predict_proba_folder</span></span>(<span>self, folder)</span>
+<span>def <span class="ident">predict_proba_folder</span></span>(<span>self, folder, verbose=0)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -1576,12 +1586,12 @@ If return_proba is True, returns probabilities of each class.
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def predict_proba_folder(self, folder):
-    return self.predict_folder(folder, return_proba=True)</code></pre>
+<pre><code class="python">def predict_proba_folder(self, folder, verbose=0):
+    return self.predict_folder(folder, return_proba=True, verbose=verbose)</code></pre>
 </details>
 </dd>
 <dt id="ktrain.vision.ImagePredictor.predict_proba_generator"><code class="name flex">
-<span>def <span class="ident">predict_proba_generator</span></span>(<span>self, generator, steps=None)</span>
+<span>def <span class="ident">predict_proba_generator</span></span>(<span>self, generator, steps=None, verbose=0)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -1589,8 +1599,10 @@ If return_proba is True, returns probabilities of each class.
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def predict_proba_generator(self, generator, steps=None):
-    return self.predict_proba_generator(generator, steps=steps, return_proba=True)</code></pre>
+<pre><code class="python">def predict_proba_generator(self, generator, steps=None, verbose=0):
+    return self.predict_proba_generator(
+        generator, steps=steps, return_proba=True, verbose=verbose
+    )</code></pre>
 </details>
 </dd>
 </dl>
