@@ -54,7 +54,7 @@ class TransformerSummarizer(TorchBase):
             self.torch_device
         )
 
-    def summarize(self, doc):
+    def summarize(self, doc, **kwargs):
         &#34;&#34;&#34;
         ```
         summarize document text
@@ -82,7 +82,83 @@ class TransformerSummarizer(TorchBase):
             exec_sum = self.tokenizer.decode(
                 summary_ids.squeeze(), skip_special_tokens=True
             )
-        return exec_sum</code></pre>
+        return exec_sum
+
+
+class LexRankSummarizer:
+    &#34;&#34;&#34;
+    interface to Lexrank-based text summarization
+    &#34;&#34;&#34;
+
+    def __init__(self, language=&#34;english&#34;):
+        &#34;&#34;&#34;
+        ```
+        interface to Lexrank-based text summarization using sumy library
+
+        Args:
+          language(str): default is &#34;english&#34;
+        ```
+        &#34;&#34;&#34;
+
+        try:
+            from sumy.nlp.stemmers import Stemmer
+            from sumy.summarizers.lex_rank import LexRankSummarizer as Summarizer
+            from sumy.utils import get_stop_words
+        except ImportError:
+            raise ImportError(&#34;Please install the sumy package: pip install sumy&#34;)
+
+        self.language = language
+        stemmer = Stemmer(self.language)
+        self.summarizer = Summarizer(stemmer)
+        self.summarizer.stop_words = get_stop_words(self.language)
+
+    def summarize(
+        self,
+        doc,
+        num_sentences=3,
+        maximum_length=2000,
+        minimum_length=40,
+        join_sentences=True,
+        num_candidate_sentences=100,
+        **kwargs,
+    ):
+        &#34;&#34;&#34;
+        ```
+        summarize document text
+        Args:
+          doc(str): text of document
+          num_sentences(int): Number of sentences for summary
+          maximum_length(int): Maximum length of sentence in summary
+          minimumlength(int): Minimum length of sentence in summary
+          join_sentences(bool): If True, summary is a single string instead of a list of sentences.
+          num_candidate_sentences(int): Number of candidate sentences from which to select final summary.
+        Returns:
+          str: summary text
+        ```
+        &#34;&#34;&#34;
+        from sumy.nlp.tokenizers import Tokenizer
+        from sumy.parsers.html import HtmlParser
+        from sumy.parsers.plaintext import PlaintextParser
+
+        parser = PlaintextParser.from_string(doc, Tokenizer(self.language))
+        results = []
+        for sentence in self.summarizer(parser.document, num_candidate_sentences):
+            if (
+                len(sentence._text) &gt; maximum_length
+                or len(sentence._text) &lt; minimum_length
+                or sentence._text[0].isdigit()
+            ):
+                continue
+            results.append(
+                sentence._text + &#34;.&#34;
+                if sentence._text[-1] not in [&#34;.&#34;, &#34;?&#34;, &#34;!&#34;, &#34;;&#34;]
+                else sentence._text
+            )
+        return (
+            &#34; &#34;.join(results[:num_sentences])
+            if join_sentences
+            else results[:num_sentences]
+        )</code></pre>
 </details>
 </section>
 <section>
@@ -94,6 +170,168 @@ class TransformerSummarizer(TorchBase):
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
+<dt id="ktrain.text.summarization.core.LexRankSummarizer"><code class="flex name class">
+<span>class <span class="ident">LexRankSummarizer</span></span>
+<span>(</span><span>language='english')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>interface to Lexrank-based text summarization</p>
+<pre><code>interface to Lexrank-based text summarization using sumy library
+
+Args:
+  language(str): default is &quot;english&quot;
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class LexRankSummarizer:
+    &#34;&#34;&#34;
+    interface to Lexrank-based text summarization
+    &#34;&#34;&#34;
+
+    def __init__(self, language=&#34;english&#34;):
+        &#34;&#34;&#34;
+        ```
+        interface to Lexrank-based text summarization using sumy library
+
+        Args:
+          language(str): default is &#34;english&#34;
+        ```
+        &#34;&#34;&#34;
+
+        try:
+            from sumy.nlp.stemmers import Stemmer
+            from sumy.summarizers.lex_rank import LexRankSummarizer as Summarizer
+            from sumy.utils import get_stop_words
+        except ImportError:
+            raise ImportError(&#34;Please install the sumy package: pip install sumy&#34;)
+
+        self.language = language
+        stemmer = Stemmer(self.language)
+        self.summarizer = Summarizer(stemmer)
+        self.summarizer.stop_words = get_stop_words(self.language)
+
+    def summarize(
+        self,
+        doc,
+        num_sentences=3,
+        maximum_length=2000,
+        minimum_length=40,
+        join_sentences=True,
+        num_candidate_sentences=100,
+        **kwargs,
+    ):
+        &#34;&#34;&#34;
+        ```
+        summarize document text
+        Args:
+          doc(str): text of document
+          num_sentences(int): Number of sentences for summary
+          maximum_length(int): Maximum length of sentence in summary
+          minimumlength(int): Minimum length of sentence in summary
+          join_sentences(bool): If True, summary is a single string instead of a list of sentences.
+          num_candidate_sentences(int): Number of candidate sentences from which to select final summary.
+        Returns:
+          str: summary text
+        ```
+        &#34;&#34;&#34;
+        from sumy.nlp.tokenizers import Tokenizer
+        from sumy.parsers.html import HtmlParser
+        from sumy.parsers.plaintext import PlaintextParser
+
+        parser = PlaintextParser.from_string(doc, Tokenizer(self.language))
+        results = []
+        for sentence in self.summarizer(parser.document, num_candidate_sentences):
+            if (
+                len(sentence._text) &gt; maximum_length
+                or len(sentence._text) &lt; minimum_length
+                or sentence._text[0].isdigit()
+            ):
+                continue
+            results.append(
+                sentence._text + &#34;.&#34;
+                if sentence._text[-1] not in [&#34;.&#34;, &#34;?&#34;, &#34;!&#34;, &#34;;&#34;]
+                else sentence._text
+            )
+        return (
+            &#34; &#34;.join(results[:num_sentences])
+            if join_sentences
+            else results[:num_sentences]
+        )</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="ktrain.text.summarization.core.LexRankSummarizer.summarize"><code class="name flex">
+<span>def <span class="ident">summarize</span></span>(<span>self, doc, num_sentences=3, maximum_length=2000, minimum_length=40, join_sentences=True, num_candidate_sentences=100, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><pre><code>summarize document text
+Args:
+  doc(str): text of document
+  num_sentences(int): Number of sentences for summary
+  maximum_length(int): Maximum length of sentence in summary
+  minimumlength(int): Minimum length of sentence in summary
+  join_sentences(bool): If True, summary is a single string instead of a list of sentences.
+  num_candidate_sentences(int): Number of candidate sentences from which to select final summary.
+Returns:
+  str: summary text
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def summarize(
+    self,
+    doc,
+    num_sentences=3,
+    maximum_length=2000,
+    minimum_length=40,
+    join_sentences=True,
+    num_candidate_sentences=100,
+    **kwargs,
+):
+    &#34;&#34;&#34;
+    ```
+    summarize document text
+    Args:
+      doc(str): text of document
+      num_sentences(int): Number of sentences for summary
+      maximum_length(int): Maximum length of sentence in summary
+      minimumlength(int): Minimum length of sentence in summary
+      join_sentences(bool): If True, summary is a single string instead of a list of sentences.
+      num_candidate_sentences(int): Number of candidate sentences from which to select final summary.
+    Returns:
+      str: summary text
+    ```
+    &#34;&#34;&#34;
+    from sumy.nlp.tokenizers import Tokenizer
+    from sumy.parsers.html import HtmlParser
+    from sumy.parsers.plaintext import PlaintextParser
+
+    parser = PlaintextParser.from_string(doc, Tokenizer(self.language))
+    results = []
+    for sentence in self.summarizer(parser.document, num_candidate_sentences):
+        if (
+            len(sentence._text) &gt; maximum_length
+            or len(sentence._text) &lt; minimum_length
+            or sentence._text[0].isdigit()
+        ):
+            continue
+        results.append(
+            sentence._text + &#34;.&#34;
+            if sentence._text[-1] not in [&#34;.&#34;, &#34;?&#34;, &#34;!&#34;, &#34;;&#34;]
+            else sentence._text
+        )
+    return (
+        &#34; &#34;.join(results[:num_sentences])
+        if join_sentences
+        else results[:num_sentences]
+    )</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
 <dt id="ktrain.text.summarization.core.TransformerSummarizer"><code class="flex name class">
 <span>class <span class="ident">TransformerSummarizer</span></span>
 <span>(</span><span>model_name='facebook/bart-large-cnn', device=None)</span>
@@ -135,7 +373,7 @@ Args:
             self.torch_device
         )
 
-    def summarize(self, doc):
+    def summarize(self, doc, **kwargs):
         &#34;&#34;&#34;
         ```
         summarize document text
@@ -172,7 +410,7 @@ Args:
 <h3>Methods</h3>
 <dl>
 <dt id="ktrain.text.summarization.core.TransformerSummarizer.summarize"><code class="name flex">
-<span>def <span class="ident">summarize</span></span>(<span>self, doc)</span>
+<span>def <span class="ident">summarize</span></span>(<span>self, doc, **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"><pre><code>summarize document text
@@ -185,7 +423,7 @@ Returns:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def summarize(self, doc):
+<pre><code class="python">def summarize(self, doc, **kwargs):
     &#34;&#34;&#34;
     ```
     summarize document text
@@ -242,6 +480,12 @@ Returns:
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
+<li>
+<h4><code><a title="ktrain.text.summarization.core.LexRankSummarizer" href="#ktrain.text.summarization.core.LexRankSummarizer">LexRankSummarizer</a></code></h4>
+<ul class="">
+<li><code><a title="ktrain.text.summarization.core.LexRankSummarizer.summarize" href="#ktrain.text.summarization.core.LexRankSummarizer.summarize">summarize</a></code></li>
+</ul>
+</li>
 <li>
 <h4><code><a title="ktrain.text.summarization.core.TransformerSummarizer" href="#ktrain.text.summarization.core.TransformerSummarizer">TransformerSummarizer</a></code></h4>
 <ul class="">

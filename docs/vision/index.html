@@ -165,7 +165,7 @@ function may adjust these as needed.
 </details>
 </dd>
 <dt id="ktrain.vision.image_classifier"><code class="name flex">
-<span>def <span class="ident">image_classifier</span></span>(<span>name, train_data, val_data=None, freeze_layers=None, metrics=['accuracy'], optimizer_name=&lt;keras.optimizers.optimizer_v2.adam.Adam object&gt;, multilabel=None, pt_fc=[], pt_ps=[], verbose=1)</span>
+<span>def <span class="ident">image_classifier</span></span>(<span>name, train_data, val_data=None, freeze_layers=None, metrics=['accuracy'], optimizer_name='adam', multilabel=None, pt_fc=[], pt_ps=[], verbose=1)</span>
 </code></dt>
 <dd>
 <div class="desc"><pre><code>Returns a pre-defined/pre-trained model ready to be trained/fine-tuned
@@ -260,7 +260,7 @@ Return:
 </details>
 </dd>
 <dt id="ktrain.vision.image_regression_model"><code class="name flex">
-<span>def <span class="ident">image_regression_model</span></span>(<span>name, train_data, val_data=None, freeze_layers=None, metrics=['mae'], optimizer_name=&lt;keras.optimizers.optimizer_v2.adam.Adam object&gt;, pt_fc=[], pt_ps=[], verbose=1)</span>
+<span>def <span class="ident">image_regression_model</span></span>(<span>name, train_data, val_data=None, freeze_layers=None, metrics=['mae'], optimizer_name='adam', pt_fc=[], pt_ps=[], verbose=1)</span>
 </code></dt>
 <dd>
 <div class="desc"><pre><code>Returns a pre-defined/pre-trained model ready to be trained/fine-tuned

@@ -558,7 +558,7 @@ facility instead.</p>
   # Simple example, double the gradients.
   return [(2. * g, v) for g, v in grads_and_vars]
 
-optimizer = tf.keras.optimizers.legacy.SGD(
+optimizer = tf.keras.optimizers.SGD(
     1e-3, gradient_transformers=[my_gradient_transformer])
 </code></pre>
 <h2 id="args">Args</h2>
@@ -568,9 +568,9 @@ optimizer = tf.keras.optimizers.legacy.SGD(
 by the optimizer.</dd>
 <dt><strong><code>gradient_aggregator</code></strong></dt>
 <dd>The function to use to aggregate gradients across
-devices (when using <code>tf.distribute.Strategy</code>). If <code>None</code>, defaults
-to summing the gradients across devices. The function should accept
-and return a list of <code>(gradient, variable)</code> tuples.</dd>
+devices (when using <code>tf.distribute.Strategy</code>). If <code>None</code>, defaults to
+summing the gradients across devices. The function should accept and
+return a list of <code>(gradient, variable)</code> tuples.</dd>
 <dt><strong><code>gradient_transformers</code></strong></dt>
 <dd>Optional. List of functions to use to transform
 gradients before applying updates to Variables. The functions are
@@ -582,10 +582,9 @@ return a list of <code>(gradient, variable)</code> tuples.</dd>
 If <code>clipvalue</code> (float) is set, the gradient of each weight
 is clipped to be no higher than this value.
 If <code>clipnorm</code> (float) is set, the gradient of each weight
-is individually clipped so that its norm is no higher than this
-value. If <code>global_clipnorm</code> (float) is set the gradient of all
-weights is clipped so that their global norm is no higher than this
-value.</dd>
+is individually clipped so that its norm is no higher than this value.
+If <code>global_clipnorm</code> (float) is set the gradient of all weights is
+clipped so that their global norm is no higher than this value.</dd>
 </dl>
 <h2 id="raises">Raises</h2>
 <dl>
@@ -744,7 +743,7 @@ value.</dd>
 <ul class="hlist">
 <li>keras.optimizers.optimizer_v2.adam.Adam</li>
 <li>keras.optimizers.optimizer_v2.optimizer_v2.OptimizerV2</li>
-<li>tensorflow.python.trackable.base.Trackable</li>
+<li>tensorflow.python.training.tracking.base.Trackable</li>
 </ul>
 <h3>Static methods</h3>
 <dl>
@@ -777,8 +776,8 @@ def from_config(cls, config):
 <p>This is the second part of <code>minimize()</code>. It returns an <code>Operation</code> that
 applies gradients.</p>
 <p>The method sums gradients from all replicas in the presence of
-<code>tf.distribute.Strategy</code> by default. You can aggregate gradients
-yourself by passing <code>experimental_aggregate_gradients=False</code>.</p>
+<code>tf.distribute.Strategy</code> by default. You can aggregate gradients yourself by
+passing <code>experimental_aggregate_gradients=False</code>.</p>
 <p>Example:</p>
 <pre><code class="language-python">grads = tape.gradient(loss, vars)
 grads = tf.distribute.get_replica_context().all_reduce('sum', grads)
@@ -792,13 +791,12 @@ optimizer.apply_gradients(zip(grads, vars),
 <dt><strong><code>grads_and_vars</code></strong></dt>
 <dd>List of (gradient, variable) pairs.</dd>
 <dt><strong><code>name</code></strong></dt>
-<dd>Optional name for the returned operation. Default to the name
-passed to the <code>Optimizer</code> constructor.</dd>
+<dd>Optional name for the returned operation. Default to the name passed
+to the <code>Optimizer</code> constructor.</dd>
 <dt><strong><code>experimental_aggregate_gradients</code></strong></dt>
-<dd>Whether to sum gradients from
-different replicas in the presence of <code>tf.distribute.Strategy</code>. If
-False, it's user responsibility to aggregate the gradients. Default
-to True.</dd>
+<dd>Whether to sum gradients from different
+replicas in the presence of <code>tf.distribute.Strategy</code>. If False, it's
+user responsibility to aggregate the gradients. Default to True.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <p>An <code>Operation</code> that applies the specified gradients. The <code>iterations</code>
