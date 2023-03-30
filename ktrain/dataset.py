@@ -152,8 +152,9 @@ class MultiArrayDataset(SequenceDataset):
     def __init__(self, x, y, batch_size=32, shuffle=True):
         # error checks
         err = False
-        if type(x) == np.ndarray and len(x.shape) != 2:
-            err = True
+        if type(x) == np.ndarray:
+            if len(x.shape) != 2:
+                err = True
         elif type(x) == list:
             for d in x:
                 if type(d) != np.ndarray or len(d.shape) != 2:
