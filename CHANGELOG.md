@@ -9,7 +9,7 @@ Most recent releases are shown at the top. Each release shows:
 ## 0.34.dev (TBD)
 
 ### new:
-- N/A
+- Support for LexRank summarization
 
 ### changed
 - N/A
