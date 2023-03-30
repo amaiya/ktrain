@@ -372,8 +372,8 @@ pip install torch
 pip install librosa
 # for tabular.causal_inference_model:
 pip install causalnlp
-# for text.TextExtractor:
-pip install tika
+# for text.summarization.core.LexRankSummarizer:
+pip install sumy
 # for text.kw.KeywordExtractor
 pip install textblob
 ```

@@ -16,8 +16,7 @@ all_extras = [
     "ipython",  # for tests
     "datasets",  # for text.qa.AnswerExtractor.finetune
     "textblob",  # for text.kw.KeywordExtractor and textutils.extract_noun_phrases
-    "tika",  # for TextExtractor
-    "textract",  # for TextExtractor
+    "textract",  # for TextExtractor non-default method
     "causalnlp",  # for tabular.causalinference
     "librosa",  # for text.speech
     # "torch",  # for qa, summarization, translation, zsl, speech
@@ -56,6 +55,7 @@ setup(
         "cchardet",  # previously pinned to 2.1.5 (due to this issue: https://github.com/PyYoshi/cChardet/issues/61) but no longer needed
         "chardet",  # required by stellargraph and no longer installed by other dependencies as of July 2021
         "syntok>1.3.3",  # previously pinned to 1.3.3 due to bug in 1.4.1, which caused problems in QA paragraph tokenization (now appears fixed)
+        "tika",  # for TextExtractor
         # NOTE: these modules can be optionally omitted from deployment if not being used to yield lighter-weight footprint
         "transformers>=4.17.0",  # previously pinned to transformers==4.17.0 due to undocumented transformers issue in >=4.18.0 -> **kwargs removed from call
         "sentencepiece",  #  Added due to breaking change in transformers>=4.0

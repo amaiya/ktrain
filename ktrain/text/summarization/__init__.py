@@ -1,1 +1,1 @@
-from .core import TransformerSummarizer
+from .core import TransformerSummarizer, LexRankSummarizer
