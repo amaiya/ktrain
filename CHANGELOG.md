@@ -15,7 +15,7 @@ Most recent releases are shown at the top. Each release shows:
 - N/A
 
 ### fixed:
-- N/A
+- Bug fix in `dataset` module (#486)
 
 
 ## 0.33.4 (2023-03-22)
