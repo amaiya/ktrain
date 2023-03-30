@@ -26,7 +26,7 @@ class TransformerSummarizer(TorchBase):
             self.torch_device
         )
 
-    def summarize(self, doc):
+    def summarize(self, doc, **kwargs):
         """
         ```
         summarize document text
