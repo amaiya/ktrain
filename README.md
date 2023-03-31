@@ -12,48 +12,27 @@
 
 
 ### News and Announcements
+- **2023-03-31**
+  - **ktrain 0.35.x** is released and supports Generative AI using an instruction-fine-tuned version of GPT-J that can run on your own machine. See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/generative_ai_example.ipynb).
+```python
+from ktrain.text.generative_ai import GenerativeAI
+model = GenerativeAI(device='cpu') # use device='cuda' if you have a good GPU!
+prompt = """Extract the names of people in the supplied sentences. Here is an example:
+Sentence:Paul Newman is a great actor.
+People:
+Paul Newman
+Sentence:
+I like James Gandolfini's acting.
+People:"""
+print(model.execute(prompt))
+# OUTPUT:
+# James Gandolfini
+```
 - **2023-03-30**
   - **ktrain 0.34.x** is released and supports fast LexRank-based text summarization.
 - **2023-01-14**
   - **ktrain 0.33.x** is released and includes fixes to support the latest version of Hugging Face`transformers`. Note that `transformers<=4.25.1` [has a bug](https://github.com/huggingface/transformers/issues/20750) related to TensorFlow 2.11. You can downgrade TensorFlow to 2.10 if you receive an error that says *"has no attribute 'expand_1d'"* (or upgrade to `transformers>4.25.1` if available).
 
-- **2022-12-08**
-  - **ktrain 0.32.x** is released and includes fixes to support TensorFlow 2.11 and Python 3.10.
-- **2022-05-07**
-  - **ktrain v0.31.x** is released and now allows you to use any `transformers` model (e.g., `roberta-base`) for word embeddings in sequence-tagging via the `transformer_model` argument (thanks to Niek van der Plas). See [this Colab notebook](https://colab.research.google.com/drive/1whrnmM7ElqbaEhXf760eiOMiYk5MNO-Z?usp=sharing) for an example.
-```python
-import ktrain
-(trn, val, preproc) = ktrain.text.entities_from_conll2003('train.txt', val_filepath='valid.txt')
-model = ktrain.text.sequence_tagger('bilstm-transformer', preproc, transformer_model='roberta-base')
-learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=128)
-learner.fit(0.01, 1, cycle_len=1)
-predictor = ktrain.get_predictor(model, preproc)
-predictor.predict('James Gandolfini was a great actor.')
-```
-
-- **2022-03-31**
-  - **ktrain v0.30.x** is released and now includes support for [keyphrase extraction](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/keyword_extraction_example.ipynb):
-```python
-# Keyphrase Extraction in ktrain
-from ktrain.text.kw import KeywordExtractor
-from ktrain.text.textextractor import TextExtractor
-!wget --user-agent="Mozilla" https://arxiv.org/pdf/2004.10703.pdf -O /tmp/downloaded_paper.pdf -q
-text = TextExtractor().extract('/tmp/downloaded_paper.pdf')
-kwe = KeywordExtractor()
-kwe.extract_keywords(text, candidate_generator='noun_phrases')
-
-# OUTPUT
-[('machine learning', 0.5341716824761019),
- ('augmented machine learning', 0.5208544167057394),
- ('text classification', 0.5134074336523509),
- ('image classification', 0.5071170746851726),
- ('node classification', 0.4973034499292447),
- ('tabular data', 0.49645958463369566),
- ('entity recognition', 0.45195059648705926),
- ('exact answers', 0.4462502183477142),
- ('import ktrain', 0.32891369271775894),
- ('load model', 0.32052348289886556)]
-```
 ----
 
 ### Overview
