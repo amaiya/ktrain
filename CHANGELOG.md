@@ -9,7 +9,7 @@ Most recent releases are shown at the top. Each release shows:
 ## 0.35.dev (TBD)
 
 ### new:
-- N/A
+- Support for generative AI with few-shot and zero-shot prompting using a model that can run on your own machine.
 
 ### changed
 - N/A
