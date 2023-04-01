@@ -13,7 +13,7 @@
 
 ### News and Announcements
 - **2023-04-01**
-  - **ktrain 0.35.x** is released and supports Generative AI using an instruction-fine-tuned version of GPT-J that can run on your own machine. See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/generative_ai_example.ipynb) for more information.
+  - **ktrain 0.35.x** is released and supports Generative AI using an instruction-fine-tuned version of GPT-J that can run on your own machine.  See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/generative_ai_example.ipynb) for more information. Supply prompts in the form of instructions for what you want the model to do:
 ```python
 # Example: Generative AI in ktrain
 from ktrain.text.generative_ai import GenerativeAI
