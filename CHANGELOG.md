@@ -6,7 +6,7 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
-## 0.35.dev (TBD)
+## 0.35.0 (2023-04-01)
 
 ### new:
 - Support for generative AI with few-shot and zero-shot prompting using a model that can run on your own machine.
