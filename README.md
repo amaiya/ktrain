@@ -13,8 +13,9 @@
 
 ### News and Announcements
 - **2023-03-31**
-  - **ktrain 0.35.x** is released and supports Generative AI using an instruction-fine-tuned version of GPT-J that can run on your own machine. See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/generative_ai_example.ipynb).
+  - **ktrain 0.35.x** is released and supports Generative AI using an instruction-fine-tuned version of GPT-J that can run on your own machine. See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/generative_ai_example.ipynb) for more information.
 ```python
+# Example: Generative AI in ktrain
 from ktrain.text.generative_ai import GenerativeAI
 model = GenerativeAI(device='cpu') # use device='cuda' if you have a good GPU!
 prompt = """Extract the names of people in the supplied sentences. Here is an example:
@@ -58,6 +59,7 @@ print(model.execute(prompt))
      - **Speech Transcription**: Extract text from audio files <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/speech_transcription_example.ipynb)]</sup></sub>
      - **Universal Information Extraction**:  extract any kind of information from documents by simply phrasing it in the form of a question <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/qa_information_extraction.ipynb)]</sup></sub>
      - **Keyphrase Extraction**:  extract keywords from documents <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/keyword_extraction_example.ipynb)]</sup></sub>
+     - **Generative AI with GPT**: Provide instructions to a lightweight ChatGPT-like model running on your own own machine to solve various tasks. <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/generative_ai_example.ipynb)]</sup
   - `vision` data:
     - **image classification** (e.g., [ResNet](https://arxiv.org/abs/1512.03385), [Wide ResNet](https://arxiv.org/abs/1605.07146), [Inception](https://www.cs.unc.edu/~wliu/papers/GoogLeNet.pdf)) <sub><sup>[[example notebook](https://colab.research.google.com/drive/1WipQJUPL7zqyvLT10yekxf_HNMXDDtyR)]</sup></sub>
     - **image regression** for predicting numerical targets from photos (e.g., age prediction) <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/vision/utk_faces_age_prediction-resnet50.ipynb)]</sup></sub>

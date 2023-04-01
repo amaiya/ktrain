@@ -1,4 +1,4 @@
-from transformers import pipeline
+from transformers import pipeline, GenerationConfig
 import torch
 from ...torch_base import TorchBase
 from typing import Optional
@@ -14,33 +14,45 @@ class GenerativeAI(TorchBase):
         self,
         model_name: str = "nlpcloud/instruct-gpt-j-fp16",
         device: Optional[str] = None,
+        max_new_tokens: int = 512,
+        **kwargs
     ):
         """
         ```
-        interface to GenerativeAI models using the transformers library
+        Interface to GenerativeAI models using the transformers library.
+        Extra kwargs are supplied directly to the generate method of the model.
 
         Args:
           model_name(str): name of the model.  Currently, only the nlpcloud/instruct-gpt-j-fp16
           device(str): device to use ("cpu" for CPU, "cuda" for GPU, "cuda:0" for first GPU, "cuda:1" for second GPU ,etc.):
+          max_new_tokens(int):  The maximum numbers of tokens to generate, ignoring the number of tokens in the prompt.
         ```
         """
 
         super().__init__(device=device)
         self.device_id = self.device_to_id()
+        self.config = GenerationConfig(max_new_tokens=max_new_tokens, **kwargs)
         if self.device_id < 0:
-            self.generator = pipeline(model=model_name, device=self.device_id)
+            self.generator = pipeline(
+                model=model_name, device=self.device_id, generation_config=self.config
+            )
         else:
             self.generator = pipeline(
-                model=model_name, torch_dtype=torch.float16, device=self.device_id
+                model=model_name,
+                torch_dtype=torch.float16,
+                device=self.device_id,
+                generation_config=self.config,
             )
+        self.generator.model.generation_config.pad_token_id = (
+            self.generator.model.generation_config.eos_token_id
+        )
 
-    def execute(self, prompt: str, max_new_tokens: int = 512, **kwargs):
+    def execute(self, prompt: str):
         """
         ```
         Issue a prompt to the model.  The default model is an instruction-fine-tuned model based on GPT-J.
         This means that you should always construct your prompt in the form of an instruction.
-        In addition to max_new_tokens, additonal parmeters can be supplied that will be fed directly to the model.
-        Examples include min_new_tokens and max_time.
+
 
         Example:
 
@@ -51,13 +63,12 @@ class GenerativeAI(TorchBase):
 
         Args:
           prompt(str): prompt to supply to model
-          max_new_tokens(int):  The maximum numbers of tokens to generate, ignoring the number of tokens in the prompt.
         Returns:
           str: generated text
         ```
         """
         prompt = prompt.strip() + "\n"
-        result = self.generator(prompt, max_new_tokens=512, **kwargs)
+        result = self.generator(prompt)
         result = result[0]["generated_text"]
         if result.startswith(prompt):
             result = result.replace(prompt, "")
