@@ -17,7 +17,7 @@
 ```python
 # Example: Generative AI in ktrain
 from ktrain.text.generative_ai import GenerativeAI
-model = GenerativeAI(device='cpu') # use device='cuda' if you have a good GPU!
+model = GenerativeAI() # needs at least 16GB of GPU memory
 prompt = """Extract the names of people in the supplied sentences. Here is an example:
 Sentence:Paul Newman is a great actor.
 People:
