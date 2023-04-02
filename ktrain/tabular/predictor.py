@@ -27,13 +27,14 @@ class TabularPredictor(Predictor):
     def get_classes(self):
         return self.c
 
-    def predict(self, df, return_proba=False):
+    def predict(self, df, return_proba=False, verbose=0):
         """
         ```
         Makes predictions for a test dataframe
         Args:
           df(pd.DataFrame):  a pandas DataFrame in same format as DataFrame used for training model
           return_proba(bool): If True, return probabilities instead of predicted class labels
+          verbose(int): verbosity: 0 (silent), 1 (progress bar), 2 (single line)
         ```
         """
         if not isinstance(df, pd.DataFrame):
@@ -45,7 +46,7 @@ class TabularPredictor(Predictor):
         # get predictions
         tseq = self.preproc.preprocess_test(df, verbose=0)
         tseq.batch_size = self.batch_size
-        preds = self.model.predict(tseq)
+        preds = self.model.predict(tseq, verbose=verbose)
         result = (
             preds
             if return_proba or multilabel or not self.c

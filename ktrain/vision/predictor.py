@@ -63,7 +63,7 @@ class ImagePredictor(Predictor):
         x = np.expand_dims(x, axis=0)
         return eli5.show_prediction(self.model, x)
 
-    def predict(self, data, return_proba=False):
+    def predict(self, data, return_proba=False, verbose=0):
         """
         ```
         Predicts class from image in array format.
@@ -73,9 +73,11 @@ class ImagePredictor(Predictor):
         if not isinstance(data, np.ndarray):
             raise ValueError("data must be numpy.ndarray")
         (generator, steps) = self.preproc.preprocess(data, batch_size=self.batch_size)
-        return self.predict_generator(generator, steps=steps, return_proba=return_proba)
+        return self.predict_generator(
+            generator, steps=steps, return_proba=return_proba, verbose=verbose
+        )
 
-    def predict_filename(self, img_path, return_proba=False):
+    def predict_filename(self, img_path, return_proba=False, verbose=0):
         """
         ```
         Predicts class from filepath to single image file.
@@ -87,9 +89,11 @@ class ImagePredictor(Predictor):
         (generator, steps) = self.preproc.preprocess(
             img_path, batch_size=self.batch_size
         )
-        return self.predict_generator(generator, steps=steps, return_proba=return_proba)
+        return self.predict_generator(
+            generator, steps=steps, return_proba=return_proba, verbose=verbose
+        )
 
-    def predict_folder(self, folder, return_proba=False):
+    def predict_folder(self, folder, return_proba=False, verbose=0):
         """
         ```
         Predicts the classes of all images in a folder.
@@ -101,13 +105,13 @@ class ImagePredictor(Predictor):
             raise ValueError("folder must be valid directory")
         (generator, steps) = self.preproc.preprocess(folder, batch_size=self.batch_size)
         result = self.predict_generator(
-            generator, steps=steps, return_proba=return_proba
+            generator, steps=steps, return_proba=return_proba, verbose=verbose
         )
         if len(result) != len(generator.filenames):
             raise Exception("number of results does not equal number of filenames")
         return list(zip(generator.filenames, result))
 
-    def predict_generator(self, generator, steps=None, return_proba=False):
+    def predict_generator(self, generator, steps=None, return_proba=False, verbose=0):
         # loss = self.model.loss
         # if callable(loss): loss = loss.__name__
         # treat_multilabel = False
@@ -119,7 +123,7 @@ class ImagePredictor(Predictor):
             return_proba = True
         # *_generator methods are deprecated from TF 2.1.0
         # preds =  self.model.predict_generator(generator, steps=steps)
-        preds = self.model.predict(generator, steps=steps)
+        preds = self.model.predict(generator, steps=steps, verbose=verbose)
         result = (
             preds
             if return_proba or multilabel
@@ -132,17 +136,19 @@ class ImagePredictor(Predictor):
         else:
             return result
 
-    def predict_proba(self, data):
-        return self.predict(data, return_proba=True)
+    def predict_proba(self, data, verbose=0):
+        return self.predict(data, return_proba=True, verbose=verbose)
 
-    def predict_proba_folder(self, folder):
-        return self.predict_folder(folder, return_proba=True)
+    def predict_proba_folder(self, folder, verbose=0):
+        return self.predict_folder(folder, return_proba=True, verbose=verbose)
 
-    def predict_proba_filename(self, img_path):
-        return self.predict_filename(img_path, return_proba=True)
+    def predict_proba_filename(self, img_path, verbose=0):
+        return self.predict_filename(img_path, return_proba=True, verbose=verbose)
 
-    def predict_proba_generator(self, generator, steps=None):
-        return self.predict_proba_generator(generator, steps=steps, return_proba=True)
+    def predict_proba_generator(self, generator, steps=None, verbose=0):
+        return self.predict_proba_generator(
+            generator, steps=steps, return_proba=True, verbose=verbose
+        )
 
     def analyze_valid(self, generator, print_report=True, multilabel=None):
         """

@@ -12,46 +12,28 @@
 
 
 ### News and Announcements
+- **2023-04-01**
+  - **ktrain 0.35.x** is released and supports **Generative AI** using an instruction-fine-tuned version of GPT-J that can run on your own machine.  See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/generative_ai_example.ipynb) for more information. Supply prompts in the form of instructions for what you want the model to do:
+```python
+# Example: Generative AI in ktrain
+from ktrain.text.generative_ai import GenerativeAI
+model = GenerativeAI() # needs at least 16GB of GPU memory
+prompt = """Extract the names of people in the supplied sentences. Here is an example:
+Sentence:Paul Newman is a great actor.
+People:
+Paul Newman
+Sentence:
+I like James Gandolfini's acting.
+People:"""
+print(model.execute(prompt))
+# OUTPUT:
+# James Gandolfini
+```
+- **2023-03-30**
+  - **ktrain 0.34.x** is released and supports fast LexRank-based text summarization.
 - **2023-01-14**
   - **ktrain 0.33.x** is released and includes fixes to support the latest version of Hugging Face`transformers`. Note that `transformers<=4.25.1` [has a bug](https://github.com/huggingface/transformers/issues/20750) related to TensorFlow 2.11. You can downgrade TensorFlow to 2.10 if you receive an error that says *"has no attribute 'expand_1d'"* (or upgrade to `transformers>4.25.1` if available).
 
-- **2022-12-08**
-  - **ktrain 0.32.x** is released and includes fixes to support TensorFlow 2.11 and Python 3.10.
-- **2022-05-07**
-  - **ktrain v0.31.x** is released and now allows you to use any `transformers` model (e.g., `roberta-base`) for word embeddings in sequence-tagging via the `transformer_model` argument (thanks to Niek van der Plas). See [this Colab notebook](https://colab.research.google.com/drive/1whrnmM7ElqbaEhXf760eiOMiYk5MNO-Z?usp=sharing) for an example.
-```python
-import ktrain
-(trn, val, preproc) = ktrain.text.entities_from_conll2003('train.txt', val_filepath='valid.txt')
-model = ktrain.text.sequence_tagger('bilstm-transformer', preproc, transformer_model='roberta-base')
-learner = ktrain.get_learner(model, train_data=trn, val_data=val, batch_size=128)
-learner.fit(0.01, 1, cycle_len=1)
-predictor = ktrain.get_predictor(model, preproc)
-predictor.predict('James Gandolfini was a great actor.')
-```
-
-- **2022-03-31**
-  - **ktrain v0.30.x** is released and now includes support for [keyphrase extraction](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/keyword_extraction_example.ipynb):
-```python
-# Keyphrase Extraction in ktrain
-from ktrain.text.kw import KeywordExtractor
-from ktrain.text.textextractor import TextExtractor
-!wget --user-agent="Mozilla" https://arxiv.org/pdf/2004.10703.pdf -O /tmp/downloaded_paper.pdf -q
-text = TextExtractor().extract('/tmp/downloaded_paper.pdf')
-kwe = KeywordExtractor()
-kwe.extract_keywords(text, candidate_generator='noun_phrases')
-
-# OUTPUT
-[('machine learning', 0.5341716824761019),
- ('augmented machine learning', 0.5208544167057394),
- ('text classification', 0.5134074336523509),
- ('image classification', 0.5071170746851726),
- ('node classification', 0.4973034499292447),
- ('tabular data', 0.49645958463369566),
- ('entity recognition', 0.45195059648705926),
- ('exact answers', 0.4462502183477142),
- ('import ktrain', 0.32891369271775894),
- ('load model', 0.32052348289886556)]
-```
 ----
 
 ### Overview
@@ -68,7 +50,7 @@ kwe.extract_keywords(text, candidate_generator='noun_phrases')
      - **Unsupervised Topic Modeling** with [LDA](http://www.jmlr.org/papers/volume3/blei03a/blei03a.pdf)  <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/20newsgroups-topic_modeling.ipynb)]</sup></sub>
      - **Document Similarity with One-Class Learning**:  given some documents of interest, find and score new documents that are thematically similar to them using [One-Class Text Classification](https://en.wikipedia.org/wiki/One-class_classification) <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/20newsgroups-document_similarity_scorer.ipynb)]</sup></sub>
      - **Document Recommendation Engines and Semantic Searches**:  given a text snippet from a sample document, recommend documents that are semantically-related from a larger corpus  <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/20newsgroups-recommendation_engine.ipynb)]</sup></sub>
-     - **Text Summarization**:  summarize long documents with a pretrained BART model - no training required <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/text_summarization_with_bart.ipynb)]</sup></sub>
+     - **Text Summarization**:  summarize long documents - no training required <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/text_summarization.ipynb)]</sup></sub>
      - **End-to-End Question-Answering**:  ask a large text corpus questions and receive exact answers <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/question_answering_with_bert.ipynb)]</sup></sub>
      - **Easy-to-Use Built-In Search Engine**:  perform keyword searches on large collections of documents <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/question_answering_with_bert.ipynb)]</sup></sub>
      - **Zero-Shot Learning**:  classify documents into user-provided topics **without** training examples <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/zero_shot_learning_with_nli.ipynb)]</sup></sub>
@@ -77,6 +59,7 @@ kwe.extract_keywords(text, candidate_generator='noun_phrases')
      - **Speech Transcription**: Extract text from audio files <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/speech_transcription_example.ipynb)]</sup></sub>
      - **Universal Information Extraction**:  extract any kind of information from documents by simply phrasing it in the form of a question <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/qa_information_extraction.ipynb)]</sup></sub>
      - **Keyphrase Extraction**:  extract keywords from documents <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/keyword_extraction_example.ipynb)]</sup></sub>
+     - **Generative AI with GPT**: Provide instructions to a lightweight ChatGPT-like model running on your own own machine to solve various tasks. Model was fine-tuned on the [Alpaca](https://github.com/tatsu-lab/stanford_alpaca) instruction dataset ([CC By NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/deed.en_GB)) <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/generative_ai_example.ipynb)]</sup>
   - `vision` data:
     - **image classification** (e.g., [ResNet](https://arxiv.org/abs/1512.03385), [Wide ResNet](https://arxiv.org/abs/1605.07146), [Inception](https://www.cs.unc.edu/~wliu/papers/GoogLeNet.pdf)) <sub><sup>[[example notebook](https://colab.research.google.com/drive/1WipQJUPL7zqyvLT10yekxf_HNMXDDtyR)]</sup></sub>
     - **image regression** for predicting numerical targets from photos (e.g., age prediction) <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/vision/utk_faces_age_prediction-resnet50.ipynb)]</sup></sub>
@@ -372,8 +355,8 @@ pip install torch
 pip install librosa
 # for tabular.causal_inference_model:
 pip install causalnlp
-# for text.TextExtractor:
-pip install tika
+# for text.summarization.core.LexRankSummarizer:
+pip install sumy
 # for text.kw.KeywordExtractor
 pip install textblob
 ```

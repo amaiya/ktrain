@@ -6,6 +6,42 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.35.0 (2023-04-01)
+
+### new:
+- Support for generative AI with few-shot and zero-shot prompting using a model that can run on your own machine.
+
+### changed
+- N/A
+
+### fixed:
+- N/A
+
+
+## 0.34.0 (2023-03-30)
+
+### new:
+- Support for LexRank summarization
+
+### changed
+- N/A
+
+### fixed:
+- Bug fix in `dataset` module (#486)
+
+
+## 0.33.4 (2023-03-22)
+
+### new:
+- N/A
+
+### changed
+- Added `verbose` parameter to `predict*` methods in all `Predictor` classes
+
+### fixed:
+- N/A
+
+
 ## 0.33.3 (2023-03-17)
 
 ### new:

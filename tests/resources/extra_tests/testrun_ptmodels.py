@@ -1,10 +1,12 @@
+import sys
 import time
 
 import testenv
 
-from ktrain.text.summarization import TransformerSummarizer
+from ktrain.text.summarization import TransformerSummarizer, LexRankSummarizer
 
 ts = TransformerSummarizer()
+ls = LexRankSummarizer()
 
 
 sample_doc = """Archive-name: space/new_probes
@@ -251,6 +253,11 @@ UPCOMING PLANETARY PROBES - MISSIONS AND SCHEDULES
 start = time.time()
 print(ts.summarize(sample_doc))
 print(time.time() - start)
+
+start = time.time()
+print(ls.summarize(sample_doc, num_sentences=5))
+print(time.time() - start)
+# sys.exit(1)
 
 
 # zsl

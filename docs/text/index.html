@@ -5940,7 +5940,7 @@ Args:
             self.torch_device
         )
 
-    def summarize(self, doc):
+    def summarize(self, doc, **kwargs):
         &#34;&#34;&#34;
         ```
         summarize document text
@@ -5977,7 +5977,7 @@ Args:
 <h3>Methods</h3>
 <dl>
 <dt id="ktrain.text.TransformerSummarizer.summarize"><code class="name flex">
-<span>def <span class="ident">summarize</span></span>(<span>self, doc)</span>
+<span>def <span class="ident">summarize</span></span>(<span>self, doc, **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"><pre><code>summarize document text
@@ -5990,7 +5990,7 @@ Returns:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def summarize(self, doc):
+<pre><code class="python">def summarize(self, doc, **kwargs):
     &#34;&#34;&#34;
     ```
     summarize document text

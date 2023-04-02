@@ -24,10 +24,12 @@ class NodePredictor(Predictor):
     def get_classes(self):
         return self.c
 
-    def predict(self, node_ids, return_proba=False):
-        return self.predict_transductive(node_ids, return_proba=return_proba)
+    def predict(self, node_ids, return_proba=False, verbose=0):
+        return self.predict_transductive(
+            node_ids, return_proba=return_proba, verbose=verbose
+        )
 
-    def predict_transductive(self, node_ids, return_proba=False):
+    def predict_transductive(self, node_ids, return_proba=False, verbose=0):
         """
         ```
         Performs transductive inference.
@@ -38,11 +40,11 @@ class NodePredictor(Predictor):
         gen.batch_size = self.batch_size
         # *_generator methods are deprecated from TF 2.1.0
         # preds = self.model.predict_generator(gen)
-        preds = self.model.predict(gen)
+        preds = self.model.predict(gen, verbose=verbose)
         result = preds if return_proba else [self.c[np.argmax(pred)] for pred in preds]
         return result
 
-    def predict_inductive(self, df, G, return_proba=False):
+    def predict_inductive(self, df, G, return_proba=False, verbose=0):
         """
         ```
         Performs inductive inference.
@@ -54,7 +56,7 @@ class NodePredictor(Predictor):
         gen.batch_size = self.batch_size
         # *_generator methods are deprecated from TF 2.1.0
         # preds = self.model.predict_generator(gen)
-        preds = self.model.predict(gen)
+        preds = self.model.predict(gen, verbose=verbose)
         result = preds if return_proba else [self.c[np.argmax(pred)] for pred in preds]
         return result
 
@@ -79,7 +81,7 @@ class LinkPredictor(Predictor):
     def get_classes(self):
         return self.c
 
-    def predict(self, G, edge_ids, return_proba=False):
+    def predict(self, G, edge_ids, return_proba=False, verbose=0):
         """
         ```
         Performs link prediction
@@ -90,7 +92,7 @@ class LinkPredictor(Predictor):
         gen.batch_size = self.batch_size
         # *_generator methods are deprecated from TF 2.1.0
         # preds = self.model.predict_generator(gen)
-        preds = self.model.predict(gen)
+        preds = self.model.predict(gen, verbose=verbose)
         preds = np.squeeze(preds)
         if return_proba:
             return [[1 - pred, pred] for pred in preds]
