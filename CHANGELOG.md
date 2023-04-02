@@ -6,6 +6,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.35.1 (2023-04-02)
+
+### new:
+- N/A
+
+### changed
+- N/A
+
+### fixed:
+- Ensure `do_sample=True` for `GenerativeAI`
+
+
 ## 0.35.0 (2023-04-01)
 
 ### new:

@@ -15,6 +15,7 @@ class GenerativeAI(TorchBase):
         model_name: str = "nlpcloud/instruct-gpt-j-fp16",
         device: Optional[str] = None,
         max_new_tokens: int = 512,
+        do_sample: bool = True,
         **kwargs
     ):
         """
@@ -26,12 +27,15 @@ class GenerativeAI(TorchBase):
           model_name(str): name of the model.  Currently, only the nlpcloud/instruct-gpt-j-fp16
           device(str): device to use ("cpu" for CPU, "cuda" for GPU, "cuda:0" for first GPU, "cuda:1" for second GPU ,etc.):
           max_new_tokens(int):  The maximum numbers of tokens to generate, ignoring the number of tokens in the prompt.
+          do_sample(bool):  If True, use sampling instead of the default greedy decoding.
         ```
         """
 
         super().__init__(device=device)
         self.device_id = self.device_to_id()
-        self.config = GenerationConfig(max_new_tokens=max_new_tokens, **kwargs)
+        self.config = GenerationConfig(
+            max_new_tokens=max_new_tokens, do_sample=do_sample, **kwargs
+        )
         if self.device_id < 0:
             self.generator = pipeline(
                 model=model_name, device=self.device_id, generation_config=self.config
