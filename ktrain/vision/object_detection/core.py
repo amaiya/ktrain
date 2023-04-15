@@ -15,7 +15,6 @@ class ObjectDetector(TorchBase):
         ImageCaptioner constructor
 
         Args:
-          model_name(str): name of  image captioning model
           device(str): device to use (e.g., 'cuda', 'cpu')
           threshold(float):  threshold for object detection
           classification(bool): If True, simpy do image classification
