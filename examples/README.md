@@ -19,6 +19,7 @@ This directory contains various example notebooks using *ktrain*.  The directory
   - [Universal Information Extraction](#extraction): an example of using a Question-Answering model for information extraction
   - [Keyphrase Extraction](#kwextraction): an example of keyphrase extraction in **ktrain**
   - [Indonesian Text Examples](#indonesian):  examples such as zero-Shot text classification and question-answering on Indonesian text by [Sandy Khosasi](https://github.com/ilos-vigil)
+  - [Sentiment Analysis Examples](#sentiment): simple-to-use sentiment analysis
   - [Generative AI Examples](#generativeai):  provide instructions to a language model running on your own machine to solve various tasks
 - `vision`:  
   - [image classification](#imageclass):  models for image datasetsimage classification examples using various models and datasets
@@ -155,6 +156,7 @@ The objective of the CoNLL2003 task is to classify sequences of words as belongi
 ### <a name="extraction"></a>Universal Information Extraction: [qa_information_extraction.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text)
 ### <a name="kwextraction"></a>Keyphrase Extraction: [keyword_extraction_example.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text)
 ### <a name="indonesian"></a> [Indonesian NLP examples by Sandy Khosasi](https://github.com/ilos-vigil/ktrain-assessment-study) including Indonesian question-answering, emotion recognition, and document similarity
+### <a name="sentiment"></a> Sentiment Analysis:  [sentiment_analysis_example.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text/)
 ### <a name="generativeai"></a> Generative AI Using GPT:  [generative_ai_example.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text/generative_ai_example.ipynb)
 
 

@@ -301,3 +301,13 @@ start = time.time()
 result = ic.caption(ifiles)
 print(time.time() - start)
 print(result)
+
+
+# sentiment-analysis
+from ktrain.text.sentiment import SentimentAnalyzer
+
+classifier = SentimentAnalyzer()
+start = time.time()
+result = classifier.predict("I got a promotion today.")
+print(time.time() - start)
+print(result)

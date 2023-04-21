@@ -12,6 +12,16 @@
 
 
 ### News and Announcements
+- **2023-04-21**
+  - **ktrain 0.36.x** is released and supports **Sentiment Analysis**. See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/sentiment_analysis_example.ipynb) for more information. 
+```python
+# Example: Sentiment Analysis
+from ktrain.text.sentiment import SentimentAnalyzer
+classifier = SentimentAnalyzer()
+result = classifier.predict('I got a promotion today.')
+# OUTPUT:
+# {'POSITIVE': 0.9021117091178894}
+```
 - **2023-04-01**
   - **ktrain 0.35.x** is released and supports **Generative AI** using an instruction-fine-tuned version of GPT-J that can run on your own machine.  See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/generative_ai_example.ipynb) for more information. Supply prompts in the form of instructions for what you want the model to do:
 ```python
@@ -378,6 +388,7 @@ can be used out-of-the-box **without** having TensorFlow installed, as summarize
 | [Speech Transcription](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/speech_transcription_example.ipynb) (pretrained)     |  ❌  | ✅  |❌   |
 | [Image Captioning](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/vision/image_captioning_example.ipynb) (pretrained)     |  ❌  | ✅  |❌   |
 | [Object Detection](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/vision/object_detection_example.ipynb) (pretrained)     |  ❌  | ✅  |❌   |
+| [Sentiment Analysis](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/sentiment_analysis_example.ipynb) (pretrained)     |  ❌  | ✅  |❌   |
 | [Topic Modeling](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-05-learning_from_unlabeled_text_data.ipynb) (sklearn)  |  ❌  | ❌  | ✅  |
 | [Keyphrase Extraction](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/keyword_extraction_example.ipynb) (textblob/nltk/sklearn)   |  ❌  | ❌  | ✅  |
 

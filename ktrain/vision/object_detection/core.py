@@ -12,7 +12,7 @@ class ObjectDetector(TorchBase):
     def __init__(self, device=None, classification=False, threshold=0.9):
         """
         ```
-        ImageCaptioner constructor
+        Object detection constructor
 
         Args:
           device(str): device to use (e.g., 'cuda', 'cpu')
