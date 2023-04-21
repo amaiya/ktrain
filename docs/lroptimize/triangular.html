@@ -761,19 +761,19 @@ Code Reference: <a href="https://github.com/bckenstler/CLR">https://github.com/b
 </code></dt>
 <dd>
 <div class="desc"><p>Called at the end of an epoch.</p>
-<p>Subclasses should override for any actions to run. This function should only
-be called during TRAIN mode.</p>
+<p>Subclasses should override for any actions to run. This function should
+only be called during TRAIN mode.</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>epoch</code></strong></dt>
 <dd>Integer, index of epoch.</dd>
 <dt><strong><code>logs</code></strong></dt>
 <dd>Dict, metric results for this training epoch, and for the
-validation epoch if validation is performed. Validation result keys
-are prefixed with <code>val_</code>. For training epoch, the values of the</dd>
-</dl>
-<p><code>Model</code>'s metrics are returned. Example : <code>{'loss': 0.2, 'accuracy':
-0.7}</code>.</p></div>
+validation epoch if validation is performed. Validation result
+keys are prefixed with <code>val_</code>. For training epoch, the values of
+the <code>Model</code>'s metrics are returned. Example:
+<code>{'loss': 0.2, 'accuracy': 0.7}</code>.</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -839,8 +839,8 @@ are prefixed with <code>val_</code>. For training epoch, the values of the</dd>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>logs</code></strong></dt>
-<dd>Dict. Currently no data is passed to this argument for this method
-but that may change in the future.</dd>
+<dd>Dict. Currently no data is passed to this argument for this
+method but that may change in the future.</dd>
 </dl></div>
 <details class="source">
 <summary>

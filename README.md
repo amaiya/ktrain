@@ -13,7 +13,7 @@
 
 ### News and Announcements
 - **2023-04-21**
-  - **ktrain 0.36.x** is released and supports **Sentiment Analysis**. See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/sentiment_analysis_example.ipynb) for more information. 
+  - **ktrain 0.36.x** is released and supports a simple wrapper to **Sentiment Analysis**. See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/sentiment_analysis_example.ipynb) for more information. 
 ```python
 # Example: Sentiment Analysis
 from ktrain.text.sentiment import SentimentAnalyzer
@@ -42,9 +42,6 @@ print(model.execute(prompt))
 ```
 - **2023-03-30**
   - **ktrain 0.34.x** is released and supports fast LexRank-based text summarization.
-- **2023-01-14**
-  - **ktrain 0.33.x** is released and includes fixes to support the latest version of Hugging Face`transformers`. Note that `transformers<=4.25.1` [has a bug](https://github.com/huggingface/transformers/issues/20750) related to TensorFlow 2.11. You can downgrade TensorFlow to 2.10 if you receive an error that says *"has no attribute 'expand_1d'"* (or upgrade to `transformers>4.25.1` if available).
-
 ----
 
 ### Overview
@@ -70,6 +67,7 @@ print(model.execute(prompt))
      - **Speech Transcription**: Extract text from audio files <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/speech_transcription_example.ipynb)]</sup></sub>
      - **Universal Information Extraction**:  extract any kind of information from documents by simply phrasing it in the form of a question <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/qa_information_extraction.ipynb)]</sup></sub>
      - **Keyphrase Extraction**:  extract keywords from documents <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/keyword_extraction_example.ipynb)]</sup></sub>
+     - **Sentiment Analysis**: easy-to-use wrapper to pretrained sentiment analysis <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/sentiment_analysis_example.ipynb)]</sup
      - **Generative AI with GPT**: Provide instructions to a lightweight ChatGPT-like model running on your own own machine to solve various tasks. Model was fine-tuned on the [Alpaca](https://github.com/tatsu-lab/stanford_alpaca) instruction dataset ([CC By NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/deed.en_GB)) <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/generative_ai_example.ipynb)]</sup>
   - `vision` data:
     - **image classification** (e.g., [ResNet](https://arxiv.org/abs/1512.03385), [Wide ResNet](https://arxiv.org/abs/1605.07146), [Inception](https://www.cs.unc.edu/~wliu/papers/GoogLeNet.pdf)) <sub><sup>[[example notebook](https://colab.research.google.com/drive/1WipQJUPL7zqyvLT10yekxf_HNMXDDtyR)]</sup></sub>

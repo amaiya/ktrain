@@ -1456,8 +1456,8 @@ set to &lt;code&gt;True&lt;/code&gt;.
 <ul class="hlist">
 <li>keras.engine.base_layer.Layer</li>
 <li>tensorflow.python.module.module.Module</li>
-<li>tensorflow.python.training.tracking.autotrackable.AutoTrackable</li>
-<li>tensorflow.python.training.tracking.base.Trackable</li>
+<li>tensorflow.python.trackable.autotrackable.AutoTrackable</li>
+<li>tensorflow.python.trackable.base.Trackable</li>
 <li>keras.utils.version_utils.LayerVersionSelector</li>
 </ul>
 <h3>Static methods</h3>
@@ -1710,10 +1710,13 @@ the first execution of <code>call()</code>.</p>
 </code></dt>
 <dd>
 <div class="desc"><p>This is where the layer's logic lives.</p>
-<p>The <code>call()</code> method may not create state (except in its first invocation,
-wrapping the creation of variables or other resources in <code>tf.init_scope()</code>).
-It is recommended to create state in <code>__init__()</code>, or the <code>build()</code> method
-that is called automatically before <code>call()</code> executes the first time.</p>
+<p>The <code>call()</code> method may not create state (except in its first
+invocation, wrapping the creation of variables or other resources in
+<code>tf.init_scope()</code>).
+It is recommended to create state, including
+<code>tf.Variable</code> instances and nested <code>Layer</code> instances,
+in <code>__init__()</code>, or in the <code>build()</code> method that is
+called automatically before <code>call()</code> executes for the first time.</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>inputs</code></strong></dt>
@@ -1722,7 +1725,8 @@ The first positional <code>inputs</code> argument is subject to special rules:
 - <code>inputs</code> must be explicitly passed. A layer cannot have zero
 arguments, and <code>inputs</code> cannot be provided via the default value
 of a keyword argument.
-- NumPy array or Python scalar values in <code>inputs</code> get cast as tensors.
+- NumPy array or Python scalar values in <code>inputs</code> get cast as
+tensors.
 - Keras mask metadata is only collected from <code>inputs</code>.
 - Layers are built (<code>build(input_shape)</code> method)
 using shape info from <code>inputs</code> only.
@@ -1730,7 +1734,8 @@ using shape info from <code>inputs</code> only.
 - Mixed precision input casting is only applied to <code>inputs</code>.
 If a layer has tensor arguments in <code>*args</code> or <code>**kwargs</code>, their
 casting behavior in mixed precision should be handled manually.
-- The SavedModel input specification is generated using <code>inputs</code> only.
+- The SavedModel input specification is generated using <code>inputs</code>
+only.
 - Integration with various ecosystem packages like TFMOT, TFLite,
 TF.js, etc is only supported for <code>inputs</code> and not for tensors in
 positional and keyword arguments.</dd>
@@ -1744,10 +1749,10 @@ The following optional keyword arguments are reserved:
 - <code>training</code>: Boolean scalar tensor of Python boolean indicating
 whether the <code>call</code> is meant for training or inference.
 - <code>mask</code>: Boolean input mask. If the layer's <code>call()</code> method takes a
-<code>mask</code> argument, its default value will be set to the mask generated
-for <code>inputs</code> by the previous layer (if <code>input</code> did come from a layer
-that generated a corresponding mask, i.e. if it came from a Keras
-layer with masking support).</dd>
+<code>mask</code> argument, its default value will be set to the mask
+generated for <code>inputs</code> by the previous layer (if <code>input</code> did come
+from a layer that generated a corresponding mask, i.e. if it came
+from a Keras layer with masking support).</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <p>A tensor or list/tuple of tensors.</p></div>
@@ -1813,13 +1818,15 @@ inputs that match the input shape provided here.</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>input_shape</code></strong></dt>
-<dd>Shape tuple (tuple of integers)
-or list of shape tuples (one per output tensor of the layer).
+<dd>Shape tuple (tuple of integers) or <code>tf.TensorShape</code>,
+or structure of shape tuples / <code>tf.TensorShape</code> instances
+(one per output tensor of the layer).
 Shape tuples can include None for free dimensions,
 instead of an integer.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
-<p>An input shape tuple.</p></div>
+<p>A <code>tf.TensorShape</code> instance
+or structure of <code>tf.TensorShape</code> instances.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1853,9 +1860,9 @@ The same layer can be reinstantiated later
 <p>The config of a layer does not include connectivity
 information, nor the layer class name. These are handled
 by <code>Network</code> (one layer of abstraction above).</p>
-<p>Note that <code>get_config()</code> does not guarantee to return a fresh copy of dict
-every time it is called. The callers should make a copy of the returned dict
-if they want to modify it.</p>
+<p>Note that <code>get_config()</code> does not guarantee to return a fresh copy of
+dict every time it is called. The callers should make a copy of the
+returned dict if they want to modify it.</p>
 <h2 id="returns">Returns</h2>
 <p>Python dictionary.</p></div>
 <details class="source">

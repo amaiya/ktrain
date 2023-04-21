@@ -89,8 +89,8 @@ class F1score(keras.callbacks.Callback):
 <p>Callbacks can be passed to keras methods such as <code>fit</code>, <code>evaluate</code>, and
 <code>predict</code> in order to hook into the various stages of the model training and
 inference lifecycle.</p>
-<p>To create a custom callback, subclass <code>keras.callbacks.Callback</code> and override
-the method associated with the stage of interest. See
+<p>To create a custom callback, subclass <code>keras.callbacks.Callback</code> and
+override the method associated with the stage of interest. See
 <a href="https://www.tensorflow.org/guide/keras/custom_callback">https://www.tensorflow.org/guide/keras/custom_callback</a> for more information.</p>
 <p>Example:</p>
 <pre><code class="language-python-repl">&gt;&gt;&gt; training_finished = False
@@ -98,7 +98,8 @@ the method associated with the stage of interest. See
 ...   def on_train_end(self, logs=None):
 ...     global training_finished
 ...     training_finished = True
-&gt;&gt;&gt; model = tf.keras.Sequential([tf.keras.layers.Dense(1, input_shape=(1,))])
+&gt;&gt;&gt; model = tf.keras.Sequential([
+...     tf.keras.layers.Dense(1, input_shape=(1,))])
 &gt;&gt;&gt; model.compile(loss='mean_squared_error')
 &gt;&gt;&gt; model.fit(tf.constant([[1.0]]), tf.constant([[1.0]]),
 ...           callbacks=[MyCallback()])
@@ -111,22 +112,21 @@ so they can all be called together.</li>
 <li>You will need to manually call all the <code>on_*</code> methods at the appropriate
 locations in your loop. Like this:</li>
 </ol>
-<p>```
-callbacks =
-tf.keras.callbacks.CallbackList([&hellip;])
-callbacks.append(&hellip;)</p>
-<p>callbacks.on_train_begin(&hellip;)
-for epoch in range(EPOCHS):
-callbacks.on_epoch_begin(epoch)
-for i, data in dataset.enumerate():
-callbacks.on_train_batch_begin(i)
-batch_logs = model.train_step(data)
-callbacks.on_train_batch_end(i, batch_logs)
-epoch_logs = &hellip;
-callbacks.on_epoch_end(epoch, epoch_logs)
-final_logs=&hellip;
-callbacks.on_train_end(final_logs)
-```</p>
+<p>Example:</p>
+<pre><code class="language-python">   callbacks =  tf.keras.callbacks.CallbackList([...])
+   callbacks.append(...)
+   callbacks.on_train_begin(...)
+   for epoch in range(EPOCHS):
+     callbacks.on_epoch_begin(epoch)
+     for i, data in dataset.enumerate():
+       callbacks.on_train_batch_begin(i)
+       batch_logs = model.train_step(data)
+       callbacks.on_train_batch_end(i, batch_logs)
+     epoch_logs = ...
+     callbacks.on_epoch_end(epoch, epoch_logs)
+   final_logs=...
+   callbacks.on_train_end(final_logs)
+</code></pre>
 <h2 id="attributes">Attributes</h2>
 <dl>
 <dt><strong><code>params</code></strong></dt>
@@ -211,19 +211,19 @@ the current batch or epoch (see method-specific docstrings).</p></div>
 </code></dt>
 <dd>
 <div class="desc"><p>Called at the end of an epoch.</p>
-<p>Subclasses should override for any actions to run. This function should only
-be called during TRAIN mode.</p>
+<p>Subclasses should override for any actions to run. This function should
+only be called during TRAIN mode.</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>epoch</code></strong></dt>
 <dd>Integer, index of epoch.</dd>
 <dt><strong><code>logs</code></strong></dt>
 <dd>Dict, metric results for this training epoch, and for the
-validation epoch if validation is performed. Validation result keys
-are prefixed with <code>val_</code>. For training epoch, the values of the</dd>
-</dl>
-<p><code>Model</code>'s metrics are returned. Example : <code>{'loss': 0.2, 'accuracy':
-0.7}</code>.</p></div>
+validation epoch if validation is performed. Validation result
+keys are prefixed with <code>val_</code>. For training epoch, the values of
+the <code>Model</code>'s metrics are returned. Example:
+<code>{'loss': 0.2, 'accuracy': 0.7}</code>.</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
