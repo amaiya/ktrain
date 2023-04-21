@@ -18,12 +18,12 @@
 # Example: Sentiment Analysis
 from ktrain.text.sentiment import SentimentAnalyzer
 classifier = SentimentAnalyzer()
-texts = ['I got a promotion today.', 'My appointment is at 3:30.', 'This blows.']
+texts = ['I got a promotion today.', 'My appointment is at 3:30.', 'There were cost overruns.']
 result = classifier.predict(texts)
 # OUTPUT:
 #[{'POSITIVE': 0.9021117091178894},
 # {'NEUTRAL': 0.9110478758811951},
-# {'NEGATIVE': 0.9071289896965027}]
+# {'NEGATIVE': 0.743671715259552}]
 ```
 - **2023-04-01**
   - **ktrain 0.35.x** is released and supports **Generative AI** using an instruction-fine-tuned version of GPT-J that can run on your own machine.  See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/generative_ai_example.ipynb) for more information. Supply prompts in the form of instructions for what you want the model to do:
