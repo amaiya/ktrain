@@ -389,7 +389,7 @@ can be used out-of-the-box **without** having TensorFlow installed, as summarize
 | [Speech Transcription](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/speech_transcription_example.ipynb) (pretrained)     |  ❌  | ✅  |❌   |
 | [Image Captioning](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/vision/image_captioning_example.ipynb) (pretrained)     |  ❌  | ✅  |❌   |
 | [Object Detection](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/vision/object_detection_example.ipynb) (pretrained)     |  ❌  | ✅  |❌   |
-| [Sentiment Analysis](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/sentiment_analysis_example.ipynb) (pretrained)     |  ❌  | ✅  |❌   |
+| [Sentiment Analysis](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/sentiment_analysis_example.ipynb) (pretrained)     |  ❌  | ✅  |❌   |
 | [Topic Modeling](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-05-learning_from_unlabeled_text_data.ipynb) (sklearn)  |  ❌  | ❌  | ✅  |
 | [Keyphrase Extraction](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/keyword_extraction_example.ipynb) (textblob/nltk/sklearn)   |  ❌  | ❌  | ✅  |
 
