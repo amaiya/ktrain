@@ -15,7 +15,7 @@ Most recent releases are shown at the top. Each release shows:
 - N/A
 
 ### fixed:
-- resolved issue with using DeBERTa embedding models with NER
+- resolved issue with using DeBERTa embedding models with NER (#492)
 
 
 ## 0.36.0 (2023-04-21)
