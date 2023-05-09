@@ -6,6 +6,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.36.1 (2023-05-09)
+
+### new:
+- N/A
+
+### changed
+- N/A
+
+### fixed:
+- resolved issue with using DeBERTa embedding models with NER
+
+
 ## 0.36.0 (2023-04-21)
 
 ### new:

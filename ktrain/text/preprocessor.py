@@ -1516,6 +1516,28 @@ class TransformerEmbedding:
             )
         return model
 
+    def _reconstruct_word_ids(self, offsets):
+        """
+        ```
+        Reverse engineer the word_ids.
+        ```
+        """
+        word_ids = []
+        last_word_id = -1
+        last_offset = (-1, -1)
+        for o in offsets:
+            if o == (0, 0):
+                word_ids.append(None)
+                continue
+            # must test to see if start is same as last offset start due to xml-roberta quirk with tokens like 070
+            if o[0] == last_offset[0] or o[0] == last_offset[1]:
+                word_ids.append(last_word_id)
+            elif o[0] > last_offset[1]:
+                last_word_id += 1
+                word_ids.append(last_word_id)
+            last_offset = o
+        return word_ids
+
     def embed(
         self,
         texts,
@@ -1526,7 +1548,8 @@ class TransformerEmbedding:
     ):
         """
         ```
-        get embedding for word, phrase, or sentence
+        Get embedding for word, phrase, or sentence.
+
         Args:
           text(str|list): word, phrase, or sentence or list of them representing a batch
           word_level(bool): If True, returns embedding for each token in supplied texts.
@@ -1564,7 +1587,7 @@ class TransformerEmbedding:
         all_input_ids = []
         all_input_masks = []
         all_word_ids = []
-        all_offsets = []
+        all_offsets = []  # retained but not currently used as of v0.36.1 (#492)
         for text in texts:
             encoded = self.tokenizer.encode_plus(
                 text, max_length=maxlen, truncation=True, return_offsets_mapping=True
@@ -1585,7 +1608,16 @@ class TransformerEmbedding:
                 input_mask.append(0)
             all_input_ids.append(input_ids)
             all_input_masks.append(input_mask)
-            all_word_ids.append(encoded.word_ids())
+            # Note about Issue #492:
+            # deberta includes preceding space in offfset_mapping (https://www.kaggle.com/code/junkoda/be-aware-of-white-space-deberta-roberta)
+            # models like bert-base-case produce word_ids that do not correspond to whitespace tokenization (e.g.,"score 99.9%", "BRUSSELS 1996-08-22")
+            # Therefore, we use offset_mappings unless the model is deberta for now.
+            word_ids = (
+                encoded.word_ids()
+                if "deberta" in self.model_name
+                else self._reconstruct_word_ids(offsets)
+            )
+            all_word_ids.append(word_ids)
             all_offsets.append(offsets)
 
         all_input_ids = np.array(all_input_ids)
@@ -1622,21 +1654,14 @@ class TransformerEmbedding:
             filtered_embedding = []
             raw_embedding = raw_embeddings[i]
             subvectors = []
-            last_offset = (-1, -1)
-            # subwords = [] # debugging
+            last_word_id = -1
             for j in range(len(all_offsets[i])):
-                if all_word_ids[i][j] is None:
+                word_id = all_word_ids[i][j]
+                if word_id is None:
                     continue
-                # must test to see if start is same as last offset start due to xml-roberta quirk with tokens like 070
-                if (
-                    all_offsets[i][j][0] == last_offset[1]
-                    or all_offsets[i][j][0] == last_offset[0]
-                ):
+                if word_id == last_word_id:
                     subvectors.append(raw_embedding[j])
-                    # subwords[-1] += texts[i][all_offsets[i][j][0]:all_offsets[i][j][1]] # debugging
-                    last_offset = all_offsets[i][j]
-                if all_offsets[i][j][0] > last_offset[1]:
-                    # subwords.append(texts[i][all_offsets[i][j][0]:all_offsets[i][j][1]]) # debugging
+                if word_id > last_word_id:
                     if len(subvectors) > 0:
                         if aggregation_strategy == "average":
                             filtered_embedding.append(np.mean(subvectors, axis=0))
@@ -1644,7 +1669,7 @@ class TransformerEmbedding:
                             filtered_embedding.append(subvectors[0])
                         subvectors = []
                     subvectors.append(raw_embedding[j])
-                    last_offset = all_offsets[i][j]
+                    last_word_id = word_id
             if len(subvectors) > 0:
                 if aggregation_strategy == "average":
                     filtered_embedding.append(np.mean(subvectors, axis=0))
