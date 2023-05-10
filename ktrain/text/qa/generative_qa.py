@@ -152,6 +152,7 @@ class GenerativeQA:
         marginal_relevance: bool = True,
         answer=None,
         key_filter: Optional[bool] = None,
+        show_token_usage=False,
         # get_callbacks: Callable[[str], AsyncCallbackHandler] = lambda x: [],
     ):
         """
@@ -169,6 +170,10 @@ class GenerativeQA:
                 answer=answer,
                 key_filter=key_filter,
             )
+            if not show_token_usage:
+                result.formatted_answer = result.formatted_answer.split("Tokens Used")[
+                    0
+                ]
             return result
         except RuntimeError:
             raise Exception(
