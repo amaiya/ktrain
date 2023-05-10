@@ -12,6 +12,17 @@
 
 
 ### News and Announcements
+- **2023-05-10**
+  - **ktrain 0.37.x** is released and supports a generative question-answering using OpenAI models like GPT-3.5-turbo. Ask a large text corpus questions and receive answers with citations into your corpus.See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/question_answering_with_openai.ipynb) for more information.
+```python
+import os
+os.environ['OPENAI_API_KEY'] = 'ENTER YOUR OPENAI API KEY HERE'
+from ktrain .text.qa import GenerativeQA
+genqa = GenerativeQA()
+genqa.add_doc(text=your_text_document)
+print(genqa.query('What is ktrain?'))
+```
+
 - **2023-04-21**
   - **ktrain 0.36.x** is released and supports a simple wrapper to **Sentiment Analysis**. See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/sentiment_analysis_example.ipynb) for more information. 
 ```python
@@ -62,7 +73,8 @@ print(model.execute(prompt))
      - **Document Similarity with One-Class Learning**:  given some documents of interest, find and score new documents that are thematically similar to them using [One-Class Text Classification](https://en.wikipedia.org/wiki/One-class_classification) <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/20newsgroups-document_similarity_scorer.ipynb)]</sup></sub>
      - **Document Recommendation Engines and Semantic Searches**:  given a text snippet from a sample document, recommend documents that are semantically-related from a larger corpus  <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/20newsgroups-recommendation_engine.ipynb)]</sup></sub>
      - **Text Summarization**:  summarize long documents - no training required <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/text_summarization.ipynb)]</sup></sub>
-     - **End-to-End Question-Answering**:  ask a large text corpus questions and receive exact answers <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/question_answering_with_bert.ipynb)]</sup></sub>
+     - **Extractive Question-Answering**:  ask a large text corpus questions and receive exact answers using BERT <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/question_answering_with_bert.ipynb)]</sup></sub>
+     - **Generative Question-Answering**:  ask a large text corpus questions and receive answers with citations using OpenAI models <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/question_answering_with_openai.ipynb)]</sup></sub>
      - **Easy-to-Use Built-In Search Engine**:  perform keyword searches on large collections of documents <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/question_answering_with_bert.ipynb)]</sup></sub>
      - **Zero-Shot Learning**:  classify documents into user-provided topics **without** training examples <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/zero_shot_learning_with_nli.ipynb)]</sup></sub>
      - **Language Translation**:  translate text from one language to another <sub><sup>[[example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/examples/text/language_translation_example.ipynb)]</sup></sub>

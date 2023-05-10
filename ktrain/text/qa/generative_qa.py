@@ -1,3 +1,4 @@
+import sys
 import os
 import pickle
 from typing import Optional
@@ -13,22 +14,44 @@ except ImportError:
 DOCS = "docs_obj.pkl"
 
 
+def is_notebook() -> bool:
+    try:
+        shell = get_ipython().__class__.__name__
+        if "google.colab" in sys.modules:
+            return True
+        elif shell == "ZMQInteractiveShell":
+            return True  # Jupyter notebook or qtconsole
+        elif shell == "TerminalInteractiveShell":
+            return False  # Terminal running IPython
+        else:
+            return False  # Other type (?)
+    except NameError:
+        return False  # Probably standard Python interpreter
+
+
 class GenerativeQA:
     """
     Question-answering using OpenAI or open-source GPT or GPT-like generative LLM models
     """
 
-    def __init__(self):
+    def __init__(self, llm=None):
         """
         ```
         GenerativeQA constructor
+
+        Args:
+          llm(str):  The LLM to use.  If None, gpt-3.5-turbo is used.
         ```
         """
         if not PAPERQA_INSTALLED:
             raise Exception(
                 "GenerativeQA in ktrain requires the paper-qa package by Andrew White: pip install paper-qa"
             )
-        self.docs = Docs()
+        self.docs = Docs(llm)
+        if is_notebook():
+            import nest_asyncio
+
+            nest_asyncio.apply()
 
     def load(self, path: str):
         """
