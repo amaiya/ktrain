@@ -13,7 +13,7 @@
 
 ### News and Announcements
 - **2023-05-10**
-  - **ktrain 0.37.x** is released and supports a generative question-answering using OpenAI models like GPT-3.5-turbo via the LangChain and Paper-QA packages. Ask a large text corpus questions and receive answers with citations into your corpus.See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/question_answering_with_openai.ipynb) for more information.
+  - **ktrain 0.37.x** is released and supports a **Generative Question-Answering** using OpenAI models like GPT-3.5-turbo by wrapping the LangChain and Paper-QA packages. Ask a large text corpus questions and receive answers with citations into your corpus. See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/question_answering_with_openai.ipynb) for more information.
 ```python
 import os
 os.environ['OPENAI_API_KEY'] = 'ENTER YOUR OPENAI API KEY HERE'
