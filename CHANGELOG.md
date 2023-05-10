@@ -6,6 +6,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.37.0 (TBD)
+
+### new:
+- Support for **Generative Question-Answering** powered by OpenAI models.  Ask questions to any set of documents and get back answers with citations to where the answer was found in your corpus.
+
+### changed
+- N/A
+
+### fixed:
+- N/A
+
+
 ## 0.36.1 (2023-05-09)
 
 ### new:

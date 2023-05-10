@@ -128,7 +128,7 @@ _process_question = process_question  # for backwards compatibility
 #        return TU.tokenize(question, join_tokens=True)
 
 
-class QA(ABC, TorchBase):
+class ExtractiveQABase(ABC, TorchBase):
     """
     Base class for QA
     """
@@ -603,7 +603,7 @@ class QA(ABC, TorchBase):
         return display_answers(answers)
 
 
-class SimpleQA(QA):
+class SimpleQA(ExtractiveQABase):
     """
     SimpleQA: Question-Answering on a list of texts
     """
@@ -887,7 +887,7 @@ class SimpleQA(QA):
             return output
 
 
-class _QAExtractor(QA):
+class _QAExtractor(ExtractiveQABase):
     def __init__(
         self,
         model_name=DEFAULT_MODEL,
