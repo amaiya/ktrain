@@ -9,7 +9,7 @@ Most recent releases are shown at the top. Each release shows:
 ## 0.37.0 (2023-05-11)
 
 ### new:
-- Support for **Generative Question-Answering** powered by OpenAI models.  Ask questions to any set of documents and get back answers with citations to where the answer was found in your corpus.
+- Support for **Generative Question-Answering** powered by OpenAI models.  Ask questions to any set of documents and get back answers with citations to where the answer was found in your documents.
 
 ### changed
 - N/A
