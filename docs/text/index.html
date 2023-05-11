@@ -2319,7 +2319,7 @@ Args:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class SimpleQA(QA):
+<pre><code class="python">class SimpleQA(ExtractiveQABase):
     &#34;&#34;&#34;
     SimpleQA: Question-Answering on a list of texts
     &#34;&#34;&#34;
@@ -2604,7 +2604,7 @@ Args:
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
-<li><a title="ktrain.text.qa.core.QA" href="qa/core.html#ktrain.text.qa.core.QA">QA</a></li>
+<li><a title="ktrain.text.qa.extractive_qa.ExtractiveQABase" href="qa/extractive_qa.html#ktrain.text.qa.extractive_qa.ExtractiveQABase">ExtractiveQABase</a></li>
 <li>abc.ABC</li>
 <li><a title="ktrain.torch_base.TorchBase" href="../torch_base.html#ktrain.torch_base.TorchBase">TorchBase</a></li>
 </ul>
@@ -2942,11 +2942,11 @@ Returns:
 </dl>
 <h3>Inherited members</h3>
 <ul class="hlist">
-<li><code><b><a title="ktrain.text.qa.core.QA" href="qa/core.html#ktrain.text.qa.core.QA">QA</a></b></code>:
+<li><code><b><a title="ktrain.text.qa.extractive_qa.ExtractiveQABase" href="qa/extractive_qa.html#ktrain.text.qa.extractive_qa.ExtractiveQABase">ExtractiveQABase</a></b></code>:
 <ul class="hlist">
-<li><code><a title="ktrain.text.qa.core.QA.ask" href="qa/core.html#ktrain.text.qa.core.QA.ask">ask</a></code></li>
-<li><code><a title="ktrain.text.qa.core.QA.predict_squad" href="qa/core.html#ktrain.text.qa.core.QA.predict_squad">predict_squad</a></code></li>
-<li><code><a title="ktrain.text.qa.core.QA.quantize_model" href="../torch_base.html#ktrain.torch_base.TorchBase.quantize_model">quantize_model</a></code></li>
+<li><code><a title="ktrain.text.qa.extractive_qa.ExtractiveQABase.ask" href="qa/extractive_qa.html#ktrain.text.qa.extractive_qa.ExtractiveQABase.ask">ask</a></code></li>
+<li><code><a title="ktrain.text.qa.extractive_qa.ExtractiveQABase.predict_squad" href="qa/extractive_qa.html#ktrain.text.qa.extractive_qa.ExtractiveQABase.predict_squad">predict_squad</a></code></li>
+<li><code><a title="ktrain.text.qa.extractive_qa.ExtractiveQABase.quantize_model" href="../torch_base.html#ktrain.torch_base.TorchBase.quantize_model">quantize_model</a></code></li>
 </ul>
 </li>
 </ul>
@@ -5589,6 +5589,28 @@ Returns:
             )
         return model
 
+    def _reconstruct_word_ids(self, offsets):
+        &#34;&#34;&#34;
+        ```
+        Reverse engineer the word_ids.
+        ```
+        &#34;&#34;&#34;
+        word_ids = []
+        last_word_id = -1
+        last_offset = (-1, -1)
+        for o in offsets:
+            if o == (0, 0):
+                word_ids.append(None)
+                continue
+            # must test to see if start is same as last offset start due to xml-roberta quirk with tokens like 070
+            if o[0] == last_offset[0] or o[0] == last_offset[1]:
+                word_ids.append(last_word_id)
+            elif o[0] &gt; last_offset[1]:
+                last_word_id += 1
+                word_ids.append(last_word_id)
+            last_offset = o
+        return word_ids
+
     def embed(
         self,
         texts,
@@ -5599,7 +5621,8 @@ Returns:
     ):
         &#34;&#34;&#34;
         ```
-        get embedding for word, phrase, or sentence
+        Get embedding for word, phrase, or sentence.
+
         Args:
           text(str|list): word, phrase, or sentence or list of them representing a batch
           word_level(bool): If True, returns embedding for each token in supplied texts.
@@ -5637,7 +5660,7 @@ Returns:
         all_input_ids = []
         all_input_masks = []
         all_word_ids = []
-        all_offsets = []
+        all_offsets = []  # retained but not currently used as of v0.36.1 (#492)
         for text in texts:
             encoded = self.tokenizer.encode_plus(
                 text, max_length=maxlen, truncation=True, return_offsets_mapping=True
@@ -5658,7 +5681,16 @@ Returns:
                 input_mask.append(0)
             all_input_ids.append(input_ids)
             all_input_masks.append(input_mask)
-            all_word_ids.append(encoded.word_ids())
+            # Note about Issue #492:
+            # deberta includes preceding space in offfset_mapping (https://www.kaggle.com/code/junkoda/be-aware-of-white-space-deberta-roberta)
+            # models like bert-base-case produce word_ids that do not correspond to whitespace tokenization (e.g.,&#34;score 99.9%&#34;, &#34;BRUSSELS 1996-08-22&#34;)
+            # Therefore, we use offset_mappings unless the model is deberta for now.
+            word_ids = (
+                encoded.word_ids()
+                if &#34;deberta&#34; in self.model_name
+                else self._reconstruct_word_ids(offsets)
+            )
+            all_word_ids.append(word_ids)
             all_offsets.append(offsets)
 
         all_input_ids = np.array(all_input_ids)
@@ -5695,21 +5727,14 @@ Returns:
             filtered_embedding = []
             raw_embedding = raw_embeddings[i]
             subvectors = []
-            last_offset = (-1, -1)
-            # subwords = [] # debugging
+            last_word_id = -1
             for j in range(len(all_offsets[i])):
-                if all_word_ids[i][j] is None:
+                word_id = all_word_ids[i][j]
+                if word_id is None:
                     continue
-                # must test to see if start is same as last offset start due to xml-roberta quirk with tokens like 070
-                if (
-                    all_offsets[i][j][0] == last_offset[1]
-                    or all_offsets[i][j][0] == last_offset[0]
-                ):
+                if word_id == last_word_id:
                     subvectors.append(raw_embedding[j])
-                    # subwords[-1] += texts[i][all_offsets[i][j][0]:all_offsets[i][j][1]] # debugging
-                    last_offset = all_offsets[i][j]
-                if all_offsets[i][j][0] &gt; last_offset[1]:
-                    # subwords.append(texts[i][all_offsets[i][j][0]:all_offsets[i][j][1]]) # debugging
+                if word_id &gt; last_word_id:
                     if len(subvectors) &gt; 0:
                         if aggregation_strategy == &#34;average&#34;:
                             filtered_embedding.append(np.mean(subvectors, axis=0))
@@ -5717,7 +5742,7 @@ Returns:
                             filtered_embedding.append(subvectors[0])
                         subvectors = []
                     subvectors.append(raw_embedding[j])
-                    last_offset = all_offsets[i][j]
+                    last_word_id = word_id
             if len(subvectors) &gt; 0:
                 if aggregation_strategy == &#34;average&#34;:
                     filtered_embedding.append(np.mean(subvectors, axis=0))
@@ -5741,7 +5766,8 @@ Returns:
 <span>def <span class="ident">embed</span></span>(<span>self, texts, word_level=True, max_length=512, aggregation_strategy='first', layers=[-2])</span>
 </code></dt>
 <dd>
-<div class="desc"><pre><code>get embedding for word, phrase, or sentence
+<div class="desc"><pre><code>Get embedding for word, phrase, or sentence.
+
 Args:
   text(str|list): word, phrase, or sentence or list of them representing a batch
   word_level(bool): If True, returns embedding for each token in supplied texts.
@@ -5768,7 +5794,8 @@ Returns:
 ):
     &#34;&#34;&#34;
     ```
-    get embedding for word, phrase, or sentence
+    Get embedding for word, phrase, or sentence.
+
     Args:
       text(str|list): word, phrase, or sentence or list of them representing a batch
       word_level(bool): If True, returns embedding for each token in supplied texts.
@@ -5806,7 +5833,7 @@ Returns:
     all_input_ids = []
     all_input_masks = []
     all_word_ids = []
-    all_offsets = []
+    all_offsets = []  # retained but not currently used as of v0.36.1 (#492)
     for text in texts:
         encoded = self.tokenizer.encode_plus(
             text, max_length=maxlen, truncation=True, return_offsets_mapping=True
@@ -5827,7 +5854,16 @@ Returns:
             input_mask.append(0)
         all_input_ids.append(input_ids)
         all_input_masks.append(input_mask)
-        all_word_ids.append(encoded.word_ids())
+        # Note about Issue #492:
+        # deberta includes preceding space in offfset_mapping (https://www.kaggle.com/code/junkoda/be-aware-of-white-space-deberta-roberta)
+        # models like bert-base-case produce word_ids that do not correspond to whitespace tokenization (e.g.,&#34;score 99.9%&#34;, &#34;BRUSSELS 1996-08-22&#34;)
+        # Therefore, we use offset_mappings unless the model is deberta for now.
+        word_ids = (
+            encoded.word_ids()
+            if &#34;deberta&#34; in self.model_name
+            else self._reconstruct_word_ids(offsets)
+        )
+        all_word_ids.append(word_ids)
         all_offsets.append(offsets)
 
     all_input_ids = np.array(all_input_ids)
@@ -5864,21 +5900,14 @@ Returns:
         filtered_embedding = []
         raw_embedding = raw_embeddings[i]
         subvectors = []
-        last_offset = (-1, -1)
-        # subwords = [] # debugging
+        last_word_id = -1
         for j in range(len(all_offsets[i])):
-            if all_word_ids[i][j] is None:
+            word_id = all_word_ids[i][j]
+            if word_id is None:
                 continue
-            # must test to see if start is same as last offset start due to xml-roberta quirk with tokens like 070
-            if (
-                all_offsets[i][j][0] == last_offset[1]
-                or all_offsets[i][j][0] == last_offset[0]
-            ):
+            if word_id == last_word_id:
                 subvectors.append(raw_embedding[j])
-                # subwords[-1] += texts[i][all_offsets[i][j][0]:all_offsets[i][j][1]] # debugging
-                last_offset = all_offsets[i][j]
-            if all_offsets[i][j][0] &gt; last_offset[1]:
-                # subwords.append(texts[i][all_offsets[i][j][0]:all_offsets[i][j][1]]) # debugging
+            if word_id &gt; last_word_id:
                 if len(subvectors) &gt; 0:
                     if aggregation_strategy == &#34;average&#34;:
                         filtered_embedding.append(np.mean(subvectors, axis=0))
@@ -5886,7 +5915,7 @@ Returns:
                         filtered_embedding.append(subvectors[0])
                     subvectors = []
                 subvectors.append(raw_embedding[j])
-                last_offset = all_offsets[i][j]
+                last_word_id = word_id
         if len(subvectors) &gt; 0:
             if aggregation_strategy == &#34;average&#34;:
                 filtered_embedding.append(np.mean(subvectors, axis=0))
