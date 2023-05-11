@@ -13,13 +13,15 @@ with open("README.md", encoding="utf-8") as readme_file:
 exec(open("ktrain/version.py").read())
 
 all_extras = [
+    # "torch",  # for qa, summarization, translation, zsl, speech
     "ipython",  # for tests
-    "datasets",  # for text.qa.AnswerExtractor.finetune
-    "textblob",  # for text.kw.KeywordExtractor and textutils.extract_noun_phrases
     "textract",  # for TextExtractor non-default method
+    "datasets",  # for text.qa.AnswerExtractor.finetune
+    "paper-qa",  # text.qa.generative_qa
+    "textblob",  # for text.kw.KeywordExtractor and textutils.extract_noun_phrases
+    "sumy",  # text.summarization.core.LexRankSummarizer
     "causalnlp",  # for tabular.causalinference
     "librosa",  # for text.speech
-    # "torch",  # for qa, summarization, translation, zsl, speech
     "shap",  # for tabular.TabularPredictor.explain
     "eli5 @ git+https://github@github.com/amaiya/eli5-tf@master#egg=eli5",  # for explain in text/vision
     "stellargraph @ git+https://github@github.com/amaiya/stellargraph@no_tf_dep_082#egg=stellargraph",  # for graph module

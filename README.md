@@ -12,7 +12,7 @@
 
 
 ### News and Announcements
-- **2023-05-10**
+- **2023-05-11**
   - **ktrain 0.37.x** is released and supports **Generative Question-Answering** using OpenAI models like GPT-3.5-turbo by wrapping the LangChain and Paper-QA packages. Ask a large text corpus questions and receive answers with citations into your corpus. See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/question_answering_with_openai.ipynb) for more information.
 ```python
 import os
@@ -384,7 +384,7 @@ pip install sumy
 # for text.kw.KeywordExtractor
 pip install textblob
 # for text.qa.generative_qa
-pip install text-qa
+pip install paper-qa
 ```
 - **ktrain** purposely pins to a lower version of **transformers** to include support for older versions of TensorFlow.  If you need a newer version of `transformers`, it is usually safe for you to upgrade `transformers`, as long as you do it **after** installing **ktrain**.
 
