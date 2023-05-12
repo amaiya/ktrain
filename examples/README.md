@@ -11,7 +11,8 @@ This directory contains various example notebooks using *ktrain*.  The directory
   - [document recommender system](#docrec):  given text from a sample document, recommend documents that are semantically similar to it from a larger corpus 
   - [Shallow NLP](#shallownlp):  a small collection of miscellaneous text utilities amenable to being used on machines with only a CPU available (no GPU required)
   - [Text Summarization](#bart):  an example of text summarization using a pretrained BART model
-  - [Open-Domain Question-Answering](#textqa):  ask questions to a large text corpus and receive exact candidate answers
+  - [Extractive, End-to-End Question-Answering](#textqa):  ask questions to a large text corpus and extract exact candidate answers
+  - [Generative, End-to-End Question-Answering](#genqa):  ask questions to a large text corpus and generate answers with citations to documents containing the answers
   - [Zero-Shot Learning](#zsl):  classify documents by user-supplied topics **without** any training examples
   - [Language Translation](#translation): an example of language translation using pretrained MarianMT models
   - [Text Extraction](#textextraction): extract text from PDFs, Word documents, etc.
