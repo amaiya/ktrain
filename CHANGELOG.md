@@ -6,6 +6,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.37.1 (TBD)
+
+### new:
+- Supply arguments to `generate` in `TransformerSummarizer.summarize`
+
+### changed
+- N/A
+
+### fixed:
+- N/A
+
+
 ## 0.37.0 (2023-05-11)
 
 ### new:

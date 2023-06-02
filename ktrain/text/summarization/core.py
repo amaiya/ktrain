@@ -26,10 +26,19 @@ class TransformerSummarizer(TorchBase):
             self.torch_device
         )
 
-    def summarize(self, doc, **kwargs):
+    def summarize(
+        self,
+        doc,
+        max_length=150,
+        min_length=56,
+        no_repeat_ngram_size=3,
+        length_penalty=2.0,
+        num_beams=4,
+        **kwargs,
+    ):
         """
         ```
-        summarize document text
+        Summarize document text.  Extra arguments are fed to generate method
         Args:
           doc(str): text of document
         Returns:
@@ -44,11 +53,12 @@ class TransformerSummarizer(TorchBase):
             )["input_ids"].to(self.torch_device)
             summary_ids = self.model.generate(
                 answers_input_ids,
-                num_beams=4,
-                length_penalty=2.0,
-                max_length=142,
-                min_length=56,
-                no_repeat_ngram_size=3,
+                num_beams=num_beams,
+                length_penalty=length_penalty,
+                max_length=max_length,
+                min_length=min_length,
+                no_repeat_ngram_size=no_repeat_ngram_size,
+                **kwargs,
             )
 
             exec_sum = self.tokenizer.decode(
