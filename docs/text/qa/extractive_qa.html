@@ -1,0 +1,3147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>ktrain.text.qa.extractive_qa API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>ktrain.text.qa.extractive_qa</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python"># from transformers import TFBertForQuestionAnswering
+# from transformers import BertTokenizer
+from transformers import (
+    AutoModelForQuestionAnswering,
+    AutoTokenizer,
+    TFAutoModelForQuestionAnswering,
+)
+from whoosh import index, qparser
+from whoosh.fields import *
+from whoosh.qparser import QueryParser
+
+from ... import utils as U
+from ...imports import *
+from ...torch_base import TorchBase
+from .. import preprocessor as tpp
+from .. import textutils as TU
+
+LOWCONF = -10000
+
+DEFAULT_MODEL = &#34;bert-large-uncased-whole-word-masking-finetuned-squad&#34;
+DEFAULT_MIN_CONF = 6
+
+from itertools import chain, zip_longest
+
+
+def twolists(l1, l2):
+    return [x for x in chain(*zip_longest(l1, l2)) if x is not None]
+
+
+def _answers2df(answers):
+    dfdata = []
+    for a in answers:
+        answer_text = a[&#34;answer&#34;]
+        snippet_html = (
+            &#34;&lt;div&gt;&#34;
+            + a[&#34;sentence_beginning&#34;]
+            + &#34; &lt;font color=&#39;red&#39;&gt;&#34;
+            + a[&#34;answer&#34;]
+            + &#34;&lt;/font&gt; &#34;
+            + a[&#34;sentence_end&#34;]
+            + &#34;&lt;/div&gt;&#34;
+        )
+        confidence = a[&#34;confidence&#34;]
+        doc_key = a[&#34;reference&#34;]
+        dfdata.append([answer_text, snippet_html, confidence, doc_key])
+    df = pd.DataFrame(
+        dfdata,
+        columns=[&#34;Candidate Answer&#34;, &#34;Context&#34;, &#34;Confidence&#34;, &#34;Document Reference&#34;],
+    )
+    if &#34;\t&#34; in answers[0][&#34;reference&#34;]:
+        df[&#34;Document Reference&#34;] = df[&#34;Document Reference&#34;].apply(
+            lambda x: &#39;&lt;a href=&#34;{}&#34; target=&#34;_blank&#34;&gt;{}&lt;/a&gt;&#39;.format(
+                x.split(&#34;\t&#34;)[1], x.split(&#34;\t&#34;)[0]
+            )
+        )
+    return df
+
+
+def display_answers(answers):
+    if not answers:
+        return
+    df = _answers2df(answers)
+    from IPython.core.display import HTML, display
+
+    return display(HTML(df.to_html(render_links=True, escape=False)))
+
+
+def process_question(
+    question, include_np=False, and_np=False, remove_english_stopwords=False
+):
+    result = None
+    np_list = []
+    if include_np:
+        try:
+            # np_list = [&#39;&#34;%s&#34;&#39; % (np) for np in TU.extract_noun_phrases(question) if len(np.split()) &gt; 1]
+            raw_np_list = [
+                np for np in TU.extract_noun_phrases(question) if len(np.split()) &gt; 1
+            ]
+            np_list = []
+            for np in raw_np_list:
+                N = 2
+                sentence = np.split()
+                np_list.extend(
+                    [
+                        &#39;&#34;%s&#34;&#39; % (&#34; &#34;.join(sentence[i : i + N]))
+                        for i in range(len(sentence) - N + 1)
+                    ]
+                )
+            np_list = list(set(np_list))
+        except:
+            import warnings
+
+            warnings.warn(
+                &#34;TextBlob is not currently installed, so falling back to include_np=False with no extra question processing. &#34;
+                + &#34;To install: pip install textblob&#34;
+            )
+    result = TU.tokenize(question, join_tokens=False)
+    if remove_english_stopwords:
+        from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
+
+        result = [
+            term
+            for term in result
+            if term.lower().strip() not in list(ENGLISH_STOP_WORDS) + [&#34;?&#34;]
+        ]
+    if np_list and and_np:
+        return f&#39;( {&#34; &#34;.join(result)} ) AND ({&#34; &#34;.join(np_list)})&#39;
+    else:
+        return &#34; &#34;.join(result + np_list)
+
+
+_process_question = process_question  # for backwards compatibility
+
+# def _process_question(question, include_np=False):
+#    if include_np:
+#        try:
+#            # attempt to use extract_noun_phrases first if textblob is installed
+#            np_list = [&#39;&#34;%s&#34;&#39; % (np) for np in TU.extract_noun_phrases(question) if len(np.split()) &gt; 1]
+#            q_tokens = TU.tokenize(question, join_tokens=False)
+#            q_tokens.extend(np_list)
+#            return &#34; &#34;.join(q_tokens)
+#        except:
+#            import warnings
+#            warnings.warn(&#39;TextBlob is not currently installed, so falling back to include_np=False with no extra question processing. &#39;+\
+#                          &#39;To install: pip install textblob&#39;)
+#            return TU.tokenize(question, join_tokens=True)
+#    else:
+#        return TU.tokenize(question, join_tokens=True)
+
+
+class ExtractiveQABase(ABC, TorchBase):
+    &#34;&#34;&#34;
+    Base class for QA
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        model_name=DEFAULT_MODEL,
+        bert_squad_model=None,
+        bert_emb_model=&#34;bert-base-uncased&#34;,
+        framework=&#34;tf&#34;,
+        device=None,
+        quantize=False,
+    ):
+        model_name = bert_squad_model if bert_squad_model is not None else model_name
+        if bert_squad_model:
+            warnings.warn(
+                &#34;The bert_squad_model argument is deprecated - please use model_name instead.&#34;,
+                DeprecationWarning,
+                stacklevel=2,
+            )
+        self.model_name = model_name
+        self.framework = framework
+        if framework == &#34;tf&#34;:
+            try:
+                import tensorflow as tf
+            except ImportError:
+                raise Exception(&#39;If framework==&#34;tf&#34;, TensorFlow must be installed.&#39;)
+            try:
+                self.model = TFAutoModelForQuestionAnswering.from_pretrained(
+                    self.model_name
+                )
+            except:
+                warnings.warn(
+                    &#34;Could not load supplied model as TensorFlow checkpoint - attempting to load using from_pt=True&#34;
+                )
+                self.model = TFAutoModelForQuestionAnswering.from_pretrained(
+                    self.model_name, from_pt=True
+                )
+        else:
+            bert_emb_model = (
+                None  # set to None and ignore since we only want to use PyTorch
+            )
+            super().__init__(device=device, quantize=quantize)
+            self.model = AutoModelForQuestionAnswering.from_pretrained(
+                self.model_name
+            ).to(self.torch_device)
+            if quantize:
+                self.model = self.quantize_model(self.model)
+
+        self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+        self.maxlen = 512
+        self.te = (
+            tpp.TransformerEmbedding(bert_emb_model, layers=[-2])
+            if bert_emb_model is not None
+            else None
+        )
+
+    @abstractmethod
+    def search(self, query):
+        pass
+
+    def predict_squad(self, documents, question):
+        &#34;&#34;&#34;
+        Generates candidate answers to the &lt;question&gt; provided given &lt;documents&gt; as contexts.
+        &#34;&#34;&#34;
+        if isinstance(documents, str):
+            documents = [documents]
+        sequences = [[question, d] for d in documents]
+        batch = self.tokenizer.batch_encode_plus(
+            sequences,
+            return_tensors=self.framework,
+            max_length=self.maxlen,
+            truncation=&#34;only_second&#34;,
+            padding=True,
+        )
+        batch = batch.to(self.torch_device) if self.framework == &#34;pt&#34; else batch
+        tokens_batch = list(
+            map(self.tokenizer.convert_ids_to_tokens, batch[&#34;input_ids&#34;])
+        )
+
+        # Added from: https://github.com/huggingface/transformers/commit/16ce15ed4bd0865d24a94aa839a44cf0f400ef50
+        if U.get_hf_model_name(self.model_name) in [&#34;xlm&#34;, &#34;roberta&#34;, &#34;distilbert&#34;]:
+            start_scores, end_scores = self.model(
+                batch[&#34;input_ids&#34;],
+                attention_mask=batch[&#34;attention_mask&#34;],
+                return_dict=False,
+            )
+        else:
+            start_scores, end_scores = self.model(
+                batch[&#34;input_ids&#34;],
+                attention_mask=batch[&#34;attention_mask&#34;],
+                token_type_ids=batch[&#34;token_type_ids&#34;],
+                return_dict=False,
+            )
+        start_scores = (
+            start_scores.cpu().detach().numpy()
+            if self.framework == &#34;pt&#34;
+            else start_scores.numpy()
+        )
+        end_scores = (
+            end_scores.cpu().detach().numpy()
+            if self.framework == &#34;pt&#34;
+            else end_scores.numpy()
+        )
+        start_scores = start_scores[:, 1:-1]
+        end_scores = end_scores[:, 1:-1]
+
+        # normalize logits and spans to retrieve the answer
+        # start_scores = np.exp(start_scores - np.log(np.sum(np.exp(start_scores), axis=-1, keepdims=True))) # from HF pipeline
+        # end_scores = np.exp(end_scores - np.log(np.sum(np.exp(end_scores), axis=-1, keepdims=True)))             # from HF pipeline
+        answer_starts = np.argmax(start_scores, axis=1)
+        answer_ends = np.argmax(end_scores, axis=1)
+
+        answers = []
+        for i, tokens in enumerate(tokens_batch):
+            answer_start = answer_starts[i]
+            answer_end = answer_ends[i]
+            answer = self._reconstruct_text(tokens, answer_start, answer_end + 2)
+            if answer.startswith(&#34;. &#34;) or answer.startswith(&#34;, &#34;):
+                answer = answer[2:]
+            sep_index = tokens.index(&#34;[SEP]&#34;)
+            full_txt_tokens = tokens[sep_index + 1 :]
+            paragraph_bert = self._reconstruct_text(full_txt_tokens)
+
+            ans = {}
+            ans[&#34;answer&#34;] = answer
+            if (
+                answer.startswith(&#34;[CLS]&#34;)
+                or answer_end &lt; sep_index
+                or answer.endswith(&#34;[SEP]&#34;)
+            ):
+                ans[&#34;confidence&#34;] = LOWCONF
+            else:
+                # confidence = torch.max(start_scores) + torch.max(end_scores)
+                # confidence = np.log(confidence.item())
+                # ans[&#39;confidence&#39;] = start_scores[i,answer_start]*end_scores[i,answer_end]
+                ans[&#34;confidence&#34;] = (
+                    start_scores[i, answer_start] + end_scores[i, answer_end]
+                )
+
+            ans[&#34;start&#34;] = answer_start
+            ans[&#34;end&#34;] = answer_end
+            ans[&#34;context&#34;] = paragraph_bert
+            answers.append(ans)
+        # if len(answers) == 1: answers = answers[0]
+        return answers
+
+    def _clean_answer(self, answer):
+        import string
+
+        if not answer:
+            return answer
+        remove_list = [
+            &#34;is &#34;,
+            &#34;are &#34;,
+            &#34;was &#34;,
+            &#34;were &#34;,
+            &#34;of &#34;,
+            &#34;include &#34;,
+            &#34;including &#34;,
+            &#34;in &#34;,
+            &#34;of &#34;,
+            &#34;the &#34;,
+            &#34;for &#34;,
+            &#34;on &#34;,
+            &#34;to &#34;,
+            &#34;-&#34;,
+            &#34;:&#34;,
+            &#34;/&#34;,
+            &#34;and &#34;,
+        ]
+        for w in remove_list:
+            if answer.startswith(w):
+                answer = answer.replace(w, &#34;&#34;, 1)
+        answer = answer.replace(&#34; . &#34;, &#34;.&#34;)
+        answer = answer.replace(&#34; / &#34;, &#34;/&#34;)
+        answer = answer.replace(&#34; :// &#34;, &#34;://&#34;)
+        answer = answer.strip()
+        if answer and answer[0] in string.punctuation:
+            answer = answer[1:]
+        if answer and answer[-1] in string.punctuation:
+            answer = answer[:-1]
+        return answer
+
+    def _reconstruct_text(self, tokens, start=0, stop=-1):
+        &#34;&#34;&#34;
+        Reconstruct text of *either* question or answer
+        &#34;&#34;&#34;
+        tokens = tokens[start:stop]
+        # if &#39;[SEP]&#39; in tokens:
+        # sepind = tokens.index(&#39;[SEP]&#39;)
+        # tokens = tokens[sepind+1:]
+        txt = &#34; &#34;.join(tokens)
+        txt = txt.replace(
+            &#34;[SEP]&#34;, &#34;&#34;
+        )  # added for batch_encode_plus - removes [SEP] before [PAD]
+        txt = txt.replace(&#34;[PAD]&#34;, &#34;&#34;)  # added for batch_encode_plus - removes [PAD]
+        txt = txt.replace(&#34; ##&#34;, &#34;&#34;)
+        txt = txt.replace(&#34;##&#34;, &#34;&#34;)
+        txt = txt.strip()
+        txt = &#34; &#34;.join(txt.split())
+        txt = txt.replace(&#34; .&#34;, &#34;.&#34;)
+        txt = txt.replace(&#34;( &#34;, &#34;(&#34;)
+        txt = txt.replace(&#34; )&#34;, &#34;)&#34;)
+        txt = txt.replace(&#34; - &#34;, &#34;-&#34;)
+        txt_list = txt.split(&#34; , &#34;)
+        txt = &#34;&#34;
+        length = len(txt_list)
+        if length == 1:
+            return txt_list[0]
+        new_list = []
+        for i, t in enumerate(txt_list):
+            if i &lt; length - 1:
+                if t[-1].isdigit() and txt_list[i + 1][0].isdigit():
+                    new_list += [t, &#34;,&#34;]
+                else:
+                    new_list += [t, &#34;, &#34;]
+            else:
+                new_list += [t]
+        return &#34;&#34;.join(new_list)
+
+    def _expand_answer(self, answer):
+        &#34;&#34;&#34;
+        expand answer to include more of the context
+        &#34;&#34;&#34;
+        full_abs = answer[&#34;context&#34;]
+        bert_ans = answer[&#34;answer&#34;]
+        split_abs = full_abs.split(bert_ans)
+        sent_beginning = split_abs[0][split_abs[0].rfind(&#34;.&#34;) + 1 :]
+        if len(split_abs) == 1:
+            sent_end_pos = len(full_abs)
+            sent_end = &#34;&#34;
+        else:
+            sent_end_pos = split_abs[1].find(&#34;. &#34;) + 1
+            if sent_end_pos == 0:
+                sent_end = split_abs[1]
+            else:
+                sent_end = split_abs[1][:sent_end_pos]
+
+        answer[&#34;full_answer&#34;] = sent_beginning + bert_ans + sent_end
+        answer[&#34;full_answer&#34;] = answer[&#34;full_answer&#34;].strip()
+        answer[&#34;sentence_beginning&#34;] = sent_beginning
+        answer[&#34;sentence_end&#34;] = sent_end
+        return answer
+
+    def _span_to_answer(self, question, text, start, end):
+        &#34;&#34;&#34;
+        ```
+        This method maps token indexes to actual word in the initial context.
+
+        Args:
+            text (str): The actual context to extract the answer from.
+            start (int): The answer starting token index.
+            end (int): The answer end token index.
+
+        Returns:
+            dct:  `{&#39;answer&#39;: str, &#39;start&#39;: int, &#39;end&#39;: int}`
+        ```
+        &#34;&#34;&#34;
+        all_tokens = self.tokenizer.tokenize(
+            text=question, pair=text, add_special_tokens=True
+        )
+        sep_idxs = [i for i, x in enumerate(all_tokens) if x == &#34;[SEP]&#34;]
+        start = start - sep_idxs[0]
+        end = end - sep_idxs[0]
+
+        words = []
+        token_idx = char_start_idx = char_end_idx = chars_idx = 0
+        for i, word in enumerate(text.split(&#34; &#34;)):
+            token = self.tokenizer.tokenize(word)
+
+            # Append words if they are in the span
+            if start &lt;= token_idx &lt;= end:
+                if token_idx == start:
+                    char_start_idx = chars_idx
+
+                if token_idx == end:
+                    char_end_idx = chars_idx + len(word)
+
+                words += [word]
+
+            # Stop if we went over the end of the answer
+            if token_idx &gt; end:
+                break
+
+            # Append the subtokenization length to the running index
+            token_idx += len(token)
+            chars_idx += len(word) + 1
+
+        # Join text with spaces
+        return {
+            &#34;answer&#34;: &#34; &#34;.join(words),
+            &#34;start&#34;: max(0, char_start_idx),
+            &#34;end&#34;: min(len(text), char_end_idx),
+        }
+
+    def _batchify(self, contexts, batch_size=8):
+        &#34;&#34;&#34;
+        batchify contexts
+        &#34;&#34;&#34;
+        if batch_size &gt; len(contexts):
+            batch_size = len(contexts)
+        num_chunks = math.ceil(len(contexts) / batch_size)
+        return list(U.list2chunks(contexts, n=num_chunks))
+
+    def _split_contexts(self, doc_results):
+        &#34;&#34;&#34;
+        ```
+        splitup contexts into a manageable size
+        Args:
+          doc_results(list):  list of dicts with keys: rawtext and reference
+        ```
+        &#34;&#34;&#34;
+        # extract paragraphs as contexts
+        contexts = []
+        refs = []
+        for doc_result in doc_results:
+            rawtext = doc_result.get(&#34;rawtext&#34;, &#34;&#34;)
+            reference = doc_result.get(&#34;reference&#34;, &#34;&#34;)
+            if len(self.tokenizer.tokenize(rawtext)) &lt; self.maxlen:
+                contexts.append(rawtext)
+                refs.append(reference)
+            else:
+                paragraphs = TU.paragraph_tokenize(rawtext, join_sentences=True)
+                contexts.extend(paragraphs)
+                refs.extend([reference] * len(paragraphs))
+        return (contexts, refs)
+
+    def ask(
+        self,
+        question,
+        query=None,
+        batch_size=8,
+        n_docs_considered=10,
+        n_answers=50,
+        raw_confidence=False,
+        rerank_threshold=0.015,
+        include_np=False,
+    ):
+        &#34;&#34;&#34;
+        ```
+        submit question to obtain candidate answers
+
+        Args:
+          question(str): question in the form of a string
+          query(str): Optional. If not None, words in query will be used to retrieve contexts instead of words in question
+          batch_size(int):  number of question-context pairs fed to model at each iteration
+                            Default:8
+                            Increase for faster answer-retrieval.
+                            Decrease to reduce memory (if out-of-memory errors occur).
+          n_docs_considered(int): number of top search results that will
+                                  be searched for answer
+                                  Default:10
+          n_answers(int): maximum number of candidate answers to return
+                          Default:50
+          raw_confidence(bool): If True, show raw confidence score of each answer. It could be used to
+                                mitigate very high confidence on first answer when softmax is used.
+                                If False, perform softmax on raw confidence scores.
+                                Default: False
+          rerank_threshold(int): rerank top answers with confidence &gt;= rerank_threshold
+                                 based on semantic similarity between question and answer.
+                                 This can help bump the correct answer closer to the top.
+                                 Default:0.015. This should be changed to somethink like 6.0
+                                 if raw_confidence=True.
+                                 If None, no re-ranking is performed.
+          include_np(bool):  If True, noun phrases will be extracted from question and included
+                             in query that retrieves documents likely to contain candidate answers.
+                             This may be useful if you ask a question about artificial intelligence
+                             and the answers returned pertain just to intelligence, for example.
+                             Note: include_np=True requires textblob be installed.
+                             Default:False
+        Returns:
+          list
+        ```
+        &#34;&#34;&#34;
+        # sanity check
+        if raw_confidence and rerank_threshold is not None and rerank_threshold &lt; 1.00:
+            warnings.warn(
+                &#34;Raw confidence is used, but rerank_threshold value is below 1.00: are you sure you this is what you wanted?&#34;
+            )
+
+        # locate candidate document contexts
+        doc_results = self.search(
+            process_question(
+                query if query is not None else question, include_np=include_np
+            ),
+            limit=n_docs_considered,
+        )
+        if not doc_results:
+            warnings.warn(
+                &#34;No documents matched words in question (or query if supplied)&#34;
+            )
+            return []
+
+        # extract paragraphs as contexts
+        contexts, refs = self._split_contexts(doc_results)
+
+        # batchify contexts
+        context_batches = self._batchify(contexts, batch_size=batch_size)
+
+        # locate candidate answers
+        answers = []
+        mb = master_bar(range(1))
+        answer_batches = []
+        for i in mb:
+            idx = 0
+            for batch_id, contexts in enumerate(
+                progress_bar(context_batches, parent=mb)
+            ):
+                answer_batch = self.predict_squad(contexts, question)
+                answer_batches.extend(answer_batch)
+                for answer in answer_batch:
+                    idx += 1
+                    if not answer[&#34;answer&#34;] or answer[&#34;confidence&#34;] &lt; -100:
+                        continue
+                    answer[&#34;confidence&#34;] = answer[&#34;confidence&#34;]
+                    answer[&#34;reference&#34;] = refs[idx - 1]
+                    answer = self._expand_answer(answer)
+                    answers.append(answer)
+
+                mb.child.comment = f&#34;generating candidate answers&#34;
+
+        if not answers:
+            return answers  # fix for #307
+        answers = sorted(answers, key=lambda k: k[&#34;confidence&#34;], reverse=True)
+        if n_answers is not None:
+            answers = answers[:n_answers]
+
+        # transform confidence scores
+        if not raw_confidence:
+            confidences = [a[&#34;confidence&#34;] for a in answers]
+            max_conf = max(confidences)
+            total = 0.0
+            exp_scores = []
+            for c in confidences:
+                s = np.exp(c - max_conf)
+                exp_scores.append(s)
+            total = sum(exp_scores)
+            for idx, c in enumerate(confidences):
+                answers[idx][&#34;confidence&#34;] = exp_scores[idx] / total
+
+        if rerank_threshold is None or self.te is None:
+            return answers
+
+        # re-rank
+        top_confidences = [
+            a[&#34;confidence&#34;]
+            for idx, a in enumerate(answers)
+            if a[&#34;confidence&#34;] &gt; rerank_threshold
+        ]
+        v1 = self.te.embed(question, word_level=False)
+        for idx, answer in enumerate(answers):
+            # if idx &gt;= rerank_top_n:
+            if answer[&#34;confidence&#34;] &lt;= rerank_threshold:
+                answer[&#34;similarity_score&#34;] = 0.0
+                continue
+            v2 = self.te.embed(answer[&#34;full_answer&#34;], word_level=False)
+            score = v1 @ v2.T / (np.linalg.norm(v1) * np.linalg.norm(v2))
+            answer[&#34;similarity_score&#34;] = float(np.squeeze(score))
+            answer[&#34;confidence&#34;] = top_confidences[idx]
+        answers = sorted(
+            answers,
+            key=lambda k: (k[&#34;similarity_score&#34;], k[&#34;confidence&#34;]),
+            reverse=True,
+        )
+        for idx, confidence in enumerate(top_confidences):
+            answers[idx][&#34;confidence&#34;] = confidence
+
+        return answers
+
+    def display_answers(self, answers):
+        return display_answers(answers)
+
+
+class SimpleQA(ExtractiveQABase):
+    &#34;&#34;&#34;
+    SimpleQA: Question-Answering on a list of texts
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        index_dir,
+        model_name=DEFAULT_MODEL,
+        bert_squad_model=None,  # deprecated
+        bert_emb_model=&#34;bert-base-uncased&#34;,
+        framework=&#34;tf&#34;,
+        device=None,
+        quantize=False,
+    ):
+        &#34;&#34;&#34;
+        ```
+        SimpleQA constructor
+        Args:
+          index_dir(str):  path to index directory created by SimpleQA.initialze_index
+          model_name(str): name of Question-Answering model (e.g., BERT SQUAD) to use
+          bert_squad_model(str): alias for model_name (deprecated)
+          bert_emb_model(str): BERT model to use to generate embeddings for semantic similarity
+          framework(str): &#39;tf&#39; for TensorFlow or &#39;pt&#39; for PyTorch
+          device(str): Torch device to use (e.g., &#39;cuda&#39;, &#39;cpu&#39;). Ignored if framework==&#39;tf&#39;.
+                       If framework==&#39;tf&#39;, use CUDA_VISIBLE_DEVICES environment variable
+                       to select device.
+          quantize(bool): If True and framework==&#39;pt&#39; and device != &#39;cpu&#39;, then faster quantized inference is used.
+                      Ignored if framework==&#34;tf&#34;.
+        ```
+        &#34;&#34;&#34;
+
+        self.index_dir = index_dir
+        try:
+            ix = index.open_dir(self.index_dir)
+        except:
+            raise ValueError(
+                &#39;index_dir has not yet been created - please call SimpleQA.initialize_index(&#34;%s&#34;)&#39;
+                % (self.index_dir)
+            )
+        super().__init__(
+            model_name=model_name,
+            bert_squad_model=bert_squad_model,
+            bert_emb_model=bert_emb_model,
+            framework=framework,
+            device=device,
+            quantize=quantize,
+        )
+
+    def _open_ix(self):
+        return index.open_dir(self.index_dir)
+
+    @classmethod
+    def initialize_index(cls, index_dir):
+        schema = Schema(
+            reference=ID(stored=True), content=TEXT, rawtext=TEXT(stored=True)
+        )
+        if not os.path.exists(index_dir):
+            os.makedirs(index_dir)
+        else:
+            raise ValueError(
+                &#34;There is already an existing directory or file with path %s&#34;
+                % (index_dir)
+            )
+        ix = index.create_in(index_dir, schema)
+        return ix
+
+    @classmethod
+    def index_from_list(
+        cls,
+        docs,
+        index_dir,
+        commit_every=1024,
+        breakup_docs=True,
+        procs=1,
+        limitmb=256,
+        multisegment=False,
+        min_words=20,
+        references=None,
+    ):
+        &#34;&#34;&#34;
+        ```
+        index documents from list.
+        The procs, limitmb, and especially multisegment arguments can be used to
+        speed up indexing, if it is too slow.  Please see the whoosh documentation
+        for more information on these parameters:  https://whoosh.readthedocs.io/en/latest/batch.html
+        Args:
+          docs(list): list of strings representing documents
+          index_dir(str): path to index directory (see initialize_index)
+          commit_every(int): commet after adding this many documents
+          breakup_docs(bool): break up documents into smaller paragraphs and treat those as the documents.
+                              This can potentially improve the speed at which answers are returned by the ask method
+                              when documents being searched are longer.
+          procs(int): number of processors
+          limitmb(int): memory limit in MB for each process
+          multisegment(bool): new segments written instead of merging
+          min_words(int):  minimum words for a document (or paragraph extracted from document when breakup_docs=True) to be included in index.
+                           Useful for pruning contexts that are unlikely to contain useful answers
+          references(list): List of strings containing a reference (e.g., file name) for each document in docs.
+                            Each string is treated as a label for the document (e.g., file name, MD5 hash, etc.):
+                               Example:  [&#39;some_file.pdf&#39;, &#39;some_other_file,pdf&#39;, ...]
+                            Strings can also be hyperlinks in which case the label and URL should be separated by a single tab character:
+                               Example: [&#39;ktrain_article\thttps://arxiv.org/pdf/2004.10703v4.pdf&#39;, ...]
+
+                            These references will be returned in the output of the ask method.
+                            If strings are  hyperlinks, then they will automatically be made clickable when the display_answers function
+                            displays candidate answers in a pandas DataFRame.
+
+                            If references is None, the index of element in docs is used as reference.
+        ```
+        &#34;&#34;&#34;
+        if not isinstance(docs, (np.ndarray, list)):
+            raise ValueError(&#34;docs must be a list of strings&#34;)
+        if references is not None and not isinstance(references, (np.ndarray, list)):
+            raise ValueError(&#34;references must be a list of strings&#34;)
+        if references is not None and len(references) != len(docs):
+            raise ValueError(&#34;lengths of docs and references must be equal&#34;)
+
+        ix = index.open_dir(index_dir)
+        writer = ix.writer(procs=procs, limitmb=limitmb, multisegment=multisegment)
+
+        mb = master_bar(range(1))
+        for i in mb:
+            for idx, doc in enumerate(progress_bar(docs, parent=mb)):
+                reference = &#34;%s&#34; % (idx) if references is None else references[idx]
+
+                if breakup_docs:
+                    small_docs = TU.paragraph_tokenize(
+                        doc, join_sentences=True, lang=&#34;en&#34;
+                    )
+                    refs = [reference] * len(small_docs)
+                    for i, small_doc in enumerate(small_docs):
+                        if len(small_doc.split()) &lt; min_words:
+                            continue
+                        content = small_doc
+                        reference = refs[i]
+                        writer.add_document(
+                            reference=reference, content=content, rawtext=content
+                        )
+                else:
+                    if len(doc.split()) &lt; min_words:
+                        continue
+                    content = doc
+                    writer.add_document(
+                        reference=reference, content=content, rawtext=content
+                    )
+
+                idx += 1
+                if idx % commit_every == 0:
+                    writer.commit()
+                    # writer = ix.writer()
+                    writer = ix.writer(
+                        procs=procs, limitmb=limitmb, multisegment=multisegment
+                    )
+                mb.child.comment = f&#34;indexing documents&#34;
+            writer.commit()
+            # mb.write(f&#39;Finished indexing documents&#39;)
+        return
+
+    @classmethod
+    def index_from_folder(
+        cls,
+        folder_path,
+        index_dir,
+        use_text_extraction=False,
+        commit_every=1024,
+        breakup_docs=True,
+        min_words=20,
+        encoding=&#34;utf-8&#34;,
+        procs=1,
+        limitmb=256,
+        multisegment=False,
+        verbose=1,
+    ):
+        &#34;&#34;&#34;
+        ```
+        index all plain text documents within a folder.
+        The procs, limitmb, and especially multisegment arguments can be used to
+        speed up indexing, if it is too slow.  Please see the whoosh documentation
+        for more information on these parameters:  https://whoosh.readthedocs.io/en/latest/batch.html
+
+        Args:
+          folder_path(str): path to folder containing plain text documents (e.g., .txt files)
+          index_dir(str): path to index directory (see initialize_index)
+          use_text_extraction(bool): If True, the  `textract` package will be used to index text from various
+                                     file types including PDF, MS Word, and MS PowerPoint (in addition to plain text files).
+                                     If False, only plain text files will be indexed.
+          commit_every(int): commet after adding this many documents
+          breakup_docs(bool): break up documents into smaller paragraphs and treat those as the documents.
+                              This can potentially improve the speed at which answers are returned by the ask method
+                              when documents being searched are longer.
+          min_words(int):  minimum words for a document (or paragraph extracted from document when breakup_docs=True) to be included in index.
+                           Useful for pruning contexts that are unlikely to contain useful answers
+          encoding(str): encoding to use when reading document files from disk
+          procs(int): number of processors
+          limitmb(int): memory limit in MB for each process
+          multisegment(bool): new segments written instead of merging
+          verbose(bool): verbosity
+        ```
+        &#34;&#34;&#34;
+        if use_text_extraction:
+            # TODO:  change this to use TextExtractor
+            try:
+                import textract
+            except ImportError:
+                raise Exception(
+                    &#34;use_text_extraction=True requires textract:   pip install textract&#34;
+                )
+
+        if not os.path.isdir(folder_path):
+            raise ValueError(&#34;folder_path is not a valid folder&#34;)
+        if folder_path[-1] != os.sep:
+            folder_path += os.sep
+        ix = index.open_dir(index_dir)
+        writer = ix.writer(procs=procs, limitmb=limitmb, multisegment=multisegment)
+        for idx, fpath in enumerate(TU.extract_filenames(folder_path)):
+            reference = &#34;%s&#34; % (fpath.join(fpath.split(folder_path)[1:]))
+            if TU.is_txt(fpath):
+                with open(fpath, &#34;r&#34;, encoding=encoding) as f:
+                    doc = f.read()
+            else:
+                if use_text_extraction:
+                    try:
+                        doc = textract.process(fpath)
+                        doc = doc.decode(&#34;utf-8&#34;, &#34;ignore&#34;)
+                    except:
+                        if verbose:
+                            warnings.warn(&#34;Could not extract text from %s&#34; % (fpath))
+                        continue
+                else:
+                    continue
+
+            if breakup_docs:
+                small_docs = TU.paragraph_tokenize(doc, join_sentences=True, lang=&#34;en&#34;)
+                refs = [reference] * len(small_docs)
+                for i, small_doc in enumerate(small_docs):
+                    if len(small_doc.split()) &lt; min_words:
+                        continue
+                    content = small_doc
+                    reference = refs[i]
+                    writer.add_document(
+                        reference=reference, content=content, rawtext=content
+                    )
+            else:
+                if len(doc.split()) &lt; min_words:
+                    continue
+                content = doc
+                writer.add_document(
+                    reference=reference, content=content, rawtext=content
+                )
+
+            idx += 1
+            if idx % commit_every == 0:
+                writer.commit()
+                writer = ix.writer(
+                    procs=procs, limitmb=limitmb, multisegment=multisegment
+                )
+                if verbose:
+                    print(&#34;%s docs indexed&#34; % (idx))
+        writer.commit()
+        return
+
+    def search(self, query, limit=10):
+        &#34;&#34;&#34;
+        ```
+        search index for query
+        Args:
+          query(str): search query
+          limit(int):  number of top search results to return
+        Returns:
+          list of dicts with keys: reference, rawtext
+        ```
+        &#34;&#34;&#34;
+        ix = self._open_ix()
+        with ix.searcher() as searcher:
+            query_obj = QueryParser(&#34;content&#34;, ix.schema, group=qparser.OrGroup).parse(
+                query
+            )
+            results = searcher.search(query_obj, limit=limit)
+            docs = []
+            output = [dict(r) for r in results]
+            return output
+
+
+class _QAExtractor(ExtractiveQABase):
+    def __init__(
+        self,
+        model_name=DEFAULT_MODEL,
+        bert_squad_model=None,
+        framework=&#34;tf&#34;,
+        device=None,
+        quantize=False,
+    ):
+        &#34;&#34;&#34;
+        ```
+        QAExtractor is a convenience class for extracting answers from contexts
+        Args:
+          model_name(str): name of Question-Answering model (e.g., BERT SQUAD) to use
+          bert_squad_model(str): alias for model_name (deprecated)
+          framework(str): &#39;tf&#39; for TensorFlow or &#39;pt&#39; for PyTorch
+          device(str): Torch device to use (e.g., &#39;cuda&#39;, &#39;cpu&#39;). Ignored if framework==&#39;tf&#39;.
+                       If framework==&#39;tf&#39;, use CUDA_VISIBLE_DEVICES environment variable
+                       to select device.
+          quantize(bool): If True and framework==&#39;pt&#39; and device != &#39;cpu&#39;, then faster quantized inference is used.
+                      Ignored if framework==&#34;tf&#34;.
+        ```
+        &#34;&#34;&#34;
+        super().__init__(
+            model_name=model_name,
+            bert_squad_model=bert_squad_model,
+            framework=framework,
+            device=device,
+            quantize=quantize,
+        )
+
+    def search(self, query):
+        raise NotImplemented(
+            &#34;This method is not used or needed for extraction QA-based extraction.&#34;
+        )
+
+    def ask(self, question, batch_size=8, **kwargs):
+        # locate candidate document contexts
+        doc_results = kwargs.get(&#34;doc_results&#34;, [])
+        if not doc_results:
+            return []
+
+        # extract paragraphs as contexts
+        contexts, refs = self._split_contexts(doc_results)
+        contexts = [c.replace(&#34;\n&#34;, &#34; &#34;) for c in contexts]
+
+        # batchify contexts
+        context_batches = self._batchify(contexts, batch_size=batch_size)
+
+        # locate candidate answers
+        answers = []
+        mb = master_bar(range(1))
+        answer_batches = []
+        for i in mb:
+            idx = 0
+            for batch_id, contexts in enumerate(
+                progress_bar(context_batches, parent=mb)
+            ):
+                answer_batch = self.predict_squad(contexts, question)
+                answer_batches.extend(answer_batch)
+                for i, answer in enumerate(answer_batch):
+                    idx += 1
+                    if not answer[&#34;answer&#34;]:
+                        answer[&#34;answer&#34;] = None
+                    answer[&#34;confidence&#34;] = (
+                        answer[&#34;confidence&#34;]
+                        if isinstance(
+                            answer[&#34;confidence&#34;], (int, float, np.float32, np.float16)
+                        )
+                        else answer[&#34;confidence&#34;].numpy()
+                    )
+                    answer[&#34;reference&#34;] = refs[idx - 1]
+                    if answer[&#34;answer&#34;] is not None:
+                        formatted_answer = self._span_to_answer(
+                            question, contexts[i], answer[&#34;start&#34;], answer[&#34;end&#34;]
+                        )[&#34;answer&#34;].strip()
+                        if formatted_answer:
+                            answer[&#34;answer&#34;] = formatted_answer
+                    answer[&#34;answer&#34;] = self._clean_answer(answer[&#34;answer&#34;])
+                    answers.append(answer)
+                mb.child.comment = f&#34;extracting information&#34;
+        return answers
+
+
+class AnswerExtractor:
+    &#34;&#34;&#34;
+    Question-Answering-based Information Extraction
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        model_name=DEFAULT_MODEL,
+        bert_squad_model=None,
+        framework=&#34;tf&#34;,
+        device=None,
+        quantize=False,
+    ):
+        &#34;&#34;&#34;
+        ```
+        Extracts information from documents using Question-Answering.
+
+          model_name(str): name of Question-Answering model (e.g., BERT SQUAD) to use
+          bert_squad_model(str): alias for model_name (deprecated)
+          framework(str): &#39;tf&#39; for TensorFlow or &#39;pt&#39; for PyTorch
+          device(str): Torch device to use (e.g., &#39;cuda&#39;, &#39;cpu&#39;). Ignored if framework==&#39;tf&#39;.
+                       If framework==&#39;tf&#39;, use CUDA_VISIBLE_DEVICES environment variable
+                       to select device.
+          quantize(bool): If True and framework==&#39;pt&#39; and device != &#39;cpu&#39;, then faster quantized inference is used.
+                      Ignored if framework==&#34;tf&#34;.
+        ```
+        &#34;&#34;&#34;
+        self.qa = _QAExtractor(
+            model_name=model_name,
+            bert_squad_model=bert_squad_model,
+            framework=framework,
+            device=device,
+            quantize=quantize,
+        )
+        return
+
+    def _check_columns(self, labels, df):
+        &#34;&#34;&#34;check columns&#34;&#34;&#34;
+        cols = df.columns.values
+        for l in labels:
+            if l in cols:
+                raise ValueError(
+                    &#34;There is already a column named %s in your DataFrame.&#34; % (l)
+                )
+
+    def _extract(
+        self,
+        questions,
+        contexts,
+        min_conf=DEFAULT_MIN_CONF,
+        return_conf=False,
+        batch_size=8,
+    ):
+        &#34;&#34;&#34;
+        ```
+        Extracts answers
+        ```
+        &#34;&#34;&#34;
+        num_rows = len(contexts)
+        doc_results = [
+            {&#34;rawtext&#34;: rawtext, &#34;reference&#34;: row}
+            for row, rawtext in enumerate(contexts)
+        ]
+        cols = []
+        for q in questions:
+            result_dict = {}
+            conf_dict = {}
+            answers = self.qa.ask(q, doc_results=doc_results, batch_size=batch_size)
+            for a in answers:
+                answer = a[&#34;answer&#34;] if a[&#34;confidence&#34;] &gt; min_conf else None
+                lst = result_dict.get(a[&#34;reference&#34;], [])
+                lst.append(answer)
+                result_dict[a[&#34;reference&#34;]] = lst
+                lst = conf_dict.get(a[&#34;reference&#34;], [])
+                lst.append(a[&#34;confidence&#34;])
+                conf_dict[a[&#34;reference&#34;]] = lst
+
+            results = []
+            for i in range(num_rows):
+                ans = [a for a in result_dict[i] if a is not None]
+                results.append(None if not ans else &#34; | &#34;.join(ans))
+            cols.append(results)
+            if return_conf:
+                confs = []
+                for i in range(num_rows):
+                    conf = [str(round(c, 2)) for c in conf_dict[i] if c is not None]
+                    confs.append(None if not conf else &#34; | &#34;.join(conf))
+                cols.append(confs)
+        return cols
+
+    def extract(
+        self,
+        texts,
+        df,
+        question_label_pairs,
+        min_conf=DEFAULT_MIN_CONF,
+        return_conf=False,
+        batch_size=8,
+    ):
+        &#34;&#34;&#34;
+        ```
+        Extracts answers from texts
+
+        Args:
+          texts(list): list of strings
+          df(pd.DataFrame): original DataFrame to which columns need to be added
+          question_label_pairs(list):  A list of tuples of the form (question, label).
+                                     Extracted ansewrs to the question will be added as new columns with the
+                                     specified labels.
+                                     Example: (&#39;What are the risk factors?&#39;, &#39;Risk Factors&#39;)
+          min_conf(float):  Answers at or below this confidence value will be set to None in the results
+                            Default: 5.0
+                            Lower this value to reduce false negatives.
+                            Raise this value to reduce false positives.
+          return_conf(bool): If True, confidence score of each extraction is included in results
+          batch_size(int): batch size. Default: 8
+        ```
+        &#34;&#34;&#34;
+        if not isinstance(df, pd.DataFrame):
+            raise ValueError(&#34;df must be a pandas DataFrame.&#34;)
+        if len(texts) != df.shape[0]:
+            raise ValueError(
+                &#34;Number of texts is not equal to the number of rows in the DataFrame.&#34;
+            )
+        # texts = [t.replace(&#34;\n&#34;, &#34; &#34;).replace(&#34;\t&#34;, &#34; &#34;) for t in texts]
+        texts = [t.replace(&#34;\t&#34;, &#34; &#34;) for t in texts]
+        questions = [q for q, l in question_label_pairs]
+        labels = [l for q, l in question_label_pairs]
+        self._check_columns(labels, df)
+        cols = self._extract(
+            questions,
+            texts,
+            min_conf=min_conf,
+            return_conf=return_conf,
+            batch_size=batch_size,
+        )
+        data = list(zip(*cols)) if len(cols) &gt; 1 else cols[0]
+        if return_conf:
+            labels = twolists(labels, [l + &#34; CONF&#34; for l in labels])
+        return df.join(pd.DataFrame(data, columns=labels, index=df.index))
+
+    def finetune(
+        self, data, epochs=3, learning_rate=2e-5, batch_size=8, max_seq_length=512
+    ):
+        &#34;&#34;&#34;
+        ```
+        Finetune a QA model.
+
+        Args:
+          data(list): list of dictionaries of the form:
+                      [{&#39;question&#39;: &#39;What is ktrain?&#39;
+                       &#39;context&#39;: &#39;ktrain is a low-code library for augmented machine learning.&#39;
+                       &#39;answer&#39;: &#39;ktrain&#39;}]
+          epochs(int): number of epochs.  Default:3
+          learning_rate(float): learning rate.  Default: 2e-5
+          batch_size(int): batch size. Default:8
+          max_seq_length(int): maximum sequence length.  Default:512
+        Returns:
+          None
+        ```
+        &#34;&#34;&#34;
+        if self.qa.framework != &#34;tf&#34;:
+            raise ValueError(
+                &#39;The finetune method does not currently support the framework=&#34;pt&#34; option. Please use framework=&#34;tf&#34; to finetune.&#39;
+            )
+        from .qa_finetuner import QAFineTuner
+
+        ft = QAFineTuner(self.qa.model, self.qa.tokenizer)
+        model = ft.finetune(
+            data, epochs=epochs, learning_rate=learning_rate, batch_size=batch_size
+        )
+        return</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="ktrain.text.qa.extractive_qa.display_answers"><code class="name flex">
+<span>def <span class="ident">display_answers</span></span>(<span>answers)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def display_answers(answers):
+    if not answers:
+        return
+    df = _answers2df(answers)
+    from IPython.core.display import HTML, display
+
+    return display(HTML(df.to_html(render_links=True, escape=False)))</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.qa.extractive_qa.pack_byte"><code class="name flex">
+<span>def <span class="ident">pack_byte</span></span>(<span>...)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>S.pack(v1, v2, &hellip;) -&gt; bytes</p>
+<p>Return a bytes object containing values v1, v2, &hellip; packed according
+to the format string S.format.
+See help(struct) for more on format
+strings.</p></div>
+</dd>
+<dt id="ktrain.text.qa.extractive_qa.process_question"><code class="name flex">
+<span>def <span class="ident">process_question</span></span>(<span>question, include_np=False, and_np=False, remove_english_stopwords=False)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def process_question(
+    question, include_np=False, and_np=False, remove_english_stopwords=False
+):
+    result = None
+    np_list = []
+    if include_np:
+        try:
+            # np_list = [&#39;&#34;%s&#34;&#39; % (np) for np in TU.extract_noun_phrases(question) if len(np.split()) &gt; 1]
+            raw_np_list = [
+                np for np in TU.extract_noun_phrases(question) if len(np.split()) &gt; 1
+            ]
+            np_list = []
+            for np in raw_np_list:
+                N = 2
+                sentence = np.split()
+                np_list.extend(
+                    [
+                        &#39;&#34;%s&#34;&#39; % (&#34; &#34;.join(sentence[i : i + N]))
+                        for i in range(len(sentence) - N + 1)
+                    ]
+                )
+            np_list = list(set(np_list))
+        except:
+            import warnings
+
+            warnings.warn(
+                &#34;TextBlob is not currently installed, so falling back to include_np=False with no extra question processing. &#34;
+                + &#34;To install: pip install textblob&#34;
+            )
+    result = TU.tokenize(question, join_tokens=False)
+    if remove_english_stopwords:
+        from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
+
+        result = [
+            term
+            for term in result
+            if term.lower().strip() not in list(ENGLISH_STOP_WORDS) + [&#34;?&#34;]
+        ]
+    if np_list and and_np:
+        return f&#39;( {&#34; &#34;.join(result)} ) AND ({&#34; &#34;.join(np_list)})&#39;
+    else:
+        return &#34; &#34;.join(result + np_list)</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.qa.extractive_qa.twolists"><code class="name flex">
+<span>def <span class="ident">twolists</span></span>(<span>l1, l2)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def twolists(l1, l2):
+    return [x for x in chain(*zip_longest(l1, l2)) if x is not None]</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.qa.extractive_qa.unpack_byte"><code class="name flex">
+<span>def <span class="ident">unpack_byte</span></span>(<span>buffer, /)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return a tuple containing unpacked values.</p>
+<p>Unpack according to the format string Struct.format. The buffer's size
+in bytes must be Struct.size.</p>
+<p>See help(struct) for more on format strings.</p></div>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="ktrain.text.qa.extractive_qa.AnswerExtractor"><code class="flex name class">
+<span>class <span class="ident">AnswerExtractor</span></span>
+<span>(</span><span>model_name='bert-large-uncased-whole-word-masking-finetuned-squad', bert_squad_model=None, framework='tf', device=None, quantize=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Question-Answering-based Information Extraction</p>
+<pre><code>Extracts information from documents using Question-Answering.
+
+  model_name(str): name of Question-Answering model (e.g., BERT SQUAD) to use
+  bert_squad_model(str): alias for model_name (deprecated)
+  framework(str): 'tf' for TensorFlow or 'pt' for PyTorch
+  device(str): Torch device to use (e.g., 'cuda', 'cpu'). Ignored if framework=='tf'.
+               If framework=='tf', use CUDA_VISIBLE_DEVICES environment variable
+               to select device.
+  quantize(bool): If True and framework=='pt' and device != 'cpu', then faster quantized inference is used.
+              Ignored if framework==&quot;tf&quot;.
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AnswerExtractor:
+    &#34;&#34;&#34;
+    Question-Answering-based Information Extraction
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        model_name=DEFAULT_MODEL,
+        bert_squad_model=None,
+        framework=&#34;tf&#34;,
+        device=None,
+        quantize=False,
+    ):
+        &#34;&#34;&#34;
+        ```
+        Extracts information from documents using Question-Answering.
+
+          model_name(str): name of Question-Answering model (e.g., BERT SQUAD) to use
+          bert_squad_model(str): alias for model_name (deprecated)
+          framework(str): &#39;tf&#39; for TensorFlow or &#39;pt&#39; for PyTorch
+          device(str): Torch device to use (e.g., &#39;cuda&#39;, &#39;cpu&#39;). Ignored if framework==&#39;tf&#39;.
+                       If framework==&#39;tf&#39;, use CUDA_VISIBLE_DEVICES environment variable
+                       to select device.
+          quantize(bool): If True and framework==&#39;pt&#39; and device != &#39;cpu&#39;, then faster quantized inference is used.
+                      Ignored if framework==&#34;tf&#34;.
+        ```
+        &#34;&#34;&#34;
+        self.qa = _QAExtractor(
+            model_name=model_name,
+            bert_squad_model=bert_squad_model,
+            framework=framework,
+            device=device,
+            quantize=quantize,
+        )
+        return
+
+    def _check_columns(self, labels, df):
+        &#34;&#34;&#34;check columns&#34;&#34;&#34;
+        cols = df.columns.values
+        for l in labels:
+            if l in cols:
+                raise ValueError(
+                    &#34;There is already a column named %s in your DataFrame.&#34; % (l)
+                )
+
+    def _extract(
+        self,
+        questions,
+        contexts,
+        min_conf=DEFAULT_MIN_CONF,
+        return_conf=False,
+        batch_size=8,
+    ):
+        &#34;&#34;&#34;
+        ```
+        Extracts answers
+        ```
+        &#34;&#34;&#34;
+        num_rows = len(contexts)
+        doc_results = [
+            {&#34;rawtext&#34;: rawtext, &#34;reference&#34;: row}
+            for row, rawtext in enumerate(contexts)
+        ]
+        cols = []
+        for q in questions:
+            result_dict = {}
+            conf_dict = {}
+            answers = self.qa.ask(q, doc_results=doc_results, batch_size=batch_size)
+            for a in answers:
+                answer = a[&#34;answer&#34;] if a[&#34;confidence&#34;] &gt; min_conf else None
+                lst = result_dict.get(a[&#34;reference&#34;], [])
+                lst.append(answer)
+                result_dict[a[&#34;reference&#34;]] = lst
+                lst = conf_dict.get(a[&#34;reference&#34;], [])
+                lst.append(a[&#34;confidence&#34;])
+                conf_dict[a[&#34;reference&#34;]] = lst
+
+            results = []
+            for i in range(num_rows):
+                ans = [a for a in result_dict[i] if a is not None]
+                results.append(None if not ans else &#34; | &#34;.join(ans))
+            cols.append(results)
+            if return_conf:
+                confs = []
+                for i in range(num_rows):
+                    conf = [str(round(c, 2)) for c in conf_dict[i] if c is not None]
+                    confs.append(None if not conf else &#34; | &#34;.join(conf))
+                cols.append(confs)
+        return cols
+
+    def extract(
+        self,
+        texts,
+        df,
+        question_label_pairs,
+        min_conf=DEFAULT_MIN_CONF,
+        return_conf=False,
+        batch_size=8,
+    ):
+        &#34;&#34;&#34;
+        ```
+        Extracts answers from texts
+
+        Args:
+          texts(list): list of strings
+          df(pd.DataFrame): original DataFrame to which columns need to be added
+          question_label_pairs(list):  A list of tuples of the form (question, label).
+                                     Extracted ansewrs to the question will be added as new columns with the
+                                     specified labels.
+                                     Example: (&#39;What are the risk factors?&#39;, &#39;Risk Factors&#39;)
+          min_conf(float):  Answers at or below this confidence value will be set to None in the results
+                            Default: 5.0
+                            Lower this value to reduce false negatives.
+                            Raise this value to reduce false positives.
+          return_conf(bool): If True, confidence score of each extraction is included in results
+          batch_size(int): batch size. Default: 8
+        ```
+        &#34;&#34;&#34;
+        if not isinstance(df, pd.DataFrame):
+            raise ValueError(&#34;df must be a pandas DataFrame.&#34;)
+        if len(texts) != df.shape[0]:
+            raise ValueError(
+                &#34;Number of texts is not equal to the number of rows in the DataFrame.&#34;
+            )
+        # texts = [t.replace(&#34;\n&#34;, &#34; &#34;).replace(&#34;\t&#34;, &#34; &#34;) for t in texts]
+        texts = [t.replace(&#34;\t&#34;, &#34; &#34;) for t in texts]
+        questions = [q for q, l in question_label_pairs]
+        labels = [l for q, l in question_label_pairs]
+        self._check_columns(labels, df)
+        cols = self._extract(
+            questions,
+            texts,
+            min_conf=min_conf,
+            return_conf=return_conf,
+            batch_size=batch_size,
+        )
+        data = list(zip(*cols)) if len(cols) &gt; 1 else cols[0]
+        if return_conf:
+            labels = twolists(labels, [l + &#34; CONF&#34; for l in labels])
+        return df.join(pd.DataFrame(data, columns=labels, index=df.index))
+
+    def finetune(
+        self, data, epochs=3, learning_rate=2e-5, batch_size=8, max_seq_length=512
+    ):
+        &#34;&#34;&#34;
+        ```
+        Finetune a QA model.
+
+        Args:
+          data(list): list of dictionaries of the form:
+                      [{&#39;question&#39;: &#39;What is ktrain?&#39;
+                       &#39;context&#39;: &#39;ktrain is a low-code library for augmented machine learning.&#39;
+                       &#39;answer&#39;: &#39;ktrain&#39;}]
+          epochs(int): number of epochs.  Default:3
+          learning_rate(float): learning rate.  Default: 2e-5
+          batch_size(int): batch size. Default:8
+          max_seq_length(int): maximum sequence length.  Default:512
+        Returns:
+          None
+        ```
+        &#34;&#34;&#34;
+        if self.qa.framework != &#34;tf&#34;:
+            raise ValueError(
+                &#39;The finetune method does not currently support the framework=&#34;pt&#34; option. Please use framework=&#34;tf&#34; to finetune.&#39;
+            )
+        from .qa_finetuner import QAFineTuner
+
+        ft = QAFineTuner(self.qa.model, self.qa.tokenizer)
+        model = ft.finetune(
+            data, epochs=epochs, learning_rate=learning_rate, batch_size=batch_size
+        )
+        return</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="ktrain.text.qa.extractive_qa.AnswerExtractor.extract"><code class="name flex">
+<span>def <span class="ident">extract</span></span>(<span>self, texts, df, question_label_pairs, min_conf=6, return_conf=False, batch_size=8)</span>
+</code></dt>
+<dd>
+<div class="desc"><pre><code>Extracts answers from texts
+
+Args:
+  texts(list): list of strings
+  df(pd.DataFrame): original DataFrame to which columns need to be added
+  question_label_pairs(list):  A list of tuples of the form (question, label).
+                             Extracted ansewrs to the question will be added as new columns with the
+                             specified labels.
+                             Example: ('What are the risk factors?', 'Risk Factors')
+  min_conf(float):  Answers at or below this confidence value will be set to None in the results
+                    Default: 5.0
+                    Lower this value to reduce false negatives.
+                    Raise this value to reduce false positives.
+  return_conf(bool): If True, confidence score of each extraction is included in results
+  batch_size(int): batch size. Default: 8
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def extract(
+    self,
+    texts,
+    df,
+    question_label_pairs,
+    min_conf=DEFAULT_MIN_CONF,
+    return_conf=False,
+    batch_size=8,
+):
+    &#34;&#34;&#34;
+    ```
+    Extracts answers from texts
+
+    Args:
+      texts(list): list of strings
+      df(pd.DataFrame): original DataFrame to which columns need to be added
+      question_label_pairs(list):  A list of tuples of the form (question, label).
+                                 Extracted ansewrs to the question will be added as new columns with the
+                                 specified labels.
+                                 Example: (&#39;What are the risk factors?&#39;, &#39;Risk Factors&#39;)
+      min_conf(float):  Answers at or below this confidence value will be set to None in the results
+                        Default: 5.0
+                        Lower this value to reduce false negatives.
+                        Raise this value to reduce false positives.
+      return_conf(bool): If True, confidence score of each extraction is included in results
+      batch_size(int): batch size. Default: 8
+    ```
+    &#34;&#34;&#34;
+    if not isinstance(df, pd.DataFrame):
+        raise ValueError(&#34;df must be a pandas DataFrame.&#34;)
+    if len(texts) != df.shape[0]:
+        raise ValueError(
+            &#34;Number of texts is not equal to the number of rows in the DataFrame.&#34;
+        )
+    # texts = [t.replace(&#34;\n&#34;, &#34; &#34;).replace(&#34;\t&#34;, &#34; &#34;) for t in texts]
+    texts = [t.replace(&#34;\t&#34;, &#34; &#34;) for t in texts]
+    questions = [q for q, l in question_label_pairs]
+    labels = [l for q, l in question_label_pairs]
+    self._check_columns(labels, df)
+    cols = self._extract(
+        questions,
+        texts,
+        min_conf=min_conf,
+        return_conf=return_conf,
+        batch_size=batch_size,
+    )
+    data = list(zip(*cols)) if len(cols) &gt; 1 else cols[0]
+    if return_conf:
+        labels = twolists(labels, [l + &#34; CONF&#34; for l in labels])
+    return df.join(pd.DataFrame(data, columns=labels, index=df.index))</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.qa.extractive_qa.AnswerExtractor.finetune"><code class="name flex">
+<span>def <span class="ident">finetune</span></span>(<span>self, data, epochs=3, learning_rate=2e-05, batch_size=8, max_seq_length=512)</span>
+</code></dt>
+<dd>
+<div class="desc"><pre><code>Finetune a QA model.
+
+Args:
+  data(list): list of dictionaries of the form:
+              [{'question': 'What is ktrain?'
+               'context': 'ktrain is a low-code library for augmented machine learning.'
+               'answer': 'ktrain'}]
+  epochs(int): number of epochs.  Default:3
+  learning_rate(float): learning rate.  Default: 2e-5
+  batch_size(int): batch size. Default:8
+  max_seq_length(int): maximum sequence length.  Default:512
+Returns:
+  None
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def finetune(
+    self, data, epochs=3, learning_rate=2e-5, batch_size=8, max_seq_length=512
+):
+    &#34;&#34;&#34;
+    ```
+    Finetune a QA model.
+
+    Args:
+      data(list): list of dictionaries of the form:
+                  [{&#39;question&#39;: &#39;What is ktrain?&#39;
+                   &#39;context&#39;: &#39;ktrain is a low-code library for augmented machine learning.&#39;
+                   &#39;answer&#39;: &#39;ktrain&#39;}]
+      epochs(int): number of epochs.  Default:3
+      learning_rate(float): learning rate.  Default: 2e-5
+      batch_size(int): batch size. Default:8
+      max_seq_length(int): maximum sequence length.  Default:512
+    Returns:
+      None
+    ```
+    &#34;&#34;&#34;
+    if self.qa.framework != &#34;tf&#34;:
+        raise ValueError(
+            &#39;The finetune method does not currently support the framework=&#34;pt&#34; option. Please use framework=&#34;tf&#34; to finetune.&#39;
+        )
+    from .qa_finetuner import QAFineTuner
+
+    ft = QAFineTuner(self.qa.model, self.qa.tokenizer)
+    model = ft.finetune(
+        data, epochs=epochs, learning_rate=learning_rate, batch_size=batch_size
+    )
+    return</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="ktrain.text.qa.extractive_qa.ExtractiveQABase"><code class="flex name class">
+<span>class <span class="ident">ExtractiveQABase</span></span>
+<span>(</span><span>model_name='bert-large-uncased-whole-word-masking-finetuned-squad', bert_squad_model=None, bert_emb_model='bert-base-uncased', framework='tf', device=None, quantize=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Base class for QA</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ExtractiveQABase(ABC, TorchBase):
+    &#34;&#34;&#34;
+    Base class for QA
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        model_name=DEFAULT_MODEL,
+        bert_squad_model=None,
+        bert_emb_model=&#34;bert-base-uncased&#34;,
+        framework=&#34;tf&#34;,
+        device=None,
+        quantize=False,
+    ):
+        model_name = bert_squad_model if bert_squad_model is not None else model_name
+        if bert_squad_model:
+            warnings.warn(
+                &#34;The bert_squad_model argument is deprecated - please use model_name instead.&#34;,
+                DeprecationWarning,
+                stacklevel=2,
+            )
+        self.model_name = model_name
+        self.framework = framework
+        if framework == &#34;tf&#34;:
+            try:
+                import tensorflow as tf
+            except ImportError:
+                raise Exception(&#39;If framework==&#34;tf&#34;, TensorFlow must be installed.&#39;)
+            try:
+                self.model = TFAutoModelForQuestionAnswering.from_pretrained(
+                    self.model_name
+                )
+            except:
+                warnings.warn(
+                    &#34;Could not load supplied model as TensorFlow checkpoint - attempting to load using from_pt=True&#34;
+                )
+                self.model = TFAutoModelForQuestionAnswering.from_pretrained(
+                    self.model_name, from_pt=True
+                )
+        else:
+            bert_emb_model = (
+                None  # set to None and ignore since we only want to use PyTorch
+            )
+            super().__init__(device=device, quantize=quantize)
+            self.model = AutoModelForQuestionAnswering.from_pretrained(
+                self.model_name
+            ).to(self.torch_device)
+            if quantize:
+                self.model = self.quantize_model(self.model)
+
+        self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+        self.maxlen = 512
+        self.te = (
+            tpp.TransformerEmbedding(bert_emb_model, layers=[-2])
+            if bert_emb_model is not None
+            else None
+        )
+
+    @abstractmethod
+    def search(self, query):
+        pass
+
+    def predict_squad(self, documents, question):
+        &#34;&#34;&#34;
+        Generates candidate answers to the &lt;question&gt; provided given &lt;documents&gt; as contexts.
+        &#34;&#34;&#34;
+        if isinstance(documents, str):
+            documents = [documents]
+        sequences = [[question, d] for d in documents]
+        batch = self.tokenizer.batch_encode_plus(
+            sequences,
+            return_tensors=self.framework,
+            max_length=self.maxlen,
+            truncation=&#34;only_second&#34;,
+            padding=True,
+        )
+        batch = batch.to(self.torch_device) if self.framework == &#34;pt&#34; else batch
+        tokens_batch = list(
+            map(self.tokenizer.convert_ids_to_tokens, batch[&#34;input_ids&#34;])
+        )
+
+        # Added from: https://github.com/huggingface/transformers/commit/16ce15ed4bd0865d24a94aa839a44cf0f400ef50
+        if U.get_hf_model_name(self.model_name) in [&#34;xlm&#34;, &#34;roberta&#34;, &#34;distilbert&#34;]:
+            start_scores, end_scores = self.model(
+                batch[&#34;input_ids&#34;],
+                attention_mask=batch[&#34;attention_mask&#34;],
+                return_dict=False,
+            )
+        else:
+            start_scores, end_scores = self.model(
+                batch[&#34;input_ids&#34;],
+                attention_mask=batch[&#34;attention_mask&#34;],
+                token_type_ids=batch[&#34;token_type_ids&#34;],
+                return_dict=False,
+            )
+        start_scores = (
+            start_scores.cpu().detach().numpy()
+            if self.framework == &#34;pt&#34;
+            else start_scores.numpy()
+        )
+        end_scores = (
+            end_scores.cpu().detach().numpy()
+            if self.framework == &#34;pt&#34;
+            else end_scores.numpy()
+        )
+        start_scores = start_scores[:, 1:-1]
+        end_scores = end_scores[:, 1:-1]
+
+        # normalize logits and spans to retrieve the answer
+        # start_scores = np.exp(start_scores - np.log(np.sum(np.exp(start_scores), axis=-1, keepdims=True))) # from HF pipeline
+        # end_scores = np.exp(end_scores - np.log(np.sum(np.exp(end_scores), axis=-1, keepdims=True)))             # from HF pipeline
+        answer_starts = np.argmax(start_scores, axis=1)
+        answer_ends = np.argmax(end_scores, axis=1)
+
+        answers = []
+        for i, tokens in enumerate(tokens_batch):
+            answer_start = answer_starts[i]
+            answer_end = answer_ends[i]
+            answer = self._reconstruct_text(tokens, answer_start, answer_end + 2)
+            if answer.startswith(&#34;. &#34;) or answer.startswith(&#34;, &#34;):
+                answer = answer[2:]
+            sep_index = tokens.index(&#34;[SEP]&#34;)
+            full_txt_tokens = tokens[sep_index + 1 :]
+            paragraph_bert = self._reconstruct_text(full_txt_tokens)
+
+            ans = {}
+            ans[&#34;answer&#34;] = answer
+            if (
+                answer.startswith(&#34;[CLS]&#34;)
+                or answer_end &lt; sep_index
+                or answer.endswith(&#34;[SEP]&#34;)
+            ):
+                ans[&#34;confidence&#34;] = LOWCONF
+            else:
+                # confidence = torch.max(start_scores) + torch.max(end_scores)
+                # confidence = np.log(confidence.item())
+                # ans[&#39;confidence&#39;] = start_scores[i,answer_start]*end_scores[i,answer_end]
+                ans[&#34;confidence&#34;] = (
+                    start_scores[i, answer_start] + end_scores[i, answer_end]
+                )
+
+            ans[&#34;start&#34;] = answer_start
+            ans[&#34;end&#34;] = answer_end
+            ans[&#34;context&#34;] = paragraph_bert
+            answers.append(ans)
+        # if len(answers) == 1: answers = answers[0]
+        return answers
+
+    def _clean_answer(self, answer):
+        import string
+
+        if not answer:
+            return answer
+        remove_list = [
+            &#34;is &#34;,
+            &#34;are &#34;,
+            &#34;was &#34;,
+            &#34;were &#34;,
+            &#34;of &#34;,
+            &#34;include &#34;,
+            &#34;including &#34;,
+            &#34;in &#34;,
+            &#34;of &#34;,
+            &#34;the &#34;,
+            &#34;for &#34;,
+            &#34;on &#34;,
+            &#34;to &#34;,
+            &#34;-&#34;,
+            &#34;:&#34;,
+            &#34;/&#34;,
+            &#34;and &#34;,
+        ]
+        for w in remove_list:
+            if answer.startswith(w):
+                answer = answer.replace(w, &#34;&#34;, 1)
+        answer = answer.replace(&#34; . &#34;, &#34;.&#34;)
+        answer = answer.replace(&#34; / &#34;, &#34;/&#34;)
+        answer = answer.replace(&#34; :// &#34;, &#34;://&#34;)
+        answer = answer.strip()
+        if answer and answer[0] in string.punctuation:
+            answer = answer[1:]
+        if answer and answer[-1] in string.punctuation:
+            answer = answer[:-1]
+        return answer
+
+    def _reconstruct_text(self, tokens, start=0, stop=-1):
+        &#34;&#34;&#34;
+        Reconstruct text of *either* question or answer
+        &#34;&#34;&#34;
+        tokens = tokens[start:stop]
+        # if &#39;[SEP]&#39; in tokens:
+        # sepind = tokens.index(&#39;[SEP]&#39;)
+        # tokens = tokens[sepind+1:]
+        txt = &#34; &#34;.join(tokens)
+        txt = txt.replace(
+            &#34;[SEP]&#34;, &#34;&#34;
+        )  # added for batch_encode_plus - removes [SEP] before [PAD]
+        txt = txt.replace(&#34;[PAD]&#34;, &#34;&#34;)  # added for batch_encode_plus - removes [PAD]
+        txt = txt.replace(&#34; ##&#34;, &#34;&#34;)
+        txt = txt.replace(&#34;##&#34;, &#34;&#34;)
+        txt = txt.strip()
+        txt = &#34; &#34;.join(txt.split())
+        txt = txt.replace(&#34; .&#34;, &#34;.&#34;)
+        txt = txt.replace(&#34;( &#34;, &#34;(&#34;)
+        txt = txt.replace(&#34; )&#34;, &#34;)&#34;)
+        txt = txt.replace(&#34; - &#34;, &#34;-&#34;)
+        txt_list = txt.split(&#34; , &#34;)
+        txt = &#34;&#34;
+        length = len(txt_list)
+        if length == 1:
+            return txt_list[0]
+        new_list = []
+        for i, t in enumerate(txt_list):
+            if i &lt; length - 1:
+                if t[-1].isdigit() and txt_list[i + 1][0].isdigit():
+                    new_list += [t, &#34;,&#34;]
+                else:
+                    new_list += [t, &#34;, &#34;]
+            else:
+                new_list += [t]
+        return &#34;&#34;.join(new_list)
+
+    def _expand_answer(self, answer):
+        &#34;&#34;&#34;
+        expand answer to include more of the context
+        &#34;&#34;&#34;
+        full_abs = answer[&#34;context&#34;]
+        bert_ans = answer[&#34;answer&#34;]
+        split_abs = full_abs.split(bert_ans)
+        sent_beginning = split_abs[0][split_abs[0].rfind(&#34;.&#34;) + 1 :]
+        if len(split_abs) == 1:
+            sent_end_pos = len(full_abs)
+            sent_end = &#34;&#34;
+        else:
+            sent_end_pos = split_abs[1].find(&#34;. &#34;) + 1
+            if sent_end_pos == 0:
+                sent_end = split_abs[1]
+            else:
+                sent_end = split_abs[1][:sent_end_pos]
+
+        answer[&#34;full_answer&#34;] = sent_beginning + bert_ans + sent_end
+        answer[&#34;full_answer&#34;] = answer[&#34;full_answer&#34;].strip()
+        answer[&#34;sentence_beginning&#34;] = sent_beginning
+        answer[&#34;sentence_end&#34;] = sent_end
+        return answer
+
+    def _span_to_answer(self, question, text, start, end):
+        &#34;&#34;&#34;
+        ```
+        This method maps token indexes to actual word in the initial context.
+
+        Args:
+            text (str): The actual context to extract the answer from.
+            start (int): The answer starting token index.
+            end (int): The answer end token index.
+
+        Returns:
+            dct:  `{&#39;answer&#39;: str, &#39;start&#39;: int, &#39;end&#39;: int}`
+        ```
+        &#34;&#34;&#34;
+        all_tokens = self.tokenizer.tokenize(
+            text=question, pair=text, add_special_tokens=True
+        )
+        sep_idxs = [i for i, x in enumerate(all_tokens) if x == &#34;[SEP]&#34;]
+        start = start - sep_idxs[0]
+        end = end - sep_idxs[0]
+
+        words = []
+        token_idx = char_start_idx = char_end_idx = chars_idx = 0
+        for i, word in enumerate(text.split(&#34; &#34;)):
+            token = self.tokenizer.tokenize(word)
+
+            # Append words if they are in the span
+            if start &lt;= token_idx &lt;= end:
+                if token_idx == start:
+                    char_start_idx = chars_idx
+
+                if token_idx == end:
+                    char_end_idx = chars_idx + len(word)
+
+                words += [word]
+
+            # Stop if we went over the end of the answer
+            if token_idx &gt; end:
+                break
+
+            # Append the subtokenization length to the running index
+            token_idx += len(token)
+            chars_idx += len(word) + 1
+
+        # Join text with spaces
+        return {
+            &#34;answer&#34;: &#34; &#34;.join(words),
+            &#34;start&#34;: max(0, char_start_idx),
+            &#34;end&#34;: min(len(text), char_end_idx),
+        }
+
+    def _batchify(self, contexts, batch_size=8):
+        &#34;&#34;&#34;
+        batchify contexts
+        &#34;&#34;&#34;
+        if batch_size &gt; len(contexts):
+            batch_size = len(contexts)
+        num_chunks = math.ceil(len(contexts) / batch_size)
+        return list(U.list2chunks(contexts, n=num_chunks))
+
+    def _split_contexts(self, doc_results):
+        &#34;&#34;&#34;
+        ```
+        splitup contexts into a manageable size
+        Args:
+          doc_results(list):  list of dicts with keys: rawtext and reference
+        ```
+        &#34;&#34;&#34;
+        # extract paragraphs as contexts
+        contexts = []
+        refs = []
+        for doc_result in doc_results:
+            rawtext = doc_result.get(&#34;rawtext&#34;, &#34;&#34;)
+            reference = doc_result.get(&#34;reference&#34;, &#34;&#34;)
+            if len(self.tokenizer.tokenize(rawtext)) &lt; self.maxlen:
+                contexts.append(rawtext)
+                refs.append(reference)
+            else:
+                paragraphs = TU.paragraph_tokenize(rawtext, join_sentences=True)
+                contexts.extend(paragraphs)
+                refs.extend([reference] * len(paragraphs))
+        return (contexts, refs)
+
+    def ask(
+        self,
+        question,
+        query=None,
+        batch_size=8,
+        n_docs_considered=10,
+        n_answers=50,
+        raw_confidence=False,
+        rerank_threshold=0.015,
+        include_np=False,
+    ):
+        &#34;&#34;&#34;
+        ```
+        submit question to obtain candidate answers
+
+        Args:
+          question(str): question in the form of a string
+          query(str): Optional. If not None, words in query will be used to retrieve contexts instead of words in question
+          batch_size(int):  number of question-context pairs fed to model at each iteration
+                            Default:8
+                            Increase for faster answer-retrieval.
+                            Decrease to reduce memory (if out-of-memory errors occur).
+          n_docs_considered(int): number of top search results that will
+                                  be searched for answer
+                                  Default:10
+          n_answers(int): maximum number of candidate answers to return
+                          Default:50
+          raw_confidence(bool): If True, show raw confidence score of each answer. It could be used to
+                                mitigate very high confidence on first answer when softmax is used.
+                                If False, perform softmax on raw confidence scores.
+                                Default: False
+          rerank_threshold(int): rerank top answers with confidence &gt;= rerank_threshold
+                                 based on semantic similarity between question and answer.
+                                 This can help bump the correct answer closer to the top.
+                                 Default:0.015. This should be changed to somethink like 6.0
+                                 if raw_confidence=True.
+                                 If None, no re-ranking is performed.
+          include_np(bool):  If True, noun phrases will be extracted from question and included
+                             in query that retrieves documents likely to contain candidate answers.
+                             This may be useful if you ask a question about artificial intelligence
+                             and the answers returned pertain just to intelligence, for example.
+                             Note: include_np=True requires textblob be installed.
+                             Default:False
+        Returns:
+          list
+        ```
+        &#34;&#34;&#34;
+        # sanity check
+        if raw_confidence and rerank_threshold is not None and rerank_threshold &lt; 1.00:
+            warnings.warn(
+                &#34;Raw confidence is used, but rerank_threshold value is below 1.00: are you sure you this is what you wanted?&#34;
+            )
+
+        # locate candidate document contexts
+        doc_results = self.search(
+            process_question(
+                query if query is not None else question, include_np=include_np
+            ),
+            limit=n_docs_considered,
+        )
+        if not doc_results:
+            warnings.warn(
+                &#34;No documents matched words in question (or query if supplied)&#34;
+            )
+            return []
+
+        # extract paragraphs as contexts
+        contexts, refs = self._split_contexts(doc_results)
+
+        # batchify contexts
+        context_batches = self._batchify(contexts, batch_size=batch_size)
+
+        # locate candidate answers
+        answers = []
+        mb = master_bar(range(1))
+        answer_batches = []
+        for i in mb:
+            idx = 0
+            for batch_id, contexts in enumerate(
+                progress_bar(context_batches, parent=mb)
+            ):
+                answer_batch = self.predict_squad(contexts, question)
+                answer_batches.extend(answer_batch)
+                for answer in answer_batch:
+                    idx += 1
+                    if not answer[&#34;answer&#34;] or answer[&#34;confidence&#34;] &lt; -100:
+                        continue
+                    answer[&#34;confidence&#34;] = answer[&#34;confidence&#34;]
+                    answer[&#34;reference&#34;] = refs[idx - 1]
+                    answer = self._expand_answer(answer)
+                    answers.append(answer)
+
+                mb.child.comment = f&#34;generating candidate answers&#34;
+
+        if not answers:
+            return answers  # fix for #307
+        answers = sorted(answers, key=lambda k: k[&#34;confidence&#34;], reverse=True)
+        if n_answers is not None:
+            answers = answers[:n_answers]
+
+        # transform confidence scores
+        if not raw_confidence:
+            confidences = [a[&#34;confidence&#34;] for a in answers]
+            max_conf = max(confidences)
+            total = 0.0
+            exp_scores = []
+            for c in confidences:
+                s = np.exp(c - max_conf)
+                exp_scores.append(s)
+            total = sum(exp_scores)
+            for idx, c in enumerate(confidences):
+                answers[idx][&#34;confidence&#34;] = exp_scores[idx] / total
+
+        if rerank_threshold is None or self.te is None:
+            return answers
+
+        # re-rank
+        top_confidences = [
+            a[&#34;confidence&#34;]
+            for idx, a in enumerate(answers)
+            if a[&#34;confidence&#34;] &gt; rerank_threshold
+        ]
+        v1 = self.te.embed(question, word_level=False)
+        for idx, answer in enumerate(answers):
+            # if idx &gt;= rerank_top_n:
+            if answer[&#34;confidence&#34;] &lt;= rerank_threshold:
+                answer[&#34;similarity_score&#34;] = 0.0
+                continue
+            v2 = self.te.embed(answer[&#34;full_answer&#34;], word_level=False)
+            score = v1 @ v2.T / (np.linalg.norm(v1) * np.linalg.norm(v2))
+            answer[&#34;similarity_score&#34;] = float(np.squeeze(score))
+            answer[&#34;confidence&#34;] = top_confidences[idx]
+        answers = sorted(
+            answers,
+            key=lambda k: (k[&#34;similarity_score&#34;], k[&#34;confidence&#34;]),
+            reverse=True,
+        )
+        for idx, confidence in enumerate(top_confidences):
+            answers[idx][&#34;confidence&#34;] = confidence
+
+        return answers
+
+    def display_answers(self, answers):
+        return display_answers(answers)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>abc.ABC</li>
+<li><a title="ktrain.torch_base.TorchBase" href="../../torch_base.html#ktrain.torch_base.TorchBase">TorchBase</a></li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="ktrain.text.qa.extractive_qa.SimpleQA" href="#ktrain.text.qa.extractive_qa.SimpleQA">SimpleQA</a></li>
+<li>ktrain.text.qa.extractive_qa._QAExtractor</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="ktrain.text.qa.extractive_qa.ExtractiveQABase.ask"><code class="name flex">
+<span>def <span class="ident">ask</span></span>(<span>self, question, query=None, batch_size=8, n_docs_considered=10, n_answers=50, raw_confidence=False, rerank_threshold=0.015, include_np=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><pre><code>submit question to obtain candidate answers
+
+Args:
+  question(str): question in the form of a string
+  query(str): Optional. If not None, words in query will be used to retrieve contexts instead of words in question
+  batch_size(int):  number of question-context pairs fed to model at each iteration
+                    Default:8
+                    Increase for faster answer-retrieval.
+                    Decrease to reduce memory (if out-of-memory errors occur).
+  n_docs_considered(int): number of top search results that will
+                          be searched for answer
+                          Default:10
+  n_answers(int): maximum number of candidate answers to return
+                  Default:50
+  raw_confidence(bool): If True, show raw confidence score of each answer. It could be used to
+                        mitigate very high confidence on first answer when softmax is used.
+                        If False, perform softmax on raw confidence scores.
+                        Default: False
+  rerank_threshold(int): rerank top answers with confidence &gt;= rerank_threshold
+                         based on semantic similarity between question and answer.
+                         This can help bump the correct answer closer to the top.
+                         Default:0.015. This should be changed to somethink like 6.0
+                         if raw_confidence=True.
+                         If None, no re-ranking is performed.
+  include_np(bool):  If True, noun phrases will be extracted from question and included
+                     in query that retrieves documents likely to contain candidate answers.
+                     This may be useful if you ask a question about artificial intelligence
+                     and the answers returned pertain just to intelligence, for example.
+                     Note: include_np=True requires textblob be installed.
+                     Default:False
+Returns:
+  list
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def ask(
+    self,
+    question,
+    query=None,
+    batch_size=8,
+    n_docs_considered=10,
+    n_answers=50,
+    raw_confidence=False,
+    rerank_threshold=0.015,
+    include_np=False,
+):
+    &#34;&#34;&#34;
+    ```
+    submit question to obtain candidate answers
+
+    Args:
+      question(str): question in the form of a string
+      query(str): Optional. If not None, words in query will be used to retrieve contexts instead of words in question
+      batch_size(int):  number of question-context pairs fed to model at each iteration
+                        Default:8
+                        Increase for faster answer-retrieval.
+                        Decrease to reduce memory (if out-of-memory errors occur).
+      n_docs_considered(int): number of top search results that will
+                              be searched for answer
+                              Default:10
+      n_answers(int): maximum number of candidate answers to return
+                      Default:50
+      raw_confidence(bool): If True, show raw confidence score of each answer. It could be used to
+                            mitigate very high confidence on first answer when softmax is used.
+                            If False, perform softmax on raw confidence scores.
+                            Default: False
+      rerank_threshold(int): rerank top answers with confidence &gt;= rerank_threshold
+                             based on semantic similarity between question and answer.
+                             This can help bump the correct answer closer to the top.
+                             Default:0.015. This should be changed to somethink like 6.0
+                             if raw_confidence=True.
+                             If None, no re-ranking is performed.
+      include_np(bool):  If True, noun phrases will be extracted from question and included
+                         in query that retrieves documents likely to contain candidate answers.
+                         This may be useful if you ask a question about artificial intelligence
+                         and the answers returned pertain just to intelligence, for example.
+                         Note: include_np=True requires textblob be installed.
+                         Default:False
+    Returns:
+      list
+    ```
+    &#34;&#34;&#34;
+    # sanity check
+    if raw_confidence and rerank_threshold is not None and rerank_threshold &lt; 1.00:
+        warnings.warn(
+            &#34;Raw confidence is used, but rerank_threshold value is below 1.00: are you sure you this is what you wanted?&#34;
+        )
+
+    # locate candidate document contexts
+    doc_results = self.search(
+        process_question(
+            query if query is not None else question, include_np=include_np
+        ),
+        limit=n_docs_considered,
+    )
+    if not doc_results:
+        warnings.warn(
+            &#34;No documents matched words in question (or query if supplied)&#34;
+        )
+        return []
+
+    # extract paragraphs as contexts
+    contexts, refs = self._split_contexts(doc_results)
+
+    # batchify contexts
+    context_batches = self._batchify(contexts, batch_size=batch_size)
+
+    # locate candidate answers
+    answers = []
+    mb = master_bar(range(1))
+    answer_batches = []
+    for i in mb:
+        idx = 0
+        for batch_id, contexts in enumerate(
+            progress_bar(context_batches, parent=mb)
+        ):
+            answer_batch = self.predict_squad(contexts, question)
+            answer_batches.extend(answer_batch)
+            for answer in answer_batch:
+                idx += 1
+                if not answer[&#34;answer&#34;] or answer[&#34;confidence&#34;] &lt; -100:
+                    continue
+                answer[&#34;confidence&#34;] = answer[&#34;confidence&#34;]
+                answer[&#34;reference&#34;] = refs[idx - 1]
+                answer = self._expand_answer(answer)
+                answers.append(answer)
+
+            mb.child.comment = f&#34;generating candidate answers&#34;
+
+    if not answers:
+        return answers  # fix for #307
+    answers = sorted(answers, key=lambda k: k[&#34;confidence&#34;], reverse=True)
+    if n_answers is not None:
+        answers = answers[:n_answers]
+
+    # transform confidence scores
+    if not raw_confidence:
+        confidences = [a[&#34;confidence&#34;] for a in answers]
+        max_conf = max(confidences)
+        total = 0.0
+        exp_scores = []
+        for c in confidences:
+            s = np.exp(c - max_conf)
+            exp_scores.append(s)
+        total = sum(exp_scores)
+        for idx, c in enumerate(confidences):
+            answers[idx][&#34;confidence&#34;] = exp_scores[idx] / total
+
+    if rerank_threshold is None or self.te is None:
+        return answers
+
+    # re-rank
+    top_confidences = [
+        a[&#34;confidence&#34;]
+        for idx, a in enumerate(answers)
+        if a[&#34;confidence&#34;] &gt; rerank_threshold
+    ]
+    v1 = self.te.embed(question, word_level=False)
+    for idx, answer in enumerate(answers):
+        # if idx &gt;= rerank_top_n:
+        if answer[&#34;confidence&#34;] &lt;= rerank_threshold:
+            answer[&#34;similarity_score&#34;] = 0.0
+            continue
+        v2 = self.te.embed(answer[&#34;full_answer&#34;], word_level=False)
+        score = v1 @ v2.T / (np.linalg.norm(v1) * np.linalg.norm(v2))
+        answer[&#34;similarity_score&#34;] = float(np.squeeze(score))
+        answer[&#34;confidence&#34;] = top_confidences[idx]
+    answers = sorted(
+        answers,
+        key=lambda k: (k[&#34;similarity_score&#34;], k[&#34;confidence&#34;]),
+        reverse=True,
+    )
+    for idx, confidence in enumerate(top_confidences):
+        answers[idx][&#34;confidence&#34;] = confidence
+
+    return answers</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.qa.extractive_qa.ExtractiveQABase.display_answers"><code class="name flex">
+<span>def <span class="ident">display_answers</span></span>(<span>self, answers)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def display_answers(self, answers):
+    return display_answers(answers)</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.qa.extractive_qa.ExtractiveQABase.predict_squad"><code class="name flex">
+<span>def <span class="ident">predict_squad</span></span>(<span>self, documents, question)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Generates candidate answers to the <question> provided given <documents> as contexts.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def predict_squad(self, documents, question):
+    &#34;&#34;&#34;
+    Generates candidate answers to the &lt;question&gt; provided given &lt;documents&gt; as contexts.
+    &#34;&#34;&#34;
+    if isinstance(documents, str):
+        documents = [documents]
+    sequences = [[question, d] for d in documents]
+    batch = self.tokenizer.batch_encode_plus(
+        sequences,
+        return_tensors=self.framework,
+        max_length=self.maxlen,
+        truncation=&#34;only_second&#34;,
+        padding=True,
+    )
+    batch = batch.to(self.torch_device) if self.framework == &#34;pt&#34; else batch
+    tokens_batch = list(
+        map(self.tokenizer.convert_ids_to_tokens, batch[&#34;input_ids&#34;])
+    )
+
+    # Added from: https://github.com/huggingface/transformers/commit/16ce15ed4bd0865d24a94aa839a44cf0f400ef50
+    if U.get_hf_model_name(self.model_name) in [&#34;xlm&#34;, &#34;roberta&#34;, &#34;distilbert&#34;]:
+        start_scores, end_scores = self.model(
+            batch[&#34;input_ids&#34;],
+            attention_mask=batch[&#34;attention_mask&#34;],
+            return_dict=False,
+        )
+    else:
+        start_scores, end_scores = self.model(
+            batch[&#34;input_ids&#34;],
+            attention_mask=batch[&#34;attention_mask&#34;],
+            token_type_ids=batch[&#34;token_type_ids&#34;],
+            return_dict=False,
+        )
+    start_scores = (
+        start_scores.cpu().detach().numpy()
+        if self.framework == &#34;pt&#34;
+        else start_scores.numpy()
+    )
+    end_scores = (
+        end_scores.cpu().detach().numpy()
+        if self.framework == &#34;pt&#34;
+        else end_scores.numpy()
+    )
+    start_scores = start_scores[:, 1:-1]
+    end_scores = end_scores[:, 1:-1]
+
+    # normalize logits and spans to retrieve the answer
+    # start_scores = np.exp(start_scores - np.log(np.sum(np.exp(start_scores), axis=-1, keepdims=True))) # from HF pipeline
+    # end_scores = np.exp(end_scores - np.log(np.sum(np.exp(end_scores), axis=-1, keepdims=True)))             # from HF pipeline
+    answer_starts = np.argmax(start_scores, axis=1)
+    answer_ends = np.argmax(end_scores, axis=1)
+
+    answers = []
+    for i, tokens in enumerate(tokens_batch):
+        answer_start = answer_starts[i]
+        answer_end = answer_ends[i]
+        answer = self._reconstruct_text(tokens, answer_start, answer_end + 2)
+        if answer.startswith(&#34;. &#34;) or answer.startswith(&#34;, &#34;):
+            answer = answer[2:]
+        sep_index = tokens.index(&#34;[SEP]&#34;)
+        full_txt_tokens = tokens[sep_index + 1 :]
+        paragraph_bert = self._reconstruct_text(full_txt_tokens)
+
+        ans = {}
+        ans[&#34;answer&#34;] = answer
+        if (
+            answer.startswith(&#34;[CLS]&#34;)
+            or answer_end &lt; sep_index
+            or answer.endswith(&#34;[SEP]&#34;)
+        ):
+            ans[&#34;confidence&#34;] = LOWCONF
+        else:
+            # confidence = torch.max(start_scores) + torch.max(end_scores)
+            # confidence = np.log(confidence.item())
+            # ans[&#39;confidence&#39;] = start_scores[i,answer_start]*end_scores[i,answer_end]
+            ans[&#34;confidence&#34;] = (
+                start_scores[i, answer_start] + end_scores[i, answer_end]
+            )
+
+        ans[&#34;start&#34;] = answer_start
+        ans[&#34;end&#34;] = answer_end
+        ans[&#34;context&#34;] = paragraph_bert
+        answers.append(ans)
+    # if len(answers) == 1: answers = answers[0]
+    return answers</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.qa.extractive_qa.ExtractiveQABase.search"><code class="name flex">
+<span>def <span class="ident">search</span></span>(<span>self, query)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@abstractmethod
+def search(self, query):
+    pass</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="ktrain.torch_base.TorchBase" href="../../torch_base.html#ktrain.torch_base.TorchBase">TorchBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="ktrain.torch_base.TorchBase.quantize_model" href="../../torch_base.html#ktrain.torch_base.TorchBase.quantize_model">quantize_model</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="ktrain.text.qa.extractive_qa.SimpleQA"><code class="flex name class">
+<span>class <span class="ident">SimpleQA</span></span>
+<span>(</span><span>index_dir, model_name='bert-large-uncased-whole-word-masking-finetuned-squad', bert_squad_model=None, bert_emb_model='bert-base-uncased', framework='tf', device=None, quantize=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>SimpleQA: Question-Answering on a list of texts</p>
+<pre><code>SimpleQA constructor
+Args:
+  index_dir(str):  path to index directory created by SimpleQA.initialze_index
+  model_name(str): name of Question-Answering model (e.g., BERT SQUAD) to use
+  bert_squad_model(str): alias for model_name (deprecated)
+  bert_emb_model(str): BERT model to use to generate embeddings for semantic similarity
+  framework(str): 'tf' for TensorFlow or 'pt' for PyTorch
+  device(str): Torch device to use (e.g., 'cuda', 'cpu'). Ignored if framework=='tf'.
+               If framework=='tf', use CUDA_VISIBLE_DEVICES environment variable
+               to select device.
+  quantize(bool): If True and framework=='pt' and device != 'cpu', then faster quantized inference is used.
+              Ignored if framework==&quot;tf&quot;.
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class SimpleQA(ExtractiveQABase):
+    &#34;&#34;&#34;
+    SimpleQA: Question-Answering on a list of texts
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        index_dir,
+        model_name=DEFAULT_MODEL,
+        bert_squad_model=None,  # deprecated
+        bert_emb_model=&#34;bert-base-uncased&#34;,
+        framework=&#34;tf&#34;,
+        device=None,
+        quantize=False,
+    ):
+        &#34;&#34;&#34;
+        ```
+        SimpleQA constructor
+        Args:
+          index_dir(str):  path to index directory created by SimpleQA.initialze_index
+          model_name(str): name of Question-Answering model (e.g., BERT SQUAD) to use
+          bert_squad_model(str): alias for model_name (deprecated)
+          bert_emb_model(str): BERT model to use to generate embeddings for semantic similarity
+          framework(str): &#39;tf&#39; for TensorFlow or &#39;pt&#39; for PyTorch
+          device(str): Torch device to use (e.g., &#39;cuda&#39;, &#39;cpu&#39;). Ignored if framework==&#39;tf&#39;.
+                       If framework==&#39;tf&#39;, use CUDA_VISIBLE_DEVICES environment variable
+                       to select device.
+          quantize(bool): If True and framework==&#39;pt&#39; and device != &#39;cpu&#39;, then faster quantized inference is used.
+                      Ignored if framework==&#34;tf&#34;.
+        ```
+        &#34;&#34;&#34;
+
+        self.index_dir = index_dir
+        try:
+            ix = index.open_dir(self.index_dir)
+        except:
+            raise ValueError(
+                &#39;index_dir has not yet been created - please call SimpleQA.initialize_index(&#34;%s&#34;)&#39;
+                % (self.index_dir)
+            )
+        super().__init__(
+            model_name=model_name,
+            bert_squad_model=bert_squad_model,
+            bert_emb_model=bert_emb_model,
+            framework=framework,
+            device=device,
+            quantize=quantize,
+        )
+
+    def _open_ix(self):
+        return index.open_dir(self.index_dir)
+
+    @classmethod
+    def initialize_index(cls, index_dir):
+        schema = Schema(
+            reference=ID(stored=True), content=TEXT, rawtext=TEXT(stored=True)
+        )
+        if not os.path.exists(index_dir):
+            os.makedirs(index_dir)
+        else:
+            raise ValueError(
+                &#34;There is already an existing directory or file with path %s&#34;
+                % (index_dir)
+            )
+        ix = index.create_in(index_dir, schema)
+        return ix
+
+    @classmethod
+    def index_from_list(
+        cls,
+        docs,
+        index_dir,
+        commit_every=1024,
+        breakup_docs=True,
+        procs=1,
+        limitmb=256,
+        multisegment=False,
+        min_words=20,
+        references=None,
+    ):
+        &#34;&#34;&#34;
+        ```
+        index documents from list.
+        The procs, limitmb, and especially multisegment arguments can be used to
+        speed up indexing, if it is too slow.  Please see the whoosh documentation
+        for more information on these parameters:  https://whoosh.readthedocs.io/en/latest/batch.html
+        Args:
+          docs(list): list of strings representing documents
+          index_dir(str): path to index directory (see initialize_index)
+          commit_every(int): commet after adding this many documents
+          breakup_docs(bool): break up documents into smaller paragraphs and treat those as the documents.
+                              This can potentially improve the speed at which answers are returned by the ask method
+                              when documents being searched are longer.
+          procs(int): number of processors
+          limitmb(int): memory limit in MB for each process
+          multisegment(bool): new segments written instead of merging
+          min_words(int):  minimum words for a document (or paragraph extracted from document when breakup_docs=True) to be included in index.
+                           Useful for pruning contexts that are unlikely to contain useful answers
+          references(list): List of strings containing a reference (e.g., file name) for each document in docs.
+                            Each string is treated as a label for the document (e.g., file name, MD5 hash, etc.):
+                               Example:  [&#39;some_file.pdf&#39;, &#39;some_other_file,pdf&#39;, ...]
+                            Strings can also be hyperlinks in which case the label and URL should be separated by a single tab character:
+                               Example: [&#39;ktrain_article\thttps://arxiv.org/pdf/2004.10703v4.pdf&#39;, ...]
+
+                            These references will be returned in the output of the ask method.
+                            If strings are  hyperlinks, then they will automatically be made clickable when the display_answers function
+                            displays candidate answers in a pandas DataFRame.
+
+                            If references is None, the index of element in docs is used as reference.
+        ```
+        &#34;&#34;&#34;
+        if not isinstance(docs, (np.ndarray, list)):
+            raise ValueError(&#34;docs must be a list of strings&#34;)
+        if references is not None and not isinstance(references, (np.ndarray, list)):
+            raise ValueError(&#34;references must be a list of strings&#34;)
+        if references is not None and len(references) != len(docs):
+            raise ValueError(&#34;lengths of docs and references must be equal&#34;)
+
+        ix = index.open_dir(index_dir)
+        writer = ix.writer(procs=procs, limitmb=limitmb, multisegment=multisegment)
+
+        mb = master_bar(range(1))
+        for i in mb:
+            for idx, doc in enumerate(progress_bar(docs, parent=mb)):
+                reference = &#34;%s&#34; % (idx) if references is None else references[idx]
+
+                if breakup_docs:
+                    small_docs = TU.paragraph_tokenize(
+                        doc, join_sentences=True, lang=&#34;en&#34;
+                    )
+                    refs = [reference] * len(small_docs)
+                    for i, small_doc in enumerate(small_docs):
+                        if len(small_doc.split()) &lt; min_words:
+                            continue
+                        content = small_doc
+                        reference = refs[i]
+                        writer.add_document(
+                            reference=reference, content=content, rawtext=content
+                        )
+                else:
+                    if len(doc.split()) &lt; min_words:
+                        continue
+                    content = doc
+                    writer.add_document(
+                        reference=reference, content=content, rawtext=content
+                    )
+
+                idx += 1
+                if idx % commit_every == 0:
+                    writer.commit()
+                    # writer = ix.writer()
+                    writer = ix.writer(
+                        procs=procs, limitmb=limitmb, multisegment=multisegment
+                    )
+                mb.child.comment = f&#34;indexing documents&#34;
+            writer.commit()
+            # mb.write(f&#39;Finished indexing documents&#39;)
+        return
+
+    @classmethod
+    def index_from_folder(
+        cls,
+        folder_path,
+        index_dir,
+        use_text_extraction=False,
+        commit_every=1024,
+        breakup_docs=True,
+        min_words=20,
+        encoding=&#34;utf-8&#34;,
+        procs=1,
+        limitmb=256,
+        multisegment=False,
+        verbose=1,
+    ):
+        &#34;&#34;&#34;
+        ```
+        index all plain text documents within a folder.
+        The procs, limitmb, and especially multisegment arguments can be used to
+        speed up indexing, if it is too slow.  Please see the whoosh documentation
+        for more information on these parameters:  https://whoosh.readthedocs.io/en/latest/batch.html
+
+        Args:
+          folder_path(str): path to folder containing plain text documents (e.g., .txt files)
+          index_dir(str): path to index directory (see initialize_index)
+          use_text_extraction(bool): If True, the  `textract` package will be used to index text from various
+                                     file types including PDF, MS Word, and MS PowerPoint (in addition to plain text files).
+                                     If False, only plain text files will be indexed.
+          commit_every(int): commet after adding this many documents
+          breakup_docs(bool): break up documents into smaller paragraphs and treat those as the documents.
+                              This can potentially improve the speed at which answers are returned by the ask method
+                              when documents being searched are longer.
+          min_words(int):  minimum words for a document (or paragraph extracted from document when breakup_docs=True) to be included in index.
+                           Useful for pruning contexts that are unlikely to contain useful answers
+          encoding(str): encoding to use when reading document files from disk
+          procs(int): number of processors
+          limitmb(int): memory limit in MB for each process
+          multisegment(bool): new segments written instead of merging
+          verbose(bool): verbosity
+        ```
+        &#34;&#34;&#34;
+        if use_text_extraction:
+            # TODO:  change this to use TextExtractor
+            try:
+                import textract
+            except ImportError:
+                raise Exception(
+                    &#34;use_text_extraction=True requires textract:   pip install textract&#34;
+                )
+
+        if not os.path.isdir(folder_path):
+            raise ValueError(&#34;folder_path is not a valid folder&#34;)
+        if folder_path[-1] != os.sep:
+            folder_path += os.sep
+        ix = index.open_dir(index_dir)
+        writer = ix.writer(procs=procs, limitmb=limitmb, multisegment=multisegment)
+        for idx, fpath in enumerate(TU.extract_filenames(folder_path)):
+            reference = &#34;%s&#34; % (fpath.join(fpath.split(folder_path)[1:]))
+            if TU.is_txt(fpath):
+                with open(fpath, &#34;r&#34;, encoding=encoding) as f:
+                    doc = f.read()
+            else:
+                if use_text_extraction:
+                    try:
+                        doc = textract.process(fpath)
+                        doc = doc.decode(&#34;utf-8&#34;, &#34;ignore&#34;)
+                    except:
+                        if verbose:
+                            warnings.warn(&#34;Could not extract text from %s&#34; % (fpath))
+                        continue
+                else:
+                    continue
+
+            if breakup_docs:
+                small_docs = TU.paragraph_tokenize(doc, join_sentences=True, lang=&#34;en&#34;)
+                refs = [reference] * len(small_docs)
+                for i, small_doc in enumerate(small_docs):
+                    if len(small_doc.split()) &lt; min_words:
+                        continue
+                    content = small_doc
+                    reference = refs[i]
+                    writer.add_document(
+                        reference=reference, content=content, rawtext=content
+                    )
+            else:
+                if len(doc.split()) &lt; min_words:
+                    continue
+                content = doc
+                writer.add_document(
+                    reference=reference, content=content, rawtext=content
+                )
+
+            idx += 1
+            if idx % commit_every == 0:
+                writer.commit()
+                writer = ix.writer(
+                    procs=procs, limitmb=limitmb, multisegment=multisegment
+                )
+                if verbose:
+                    print(&#34;%s docs indexed&#34; % (idx))
+        writer.commit()
+        return
+
+    def search(self, query, limit=10):
+        &#34;&#34;&#34;
+        ```
+        search index for query
+        Args:
+          query(str): search query
+          limit(int):  number of top search results to return
+        Returns:
+          list of dicts with keys: reference, rawtext
+        ```
+        &#34;&#34;&#34;
+        ix = self._open_ix()
+        with ix.searcher() as searcher:
+            query_obj = QueryParser(&#34;content&#34;, ix.schema, group=qparser.OrGroup).parse(
+                query
+            )
+            results = searcher.search(query_obj, limit=limit)
+            docs = []
+            output = [dict(r) for r in results]
+            return output</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="ktrain.text.qa.extractive_qa.ExtractiveQABase" href="#ktrain.text.qa.extractive_qa.ExtractiveQABase">ExtractiveQABase</a></li>
+<li>abc.ABC</li>
+<li><a title="ktrain.torch_base.TorchBase" href="../../torch_base.html#ktrain.torch_base.TorchBase">TorchBase</a></li>
+</ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="ktrain.text.qa.extractive_qa.SimpleQA.index_from_folder"><code class="name flex">
+<span>def <span class="ident">index_from_folder</span></span>(<span>folder_path, index_dir, use_text_extraction=False, commit_every=1024, breakup_docs=True, min_words=20, encoding='utf-8', procs=1, limitmb=256, multisegment=False, verbose=1)</span>
+</code></dt>
+<dd>
+<div class="desc"><pre><code>index all plain text documents within a folder.
+The procs, limitmb, and especially multisegment arguments can be used to
+speed up indexing, if it is too slow.  Please see the whoosh documentation
+for more information on these parameters:  https://whoosh.readthedocs.io/en/latest/batch.html
+
+Args:
+  folder_path(str): path to folder containing plain text documents (e.g., .txt files)
+  index_dir(str): path to index directory (see initialize_index)
+  use_text_extraction(bool): If True, the  `textract` package will be used to index text from various
+                             file types including PDF, MS Word, and MS PowerPoint (in addition to plain text files).
+                             If False, only plain text files will be indexed.
+  commit_every(int): commet after adding this many documents
+  breakup_docs(bool): break up documents into smaller paragraphs and treat those as the documents.
+                      This can potentially improve the speed at which answers are returned by the ask method
+                      when documents being searched are longer.
+  min_words(int):  minimum words for a document (or paragraph extracted from document when breakup_docs=True) to be included in index.
+                   Useful for pruning contexts that are unlikely to contain useful answers
+  encoding(str): encoding to use when reading document files from disk
+  procs(int): number of processors
+  limitmb(int): memory limit in MB for each process
+  multisegment(bool): new segments written instead of merging
+  verbose(bool): verbosity
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def index_from_folder(
+    cls,
+    folder_path,
+    index_dir,
+    use_text_extraction=False,
+    commit_every=1024,
+    breakup_docs=True,
+    min_words=20,
+    encoding=&#34;utf-8&#34;,
+    procs=1,
+    limitmb=256,
+    multisegment=False,
+    verbose=1,
+):
+    &#34;&#34;&#34;
+    ```
+    index all plain text documents within a folder.
+    The procs, limitmb, and especially multisegment arguments can be used to
+    speed up indexing, if it is too slow.  Please see the whoosh documentation
+    for more information on these parameters:  https://whoosh.readthedocs.io/en/latest/batch.html
+
+    Args:
+      folder_path(str): path to folder containing plain text documents (e.g., .txt files)
+      index_dir(str): path to index directory (see initialize_index)
+      use_text_extraction(bool): If True, the  `textract` package will be used to index text from various
+                                 file types including PDF, MS Word, and MS PowerPoint (in addition to plain text files).
+                                 If False, only plain text files will be indexed.
+      commit_every(int): commet after adding this many documents
+      breakup_docs(bool): break up documents into smaller paragraphs and treat those as the documents.
+                          This can potentially improve the speed at which answers are returned by the ask method
+                          when documents being searched are longer.
+      min_words(int):  minimum words for a document (or paragraph extracted from document when breakup_docs=True) to be included in index.
+                       Useful for pruning contexts that are unlikely to contain useful answers
+      encoding(str): encoding to use when reading document files from disk
+      procs(int): number of processors
+      limitmb(int): memory limit in MB for each process
+      multisegment(bool): new segments written instead of merging
+      verbose(bool): verbosity
+    ```
+    &#34;&#34;&#34;
+    if use_text_extraction:
+        # TODO:  change this to use TextExtractor
+        try:
+            import textract
+        except ImportError:
+            raise Exception(
+                &#34;use_text_extraction=True requires textract:   pip install textract&#34;
+            )
+
+    if not os.path.isdir(folder_path):
+        raise ValueError(&#34;folder_path is not a valid folder&#34;)
+    if folder_path[-1] != os.sep:
+        folder_path += os.sep
+    ix = index.open_dir(index_dir)
+    writer = ix.writer(procs=procs, limitmb=limitmb, multisegment=multisegment)
+    for idx, fpath in enumerate(TU.extract_filenames(folder_path)):
+        reference = &#34;%s&#34; % (fpath.join(fpath.split(folder_path)[1:]))
+        if TU.is_txt(fpath):
+            with open(fpath, &#34;r&#34;, encoding=encoding) as f:
+                doc = f.read()
+        else:
+            if use_text_extraction:
+                try:
+                    doc = textract.process(fpath)
+                    doc = doc.decode(&#34;utf-8&#34;, &#34;ignore&#34;)
+                except:
+                    if verbose:
+                        warnings.warn(&#34;Could not extract text from %s&#34; % (fpath))
+                    continue
+            else:
+                continue
+
+        if breakup_docs:
+            small_docs = TU.paragraph_tokenize(doc, join_sentences=True, lang=&#34;en&#34;)
+            refs = [reference] * len(small_docs)
+            for i, small_doc in enumerate(small_docs):
+                if len(small_doc.split()) &lt; min_words:
+                    continue
+                content = small_doc
+                reference = refs[i]
+                writer.add_document(
+                    reference=reference, content=content, rawtext=content
+                )
+        else:
+            if len(doc.split()) &lt; min_words:
+                continue
+            content = doc
+            writer.add_document(
+                reference=reference, content=content, rawtext=content
+            )
+
+        idx += 1
+        if idx % commit_every == 0:
+            writer.commit()
+            writer = ix.writer(
+                procs=procs, limitmb=limitmb, multisegment=multisegment
+            )
+            if verbose:
+                print(&#34;%s docs indexed&#34; % (idx))
+    writer.commit()
+    return</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.qa.extractive_qa.SimpleQA.index_from_list"><code class="name flex">
+<span>def <span class="ident">index_from_list</span></span>(<span>docs, index_dir, commit_every=1024, breakup_docs=True, procs=1, limitmb=256, multisegment=False, min_words=20, references=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><pre><code>index documents from list.
+The procs, limitmb, and especially multisegment arguments can be used to
+speed up indexing, if it is too slow.  Please see the whoosh documentation
+for more information on these parameters:  https://whoosh.readthedocs.io/en/latest/batch.html
+Args:
+  docs(list): list of strings representing documents
+  index_dir(str): path to index directory (see initialize_index)
+  commit_every(int): commet after adding this many documents
+  breakup_docs(bool): break up documents into smaller paragraphs and treat those as the documents.
+                      This can potentially improve the speed at which answers are returned by the ask method
+                      when documents being searched are longer.
+  procs(int): number of processors
+  limitmb(int): memory limit in MB for each process
+  multisegment(bool): new segments written instead of merging
+  min_words(int):  minimum words for a document (or paragraph extracted from document when breakup_docs=True) to be included in index.
+                   Useful for pruning contexts that are unlikely to contain useful answers
+  references(list): List of strings containing a reference (e.g., file name) for each document in docs.
+                    Each string is treated as a label for the document (e.g., file name, MD5 hash, etc.):
+                       Example:  ['some_file.pdf', 'some_other_file,pdf', ...]
+                    Strings can also be hyperlinks in which case the label and URL should be separated by a single tab character:
+                       Example: ['ktrain_article        https://arxiv.org/pdf/2004.10703v4.pdf', ...]
+
+                    These references will be returned in the output of the ask method.
+                    If strings are  hyperlinks, then they will automatically be made clickable when the display_answers function
+                    displays candidate answers in a pandas DataFRame.
+
+                    If references is None, the index of element in docs is used as reference.
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def index_from_list(
+    cls,
+    docs,
+    index_dir,
+    commit_every=1024,
+    breakup_docs=True,
+    procs=1,
+    limitmb=256,
+    multisegment=False,
+    min_words=20,
+    references=None,
+):
+    &#34;&#34;&#34;
+    ```
+    index documents from list.
+    The procs, limitmb, and especially multisegment arguments can be used to
+    speed up indexing, if it is too slow.  Please see the whoosh documentation
+    for more information on these parameters:  https://whoosh.readthedocs.io/en/latest/batch.html
+    Args:
+      docs(list): list of strings representing documents
+      index_dir(str): path to index directory (see initialize_index)
+      commit_every(int): commet after adding this many documents
+      breakup_docs(bool): break up documents into smaller paragraphs and treat those as the documents.
+                          This can potentially improve the speed at which answers are returned by the ask method
+                          when documents being searched are longer.
+      procs(int): number of processors
+      limitmb(int): memory limit in MB for each process
+      multisegment(bool): new segments written instead of merging
+      min_words(int):  minimum words for a document (or paragraph extracted from document when breakup_docs=True) to be included in index.
+                       Useful for pruning contexts that are unlikely to contain useful answers
+      references(list): List of strings containing a reference (e.g., file name) for each document in docs.
+                        Each string is treated as a label for the document (e.g., file name, MD5 hash, etc.):
+                           Example:  [&#39;some_file.pdf&#39;, &#39;some_other_file,pdf&#39;, ...]
+                        Strings can also be hyperlinks in which case the label and URL should be separated by a single tab character:
+                           Example: [&#39;ktrain_article\thttps://arxiv.org/pdf/2004.10703v4.pdf&#39;, ...]
+
+                        These references will be returned in the output of the ask method.
+                        If strings are  hyperlinks, then they will automatically be made clickable when the display_answers function
+                        displays candidate answers in a pandas DataFRame.
+
+                        If references is None, the index of element in docs is used as reference.
+    ```
+    &#34;&#34;&#34;
+    if not isinstance(docs, (np.ndarray, list)):
+        raise ValueError(&#34;docs must be a list of strings&#34;)
+    if references is not None and not isinstance(references, (np.ndarray, list)):
+        raise ValueError(&#34;references must be a list of strings&#34;)
+    if references is not None and len(references) != len(docs):
+        raise ValueError(&#34;lengths of docs and references must be equal&#34;)
+
+    ix = index.open_dir(index_dir)
+    writer = ix.writer(procs=procs, limitmb=limitmb, multisegment=multisegment)
+
+    mb = master_bar(range(1))
+    for i in mb:
+        for idx, doc in enumerate(progress_bar(docs, parent=mb)):
+            reference = &#34;%s&#34; % (idx) if references is None else references[idx]
+
+            if breakup_docs:
+                small_docs = TU.paragraph_tokenize(
+                    doc, join_sentences=True, lang=&#34;en&#34;
+                )
+                refs = [reference] * len(small_docs)
+                for i, small_doc in enumerate(small_docs):
+                    if len(small_doc.split()) &lt; min_words:
+                        continue
+                    content = small_doc
+                    reference = refs[i]
+                    writer.add_document(
+                        reference=reference, content=content, rawtext=content
+                    )
+            else:
+                if len(doc.split()) &lt; min_words:
+                    continue
+                content = doc
+                writer.add_document(
+                    reference=reference, content=content, rawtext=content
+                )
+
+            idx += 1
+            if idx % commit_every == 0:
+                writer.commit()
+                # writer = ix.writer()
+                writer = ix.writer(
+                    procs=procs, limitmb=limitmb, multisegment=multisegment
+                )
+            mb.child.comment = f&#34;indexing documents&#34;
+        writer.commit()
+        # mb.write(f&#39;Finished indexing documents&#39;)
+    return</code></pre>
+</details>
+</dd>
+<dt id="ktrain.text.qa.extractive_qa.SimpleQA.initialize_index"><code class="name flex">
+<span>def <span class="ident">initialize_index</span></span>(<span>index_dir)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def initialize_index(cls, index_dir):
+    schema = Schema(
+        reference=ID(stored=True), content=TEXT, rawtext=TEXT(stored=True)
+    )
+    if not os.path.exists(index_dir):
+        os.makedirs(index_dir)
+    else:
+        raise ValueError(
+            &#34;There is already an existing directory or file with path %s&#34;
+            % (index_dir)
+        )
+    ix = index.create_in(index_dir, schema)
+    return ix</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="ktrain.text.qa.extractive_qa.SimpleQA.search"><code class="name flex">
+<span>def <span class="ident">search</span></span>(<span>self, query, limit=10)</span>
+</code></dt>
+<dd>
+<div class="desc"><pre><code>search index for query
+Args:
+  query(str): search query
+  limit(int):  number of top search results to return
+Returns:
+  list of dicts with keys: reference, rawtext
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def search(self, query, limit=10):
+    &#34;&#34;&#34;
+    ```
+    search index for query
+    Args:
+      query(str): search query
+      limit(int):  number of top search results to return
+    Returns:
+      list of dicts with keys: reference, rawtext
+    ```
+    &#34;&#34;&#34;
+    ix = self._open_ix()
+    with ix.searcher() as searcher:
+        query_obj = QueryParser(&#34;content&#34;, ix.schema, group=qparser.OrGroup).parse(
+            query
+        )
+        results = searcher.search(query_obj, limit=limit)
+        docs = []
+        output = [dict(r) for r in results]
+        return output</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="ktrain.text.qa.extractive_qa.ExtractiveQABase" href="#ktrain.text.qa.extractive_qa.ExtractiveQABase">ExtractiveQABase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="ktrain.text.qa.extractive_qa.ExtractiveQABase.ask" href="#ktrain.text.qa.extractive_qa.ExtractiveQABase.ask">ask</a></code></li>
+<li><code><a title="ktrain.text.qa.extractive_qa.ExtractiveQABase.predict_squad" href="#ktrain.text.qa.extractive_qa.ExtractiveQABase.predict_squad">predict_squad</a></code></li>
+<li><code><a title="ktrain.text.qa.extractive_qa.ExtractiveQABase.quantize_model" href="../../torch_base.html#ktrain.torch_base.TorchBase.quantize_model">quantize_model</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="ktrain.text.qa" href="index.html">ktrain.text.qa</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="ktrain.text.qa.extractive_qa.display_answers" href="#ktrain.text.qa.extractive_qa.display_answers">display_answers</a></code></li>
+<li><code><a title="ktrain.text.qa.extractive_qa.pack_byte" href="#ktrain.text.qa.extractive_qa.pack_byte">pack_byte</a></code></li>
+<li><code><a title="ktrain.text.qa.extractive_qa.process_question" href="#ktrain.text.qa.extractive_qa.process_question">process_question</a></code></li>
+<li><code><a title="ktrain.text.qa.extractive_qa.twolists" href="#ktrain.text.qa.extractive_qa.twolists">twolists</a></code></li>
+<li><code><a title="ktrain.text.qa.extractive_qa.unpack_byte" href="#ktrain.text.qa.extractive_qa.unpack_byte">unpack_byte</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="ktrain.text.qa.extractive_qa.AnswerExtractor" href="#ktrain.text.qa.extractive_qa.AnswerExtractor">AnswerExtractor</a></code></h4>
+<ul class="">
+<li><code><a title="ktrain.text.qa.extractive_qa.AnswerExtractor.extract" href="#ktrain.text.qa.extractive_qa.AnswerExtractor.extract">extract</a></code></li>
+<li><code><a title="ktrain.text.qa.extractive_qa.AnswerExtractor.finetune" href="#ktrain.text.qa.extractive_qa.AnswerExtractor.finetune">finetune</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="ktrain.text.qa.extractive_qa.ExtractiveQABase" href="#ktrain.text.qa.extractive_qa.ExtractiveQABase">ExtractiveQABase</a></code></h4>
+<ul class="">
+<li><code><a title="ktrain.text.qa.extractive_qa.ExtractiveQABase.ask" href="#ktrain.text.qa.extractive_qa.ExtractiveQABase.ask">ask</a></code></li>
+<li><code><a title="ktrain.text.qa.extractive_qa.ExtractiveQABase.display_answers" href="#ktrain.text.qa.extractive_qa.ExtractiveQABase.display_answers">display_answers</a></code></li>
+<li><code><a title="ktrain.text.qa.extractive_qa.ExtractiveQABase.predict_squad" href="#ktrain.text.qa.extractive_qa.ExtractiveQABase.predict_squad">predict_squad</a></code></li>
+<li><code><a title="ktrain.text.qa.extractive_qa.ExtractiveQABase.search" href="#ktrain.text.qa.extractive_qa.ExtractiveQABase.search">search</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="ktrain.text.qa.extractive_qa.SimpleQA" href="#ktrain.text.qa.extractive_qa.SimpleQA">SimpleQA</a></code></h4>
+<ul class="">
+<li><code><a title="ktrain.text.qa.extractive_qa.SimpleQA.index_from_folder" href="#ktrain.text.qa.extractive_qa.SimpleQA.index_from_folder">index_from_folder</a></code></li>
+<li><code><a title="ktrain.text.qa.extractive_qa.SimpleQA.index_from_list" href="#ktrain.text.qa.extractive_qa.SimpleQA.index_from_list">index_from_list</a></code></li>
+<li><code><a title="ktrain.text.qa.extractive_qa.SimpleQA.initialize_index" href="#ktrain.text.qa.extractive_qa.SimpleQA.initialize_index">initialize_index</a></code></li>
+<li><code><a title="ktrain.text.qa.extractive_qa.SimpleQA.search" href="#ktrain.text.qa.extractive_qa.SimpleQA.search">search</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>
