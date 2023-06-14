@@ -1139,6 +1139,11 @@ class TransformersPreprocessor(TextPreprocessor):
                 + "this is a multilabel problem (labels are not mutually-exclusive).  Using multilabel=False anyways."
             )
 
+        if multilabel and metrics == ["accuracy"]:
+            warnings.warn(
+                'For multilabel problems, we recommend you supply the following argument to this method: metrics=["binary_accuracy"]'
+            )
+
         # setup model
         num_labels = len(self.get_classes())
         mname = fpath if fpath is not None else self.model_name

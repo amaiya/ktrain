@@ -6,6 +6,19 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
+## 0.37.2 (TBD)
+
+### new:
+- N/A
+
+### changed
+- N/A
+
+### fixed:
+- fix `validate` to support multilabel classification problems (#498)
+- add a warning to `TransformerPreprocessor.get_classifier` to use `binary_accuracy` for multilabel problems (#498)
+
+
 ## 0.37.1 (2023-06-05)
 
 ### new:

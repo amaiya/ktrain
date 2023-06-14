@@ -161,10 +161,7 @@ class Learner(ABC):
             #'to manually validate.')
             # return
             pass
-
-        if U.is_multilabel(val) or multilabel:
-            warnings.warn("multilabel confusion matrices not yet supported")
-            return
+        is_multilabel = U.is_multilabel(val) or multilabel
         y_pred = self.predict(val_data=val)
         y_true = self.ground_truth(val_data=val)
         y_pred = np.squeeze(y_pred)
@@ -191,9 +188,14 @@ class Learner(ABC):
         if len(y_pred.shape) == 1:
             y_pred = np.where(y_pred > 0.5, 1, 0)
             y_true = np.where(y_true > 0.5, 1, 0)
+        elif is_multilabel:
+            from sklearn.preprocessing import binarize
+
+            y_pred = binarize(y_pred, threshold=0.5)
         else:
             y_pred = np.argmax(y_pred, axis=1)
             y_true = np.argmax(y_true, axis=1)
+
         if print_report or save_path is not None:
             if class_names:
                 try:
@@ -208,7 +210,10 @@ class Learner(ABC):
                 )
             else:
                 report = classification_report(
-                    y_true, y_pred, output_dict=not print_report
+                    y_true,
+                    y_pred,
+                    output_dict=not print_report,
+                    zero_division=0,
                 )
             if print_report:
                 print(report)
@@ -217,6 +222,12 @@ class Learner(ABC):
                 df.to_csv(save_path)
                 print("classification report saved to: %s" % (save_path))
             cm_func = confusion_matrix
+        if is_multilabel:
+            warnings.warn(
+                "Confusion matrices do not currently support multilabel classification, so returning None"
+            )
+            return
+
         cm = confusion_matrix(y_true, y_pred)
         return cm
 
