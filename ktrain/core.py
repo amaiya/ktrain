@@ -134,8 +134,8 @@ class Learner(ABC):
         ```
         Returns confusion matrix and optionally prints
         a classification report.
-        This is currently only supported for binary and multiclass
-        classification, not multilabel classification.
+        For multilabel classification problems,confusion matrices are not supported,
+        but classification reports are.
 
         By default, this uses val_data, as supplied to ktrain.get_learner().
         Other validation or test data can be optionally be supplied as argument.

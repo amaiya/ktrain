@@ -1141,7 +1141,8 @@ class TransformersPreprocessor(TextPreprocessor):
 
         if multilabel and metrics == ["accuracy"]:
             warnings.warn(
-                'For multilabel problems, we recommend you supply the following argument to this method: metrics=["binary_accuracy"]'
+                'For multilabel problems, we recommend you supply the following argument to this method: metrics=["binary_accuracy"]. '
+                + "Otherwise, a low accuracy score will be displayed by TensorFlow (https://github.com/tensorflow/tensorflow/issues/41114)."
             )
 
         # setup model
