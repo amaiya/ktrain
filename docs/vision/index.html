@@ -165,7 +165,7 @@ function may adjust these as needed.
 </details>
 </dd>
 <dt id="ktrain.vision.image_classifier"><code class="name flex">
-<span>def <span class="ident">image_classifier</span></span>(<span>name, train_data, val_data=None, freeze_layers=None, metrics=['accuracy'], optimizer_name=&lt;keras.optimizers.optimizer_v2.adam.Adam object&gt;, multilabel=None, pt_fc=[], pt_ps=[], verbose=1)</span>
+<span>def <span class="ident">image_classifier</span></span>(<span>name, train_data, val_data=None, freeze_layers=None, metrics=None, optimizer_name=&lt;keras.optimizers.optimizer_v2.adam.Adam object&gt;, multilabel=None, pt_fc=[], pt_ps=[], verbose=1)</span>
 </code></dt>
 <dd>
 <div class="desc"><pre><code>Returns a pre-defined/pre-trained model ready to be trained/fine-tuned
@@ -181,9 +181,11 @@ Args:
                         If None, then all layers except new Dense layers
                         will be frozen/untrainable.
     metrics (list):  metrics to use
+    metrics(list): List of metrics to use.  If None: 'accuracy' is used for binar/multiclass,
+                   'binary_accuracy' is used for multilabel classification, and 'mae' is used for regression
     optimizer_name(str|obj): name of Keras optimizer (e.g., 'adam', 'sgd') or instance of keras Optimizer
     multilabel(bool):  If True, model will be build to support
-                       multilabel classificaiton (labels are not mutually exclusive).
+                       multilabel classification (labels are not mutually exclusive).
                        If False, binary/multiclassification model will be returned.
                        If None, multilabel status will be inferred from data.
     pt_fc (list of ints): number of hidden units in extra Dense layers
@@ -206,7 +208,7 @@ Return:
     train_data,
     val_data=None,
     freeze_layers=None,
-    metrics=[&#34;accuracy&#34;],
+    metrics=None,
     optimizer_name=U.DEFAULT_OPT,
     multilabel=None,
     pt_fc=[],
@@ -228,9 +230,11 @@ Return:
                             If None, then all layers except new Dense layers
                             will be frozen/untrainable.
         metrics (list):  metrics to use
+        metrics(list): List of metrics to use.  If None: &#39;accuracy&#39; is used for binar/multiclass,
+                       &#39;binary_accuracy&#39; is used for multilabel classification, and &#39;mae&#39; is used for regression
         optimizer_name(str|obj): name of Keras optimizer (e.g., &#39;adam&#39;, &#39;sgd&#39;) or instance of keras Optimizer
         multilabel(bool):  If True, model will be build to support
-                           multilabel classificaiton (labels are not mutually exclusive).
+                           multilabel classification (labels are not mutually exclusive).
                            If False, binary/multiclassification model will be returned.
                            If None, multilabel status will be inferred from data.
         pt_fc (list of ints): number of hidden units in extra Dense layers

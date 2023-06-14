@@ -162,8 +162,8 @@ class Learner(ABC):
         ```
         Returns confusion matrix and optionally prints
         a classification report.
-        This is currently only supported for binary and multiclass
-        classification, not multilabel classification.
+        For multilabel classification problems,confusion matrices are not supported,
+        but classification reports are.
 
         By default, this uses val_data, as supplied to ktrain.get_learner().
         Other validation or test data can be optionally be supplied as argument.
@@ -189,10 +189,7 @@ class Learner(ABC):
             #&#39;to manually validate.&#39;)
             # return
             pass
-
-        if U.is_multilabel(val) or multilabel:
-            warnings.warn(&#34;multilabel confusion matrices not yet supported&#34;)
-            return
+        is_multilabel = U.is_multilabel(val) or multilabel
         y_pred = self.predict(val_data=val)
         y_true = self.ground_truth(val_data=val)
         y_pred = np.squeeze(y_pred)
@@ -219,9 +216,14 @@ class Learner(ABC):
         if len(y_pred.shape) == 1:
             y_pred = np.where(y_pred &gt; 0.5, 1, 0)
             y_true = np.where(y_true &gt; 0.5, 1, 0)
+        elif is_multilabel:
+            from sklearn.preprocessing import binarize
+
+            y_pred = binarize(y_pred, threshold=0.5)
         else:
             y_pred = np.argmax(y_pred, axis=1)
             y_true = np.argmax(y_true, axis=1)
+
         if print_report or save_path is not None:
             if class_names:
                 try:
@@ -236,7 +238,10 @@ class Learner(ABC):
                 )
             else:
                 report = classification_report(
-                    y_true, y_pred, output_dict=not print_report
+                    y_true,
+                    y_pred,
+                    output_dict=not print_report,
+                    zero_division=0,
                 )
             if print_report:
                 print(report)
@@ -245,6 +250,12 @@ class Learner(ABC):
                 df.to_csv(save_path)
                 print(&#34;classification report saved to: %s&#34; % (save_path))
             cm_func = confusion_matrix
+        if is_multilabel:
+            warnings.warn(
+                &#34;Confusion matrices do not currently support multilabel classification, so returning None&#34;
+            )
+            return
+
         cm = confusion_matrix(y_true, y_pred)
         return cm
 
@@ -3544,8 +3555,8 @@ an abstract method and must be implemented by subclasses.
         ```
         Returns confusion matrix and optionally prints
         a classification report.
-        This is currently only supported for binary and multiclass
-        classification, not multilabel classification.
+        For multilabel classification problems,confusion matrices are not supported,
+        but classification reports are.
 
         By default, this uses val_data, as supplied to ktrain.get_learner().
         Other validation or test data can be optionally be supplied as argument.
@@ -3571,10 +3582,7 @@ an abstract method and must be implemented by subclasses.
             #&#39;to manually validate.&#39;)
             # return
             pass
-
-        if U.is_multilabel(val) or multilabel:
-            warnings.warn(&#34;multilabel confusion matrices not yet supported&#34;)
-            return
+        is_multilabel = U.is_multilabel(val) or multilabel
         y_pred = self.predict(val_data=val)
         y_true = self.ground_truth(val_data=val)
         y_pred = np.squeeze(y_pred)
@@ -3601,9 +3609,14 @@ an abstract method and must be implemented by subclasses.
         if len(y_pred.shape) == 1:
             y_pred = np.where(y_pred &gt; 0.5, 1, 0)
             y_true = np.where(y_true &gt; 0.5, 1, 0)
+        elif is_multilabel:
+            from sklearn.preprocessing import binarize
+
+            y_pred = binarize(y_pred, threshold=0.5)
         else:
             y_pred = np.argmax(y_pred, axis=1)
             y_true = np.argmax(y_true, axis=1)
+
         if print_report or save_path is not None:
             if class_names:
                 try:
@@ -3618,7 +3631,10 @@ an abstract method and must be implemented by subclasses.
                 )
             else:
                 report = classification_report(
-                    y_true, y_pred, output_dict=not print_report
+                    y_true,
+                    y_pred,
+                    output_dict=not print_report,
+                    zero_division=0,
                 )
             if print_report:
                 print(report)
@@ -3627,6 +3643,12 @@ an abstract method and must be implemented by subclasses.
                 df.to_csv(save_path)
                 print(&#34;classification report saved to: %s&#34; % (save_path))
             cm_func = confusion_matrix
+        if is_multilabel:
+            warnings.warn(
+                &#34;Confusion matrices do not currently support multilabel classification, so returning None&#34;
+            )
+            return
+
         cm = confusion_matrix(y_true, y_pred)
         return cm
 
@@ -6053,8 +6075,8 @@ NOTE:      Unfreeze method does not currently work with
 <dd>
 <div class="desc"><pre><code>Returns confusion matrix and optionally prints
 a classification report.
-This is currently only supported for binary and multiclass
-classification, not multilabel classification.
+For multilabel classification problems,confusion matrices are not supported,
+but classification reports are.
 
 By default, this uses val_data, as supplied to ktrain.get_learner().
 Other validation or test data can be optionally be supplied as argument.
@@ -6082,8 +6104,8 @@ Args:
     ```
     Returns confusion matrix and optionally prints
     a classification report.
-    This is currently only supported for binary and multiclass
-    classification, not multilabel classification.
+    For multilabel classification problems,confusion matrices are not supported,
+    but classification reports are.
 
     By default, this uses val_data, as supplied to ktrain.get_learner().
     Other validation or test data can be optionally be supplied as argument.
@@ -6109,10 +6131,7 @@ Args:
         #&#39;to manually validate.&#39;)
         # return
         pass
-
-    if U.is_multilabel(val) or multilabel:
-        warnings.warn(&#34;multilabel confusion matrices not yet supported&#34;)
-        return
+    is_multilabel = U.is_multilabel(val) or multilabel
     y_pred = self.predict(val_data=val)
     y_true = self.ground_truth(val_data=val)
     y_pred = np.squeeze(y_pred)
@@ -6139,9 +6158,14 @@ Args:
     if len(y_pred.shape) == 1:
         y_pred = np.where(y_pred &gt; 0.5, 1, 0)
         y_true = np.where(y_true &gt; 0.5, 1, 0)
+    elif is_multilabel:
+        from sklearn.preprocessing import binarize
+
+        y_pred = binarize(y_pred, threshold=0.5)
     else:
         y_pred = np.argmax(y_pred, axis=1)
         y_true = np.argmax(y_true, axis=1)
+
     if print_report or save_path is not None:
         if class_names:
             try:
@@ -6156,7 +6180,10 @@ Args:
             )
         else:
             report = classification_report(
-                y_true, y_pred, output_dict=not print_report
+                y_true,
+                y_pred,
+                output_dict=not print_report,
+                zero_division=0,
             )
         if print_report:
             print(report)
@@ -6165,6 +6192,12 @@ Args:
             df.to_csv(save_path)
             print(&#34;classification report saved to: %s&#34; % (save_path))
         cm_func = confusion_matrix
+    if is_multilabel:
+        warnings.warn(
+            &#34;Confusion matrices do not currently support multilabel classification, so returning None&#34;
+        )
+        return
+
     cm = confusion_matrix(y_true, y_pred)
     return cm</code></pre>
 </details>

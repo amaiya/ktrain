@@ -1136,7 +1136,7 @@ class TransformersPreprocessor(TextPreprocessor):
         self.get_tokenizer(mname)
         return model
 
-    def get_classifier(self, fpath=None, multilabel=None, metrics=[&#34;accuracy&#34;]):
+    def get_classifier(self, fpath=None, multilabel=None, metrics=None):
         &#34;&#34;&#34;
         ```
         creates a model for text classification
@@ -1146,7 +1146,8 @@ class TransformersPreprocessor(TextPreprocessor):
                             If True, model will be forcibly configured for multilabel task.
                             If False, model will be forcibly configured for non-multilabel task.
                             It is recommended to leave this as None.
-          metrics(list): metrics to use
+          metrics(list): Metrics to use.  If None, &#39;binary_accuracy&#39; will be used if multilabel is True
+                         and &#39;accuracy&#39; is used otherwise.
         ```
         &#34;&#34;&#34;
         self.check_trained()
@@ -1165,6 +1166,17 @@ class TransformersPreprocessor(TextPreprocessor):
             warnings.warn(
                 &#34;The multilabel=False argument was supplied, but labels inidcate that  &#34;
                 + &#34;this is a multilabel problem (labels are not mutually-exclusive).  Using multilabel=False anyways.&#34;
+            )
+
+        if multilabel and metrics is None:
+            metrics = [&#34;binary_accuracy&#34;]
+        elif metrics is None:
+            metrics = [&#34;accuracy&#34;]
+
+        if multilabel and metrics == [&#34;accuracy&#34;]:
+            warnings.warn(
+                &#39;For multilabel problems, we recommend you supply the following argument to this method: metrics=[&#34;binary_accuracy&#34;]. &#39;
+                + &#34;Otherwise, a low accuracy score will be displayed by TensorFlow (https://github.com/tensorflow/tensorflow/issues/41114).&#34;
             )
 
         # setup model
@@ -4265,7 +4277,7 @@ Returns:
         self.get_tokenizer(mname)
         return model
 
-    def get_classifier(self, fpath=None, multilabel=None, metrics=[&#34;accuracy&#34;]):
+    def get_classifier(self, fpath=None, multilabel=None, metrics=None):
         &#34;&#34;&#34;
         ```
         creates a model for text classification
@@ -4275,7 +4287,8 @@ Returns:
                             If True, model will be forcibly configured for multilabel task.
                             If False, model will be forcibly configured for non-multilabel task.
                             It is recommended to leave this as None.
-          metrics(list): metrics to use
+          metrics(list): Metrics to use.  If None, &#39;binary_accuracy&#39; will be used if multilabel is True
+                         and &#39;accuracy&#39; is used otherwise.
         ```
         &#34;&#34;&#34;
         self.check_trained()
@@ -4294,6 +4307,17 @@ Returns:
             warnings.warn(
                 &#34;The multilabel=False argument was supplied, but labels inidcate that  &#34;
                 + &#34;this is a multilabel problem (labels are not mutually-exclusive).  Using multilabel=False anyways.&#34;
+            )
+
+        if multilabel and metrics is None:
+            metrics = [&#34;binary_accuracy&#34;]
+        elif metrics is None:
+            metrics = [&#34;accuracy&#34;]
+
+        if multilabel and metrics == [&#34;accuracy&#34;]:
+            warnings.warn(
+                &#39;For multilabel problems, we recommend you supply the following argument to this method: metrics=[&#34;binary_accuracy&#34;]. &#39;
+                + &#34;Otherwise, a low accuracy score will be displayed by TensorFlow (https://github.com/tensorflow/tensorflow/issues/41114).&#34;
             )
 
         # setup model
@@ -4504,7 +4528,7 @@ def load_model_and_configure_from_data(cls, fpath, transformer_ds):
 <h3>Methods</h3>
 <dl>
 <dt id="ktrain.text.preprocessor.TransformersPreprocessor.get_classifier"><code class="name flex">
-<span>def <span class="ident">get_classifier</span></span>(<span>self, fpath=None, multilabel=None, metrics=['accuracy'])</span>
+<span>def <span class="ident">get_classifier</span></span>(<span>self, fpath=None, multilabel=None, metrics=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><pre><code>creates a model for text classification
@@ -4514,13 +4538,14 @@ Args:
                     If True, model will be forcibly configured for multilabel task.
                     If False, model will be forcibly configured for non-multilabel task.
                     It is recommended to leave this as None.
-  metrics(list): metrics to use
+  metrics(list): Metrics to use.  If None, 'binary_accuracy' will be used if multilabel is True
+                 and 'accuracy' is used otherwise.
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_classifier(self, fpath=None, multilabel=None, metrics=[&#34;accuracy&#34;]):
+<pre><code class="python">def get_classifier(self, fpath=None, multilabel=None, metrics=None):
     &#34;&#34;&#34;
     ```
     creates a model for text classification
@@ -4530,7 +4555,8 @@ Args:
                         If True, model will be forcibly configured for multilabel task.
                         If False, model will be forcibly configured for non-multilabel task.
                         It is recommended to leave this as None.
-      metrics(list): metrics to use
+      metrics(list): Metrics to use.  If None, &#39;binary_accuracy&#39; will be used if multilabel is True
+                     and &#39;accuracy&#39; is used otherwise.
     ```
     &#34;&#34;&#34;
     self.check_trained()
@@ -4549,6 +4575,17 @@ Args:
         warnings.warn(
             &#34;The multilabel=False argument was supplied, but labels inidcate that  &#34;
             + &#34;this is a multilabel problem (labels are not mutually-exclusive).  Using multilabel=False anyways.&#34;
+        )
+
+    if multilabel and metrics is None:
+        metrics = [&#34;binary_accuracy&#34;]
+    elif metrics is None:
+        metrics = [&#34;accuracy&#34;]
+
+    if multilabel and metrics == [&#34;accuracy&#34;]:
+        warnings.warn(
+            &#39;For multilabel problems, we recommend you supply the following argument to this method: metrics=[&#34;binary_accuracy&#34;]. &#39;
+            + &#34;Otherwise, a low accuracy score will be displayed by TensorFlow (https://github.com/tensorflow/tensorflow/issues/41114).&#34;
         )
 
     # setup model

@@ -976,7 +976,7 @@ default:[-2] # second-to-last layer</dt>
 </details>
 </dd>
 <dt id="ktrain.text.text_classifier"><code class="name flex">
-<span>def <span class="ident">text_classifier</span></span>(<span>name, train_data, preproc=None, multilabel=None, metrics=['accuracy'], verbose=1)</span>
+<span>def <span class="ident">text_classifier</span></span>(<span>name, train_data, preproc=None, multilabel=None, metrics=None, verbose=1)</span>
 </code></dt>
 <dd>
 <div class="desc"><pre><code>Build and return a text classification model.
@@ -997,7 +997,8 @@ Args:
     multilabel (bool):  If True, multilabel model will be returned.
                         If false, binary/multiclass model will be returned.
                         If None, multilabel will be inferred from data.
-    metrics(list): metrics to use
+    metrics(list): List of metrics to use.  If None: 'accuracy' is used for binar/multiclassification,
+                   'binary_accuracy' is used for multilabel classification, and 'mae' is used for regression.
     verbose (boolean): verbosity of output
 Return:
     model (Model): A Keras Model instance
@@ -1007,7 +1008,7 @@ Return:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def text_classifier(
-    name, train_data, preproc=None, multilabel=None, metrics=[&#34;accuracy&#34;], verbose=1
+    name, train_data, preproc=None, multilabel=None, metrics=None, verbose=1
 ):
     &#34;&#34;&#34;
     ```
@@ -1029,7 +1030,8 @@ Return:
         multilabel (bool):  If True, multilabel model will be returned.
                             If false, binary/multiclass model will be returned.
                             If None, multilabel will be inferred from data.
-        metrics(list): metrics to use
+        metrics(list): List of metrics to use.  If None: &#39;accuracy&#39; is used for binar/multiclassification,
+                       &#39;binary_accuracy&#39; is used for multilabel classification, and &#39;mae&#39; is used for regression.
         verbose (boolean): verbosity of output
     Return:
         model (Model): A Keras Model instance
