@@ -92,7 +92,7 @@ class TestMultilabel(TestCase):
         # use loss instead of accuracy due to: https://github.com/tensorflow/tensorflow/issues/41114
         hist = learner.fit(0.001, 200)
         learner.view_top_losses(n=5)
-        print(learner.validate())
+        learner.validate()
         # final_acc = hist.history[VAL_ACC_NAME][-1]
         # print('final_accuracy:%s' % (final_acc))
         # self.assertGreater(final_acc, 0.97)

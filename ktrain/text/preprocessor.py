@@ -1108,7 +1108,7 @@ class TransformersPreprocessor(TextPreprocessor):
         self.get_tokenizer(mname)
         return model
 
-    def get_classifier(self, fpath=None, multilabel=None, metrics=["accuracy"]):
+    def get_classifier(self, fpath=None, multilabel=None, metrics=None):
         """
         ```
         creates a model for text classification
@@ -1118,7 +1118,8 @@ class TransformersPreprocessor(TextPreprocessor):
                             If True, model will be forcibly configured for multilabel task.
                             If False, model will be forcibly configured for non-multilabel task.
                             It is recommended to leave this as None.
-          metrics(list): metrics to use
+          metrics(list): Metrics to use.  If None, 'binary_accuracy' will be used if multilabel is True
+                         and 'accuracy' is used otherwise.
         ```
         """
         self.check_trained()
@@ -1138,6 +1139,11 @@ class TransformersPreprocessor(TextPreprocessor):
                 "The multilabel=False argument was supplied, but labels inidcate that  "
                 + "this is a multilabel problem (labels are not mutually-exclusive).  Using multilabel=False anyways."
             )
+
+        if multilabel and metrics is None:
+            metrics = ["binary_accuracy"]
+        elif metrics is None:
+            metrics = ["accuracy"]
 
         if multilabel and metrics == ["accuracy"]:
             warnings.warn(
