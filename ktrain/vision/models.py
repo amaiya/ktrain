@@ -118,7 +118,7 @@ def image_classifier(
     train_data,
     val_data=None,
     freeze_layers=None,
-    metrics=["accuracy"],
+    metrics=None,
     optimizer_name=U.DEFAULT_OPT,
     multilabel=None,
     pt_fc=[],
@@ -140,9 +140,11 @@ def image_classifier(
                             If None, then all layers except new Dense layers
                             will be frozen/untrainable.
         metrics (list):  metrics to use
+        metrics(list): List of metrics to use.  If None: 'accuracy' is used for binar/multiclass,
+                       'binary_accuracy' is used for multilabel classification, and 'mae' is used for regression
         optimizer_name(str|obj): name of Keras optimizer (e.g., 'adam', 'sgd') or instance of keras Optimizer
         multilabel(bool):  If True, model will be build to support
-                           multilabel classificaiton (labels are not mutually exclusive).
+                           multilabel classification (labels are not mutually exclusive).
                            If False, binary/multiclassification model will be returned.
                            If None, multilabel status will be inferred from data.
         pt_fc (list of ints): number of hidden units in extra Dense layers
@@ -234,7 +236,7 @@ def image_model(
     train_data,
     val_data=None,
     freeze_layers=None,
-    metrics=["accuracy"],
+    metrics=None,
     optimizer_name=U.DEFAULT_OPT,
     multilabel=None,
     pt_fc=[],
@@ -255,7 +257,8 @@ def image_model(
         freeze_layers (int):  number of beginning layers to make untrainable
                             If None, then all layers except new Dense layers
                             will be frozen/untrainable.
-        metrics (list):  metrics to use
+        metrics(list): List of metrics to use.  If None: 'accuracy' is used for binar/multiclass,
+                       'binary_accuracy' is used for multilabel classification, and 'mae' is used for regression
         optimizer_name(str|obj): name of Keras optimizer (e.g., 'adam', 'sgd') or instance of Keras optimizer
         multilabel(bool):  If True, model will be build to support
                            multilabel classificaiton (labels are not mutually exclusive).
@@ -328,6 +331,14 @@ def image_model(
     if not multilabel and len(train_data[0][-1].shape) == 1:
         is_regression = True
 
+    # set metrics
+    if is_regression and metrics is None:
+        metrics = ["mae"]
+    elif multilabel and metrics is None:
+        metrics = ["binary_accuracy"]
+    elif metrics is None:
+        metrics = ["accuracy"]
+
     # set loss and acivations
     loss_func = "categorical_crossentropy"
     activation = "softmax"
@@ -337,8 +348,6 @@ def image_model(
     elif is_regression:
         loss_func = "mse"
         activation = None
-        if metrics == ["accuracy"]:
-            metrics = ["mae"]
 
     U.vprint("Is Multi-Label? %s" % (multilabel), verbose=verbose)
     U.vprint("Is Regression? %s" % (is_regression), verbose=verbose)

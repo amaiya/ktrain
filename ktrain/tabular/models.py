@@ -23,7 +23,7 @@ def _tabular_model(
     train_data,
     multilabel=None,
     is_regression=False,
-    metrics=["accuracy"],
+    metrics=None,
     hidden_layers=[1000, 500],
     hidden_dropouts=[0.0, 0.5],
     bn=False,
@@ -40,7 +40,8 @@ def _tabular_model(
                             If false, binary/multiclass model will be returned.
                             If None, multilabel will be inferred from data.
         is_regression(bool): If True, will build a regression model, else classification model.
-        metrics(list): list of metrics to use
+        metrics(list): List of metrics to use.  If None: 'accuracy' is used for binar/multiclass,
+                       'binary_accuracy' is used for multilabel classification, and 'mae' is used for regressio
         hidden_layers(list): number of units in each hidden layer of NN
         hidden_dropouts(list): Dropout values after each hidden layer of NN
         bn(bool): If True, BatchNormalization will be used before each fully-connected layer in NN
@@ -73,8 +74,12 @@ def _tabular_model(
         loss_func = "mse"
         activation = "linear"
     else:  # classification
-        if metrics is None:
+        # set metrics
+        if multilabel and metrics is None:
+            metrics = ["binary_accuracy"]
+        elif metrics is None:
             metrics = ["accuracy"]
+
         # set number of classes and multilabel flag
         num_classes = U.nclasses_from_data(train_data)
 
@@ -140,7 +145,7 @@ def tabular_classifier(
     name,
     train_data,
     multilabel=None,
-    metrics=["accuracy"],
+    metrics=None,
     hidden_layers=[1000, 500],
     hidden_dropouts=[0.0, 0.5],
     bn=False,
@@ -156,7 +161,8 @@ def tabular_classifier(
         multilabel (bool):  If True, multilabel model will be returned.
                             If false, binary/multiclass model will be returned.
                             If None, multilabel will be inferred from data.
-        metrics(list): list of metrics to use
+        metrics(list): List of metrics to use.  If None: 'accuracy' is used for binar/multiclass,
+                       'binary_accuracy' is used for multilabel classification, and 'mae' is used for regressio
         hidden_layers(list): number of units in each hidden layer of NN
         hidden_dropouts(list): Dropout values after each hidden layer of NN
         bn(bool): If True, BatchNormalization will be used before each fully-connected layer in NN

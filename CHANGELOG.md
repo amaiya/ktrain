@@ -6,13 +6,13 @@ Most recent releases are shown at the top. Each release shows:
 - **Changed**: Additional parameters, changes to inputs or outputs, etc
 - **Fixed**: Bug fixes that don't change documented behaviour
 
-## 0.37.2 (TBD)
+## 0.37.2 (2023-06-14)
 
 ### new:
 - N/A
 
 ### changed
-- N/A
+- `text.models`, `vision.models`, and `tabular.models` now all automatically set metrics to use `binary_accuracy` for multilabel problems
 
 ### fixed:
 - fix `validate` to support multilabel classification problems (#498)

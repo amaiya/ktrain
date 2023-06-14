@@ -58,7 +58,7 @@ def _text_model(
     preproc=None,
     multilabel=None,
     classification=True,
-    metrics=["accuracy"],
+    metrics=None,
     verbose=1,
 ):
     """
@@ -82,7 +82,8 @@ def _text_model(
                             If None, multilabel will be inferred from data.
         classification(bool): If True, will build a text classificaton model.
                               Otherwise, a text regression model will be returned.
-        metrics(list): list of metrics to use
+        metrics(list): List of metrics to use.  If None: 'accuracy' is used for binar/multiclassification,
+                       'binary_accuracy' is used for multilabel classification, and 'mae' is used for regression.
         verbose (boolean): verbosity of output
     Return:
         model (Model): A Keras Model instance
@@ -135,8 +136,6 @@ def _text_model(
         maxlen = U.shape_from_data(train_data)[1]
         U.vprint("maxlen is %s" % (maxlen), verbose=verbose)
     else:  # classification
-        if metrics is None:
-            metrics = ["accuracy"]
         # set number of classes and multilabel flag
         num_classes = U.nclasses_from_data(train_data)
 
@@ -150,6 +149,12 @@ def _text_model(
             )
             name = FASTTEXT
         U.vprint("Is Multi-Label? %s" % (multilabel), verbose=verbose)
+
+        # set metrics
+        if multilabel and metrics is None:
+            metrics = ["binary_accuracy"]
+        elif metrics is None:
+            metrics = ["accuracy"]
 
         # set loss and activations
         loss_func = "categorical_crossentropy"
@@ -548,7 +553,7 @@ def _build_bigru(
 
 
 def text_classifier(
-    name, train_data, preproc=None, multilabel=None, metrics=["accuracy"], verbose=1
+    name, train_data, preproc=None, multilabel=None, metrics=None, verbose=1
 ):
     """
     ```
@@ -570,7 +575,8 @@ def text_classifier(
         multilabel (bool):  If True, multilabel model will be returned.
                             If false, binary/multiclass model will be returned.
                             If None, multilabel will be inferred from data.
-        metrics(list): metrics to use
+        metrics(list): List of metrics to use.  If None: 'accuracy' is used for binar/multiclassification,
+                       'binary_accuracy' is used for multilabel classification, and 'mae' is used for regression.
         verbose (boolean): verbosity of output
     Return:
         model (Model): A Keras Model instance
