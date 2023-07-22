@@ -9,7 +9,7 @@ Most recent releases are shown at the top. Each release shows:
 
 
 
-## 0.37.4 (TBD)
+## 0.37.4 (2023-07-22)
 
 ### new:
 - N/A
