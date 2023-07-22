@@ -7,7 +7,7 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
-## 0.37.5 (TBD)
+## 0.37.5 (2023-07-22)
 
 ### new:
 - N/A
@@ -17,6 +17,7 @@ Most recent releases are shown at the top. Each release shows:
 
 ### fixed:
 - Removed pin on `scikit-learn`, as `eli5-tf` repo was updated to support `scikit-learn>=1.3` (#505)
+- pin to `paper-qa==2.1.1` due to breaking changes (#506)
 
 
 ## 0.37.4 (2023-07-22)
