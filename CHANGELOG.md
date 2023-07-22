@@ -18,7 +18,8 @@ Most recent releases are shown at the top. Each release shows:
 - N/A
 
 ### fixed:
-- N/A
+- Temporarily pin to `scikit-learn<1.3` to avoid `eli5` import error (#505) 
+- Temporarily changed `generative_qa` imports to avoid `OPENAI_API_KEY error (#506)
 
 
 ## 0.37.3 (2023-07-22)

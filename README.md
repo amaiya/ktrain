@@ -17,7 +17,7 @@
 ```python
 import os
 os.environ['OPENAI_API_KEY'] = 'ENTER YOUR OPENAI API KEY HERE'
-from ktrain.text.qa import GenerativeQA
+from ktrain.text.qa.generative_qa import GenerativeQA
 genqa = GenerativeQA()
 genqa.add_doc(text=a_string_containing_text_of_your_document)
 print(genqa.query('What is ktrain?'))
