@@ -16,7 +16,7 @@ Most recent releases are shown at the top. Each release shows:
 - N/A
 
 ### fixed:
-- Removed pin to `paper-qa==2.1.1` due to issue in latest `langchain` release
+- Removed pin to `paper-qa==2.1.1` due to issue in latest `langchain` release. Added notification to install `langchain==0.0.180`
 
 
 ## 0.37.5 (2023-07-22)

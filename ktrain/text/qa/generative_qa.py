@@ -45,7 +45,7 @@ class GenerativeQA:
         """
         if not PAPERQA_INSTALLED:
             raise Exception(
-                "GenerativeQA in ktrain requires the paper-qa package by Andrew White: pip install paper-qa==2.1.1"
+                "GenerativeQA in ktrain requires the paper-qa package by Andrew White: pip install paper-qa==2.1.1 langchain==0.0.180"
             )
         self.docs = Docs(llm)
         if is_notebook():
