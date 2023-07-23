@@ -137,6 +137,8 @@ type a question mark before the method and press ENTER in a Google Colab or Jupy
 ### How do I train on dataset too large for RAM?
 
 If a call to `preprocess_train` is exceeding the limits of your memory/RAM, you can split up your training set into parts and preprocess/train each part separately.
+This way, you can train using as little or as much RAM memory as you want based on how large you make each part.
+
 
 ```python
 # load text data
