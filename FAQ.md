@@ -34,6 +34,8 @@
 
 - [How do I save and/or reload a trained model?](#how-do-i-resume-training-from-a-saved-checkpoint)
 
+- [How do I train using dataset too large for RAM?](#how-do-i-train-on-dataset-too-large-for-ram)
+
 - [How do I train using multiple GPUs?](#how-do-i-train-using-multiple-gpus)
 
 - [How do I train a model using mixed precision?](#how-do-i-train-a-model-using-mixed-precision)
@@ -130,6 +132,57 @@ type a question mark before the method and press ENTER in a Google Colab or Jupy
 
 
 [[Back to Top](#frequently-asked-questions-about-ktrain)]
+
+
+### How do I train on dataset too large for RAM?
+
+If a call to `preprocess_train` is exceeding the limits of your memory/RAM, you can split up your training set into parts and preprocess/train each part separately.
+
+```python
+# load text data
+categories = ['alt.atheism', 'soc.religion.christian','comp.graphics', 'sci.med']
+from sklearn.datasets import fetch_20newsgroups
+train_b = fetch_20newsgroups(subset='train', categories=categories, shuffle=True)
+(x_train, y_train) = (train_b.data, train_b.target)
+
+# split training set into parts (optionally store on disk and read in only one at a time)
+part1_x = x_train[:1000]
+part1_y = y_train[:1000]
+part2_x = x_train[1000:]
+part2_y = y_train[1000:]
+
+# preprocess/train on first part
+import ktrain
+from ktrain import text
+MODEL_NAME = 'distilbert-base-uncased'
+t = text.Transformer(MODEL_NAME, maxlen=500, class_names=train_b.target_names)
+trn = t.preprocess_train(part1_x, part1_y)
+model = t.get_classifier()
+learner = ktrain.get_learner(model, train_data=trn, val_data=None, batch_size=6)
+learner.fit_onecycle(5e-5, 1)
+
+# save partially-trained model
+predictor = ktrain.get_predictor(model, t)
+predictor.save('/tmp/part1_pred')
+
+# to resume training during different session you can
+# read back in partially-trained model
+predictor = ktrain.load_predictor('/tmp/part1_pred')
+model = predictor.model
+t = predictor.preproc # Preprocessor object
+
+# preprocess/train on second part
+# Since we save the predictor, this can potentially occur in/on a different session/day
+trn = t.preprocess_train(part2_x, part2_y)
+learner = ktrain.get_learner(model, train_data=trn, val_data=None, batch_size=6)
+learner.fit_onecycle(5e-5, 1)
+
+# learner.model is now fully trained on entire dataset
+```
+
+[[Back to Top](#frequently-asked-questions-about-ktrain)]
+
+
 
 
 ### How do I resume training from a saved checkpoint?
