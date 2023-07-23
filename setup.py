@@ -16,6 +16,7 @@ all_extras = [
     # "torch",  # for qa, summarization, translation, zsl, speech
     "ipython",  # for tests
     "textract",  # for TextExtractor non-default method
+    "paper-qa==2.1.1",  # text.qa.generative_qa
     "datasets",  # for text.qa.AnswerExtractor.finetune
     "textblob",  # for text.kw.KeywordExtractor and textutils.extract_noun_phrases
     "sumy",  # text.summarization.core.LexRankSummarizer
@@ -62,7 +63,6 @@ setup(
         "sentencepiece",  #  Added due to breaking change in transformers>=4.0
         "keras_bert>=0.86.0",  # imported in imports with warning and used in 'ktrain.text' ; support for TF 2.3
         "whoosh",  # imported by text.qa module
-        "paper-qa==2.1.1",  # text.qa.generative_qa
     ],
     extras_require={
         # NOTE: If missing, these libraries below are installed manually on-the-fly when required by an invoked method with appropriate warnings

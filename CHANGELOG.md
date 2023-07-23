@@ -7,6 +7,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.37.6 (2023-07-23)
+
+### new:
+- N/A
+
+### changed
+- N/A
+
+### fixed:
+- Removed pin to `paper-qa==2.1.1` due to issue in latest `langchain` release
+
+
 ## 0.37.5 (2023-07-22)
 
 ### new:
