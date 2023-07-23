@@ -384,7 +384,7 @@ pip install sumy
 # for text.kw.KeywordExtractor
 pip install textblob
 # for text.qa.generative_qa
-pip install paper-qa
+pip install paper-qa==2.1.1 langchain==0.0.180
 ```
 - **ktrain** purposely pins to a lower version of **transformers** to include support for older versions of TensorFlow.  If you need a newer version of `transformers`, it is usually safe for you to upgrade `transformers`, as long as you do it **after** installing **ktrain**.
 
