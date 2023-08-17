@@ -1,5 +1,5 @@
 ### [Overview](#overview) | [Tutorials](#tutorials) | [Examples](#examples) |  [Installation](#installation) | [FAQ](https://github.com/amaiya/ktrain/blob/master/FAQ.md) | [API Docs](https://amaiya.github.io/ktrain/index.html) |  [How to Cite](#how-to-cite)
-[![PyPI Status](https://badge.fury.io/py/ktrain.svg)](https://badge.fury.io/py/ktrain) [![ktrain python compatibility](https://img.shields.io/pypi/pyversions/ktrain.svg)](https://pypi.python.org/pypi/ktrain) [![license](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/amaiya/ktrain/blob/master/LICENSE) [![Downloads](https://pepy.tech/badge/ktrain)](https://pepy.tech/project/ktrain)
+[![PyPI Status](https://badge.fury.io/py/ktrain.svg)](https://badge.fury.io/py/ktrain) [![ktrain python compatibility](https://img.shields.io/pypi/pyversions/ktrain.svg)](https://pypi.python.org/pypi/ktrain) [![license](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/amaiya/ktrain/blob/master/LICENSE) [![Downloads](https://static.pepy.tech/badge/ktrain)](https://pepy.tech/project/ktrain)
 <!--[![Twitter URL](https://img.shields.io/twitter/url/https/twitter.com/ktrain_ai.svg?style=social&label=Follow%20%40ktrain_ai)](https://twitter.com/ktrain_ai)-->
 
 <p align="center">
