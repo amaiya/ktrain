@@ -7,6 +7,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.38.dev (TBD)
+
+### new:
+- N/A
+
+### changed
+- `GenerativeQA` now recomends `langchain==0.0.240`
+
+### fixed:
+- N/A
+
+
 ## 0.37.6 (2023-07-23)
 
 ### new:
