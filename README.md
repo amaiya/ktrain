@@ -368,7 +368,9 @@ pip install sumy
 # for text.kw.KeywordExtractor
 pip install textblob
 # for text.qa.generative_qa
-pip install paper-qa==2.1.1 langchain==0.0.180
+pip install paper-qa==2.1.1 langchain==0.0.240
+# for text.generative_ai
+pip install onprem
 ```
 - **ktrain** purposely pins to a lower version of **transformers** to include support for older versions of TensorFlow.  If you need a newer version of `transformers`, it is usually safe for you to upgrade `transformers`, as long as you do it **after** installing **ktrain**.
 
@@ -388,6 +390,7 @@ can be used out-of-the-box **without** having TensorFlow installed, as summarize
 | [Image Captioning](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/vision/image_captioning_example.ipynb) (pretrained)     |  ❌  | ✅  |❌   |
 | [Object Detection](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/vision/object_detection_example.ipynb) (pretrained)     |  ❌  | ✅  |❌   |
 | [Sentiment Analysis](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/sentiment_analysis_example.ipynb) (pretrained)     |  ❌  | ✅  |❌   |
+| [GenerativeAI](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/generative_ai_example.ipynb) (sentence-transformers)     |  ❌  | ✅  |❌   |
 | [Topic Modeling](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/master/tutorials/tutorial-05-learning_from_unlabeled_text_data.ipynb) (sklearn)  |  ❌  | ❌  | ✅  |
 | [Keyphrase Extraction](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/keyword_extraction_example.ipynb) (textblob/nltk/sklearn)   |  ❌  | ❌  | ✅  |
 
