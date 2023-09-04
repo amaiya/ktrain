@@ -27,7 +27,7 @@ People:"""
 
 saved_output = llm.prompt(prompt)
 # OUTPUT
-#Cillian Murphy, Florence Pugh
+# Cillian Murphy, Florence Pugh
 ```
 
 - **2023-05-11**
