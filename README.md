@@ -13,9 +13,9 @@
 
 ### News and Announcements
 - **2023-09-05**
-  - **ktrain 0.38.x** is released and is now powered by the [onprem.LLM](https://github.com/amaiya/onprem) package for ChatGPT-like generative AI. See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/generative_ai_example.ipynb).
+  - **ktrain 0.38.x** is released and includes a `generative_ai` module that is now powered by the [onprem.LLM](https://github.com/amaiya/onprem) package for ChatGPT-like generative AI. The `generative_ai.LLM` class replaces the previous `generative_ai.GenerativeAI` class (**breaking change**).  See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/generative_ai_example.ipynb).
 ```python
-from ktrain.text.generative_ai import GenerativeAI
+from ktrain.text.generative_ai import LLM
 llm = GenerativeAI(n_gpu_layers=35)
 prompt = """Extract the names of people in the supplied sentences. Here is an example:
 Sentence: James Gandolfini and Paul Newman were great actors.
