@@ -1,1 +1,1 @@
-from .core import GenerativeAI
+from .core import LLM as GenerativeAI

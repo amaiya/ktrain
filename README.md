@@ -12,6 +12,24 @@
 
 
 ### News and Announcements
+- **2023-09-05**
+  - **ktrain 0.38.x** is released and is now powered by the [onprem.LLM](https://github.com/amaiya/onprem) package for ChatGPT-like generative AI. See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/generative_ai_example.ipynb).
+```python
+from ktrain.text.generative_ai import GenerativeAI
+llm = GenerativeAI(n_gpu_layers=35)
+prompt = """Extract the names of people in the supplied sentences. Here is an example:
+Sentence: James Gandolfini and Paul Newman were great actors.
+People:
+James Gandolfini, Paul Newman
+Sentence:
+I like Cillian Murphy's acting. Florence Pugh is great, too.
+People:"""
+
+saved_output = llm.prompt(prompt)
+# OUTPUT
+#Cillian Murphy, Florence Pugh
+```
+
 - **2023-05-11**
   - **ktrain 0.37.x** is released and supports **Generative Question-Answering** using OpenAI models like GPT-3.5-turbo by wrapping the LangChain and Paper-QA packages. Ask a large text corpus questions and receive answers with citations to which documents the answers were found. See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/question_answering_with_openai.ipynb) for more information.
 ```python
@@ -22,40 +40,6 @@ genqa = GenerativeQA()
 genqa.add_doc(text=a_string_containing_text_of_your_document)
 print(genqa.query('What is ktrain?'))
 ```
-
-- **2023-04-21**
-  - **ktrain 0.36.x** is released and supports a simple wrapper to **Sentiment Analysis**. See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/sentiment_analysis_example.ipynb) for more information. 
-```python
-# Example: Sentiment Analysis
-from ktrain.text.sentiment import SentimentAnalyzer
-classifier = SentimentAnalyzer()
-texts = ['I got a promotion today.', 'My appointment is at 3:30.', 'There were cost overruns.']
-result = classifier.predict(texts)
-# OUTPUT:
-#[{'POSITIVE': 0.9021117091178894},
-# {'NEUTRAL': 0.9110478758811951},
-# {'NEGATIVE': 0.743671715259552}]
-```
-- **2023-04-01**
-  - **ktrain 0.35.x** is released and supports **Generative AI** using an instruction-fine-tuned version of GPT-J that can run on your own machine.  See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/generative_ai_example.ipynb) for more information. Supply prompts in the form of instructions for what you want the model to do:
-```python
-# Example: Generative AI in ktrain
-from ktrain.text.generative_ai import GenerativeAI
-model = GenerativeAI() # needs at least 16GB of GPU memory
-prompt = """Extract the names of people in the supplied sentences. Here is an example:
-Sentence:
-Paul Newman is a great actor.
-People:
-Paul Newman
-Sentence:
-I like James Gandolfini's acting.
-People:"""
-print(model.execute(prompt))
-# OUTPUT:
-# James Gandolfini
-```
-- **2023-03-30**
-  - **ktrain 0.34.x** is released and supports fast LexRank-based text summarization.
 ----
 
 ### Overview

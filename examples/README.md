@@ -159,7 +159,7 @@ The objective of the CoNLL2003 task is to classify sequences of words as belongi
 ### <a name="kwextraction"></a>Keyphrase Extraction: [keyword_extraction_example.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text)
 ### <a name="indonesian"></a> [Indonesian NLP examples by Sandy Khosasi](https://github.com/ilos-vigil/ktrain-assessment-study) including Indonesian question-answering, emotion recognition, and document similarity
 ### <a name="sentiment"></a> Sentiment Analysis:  [sentiment_analysis_example.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text/)
-### <a name="generativeai"></a> Generative AI Using GPT:  [generative_ai_example.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text/generative_ai_example.ipynb)
+### <a name="generativeai"></a> ChatGPT-like Generative AI on Your Own Machine:  [generative_ai_example.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text/generative_ai_example.ipynb)
 
 
 ## Vision Data
