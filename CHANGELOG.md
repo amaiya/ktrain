@@ -13,7 +13,7 @@ Most recent releases are shown at the top. Each release shows:
 - N/A
 
 ### changed
-- **Breaking Change**: The `generative_ai.GenerativeAI` module is now powered by our `onprem.LLM` package (see [example notebook](https://nbviewer.org/github/amaiya/ktrain/blob/develop/examples/text/generative_ai_example.ipynb)).
+- **Breaking Change**: The `generative_ai.LLM` class replaces the `generative_ai.GenerativeAI` module is now powered by our `OnPrem.LLM` package (see [example notebook](https://nbviewer.org/github/amaiya/ktrain/blob/develop/examples/text/generative_ai_example.ipynb)).
 - `GenerativeQA` now recomends `langchain==0.0.240`
 
 ### fixed:
