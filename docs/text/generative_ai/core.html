@@ -26,90 +26,16 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from transformers import pipeline, GenerationConfig
-import torch
-from ...torch_base import TorchBase
-from typing import Optional
-import warnings
+<pre><code class="python"># As of v0.38.x, generative_ai is powered by our onprem.LLM package
+try:
+    from onprem import LLM
+except ImportError:
+    raise ImportError(
+        &#34;The generative_ai module requires the onprem package.  Please install it with: pip install onprem&#34;
+    )
+import langchain
 
-
-class GenerativeAI(TorchBase):
-    &#34;&#34;&#34;
-    interface to Transformer-based generative AI models like GPT*
-    &#34;&#34;&#34;
-
-    def __init__(
-        self,
-        model_name: str = &#34;nlpcloud/instruct-gpt-j-fp16&#34;,
-        device: Optional[str] = None,
-        max_new_tokens: int = 512,
-        do_sample: bool = True,
-        **kwargs
-    ):
-        &#34;&#34;&#34;
-        ```
-        Interface to GenerativeAI models using the transformers library.
-        Extra kwargs are supplied directly to the generate method of the model.
-
-        Args:
-          model_name(str): name of the model.  Currently, only the nlpcloud/instruct-gpt-j-fp16
-          device(str): device to use (&#34;cpu&#34; for CPU, &#34;cuda&#34; for GPU, &#34;cuda:0&#34; for first GPU, &#34;cuda:1&#34; for second GPU ,etc.):
-          max_new_tokens(int):  The maximum numbers of tokens to generate, ignoring the number of tokens in the prompt.
-          do_sample(bool):  If True, use sampling instead of the default greedy decoding.
-        ```
-        &#34;&#34;&#34;
-
-        super().__init__(device=device)
-        self.device_id = self.device_to_id()
-        self.config = GenerationConfig(
-            max_new_tokens=max_new_tokens, do_sample=do_sample, **kwargs
-        )
-        if self.device_id &lt; 0:
-            self.generator = pipeline(
-                model=model_name, device=self.device_id, generation_config=self.config
-            )
-        else:
-            self.generator = pipeline(
-                model=model_name,
-                torch_dtype=torch.float16,
-                device=self.device_id,
-                generation_config=self.config,
-            )
-        self.generator.model.generation_config.pad_token_id = (
-            self.generator.model.generation_config.eos_token_id
-        )
-
-    def execute(self, prompt: str):
-        &#34;&#34;&#34;
-        ```
-        Issue a prompt to the model.  The default model is an instruction-fine-tuned model based on GPT-J.
-        This means that you should always construct your prompt in the form of an instruction.
-
-
-        Example:
-
-        model = GenerativeAI()
-        prompt = &#34;Tell me whether the following sentence is positive,  negative, or neutral in sentiment.\\nThe reactivity of  your team has been amazing, thanks!\\n&#34;
-        model.prompt(prompt)
-
-
-        Args:
-          prompt(str): prompt to supply to model
-        Returns:
-          str: generated text
-        ```
-        &#34;&#34;&#34;
-        prompt = prompt.strip() + &#34;\n&#34;
-        result = self.generator(prompt)
-        result = result[0][&#34;generated_text&#34;]
-        if result.startswith(prompt):
-            result = result.replace(prompt, &#34;&#34;)
-        if not result:
-            warnings.warn(
-                &#34;No output was generated. The model is sensitive to where you please newlines. Try adding or removing embedded newlines in the prompt. Follow the example notebook for tips.&#34;
-            )
-
-        return result.replace(&#34;\\n&#34;, &#34;\n&#34;)</code></pre>
+langchain.llm_cache = None</code></pre>
 </details>
 </section>
 <section>
@@ -119,179 +45,6 @@ class GenerativeAI(TorchBase):
 <section>
 </section>
 <section>
-<h2 class="section-title" id="header-classes">Classes</h2>
-<dl>
-<dt id="ktrain.text.generative_ai.core.GenerativeAI"><code class="flex name class">
-<span>class <span class="ident">GenerativeAI</span></span>
-<span>(</span><span>model_name: str = 'nlpcloud/instruct-gpt-j-fp16', device: Optional[str] = None, max_new_tokens: int = 512, do_sample: bool = True, **kwargs)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>interface to Transformer-based generative AI models like GPT*</p>
-<pre><code>Interface to GenerativeAI models using the transformers library.
-Extra kwargs are supplied directly to the generate method of the model.
-
-Args:
-  model_name(str): name of the model.  Currently, only the nlpcloud/instruct-gpt-j-fp16
-  device(str): device to use (&quot;cpu&quot; for CPU, &quot;cuda&quot; for GPU, &quot;cuda:0&quot; for first GPU, &quot;cuda:1&quot; for second GPU ,etc.):
-  max_new_tokens(int):  The maximum numbers of tokens to generate, ignoring the number of tokens in the prompt.
-  do_sample(bool):  If True, use sampling instead of the default greedy decoding.
-</code></pre></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class GenerativeAI(TorchBase):
-    &#34;&#34;&#34;
-    interface to Transformer-based generative AI models like GPT*
-    &#34;&#34;&#34;
-
-    def __init__(
-        self,
-        model_name: str = &#34;nlpcloud/instruct-gpt-j-fp16&#34;,
-        device: Optional[str] = None,
-        max_new_tokens: int = 512,
-        do_sample: bool = True,
-        **kwargs
-    ):
-        &#34;&#34;&#34;
-        ```
-        Interface to GenerativeAI models using the transformers library.
-        Extra kwargs are supplied directly to the generate method of the model.
-
-        Args:
-          model_name(str): name of the model.  Currently, only the nlpcloud/instruct-gpt-j-fp16
-          device(str): device to use (&#34;cpu&#34; for CPU, &#34;cuda&#34; for GPU, &#34;cuda:0&#34; for first GPU, &#34;cuda:1&#34; for second GPU ,etc.):
-          max_new_tokens(int):  The maximum numbers of tokens to generate, ignoring the number of tokens in the prompt.
-          do_sample(bool):  If True, use sampling instead of the default greedy decoding.
-        ```
-        &#34;&#34;&#34;
-
-        super().__init__(device=device)
-        self.device_id = self.device_to_id()
-        self.config = GenerationConfig(
-            max_new_tokens=max_new_tokens, do_sample=do_sample, **kwargs
-        )
-        if self.device_id &lt; 0:
-            self.generator = pipeline(
-                model=model_name, device=self.device_id, generation_config=self.config
-            )
-        else:
-            self.generator = pipeline(
-                model=model_name,
-                torch_dtype=torch.float16,
-                device=self.device_id,
-                generation_config=self.config,
-            )
-        self.generator.model.generation_config.pad_token_id = (
-            self.generator.model.generation_config.eos_token_id
-        )
-
-    def execute(self, prompt: str):
-        &#34;&#34;&#34;
-        ```
-        Issue a prompt to the model.  The default model is an instruction-fine-tuned model based on GPT-J.
-        This means that you should always construct your prompt in the form of an instruction.
-
-
-        Example:
-
-        model = GenerativeAI()
-        prompt = &#34;Tell me whether the following sentence is positive,  negative, or neutral in sentiment.\\nThe reactivity of  your team has been amazing, thanks!\\n&#34;
-        model.prompt(prompt)
-
-
-        Args:
-          prompt(str): prompt to supply to model
-        Returns:
-          str: generated text
-        ```
-        &#34;&#34;&#34;
-        prompt = prompt.strip() + &#34;\n&#34;
-        result = self.generator(prompt)
-        result = result[0][&#34;generated_text&#34;]
-        if result.startswith(prompt):
-            result = result.replace(prompt, &#34;&#34;)
-        if not result:
-            warnings.warn(
-                &#34;No output was generated. The model is sensitive to where you please newlines. Try adding or removing embedded newlines in the prompt. Follow the example notebook for tips.&#34;
-            )
-
-        return result.replace(&#34;\\n&#34;, &#34;\n&#34;)</code></pre>
-</details>
-<h3>Ancestors</h3>
-<ul class="hlist">
-<li><a title="ktrain.torch_base.TorchBase" href="../../torch_base.html#ktrain.torch_base.TorchBase">TorchBase</a></li>
-</ul>
-<h3>Methods</h3>
-<dl>
-<dt id="ktrain.text.generative_ai.core.GenerativeAI.execute"><code class="name flex">
-<span>def <span class="ident">execute</span></span>(<span>self, prompt: str)</span>
-</code></dt>
-<dd>
-<div class="desc"><pre><code>Issue a prompt to the model.  The default model is an instruction-fine-tuned model based on GPT-J.
-This means that you should always construct your prompt in the form of an instruction.
-
-
-Example:
-
-model = GenerativeAI()
-prompt = &quot;Tell me whether the following sentence is positive,  negative, or neutral in sentiment.\nThe reactivity of  your team has been amazing, thanks!\n&quot;
-model.prompt(prompt)
-
-
-Args:
-  prompt(str): prompt to supply to model
-Returns:
-  str: generated text
-</code></pre></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def execute(self, prompt: str):
-    &#34;&#34;&#34;
-    ```
-    Issue a prompt to the model.  The default model is an instruction-fine-tuned model based on GPT-J.
-    This means that you should always construct your prompt in the form of an instruction.
-
-
-    Example:
-
-    model = GenerativeAI()
-    prompt = &#34;Tell me whether the following sentence is positive,  negative, or neutral in sentiment.\\nThe reactivity of  your team has been amazing, thanks!\\n&#34;
-    model.prompt(prompt)
-
-
-    Args:
-      prompt(str): prompt to supply to model
-    Returns:
-      str: generated text
-    ```
-    &#34;&#34;&#34;
-    prompt = prompt.strip() + &#34;\n&#34;
-    result = self.generator(prompt)
-    result = result[0][&#34;generated_text&#34;]
-    if result.startswith(prompt):
-        result = result.replace(prompt, &#34;&#34;)
-    if not result:
-        warnings.warn(
-            &#34;No output was generated. The model is sensitive to where you please newlines. Try adding or removing embedded newlines in the prompt. Follow the example notebook for tips.&#34;
-        )
-
-    return result.replace(&#34;\\n&#34;, &#34;\n&#34;)</code></pre>
-</details>
-</dd>
-</dl>
-<h3>Inherited members</h3>
-<ul class="hlist">
-<li><code><b><a title="ktrain.torch_base.TorchBase" href="../../torch_base.html#ktrain.torch_base.TorchBase">TorchBase</a></b></code>:
-<ul class="hlist">
-<li><code><a title="ktrain.torch_base.TorchBase.quantize_model" href="../../torch_base.html#ktrain.torch_base.TorchBase.quantize_model">quantize_model</a></code></li>
-</ul>
-</li>
-</ul>
-</dd>
-</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -303,16 +56,6 @@ Returns:
 <li><h3>Super-module</h3>
 <ul>
 <li><code><a title="ktrain.text.generative_ai" href="index.html">ktrain.text.generative_ai</a></code></li>
-</ul>
-</li>
-<li><h3><a href="#header-classes">Classes</a></h3>
-<ul>
-<li>
-<h4><code><a title="ktrain.text.generative_ai.core.GenerativeAI" href="#ktrain.text.generative_ai.core.GenerativeAI">GenerativeAI</a></code></h4>
-<ul class="">
-<li><code><a title="ktrain.text.generative_ai.core.GenerativeAI.execute" href="#ktrain.text.generative_ai.core.GenerativeAI.execute">execute</a></code></li>
-</ul>
-</li>
 </ul>
 </li>
 </ul>

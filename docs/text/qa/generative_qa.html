@@ -73,7 +73,7 @@ class GenerativeQA:
         &#34;&#34;&#34;
         if not PAPERQA_INSTALLED:
             raise Exception(
-                &#34;GenerativeQA in ktrain requires the paper-qa package by Andrew White: pip install paper-qa&#34;
+                &#34;GenerativeQA in ktrain requires the paper-qa package by Andrew White: pip install paper-qa==2.1.1 langchain==0.0.240&#34;
             )
         self.docs = Docs(llm)
         if is_notebook():
@@ -326,7 +326,7 @@ Args:
         &#34;&#34;&#34;
         if not PAPERQA_INSTALLED:
             raise Exception(
-                &#34;GenerativeQA in ktrain requires the paper-qa package by Andrew White: pip install paper-qa&#34;
+                &#34;GenerativeQA in ktrain requires the paper-qa package by Andrew White: pip install paper-qa==2.1.1 langchain==0.0.240&#34;
             )
         self.docs = Docs(llm)
         if is_notebook():
