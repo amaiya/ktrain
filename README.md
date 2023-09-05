@@ -13,7 +13,7 @@
 
 ### News and Announcements
 - **2023-09-05**
-  - **ktrain 0.38.x** is released and includes a `generative_ai` module that is now powered by our [onprem.LLM](https://github.com/amaiya/onprem) package for ChatGPT-like generative AI running on your own machine. The `generative_ai.LLM` class replaces the previous `generative_ai.GenerativeAI` class (**breaking change**).  See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/generative_ai_example.ipynb).
+  - **ktrain 0.38.x** is released and includes a `generative_ai` module that is now powered by our [onprem.LLM](https://github.com/amaiya/onprem) package for ChatGPT-like generative AI running on your own machine. The `generative_ai.LLM` class replaces the previous `generative_ai.GenerativeAI` class (**breaking change**).  See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/generative_ai_example.ipynb) for more information.
 ```python
 from ktrain.text.generative_ai import LLM
 llm = LLM() # for GPU inference, supply n_gpu_layers parameter
