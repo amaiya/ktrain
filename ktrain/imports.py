@@ -137,7 +137,7 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-import cchardet as chardet
+import charset_normalizer as chardet
 import jieba
 
 # multilingual text processing

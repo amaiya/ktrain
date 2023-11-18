@@ -92,7 +92,9 @@ def decode_by_line(texts, encoding="utf-8", verbose=1):
 
 def detect_encoding(texts, sample_size=32):
     if not CHARDET:
-        raise ValueError("cchardet is missing - install with pip install cchardet")
+        raise ValueError(
+            "charset-normalizer is missing - install with pip install charset-normalizer"
+        )
     if isinstance(texts, str):
         texts = [texts]
     lst = [chardet.detect(doc)["encoding"] for doc in texts[:sample_size]]

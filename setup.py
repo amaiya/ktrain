@@ -54,7 +54,7 @@ setup(
         "packaging",
         "langdetect",
         "jieba",
-        "cchardet",  # previously pinned to 2.1.5 (due to this issue: https://github.com/PyYoshi/cChardet/issues/61) but no longer needed
+        "charset-normalizer",  # previously pinned to 2.1.5 (due to this issue: https://github.com/PyYoshi/cChardet/issues/61) but no longer needed
         "chardet",  # required by stellargraph and no longer installed by other dependencies as of July 2021
         "syntok>1.3.3",  # previously pinned to 1.3.3 due to bug in 1.4.1, which caused problems in QA paragraph tokenization (now appears fixed)
         "tika",  # for TextExtractor

@@ -7,6 +7,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.39.0 (TBD)
+
+### new:
+- N/A
+
+### changed
+- N/A
+
+### fixed:
+- Switch from unmaintained `cchardet` to `charset-normalizer` (#512)
+
+
 ## 0.38.0 (2023-09-05)
 
 ### new:

@@ -59,7 +59,7 @@ try:
 except:
     LANGDETECT = False
 try:
-    import cchardet as chardet
+    import charset_normalizer as chardet
 
     CHARDET = True
 except:

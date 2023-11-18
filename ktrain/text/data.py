@@ -198,8 +198,6 @@ def texts_from_csv(
     """
     if encoding is None:
         with open(train_filepath, "rb") as f:
-            # encoding = chardet.detect(f.read())['encoding']
-            # encoding = 'utf-8' if encoding.lower() in ['ascii', 'utf8', 'utf-8'] else encoding
             encoding = TU.detect_encoding(f.read())
             U.vprint(
                 "detected encoding: %s (if wrong, set manually)" % (encoding),

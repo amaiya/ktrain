@@ -64,7 +64,6 @@ class Classifier:
                 tol=hp_dict.get("tol", None),
                 l1_ratio=hp_dict.get("l1_ratio", 0.15),
                 fit_intercept=hp_dict.get("fit_intercept", True),
-                episilon=hp_dict.get("epsilon", 0.1),
                 n_jobs=hp_dict.get("n_jobs", None),
                 learning_rate=hp_dict.get("learning_rate", "optimal"),
                 eta0=hp_dict.get("eta0", 0.0),
