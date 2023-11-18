@@ -12,6 +12,8 @@
 
 
 ### News and Announcements
+- **2023-11-18**
+  - **ktrain 0.39.x** is released with support for Python 3.11. 
 - **2023-09-05**
   - **ktrain 0.38.x** is released and includes a `generative_ai` module that is now powered by our [onprem.LLM](https://github.com/amaiya/onprem) package for ChatGPT-like generative AI running on your own machine. The `generative_ai.LLM` class replaces the previous `generative_ai.GenerativeAI` class (**breaking change**).  See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/generative_ai_example.ipynb) for more information.
 ```python
@@ -28,17 +30,6 @@ People:"""
 saved_output = llm.prompt(prompt)
 # OUTPUT
 # Cillian Murphy, Florence Pugh
-```
-
-- **2023-05-11**
-  - **ktrain 0.37.x** is released and supports **Generative Question-Answering** using OpenAI models like GPT-3.5-turbo by wrapping the LangChain and Paper-QA packages. Ask a large text corpus questions and receive answers with citations to which documents the answers were found. See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/question_answering_with_openai.ipynb) for more information.
-```python
-import os
-os.environ['OPENAI_API_KEY'] = 'ENTER YOUR OPENAI API KEY HERE'
-from ktrain.text.qa.generative_qa import GenerativeQA
-genqa = GenerativeQA()
-genqa.add_doc(text=a_string_containing_text_of_your_document)
-print(genqa.query('What is ktrain?'))
 ```
 ----
 
