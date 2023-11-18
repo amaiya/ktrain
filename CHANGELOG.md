@@ -17,6 +17,7 @@ Most recent releases are shown at the top. Each release shows:
 
 ### fixed:
 - Switch from unmaintained `cchardet` to `charset-normalizer` (#512)
+- Use `textract-py3` instead of `textract` (#511)
 
 
 ## 0.38.0 (2023-09-05)
