@@ -15,7 +15,7 @@ exec(open("ktrain/version.py").read())
 all_extras = [
     # "torch",  # for qa, summarization, translation, zsl, speech
     "ipython",  # for tests
-    "textract",  # for TextExtractor non-default method
+    "textract-py3",  # for TextExtractor non-default method
     "paper-qa==2.1.1",  # text.qa.generative_qa
     "datasets",  # for text.qa.AnswerExtractor.finetune
     "textblob",  # for text.kw.KeywordExtractor and textutils.extract_noun_phrases
