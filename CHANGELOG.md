@@ -13,7 +13,7 @@ Most recent releases are shown at the top. Each release shows:
 - N/A
 
 ### changed
-- N/A
+- Changes to custom `eli5` and `stellargraph` to support Python 3.11 (#515)
 
 ### fixed:
 - Switch from unmaintained `cchardet` to `charset-normalizer` (#512)
