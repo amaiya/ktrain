@@ -11,93 +11,57 @@ class Classifier:
         """
         self.model = None
 
-    def create_model(self, ctype, texts, hp_dict={}, ngram_range=(1, 3), binary=True):
+    def create_model(self, ctype, texts, use_tfidf=False, **kwargs):
         """
         ```
         create a model
         Args:
           ctype(str): one of {'nbsvm', 'logreg', 'sgdclassifier'}
           texts(list): list of texts
-          hp_dict(dict): dictionary of hyperparameters to use for the ctype selected.
-                         hp_dict can also be used to supply arguments to CountVectorizer
-          ngram_range(tuple): default ngram_range.
-                              overridden if 'ngram_range' in hp_dict
-          binary(bool): default value for binary argument to CountVectorizer.
-                        overridden if 'binary' key in hp_dict
+          kwargs(dict):   additional parameters should have one of the following prefixes:
+                          vec__ :  hyperparameters to CountVectorizer (e.g., vec__max_features=10000)
+                          tfidf__ :  hyperparameters to TfidfTransformer
+                          clf__:   hyperparameters to classifier (specific to ctype).
+                                   If ctype='logreg', then an example is clf__solver='liblinear'.
         ```
         """
-        lang = U.detect_lang(texts)
-        if U.is_chinese(lang):
-            token_pattern = r"(?u)\b\w+\b"
-        else:
-            token_pattern = r"\w+|[%s]" % string.punctuation
         if ctype == "nbsvm":
-            clf = NBSVM(
-                C=hp_dict.get("C", 0.01),
-                alpha=hp_dict.get("alpha", 0.75),
-                beta=hp_dict.get("beta", 0.25),
-                fit_intercept=hp_dict.get("fit_intercept", False),
-            )
+            if kwargs.get("vec__binary", False) is False:
+                warnings.warn("nbsvm must use binary=True - changing automatically")
+            if use_tfidf:
+                warnings.warn("nbsvm must use use_tfidf=False = changing automatically")
+        vec_kwargs = dict(
+            (k.replace("vec__", ""), kwargs[k]) for k in kwargs if k.startswith("vec__")
+        )
+        tfidf_kwargs = dict(
+            (k.replace("tfidf__", ""), kwargs[k])
+            for k in kwargs
+            if k.startswith("tfidf__")
+        )
+        clf_kwargs = dict(
+            (k.replace("clf__", ""), kwargs[k]) for k in kwargs if k.startswith("clf__")
+        )
+
+        lang = U.detect_lang(texts)
+        if U.is_chinese(lang) and not vec_kwargs.get("token_pattern", None):
+            vec_kwargs["token_pattern"] = r"(?u)\b\w+\b"
+        elif not kwargs.get("vec__token_pattern", None):
+            vec_kwargs["token_pattern"] = r"\w+|[%s]" % string.punctuation
+
+        if ctype == "nbsvm":
+            clf = NBSVM(**clf_kwargs)
         elif ctype == "logreg":
-            clf = LogisticRegression(
-                C=hp_dict.get("C", 0.1),
-                dual=hp_dict.get("dual", True),
-                penalty=hp_dict.get("penalty", "l2"),
-                tol=hp_dict.get("tol", 1e-4),
-                intercept_scaling=hp_dict.get("intercept_scaling", 1),
-                solver=hp_dict.get("solver", "liblinear"),
-                max_iter=hp_dict.get("max_iter", 100),
-                multi_class=hp_dict.get("multi_class", "auto"),
-                warm_start=hp_dict.get("warm_start", False),
-                n_jobs=hp_dict.get("n_jobs", None),
-                l1_ratio=hp_dict.get("l1_ratio", None),
-                random_state=hp_dict.get("random_state", 42),
-                class_weight=hp_dict.get("class_weight", None),
-            )
+            clf = LogisticRegression(**clf_kwargs)
         elif ctype == "sgdclassifier":
-            clf = SGDClassifier(
-                loss=hp_dict.get("loss", "hinge"),
-                penalty=hp_dict.get("penalty", "l2"),
-                alpha=hp_dict.get("alpha", 1e-3),
-                random_state=hp_dict.get("random_state", 42),
-                max_iter=hp_dict.get("max_iter", 5),  # scikit-learn default is 1000
-                tol=hp_dict.get("tol", None),
-                l1_ratio=hp_dict.get("l1_ratio", 0.15),
-                fit_intercept=hp_dict.get("fit_intercept", True),
-                n_jobs=hp_dict.get("n_jobs", None),
-                learning_rate=hp_dict.get("learning_rate", "optimal"),
-                eta0=hp_dict.get("eta0", 0.0),
-                power_t=hp_dict.get("power_t", 0.5),
-                early_stopping=hp_dict.get("early_stopping", False),
-                validation_fraction=hp_dict.get("validation_fraction", 0.1),
-                n_iter_no_change=hp_dict.get("n_iter_no_change", 5),
-                warm_start=hp_dict.get("warm_start", False),
-                average=hp_dict.get("average", False),
-                class_weight=hp_dict.get("class_weight", None),
-            )
+            clf = SGDClassifier(**clf_kwargs)
         else:
             raise ValueError("Unknown ctype: %s" % (ctype))
 
-        self.model = Pipeline(
-            [
-                (
-                    "vect",
-                    CountVectorizer(
-                        ngram_range=hp_dict.get("ngram_range", ngram_range),
-                        binary=hp_dict.get("binary", binary),
-                        token_pattern=token_pattern,
-                        max_features=hp_dict.get("max_features", None),
-                        max_df=hp_dict.get("max_df", 1.0),
-                        min_df=hp_dict.get("min_df", 1),
-                        stop_words=hp_dict.get("stop_words", None),
-                        lowercase=hp_dict.get("lowercase", True),
-                        strip_accents=hp_dict.get("strip_accents", None),
-                        encoding=hp_dict.get("encoding", "utf-8"),
-                    ),
-                ),
-                ("clf", clf),
-            ]
-        )
+        pipeline = [("vect", CountVectorizer(**vec_kwargs))]
+        if use_tfidf:
+            pipeline.append(("tfidf", TfidfTransformer(**tfidf_kwargs)))
+        pipeline.append(("clf", clf))
+        self.model = Pipeline(pipeline)
         return
 
     @classmethod
@@ -291,7 +255,7 @@ class Classifier:
 
 
 class NBSVM(BaseEstimator, LinearClassifierMixin, SparseCoefMixin):
-    def __init__(self, alpha=1, C=1, beta=0.25, fit_intercept=False):
+    def __init__(self, alpha=0.75, C=0.01, beta=0.25, fit_intercept=False):
         self.alpha = alpha
         self.C = C
         self.beta = beta

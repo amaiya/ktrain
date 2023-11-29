@@ -7,6 +7,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.40.0 (TBD)
+
+### new:
+- N/A
+
+### changed
+- Changed `shallownlp.classifier` API with respect to hyperparameters and defaults
+
+### fixed:
+- N/A
+
+
 ## 0.39.0 (2023-11-18)
 
 ### new:

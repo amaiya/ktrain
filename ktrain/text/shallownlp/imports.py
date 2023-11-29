@@ -39,7 +39,7 @@ except ImportError:  # sklearn>=0.24.x
 import syntok.segmenter as segmenter
 from joblib import dump, load
 from sklearn.datasets import load_files
-from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn.model_selection import GridSearchCV
 from sklearn.pipeline import Pipeline
