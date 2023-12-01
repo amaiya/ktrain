@@ -289,7 +289,7 @@ class NBSVM(BaseEstimator, LinearClassifierMixin, SparseCoefMixin):
             X_scaled = X * r
 
         lsvc = LinearSVC(
-            C=self.C, fit_intercept=self.fit_intercept, max_iter=10000
+            C=self.C, fit_intercept=self.fit_intercept, max_iter=10000, dual=True
         ).fit(X_scaled, y)
 
         mean_mag = np.abs(lsvc.coef_).mean()

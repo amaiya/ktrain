@@ -15,7 +15,6 @@ from ktrain.text import shallownlp as snlp
 
 
 class TestShallowNLP(TestCase):
-
     # @skip('temporarily disabled')
     def test_classifier(self):
         categories = [
@@ -42,7 +41,8 @@ class TestShallowNLP(TestCase):
         classes = train_b.target_names
 
         clf = snlp.Classifier()
-        clf.fit(x_train, y_train, ctype="nbsvm")
+        clf.create_model("nbsvm", x_train, vec__ngram_range=(1, 3), vec__binary=True)
+        clf.fit(x_train, y_train)
         self.assertGreaterEqual(clf.evaluate(x_test, y_test), 0.93)
         test_doc = "god christ jesus mother mary church sunday lord heaven amen"
         self.assertEqual(clf.predict(test_doc), 3)
@@ -55,7 +55,8 @@ class TestShallowNLP(TestCase):
         )
         print("label names: %s" % (label_names))
         clf = snlp.Classifier()
-        clf.fit(x_train, y_train, ctype="nbsvm")
+        clf.create_model("nbsvm", x_train, vec__ngram_range=(1, 3), vec__binary=True)
+        clf.fit(x_train, y_train)
         self.assertGreaterEqual(clf.evaluate(x_train, y_train), 0.98)
         neg_text = "我讨厌和鄙视这家酒店。"
         pos_text = "我喜欢这家酒店。"
