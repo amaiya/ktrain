@@ -10,9 +10,9 @@ from distutils.util import strtobool
 
 from packaging import version
 
-os.environ[
-    "NUMEXPR_MAX_THREADS"
-] = "8"  # suppress warning from NumExpr on machines with many CPUs
+os.environ["NUMEXPR_MAX_THREADS"] = (
+    "8"  # suppress warning from NumExpr on machines with many CPUs
+)
 
 # TensorFlow
 SUPPRESS_DEP_WARNINGS = strtobool(os.environ.get("SUPPRESS_DEP_WARNINGS", "1"))

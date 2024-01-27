@@ -69,9 +69,11 @@ def convert_dataset_for_tensorflow(
 
     def densify_ragged_batch(features, label=None):
         features = {
-            feature: ragged_tensor.to_tensor(shape=batch_shape[feature])
-            if feature in tensor_keys
-            else ragged_tensor
+            feature: (
+                ragged_tensor.to_tensor(shape=batch_shape[feature])
+                if feature in tensor_keys
+                else ragged_tensor
+            )
             for feature, ragged_tensor in features.items()
         }
         if label is None:

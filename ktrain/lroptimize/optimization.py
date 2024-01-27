@@ -346,14 +346,16 @@ class GradientAccumulator(object):
             _ = self.step  # Create the step variable.
             self._gradients.extend(
                 [
-                    tf.Variable(
-                        tf.zeros_like(gradient),
-                        trainable=False,
-                        synchronization=tf.VariableSynchronization.ON_READ,
-                        aggregation=tf.VariableAggregation.ONLY_FIRST_REPLICA,
+                    (
+                        tf.Variable(
+                            tf.zeros_like(gradient),
+                            trainable=False,
+                            synchronization=tf.VariableSynchronization.ON_READ,
+                            aggregation=tf.VariableAggregation.ONLY_FIRST_REPLICA,
+                        )
+                        if gradient is not None
+                        else gradient
                     )
-                    if gradient is not None
-                    else gradient
                     for gradient in gradients
                 ]
             )
