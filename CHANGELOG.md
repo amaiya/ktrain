@@ -7,7 +7,7 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
-## 0.40.0 (TBD)
+## 0.40.0 (2024-01-27)
 
 ### new:
 - N/A
@@ -16,7 +16,7 @@ Most recent releases are shown at the top. Each release shows:
 - Changed `shallownlp.classifier` API with respect to hyperparameters and defaults
 
 ### fixed:
-- N/A
+- Ensure weight files in checkpoint folder have `val_loss` in file name (#519)
 
 
 ## 0.39.0 (2023-11-18)

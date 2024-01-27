@@ -886,8 +886,12 @@ class Learner(ABC):
             os.makedirs(folder, exist_ok=True)
             if not isinstance(callbacks, list):
                 callbacks = []
-            # filepath=os.path.join(folder, "weights-{epoch:02d}-{val_loss:.2f}.hdf5")
-            filepath = os.path.join(folder, "weights-{epoch:02d}.hdf5")
+            if self.val_data is not None:
+                filepath = os.path.join(
+                    folder, "weights-{epoch:02d}-{val_loss:.2f}.hdf5"
+                )
+            else:
+                filepath = os.path.join(folder, "weights-{epoch:02d}.hdf5")
             callbacks.append(
                 keras.callbacks.ModelCheckpoint(
                     filepath, save_best_only=False, save_weights_only=True
