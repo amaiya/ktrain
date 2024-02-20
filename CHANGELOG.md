@@ -7,6 +7,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.41.1 (TBD)
+
+### new:
+- N/A
+
+### changed
+- N/A
+
+### fixed:
+- use arrays in `TextPredictor` due to possible issues with `tf.Dataset` (#521)
+
+
 ## 0.40.0 (2024-01-27)
 
 ### new:

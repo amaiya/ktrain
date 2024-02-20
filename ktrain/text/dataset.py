@@ -31,6 +31,17 @@ class TransformerDataset(SequenceDataset):
     def __len__(self):
         return math.ceil(len(self.x) / self.batch_size)
 
+    def to_array(self):
+        """
+        ```
+        convert to arrays for input to model.predict
+        ```
+        """
+        if self.use_token_type_ids:
+            return [self.x[:, 0], self.x[:, 1], self.x[:, 2]]
+        else:
+            return [self.x[:, 0], self.x[:, 1]]
+
     def to_tfdataset(self, train=True):
         """
         ```

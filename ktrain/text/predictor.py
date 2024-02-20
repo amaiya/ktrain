@@ -25,7 +25,7 @@ class TextPredictor(Predictor):
     def get_classes(self):
         return self.c
 
-    def predict(self, texts, return_proba=False, verbose=0):
+    def predict(self, texts, return_proba=False, use_tf_dataset=False, verbose=0):
         """
         ```
 
@@ -40,6 +40,8 @@ class TextPredictor(Predictor):
                            A single tuple of the form (str, str) is automatically treated as sentence pair classification, so
                            please refrain from using tuples for text classification tasks.
           return_proba(bool): If True, return probabilities instead of predicted class labels
+          use_tf_dataset(bool): If True, wraps dataset in a tf.Dataset when passing input to model.
+
           verbose(int): verbosity: 0 (silent), 1 (progress bar), 2 (single line)
         ```
         """
@@ -53,9 +55,15 @@ class TextPredictor(Predictor):
         # get predictions
         if U.is_huggingface(model=self.model):
             tseq = self.preproc.preprocess_test(texts, verbose=0)
-            tseq.batch_size = self.batch_size
-            tfd = tseq.to_tfdataset(train=False)
-            preds = self.model.predict(tfd, verbose=verbose)
+            if use_tf_dataset:
+                tseq.batch_size = self.batch_size
+                tfd = tseq.to_tfdataset(train=False)
+                preds = self.model.predict(tfd, verbose=verbose)
+            else:
+                data = tseq.to_array()
+                preds = self.model.predict(
+                    data, batch_size=self.batch_size, verbose=verbose
+                )
             if hasattr(
                 preds, "logits"
             ):  # dep_fix: breaking change - also needed for LongFormer
