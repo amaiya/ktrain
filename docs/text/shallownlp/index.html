@@ -223,94 +223,57 @@ __all__ = [
         &#34;&#34;&#34;
         self.model = None
 
-    def create_model(self, ctype, texts, hp_dict={}, ngram_range=(1, 3), binary=True):
+    def create_model(self, ctype, texts, use_tfidf=False, **kwargs):
         &#34;&#34;&#34;
         ```
         create a model
         Args:
           ctype(str): one of {&#39;nbsvm&#39;, &#39;logreg&#39;, &#39;sgdclassifier&#39;}
           texts(list): list of texts
-          hp_dict(dict): dictionary of hyperparameters to use for the ctype selected.
-                         hp_dict can also be used to supply arguments to CountVectorizer
-          ngram_range(tuple): default ngram_range.
-                              overridden if &#39;ngram_range&#39; in hp_dict
-          binary(bool): default value for binary argument to CountVectorizer.
-                        overridden if &#39;binary&#39; key in hp_dict
+          kwargs(dict):   additional parameters should have one of the following prefixes:
+                          vec__ :  hyperparameters to CountVectorizer (e.g., vec__max_features=10000)
+                          tfidf__ :  hyperparameters to TfidfTransformer
+                          clf__:   hyperparameters to classifier (specific to ctype).
+                                   If ctype=&#39;logreg&#39;, then an example is clf__solver=&#39;liblinear&#39;.
         ```
         &#34;&#34;&#34;
-        lang = U.detect_lang(texts)
-        if U.is_chinese(lang):
-            token_pattern = r&#34;(?u)\b\w+\b&#34;
-        else:
-            token_pattern = r&#34;\w+|[%s]&#34; % string.punctuation
         if ctype == &#34;nbsvm&#34;:
-            clf = NBSVM(
-                C=hp_dict.get(&#34;C&#34;, 0.01),
-                alpha=hp_dict.get(&#34;alpha&#34;, 0.75),
-                beta=hp_dict.get(&#34;beta&#34;, 0.25),
-                fit_intercept=hp_dict.get(&#34;fit_intercept&#34;, False),
-            )
+            if kwargs.get(&#34;vec__binary&#34;, False) is False:
+                warnings.warn(&#34;nbsvm must use binary=True - changing automatically&#34;)
+            if use_tfidf:
+                warnings.warn(&#34;nbsvm must use use_tfidf=False = changing automatically&#34;)
+        vec_kwargs = dict(
+            (k.replace(&#34;vec__&#34;, &#34;&#34;), kwargs[k]) for k in kwargs if k.startswith(&#34;vec__&#34;)
+        )
+        tfidf_kwargs = dict(
+            (k.replace(&#34;tfidf__&#34;, &#34;&#34;), kwargs[k])
+            for k in kwargs
+            if k.startswith(&#34;tfidf__&#34;)
+        )
+        clf_kwargs = dict(
+            (k.replace(&#34;clf__&#34;, &#34;&#34;), kwargs[k]) for k in kwargs if k.startswith(&#34;clf__&#34;)
+        )
+
+        lang = U.detect_lang(texts)
+        if U.is_chinese(lang) and not vec_kwargs.get(&#34;token_pattern&#34;, None):
+            vec_kwargs[&#34;token_pattern&#34;] = r&#34;(?u)\b\w+\b&#34;
+        elif not kwargs.get(&#34;vec__token_pattern&#34;, None):
+            vec_kwargs[&#34;token_pattern&#34;] = r&#34;\w+|[%s]&#34; % string.punctuation
+
+        if ctype == &#34;nbsvm&#34;:
+            clf = NBSVM(**clf_kwargs)
         elif ctype == &#34;logreg&#34;:
-            clf = LogisticRegression(
-                C=hp_dict.get(&#34;C&#34;, 0.1),
-                dual=hp_dict.get(&#34;dual&#34;, True),
-                penalty=hp_dict.get(&#34;penalty&#34;, &#34;l2&#34;),
-                tol=hp_dict.get(&#34;tol&#34;, 1e-4),
-                intercept_scaling=hp_dict.get(&#34;intercept_scaling&#34;, 1),
-                solver=hp_dict.get(&#34;solver&#34;, &#34;liblinear&#34;),
-                max_iter=hp_dict.get(&#34;max_iter&#34;, 100),
-                multi_class=hp_dict.get(&#34;multi_class&#34;, &#34;auto&#34;),
-                warm_start=hp_dict.get(&#34;warm_start&#34;, False),
-                n_jobs=hp_dict.get(&#34;n_jobs&#34;, None),
-                l1_ratio=hp_dict.get(&#34;l1_ratio&#34;, None),
-                random_state=hp_dict.get(&#34;random_state&#34;, 42),
-                class_weight=hp_dict.get(&#34;class_weight&#34;, None),
-            )
+            clf = LogisticRegression(**clf_kwargs)
         elif ctype == &#34;sgdclassifier&#34;:
-            clf = SGDClassifier(
-                loss=hp_dict.get(&#34;loss&#34;, &#34;hinge&#34;),
-                penalty=hp_dict.get(&#34;penalty&#34;, &#34;l2&#34;),
-                alpha=hp_dict.get(&#34;alpha&#34;, 1e-3),
-                random_state=hp_dict.get(&#34;random_state&#34;, 42),
-                max_iter=hp_dict.get(&#34;max_iter&#34;, 5),  # scikit-learn default is 1000
-                tol=hp_dict.get(&#34;tol&#34;, None),
-                l1_ratio=hp_dict.get(&#34;l1_ratio&#34;, 0.15),
-                fit_intercept=hp_dict.get(&#34;fit_intercept&#34;, True),
-                episilon=hp_dict.get(&#34;epsilon&#34;, 0.1),
-                n_jobs=hp_dict.get(&#34;n_jobs&#34;, None),
-                learning_rate=hp_dict.get(&#34;learning_rate&#34;, &#34;optimal&#34;),
-                eta0=hp_dict.get(&#34;eta0&#34;, 0.0),
-                power_t=hp_dict.get(&#34;power_t&#34;, 0.5),
-                early_stopping=hp_dict.get(&#34;early_stopping&#34;, False),
-                validation_fraction=hp_dict.get(&#34;validation_fraction&#34;, 0.1),
-                n_iter_no_change=hp_dict.get(&#34;n_iter_no_change&#34;, 5),
-                warm_start=hp_dict.get(&#34;warm_start&#34;, False),
-                average=hp_dict.get(&#34;average&#34;, False),
-                class_weight=hp_dict.get(&#34;class_weight&#34;, None),
-            )
+            clf = SGDClassifier(**clf_kwargs)
         else:
             raise ValueError(&#34;Unknown ctype: %s&#34; % (ctype))
 
-        self.model = Pipeline(
-            [
-                (
-                    &#34;vect&#34;,
-                    CountVectorizer(
-                        ngram_range=hp_dict.get(&#34;ngram_range&#34;, ngram_range),
-                        binary=hp_dict.get(&#34;binary&#34;, binary),
-                        token_pattern=token_pattern,
-                        max_features=hp_dict.get(&#34;max_features&#34;, None),
-                        max_df=hp_dict.get(&#34;max_df&#34;, 1.0),
-                        min_df=hp_dict.get(&#34;min_df&#34;, 1),
-                        stop_words=hp_dict.get(&#34;stop_words&#34;, None),
-                        lowercase=hp_dict.get(&#34;lowercase&#34;, True),
-                        strip_accents=hp_dict.get(&#34;strip_accents&#34;, None),
-                        encoding=hp_dict.get(&#34;encoding&#34;, &#34;utf-8&#34;),
-                    ),
-                ),
-                (&#34;clf&#34;, clf),
-            ]
-        )
+        pipeline = [(&#34;vect&#34;, CountVectorizer(**vec_kwargs))]
+        if use_tfidf:
+            pipeline.append((&#34;tfidf&#34;, TfidfTransformer(**tfidf_kwargs)))
+        pipeline.append((&#34;clf&#34;, clf))
+        self.model = Pipeline(pipeline)
         return
 
     @classmethod
@@ -650,112 +613,74 @@ def load_texts_from_folder(
 <h3>Methods</h3>
 <dl>
 <dt id="ktrain.text.shallownlp.Classifier.create_model"><code class="name flex">
-<span>def <span class="ident">create_model</span></span>(<span>self, ctype, texts, hp_dict={}, ngram_range=(1, 3), binary=True)</span>
+<span>def <span class="ident">create_model</span></span>(<span>self, ctype, texts, use_tfidf=False, **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"><pre><code>create a model
 Args:
   ctype(str): one of {'nbsvm', 'logreg', 'sgdclassifier'}
   texts(list): list of texts
-  hp_dict(dict): dictionary of hyperparameters to use for the ctype selected.
-                 hp_dict can also be used to supply arguments to CountVectorizer
-  ngram_range(tuple): default ngram_range.
-                      overridden if 'ngram_range' in hp_dict
-  binary(bool): default value for binary argument to CountVectorizer.
-                overridden if 'binary' key in hp_dict
+  kwargs(dict):   additional parameters should have one of the following prefixes:
+                  vec__ :  hyperparameters to CountVectorizer (e.g., vec__max_features=10000)
+                  tfidf__ :  hyperparameters to TfidfTransformer
+                  clf__:   hyperparameters to classifier (specific to ctype).
+                           If ctype='logreg', then an example is clf__solver='liblinear'.
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def create_model(self, ctype, texts, hp_dict={}, ngram_range=(1, 3), binary=True):
+<pre><code class="python">def create_model(self, ctype, texts, use_tfidf=False, **kwargs):
     &#34;&#34;&#34;
     ```
     create a model
     Args:
       ctype(str): one of {&#39;nbsvm&#39;, &#39;logreg&#39;, &#39;sgdclassifier&#39;}
       texts(list): list of texts
-      hp_dict(dict): dictionary of hyperparameters to use for the ctype selected.
-                     hp_dict can also be used to supply arguments to CountVectorizer
-      ngram_range(tuple): default ngram_range.
-                          overridden if &#39;ngram_range&#39; in hp_dict
-      binary(bool): default value for binary argument to CountVectorizer.
-                    overridden if &#39;binary&#39; key in hp_dict
+      kwargs(dict):   additional parameters should have one of the following prefixes:
+                      vec__ :  hyperparameters to CountVectorizer (e.g., vec__max_features=10000)
+                      tfidf__ :  hyperparameters to TfidfTransformer
+                      clf__:   hyperparameters to classifier (specific to ctype).
+                               If ctype=&#39;logreg&#39;, then an example is clf__solver=&#39;liblinear&#39;.
     ```
     &#34;&#34;&#34;
-    lang = U.detect_lang(texts)
-    if U.is_chinese(lang):
-        token_pattern = r&#34;(?u)\b\w+\b&#34;
-    else:
-        token_pattern = r&#34;\w+|[%s]&#34; % string.punctuation
     if ctype == &#34;nbsvm&#34;:
-        clf = NBSVM(
-            C=hp_dict.get(&#34;C&#34;, 0.01),
-            alpha=hp_dict.get(&#34;alpha&#34;, 0.75),
-            beta=hp_dict.get(&#34;beta&#34;, 0.25),
-            fit_intercept=hp_dict.get(&#34;fit_intercept&#34;, False),
-        )
+        if kwargs.get(&#34;vec__binary&#34;, False) is False:
+            warnings.warn(&#34;nbsvm must use binary=True - changing automatically&#34;)
+        if use_tfidf:
+            warnings.warn(&#34;nbsvm must use use_tfidf=False = changing automatically&#34;)
+    vec_kwargs = dict(
+        (k.replace(&#34;vec__&#34;, &#34;&#34;), kwargs[k]) for k in kwargs if k.startswith(&#34;vec__&#34;)
+    )
+    tfidf_kwargs = dict(
+        (k.replace(&#34;tfidf__&#34;, &#34;&#34;), kwargs[k])
+        for k in kwargs
+        if k.startswith(&#34;tfidf__&#34;)
+    )
+    clf_kwargs = dict(
+        (k.replace(&#34;clf__&#34;, &#34;&#34;), kwargs[k]) for k in kwargs if k.startswith(&#34;clf__&#34;)
+    )
+
+    lang = U.detect_lang(texts)
+    if U.is_chinese(lang) and not vec_kwargs.get(&#34;token_pattern&#34;, None):
+        vec_kwargs[&#34;token_pattern&#34;] = r&#34;(?u)\b\w+\b&#34;
+    elif not kwargs.get(&#34;vec__token_pattern&#34;, None):
+        vec_kwargs[&#34;token_pattern&#34;] = r&#34;\w+|[%s]&#34; % string.punctuation
+
+    if ctype == &#34;nbsvm&#34;:
+        clf = NBSVM(**clf_kwargs)
     elif ctype == &#34;logreg&#34;:
-        clf = LogisticRegression(
-            C=hp_dict.get(&#34;C&#34;, 0.1),
-            dual=hp_dict.get(&#34;dual&#34;, True),
-            penalty=hp_dict.get(&#34;penalty&#34;, &#34;l2&#34;),
-            tol=hp_dict.get(&#34;tol&#34;, 1e-4),
-            intercept_scaling=hp_dict.get(&#34;intercept_scaling&#34;, 1),
-            solver=hp_dict.get(&#34;solver&#34;, &#34;liblinear&#34;),
-            max_iter=hp_dict.get(&#34;max_iter&#34;, 100),
-            multi_class=hp_dict.get(&#34;multi_class&#34;, &#34;auto&#34;),
-            warm_start=hp_dict.get(&#34;warm_start&#34;, False),
-            n_jobs=hp_dict.get(&#34;n_jobs&#34;, None),
-            l1_ratio=hp_dict.get(&#34;l1_ratio&#34;, None),
-            random_state=hp_dict.get(&#34;random_state&#34;, 42),
-            class_weight=hp_dict.get(&#34;class_weight&#34;, None),
-        )
+        clf = LogisticRegression(**clf_kwargs)
     elif ctype == &#34;sgdclassifier&#34;:
-        clf = SGDClassifier(
-            loss=hp_dict.get(&#34;loss&#34;, &#34;hinge&#34;),
-            penalty=hp_dict.get(&#34;penalty&#34;, &#34;l2&#34;),
-            alpha=hp_dict.get(&#34;alpha&#34;, 1e-3),
-            random_state=hp_dict.get(&#34;random_state&#34;, 42),
-            max_iter=hp_dict.get(&#34;max_iter&#34;, 5),  # scikit-learn default is 1000
-            tol=hp_dict.get(&#34;tol&#34;, None),
-            l1_ratio=hp_dict.get(&#34;l1_ratio&#34;, 0.15),
-            fit_intercept=hp_dict.get(&#34;fit_intercept&#34;, True),
-            episilon=hp_dict.get(&#34;epsilon&#34;, 0.1),
-            n_jobs=hp_dict.get(&#34;n_jobs&#34;, None),
-            learning_rate=hp_dict.get(&#34;learning_rate&#34;, &#34;optimal&#34;),
-            eta0=hp_dict.get(&#34;eta0&#34;, 0.0),
-            power_t=hp_dict.get(&#34;power_t&#34;, 0.5),
-            early_stopping=hp_dict.get(&#34;early_stopping&#34;, False),
-            validation_fraction=hp_dict.get(&#34;validation_fraction&#34;, 0.1),
-            n_iter_no_change=hp_dict.get(&#34;n_iter_no_change&#34;, 5),
-            warm_start=hp_dict.get(&#34;warm_start&#34;, False),
-            average=hp_dict.get(&#34;average&#34;, False),
-            class_weight=hp_dict.get(&#34;class_weight&#34;, None),
-        )
+        clf = SGDClassifier(**clf_kwargs)
     else:
         raise ValueError(&#34;Unknown ctype: %s&#34; % (ctype))
 
-    self.model = Pipeline(
-        [
-            (
-                &#34;vect&#34;,
-                CountVectorizer(
-                    ngram_range=hp_dict.get(&#34;ngram_range&#34;, ngram_range),
-                    binary=hp_dict.get(&#34;binary&#34;, binary),
-                    token_pattern=token_pattern,
-                    max_features=hp_dict.get(&#34;max_features&#34;, None),
-                    max_df=hp_dict.get(&#34;max_df&#34;, 1.0),
-                    min_df=hp_dict.get(&#34;min_df&#34;, 1),
-                    stop_words=hp_dict.get(&#34;stop_words&#34;, None),
-                    lowercase=hp_dict.get(&#34;lowercase&#34;, True),
-                    strip_accents=hp_dict.get(&#34;strip_accents&#34;, None),
-                    encoding=hp_dict.get(&#34;encoding&#34;, &#34;utf-8&#34;),
-                ),
-            ),
-            (&#34;clf&#34;, clf),
-        ]
-    )
+    pipeline = [(&#34;vect&#34;, CountVectorizer(**vec_kwargs))]
+    if use_tfidf:
+        pipeline.append((&#34;tfidf&#34;, TfidfTransformer(**tfidf_kwargs)))
+    pipeline.append((&#34;clf&#34;, clf))
+    self.model = Pipeline(pipeline)
     return</code></pre>
 </details>
 </dd>

@@ -120,7 +120,9 @@ def decode_by_line(texts, encoding=&#34;utf-8&#34;, verbose=1):
 
 def detect_encoding(texts, sample_size=32):
     if not CHARDET:
-        raise ValueError(&#34;cchardet is missing - install with pip install cchardet&#34;)
+        raise ValueError(
+            &#34;charset-normalizer is missing - install with pip install charset-normalizer&#34;
+        )
     if isinstance(texts, str):
         texts = [texts]
     lst = [chardet.detect(doc)[&#34;encoding&#34;] for doc in texts[:sample_size]]
@@ -216,7 +218,9 @@ def sent_tokenize(text):
 </summary>
 <pre><code class="python">def detect_encoding(texts, sample_size=32):
     if not CHARDET:
-        raise ValueError(&#34;cchardet is missing - install with pip install cchardet&#34;)
+        raise ValueError(
+            &#34;charset-normalizer is missing - install with pip install charset-normalizer&#34;
+        )
     if isinstance(texts, str):
         texts = [texts]
     lst = [chardet.detect(doc)[&#34;encoding&#34;] for doc in texts[:sample_size]]

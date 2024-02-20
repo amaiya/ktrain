@@ -59,6 +59,17 @@ class TransformerDataset(SequenceDataset):
     def __len__(self):
         return math.ceil(len(self.x) / self.batch_size)
 
+    def to_array(self):
+        &#34;&#34;&#34;
+        ```
+        convert to arrays for input to model.predict
+        ```
+        &#34;&#34;&#34;
+        if self.use_token_type_ids:
+            return [self.x[:, 0], self.x[:, 1], self.x[:, 2]]
+        else:
+            return [self.x[:, 0], self.x[:, 1]]
+
     def to_tfdataset(self, train=True):
         &#34;&#34;&#34;
         ```
@@ -210,6 +221,17 @@ class TransformerDataset(SequenceDataset):
     def __len__(self):
         return math.ceil(len(self.x) / self.batch_size)
 
+    def to_array(self):
+        &#34;&#34;&#34;
+        ```
+        convert to arrays for input to model.predict
+        ```
+        &#34;&#34;&#34;
+        if self.use_token_type_ids:
+            return [self.x[:, 0], self.x[:, 1], self.x[:, 2]]
+        else:
+            return [self.x[:, 0], self.x[:, 1]]
+
     def to_tfdataset(self, train=True):
         &#34;&#34;&#34;
         ```
@@ -345,6 +367,28 @@ class TransformerDataset(SequenceDataset):
     return len(self.x)</code></pre>
 </details>
 </dd>
+<dt id="ktrain.text.dataset.TransformerDataset.to_array"><code class="name flex">
+<span>def <span class="ident">to_array</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><pre><code>convert to arrays for input to model.predict
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_array(self):
+    &#34;&#34;&#34;
+    ```
+    convert to arrays for input to model.predict
+    ```
+    &#34;&#34;&#34;
+    if self.use_token_type_ids:
+        return [self.x[:, 0], self.x[:, 1], self.x[:, 2]]
+    else:
+        return [self.x[:, 0], self.x[:, 1]]</code></pre>
+</details>
+</dd>
 <dt id="ktrain.text.dataset.TransformerDataset.to_tfdataset"><code class="name flex">
 <span>def <span class="ident">to_tfdataset</span></span>(<span>self, train=True)</span>
 </code></dt>
@@ -478,6 +522,7 @@ class TransformerDataset(SequenceDataset):
 <ul class="">
 <li><code><a title="ktrain.text.dataset.TransformerDataset.get_y" href="#ktrain.text.dataset.TransformerDataset.get_y">get_y</a></code></li>
 <li><code><a title="ktrain.text.dataset.TransformerDataset.nsamples" href="#ktrain.text.dataset.TransformerDataset.nsamples">nsamples</a></code></li>
+<li><code><a title="ktrain.text.dataset.TransformerDataset.to_array" href="#ktrain.text.dataset.TransformerDataset.to_array">to_array</a></code></li>
 <li><code><a title="ktrain.text.dataset.TransformerDataset.to_tfdataset" href="#ktrain.text.dataset.TransformerDataset.to_tfdataset">to_tfdataset</a></code></li>
 </ul>
 </li>

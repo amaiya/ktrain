@@ -38,9 +38,9 @@ from distutils.util import strtobool
 
 from packaging import version
 
-os.environ[
-    &#34;NUMEXPR_MAX_THREADS&#34;
-] = &#34;8&#34;  # suppress warning from NumExpr on machines with many CPUs
+os.environ[&#34;NUMEXPR_MAX_THREADS&#34;] = (
+    &#34;8&#34;  # suppress warning from NumExpr on machines with many CPUs
+)
 
 # TensorFlow
 SUPPRESS_DEP_WARNINGS = strtobool(os.environ.get(&#34;SUPPRESS_DEP_WARNINGS&#34;, &#34;1&#34;))
@@ -165,7 +165,7 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-import cchardet as chardet
+import charset_normalizer as chardet
 import jieba
 
 # multilingual text processing
