@@ -150,7 +150,7 @@ The objective of the CoNLL2003 task is to classify sequences of words as belongi
 
 ### <a name="bart"></a>Text Summarization with pretrained BART: [text_summarization_with_bart.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text)
 ### <a name="textqa"></a>Question-Answering with BERT: [question_answering_with_bert.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text)
-### <a name="genqa"></a>Question-Answering with OpenAI: [question_answering_with_openai.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text)
+### <a name="genqa"></a>Question-Answering with GPT models: [generative question-answering with OnPrem.LLM](https://amaiya.github.io/onprem/examples_rag.html)
 ### <a name="zsl"></a>Zero-Shot Learning: [zero_shot_learning_with_nli.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text)
 ### <a name="translation"></a>Language Translation: [language_translation_example.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text)
 ### <a name="textextraction"></a>Text Extraction: [text_extraction_example.ipynb](https://github.com/amaiya/ktrain/tree/master/examples/text)

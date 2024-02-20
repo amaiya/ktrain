@@ -12,25 +12,8 @@
 
 
 ### News and Announcements
-- **2023-11-18**
-  - **ktrain 0.39.x** is released with support for Python 3.11. 
-- **2023-09-05**
-  - **ktrain 0.38.x** is released and includes a `generative_ai` module that is now powered by our [onprem.LLM](https://github.com/amaiya/onprem) package for ChatGPT-like generative AI running on your own machine. The `generative_ai.LLM` class replaces the previous `generative_ai.GenerativeAI` class (**breaking change**).  See the [example notebook](https://nbviewer.jupyter.org/github/amaiya/ktrain/blob/develop/examples/text/generative_ai_example.ipynb) for more information.
-```python
-from ktrain.text.generative_ai import LLM
-llm = LLM() # for GPU inference, supply n_gpu_layers parameter
-prompt = """Extract the names of people in the supplied sentences. Here is an example:
-Sentence: James Gandolfini and Paul Newman were great actors.
-People:
-James Gandolfini, Paul Newman
-Sentence:
-I like Cillian Murphy's acting. Florence Pugh is great, too.
-People:"""
-
-saved_output = llm.prompt(prompt)
-# OUTPUT
-# Cillian Murphy, Florence Pugh
-```
+- **2024-02-20**
+  - **ktrain 0.41.x** is released and removes the `ktrain.text.qa.generative_qa` module.  Our [OnPrem.LLM](https://github.com/amaiya/onprem) package should be used for Generative Question-Answering tasks. See [example notebook](https://amaiya.github.io/onprem/examples_rag.html).
 ----
 
 ### Overview
