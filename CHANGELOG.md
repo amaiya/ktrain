@@ -13,7 +13,9 @@ Most recent releases are shown at the top. Each release shows:
 - N/A
 
 ### changed
-- N/A
+- **Breaking Change**: Removed the `ktrain.text.qa.generative_qa` module.
+  Users should use our [OnPrem.LLM](https://amaiya.github.io/onprem/examples_rag.html)
+  for generative question-answering (#522)
 
 ### fixed:
 - use arrays in `TextPredictor` due to possible issues with `tf.Dataset` (#521)
