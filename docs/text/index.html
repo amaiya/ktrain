@@ -1382,8 +1382,6 @@ Args:
     &#34;&#34;&#34;
     if encoding is None:
         with open(train_filepath, &#34;rb&#34;) as f:
-            # encoding = chardet.detect(f.read())[&#39;encoding&#39;]
-            # encoding = &#39;utf-8&#39; if encoding.lower() in [&#39;ascii&#39;, &#39;utf8&#39;, &#39;utf-8&#39;] else encoding
             encoding = TU.detect_encoding(f.read())
             U.vprint(
                 &#34;detected encoding: %s (if wrong, set manually)&#34; % (encoding),
