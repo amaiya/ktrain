@@ -7,6 +7,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.41.1 (2024-03-02)
+
+### new:
+- N/A
+
+### changed
+- N/A
+
+### fixed:
+- temporarily pinning to `transformers==4.37.2` due to issue (#523) on Google Colab
+
+
 ## 0.41.0 (2024-02-20)
 
 ### new:
