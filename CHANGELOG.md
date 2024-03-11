@@ -7,6 +7,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.41.2 (2024-03-11)
+
+### new:
+- N/A
+
+### changed
+- N/A
+
+### fixed:
+- temporarily pin to `tensorflow<2.16` due to #525
+
+
 ## 0.41.1 (2024-03-02)
 
 ### new:
