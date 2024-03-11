@@ -61,7 +61,7 @@ except ImportError:
 
 if version.parse(tf.__version__) >= version.parse("2.16.0"):
     raise Exception(
-        "Due to breaking changes in Keras 3, ktrain temporarily requires ktrain<2.16. To downlograde: pip install tensorflow==2.15.1"
+        "Due to breaking changes in Keras 3, ktrain temporarily requires tensorflow<2.16. To downlograde: pip install tensorflow==2.15.1"
     )
 
 
