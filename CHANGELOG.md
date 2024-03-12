@@ -16,7 +16,7 @@ Most recent releases are shown at the top. Each release shows:
 - N/A
 
 ### fixed:
-- temporarily pin to `tensorflow<2.16` due to #525
+- Added `tf_keras` to dependencies and set `USE_TF_TF_USE_LEGACY_KERAS` (#525)
 
 
 ## 0.41.1 (2024-03-02)
