@@ -59,10 +59,8 @@ except ImportError:
     warnings.warn(TF_WARNING)
 
 
-# if version.parse(tf.__version__) >= version.parse("2.16.0"):
-# raise Exception(
-# "Due to breaking changes in Keras 3, ktrain temporarily requires tensorflow<2.16. To download: pip install tensorflow==2.15.1"
-# )
+# for continued use of legacy optimizers (via tf_keras)
+os.environ["TF_USE_LEGACY_KERAS"] = "1"
 
 
 # for TF backwards compatibility (e.g., support for TF 2.3.x):
