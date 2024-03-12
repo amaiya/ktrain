@@ -25,6 +25,7 @@ TF_WARNING = (
     + "but non-TensorFlow features in ktrain can still be used. See https://github.com/amaiya/ktrain/blob/master/README.md"
 )
 DISABLE_V2_BEHAVIOR = strtobool(os.environ.get("DISABLE_V2_BEHAVIOR", "0"))
+os.environ["TF_USE_LEGACY_KERAS"] = "1"  # for contiued use of legacy optimizers
 try:
     if DISABLE_V2_BEHAVIOR:
         # TF2-transition
@@ -57,10 +58,6 @@ except ImportError:
     tf = None
     TF_INSTALLED = False
     warnings.warn(TF_WARNING)
-
-
-# for continued use of legacy optimizers (via tf_keras)
-os.environ["TF_USE_LEGACY_KERAS"] = "1"
 
 
 # for TF backwards compatibility (e.g., support for TF 2.3.x):
