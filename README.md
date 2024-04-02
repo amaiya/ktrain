@@ -311,7 +311,7 @@ learner.evaluate(tst, class_names=preproc.get_classes())
 
 1. Make sure pip is up-to-date with: `pip install -U pip`
 
-2. [Install TensorFlow 2](https://www.tensorflow.org/install) if it is not already installed (e.g., `pip install tensorflow`).
+2. [Install TensorFlow 2](https://www.tensorflow.org/install) if it is not already installed (e.g., `pip install tensorflow==2.15.1`).  Note that `tensorflow>=2.16` is not yet supported due to breaking changes in Keras 3.  Keras 3 will be supported in a future version of **ktrain**.
 
 3. Install *ktrain*: `pip install ktrain`
 
@@ -319,9 +319,10 @@ learner.evaluate(tst, class_names=preproc.get_classes())
 The above should be all you need on Linux systems and cloud computing environments like Google Colab and AWS EC2.  If you are using **ktrain** on a **Windows computer**, you can follow these
 [more detailed instructions](https://github.com/amaiya/ktrain/blob/master/FAQ.md#how-do-i-install-ktrain-on-a-windows-machine) that include some extra steps.
 
+If you receive an error such as `model is not an instance of Model`, ensure the version of `tf_keras` installed matches the version of Tensorflow (e.g., `pip install tensorflow==2.15.1 tf_keras==2.15.1`).
+
 #### Notes about TensorFlow Versions
 - As of `tensorflow>=2.11`, you must only use legacy optimizers such as `tf.keras.optimizers.legacy.Adam`.  The newer `tf.keras.optimizers.Optimizer` base class is not supported at this time.  For instance, when using TensorFlow 2.11 and above, please use `tf.keras.optimzers.legacy.Adam()` instead of the string `"adam"` in `model.compile`. **ktrain** does this automatically when using out-of-the-box models (e.g., models from the `transformers` library).
-- If using `tensorflow>=2.16`, you must ensure that `tf_keras` is installed and is of the same version as your TensorFlow version (e.g., `pip install tensorflow==2.16 tf_keras==2.16`). This is currently required to ensure there is access to legacy Keras optimizers. (When doing `pip install ktrain`, `tf_keras` will be automatically installed if not already installed, but will not automatically replace an older, existing version of `tf_keras`. So, manually install the appropriate version of `tf_keras` if you encounter problems.)
 
 #### Additional Notes About Installation
 
