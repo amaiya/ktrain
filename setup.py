@@ -63,7 +63,6 @@ setup(
         "sentencepiece",  #  Added due to breaking change in transformers>=4.0
         "keras_bert>=0.86.0",  # imported in imports with warning and used in 'ktrain.text' ; support for TF 2.3
         "whoosh",  # imported by text.qa module
-        "tf_keras",  # for legacy optimizers
     ],
     extras_require={
         # NOTE: If missing, these libraries below are installed manually on-the-fly when required by an invoked method with appropriate warnings

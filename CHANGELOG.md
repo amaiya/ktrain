@@ -7,6 +7,19 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.41.3 (TBD)
+
+### new:
+- N/A
+
+### changed
+- N/A
+
+### fixed:
+- Removed `tf_keras` as dependencies due to issues in varioius dependencies
+  related to TF 2.16.
+
+
 ## 0.41.2 (2024-03-11)
 
 ### new:
