@@ -311,7 +311,7 @@ learner.evaluate(tst, class_names=preproc.get_classes())
 
 1. Make sure pip is up-to-date with: `pip install -U pip`
 
-2. [Install TensorFlow 2](https://www.tensorflow.org/install) if it is not already installed (e.g., `pip install tensorflow==2.15.1`).  Note that `tensorflow>=2.16` is not yet supported due to breaking changes in Keras 3.
+2. [Install TensorFlow 2](https://www.tensorflow.org/install) if it is not already installed (e.g., `pip install tensorflow==2.15.1`). 
 
 3. Install *ktrain*: `pip install ktrain`
 
@@ -322,7 +322,7 @@ The above should be all you need on Linux systems and cloud computing environmen
 
 #### Notes about TensorFlow Versions
 - As of `tensorflow>=2.11`, you must only use legacy optimizers such as `tf.keras.optimizers.legacy.Adam`.  The newer `tf.keras.optimizers.Optimizer` base class is not supported at this time.  For instance, when using TensorFlow 2.11 and above, please use `tf.keras.optimzers.legacy.Adam()` instead of the string `"adam"` in `model.compile`. **ktrain** does this automatically when using out-of-the-box models (e.g., models from the `transformers` library).
-- On Google Colab, if you receive an error such as `model is not an instance of Model`, ensure the version of `tf_keras` installed exactly matches the version of Tensorflow (e.g., `pip install tensorflow==2.15.1 tf_keras==2.15.1`).
+- Due to breaking changes in TensorFlow 2.16, you will need to install the `tf_keras` package and also set the environment variable `TF_USE_LEGACY_KERAS=True` before importing **ktrain**.
 
 #### Additional Notes About Installation
 

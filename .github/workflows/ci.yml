@@ -24,7 +24,7 @@ jobs:
             pip install -U pip wheel
             pip install -e .
             pip install ipython
-            pip install tensorflow_cpu
+            pip install tensorflow_cpu==2.15.1
             pip install jinja2==3.0.3 # eli5 dep issue
             pip install https://github.com/amaiya/eli5-tf/archive/refs/heads/master.zip
       - name: Show installed pip dependencies
