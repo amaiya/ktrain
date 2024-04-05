@@ -19,7 +19,7 @@ Most recent releases are shown at the top. Each release shows:
 - Removed `tf_keras` as dependencies due to issues in varioius dependencies
   related to TF 2.16 and allow TF to prompt user for it (#528)
 - Removed auto-setting `TF_USE_LEGACY_KERAS`, as it causes problems in `tensorflow<2.16` (#528)
-- Changed `transformers` min version
+- Unpin `transformers` due to incompatibilites with different versions of TensorFlow.
 
 ## 0.41.2 (2024-03-11)
 
