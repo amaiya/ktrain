@@ -7,7 +7,7 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
-## 0.41.3 (TBD)
+## 0.41.3 (2024-04-05)
 
 ### new:
 - N/A
@@ -17,8 +17,8 @@ Most recent releases are shown at the top. Each release shows:
 
 ### fixed:
 - Removed `tf_keras` as dependencies due to issues in varioius dependencies
-  related to TF 2.16.
-
+  related to TF 2.16 and allow TF to prompt user for it (#528)
+- Removed auto-setting `TF_USE_LEGACY_KERAS`, as it causes problems in `tensorflow<2.16` (#528)
 
 ## 0.41.2 (2024-03-11)
 
