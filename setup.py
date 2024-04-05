@@ -23,8 +23,8 @@ all_extras = [
     "causalnlp",  # for tabular.causalinference
     "librosa",  # for text.speech
     "shap",  # for tabular.TabularPredictor.explain
-    "eli5 @ git+https://github@github.com/amaiya/eli5-tf@master#egg=eli5",  # for explain in text/vision
-    "stellargraph @ git+https://github@github.com/amaiya/stellargraph@no_tf_dep_082#egg=stellargraph",  # for graph module
+    # "eli5 @ git+https://github@github.com/amaiya/eli5-tf@master#egg=eli5",  # for explain in text/vision
+    # "stellargraph @ git+https://github@github.com/amaiya/stellargraph@no_tf_dep_082#egg=stellargraph",  # for graph module
 ]
 # not included and checked/requested within-code:
 # 1. bokeh: in TopicModel.visualize_docuemnts
