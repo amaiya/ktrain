@@ -315,6 +315,10 @@ learner.evaluate(tst, class_names=preproc.get_classes())
 
 3. Install *ktrain*: `pip install ktrain`
 
+4. If using `tensorflow>=2.16`:
+  - install **tf_keras** (`pip install tf_keras`)
+  - set the environment variable `TF_USE_LEGACY_KERAS` to true before importing **ktrain** (e.g., add `export TF_USE_LEGACY_KERAS=1` in `.bashrc` for Linux or put `os.environ["TF_USE_LEGACY_KERAS"]="1"` at top of your code).
+
 
 The above should be all you need on Linux systems and cloud computing environments like Google Colab and AWS EC2.  If you are using **ktrain** on a **Windows computer**, you can follow these
 [more detailed instructions](https://github.com/amaiya/ktrain/blob/master/FAQ.md#how-do-i-install-ktrain-on-a-windows-machine) that include some extra steps.
@@ -322,8 +326,7 @@ The above should be all you need on Linux systems and cloud computing environmen
 
 #### Notes about TensorFlow Versions
 - As of `tensorflow>=2.11`, you must only use legacy optimizers such as `tf.keras.optimizers.legacy.Adam`.  The newer `tf.keras.optimizers.Optimizer` base class is not supported at this time.  For instance, when using TensorFlow 2.11 and above, please use `tf.keras.optimzers.legacy.Adam()` instead of the string `"adam"` in `model.compile`. **ktrain** does this automatically when using out-of-the-box models (e.g., models from the `transformers` library).
-- Due to breaking changes in TensorFlow 2.16, you will need to install the `tf_keras` package and also set the environment variable `TF_USE_LEGACY_KERAS=True` before importing **ktrain**.
-- If you're using an older version of TensorFlow (e.g., `tensorflow==2.11`) and receive an error like "*AttributeError: module 'keras.utils' has no attribute 'unpack_x_y_sample_weight'"*, then downgrade transformers as follows: `pip install transormers==4.37.2`.
+- As mentioned above, due to breaking changes in TensorFlow 2.16, you will need to install the `tf_keras` package and also set the environment variable `TF_USE_LEGACY_KERAS=True` before importing **ktrain**.
 
 #### Additional Notes About Installation
 
