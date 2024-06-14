@@ -39,7 +39,7 @@ class TestImageClassification(TestCase):
             classes=["cat", "dog"],
             train_test_names=["train", "valid"],
         )
-        model = vis.image_classifier("pretrained_resnet50", trn, val)
+        model = vis.image_classifier("pretrained_mobilenet", trn, val)
         learner = ktrain.get_learner(
             model=model, train_data=trn, val_data=val, batch_size=1
         )
