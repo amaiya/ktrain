@@ -17,6 +17,7 @@ Most recent releases are shown at the top. Each release shows:
 
 ### fixed:
 - Remove references to `paper-qa` (#530)
+- Reduce memory footprint of `TopicModel.filter` (#531)
 
 
 ## 0.41.3 (2024-04-05)
