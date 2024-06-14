@@ -41,7 +41,7 @@ class TestQA(TestCase):
         top_answer = answers[0]["answer"]
         self.assertEqual(top_answer, "in october of 1997")
 
-    @skip("temporarily disabled")
+    # @skip("temporarily disabled")
     def test_extractor(self):
 
         # data = ['Indeed, risk factors are sex, obesity, genetic factors and mechanical factors (3) .',
@@ -76,7 +76,8 @@ class TestQA(TestCase):
         ]
         from ktrain.text import AnswerExtractor
 
-        ae = AnswerExtractor(framework="pt", device="cpu", quantize=True)
+        # ae = AnswerExtractor(framework="pt", device="cpu", quantize=True)
+        ae = AnswerExtractor()
         import pandas as pd
 
         pd.set_option("display.max_colwidth", None)

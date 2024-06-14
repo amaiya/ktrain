@@ -25,7 +25,7 @@ class TestNERClassification(TestCase):
 
     def test_ner(self):
         model = txt.sequence_tagger(
-            "bilstm-transformer", self.preproc, transformer_model="bert-base-cased"
+            "bilstm-transformer", self.preproc, transformer_model="roberta-base"
         )
         learner = ktrain.get_learner(
             model, train_data=self.trn, val_data=self.val, batch_size=128
