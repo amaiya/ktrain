@@ -292,10 +292,10 @@ def texts_from_df(
 
     # read in train and test data
     train_df = train_df.copy()
-    train_df[text_column].fillna("fillna", inplace=True)
+    train_df[text_column] = train_df[text_column].fillna("fillna")
     if val_df is not None:
         val_df = val_df.copy()
-        val_df[text_column].fillna("fillna", inplace=True)
+        val_df[text_column] = val_df[text_column].fillna("fillna")
     else:
         train_df, val_df = train_test_split(
             train_df, test_size=val_pct, random_state=random_state

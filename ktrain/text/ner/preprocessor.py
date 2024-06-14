@@ -178,13 +178,13 @@ def conll2003_to_df(filepath, encoding="latin1"):
                 if not docstart:
                     sent_id += 1
     df = pd.DataFrame({SENT_COL: sents, WORD_COL: words, TAG_COL: tags})
-    df = df.fillna(method="ffill")
+    df = df.ffill()
     return df
 
 
 def gmb_to_df(filepath, encoding="latin1"):
     df = pd.read_csv(filepath, encoding=encoding)
-    df = df.fillna(method="ffill")
+    df = df.ffill()
     return df
 
 
@@ -234,7 +234,9 @@ class SentenceGetter(object):
                 s[word_column].values.tolist(), s[tag_column].values.tolist()
             )
         ]
-        self.grouped = self.data.groupby(sentence_column).apply(agg_func)
+        self.grouped = self.data.groupby(sentence_column).apply(
+            agg_func, include_groups=False
+        )
         self.sentences = [s for s in self.grouped]
 
     def get_next(self):
