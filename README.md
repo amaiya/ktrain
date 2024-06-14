@@ -345,8 +345,6 @@ pip install causalnlp
 pip install sumy
 # for text.kw.KeywordExtractor
 pip install textblob
-# for text.qa.generative_qa
-pip install paper-qa==2.1.1 langchain==0.0.240
 # for text.generative_ai
 pip install onprem
 ```
