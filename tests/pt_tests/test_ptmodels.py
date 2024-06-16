@@ -275,7 +275,9 @@ print(time.time() - start)
 from ktrain.text.translation import EnglishTranslator
 
 translator = EnglishTranslator(src_lang="zh", device=None, quantize=True)
-src_text = """大流行对世界经济造成了严重破坏。但是，截至2020年6月，美国股票市场持续上涨。"""
+src_text = (
+    """大流行对世界经济造成了严重破坏。但是，截至2020年6月，美国股票市场持续上涨。"""
+)
 start = time.time()
 print(translator.translate(src_text))
 print(time.time() - start)
