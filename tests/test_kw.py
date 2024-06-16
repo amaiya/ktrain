@@ -5,6 +5,7 @@ Tests of ktrain text classification flows
 from unittest import TestCase, main, skip
 
 import numpy as np
+
 import testenv
 
 from ktrain.text.kw import KeywordExtractor

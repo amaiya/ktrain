@@ -5,6 +5,12 @@ Tests of ktrain text classification flows
 from unittest import TestCase, main, skip
 
 import numpy as np
+
+import sys, os, inspect
+
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(currentdir)
+sys.path.insert(0, parentdir)
 import testenv
 
 from ktrain import tabular
@@ -13,7 +19,7 @@ from ktrain import tabular
 def adult_census():
     import pandas as pd
 
-    df = pd.read_csv("resources/tabular_data/adults.csv")
+    df = pd.read_csv("../resources/tabular_data/adults.csv")
     df = df.rename(columns=lambda x: x.strip())
     df = df.applymap(lambda x: x.strip() if isinstance(x, str) else x)
     filter_set = "Doctorate"
