@@ -316,8 +316,8 @@ learner.evaluate(tst, class_names=preproc.get_classes())
 3. Install *ktrain*: `pip install ktrain`
 
 4. If using `tensorflow>=2.16`:
-  - install **tf_keras** (`pip install tf_keras`)
-  - set the environment variable `TF_USE_LEGACY_KERAS` to true before importing **ktrain** (e.g., add `export TF_USE_LEGACY_KERAS=1` in `.bashrc` for Linux or put `os.environ["TF_USE_LEGACY_KERAS"]="1"` at top of your code).
+    a. install **tf_keras**: `pip install tf_keras`
+    b. set the environment variable `TF_USE_LEGACY_KERAS` to true before importing **ktrain**
 
 
 The above should be all you need on Linux systems and cloud computing environments like Google Colab and AWS EC2.  If you are using **ktrain** on a **Windows computer**, you can follow these
