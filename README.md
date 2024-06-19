@@ -326,7 +326,7 @@ The above should be all you need on Linux systems and cloud computing environmen
 
 #### Notes about TensorFlow Versions
 - As of `tensorflow>=2.11`, you must only use legacy optimizers such as `tf.keras.optimizers.legacy.Adam`.  The newer `tf.keras.optimizers.Optimizer` base class is not supported at this time.  For instance, when using TensorFlow 2.11 and above, please use `tf.keras.optimzers.legacy.Adam()` instead of the string `"adam"` in `model.compile`. **ktrain** does this automatically when using out-of-the-box models (e.g., models from the `transformers` library).
-- As mentioned above, due to breaking changes in TensorFlow 2.16, you will need to install the `tf_keras` package and also set the environment variable `TF_USE_LEGACY_KERAS=True` before importing **ktrain**.
+- As mentioned above, due to breaking changes in TensorFlow 2.16, you will need to install the `tf_keras` package and also set the environment variable `TF_USE_LEGACY_KERAS=True` before importing **ktrain** (e.g., add `export TF_USE_LEGACY_KERAS=1` in `.bashrc, add `os.environ['TF_USE_LEGACY_KERAS']="1"` to top of your script, etc.).
 
 #### Additional Notes About Installation
 
