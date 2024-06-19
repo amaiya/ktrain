@@ -311,7 +311,7 @@ learner.evaluate(tst, class_names=preproc.get_classes())
 
 1. Make sure pip is up-to-date with: `pip install -U pip`
 
-2. [Install TensorFlow 2](https://www.tensorflow.org/install) if it is not already installed (e.g., `pip install tensorflow==2.15.1`). 
+2. [Install TensorFlow 2](https://www.tensorflow.org/install) if it is not already installed (e.g., `pip install tensorflow`). 
 
 3. Install *ktrain*: `pip install ktrain`
 
