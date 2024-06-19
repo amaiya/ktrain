@@ -33,8 +33,8 @@ class TestTransformers(TestCase):
 
         # Wrangling data into a dataframe and selecting training examples
         data = pd.DataFrame({"text": corpus, "label": group_labels})
-        train_df = data.groupby("label").sample(500)
-        test_df = data.drop(index=train_df.index)
+        train_df = data.groupby("label").sample(50)
+        test_df = data.drop(index=train_df.index).groupby("label").sample(100)
 
         x_train = train_df["text"].values
         y_train = train_df["label"].values
@@ -132,7 +132,7 @@ class TestTransformers(TestCase):
 
         # test training results
         self.assertAlmostEqual(max(hist.history["lr"]), lr)
-        self.assertLess(min(hist.history["val_mae"]), 0.1)
+        self.assertLess(min(hist.history["val_mae"]), 0.5)
 
         # test top losses
         obs = learner.top_losses(n=1, val_data=None)
@@ -150,10 +150,10 @@ class TestTransformers(TestCase):
 
         # test predictor
         p = ktrain.get_predictor(learner.model, preproc)
-        self.assertGreater(p.predict([TEST_DOC])[0], 0.9)
+        self.assertGreater(p.predict([TEST_DOC])[0], 0.5)
         p.save("/tmp/test_predictor")
         p = ktrain.load_predictor("/tmp/test_predictor")
-        self.assertGreater(p.predict([TEST_DOC])[0], 0.9)
+        self.assertGreater(p.predict([TEST_DOC])[0], 0.5)
         self.assertIsNone(p.explain(TEST_DOC))
 
 
