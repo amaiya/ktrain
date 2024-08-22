@@ -7,6 +7,18 @@ Most recent releases are shown at the top. Each release shows:
 - **Fixed**: Bug fixes that don't change documented behaviour
 
 
+## 0.41.5 (TBD)
+
+### new:
+- N/A
+
+### changed
+- N/A
+
+### fixed:
+- Update `test_lda.py` due to changes in `numpy` (#533)
+
+
 ## 0.41.4 (2024-06-18)
 
 ### new:
