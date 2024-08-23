@@ -316,7 +316,7 @@ learner.evaluate(tst, class_names=preproc.get_classes())
 3. Install *ktrain*: `pip install ktrain`
 
 4. If using `tensorflow>=2.16`:
-    - Install **tf_keras**: `pip install tf_keras` # ensure `tf_keras` version matches `tensorflow` version
+    - Install **tf_keras**: `pip install tf_keras` (*ensure tf_keras version matches tensorflow version*)
     - Set the environment variable `TF_USE_LEGACY_KERAS` to true before importing **ktrain**
 
 
