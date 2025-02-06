@@ -18,6 +18,7 @@ Most recent releases are shown at the top. Each release shows:
 ### fixed:
 - Update `test_lda.py` due to changes in `numpy` (#533)
 - Ensure `TopicModel.filter` returns `pd.DataFrame` if supplied (#534)
+- Remove un-needed print statments (#537)
 
 
 ## 0.41.4 (2024-06-18)
